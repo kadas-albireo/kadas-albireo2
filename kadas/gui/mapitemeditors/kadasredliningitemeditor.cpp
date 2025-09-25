@@ -18,6 +18,7 @@
 #include <qgis/qgssymbollayerutils.h>
 
 #include "kadas/gui/mapitems/kadasgeometryitem.h"
+#include "kadas/gui/mapitems/kadaspointitem.h"
 #include "kadas/gui/mapitemeditors/kadasredliningitemeditor.h"
 
 
@@ -91,57 +92,89 @@ void KadasRedliningItemEditor::setItem( KadasMapItem *item )
 
 void KadasRedliningItemEditor::syncItemToWidget()
 {
-  KadasGeometryItem *geometryItem = dynamic_cast<KadasGeometryItem *>( mItem );
-  if ( !geometryItem )
+  if ( KadasPointItem *pointItem = dynamic_cast<KadasPointItem *>( mItem ) )
   {
-    return;
+    mUi.mSpinBoxSize->blockSignals( true );
+    mUi.mSpinBoxSize->setValue( pointItem->iconSize() );
+    mUi.mSpinBoxSize->blockSignals( false );
+
+    mUi.mToolButtonBorderColor->blockSignals( true );
+    mUi.mToolButtonBorderColor->setColor( pointItem->strokeColor() );
+    mUi.mToolButtonBorderColor->blockSignals( false );
+
+    mUi.mToolButtonFillColor->blockSignals( true );
+    mUi.mToolButtonFillColor->setColor( pointItem->color() );
+    mUi.mToolButtonFillColor->blockSignals( false );
+
+    // mUi.mComboBoxOutlineStyle->blockSignals( true );
+    // mUi.mComboBoxOutlineStyle->setCurrentIndex( mUi.mComboBoxOutlineStyle->findData( static_cast<int>( geometryItem->outline().style() ) ) );
+    // mUi.mComboBoxOutlineStyle->blockSignals( false );
+
+    // mUi.mComboBoxFillStyle->blockSignals( true );
+    // mUi.mComboBoxFillStyle->setCurrentIndex( mUi.mComboBoxFillStyle->findData( static_cast<int>( geometryItem->fill().style() ) ) );
+    // mUi.mComboBoxFillStyle->blockSignals( false );
   }
+  else if ( KadasGeometryItem *geometryItem = dynamic_cast<KadasGeometryItem *>( mItem ) )
+  {
+    mUi.mSpinBoxSize->blockSignals( true );
+    mUi.mSpinBoxSize->setValue( geometryItem->outline().width() );
+    mUi.mSpinBoxSize->blockSignals( false );
 
-  mUi.mSpinBoxSize->blockSignals( true );
-  mUi.mSpinBoxSize->setValue( geometryItem->outline().width() );
-  mUi.mSpinBoxSize->blockSignals( false );
+    mUi.mToolButtonBorderColor->blockSignals( true );
+    mUi.mToolButtonBorderColor->setColor( geometryItem->outline().color() );
+    mUi.mToolButtonBorderColor->blockSignals( false );
 
-  mUi.mToolButtonBorderColor->blockSignals( true );
-  mUi.mToolButtonBorderColor->setColor( geometryItem->outline().color() );
-  mUi.mToolButtonBorderColor->blockSignals( false );
+    mUi.mToolButtonFillColor->blockSignals( true );
+    mUi.mToolButtonFillColor->setColor( geometryItem->fill().color() );
+    mUi.mToolButtonFillColor->blockSignals( false );
 
-  mUi.mToolButtonFillColor->blockSignals( true );
-  mUi.mToolButtonFillColor->setColor( geometryItem->fill().color() );
-  mUi.mToolButtonFillColor->blockSignals( false );
+    mUi.mComboBoxOutlineStyle->blockSignals( true );
+    mUi.mComboBoxOutlineStyle->setCurrentIndex( mUi.mComboBoxOutlineStyle->findData( static_cast<int>( geometryItem->outline().style() ) ) );
+    mUi.mComboBoxOutlineStyle->blockSignals( false );
 
-  mUi.mComboBoxOutlineStyle->blockSignals( true );
-  mUi.mComboBoxOutlineStyle->setCurrentIndex( mUi.mComboBoxOutlineStyle->findData( static_cast<int>( geometryItem->outline().style() ) ) );
-  mUi.mComboBoxOutlineStyle->blockSignals( false );
-
-  mUi.mComboBoxFillStyle->blockSignals( true );
-  mUi.mComboBoxFillStyle->setCurrentIndex( mUi.mComboBoxFillStyle->findData( static_cast<int>( geometryItem->fill().style() ) ) );
-  mUi.mComboBoxFillStyle->blockSignals( false );
+    mUi.mComboBoxFillStyle->blockSignals( true );
+    mUi.mComboBoxFillStyle->setCurrentIndex( mUi.mComboBoxFillStyle->findData( static_cast<int>( geometryItem->fill().style() ) ) );
+    mUi.mComboBoxFillStyle->blockSignals( false );
+  }
 }
 
 void KadasRedliningItemEditor::syncWidgetToItem()
 {
-  KadasGeometryItem *geometryItem = dynamic_cast<KadasGeometryItem *>( mItem );
-  if ( !geometryItem )
+  if ( KadasPointItem *pointItem = dynamic_cast<KadasPointItem *>( mItem ) )
   {
-    return;
+    int size = mUi.mSpinBoxSize->value();
+    QColor outlineColor = mUi.mToolButtonBorderColor->color();
+    QColor fillColor = mUi.mToolButtonFillColor->color();
+    // Qt::PenStyle lineStyle = static_cast<Qt::PenStyle>( mUi.mComboBoxOutlineStyle->itemData( mUi.mComboBoxOutlineStyle->currentIndex() ).toInt() );
+    // Qt::BrushStyle brushStyle = static_cast<Qt::BrushStyle>( mUi.mComboBoxFillStyle->itemData( mUi.mComboBoxFillStyle->currentIndex() ).toInt() );
+
+    pointItem->blockSignals( true );
+    pointItem->setColor( fillColor );
+    pointItem->setStrokeColor( outlineColor );
+    pointItem->setIconSize( size );
+    pointItem->blockSignals( false );
+    emit pointItem->changed();
+    emit pointItem->propertyChanged();
   }
+  else if ( KadasGeometryItem *geometryItem = dynamic_cast<KadasGeometryItem *>( mItem ) )
+  {
+    int outlineWidth = mUi.mSpinBoxSize->value();
+    QColor outlineColor = mUi.mToolButtonBorderColor->color();
+    QColor fillColor = mUi.mToolButtonFillColor->color();
+    Qt::PenStyle lineStyle = static_cast<Qt::PenStyle>( mUi.mComboBoxOutlineStyle->itemData( mUi.mComboBoxOutlineStyle->currentIndex() ).toInt() );
+    Qt::BrushStyle brushStyle = static_cast<Qt::BrushStyle>( mUi.mComboBoxFillStyle->itemData( mUi.mComboBoxFillStyle->currentIndex() ).toInt() );
 
-  int outlineWidth = mUi.mSpinBoxSize->value();
-  QColor outlineColor = mUi.mToolButtonBorderColor->color();
-  QColor fillColor = mUi.mToolButtonFillColor->color();
-  Qt::PenStyle lineStyle = static_cast<Qt::PenStyle>( mUi.mComboBoxOutlineStyle->itemData( mUi.mComboBoxOutlineStyle->currentIndex() ).toInt() );
-  Qt::BrushStyle brushStyle = static_cast<Qt::BrushStyle>( mUi.mComboBoxFillStyle->itemData( mUi.mComboBoxFillStyle->currentIndex() ).toInt() );
+    geometryItem->blockSignals( true );
+    geometryItem->setOutline( QPen( outlineColor, outlineWidth, lineStyle ) );
+    geometryItem->setFill( QBrush( fillColor, brushStyle ) );
 
-  geometryItem->blockSignals( true );
-  geometryItem->setOutline( QPen( outlineColor, outlineWidth, lineStyle ) );
-  geometryItem->setFill( QBrush( fillColor, brushStyle ) );
-
-  geometryItem->setIconSize( 10 + 2 * outlineWidth );
-  geometryItem->setIconOutline( QPen( outlineColor, outlineWidth / 4, lineStyle ) );
-  geometryItem->setIconFill( QBrush( fillColor, brushStyle ) );
-  geometryItem->blockSignals( false );
-  emit geometryItem->changed();
-  emit geometryItem->propertyChanged();
+    geometryItem->setIconSize( 10 + 2 * outlineWidth );
+    geometryItem->setIconOutline( QPen( outlineColor, outlineWidth / 4, lineStyle ) );
+    geometryItem->setIconFill( QBrush( fillColor, brushStyle ) );
+    geometryItem->blockSignals( false );
+    emit geometryItem->changed();
+    emit geometryItem->propertyChanged();
+  }
 }
 
 KadasRedliningItemEditor::~KadasRedliningItemEditor()
