@@ -19,6 +19,7 @@
 #include <QInputDialog>
 #include <QMenu>
 
+#include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgsapplication.h>
 #include <qgis/qgslinestring.h>
 #include <qgis/qgsmapcanvas.h>
@@ -119,7 +120,7 @@ void KadasItemContextMenuActions::createWaypointFromPin()
   KadasGpxWaypointItem *waypoint = new KadasGpxWaypointItem();
   waypoint->setName( pin->name() );
   QgsCoordinateTransform crst( pin->crs(), waypoint->crs(), QgsProject::instance()->transformContext() );
-  waypoint->setPosition( KadasItemPos::fromPoint( crst.transform( pin->position() ) ) );
+  waypoint->setPoint( QgsPoint( crst.transform( pin->position() ) ) );
   KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::RoutesLayer )->addItem( waypoint );
 
   KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::RoutesLayer )->triggerRepaint();
