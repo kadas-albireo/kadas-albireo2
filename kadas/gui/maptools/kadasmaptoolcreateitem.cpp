@@ -44,6 +44,7 @@ KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, std::uniqu
 KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItemInterface *interface, KadasItemLayer *layer )
   : QgsMapTool( canvas )
   , mInterface( std::move( std::unique_ptr<KadasMapItemInterface>( interface ) ) )
+  , mLayer( layer )
 {}
 
 
