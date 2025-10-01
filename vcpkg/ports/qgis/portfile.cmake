@@ -31,7 +31,6 @@ vcpkg_from_github(
   3dfrustumfix.patch
   3dchunkloaderconcurrency.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1278
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
-  mounteverest.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1278
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
 )
 
