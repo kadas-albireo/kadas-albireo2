@@ -28,8 +28,6 @@ vcpkg_from_github(
   sipcxx17.patch
   # nlohmann-json.patch
   qgis-debug.patch
-  62506.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1262
-  sync_2d_3d.patch # https://github.com/qgis/QGIS/pull/62530
   3dfrustumfix.patch
   3dchunkloaderconcurrency.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1278
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
