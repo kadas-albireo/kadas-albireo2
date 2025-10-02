@@ -4256,17 +4256,17 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
 <context>
     <name>KadasMapToolCreateItem</name>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="105"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="106"/>
         <source>Undo</source>
         <translation>Rückgängig</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="113"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="114"/>
         <source>Redo</source>
         <translation>Wiederholen</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="122"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="123"/>
         <source>Close</source>
         <translation>Schliessen</translation>
     </message>

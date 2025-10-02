@@ -4255,17 +4255,17 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasMapToolCreateItem</name>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="105"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="106"/>
         <source>Undo</source>
         <translation>Annulla</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="113"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="114"/>
         <source>Redo</source>
         <translation>Ripeti</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="122"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="123"/>
         <source>Close</source>
         <translation>Chiudi</translation>
     </message>
