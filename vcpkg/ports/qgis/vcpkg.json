@@ -54,6 +54,7 @@
     "qt5-multimedia",
     "qt5-svg",
     "qt5-tools",
+    "qt5-webengine",
     {
       "name": "qt5-winextras",
       "platform": "windows"
