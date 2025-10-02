@@ -10,7 +10,7 @@ jobs:
     steps:
       # use a specific user rather than standard bot to be able to bypass protection rule
       # https://github.com/orgs/community/discussions/13836
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           token: ${{ secrets.GH_GEONINJA_TOKEN }}
 
