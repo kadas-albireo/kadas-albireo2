@@ -1096,7 +1096,6 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
   }
   else if ( layer->type() == Qgis::LayerType::Vector )
   {
-
     // collect factories from registered data providers
     QList<const QgsMapLayerConfigWidgetFactory *> providerFactories = QgsGui::providerGuiRegistry()->mapLayerConfigWidgetFactories( layer );
     //providerFactories.append( mMapLayerPanelFactories );
@@ -1119,9 +1118,9 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
     //  qDebug() << "Option:" << optionName;
     //}
     //qDebug() << "test:" << optionWidgetName;
-    for (int i = 0; i < stackedWidget->count(); i++)
+    for ( int i = 0; i < stackedWidget->count(); i++ )
     {
-      qDebug() << "Stacked ption:"<< stackedWidget->widget( i )->objectName();
+      qDebug() << "Stacked ption:" << stackedWidget->widget( i )->objectName();
     }
 
     panelIndices << dialogPanelIndex( "mOptsPage_AttributesForm", stackedWidget );
@@ -1135,10 +1134,10 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
       optionsWidget->item( panelIndices[i] )->setHidden( true );
     }
 
-     for ( const QgsMapLayerConfigWidgetFactory *factory : std::as_const( providerFactories ) )
-     {
-       dialog.addPropertiesPageFactory( factory );
-     }
+    for ( const QgsMapLayerConfigWidgetFactory *factory : std::as_const( providerFactories ) )
+    {
+      dialog.addPropertiesPageFactory( factory );
+    }
 
     for ( QgsMapLayerConfigWidgetFactory *factory : std::as_const( mMapLayerPanelFactories ) )
     {

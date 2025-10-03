@@ -182,6 +182,4 @@ if(UNIX)
   )
 endif()
 
-#if (MSVC)
-#  add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
-#endif()
+# if (MSVC) add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>") endif()

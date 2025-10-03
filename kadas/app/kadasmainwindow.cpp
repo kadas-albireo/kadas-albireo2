@@ -1036,7 +1036,7 @@ void KadasMainWindow::zoomToLayerExtent()
 
 void KadasMainWindow::showSourceSelectDialog( const QString &providerName )
 {
-  // e.g ogr provider 
+  // e.g ogr provider
   QgsSourceSelectProvider *provider = QgsGui::instance()->sourceSelectProviderRegistry()->providerByName( providerName );
   if ( !provider )
   {

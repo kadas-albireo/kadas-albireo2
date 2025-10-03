@@ -697,7 +697,7 @@ QList<QgsMapLayer *> KadasAppLayerHandling::addSublayers( const QList<QgsProvide
       if ( layerName != baseName && !layerName.isEmpty() && !baseName.isEmpty() )
       {
         QString fullName = QString::fromUtf8( "%1 — %2" ).arg( baseName, layerName );
-        layer->setName( fullName ); 
+        layer->setName( fullName );
       }
       else if ( !layerName.isEmpty() )
         layer->setName( layerName );
@@ -711,14 +711,14 @@ QList<QgsMapLayer *> KadasAppLayerHandling::addSublayers( const QList<QgsProvide
       symbol3d->setExtrusionHeight( 10.f );
       QgsVectorLayer3DRenderer *renderer = new QgsVectorLayer3DRenderer( symbol3d );
       layer->setRenderer3D( renderer );
-      
-        
-//symbol.setAltitudeClamping(Qgis.AltitudeClamping.Absolute)  # type: ignore
-//symbol.setAltitudeBinding(Qgis.AltitudeBinding.Vertex)  # type: ignore
-//renderer = QgsVectorLayer3DRenderer()
-//renderer.setSymbol(symbol)
-//layer= iface.activeLayer()
-//layer.setRenderer3D(renderer)
+
+
+      //symbol.setAltitudeClamping(Qgis.AltitudeClamping.Absolute)  # type: ignore
+      //symbol.setAltitudeBinding(Qgis.AltitudeBinding.Vertex)  # type: ignore
+      //renderer = QgsVectorLayer3DRenderer()
+      //renderer.setSymbol(symbol)
+      //layer= iface.activeLayer()
+      //layer.setRenderer3D(renderer)
 
       QgsProject::instance()->addMapLayer( layer.release() );
     }
