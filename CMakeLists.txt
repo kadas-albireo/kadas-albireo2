@@ -142,19 +142,6 @@ if(BUILD_TESTING)
   add_subdirectory(tests)
 endif()
 
-option(INSTALL_DEMO_DATA "Install settings and templates" OFF)
-if(INSTALL_DEMO_DATA)
-  install(FILES "share/settings_patch.ini" DESTINATION "share/kadas/")
-  install(DIRECTORY "share/project_templates" DESTINATION "share/kadas/")
-endif()
-
-install(
-  DIRECTORY "share/"
-  DESTINATION "share/kadas/"
-  PATTERN "share/settings_patch.ini" EXCLUDE
-  PATTERN "share/project_templates" EXCLUDE
-)
-
 if(WITH_VCPKG)
   message("Install VCPKG deps")
   include(VcpkgInstallDeps)
