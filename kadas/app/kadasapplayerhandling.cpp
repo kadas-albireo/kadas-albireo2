@@ -54,6 +54,13 @@
 #include <qgis/qgsmaplayerutils.h>
 #include <qgis/qgsfieldformatter.h>
 #include <qgis/qgsabstractdatabaseproviderconnection.h>
+
+#include <qgis/qgis_3d.h>
+#include <qgis/qgs3dsymbolwidget.h>
+#include <qgis/qgspolygon3dsymbol.h>
+
+#include <qgis/qgsvectorlayer3drenderer.h>
+
 #include <qgis/qgsprovidersublayersdialog.h>
 #include <qgis/qgsvectortileutils.h>
 
@@ -688,11 +695,31 @@ QList<QgsMapLayer *> KadasAppLayerHandling::addSublayers( const QList<QgsProvide
     else
     {
       if ( layerName != baseName && !layerName.isEmpty() && !baseName.isEmpty() )
-        layer->setName( QStringLiteral( "%1 — %2" ).arg( baseName, layerName ) );
+      {
+        QString fullName = QString::fromUtf8( "%1 — %2" ).arg( baseName, layerName );
+        layer->setName( fullName ); 
+      }
       else if ( !layerName.isEmpty() )
         layer->setName( layerName );
       else if ( !baseName.isEmpty() )
         layer->setName( baseName );
+
+      QgsPhongMaterialSettings materialSettings;
+      materialSettings.setAmbient( Qt::lightGray );
+      QgsPolygon3DSymbol *symbol3d = new QgsPolygon3DSymbol;
+      symbol3d->setMaterialSettings( materialSettings.clone() );
+      symbol3d->setExtrusionHeight( 10.f );
+      QgsVectorLayer3DRenderer *renderer = new QgsVectorLayer3DRenderer( symbol3d );
+      layer->setRenderer3D( renderer );
+      
+        
+//symbol.setAltitudeClamping(Qgis.AltitudeClamping.Absolute)  # type: ignore
+//symbol.setAltitudeBinding(Qgis.AltitudeBinding.Vertex)  # type: ignore
+//renderer = QgsVectorLayer3DRenderer()
+//renderer.setSymbol(symbol)
+//layer= iface.activeLayer()
+//layer.setRenderer3D(renderer)
+
       QgsProject::instance()->addMapLayer( layer.release() );
     }
 

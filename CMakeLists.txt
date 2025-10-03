@@ -181,3 +181,7 @@ if(UNIX)
     DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/128x128/apps
   )
 endif()
+
+#if (MSVC)
+#  add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+#endif()

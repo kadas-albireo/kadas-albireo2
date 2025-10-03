@@ -1036,6 +1036,7 @@ void KadasMainWindow::zoomToLayerExtent()
 
 void KadasMainWindow::showSourceSelectDialog( const QString &providerName )
 {
+  // e.g ogr provider 
   QgsSourceSelectProvider *provider = QgsGui::instance()->sourceSelectProviderRegistry()->providerByName( providerName );
   if ( !provider )
   {
@@ -1045,6 +1046,12 @@ void KadasMainWindow::showSourceSelectDialog( const QString &providerName )
   dialog->setMapCanvas( mMapCanvas );
   dialog->setAttribute( Qt::WA_DeleteOnClose );
   QString sourceProvider = provider->providerKey();
+
+  auto fn = [=]( const QString &uri, const QString &layerName, const QString &providerKey ) {
+    kApp->addVectorLayer( uri, layerName, !providerKey.isEmpty() ? providerKey : sourceProvider );
+    qDebug() << "uri:" << uri << "layerName" << layerName << "providerKey:" << providerKey;
+  };
+
   // TODO
   //  connect(dialog, &QgsAbstractDataSourceWidget::addDatabaseLayers, kApp, &KadasApplication::addDatabaseLayers);
   //  connect(dialog, &QgsAbstractDataSourceWidget::addMeshLayer, kApp, &KadasApplication::addMeshLayer);

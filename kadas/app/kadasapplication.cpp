@@ -33,6 +33,8 @@
 #include <qgis/qgsdataitem.h>
 #include <qgis/qgsdatumtransformdialog.h>
 #include <qgis/qgsgdalutils.h>
+#include <qgis/qgsgui.h>
+#include <qgis/qgsproviderguiregistry.h>
 #include <qgis/qgsguiutils.h>
 #include <qgis/qgslayertree.h>
 #include <qgis/qgslayertreemapcanvasbridge.h>
@@ -51,6 +53,7 @@
 #include <qgis/qgspluginlayerregistry.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsproviderregistry.h>
+#include <qgis/qgsvectorlayer3drendererwidget.h>
 #include <qgis/qgsproviderutils.h>
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgsrasterlayerproperties.h>
@@ -431,6 +434,8 @@ void KadasApplication::init()
 
   // Setup layout item widgets
   QgsLayoutGuiUtils::registerGuiForKnownItemTypes( mMainWindow->mapCanvas() );
+
+  registerMapLayerPropertiesFactory( new QgsVectorLayer3DRendererWidgetFactory( this ) );
 
   // Init KadasItemLayerRegistry
   KadasItemLayerRegistry::init();
@@ -1091,12 +1096,34 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
   }
   else if ( layer->type() == Qgis::LayerType::Vector )
   {
+
+    // collect factories from registered data providers
+    QList<const QgsMapLayerConfigWidgetFactory *> providerFactories = QgsGui::providerGuiRegistry()->mapLayerConfigWidgetFactories( layer );
+    //providerFactories.append( mMapLayerPanelFactories );
+
+
+    qDebug() << "count factories: " << providerFactories.count();
+
+
     QgsVectorLayerProperties dialog( mainWindow()->mapCanvas(), mainWindow()->messageBar(), static_cast<QgsVectorLayer *>( layer ), mMainWindow );
     // Omit some panels
     QStackedWidget *stackedWidget = dialog.findChild<QStackedWidget *>( "mOptionsStackedWidget" );
     QListWidget *optionsWidget = dialog.findChild<QListWidget *>( "mOptionsListWidget" );
     dialog.findChild<QLineEdit *>( "mSearchLineEdit" )->setHidden( true );
     QList<int> panelIndices;
+
+    //QString optionWidgetName = "dregf";
+    //for ( int i = 0; i < optionsWidget->count(); ++i )
+    //{
+    //  QString optionName = optionsWidget->item( i )->data( Qt::UserRole ).toString();
+    //  qDebug() << "Option:" << optionName;
+    //}
+    //qDebug() << "test:" << optionWidgetName;
+    for (int i = 0; i < stackedWidget->count(); i++)
+    {
+      qDebug() << "Stacked ption:"<< stackedWidget->widget( i )->objectName();
+    }
+
     panelIndices << dialogPanelIndex( "mOptsPage_AttributesForm", stackedWidget );
     panelIndices << dialogPanelIndex( "mOptsPage_AuxiliaryStorage", stackedWidget );
     panelIndices << dialogPanelIndex( "mOptsPage_Variables", stackedWidget );
@@ -1107,6 +1134,11 @@ void KadasApplication::showLayerProperties( QgsMapLayer *layer )
     {
       optionsWidget->item( panelIndices[i] )->setHidden( true );
     }
+
+     for ( const QgsMapLayerConfigWidgetFactory *factory : std::as_const( providerFactories ) )
+     {
+       dialog.addPropertiesPageFactory( factory );
+     }
 
     for ( QgsMapLayerConfigWidgetFactory *factory : std::as_const( mMapLayerPanelFactories ) )
     {
