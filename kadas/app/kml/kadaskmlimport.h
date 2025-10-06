@@ -28,46 +28,45 @@ class QuaZip;
 class QgsMapCanvas;
 class QgsRedliningLayer;
 
-class KadasKMLImport : public QObject
-{
-    Q_OBJECT
-  public:
-    bool importFile( const QString &filename, QString &errMsg );
+class KadasKMLImport : public QObject {
+  Q_OBJECT
+public:
+  bool importFile(const QString &filename, QString &errMsg);
 
-  private:
-    struct StyleData
-    {
-        int outlineSize = 1;
-        Qt::PenStyle outlineStyle = Qt::SolidLine;
-        Qt::BrushStyle fillStyle = Qt::SolidPattern;
-        QColor outlineColor = Qt::black;
-        QColor fillColor = Qt::white;
-        bool isLabel = false;
-        QColor labelColor = Qt::black;
-        double labelScale = 1.;
-        QString icon;
-        QPointF hotSpot;
-    };
-    struct TileData
-    {
-        QString iconHref;
-        QgsRectangle bbox;
-        QSize size;
-    };
-    struct OverlayData
-    {
-        QgsRectangle bbox;
-        QList<TileData> tiles;
-    };
+private:
+  struct StyleData {
+    int outlineSize = 1;
+    Qt::PenStyle outlineStyle = Qt::SolidLine;
+    Qt::BrushStyle fillStyle = Qt::SolidPattern;
+    QColor outlineColor = Qt::black;
+    QColor fillColor = Qt::white;
+    bool isLabel = false;
+    QColor labelColor = Qt::black;
+    double labelScale = 1.;
+    QString icon;
+    QPointF hotSpot;
+  };
+  struct TileData {
+    QString iconHref;
+    QgsRectangle bbox;
+    QSize size;
+  };
+  struct OverlayData {
+    QgsRectangle bbox;
+    QList<TileData> tiles;
+  };
 
-    bool importDocument( const QString &filename, const QDomDocument &doc, QString &errMsg, QuaZip *zip = nullptr );
-    void buildVSIVRT( const QString &name, OverlayData &overlayData, QuaZip *kmzZip ) const;
-    QVector<QgsPoint> parseCoordinates( const QDomElement &geomEl ) const;
-    StyleData parseStyle( const QDomElement &styleEl, QuaZip *zip ) const;
-    QList<QgsAbstractGeometry *> parseGeometries( const QDomElement &containerEl, int &types, bool *extrude = nullptr );
-    QMap<QString, QString> parseExtendedData( const QDomElement &placemarkEl );
-    QColor parseColor( const QString &abgr ) const;
+  bool importDocument(const QString &filename, const QDomDocument &doc,
+                      QString &errMsg, QuaZip *zip = nullptr);
+  void buildVSIVRT(const QString &name, OverlayData &overlayData,
+                   QuaZip *kmzZip) const;
+  QVector<QgsPoint> parseCoordinates(const QDomElement &geomEl) const;
+  StyleData parseStyle(const QDomElement &styleEl, QuaZip *zip) const;
+  QList<QgsAbstractGeometry *> parseGeometries(const QDomElement &containerEl,
+                                               int &types,
+                                               bool *extrude = nullptr);
+  QMap<QString, QString> parseExtendedData(const QDomElement &placemarkEl);
+  QColor parseColor(const QString &abgr) const;
 };
-
 
 #endif // KADASKMLIMPORT_H

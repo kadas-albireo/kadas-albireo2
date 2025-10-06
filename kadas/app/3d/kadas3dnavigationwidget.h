@@ -23,15 +23,15 @@ class QwtCompass;
 
 #include <ui_3dnavigationwidget.h>
 
-class Kadas3DNavigationWidget : public QWidget, private Ui::Q3DNavigationWidget
-{
-    Q_OBJECT
-  public:
-    Kadas3DNavigationWidget( Qgs3DMapCanvas *canvas, QWidget *parent = nullptr );
+class Kadas3DNavigationWidget : public QWidget,
+                                private Ui::Q3DNavigationWidget {
+  Q_OBJECT
+public:
+  Kadas3DNavigationWidget(Qgs3DMapCanvas *canvas, QWidget *parent = nullptr);
 
-  private:
-    Qgs3DMapCanvas *m3DMapCanvas = nullptr;
-    QStandardItemModel *mCameraInfoItemModel = nullptr;
+private:
+  Qgs3DMapCanvas *m3DMapCanvas = nullptr;
+  QStandardItemModel *mCameraInfoItemModel = nullptr;
 };
 
 #endif // KADAS3DNAVIGATIONWIDGET_H

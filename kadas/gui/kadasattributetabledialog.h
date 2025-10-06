@@ -19,8 +19,8 @@
 
 #include <QDockWidget>
 
-#include "kadas/gui/kadas_gui.h"
 #include "kadas/core/kadassettingstree.h"
+#include "kadas/gui/kadas_gui.h"
 
 #include <qgis/qgssettingsentryenumflag.h>
 
@@ -33,38 +33,45 @@ class QgsVectorLayer;
 class QgsVectorLayerSelectionManager;
 class QgsDockableWidgetHelper;
 
+class KADAS_GUI_EXPORT KadasAttributeTableDialog : public QDockWidget {
+  Q_OBJECT
 
-class KADAS_GUI_EXPORT KadasAttributeTableDialog : public QDockWidget
-{
-    Q_OBJECT
+public:
+  static const inline QgsSettingsEntryEnumFlag<Qt::DockWidgetArea>
+      *settingsAttributeTableLocation =
+          new QgsSettingsEntryEnumFlag<Qt::DockWidgetArea>(
+              QStringLiteral("attribute-dock-location"),
+              KadasSettingsTree::sTreeKadas,
+              Qt::DockWidgetArea::NoDockWidgetArea) SIP_SKIP;
 
-  public:
-    static const inline QgsSettingsEntryEnumFlag<Qt::DockWidgetArea> *settingsAttributeTableLocation = new QgsSettingsEntryEnumFlag<Qt::DockWidgetArea>( QStringLiteral( "attribute-dock-location" ), KadasSettingsTree::sTreeKadas, Qt::DockWidgetArea::NoDockWidgetArea ) SIP_SKIP;
+  KadasAttributeTableDialog(
+      QgsVectorLayer *layer, QgsMapCanvas *canvas, QgsMessageBar *messageBar,
+      QMainWindow *parent = nullptr,
+      Qt::DockWidgetArea area = Qt::DockWidgetArea::RightDockWidgetArea);
+  ~KadasAttributeTableDialog();
 
-    KadasAttributeTableDialog( QgsVectorLayer *layer, QgsMapCanvas *canvas, QgsMessageBar *messageBar, QMainWindow *parent = nullptr, Qt::DockWidgetArea area = Qt::DockWidgetArea::RightDockWidgetArea );
-    ~KadasAttributeTableDialog();
+  QDomElement writeXml(QDomDocument &document);
+  static void createFromXml(const QDomElement &element, QgsMapCanvas *canvas,
+                            QgsMessageBar *messageBar, QMainWindow *parent);
 
-    QDomElement writeXml( QDomDocument &document );
-    static void createFromXml( const QDomElement &element, QgsMapCanvas *canvas, QgsMessageBar *messageBar, QMainWindow *parent );
+protected:
+  void showEvent(QShowEvent *ev) override;
 
-  protected:
-    void showEvent( QShowEvent *ev ) override;
+private:
+  QgsMapCanvas *mCanvas = nullptr;
+  QgsMessageBar *mMessageBar = nullptr;
+  QgsVectorLayer *mLayer = nullptr;
+  QgsVectorLayerSelectionManager *mFeatureSelectionManager = nullptr;
+  QMainWindow *mMainWindow = nullptr;
 
-  private:
-    QgsMapCanvas *mCanvas = nullptr;
-    QgsMessageBar *mMessageBar = nullptr;
-    QgsVectorLayer *mLayer = nullptr;
-    QgsVectorLayerSelectionManager *mFeatureSelectionManager = nullptr;
-    QMainWindow *mMainWindow = nullptr;
-
-  private slots:
-    void storeDockLocation( Qt::DockWidgetArea area );
-    void deselectAll();
-    void invertSelection();
-    void panToSelected();
-    void selectAll();
-    void selectByExpression();
-    void zoomToSelected();
+private slots:
+  void storeDockLocation(Qt::DockWidgetArea area);
+  void deselectAll();
+  void invertSelection();
+  void panToSelected();
+  void selectAll();
+  void selectByExpression();
+  void zoomToSelected();
 };
 
 #endif // KADASATTRIBUTETABLEDIALOG_H

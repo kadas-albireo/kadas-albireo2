@@ -35,41 +35,42 @@ class QgsRasterLayer;
 class QgsVectorLayer;
 class KadasPinItem;
 
+class KadasMapIdentifyDialog : public QDialog {
+  Q_OBJECT
 
-class KadasMapIdentifyDialog : public QDialog
-{
-    Q_OBJECT
+public:
+  static void popup(QgsMapCanvas *canvas, const QgsPointXY &mapPos);
 
-  public:
-    static void popup( QgsMapCanvas *canvas, const QgsPointXY &mapPos );
+private:
+  KadasMapIdentifyDialog(QgsMapCanvas *canvas, const QgsPointXY &mapPos);
+  ~KadasMapIdentifyDialog();
 
-  private:
-    KadasMapIdentifyDialog( QgsMapCanvas *canvas, const QgsPointXY &mapPos );
-    ~KadasMapIdentifyDialog();
+  static const int sGeometryRole;
+  static const int sGeometryCrsRole;
+  static QPointer<KadasMapIdentifyDialog> sInstance;
 
-    static const int sGeometryRole;
-    static const int sGeometryCrsRole;
-    static QPointer<KadasMapIdentifyDialog> sInstance;
+  QgsMapCanvas *mCanvas = nullptr;
+  QTreeWidget *mTreeWidget = nullptr;
+  QgsGeometryRubberBand *mRubberband = nullptr;
+  QPointer<KadasPinItem> mClickPosPin;
+  QPointer<KadasPinItem> mResultPin;
+  QList<QgsAbstractGeometry *> mGeometries;
+  QTimer *mTimeoutTimer = nullptr;
+  QNetworkReply *mRasterIdentifyReply = nullptr;
+  QMap<QString, QTreeWidgetItem *> mLayerTreeItemMap;
 
-    QgsMapCanvas *mCanvas = nullptr;
-    QTreeWidget *mTreeWidget = nullptr;
-    QgsGeometryRubberBand *mRubberband = nullptr;
-    QPointer<KadasPinItem> mClickPosPin;
-    QPointer<KadasPinItem> mResultPin;
-    QList<QgsAbstractGeometry *> mGeometries;
-    QTimer *mTimeoutTimer = nullptr;
-    QNetworkReply *mRasterIdentifyReply = nullptr;
-    QMap<QString, QTreeWidgetItem *> mLayerTreeItemMap;
+  void collectInfo(const QgsPointXY &mapPos);
+  void
+  addPluginLayerResults(KadasPluginLayer *pLayer,
+                        const QList<KadasPluginLayer::IdentifyResult> &results);
+  void addVectorLayerResult(QgsVectorLayer *vLayer, const QgsFeature &feature);
+  void addRasterIdentifyResult(QgsRasterLayer *rLayer,
+                               const QgsRasterIdentifyResult &result);
 
-    void collectInfo( const QgsPointXY &mapPos );
-    void addPluginLayerResults( KadasPluginLayer *pLayer, const QList<KadasPluginLayer::IdentifyResult> &results );
-    void addVectorLayerResult( QgsVectorLayer *vLayer, const QgsFeature &feature );
-    void addRasterIdentifyResult( QgsRasterLayer *rLayer, const QgsRasterIdentifyResult &result );
-
-  private slots:
-    void clear();
-    void onItemClicked( QTreeWidgetItem *item, int /*col*/ );
-    void rasterIdentifyFinished();
+private slots:
+  void clear();
+  void onItemClicked(QTreeWidgetItem *item, int /*col*/);
+  void rasterIdentifyFinished();
 };
 
 #endif // KADASMAPIDENTIFYDIALOG_H

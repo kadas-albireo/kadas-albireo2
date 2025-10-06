@@ -17,44 +17,43 @@
 #ifndef KADASMAPITEMTOOLTIP_H
 #define KADASMAPITEMTOOLTIP_H
 
-#include <QTimer>
 #include <QTextBrowser>
+#include <QTimer>
 
 #include "kadas/gui/kadas_gui.h"
 
 class QgsMapCanvas;
 class KadasMapItem;
 
-class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextEdit
-{
-    Q_OBJECT
-  public:
-    KadasMapItemTooltip( QgsMapCanvas *canvas );
-    void updateForPos( const QPoint &canvasPos );
-    QVariant loadResource( int type, const QUrl &url ) override;
+class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextEdit {
+  Q_OBJECT
+public:
+  KadasMapItemTooltip(QgsMapCanvas *canvas);
+  void updateForPos(const QPoint &canvasPos);
+  QVariant loadResource(int type, const QUrl &url) override;
 
-  public slots:
-    void clear();
+public slots:
+  void clear();
 
-  protected:
-    void enterEvent( QEvent * ) override;
-    void mousePressEvent( QMouseEvent *ev ) override;
-    void mouseMoveEvent( QMouseEvent *ev ) override;
-    void mouseReleaseEvent( QMouseEvent *ev ) override;
+protected:
+  void enterEvent(QEvent *) override;
+  void mousePressEvent(QMouseEvent *ev) override;
+  void mouseMoveEvent(QMouseEvent *ev) override;
+  void mouseReleaseEvent(QMouseEvent *ev) override;
 
-  private:
-    static constexpr int sWidth = 320;
-    static constexpr int sHeight = 240;
+private:
+  static constexpr int sWidth = 320;
+  static constexpr int sHeight = 240;
 
-    QTimer mShowTimer;
-    QTimer mHideTimer;
-    QPoint mPos;
-    QgsMapCanvas *mCanvas = nullptr;
-    bool mMouseMoved = false;
-    const KadasMapItem *mItem = nullptr;
+  QTimer mShowTimer;
+  QTimer mHideTimer;
+  QPoint mPos;
+  QgsMapCanvas *mCanvas = nullptr;
+  bool mMouseMoved = false;
+  const KadasMapItem *mItem = nullptr;
 
-  private slots:
-    void positionAndShow();
+private slots:
+  void positionAndShow();
 };
 
 #endif // KADASMAPITEMTOOLTIP_H

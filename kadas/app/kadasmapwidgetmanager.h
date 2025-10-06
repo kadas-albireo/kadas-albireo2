@@ -26,30 +26,29 @@ class QMainWindow;
 class QgsMapCanvas;
 class KadasMapWidget;
 
-class KadasMapWidgetManager : public QObject
-{
-    Q_OBJECT
-  public:
-    KadasMapWidgetManager( QgsMapCanvas *masterCanvas, QMainWindow *parent = 0 );
-    ~KadasMapWidgetManager();
-    const QList<KadasMapWidget *> &mapWidgets() { return mMapWidgets; }
+class KadasMapWidgetManager : public QObject {
+  Q_OBJECT
+public:
+  KadasMapWidgetManager(QgsMapCanvas *masterCanvas, QMainWindow *parent = 0);
+  ~KadasMapWidgetManager();
+  const QList<KadasMapWidget *> &mapWidgets() { return mMapWidgets; }
 
-  public slots:
-    KadasMapWidget *addMapWidget( const QString &id );
-    KadasMapWidget *addMapWidget() { return addMapWidget( QString() ); }
-    void removeMapWidget( const QString &id );
-    void clearMapWidgets();
+public slots:
+  KadasMapWidget *addMapWidget(const QString &id);
+  KadasMapWidget *addMapWidget() { return addMapWidget(QString()); }
+  void removeMapWidget(const QString &id);
+  void clearMapWidgets();
 
-  private:
-    QMainWindow *mMainWindow;
-    QgsMapCanvas *mMasterCanvas;
-    QList<KadasMapWidget *> mMapWidgets;
-    QAction *mActionAddMapWidget;
+private:
+  QMainWindow *mMainWindow;
+  QgsMapCanvas *mMasterCanvas;
+  QList<KadasMapWidget *> mMapWidgets;
+  QAction *mActionAddMapWidget;
 
-  private slots:
-    void mapWidgetDestroyed();
-    void writeProjectSettings( QDomDocument &doc );
-    void readProjectSettings( const QDomDocument &doc );
+private slots:
+  void mapWidgetDestroyed();
+  void writeProjectSettings(QDomDocument &doc);
+  void readProjectSettings(const QDomDocument &doc);
 };
 
 #endif // KADASMAPWIDGETMANAGER_H

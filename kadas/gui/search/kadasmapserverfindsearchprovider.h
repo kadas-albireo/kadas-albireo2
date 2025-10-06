@@ -14,7 +14,6 @@
  *                                                                         *
  ***************************************************************************/
 
-
 #ifndef KADASMAPSERVERFINDSEARCHPROVIDER_H
 #define KADASMAPSERVERFINDSEARCHPROVIDER_H
 
@@ -28,27 +27,29 @@
 
 class QgsMapCanvas;
 
-class KADAS_GUI_EXPORT KadasMapServerFindSearchProvider : public QgsLocatorFilter
-{
-    Q_OBJECT
-  public:
-    KadasMapServerFindSearchProvider( QgsMapCanvas *mapCanvas );
+class KADAS_GUI_EXPORT KadasMapServerFindSearchProvider
+    : public QgsLocatorFilter {
+  Q_OBJECT
+public:
+  KadasMapServerFindSearchProvider(QgsMapCanvas *mapCanvas);
 
-    virtual QgsLocatorFilter *clone() const override;
-    QString name() const override { return QStringLiteral( "server-find" ); }
-    QString displayName() const override { return tr( "Server Find" ); }
-    virtual Priority priority() const override { return Priority::Medium; }
-    virtual void fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback ) override;
-    virtual void triggerResult( const QgsLocatorResult &result ) override;
-    virtual void clearPreviousResults() override;
+  virtual QgsLocatorFilter *clone() const override;
+  QString name() const override { return QStringLiteral("server-find"); }
+  QString displayName() const override { return tr("Server Find"); }
+  virtual Priority priority() const override { return Priority::Medium; }
+  virtual void fetchResults(const QString &string,
+                            const QgsLocatorContext &context,
+                            QgsFeedback *feedback) override;
+  virtual void triggerResult(const QgsLocatorResult &result) override;
+  virtual void clearPreviousResults() override;
 
-  private:
-    QgsMapCanvas *mMapCanvas = nullptr;
-    static const int sSearchTimeout;
-    static const int sResultCountLimit;
-    static const QByteArray sGeoAdminUrl;
+private:
+  QgsMapCanvas *mMapCanvas = nullptr;
+  static const int sSearchTimeout;
+  static const int sResultCountLimit;
+  static const QByteArray sGeoAdminUrl;
 
-    QString mGeometryItemId;
+  QString mGeometryItemId;
 };
 
 #endif // KADASMAPSERVERFINDSEARCHPROVIDER_H

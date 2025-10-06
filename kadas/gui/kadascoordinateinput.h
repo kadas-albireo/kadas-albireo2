@@ -27,38 +27,37 @@
 class QComboBox;
 class QLineEdit;
 
+class KADAS_GUI_EXPORT KadasCoordinateInput : public QWidget {
+  Q_OBJECT
 
-class KADAS_GUI_EXPORT KadasCoordinateInput : public QWidget
-{
-    Q_OBJECT
+public:
+  KadasCoordinateInput(QWidget *parent);
 
-  public:
-    KadasCoordinateInput( QWidget *parent );
+  const QgsPointXY &getCoordinate() const { return mCoo; }
+  const QgsCoordinateReferenceSystem &getCrs() const { return mCrs; }
+  bool isEmpty() const { return mEmpty; }
 
-    const QgsPointXY &getCoordinate() const { return mCoo; }
-    const QgsCoordinateReferenceSystem &getCrs() const { return mCrs; }
-    bool isEmpty() const { return mEmpty; }
+  void setCoordinate(const QgsPointXY &coo,
+                     const QgsCoordinateReferenceSystem &crs);
 
-    void setCoordinate( const QgsPointXY &coo, const QgsCoordinateReferenceSystem &crs );
+private:
+  static const int sFormatRole = Qt::UserRole + 1;
+  static const int sAuthidRole = Qt::UserRole + 2;
+  QgsPointXY mCoo;
+  QgsCoordinateReferenceSystem mCrs;
 
-  private:
-    static const int sFormatRole = Qt::UserRole + 1;
-    static const int sAuthidRole = Qt::UserRole + 2;
-    QgsPointXY mCoo;
-    QgsCoordinateReferenceSystem mCrs;
+  bool mEmpty = true;
+  QLineEdit *mLineEdit;
+  QComboBox *mCrsCombo;
 
-    bool mEmpty = true;
-    QLineEdit *mLineEdit;
-    QComboBox *mCrsCombo;
+signals:
+  void coordinateEdited();
+  void coordinateChanged();
 
-  signals:
-    void coordinateEdited();
-    void coordinateChanged();
-
-  private slots:
-    void entryChanged();
-    void entryEdited();
-    void crsChanged();
+private slots:
+  void entryChanged();
+  void entryEdited();
+  void crsChanged();
 };
 
 #endif // KADASCOORDINATEINPUT_H

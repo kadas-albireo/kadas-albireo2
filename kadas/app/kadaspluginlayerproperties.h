@@ -25,27 +25,28 @@ class QGroupBox;
 class QgsScaleRangeWidget;
 class KadasPluginLayer;
 
+class KadasPluginLayerRenderingPropertiesWidget
+    : public QgsMapLayerConfigWidget {
+  Q_OBJECT
 
-class KadasPluginLayerRenderingPropertiesWidget : public QgsMapLayerConfigWidget
-{
-    Q_OBJECT
+public:
+  explicit KadasPluginLayerRenderingPropertiesWidget(KadasPluginLayer *layer,
+                                                     QgsMapCanvas *canvas,
+                                                     QWidget *parent = nullptr);
 
-  public:
-    explicit KadasPluginLayerRenderingPropertiesWidget( KadasPluginLayer *layer, QgsMapCanvas *canvas, QWidget *parent = nullptr );
+public slots:
+  void apply() override;
 
-  public slots:
-    void apply() override;
-
-  private:
-    QGroupBox *mGroupBox = nullptr;
-    QgsScaleRangeWidget *mScaleRangeWidget = nullptr;
+private:
+  QGroupBox *mGroupBox = nullptr;
+  QgsScaleRangeWidget *mScaleRangeWidget = nullptr;
 };
 
-class KadasPluginLayerProperties : public KadasLayerPropertiesDialog
-{
-    Q_OBJECT
-  public:
-    KadasPluginLayerProperties( KadasPluginLayer *layer, QgsMapCanvas *canvas, QWidget *parent = nullptr );
+class KadasPluginLayerProperties : public KadasLayerPropertiesDialog {
+  Q_OBJECT
+public:
+  KadasPluginLayerProperties(KadasPluginLayer *layer, QgsMapCanvas *canvas,
+                             QWidget *parent = nullptr);
 };
 
 #endif // KADASPLUGINLAYERPROPERTIES_H

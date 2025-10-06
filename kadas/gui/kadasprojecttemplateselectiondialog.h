@@ -25,28 +25,30 @@
 class QDir;
 class QFileIconProvider;
 
-class KADAS_GUI_EXPORT KadasProjectTemplateSelectionDialog : public QDialog, private Ui::KadasProjectTemplateSelectionDialogBase
-{
-    Q_OBJECT
-  public:
-    KadasProjectTemplateSelectionDialog( QWidget *parent = nullptr );
+class KADAS_GUI_EXPORT KadasProjectTemplateSelectionDialog
+    : public QDialog,
+      private Ui::KadasProjectTemplateSelectionDialogBase {
+  Q_OBJECT
+public:
+  KadasProjectTemplateSelectionDialog(QWidget *parent = nullptr);
 
-  signals:
-    void templateSelected( const QString &templateFile, const QUrl &templateUrl );
+signals:
+  void templateSelected(const QString &templateFile, const QUrl &templateUrl);
 
-  private:
-    QAbstractButton *mCreateButton = nullptr;
+private:
+  QAbstractButton *mCreateButton = nullptr;
 
-    void populateFileTree( const QDir &dir, QTreeWidgetItem *parent, const QFileIconProvider &iconProvider );
+  void populateFileTree(const QDir &dir, QTreeWidgetItem *parent,
+                        const QFileIconProvider &iconProvider);
 
-    static constexpr int sItemUrlRole = Qt::UserRole + 1;
-    static constexpr int sFilePathRole = Qt::UserRole + 2;
+  static constexpr int sItemUrlRole = Qt::UserRole + 1;
+  static constexpr int sFilePathRole = Qt::UserRole + 2;
 
-  private slots:
-    void itemClicked( QTreeWidgetItem *item, int column );
-    void itemDoubleClicked( QTreeWidgetItem *item, int column );
-    void createProject();
-    void parseServiceReply();
+private slots:
+  void itemClicked(QTreeWidgetItem *item, int column);
+  void itemDoubleClicked(QTreeWidgetItem *item, int column);
+  void createProject();
+  void parseServiceReply();
 };
 
 #endif // KADASPROJECTTEMPLATESELECTIONDIALOG_H

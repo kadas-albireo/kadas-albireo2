@@ -23,56 +23,49 @@
 
 class KadasSymbolItem;
 
+class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasMapToolCreateItem {
+  Q_OBJECT
+public:
+  KadasMapToolMinMax(QgsMapCanvas *mapCanvas, QAction *actionViewshed,
+                     QAction *actionProfile);
+  ~KadasMapToolMinMax();
 
-class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasMapToolCreateItem
-{
-    Q_OBJECT
-  public:
-    KadasMapToolMinMax( QgsMapCanvas *mapCanvas, QAction *actionViewshed, QAction *actionProfile );
-    ~KadasMapToolMinMax();
+  enum class FilterType { FilterRect, FilterPoly, FilterCircle };
+  Q_ENUM(FilterType)
 
-    enum class FilterType
-    {
-      FilterRect,
-      FilterPoly,
-      FilterCircle
-    };
-    Q_ENUM( FilterType )
+  void setFilterType(FilterType filterType);
+  void canvasPressEvent(QgsMapMouseEvent *e) override;
+  void canvasMoveEvent(QgsMapMouseEvent *e) override;
+  void canvasReleaseEvent(QgsMapMouseEvent *e) override;
 
-    void setFilterType( FilterType filterType );
-    void canvasPressEvent( QgsMapMouseEvent *e ) override;
-    void canvasMoveEvent( QgsMapMouseEvent *e ) override;
-    void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
+private slots:
+  void requestPick();
+  void drawFinished();
 
-  private slots:
-    void requestPick();
-    void drawFinished();
+private:
+  FilterType mFilterType = FilterType::FilterRect;
+  QComboBox *mFilterTypeCombo = nullptr;
+  QPointer<KadasSymbolItem> mPinMin;
+  QPointer<KadasSymbolItem> mPinMax;
+  bool mPickFeature = false;
+  QAction *mActionViewshed = nullptr;
+  QAction *mActionProfile = nullptr;
 
-  private:
-    FilterType mFilterType = FilterType::FilterRect;
-    QComboBox *mFilterTypeCombo = nullptr;
-    QPointer<KadasSymbolItem> mPinMin;
-    QPointer<KadasSymbolItem> mPinMax;
-    bool mPickFeature = false;
-    QAction *mActionViewshed = nullptr;
-    QAction *mActionProfile = nullptr;
-
-    void showContextMenu( KadasMapItem *item ) const;
+  void showContextMenu(KadasMapItem *item) const;
 };
 
+class KADAS_GUI_EXPORT KadasMapToolMinMaxItemInterface
+    : public KadasMapItemInterface {
+public:
+  KadasMapToolMinMaxItemInterface(QgsMapCanvas *mapCanvas)
+      : KadasMapItemInterface(), mCanvas(mapCanvas) {}
+  KadasMapItem *createItem() const override;
+  void setFilterType(KadasMapToolMinMax::FilterType filterType);
 
-class KADAS_GUI_EXPORT KadasMapToolMinMaxItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasMapToolMinMaxItemInterface( QgsMapCanvas *mapCanvas )
-      : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
-    KadasMapItem *createItem() const override;
-    void setFilterType( KadasMapToolMinMax::FilterType filterType );
-
-  private:
-    QgsMapCanvas *mCanvas = nullptr;
-    KadasMapToolMinMax::FilterType mFilterType = KadasMapToolMinMax::FilterType::FilterRect;
+private:
+  QgsMapCanvas *mCanvas = nullptr;
+  KadasMapToolMinMax::FilterType mFilterType =
+      KadasMapToolMinMax::FilterType::FilterRect;
 };
-
 
 #endif // KADASMAPTOOLMINMAX_H

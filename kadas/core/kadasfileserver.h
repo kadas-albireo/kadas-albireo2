@@ -18,25 +18,25 @@
 
 #include "kadas/core/kadas_core.h"
 
-class KADAS_CORE_EXPORT KadasFileServer : public QTcpServer
-{
-    Q_OBJECT
-  public:
-    KadasFileServer( const QString &topdir, const QString &host = "", int port = 0 );
-    const QString &getHost() const { return mHost; }
-    int getPort() const { return mPort; }
+class KADAS_CORE_EXPORT KadasFileServer : public QTcpServer {
+  Q_OBJECT
+public:
+  KadasFileServer(const QString &topdir, const QString &host = "",
+                  int port = 0);
+  const QString &getHost() const { return mHost; }
+  int getPort() const { return mPort; }
 
-    QString getFilesTopDir() const { return mTopdir; }
-    void setFilesTopDir( const QString &topDir );
+  QString getFilesTopDir() const { return mTopdir; }
+  void setFilesTopDir(const QString &topDir);
 
-  private:
-    QByteArray genHeaders( int code );
+private:
+  QByteArray genHeaders(int code);
 
-    QString mHost;
-    int mPort;
-    QString mTopdir;
+  QString mHost;
+  int mPort;
+  QString mTopdir;
 
-  private slots:
-    void handleConnection();
-    void sendReply( QTcpSocket *socket );
+private slots:
+  void handleConnection();
+  void sendReply(QTcpSocket *socket);
 };

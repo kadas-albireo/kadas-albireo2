@@ -19,64 +19,72 @@
 
 #include "kadas/gui/mapitems/kadasrectangleitembase.h"
 
+class KADAS_GUI_EXPORT KadasPictureItem : public KadasRectangleItemBase {
+  Q_OBJECT
+  Q_PROPERTY(QString filePath READ filePath WRITE setFilePath)
 
-class KADAS_GUI_EXPORT KadasPictureItem : public KadasRectangleItemBase
-{
-    Q_OBJECT
-    Q_PROPERTY( QString filePath READ filePath WRITE setFilePath )
+public:
+  KadasPictureItem(const QgsCoordinateReferenceSystem &crs);
+  ~KadasPictureItem();
+  void setup(const QString &path, const KadasItemPos &fallbackPos,
+             bool ignoreExiv = false, double offsetX = 0, double offsetY = 50,
+             int width = 0, int height = 0);
 
-  public:
-    KadasPictureItem( const QgsCoordinateReferenceSystem &crs );
-    ~KadasPictureItem();
-    void setup( const QString &path, const KadasItemPos &fallbackPos, bool ignoreExiv = false, double offsetX = 0, double offsetY = 50, int width = 0, int height = 0 );
+  const QString &filePath() const { return mFilePath; }
+  void setFilePath(const QString &filePath);
 
-    const QString &filePath() const { return mFilePath; }
-    void setFilePath( const QString &filePath );
+  QString itemName() const override { return tr("Picture"); }
 
-    QString itemName() const override { return tr( "Picture" ); }
-
-    QImage symbolImage() const override { return mImage; }
+  QImage symbolImage() const override { return mImage; }
 
 #ifndef SIP_RUN
-    QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
+  QString asKml(const QgsRenderContext &context,
+                QuaZip *kmzZip = nullptr) const override;
 #endif
 
-    void onDoubleClick( const QgsMapSettings &mapSettings ) override;
+  void onDoubleClick(const QgsMapSettings &mapSettings) override;
 
+  struct KADAS_GUI_EXPORT State : KadasRectangleItemBase::State {
+    void assign(const KadasMapItem::State *other) override {
+      *this = *static_cast<const State *>(other);
+    }
+    State *clone() const override SIP_FACTORY { return new State(*this); }
+    QJsonObject serialize() const override;
+    bool deserialize(const QJsonObject &json) override;
+  };
+  void setState(const KadasMapItem::State *state) override;
 
-    struct KADAS_GUI_EXPORT State : KadasRectangleItemBase::State
-    {
-        void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
-        State *clone() const override SIP_FACTORY { return new State( *this ); }
-        QJsonObject serialize() const override;
-        bool deserialize( const QJsonObject &json ) override;
-    };
-    void setState( const KadasMapItem::State *state ) override;
+protected:
+  KadasMapItem *_clone() const override SIP_FACTORY {
+    return new KadasPictureItem(crs());
+  }
+  State *createEmptyState() const override SIP_FACTORY { return new State(); }
+  void renderPrivate(QgsRenderContext &context, const QPointF &center,
+                     const QRect &rect, double dpiScale) const override;
+  void editPrivate(const KadasMapPos &newPoint,
+                   const QgsMapSettings &mapSettings) override;
 
-  protected:
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasPictureItem( crs() ); }
-    State *createEmptyState() const override SIP_FACTORY { return new State(); }
-    void renderPrivate( QgsRenderContext &context, const QPointF &center, const QRect &rect, double dpiScale ) const override;
-    void editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override;
+private:
+  QImage readImage(double dpiScale = 1) const;
+  enum AttribIds { AttrX, AttrY };
+  QString mFilePath;
+  QImage mImage;
 
-  private:
-    QImage readImage( double dpiScale = 1 ) const;
-    enum AttribIds
-    {
-      AttrX,
-      AttrY
-    };
-    QString mFilePath;
-    QImage mImage;
+  static constexpr int sFramePadding = 4;
+  static constexpr int sArrowWidth = 6;
 
-    static constexpr int sFramePadding = 4;
-    static constexpr int sArrowWidth = 6;
+  State *state() { return static_cast<State *>(mState); }
 
-    State *state() { return static_cast<State *>( mState ); }
-
-    static bool readGeoPos( const QString &filePath, const QgsCoordinateReferenceSystem &destCrs, KadasItemPos &cameraPos, QList<KadasItemPos> &footprint, KadasItemPos &cameraTarget );
-    static double parseExifRational( const QString &rational );
-    static QgsPoint findTerrainIntersection( const QgsPoint &cameraPos, QgsPoint nearPos, QgsPoint farPos, const QgsCoordinateReferenceSystem &crs );
+  static bool readGeoPos(const QString &filePath,
+                         const QgsCoordinateReferenceSystem &destCrs,
+                         KadasItemPos &cameraPos,
+                         QList<KadasItemPos> &footprint,
+                         KadasItemPos &cameraTarget);
+  static double parseExifRational(const QString &rational);
+  static QgsPoint
+  findTerrainIntersection(const QgsPoint &cameraPos, QgsPoint nearPos,
+                          QgsPoint farPos,
+                          const QgsCoordinateReferenceSystem &crs);
 };
 
 #endif // KADASPICTUREITEM_H

@@ -20,20 +20,21 @@
 
 #include "qgsshadowsettings.h"
 
-class KadasShadowRenderingSettingsWidget : public QWidget, private Ui::ShadowRenderingSettingsWidget
-{
-    Q_OBJECT
+class KadasShadowRenderingSettingsWidget
+    : public QWidget,
+      private Ui::ShadowRenderingSettingsWidget {
+  Q_OBJECT
 
-  public:
-    //! Constructor
-    explicit KadasShadowRenderingSettingsWidget( QWidget *parent = nullptr );
+public:
+  //! Constructor
+  explicit KadasShadowRenderingSettingsWidget(QWidget *parent = nullptr);
 
-    //! Sets the shadow settings in the current widget UI
-    void setShadowSettings( const QgsShadowSettings &skyboxSettings );
-    //! Returns the shadow settings from the widget UI
-    QgsShadowSettings toShadowSettings();
-  public slots:
-    void onDirectionalLightsCountChanged( int newCount );
+  //! Sets the shadow settings in the current widget UI
+  void setShadowSettings(const QgsShadowSettings &skyboxSettings);
+  //! Returns the shadow settings from the widget UI
+  QgsShadowSettings toShadowSettings();
+public slots:
+  void onDirectionalLightsCountChanged(int newCount);
 };
 
 #endif // SHADOWRENDERINGSETTINGSWIDGET_H

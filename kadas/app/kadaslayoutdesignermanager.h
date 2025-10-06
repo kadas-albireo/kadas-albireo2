@@ -23,20 +23,18 @@
 class QgsPrintLayout;
 class KadasLayoutDesignerDialog;
 
+class KadasLayoutDesignerManager : public QObject {
+  Q_OBJECT
+public:
+  static KadasLayoutDesignerManager *instance();
 
-class KadasLayoutDesignerManager : public QObject
-{
-    Q_OBJECT
-  public:
-    static KadasLayoutDesignerManager *instance();
+  void openDesigner(QgsPrintLayout *layout);
+  void closeAllDesigners();
 
-    void openDesigner( QgsPrintLayout *layout );
-    void closeAllDesigners();
+private:
+  KadasLayoutDesignerManager() = default;
 
-  private:
-    KadasLayoutDesignerManager() = default;
-
-    QList<QObject *> mOpenDialogs;
+  QList<QObject *> mOpenDialogs;
 };
 
 #endif // KADASLAYOUTDESIGNERMANAGER_H

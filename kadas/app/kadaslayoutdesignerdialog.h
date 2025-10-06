@@ -48,333 +48,342 @@ class QgsPrintLayout;
 class KadasLayoutAppMenuProvider;
 class KadasAppLayoutDesignerInterface;
 
-class KadasLayoutDesignerDialog : public QMainWindow, public Ui::KadasLayoutDesignerBase
-{
-    Q_OBJECT
-
-  public:
-    KadasLayoutDesignerDialog( QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::WindowFlags() );
-
-    /**
-     * Returns the designer interface for the dialog.
-     */
-    KadasAppLayoutDesignerInterface *iface();
-
-    /**
-     * Returns the current layout associated with the designer.
-     * \see setCurrentLayout()
-     */
-    QgsPrintLayout *currentLayout();
-
-    /**
-     * Returns the layout view utilized by the designer.
-     */
-    QgsLayoutView *view();
-
-    /**
-     * Sets the current \a layout to edit in the designer.
-     * \see currentLayout()
-     */
-    void setCurrentLayout( QgsPrintLayout *layout );
-
-    /**
-     * Shows the configuration widget for the specified layout \a item.
-     *
-     * If \a bringPanelToFront is true, then the item properties panel will be automatically
-     * shown and raised to the top of the interface.
-     */
-    void showItemOptions( QgsLayoutItem *item, bool bringPanelToFront = true );
-
-    /**
-     * Selects the specified \a items.
-     */
-    void selectItems( const QList<QgsLayoutItem *> &items );
-
-    /**
-     * Returns the designer's message bar.
-     */
-    QgsMessageBar *messageBar();
-
-    /**
-     * Sets a section \a title, to use to update the dialog title to display
-     * the currently edited section.
-     */
-    void setSectionTitle( const QString &title );
-
-    /**
-     * Returns the dialog's guide manager widget, if it exists.
-     */
-    QgsLayoutGuideWidget *guideWidget();
-
-    /**
-     * Toggles the visibility of the guide manager dock widget.
-     */
-    void showGuideDock( bool show );
-
-  public slots:
-
-    /**
-     * Opens the dialog, and sets default view.
-     */
-    void open();
-
-    /**
-     * Raise, unminimize and activate this window.
-     */
-    void activate();
-
-    /**
-     * Toggles whether or not the rulers should be \a visible.
-     */
-    void showRulers( bool visible );
-
-    /**
-     * Toggles whether the page grid should be \a visible.
-     */
-    void showGrid( bool visible );
-
-    /**
-     * Toggles whether the item bounding boxes should be \a visible.
-     */
-    void showBoxes( bool visible );
-
-    /**
-     * Toggles whether the layout pages should be \a visible.
-     */
-    void showPages( bool visible );
-
-    /**
-     * Toggles whether snapping to the page grid is \a enabled.
-     */
-    void snapToGrid( bool enabled );
-
-    /**
-     * Toggles whether the page guides should be \a visible.
-     */
-    void showGuides( bool visible );
+class KadasLayoutDesignerDialog : public QMainWindow,
+                                  public Ui::KadasLayoutDesignerBase {
+  Q_OBJECT
+
+public:
+  KadasLayoutDesignerDialog(QWidget *parent = nullptr,
+                            Qt::WindowFlags flags = Qt::WindowFlags());
+
+  /**
+   * Returns the designer interface for the dialog.
+   */
+  KadasAppLayoutDesignerInterface *iface();
+
+  /**
+   * Returns the current layout associated with the designer.
+   * \see setCurrentLayout()
+   */
+  QgsPrintLayout *currentLayout();
+
+  /**
+   * Returns the layout view utilized by the designer.
+   */
+  QgsLayoutView *view();
+
+  /**
+   * Sets the current \a layout to edit in the designer.
+   * \see currentLayout()
+   */
+  void setCurrentLayout(QgsPrintLayout *layout);
+
+  /**
+   * Shows the configuration widget for the specified layout \a item.
+   *
+   * If \a bringPanelToFront is true, then the item properties panel will be
+   * automatically shown and raised to the top of the interface.
+   */
+  void showItemOptions(QgsLayoutItem *item, bool bringPanelToFront = true);
+
+  /**
+   * Selects the specified \a items.
+   */
+  void selectItems(const QList<QgsLayoutItem *> &items);
+
+  /**
+   * Returns the designer's message bar.
+   */
+  QgsMessageBar *messageBar();
+
+  /**
+   * Sets a section \a title, to use to update the dialog title to display
+   * the currently edited section.
+   */
+  void setSectionTitle(const QString &title);
+
+  /**
+   * Returns the dialog's guide manager widget, if it exists.
+   */
+  QgsLayoutGuideWidget *guideWidget();
+
+  /**
+   * Toggles the visibility of the guide manager dock widget.
+   */
+  void showGuideDock(bool show);
+
+public slots:
+
+  /**
+   * Opens the dialog, and sets default view.
+   */
+  void open();
+
+  /**
+   * Raise, unminimize and activate this window.
+   */
+  void activate();
+
+  /**
+   * Toggles whether or not the rulers should be \a visible.
+   */
+  void showRulers(bool visible);
+
+  /**
+   * Toggles whether the page grid should be \a visible.
+   */
+  void showGrid(bool visible);
+
+  /**
+   * Toggles whether the item bounding boxes should be \a visible.
+   */
+  void showBoxes(bool visible);
+
+  /**
+   * Toggles whether the layout pages should be \a visible.
+   */
+  void showPages(bool visible);
+
+  /**
+   * Toggles whether snapping to the page grid is \a enabled.
+   */
+  void snapToGrid(bool enabled);
+
+  /**
+   * Toggles whether the page guides should be \a visible.
+   */
+  void showGuides(bool visible);
 
-    /**
-     * Toggles whether snapping to the page guides is \a enabled.
-     */
-    void snapToGuides( bool enabled );
-
-    /**
-     * Toggles whether snapping to the item guides ("smart" guides) is \a enabled.
-     */
-    void snapToItems( bool enabled );
-
-    /**
-     * Forces the layout, and all items contained within it, to refresh. For instance, this causes maps to redraw
-     * and rebuild cached images, html items to reload their source url, and attribute tables
-     * to refresh their contents. Calling this also triggers a recalculation of all data defined
-     * attributes within the layout.
-     */
-    void refreshLayout();
-
-    /**
-     * Pastes items from the clipboard to the current layout.
-     * \see pasteInPlace()
-     */
-    void paste();
+  /**
+   * Toggles whether snapping to the page guides is \a enabled.
+   */
+  void snapToGuides(bool enabled);
 
-    /**
-     * Pastes item (in place) from the clipboard to the current layout.
-     * \see paste()
-     */
-    void pasteInPlace();
+  /**
+   * Toggles whether snapping to the item guides ("smart" guides) is \a enabled.
+   */
+  void snapToItems(bool enabled);
 
-  signals:
+  /**
+   * Forces the layout, and all items contained within it, to refresh. For
+   * instance, this causes maps to redraw and rebuild cached images, html items
+   * to reload their source url, and attribute tables to refresh their contents.
+   * Calling this also triggers a recalculation of all data defined attributes
+   * within the layout.
+   */
+  void refreshLayout();
 
-    /**
-     * Emitted when the dialog is about to close.
-     */
-    void aboutToClose();
-
-  protected:
-    void closeEvent( QCloseEvent * ) override;
-
-  private slots:
-
-    void setTitle( const QString &title );
-
-    void itemTypeAdded( int id );
-    void statusZoomCombo_currentIndexChanged( int index );
-    void statusZoomCombo_zoomEntered();
-    void sliderZoomChanged( int value );
-
-    void updateStatusZoom();
-    void updateStatusCursorPos( QPointF position );
-
-    void toggleFullScreen( bool enabled );
-
-    void addPages();
-    void statusMessageReceived( const QString &message );
-    void undoRedoOccurredForItems( const QSet<QString> &itemUuids );
-    void saveAsTemplate();
-    void addItemsFromTemplate();
-    void newLayout();
-    void renameLayout();
-    void deleteLayout();
-    void print();
-    void exportToRaster();
-    void exportToPdf();
+  /**
+   * Pastes items from the clipboard to the current layout.
+   * \see pasteInPlace()
+   */
+  void paste();
 
-    void pageSetup();
+  /**
+   * Pastes item (in place) from the clipboard to the current layout.
+   * \see paste()
+   */
+  void pasteInPlace();
 
-    void updateWindowTitle();
+signals:
 
-    void backgroundTaskCountChanged( int total );
+  /**
+   * Emitted when the dialog is about to close.
+   */
+  void aboutToClose();
 
-  private:
-    static bool sInitializedRegistry;
+protected:
+  void closeEvent(QCloseEvent *) override;
+
+private slots:
+
+  void setTitle(const QString &title);
+
+  void itemTypeAdded(int id);
+  void statusZoomCombo_currentIndexChanged(int index);
+  void statusZoomCombo_zoomEntered();
+  void sliderZoomChanged(int value);
 
-    KadasAppLayoutDesignerInterface *mInterface = nullptr;
+  void updateStatusZoom();
+  void updateStatusCursorPos(QPointF position);
 
-    QgsPrintLayout *mLayout = nullptr;
+  void toggleFullScreen(bool enabled);
 
-    QgsMessageBar *mMessageBar = nullptr;
+  void addPages();
+  void statusMessageReceived(const QString &message);
+  void undoRedoOccurredForItems(const QSet<QString> &itemUuids);
+  void saveAsTemplate();
+  void addItemsFromTemplate();
+  void newLayout();
+  void renameLayout();
+  void deleteLayout();
+  void print();
+  void exportToRaster();
+  void exportToPdf();
 
-    QActionGroup *mToolsActionGroup = nullptr;
+  void pageSetup();
 
-    QgsLayoutView *mView = nullptr;
-    QgsLayoutRuler *mHorizontalRuler = nullptr;
-    QgsLayoutRuler *mVerticalRuler = nullptr;
-    QWidget *mRulerLayoutFix = nullptr;
+  void updateWindowTitle();
 
-    //! Combobox in status bar which shows/adjusts current zoom level
-    QComboBox *mStatusZoomCombo = nullptr;
-    QSlider *mStatusZoomSlider = nullptr;
+  void backgroundTaskCountChanged(int total);
 
-    //! Labels in status bar which shows current mouse position
-    QLabel *mStatusCursorXLabel = nullptr;
-    QLabel *mStatusCursorYLabel = nullptr;
-    QLabel *mStatusCursorPageLabel = nullptr;
+private:
+  static bool sInitializedRegistry;
 
-    static QList<double> sStatusZoomLevelsList;
+  KadasAppLayoutDesignerInterface *mInterface = nullptr;
 
-    QgsLayoutViewToolAddItem *mAddItemTool = nullptr;
-    QgsLayoutViewToolAddNodeItem *mAddNodeItemTool = nullptr;
-    QgsLayoutViewToolPan *mPanTool = nullptr;
-    QgsLayoutViewToolZoom *mZoomTool = nullptr;
-    QgsLayoutViewToolSelect *mSelectTool = nullptr;
-    QgsLayoutViewToolEditNodes *mNodesTool = nullptr;
-    QgsLayoutViewToolMoveItemContent *mMoveContentTool = nullptr;
+  QgsPrintLayout *mLayout = nullptr;
 
-    QMap<QString, QToolButton *> mItemGroupToolButtons;
-    QMap<QString, QMenu *> mItemGroupSubmenus;
+  QgsMessageBar *mMessageBar = nullptr;
 
-    KadasLayoutAppMenuProvider *mMenuProvider = nullptr;
+  QActionGroup *mToolsActionGroup = nullptr;
 
-    QgsDockWidget *mItemDock = nullptr;
-    QgsPanelWidgetStack *mItemPropertiesStack = nullptr;
-    QgsDockWidget *mGeneralDock = nullptr;
-    QgsPanelWidgetStack *mGeneralPropertiesStack = nullptr;
-    QgsDockWidget *mGuideDock = nullptr;
-    QgsPanelWidgetStack *mGuideStack = nullptr;
+  QgsLayoutView *mView = nullptr;
+  QgsLayoutRuler *mHorizontalRuler = nullptr;
+  QgsLayoutRuler *mVerticalRuler = nullptr;
+  QWidget *mRulerLayoutFix = nullptr;
 
-    QgsLayoutPropertiesWidget *mLayoutPropertiesWidget = nullptr;
+  //! Combobox in status bar which shows/adjusts current zoom level
+  QComboBox *mStatusZoomCombo = nullptr;
+  QSlider *mStatusZoomSlider = nullptr;
 
-    QUndoView *mUndoView = nullptr;
-    QgsDockWidget *mUndoDock = nullptr;
+  //! Labels in status bar which shows current mouse position
+  QLabel *mStatusCursorXLabel = nullptr;
+  QLabel *mStatusCursorYLabel = nullptr;
+  QLabel *mStatusCursorPageLabel = nullptr;
 
-    QgsDockWidget *mItemsDock = nullptr;
-    QgsLayoutItemsListView *mItemsTreeView = nullptr;
+  static QList<double> sStatusZoomLevelsList;
 
-    QAction *mUndoAction = nullptr;
-    QAction *mRedoAction = nullptr;
-    //! Copy/cut/paste actions
-    QAction *mActionCut = nullptr;
-    QAction *mActionCopy = nullptr;
-    QAction *mActionPaste = nullptr;
-    QProgressBar *mStatusProgressBar = nullptr;
+  QgsLayoutViewToolAddItem *mAddItemTool = nullptr;
+  QgsLayoutViewToolAddNodeItem *mAddNodeItemTool = nullptr;
+  QgsLayoutViewToolPan *mPanTool = nullptr;
+  QgsLayoutViewToolZoom *mZoomTool = nullptr;
+  QgsLayoutViewToolSelect *mSelectTool = nullptr;
+  QgsLayoutViewToolEditNodes *mNodesTool = nullptr;
+  QgsLayoutViewToolMoveItemContent *mMoveContentTool = nullptr;
 
-    struct PanelStatus
-    {
-        PanelStatus( bool visible = true, bool active = false )
-          : isVisible( visible )
-          , isActive( active )
-        {}
-        bool isVisible;
-        bool isActive;
-    };
-    QMap<QString, PanelStatus> mPanelStatus;
+  QMap<QString, QToolButton *> mItemGroupToolButtons;
+  QMap<QString, QMenu *> mItemGroupSubmenus;
 
-    bool mBlockItemOptions = false;
+  KadasLayoutAppMenuProvider *mMenuProvider = nullptr;
 
-    //! Page & Printer Setup
-    std::unique_ptr<QPrinter> mPrinter;
+  QgsDockWidget *mItemDock = nullptr;
+  QgsPanelWidgetStack *mItemPropertiesStack = nullptr;
+  QgsDockWidget *mGeneralDock = nullptr;
+  QgsPanelWidgetStack *mGeneralPropertiesStack = nullptr;
+  QgsDockWidget *mGuideDock = nullptr;
+  QgsPanelWidgetStack *mGuideStack = nullptr;
 
-    QString mTitle;
-    QString mSectionTitle;
+  QgsLayoutPropertiesWidget *mLayoutPropertiesWidget = nullptr;
 
-    QgsLayoutGuideWidget *mGuideWidget = nullptr;
+  QUndoView *mUndoView = nullptr;
+  QgsDockWidget *mUndoDock = nullptr;
 
-    //! Save window state
-    void saveWindowState();
+  QgsDockWidget *mItemsDock = nullptr;
+  QgsLayoutItemsListView *mItemsTreeView = nullptr;
 
-    //! Restore the window and toolbar state
-    void restoreWindowState();
+  QAction *mUndoAction = nullptr;
+  QAction *mRedoAction = nullptr;
+  //! Copy/cut/paste actions
+  QAction *mActionCut = nullptr;
+  QAction *mActionCopy = nullptr;
+  QAction *mActionPaste = nullptr;
+  QProgressBar *mStatusProgressBar = nullptr;
 
-    //! Switch to new item creation tool, for a new item of the specified \a id.
-    void activateNewItemCreationTool( int id, bool nodeBasedItem );
+  struct PanelStatus {
+    PanelStatus(bool visible = true, bool active = false)
+        : isVisible(visible), isActive(active) {}
+    bool isVisible;
+    bool isActive;
+  };
+  QMap<QString, PanelStatus> mPanelStatus;
 
-    void createLayoutPropertiesWidget();
+  bool mBlockItemOptions = false;
 
-    void initializeRegistry();
+  //! Page & Printer Setup
+  std::unique_ptr<QPrinter> mPrinter;
 
-    bool getRasterExportSettings( QgsLayoutExporter::ImageExportSettings &settings, QSize &imageSize );
-    bool getPdfExportSettings( QgsLayoutExporter::PdfExportSettings &settings );
+  QString mTitle;
+  QString mSectionTitle;
 
-    //! Load predefined scales from the project's properties
-    void loadPredefinedScalesFromProject();
-    QVector<double> predefinedScales() const;
+  QgsLayoutGuideWidget *mGuideWidget = nullptr;
 
-    QPrinter *printer();
+  //! Save window state
+  void saveWindowState();
 
-    QString defaultExportPath() const;
-    void setLastExportPath( const QString &path ) const;
+  //! Restore the window and toolbar state
+  void restoreWindowState();
+
+  //! Switch to new item creation tool, for a new item of the specified \a id.
+  void activateNewItemCreationTool(int id, bool nodeBasedItem);
+
+  void createLayoutPropertiesWidget();
+
+  void initializeRegistry();
+
+  bool getRasterExportSettings(QgsLayoutExporter::ImageExportSettings &settings,
+                               QSize &imageSize);
+  bool getPdfExportSettings(QgsLayoutExporter::PdfExportSettings &settings);
+
+  //! Load predefined scales from the project's properties
+  void loadPredefinedScalesFromProject();
+  QVector<double> predefinedScales() const;
+
+  QPrinter *printer();
+
+  QString defaultExportPath() const;
+  void setLastExportPath(const QString &path) const;
 };
 
+class KadasAppLayoutDesignerInterface : public QgsLayoutDesignerInterface {
+  Q_OBJECT
 
-class KadasAppLayoutDesignerInterface : public QgsLayoutDesignerInterface
-{
-    Q_OBJECT
+public:
+  KadasAppLayoutDesignerInterface(KadasLayoutDesignerDialog *dialog);
+  QWidget *window() override { return mDesigner; }
+  QgsLayout *layout() override;
+  QgsMasterLayoutInterface *masterLayout() override;
+  QgsLayoutView *view() override { return mDesigner->view(); }
+  QgsMessageBar *messageBar() override { return mDesigner->messageBar(); }
+  void selectItems(const QList<QgsLayoutItem *> &items) override {
+    mDesigner->selectItems(items);
+  }
+  void setAtlasPreviewEnabled(bool enabled) override {}
+  bool atlasPreviewEnabled() const override { return false; }
+  void showItemOptions(QgsLayoutItem *item,
+                       bool bringPanelToFront = true) override {
+    mDesigner->showItemOptions(item, bringPanelToFront);
+  }
+  QMenu *layoutMenu() override { return mDesigner->mLayoutMenu; }
+  QMenu *editMenu() override { return mDesigner->menuEdit; }
+  QMenu *viewMenu() override { return mDesigner->mMenuView; }
+  QMenu *itemsMenu() override { return mDesigner->menuLayout; }
+  QMenu *atlasMenu() override { return nullptr; }
+  QMenu *reportMenu() override { return nullptr; }
+  QMenu *settingsMenu() override { return mDesigner->menuSettings; }
+  QToolBar *layoutToolbar() override { return mDesigner->mLayoutToolbar; }
+  QToolBar *navigationToolbar() override {
+    return mDesigner->mNavigationToolbar;
+  }
+  QToolBar *actionsToolbar() override { return mDesigner->mActionsToolbar; }
+  QToolBar *atlasToolbar() override { return nullptr; }
+  void addDockWidget(Qt::DockWidgetArea area, QDockWidget *dock) override {
+    mDesigner->addDockWidget(area, dock);
+  }
+  void removeDockWidget(QDockWidget *dock) override {
+    mDesigner->removeDockWidget(dock);
+  }
+  void activateTool(StandardTool tool) override;
+  void setAtlasFeature(const QgsFeature &feature) override;
+  QgsLayoutDesignerInterface::ExportResults *lastExportResults() const override;
 
-  public:
-    KadasAppLayoutDesignerInterface( KadasLayoutDesignerDialog *dialog );
-    QWidget *window() override { return mDesigner; }
-    QgsLayout *layout() override;
-    QgsMasterLayoutInterface *masterLayout() override;
-    QgsLayoutView *view() override { return mDesigner->view(); }
-    QgsMessageBar *messageBar() override { return mDesigner->messageBar(); }
-    void selectItems( const QList<QgsLayoutItem *> &items ) override { mDesigner->selectItems( items ); }
-    void setAtlasPreviewEnabled( bool enabled ) override {}
-    bool atlasPreviewEnabled() const override { return false; }
-    void showItemOptions( QgsLayoutItem *item, bool bringPanelToFront = true ) override { mDesigner->showItemOptions( item, bringPanelToFront ); }
-    QMenu *layoutMenu() override { return mDesigner->mLayoutMenu; }
-    QMenu *editMenu() override { return mDesigner->menuEdit; }
-    QMenu *viewMenu() override { return mDesigner->mMenuView; }
-    QMenu *itemsMenu() override { return mDesigner->menuLayout; }
-    QMenu *atlasMenu() override { return nullptr; }
-    QMenu *reportMenu() override { return nullptr; }
-    QMenu *settingsMenu() override { return mDesigner->menuSettings; }
-    QToolBar *layoutToolbar() override { return mDesigner->mLayoutToolbar; }
-    QToolBar *navigationToolbar() override { return mDesigner->mNavigationToolbar; }
-    QToolBar *actionsToolbar() override { return mDesigner->mActionsToolbar; }
-    QToolBar *atlasToolbar() override { return nullptr; }
-    void addDockWidget( Qt::DockWidgetArea area, QDockWidget *dock ) override { mDesigner->addDockWidget( area, dock ); }
-    void removeDockWidget( QDockWidget *dock ) override { mDesigner->removeDockWidget( dock ); }
-    void activateTool( StandardTool tool ) override;
-    void setAtlasFeature( const QgsFeature &feature ) override;
-    QgsLayoutDesignerInterface::ExportResults *lastExportResults() const override;
+public slots:
 
-  public slots:
+  void close() override { mDesigner->close(); }
+  void showRulers(bool visible) override { mDesigner->showRulers(visible); }
 
-    void close() override { mDesigner->close(); }
-    void showRulers( bool visible ) override { mDesigner->showRulers( visible ); }
-
-  private:
-    KadasLayoutDesignerDialog *mDesigner = nullptr;
+private:
+  KadasLayoutDesignerDialog *mDesigner = nullptr;
 };
 
 #endif // KADASLAYOUTDESIGNERDIALOG_H

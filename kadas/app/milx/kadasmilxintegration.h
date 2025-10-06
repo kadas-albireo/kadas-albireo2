@@ -23,7 +23,6 @@
 
 #include "kadas/gui/kadasmapiteminterface.h"
 
-
 class QAction;
 class QComboBox;
 class QSlider;
@@ -35,68 +34,64 @@ class KadasMilxLayer;
 class KadasMilxLayerPropertiesPageFactory;
 class KadasMilxLibrary;
 
-
-class KadasMilxInterface : public KadasMapItemInterface
-{
-  public:
-    KadasMilxInterface() = default;
-    KadasMapItem *createItem() const override;
+class KadasMilxInterface : public KadasMapItemInterface {
+public:
+  KadasMilxInterface() = default;
+  KadasMapItem *createItem() const override;
 };
 
-class KadasMilxDropHandler : public QgsCustomDropHandler
-{
-    Q_OBJECT
+class KadasMilxDropHandler : public QgsCustomDropHandler {
+  Q_OBJECT
 
-  public:
-    bool canHandleMimeData( const QMimeData *data ) override;
-    bool handleMimeDataV2( const QMimeData *data ) override;
+public:
+  bool canHandleMimeData(const QMimeData *data) override;
+  bool handleMimeDataV2(const QMimeData *data) override;
 };
 
-class KadasMilxIntegration : public QObject
-{
-    Q_OBJECT
-  public:
-    struct MilxUi
-    {
-        QTabWidget *mRibbonWidget;
-        QWidget *mMssTab;
-        QAction *mActionMilx;
-        QAction *mActionSaveMilx;
-        QAction *mActionMilxKmlExport;
-        QAction *mActionLoadMilx;
-        QSlider *mSymbolSizeSlider;
-        QSlider *mLineWidthSlider;
-        QComboBox *mWorkModeCombo;
-        QSpinBox *mLeaderLineWidthSpin;
-        QgsColorButton *mLeaderLineColorButton;
-    };
-    KadasMilxIntegration( const MilxUi &ui, QObject *parent = nullptr );
-    ~KadasMilxIntegration();
+class KadasMilxIntegration : public QObject {
+  Q_OBJECT
+public:
+  struct MilxUi {
+    QTabWidget *mRibbonWidget;
+    QWidget *mMssTab;
+    QAction *mActionMilx;
+    QAction *mActionSaveMilx;
+    QAction *mActionMilxKmlExport;
+    QAction *mActionLoadMilx;
+    QSlider *mSymbolSizeSlider;
+    QSlider *mLineWidthSlider;
+    QComboBox *mWorkModeCombo;
+    QSpinBox *mLeaderLineWidthSpin;
+    QgsColorButton *mLeaderLineColorButton;
+  };
+  KadasMilxIntegration(const MilxUi &ui, QObject *parent = nullptr);
+  ~KadasMilxIntegration();
 
-    static bool importMilxly( const QString &filename, QString &errorMsg );
+  static bool importMilxly(const QString &filename, QString &errorMsg);
 
-  private:
-    MilxUi mUi;
-    KadasMilxLibrary *mMilxLibrary = nullptr;
-    KadasMilxLayerPropertiesPageFactory *mLayerPropertiesFactory = nullptr;
-    KadasMilxDropHandler mDropHandler;
-    KadasMilxLayer *getLayer();
-    KadasMilxLayer *getOrCreateLayer();
+private:
+  MilxUi mUi;
+  KadasMilxLibrary *mMilxLibrary = nullptr;
+  KadasMilxLayerPropertiesPageFactory *mLayerPropertiesFactory = nullptr;
+  KadasMilxDropHandler mDropHandler;
+  KadasMilxLayer *getLayer();
+  KadasMilxLayer *getOrCreateLayer();
 
-    void refreshMilxLayers();
-    static void showMessageDialog( const QString &title, const QString &body, const QString &messages );
+  void refreshMilxLayers();
+  static void showMessageDialog(const QString &title, const QString &body,
+                                const QString &messages);
 
-  private slots:
-    void createMilx( bool active );
-    void saveMilxly();
-    void exportKml();
-    void openMilxly();
-    void readProjectSettings();
-    void setMilXSymbolSize( int value );
-    void setMilXLineWidth( int value );
-    void setMilXWorkMode( int idx );
-    void setMilxLeaderLineWidth( int width );
-    void setMilxLeaderLineColor( QColor color );
+private slots:
+  void createMilx(bool active);
+  void saveMilxly();
+  void exportKml();
+  void openMilxly();
+  void readProjectSettings();
+  void setMilXSymbolSize(int value);
+  void setMilXLineWidth(int value);
+  void setMilXWorkMode(int idx);
+  void setMilxLeaderLineWidth(int width);
+  void setMilxLeaderLineColor(QColor color);
 };
 
 #endif // KADASMILXINTEGRATION_H

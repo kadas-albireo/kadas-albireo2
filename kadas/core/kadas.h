@@ -24,55 +24,86 @@
 #include "kadas/core/kadas_core.h"
 #include "kadas/core/kadassettingstree.h"
 
-
 class QUrl;
 class QgsMapLayer;
 class QgsRasterLayer;
 
 typedef void *GDALDatasetH;
 
-class KADAS_CORE_EXPORT Kadas
-{
-  public:
-    // Version string
-    static const char *KADAS_VERSION;
-    // Version number used for comparing versions using the "Check QGIS Version" function
-    static const int KADAS_VERSION_INT;
-    // Release name
-    static const char *KADAS_RELEASE_NAME;
-    // Full release name
-    static const char *KADAS_FULL_RELEASE_NAME;
-    // The development version
-    static const char *KADAS_DEV_VERSION;
-    // The build date
-    static const char *KADAS_BUILD_DATE;
+class KADAS_CORE_EXPORT Kadas {
+public:
+  // Version string
+  static const char *KADAS_VERSION;
+  // Version number used for comparing versions using the "Check QGIS Version"
+  // function
+  static const int KADAS_VERSION_INT;
+  // Release name
+  static const char *KADAS_RELEASE_NAME;
+  // Full release name
+  static const char *KADAS_FULL_RELEASE_NAME;
+  // The development version
+  static const char *KADAS_DEV_VERSION;
+  // The build date
+  static const char *KADAS_BUILD_DATE;
 
+  static inline QgsSettingsTreeNode *sTreeGdalProxy =
+      KadasSettingsTree::treeRoot()->createChildNode(QStringLiteral("proxy"))
+          SIP_SKIP;
+  static const inline QgsSettingsEntryString *settingsGdalProxyHttp =
+      new QgsSettingsEntryString(
+          QStringLiteral("http-proxy"), sTreeGdalProxy, QString(),
+          QStringLiteral(
+              "this will be used to set GDAL_HTTP_PROXY env variable."))
+          SIP_SKIP;
+  static const inline QgsSettingsEntryString *settingsGdalProxyAuth =
+      new QgsSettingsEntryString(
+          QStringLiteral("proxy-auth"), sTreeGdalProxy, QString(),
+          QStringLiteral(
+              "this will be used to set GDAL_HTTP_PROXY_AUTH env variable."))
+          SIP_SKIP;
+  static const inline QgsSettingsEntryString *settingsGdalProxyUserPassword =
+      new QgsSettingsEntryString(
+          QStringLiteral("proxy-user-password"), sTreeGdalProxy, QString(),
+          QStringLiteral(
+              "this will be used to set GDAL_HTTP_PROXYUSERPWD env variable."))
+          SIP_SKIP;
+  static const inline QgsSettingsEntryString *settingsGdalHttpAuth =
+      new QgsSettingsEntryString(
+          QStringLiteral("http-auth"), sTreeGdalProxy, QString(),
+          QStringLiteral(
+              "this will be used to set GDAL_HTTP_AUTH env variable."))
+          SIP_SKIP;
+  static const inline QgsSettingsEntryString *settingsGdalHttpUserPassword =
+      new QgsSettingsEntryString(
+          QStringLiteral("http-user-password"), sTreeGdalProxy, QString(),
+          QStringLiteral(
+              "this will be used to set GDAL_HTTP_USERPWD env variable."))
+          SIP_SKIP;
+  static const inline QgsSettingsEntryBool *settingsGdalUnsetEnvVar =
+      new QgsSettingsEntryBool(
+          QStringLiteral("unset-env-vars"), sTreeGdalProxy, false,
+          QStringLiteral("if this is set, the environment variable "
+                         "GDAL_PROXY_AUTH will be unset.")) SIP_SKIP;
 
-    static inline QgsSettingsTreeNode *sTreeGdalProxy = KadasSettingsTree::treeRoot()->createChildNode( QStringLiteral( "proxy" ) ) SIP_SKIP;
-    static const inline QgsSettingsEntryString *settingsGdalProxyHttp = new QgsSettingsEntryString( QStringLiteral( "http-proxy" ), sTreeGdalProxy, QString(), QStringLiteral( "this will be used to set GDAL_HTTP_PROXY env variable." ) ) SIP_SKIP;
-    static const inline QgsSettingsEntryString *settingsGdalProxyAuth = new QgsSettingsEntryString( QStringLiteral( "proxy-auth" ), sTreeGdalProxy, QString(), QStringLiteral( "this will be used to set GDAL_HTTP_PROXY_AUTH env variable." ) ) SIP_SKIP;
-    static const inline QgsSettingsEntryString *settingsGdalProxyUserPassword = new QgsSettingsEntryString( QStringLiteral( "proxy-user-password" ), sTreeGdalProxy, QString(), QStringLiteral( "this will be used to set GDAL_HTTP_PROXYUSERPWD env variable." ) ) SIP_SKIP;
-    static const inline QgsSettingsEntryString *settingsGdalHttpAuth = new QgsSettingsEntryString( QStringLiteral( "http-auth" ), sTreeGdalProxy, QString(), QStringLiteral( "this will be used to set GDAL_HTTP_AUTH env variable." ) ) SIP_SKIP;
-    static const inline QgsSettingsEntryString *settingsGdalHttpUserPassword = new QgsSettingsEntryString( QStringLiteral( "http-user-password" ), sTreeGdalProxy, QString(), QStringLiteral( "this will be used to set GDAL_HTTP_USERPWD env variable." ) ) SIP_SKIP;
-    static const inline QgsSettingsEntryBool *settingsGdalUnsetEnvVar = new QgsSettingsEntryBool( QStringLiteral( "unset-env-vars" ), sTreeGdalProxy, false, QStringLiteral( "if this is set, the environment variable GDAL_PROXY_AUTH will be unset." ) ) SIP_SKIP;
+  // Path where user-configuration is stored
+  static QString configPath();
 
-    // Path where user-configuration is stored
-    static QString configPath();
+  // Path where application data is stored
+  static QString pkgDataPath();
 
-    // Path where application data is stored
-    static QString pkgDataPath();
+  // Path where application resources are stored
+  static QString pkgResourcePath();
 
-    // Path where application resources are stored
-    static QString pkgResourcePath();
+  // Path where project templates are stored
+  static QString projectTemplatesPath();
 
-    // Path where project templates are stored
-    static QString projectTemplatesPath();
+  // Returns gdal source string for raster layer or null string in case of error
+  static GDALDatasetH gdalOpenForLayer(const QgsRasterLayer *layer,
+                                       QString *errMsg = nullptr);
 
-    // Returns gdal source string for raster layer or null string in case of error
-    static GDALDatasetH gdalOpenForLayer( const QgsRasterLayer *layer, QString *errMsg = nullptr );
-
-    // Import SSL certificates from the certificate directory and from the system store (on Windows)
-    static void importSslCertificates();
+  // Import SSL certificates from the certificate directory and from the system
+  // store (on Windows)
+  static void importSslCertificates();
 };
 
 #endif // KADAS_H

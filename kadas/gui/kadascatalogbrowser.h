@@ -28,39 +28,41 @@ class KadasCatalogProvider;
 class QgsFilterLineEdit;
 class QTreeView;
 
+class KADAS_GUI_EXPORT KadasCatalogBrowser : public QWidget {
+  Q_OBJECT
+public:
+  KadasCatalogBrowser(QWidget *parent = 0);
+  void addProvider(KadasCatalogProvider *provider) {
+    mProviders.append(provider);
+  }
+  QStandardItem *addItem(QStandardItem *parent, QString text, int sortIndex,
+                         bool isLeaf = false, QMimeData *mimeData = nullptr);
 
-class KADAS_GUI_EXPORT KadasCatalogBrowser : public QWidget
-{
-    Q_OBJECT
-  public:
-    KadasCatalogBrowser( QWidget *parent = 0 );
-    void addProvider( KadasCatalogProvider *provider ) { mProviders.append( provider ); }
-    QStandardItem *addItem( QStandardItem *parent, QString text, int sortIndex, bool isLeaf = false, QMimeData *mimeData = nullptr );
+public slots:
+  void reload();
 
-  public slots:
-    void reload();
+signals:
+  void layerSelected(const QgsMimeDataUtils::Uri &uri,
+                     const QString &metadataUrl, const QVariantList &sublayers);
 
-  signals:
-    void layerSelected( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers );
+private:
+  class CatalogModel;
+  class CatalogItem;
+  class TreeFilterProxyModel;
 
-  private:
-    class CatalogModel;
-    class CatalogItem;
-    class TreeFilterProxyModel;
+  QgsFilterLineEdit *mFilterLineEdit;
+  QTreeView *mTreeView;
+  CatalogModel *mCatalogModel;
+  QStandardItemModel *mLoadingModel;
+  QStandardItemModel *mOfflineModel;
+  TreeFilterProxyModel *mFilterProxyModel;
+  QList<KadasCatalogProvider *> mProviders;
+  int mFinishedProviders;
 
-    QgsFilterLineEdit *mFilterLineEdit;
-    QTreeView *mTreeView;
-    CatalogModel *mCatalogModel;
-    QStandardItemModel *mLoadingModel;
-    QStandardItemModel *mOfflineModel;
-    TreeFilterProxyModel *mFilterProxyModel;
-    QList<KadasCatalogProvider *> mProviders;
-    int mFinishedProviders;
-
-  private slots:
-    void filterChanged( const QString &text );
-    void itemDoubleClicked( const QModelIndex &index );
-    void providerFinished();
+private slots:
+  void filterChanged(const QString &text);
+  void itemDoubleClicked(const QModelIndex &index);
+  void providerFinished();
 };
 
 #endif // KADASCATALOGBROWSER_H

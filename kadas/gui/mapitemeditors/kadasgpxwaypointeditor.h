@@ -18,8 +18,8 @@
 #define KADASGPXWAYPOINTEDITOR_H
 
 #include "kadas/gui/kadas_gui.h"
-#include "kadas/gui/mapitems/kadasmapitem.h"
 #include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
 #include "kadas/gui/ui_kadasgpxwaypointeditor.h"
 
 class QgsSettingsEntryInteger;
@@ -27,36 +27,34 @@ class QgsSettingsEntryColor;
 class QgsSettingsEntryString;
 class QgsSettingsEntryColor;
 
+class KADAS_GUI_EXPORT KadasGpxWaypointEditor : public KadasMapItemEditor {
+  Q_OBJECT
 
-class KADAS_GUI_EXPORT KadasGpxWaypointEditor : public KadasMapItemEditor
-{
-    Q_OBJECT
+public:
+  static const QgsSettingsEntryInteger *settingsGpxWaypointSize;
+  static const QgsSettingsEntryColor *settingsGpxWaypointColor;
+  static const QgsSettingsEntryString *settingsGpxWaypointLabelFont;
+  static const QgsSettingsEntryColor *settingsGpxWaypointLabelColor;
 
-  public:
-    static const QgsSettingsEntryInteger *settingsGpxWaypointSize;
-    static const QgsSettingsEntryColor *settingsGpxWaypointColor;
-    static const QgsSettingsEntryString *settingsGpxWaypointLabelFont;
-    static const QgsSettingsEntryColor *settingsGpxWaypointLabelColor;
+  KadasGpxWaypointEditor(KadasMapItem *item);
 
-    KadasGpxWaypointEditor( KadasMapItem *item );
+  void syncItemToWidget() override;
+  void syncWidgetToItem() override;
 
-    void syncItemToWidget() override;
-    void syncWidgetToItem() override;
+private:
+  Ui::KadasGpxWaypointEditorBase mUi;
 
-  private:
-    Ui::KadasGpxWaypointEditorBase mUi;
+  QFont currentFont() const;
 
-    QFont currentFont() const;
+signals:
+  void styleChanged();
 
-  signals:
-    void styleChanged();
-
-  private slots:
-    void saveColor();
-    void saveSize();
-    void saveLabelFont();
-    void saveLabelColor();
-    void fontSizeChanged( int size );
+private slots:
+  void saveColor();
+  void saveSize();
+  void saveLabelFont();
+  void saveLabelColor();
+  void fontSizeChanged(int size);
 };
 
 #endif // KADASGPXWAYPOINTEDITOR_H

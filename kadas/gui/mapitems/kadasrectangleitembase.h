@@ -19,96 +19,117 @@
 
 #include "kadas/gui/mapitems/kadasmapitem.h"
 
+class KADAS_GUI_EXPORT KadasRectangleItemBase
+    : public KadasMapItem SIP_ABSTRACT {
+  Q_OBJECT
+  Q_PROPERTY(bool posLocked READ positionLocked WRITE setPositionLocked)
 
-class KADAS_GUI_EXPORT KadasRectangleItemBase : public KadasMapItem SIP_ABSTRACT
-{
-    Q_OBJECT
-    Q_PROPERTY( bool posLocked READ positionLocked WRITE setPositionLocked )
+public:
+  KadasRectangleItemBase(const QgsCoordinateReferenceSystem &crs);
+  virtual ~KadasRectangleItemBase();
 
-  public:
-    KadasRectangleItemBase( const QgsCoordinateReferenceSystem &crs );
-    virtual ~KadasRectangleItemBase();
+  bool frameVisible() const { return constState()->frame(); }
+  void setFrameVisible(bool frame);
+  bool positionLocked() const { return mPosLocked; }
+  void setPositionLocked(bool locked);
 
-    bool frameVisible() const { return constState()->frame(); }
-    void setFrameVisible( bool frame );
-    bool positionLocked() const { return mPosLocked; }
-    void setPositionLocked( bool locked );
+  KadasItemRect boundingBox() const override;
+  Margin margin() const override;
+  QList<KadasMapItem::Node>
+  nodes(const QgsMapSettings &settings) const override;
+  bool intersects(const KadasMapRect &rect, const QgsMapSettings &settings,
+                  bool contains = false) const override;
+  void render(QgsRenderContext &context) const override;
 
-    KadasItemRect boundingBox() const override;
-    Margin margin() const override;
-    QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
-    bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const override;
-    void render( QgsRenderContext &context ) const override;
+  bool startPart(const KadasMapPos &firstPoint,
+                 const QgsMapSettings &mapSettings) override;
+  bool startPart(const AttribValues &values,
+                 const QgsMapSettings &mapSettings) override;
+  void setCurrentPoint(const KadasMapPos &p,
+                       const QgsMapSettings &mapSettings) override;
+  void setCurrentAttributes(const AttribValues &values,
+                            const QgsMapSettings &mapSettings) override;
+  bool continuePart(const QgsMapSettings &mapSettings) override;
+  void endPart() override;
 
-    bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) override;
-    bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
-    void setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings ) override;
-    void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
-    bool continuePart( const QgsMapSettings &mapSettings ) override;
-    void endPart() override;
+  AttribDefs drawAttribs() const override;
+  AttribValues
+  drawAttribsFromPosition(const KadasMapPos &pos,
+                          const QgsMapSettings &mapSettings) const override;
+  KadasMapPos
+  positionFromDrawAttribs(const AttribValues &values,
+                          const QgsMapSettings &mapSettings) const override;
 
-    AttribDefs drawAttribs() const override;
-    AttribValues drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
-    KadasMapPos positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
+  EditContext getEditContext(const KadasMapPos &pos,
+                             const QgsMapSettings &mapSettings) const override;
+  void edit(const EditContext &context, const KadasMapPos &newPoint,
+            const QgsMapSettings &mapSettings) override;
+  void edit(const EditContext &context, const AttribValues &values,
+            const QgsMapSettings &mapSettings) override;
+  void populateContextMenu(QMenu *menu, const EditContext &context,
+                           const KadasMapPos &clickPos,
+                           const QgsMapSettings &mapSettings) override;
 
-    EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
-    void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override;
-    void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) override;
-    void populateContextMenu( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings ) override;
+  AttribValues
+  editAttribsFromPosition(const EditContext &context, const KadasMapPos &pos,
+                          const QgsMapSettings &mapSettings) const override;
+  KadasMapPos
+  positionFromEditAttribs(const EditContext &context,
+                          const AttribValues &values,
+                          const QgsMapSettings &mapSettings) const override;
 
-    AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
-    KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
+  KadasItemPos position() const override { return constState()->mPos; }
+  void setPosition(const KadasItemPos &pos) override;
 
-    KadasItemPos position() const override { return constState()->mPos; }
-    void setPosition( const KadasItemPos &pos ) override;
+  struct KADAS_GUI_EXPORT State : KadasMapItem::State {
+    KadasItemPos mPos;
+    QList<KadasItemPos> mFootprint;
+    KadasItemPos mRectangleCenterPoint;
+    double mAngle = 0.;
+    double mOffsetX = 0.;
+    double mOffsetY = 0.;
+    QSize mSize;
+    bool mFrame = true;
 
+    bool frame() const { return mFrame; }
+    virtual void assign(const KadasMapItem::State *other) override {
+      *this = *static_cast<const State *>(other);
+    }
+    virtual State *clone() const override SIP_FACTORY {
+      return new State(*this);
+    }
+    virtual QJsonObject serialize() const override;
+    virtual bool deserialize(const QJsonObject &json) override;
+  };
+  const State *constState() const { return static_cast<State *>(mState); }
+  virtual void setState(const KadasMapItem::State *state) override;
 
-    struct KADAS_GUI_EXPORT State : KadasMapItem::State
-    {
-        KadasItemPos mPos;
-        QList<KadasItemPos> mFootprint;
-        KadasItemPos mRectangleCenterPoint;
-        double mAngle = 0.;
-        double mOffsetX = 0.;
-        double mOffsetY = 0.;
-        QSize mSize;
-        bool mFrame = true;
+protected:
+  State *state() { return static_cast<State *>(mState); }
+  const State *consState() { return static_cast<const State *>(mState); }
+  State *createEmptyState() const override SIP_FACTORY { return new State(); }
 
-        bool frame() const { return mFrame; }
-        virtual void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
-        virtual State *clone() const override SIP_FACTORY { return new State( *this ); }
-        virtual QJsonObject serialize() const override;
-        virtual bool deserialize( const QJsonObject &json ) override;
-    };
-    const State *constState() const { return static_cast<State *>( mState ); }
-    virtual void setState( const KadasMapItem::State *state ) override;
+  bool mPosLocked = false;
 
-  protected:
-    State *state() { return static_cast<State *>( mState ); }
-    const State *consState() { return static_cast<const State *>( mState ); }
-    State *createEmptyState() const override SIP_FACTORY { return new State(); }
+private:
+  virtual void renderPrivate(QgsRenderContext &context, const QPointF &center,
+                             const QRect &rect, double dpiScale) const = 0;
+  virtual void editPrivate(const KadasMapPos &newPoint,
+                           const QgsMapSettings &mapSettings) = 0;
+  virtual void populateContextMenuPrivate(QMenu *menu,
+                                          const EditContext &context,
+                                          const KadasMapPos &clickPos,
+                                          const QgsMapSettings &mapSettings) {}
 
-    bool mPosLocked = false;
+  friend class KadasProjectMigration;
 
-  private:
-    virtual void renderPrivate( QgsRenderContext &context, const QPointF &center, const QRect &rect, double dpiScale ) const = 0;
-    virtual void editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) = 0;
-    virtual void populateContextMenuPrivate( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings ) {}
+  enum AttribIds { AttrX, AttrY };
+  QImage mImage;
 
-    friend class KadasProjectMigration;
+  static constexpr int sFramePadding = 4;
+  static constexpr int sArrowWidth = 6;
 
-    enum AttribIds
-    {
-      AttrX,
-      AttrY
-    };
-    QImage mImage;
-
-    static constexpr int sFramePadding = 4;
-    static constexpr int sArrowWidth = 6;
-
-
-    QList<KadasMapPos> cornerPoints( const QgsMapSettings &settings ) const;
+  QList<KadasMapPos> cornerPoints(const QgsMapSettings &settings) const;
 };
 
 #endif // KADASRECTANGLEITEMBASE_H

@@ -25,40 +25,45 @@
  * \class KadasSettingsTree
  * \brief KadasSettingsTree holds the tree structure for the settings
  */
-class KADAS_CORE_EXPORT KadasSettingsTree
-{
-  public:
+class KADAS_CORE_EXPORT KadasSettingsTree {
+public:
 #ifndef SIP_RUN
 
-    /**
-     * Returns the tree root node for the settings tree
-     */
-    static QgsSettingsTreeNode *treeRoot();
+  /**
+   * Returns the tree root node for the settings tree
+   */
+  static QgsSettingsTreeNode *treeRoot();
 
-    // only create first level here
-    static inline QgsSettingsTreeNode *sTreeKadas = treeRoot()->createChildNode( QStringLiteral( "kadas" ) );
-    static inline QgsSettingsTreeNode *sTreePortal = treeRoot()->createChildNode( QStringLiteral( "portal" ) );
-    static inline QgsSettingsTreeNode *sTreePlugins = treeRoot()->createChildNode( QStringLiteral( "plugins" ) );
-    static inline QgsSettingsTreeNode *sTreeGpx = treeRoot()->createChildNode( QStringLiteral( "gpx" ) );
+  // only create first level here
+  static inline QgsSettingsTreeNode *sTreeKadas =
+      treeRoot()->createChildNode(QStringLiteral("kadas"));
+  static inline QgsSettingsTreeNode *sTreePortal =
+      treeRoot()->createChildNode(QStringLiteral("portal"));
+  static inline QgsSettingsTreeNode *sTreePlugins =
+      treeRoot()->createChildNode(QStringLiteral("plugins"));
+  static inline QgsSettingsTreeNode *sTreeGpx =
+      treeRoot()->createChildNode(QStringLiteral("gpx"));
 
 #endif
 
-    /**
-     * Returns the tree node at the given \a key
-     * \note For Plugins, use createPluginTreeNode() to create nodes for plugin settings.
-     */
-    static const QgsSettingsTreeNode *node( const QString &key ) { return treeRoot()->childNode( key ); }
+  /**
+   * Returns the tree node at the given \a key
+   * \note For Plugins, use createPluginTreeNode() to create nodes for plugin
+   * settings.
+   */
+  static const QgsSettingsTreeNode *node(const QString &key) {
+    return treeRoot()->childNode(key);
+  }
 
-    /**
-     * Creates a settings tree node for the given \a pluginName
-     */
-    static QgsSettingsTreeNode *createPluginTreeNode( const QString &pluginName );
+  /**
+   * Creates a settings tree node for the given \a pluginName
+   */
+  static QgsSettingsTreeNode *createPluginTreeNode(const QString &pluginName);
 
-
-    /**
-     * Unregisters the tree node for the given plugin
-     */
-    static void unregisterPluginTreeNode( const QString &pluginName );
+  /**
+   * Unregisters the tree node for the given plugin
+   */
+  static void unregisterPluginTreeNode(const QString &pluginName);
 };
 
 #endif // KADASSETTINGSTREE_H

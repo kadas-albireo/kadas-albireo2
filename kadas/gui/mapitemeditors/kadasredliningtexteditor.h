@@ -18,34 +18,33 @@
 #define KADASREDLININGTEXTEDITOR_H
 
 #include "kadas/gui/kadas_gui.h"
-#include "kadas/gui/mapitems/kadasmapitem.h"
 #include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
 #include "kadas/gui/ui_kadasredliningtexteditor.h"
 
-class KADAS_GUI_EXPORT KadasRedliningTextEditor : public KadasMapItemEditor
-{
-    Q_OBJECT
+class KADAS_GUI_EXPORT KadasRedliningTextEditor : public KadasMapItemEditor {
+  Q_OBJECT
 
-  public:
-    KadasRedliningTextEditor( KadasMapItem *item );
+public:
+  KadasRedliningTextEditor(KadasMapItem *item);
 
-    void syncItemToWidget() override;
-    void syncWidgetToItem() override;
+  void syncItemToWidget() override;
+  void syncWidgetToItem() override;
 
-    void setItem( KadasMapItem *item ) override;
+  void setItem(KadasMapItem *item) override;
 
-  private:
-    Ui::KadasRedliningTextEditorBase mUi;
+private:
+  Ui::KadasRedliningTextEditorBase mUi;
 
-    QMetaObject::Connection mItemConnection;
+  QMetaObject::Connection mItemConnection;
 
-    QFont currentFont() const;
+  QFont currentFont() const;
 
-  private slots:
-    void saveFillColor();
-    void saveOutlineColor();
-    void saveFont();
-    void saveText();
+private slots:
+  void saveFillColor();
+  void saveOutlineColor();
+  void saveFont();
+  void saveText();
 };
 
 #endif // KADASREDLININGITEMEDITOR_H

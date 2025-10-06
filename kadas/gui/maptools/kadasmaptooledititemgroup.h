@@ -28,38 +28,39 @@ class KadasItemLayer;
 class KadasMapItem;
 class KadasSelectionRectItem;
 
-class KADAS_GUI_EXPORT KadasMapToolEditItemGroup : public QgsMapTool
-{
-    Q_OBJECT
+class KADAS_GUI_EXPORT KadasMapToolEditItemGroup : public QgsMapTool {
+  Q_OBJECT
 
-  public:
-    KadasMapToolEditItemGroup( QgsMapCanvas *canvas, const QList<KadasMapItem *> &items, KadasItemLayer *layer );
+public:
+  KadasMapToolEditItemGroup(QgsMapCanvas *canvas,
+                            const QList<KadasMapItem *> &items,
+                            KadasItemLayer *layer);
 
-    void activate() override;
-    void deactivate() override;
+  void activate() override;
+  void deactivate() override;
 
-    void canvasPressEvent( QgsMapMouseEvent *e ) override;
-    void canvasMoveEvent( QgsMapMouseEvent *e ) override;
-    void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
-    void keyPressEvent( QKeyEvent *e ) override;
+  void canvasPressEvent(QgsMapMouseEvent *e) override;
+  void canvasMoveEvent(QgsMapMouseEvent *e) override;
+  void canvasReleaseEvent(QgsMapMouseEvent *e) override;
+  void keyPressEvent(QKeyEvent *e) override;
 
-  private:
-    QList<KadasMapItem *> mItems;
-    KadasItemLayer *mLayer;
-    QgsPointXY mMoveRefPos;
-    QList<QgsPointXY> mItemRefPos;
-    KadasBottomBar *mBottomBar = nullptr;
-    QLabel *mStatusLabel = nullptr;
-    KadasSelectionRectItem *mSelectionRect = nullptr;
+private:
+  QList<KadasMapItem *> mItems;
+  KadasItemLayer *mLayer;
+  QgsPointXY mMoveRefPos;
+  QList<QgsPointXY> mItemRefPos;
+  KadasBottomBar *mBottomBar = nullptr;
+  QLabel *mStatusLabel = nullptr;
+  KadasSelectionRectItem *mSelectionRect = nullptr;
 
-    void createPinsFromPoints();
-    void createWaypointsFromPins();
-    void copyItems();
-    void cutItems();
-    void deleteItems();
-    void deselectItem( KadasMapItem *item, bool triggerRepaint = true );
-    void updateSelection();
-    void checkRemovedLayer( QgsMapLayer *layer );
+  void createPinsFromPoints();
+  void createWaypointsFromPins();
+  void copyItems();
+  void cutItems();
+  void deleteItems();
+  void deselectItem(KadasMapItem *item, bool triggerRepaint = true);
+  void updateSelection();
+  void checkRemovedLayer(QgsMapLayer *layer);
 };
 
 #endif // KADASMAPTOOLEDITITEMGROUP_H

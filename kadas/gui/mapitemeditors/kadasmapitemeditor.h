@@ -22,49 +22,52 @@
 #include <QMap>
 #include <QWidget>
 
-#include <qgis/qgis_sip.h>
 #include "kadas/gui/kadas_gui.h"
-
+#include <qgis/qgis_sip.h>
 
 class KadasMapItem;
 
-class KADAS_GUI_EXPORT KadasMapItemEditor : public QWidget
-{
-    Q_OBJECT
+class KADAS_GUI_EXPORT KadasMapItemEditor : public QWidget {
+  Q_OBJECT
 
-  public:
-    static inline const QString GPX_ROUTE = QStringLiteral( "KadasGpxRouteEditor" );
-    static inline const QString SYMBOL_ATTRIBUTES = QStringLiteral( "KadasSymbolAttributesEditor" );
-    static inline const QString GPX_WAYPOINT = QStringLiteral( "KadasGpxWaypointEditor" );
-    static inline const QString REDLINING_ITEM = QStringLiteral( "KadasRedliningItemEditor" );
-    static inline const QString REDLINING_TEXT = QStringLiteral( "KadasRedliningTextEditor" );
-    static inline const QString MEASURE_WIDGET = QStringLiteral( "KadasMeasureWidget" );
+public:
+  static inline const QString GPX_ROUTE = QStringLiteral("KadasGpxRouteEditor");
+  static inline const QString SYMBOL_ATTRIBUTES =
+      QStringLiteral("KadasSymbolAttributesEditor");
+  static inline const QString GPX_WAYPOINT =
+      QStringLiteral("KadasGpxWaypointEditor");
+  static inline const QString REDLINING_ITEM =
+      QStringLiteral("KadasRedliningItemEditor");
+  static inline const QString REDLINING_TEXT =
+      QStringLiteral("KadasRedliningTextEditor");
+  static inline const QString MEASURE_WIDGET =
+      QStringLiteral("KadasMeasureWidget");
 
-    enum class EditorType SIP_MONKEYPATCH_SCOPEENUM
-    {
-      CreateItemEditor,
-      EditItemEditor
-    };
+  enum class EditorType SIP_MONKEYPATCH_SCOPEENUM {
+    CreateItemEditor,
+    EditItemEditor
+  };
 
-    KadasMapItemEditor( KadasMapItem *item, QWidget *parent = nullptr )
-      : QWidget( parent ), mItem( item ) {}
+  KadasMapItemEditor(KadasMapItem *item, QWidget *parent = nullptr)
+      : QWidget(parent), mItem(item) {}
 
-    virtual void setItem( KadasMapItem *item ) { mItem = item; }
+  virtual void setItem(KadasMapItem *item) { mItem = item; }
 
-    // TODO: SIP
+  // TODO: SIP
 #ifndef SIP_RUN
-    typedef std::function<KadasMapItemEditor *( KadasMapItem *, EditorType )> Factory;
-    typedef QMap<QString, Factory> Registry;
-    static Registry *registry();
+  typedef std::function<KadasMapItemEditor *(KadasMapItem *, EditorType)>
+      Factory;
+  typedef QMap<QString, Factory> Registry;
+  static Registry *registry();
 #endif
 
-  public slots:
-    virtual void reset() {}
-    virtual void syncItemToWidget() = 0;
-    virtual void syncWidgetToItem() = 0;
+public slots:
+  virtual void reset() {}
+  virtual void syncItemToWidget() = 0;
+  virtual void syncWidgetToItem() = 0;
 
-  protected:
-    KadasMapItem *mItem;
+protected:
+  KadasMapItem *mItem;
 };
 
 #endif // KADASMAPITEMEDITOR_H

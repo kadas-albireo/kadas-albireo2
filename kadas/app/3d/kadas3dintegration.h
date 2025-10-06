@@ -24,19 +24,19 @@ class Kadas3DMapCanvas;
 class Kadas3DMapCanvasWidget;
 class QgsMapCanvas;
 
-class Kadas3DIntegration : public QObject
-{
-    Q_OBJECT
+class Kadas3DIntegration : public QObject {
+  Q_OBJECT
 
-  public:
-    Kadas3DIntegration( QAction *action3D, QgsMapCanvas *mapCanvas, QObject *parent = nullptr );
+public:
+  Kadas3DIntegration(QAction *action3D, QgsMapCanvas *mapCanvas,
+                     QObject *parent = nullptr);
 
-  private:
-    QAction *mAction3D = nullptr;
-    QgsMapCanvas *mMapCanvas = nullptr;
-    Kadas3DMapCanvasWidget *m3DMapCanvasWidget = nullptr;
+private:
+  QAction *mAction3D = nullptr;
+  QgsMapCanvas *mMapCanvas = nullptr;
+  Kadas3DMapCanvasWidget *m3DMapCanvasWidget = nullptr;
 
-    Kadas3DMapCanvasWidget *createNewMapCanvas3D( const QString &name );
+  Kadas3DMapCanvasWidget *createNewMapCanvas3D(const QString &name);
 };
 
 #endif // KADAS3DINTEGRATION_H

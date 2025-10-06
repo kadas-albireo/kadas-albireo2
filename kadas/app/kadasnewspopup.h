@@ -19,18 +19,17 @@
 
 #include <QDialog>
 
-class KadasNewsPopup : public QDialog
-{
-    Q_OBJECT
+class KadasNewsPopup : public QDialog {
+  Q_OBJECT
 
-  public:
-    static bool isConfigured();
-    static void showIfNewsAvailable( bool force = false );
+public:
+  static bool isConfigured();
+  static void showIfNewsAvailable(bool force = false);
 
-  private:
-    KadasNewsPopup( const QString &url );
-    ~KadasNewsPopup();
-    static KadasNewsPopup *sInstance;
+private:
+  KadasNewsPopup(const QString &url);
+  ~KadasNewsPopup();
+  static KadasNewsPopup *sInstance;
 };
 
 #endif // KADASNEWSPOPUP_H

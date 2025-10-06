@@ -18,8 +18,8 @@
 #define KADASGPXROUTEEDITOR_H
 
 #include "kadas/gui/kadas_gui.h"
-#include "kadas/gui/mapitems/kadasmapitem.h"
 #include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
 #include "kadas/gui/ui_kadasgpxrouteeditor.h"
 
 class QgsSettingsEntryInteger;
@@ -27,39 +27,37 @@ class QgsSettingsEntryColor;
 class QgsSettingsEntryString;
 class QgsSettingsEntryColor;
 
+class KADAS_GUI_EXPORT KadasGpxRouteEditor : public KadasMapItemEditor {
+  Q_OBJECT
 
-class KADAS_GUI_EXPORT KadasGpxRouteEditor : public KadasMapItemEditor
-{
-    Q_OBJECT
+public:
+  static const QgsSettingsEntryInteger *settingsGpxRouteSize;
+  static const QgsSettingsEntryColor *settingsGpxRouteColor;
+  static const QgsSettingsEntryString *settingsGpxRouteLabelFont;
+  static const QgsSettingsEntryColor *settingsGpxRouteLabelColor;
 
-  public:
-    static const QgsSettingsEntryInteger *settingsGpxRouteSize;
-    static const QgsSettingsEntryColor *settingsGpxRouteColor;
-    static const QgsSettingsEntryString *settingsGpxRouteLabelFont;
-    static const QgsSettingsEntryColor *settingsGpxRouteLabelColor;
+  KadasGpxRouteEditor(KadasMapItem *item);
+  ~KadasGpxRouteEditor();
 
-    KadasGpxRouteEditor( KadasMapItem *item );
-    ~KadasGpxRouteEditor();
+  void setItem(KadasMapItem *item) override;
+  void syncItemToWidget() override;
+  void syncWidgetToItem() override;
 
-    void setItem( KadasMapItem *item ) override;
-    void syncItemToWidget() override;
-    void syncWidgetToItem() override;
+private:
+  Ui::KadasGpxRouteEditorBase mUi;
 
-  private:
-    Ui::KadasGpxRouteEditorBase mUi;
+  QFont currentFont() const;
 
-    QFont currentFont() const;
+signals:
+  void styleChanged();
 
-  signals:
-    void styleChanged();
-
-  private slots:
-    void saveColor();
-    void saveSize();
-    void toggleItemMeasurements( bool enabled );
-    void saveLabelFont();
-    void saveLabelColor();
-    void fontSizeChanged( int size );
+private slots:
+  void saveColor();
+  void saveSize();
+  void toggleItemMeasurements(bool enabled);
+  void saveLabelFont();
+  void saveLabelColor();
+  void fontSizeChanged(int size);
 };
 
 #endif // KADASGPXROUTEEDITOR_H

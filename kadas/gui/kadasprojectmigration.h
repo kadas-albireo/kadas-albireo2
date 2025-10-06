@@ -23,17 +23,23 @@
 class QDomDocument;
 class QDomElement;
 
-class KADAS_GUI_EXPORT KadasProjectMigration
-{
-  public:
-    static QString migrateProject( const QString &fileName, QStringList &filesToAttach );
-    static bool migrateProjectXml( const QString &basedir, QDomDocument &doc, QStringList &filesToAttach );
+class KADAS_GUI_EXPORT KadasProjectMigration {
+public:
+  static QString migrateProject(const QString &fileName,
+                                QStringList &filesToAttach);
+  static bool migrateProjectXml(const QString &basedir, QDomDocument &doc,
+                                QStringList &filesToAttach);
 
-  private:
-    static void migrateKadas1xTo2x( QDomDocument &doc, QDomElement &root, const QString &basedir, QStringList &filesToAttach );
-    static QDomElement replaceAnnotationLayer( QDomDocument &doc, QDomElement &root, const QString &layerId );
-    static QMap<QString, QString> deserializeLegacyRedliningFlags( const QString &flagsStr );
-    static bool shouldAttach( const QString &baseDir, const QString &filePath );
+private:
+  static void migrateKadas1xTo2x(QDomDocument &doc, QDomElement &root,
+                                 const QString &basedir,
+                                 QStringList &filesToAttach);
+  static QDomElement replaceAnnotationLayer(QDomDocument &doc,
+                                            QDomElement &root,
+                                            const QString &layerId);
+  static QMap<QString, QString>
+  deserializeLegacyRedliningFlags(const QString &flagsStr);
+  static bool shouldAttach(const QString &baseDir, const QString &filePath);
 };
 
 #endif // KADASPROJECTMIGRATION_H

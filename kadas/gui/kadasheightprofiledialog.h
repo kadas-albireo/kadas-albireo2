@@ -38,81 +38,78 @@ class QwtPlotPicker;
 class KadasLineItem;
 class KadasMapToolHeightProfile;
 
+class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog {
+  Q_OBJECT
+public:
+  KadasHeightProfileDialog(KadasMapToolHeightProfile *tool,
+                           QWidget *parent = nullptr,
+                           Qt::WindowFlags f = Qt::WindowFlags());
+  void setPoints(const QList<QgsPointXY> &points,
+                 const QgsCoordinateReferenceSystem &crs);
+  void setMarkerPos(int segment, const QgsPointXY &p,
+                    const QgsCoordinateReferenceSystem &crs);
+  void clear();
+  bool isBusy() const;
 
-class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
-{
-    Q_OBJECT
-  public:
-    KadasHeightProfileDialog( KadasMapToolHeightProfile *tool, QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags() );
-    void setPoints( const QList<QgsPointXY> &points, const QgsCoordinateReferenceSystem &crs );
-    void setMarkerPos( int segment, const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs );
-    void clear();
-    bool isBusy() const;
+public slots:
+  void accept() override;
+  void reject() override;
 
-  public slots:
-    void accept() override;
-    void reject() override;
+protected:
+  void keyPressEvent(QKeyEvent *ev) override;
 
-  protected:
-    void keyPressEvent( QKeyEvent *ev ) override;
+private slots:
+  void finish();
+  void replot();
+  void updateLineOfSight();
+  void copyToClipboard();
+  void addToCanvas();
+  void setMarkerPlotPos(const QPoint &pos);
+  void toggleNodeMarkers();
 
-  private slots:
-    void finish();
-    void replot();
-    void updateLineOfSight();
-    void copyToClipboard();
-    void addToCanvas();
-    void setMarkerPlotPos( const QPoint &pos );
-    void toggleNodeMarkers();
+private:
+  class ScaleDraw;
+  enum HeightMode { HeightRelToGround, HeightRelToSeaLevel };
 
-  private:
-    class ScaleDraw;
-    enum HeightMode
-    {
-      HeightRelToGround,
-      HeightRelToSeaLevel
-    };
+  enum class Statistics {
+    HeightDifference,
+    TotalAscent,
+    TotalDescent,
+    MaxHeight,
+    MinHeight,
+    LinearDistance,
+    PathDistance
+  };
 
-    enum class Statistics
-    {
-      HeightDifference,
-      TotalAscent,
-      TotalDescent,
-      MaxHeight,
-      MinHeight,
-      LinearDistance,
-      PathDistance
-    };
+  QMap<Statistics, double> mStatisticsValues;
+  QMap<Statistics, QLabel *> mStatisticsLabels;
 
-    QMap<Statistics, double> mStatisticsValues;
-    QMap<Statistics, QLabel *> mStatisticsLabels;
-
-    KadasMapToolHeightProfile *mTool = nullptr;
-    QwtPlot *mPlot = nullptr;
-    QVector<QPointF> mPlotSamples;
-    double mNoDataValue = 0.;
-    QVector<QwtPlotCurve *> mPlotCurves;
-    QVector<QwtPlotCurve *> mLinesOfSight;
-    QVector<KadasLineItem *> mLinesOfSightRB;
-    QwtPlotMarker *mPlotMarker = nullptr;
-    QwtPlotPicker *mPlotPicker = nullptr;
-    QwtPlotMarker *mLineOfSightMarker = nullptr;
-    QList<QwtPlotMarker *> mNodeMarkers;
-    QList<QgsPointXY> mPoints;
-    QVector<double> mSegmentLengths;
-    double mTotLength = 0;
-    double mTotLengthMeters = 0;
-    //! Linear distance i.e. direct from start to end point
-    double mTotLinearDistanceMeters = 0;
-    QgsCoordinateReferenceSystem mPointsCrs;
-    int mNSamples = 1000;
-    QCheckBox *mNodeMarkersCheckbox = nullptr;
-    QGroupBox *mLineOfSightGroupBoxgroupBox = nullptr;
-    QDoubleSpinBox *mObserverHeightSpinBox = nullptr;
-    QDoubleSpinBox *mTargetHeightSpinBox = nullptr;
-    QComboBox *mHeightModeCombo = nullptr;
-    QProgressBar *mProgressBar = nullptr;
-    QPushButton *mCancelButton = nullptr;
+  KadasMapToolHeightProfile *mTool = nullptr;
+  QwtPlot *mPlot = nullptr;
+  QVector<QPointF> mPlotSamples;
+  double mNoDataValue = 0.;
+  QVector<QwtPlotCurve *> mPlotCurves;
+  QVector<QwtPlotCurve *> mLinesOfSight;
+  QVector<KadasLineItem *> mLinesOfSightRB;
+  QwtPlotMarker *mPlotMarker = nullptr;
+  QwtPlotPicker *mPlotPicker = nullptr;
+  QwtPlotMarker *mLineOfSightMarker = nullptr;
+  QList<QwtPlotMarker *> mNodeMarkers;
+  QList<QgsPointXY> mPoints;
+  QVector<double> mSegmentLengths;
+  double mTotLength = 0;
+  double mTotLengthMeters = 0;
+  //! Linear distance i.e. direct from start to end point
+  double mTotLinearDistanceMeters = 0;
+  QgsCoordinateReferenceSystem mPointsCrs;
+  int mNSamples = 1000;
+  QCheckBox *mNodeMarkersCheckbox = nullptr;
+  QGroupBox *mLineOfSightGroupBoxgroupBox = nullptr;
+  QDoubleSpinBox *mObserverHeightSpinBox = nullptr;
+  QDoubleSpinBox *mTargetHeightSpinBox = nullptr;
+  QComboBox *mHeightModeCombo = nullptr;
+  QProgressBar *mProgressBar = nullptr;
+  QPushButton *mCancelButton = nullptr;
 };
 
 #endif // KADASHEIGHTPROFILEDIALOG_H

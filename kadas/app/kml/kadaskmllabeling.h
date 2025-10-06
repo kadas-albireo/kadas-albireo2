@@ -17,22 +17,23 @@
 #ifndef KADASKMLLABELING_H
 #define KADASKMLLABELING_H
 
-#include <qgis/qgsvectorlayerlabelprovider.h>
 #include <qgis/qgsrendercontext.h>
+#include <qgis/qgsvectorlayerlabelprovider.h>
 
 class QTextStream;
 
-class KadasKMLLabelProvider : public QgsVectorLayerLabelProvider
-{
-  public:
-    KadasKMLLabelProvider( QTextStream *outStream, QgsVectorLayer *layer, const QgsPalLayerSettings *settings );
+class KadasKMLLabelProvider : public QgsVectorLayerLabelProvider {
+public:
+  KadasKMLLabelProvider(QTextStream *outStream, QgsVectorLayer *layer,
+                        const QgsPalLayerSettings *settings);
 
-    void drawLabel( QgsRenderContext &context, pal::LabelPosition *label ) const override;
+  void drawLabel(QgsRenderContext &context,
+                 pal::LabelPosition *label) const override;
 
-  private:
-    QTextStream *mOutStream;
+private:
+  QTextStream *mOutStream;
 
-    KadasKMLLabelProvider(); //private
+  KadasKMLLabelProvider(); // private
 };
 
 #endif // KADASKMLLABELING_H

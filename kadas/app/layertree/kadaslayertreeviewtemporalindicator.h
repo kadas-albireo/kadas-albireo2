@@ -16,34 +16,34 @@
 #ifndef KADASLAYERTREEVIEWTEMPORALINDICATOR_H
 #define KADASLAYERTREEVIEWTEMPORALINDICATOR_H
 
-
 #include "external/qgis/app/qgslayertreeviewindicatorprovider.h"
 
 class KadasTemporalController;
 
 //! Adds indicators for showing temporal layers.
-class KadasLayerTreeViewTemporalIndicator : public QgsLayerTreeViewIndicatorProvider
-{
-    Q_OBJECT
-  public:
-    explicit KadasLayerTreeViewTemporalIndicator( QgsLayerTreeView *view, KadasTemporalController *kadasTemporalController );
+class KadasLayerTreeViewTemporalIndicator
+    : public QgsLayerTreeViewIndicatorProvider {
+  Q_OBJECT
+public:
+  explicit KadasLayerTreeViewTemporalIndicator(
+      QgsLayerTreeView *view, KadasTemporalController *kadasTemporalController);
 
-  protected:
-    void connectSignals( QgsMapLayer *layer ) override;
+protected:
+  void connectSignals(QgsMapLayer *layer) override;
 
-  protected slots:
+protected slots:
 
-    void onIndicatorClicked( const QModelIndex &index ) override;
+  void onIndicatorClicked(const QModelIndex &index) override;
 
-    //! Adds/removes indicator of a layer
-    void onLayerChanged( QgsMapLayer *layer );
+  //! Adds/removes indicator of a layer
+  void onLayerChanged(QgsMapLayer *layer);
 
-  private:
-    bool acceptLayer( QgsMapLayer *layer ) override;
-    QString iconName( QgsMapLayer *layer ) override;
-    QString tooltipText( QgsMapLayer *layer ) override;
+private:
+  bool acceptLayer(QgsMapLayer *layer) override;
+  QString iconName(QgsMapLayer *layer) override;
+  QString tooltipText(QgsMapLayer *layer) override;
 
-    KadasTemporalController *mKadasTemporalController;
+  KadasTemporalController *mKadasTemporalController;
 };
 
 #endif // KADASLAYERTREEVIEWTEMPORALINDICATOR_H

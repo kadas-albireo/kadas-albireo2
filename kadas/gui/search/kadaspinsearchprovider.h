@@ -23,22 +23,22 @@
 
 class QgsMapCanvas;
 
+class KADAS_GUI_EXPORT KadasPinSearchProvider : public QgsLocatorFilter {
+  Q_OBJECT
+public:
+  KadasPinSearchProvider(QgsMapCanvas *mapCanvas);
 
-class KADAS_GUI_EXPORT KadasPinSearchProvider : public QgsLocatorFilter
-{
-    Q_OBJECT
-  public:
-    KadasPinSearchProvider( QgsMapCanvas *mapCanvas );
+  virtual QgsLocatorFilter *clone() const override;
+  QString name() const override { return QStringLiteral("pins"); }
+  QString displayName() const override { return tr("Pins"); }
+  virtual Priority priority() const override { return Priority::High; }
+  virtual void fetchResults(const QString &string,
+                            const QgsLocatorContext &context,
+                            QgsFeedback *feedback) override;
+  virtual void triggerResult(const QgsLocatorResult &result) override;
 
-    virtual QgsLocatorFilter *clone() const override;
-    QString name() const override { return QStringLiteral( "pins" ); }
-    QString displayName() const override { return tr( "Pins" ); }
-    virtual Priority priority() const override { return Priority::High; }
-    virtual void fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback ) override;
-    virtual void triggerResult( const QgsLocatorResult &result ) override;
-
-  private:
-    QgsMapCanvas *mMapCanvas = nullptr;
+private:
+  QgsMapCanvas *mMapCanvas = nullptr;
 };
 
 #endif // KADASPINSEARCHPROVIDER_H

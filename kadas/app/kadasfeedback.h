@@ -20,16 +20,15 @@
 
 class QgsSettingsEntryString;
 
-class KadasFeedback
-{
-  public:
-    static const QgsSettingsEntryString *settingsPortalFeedbackUrl;
+class KadasFeedback {
+public:
+  static const QgsSettingsEntryString *settingsPortalFeedbackUrl;
 
-    static bool isConfigured();
-    static void show();
+  static bool isConfigured();
+  static void show();
 
-  private:
-    KadasFeedback() {}
+private:
+  KadasFeedback() {}
 };
 
 #endif // KADASFEEDBACK_H

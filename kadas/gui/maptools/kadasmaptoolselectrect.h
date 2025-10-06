@@ -22,51 +22,50 @@
 
 #include "kadas/gui/kadas_gui.h"
 
-class KADAS_GUI_EXPORT KadasMapToolSelectRect : public QgsMapTool
-{
-    Q_OBJECT
-  public:
-    KadasMapToolSelectRect( QgsMapCanvas *mapCanvas );
+class KADAS_GUI_EXPORT KadasMapToolSelectRect : public QgsMapTool {
+  Q_OBJECT
+public:
+  KadasMapToolSelectRect(QgsMapCanvas *mapCanvas);
 
-    void setRect( const QgsRectangle &rect );
-    const QgsRectangle &rect() const { return mRect; }
+  void setRect(const QgsRectangle &rect);
+  const QgsRectangle &rect() const { return mRect; }
 
-    void clear();
+  void clear();
 
-    void setAllowResize( bool allowResize ) { mResizeAllowed = allowResize; }
-    void setShowReferenceWhenMoving( bool showReference ) { mShowReferenceWhenMoving = showReference; }
+  void setAllowResize(bool allowResize) { mResizeAllowed = allowResize; }
+  void setShowReferenceWhenMoving(bool showReference) {
+    mShowReferenceWhenMoving = showReference;
+  }
 
-    void canvasMoveEvent( QgsMapMouseEvent *e ) override;
-    void canvasPressEvent( QgsMapMouseEvent *e ) override;
-    void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
+  void canvasMoveEvent(QgsMapMouseEvent *e) override;
+  void canvasPressEvent(QgsMapMouseEvent *e) override;
+  void canvasReleaseEvent(QgsMapMouseEvent *e) override;
 
-    void deactivate() override;
+  void deactivate() override;
 
-  signals:
-    void rectChanged( const QgsRectangle &rect );
-    void rectChangeComplete( const QgsRectangle &rect );
+signals:
+  void rectChanged(const QgsRectangle &rect);
+  void rectChangeComplete(const QgsRectangle &rect);
 
-  private:
-    bool mResizeAllowed = true;
-    bool mShowReferenceWhenMoving = true;
-    QgsRectangle mRect;
-    QgsRectangle mOldRect;
+private:
+  bool mResizeAllowed = true;
+  bool mShowReferenceWhenMoving = true;
+  QgsRectangle mRect;
+  QgsRectangle mOldRect;
 
-    QgsRubberBand *mRubberband = nullptr;
-    QgsRubberBand *mOldRubberband = nullptr;
-    enum
-    {
-      InteractionNone,
-      InteractionMoving,
-      InteractionResizing
-    } mInteraction
-      = InteractionNone;
+  QgsRubberBand *mRubberband = nullptr;
+  QgsRubberBand *mOldRubberband = nullptr;
+  enum {
+    InteractionNone,
+    InteractionMoving,
+    InteractionResizing
+  } mInteraction = InteractionNone;
 
-    QList<QgsPointXY> mResizePoints;
-    QList<std::function<void( const QgsPointXY )>> mResizeHandlers;
-    QgsPointXY mResizeMoveOffset;
+  QList<QgsPointXY> mResizePoints;
+  QList<std::function<void(const QgsPointXY)>> mResizeHandlers;
+  QgsPointXY mResizeMoveOffset;
 
-    QRect canvasRect( const QgsRectangle &rect ) const;
+  QRect canvasRect(const QgsRectangle &rect) const;
 };
 
 #endif // KADASMAPTOOLSELECTRECT_H

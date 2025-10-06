@@ -14,7 +14,6 @@
  *                                                                         *
  ***************************************************************************/
 
-
 #ifndef KADASLOCALDATASEARCHPROVIDER_H
 #define KADASLOCALDATASEARCHPROVIDER_H
 
@@ -30,25 +29,25 @@ class QgsFeature;
 class QgsMapLayer;
 class QgsVectorLayer;
 
-class KADAS_GUI_EXPORT KadasLocalDataSearchFilter : public QgsLocatorFilter
-{
-    Q_OBJECT
-  public:
-    KadasLocalDataSearchFilter( QgsMapCanvas *mapCanvas );
+class KADAS_GUI_EXPORT KadasLocalDataSearchFilter : public QgsLocatorFilter {
+  Q_OBJECT
+public:
+  KadasLocalDataSearchFilter(QgsMapCanvas *mapCanvas);
 
-    virtual QgsLocatorFilter *clone() const override;
-    QString name() const override { return QStringLiteral( "local-data" ); }
-    QString displayName() const override { return tr( "Local data" ); }
-    virtual Priority priority() const override { return Priority::Medium; }
-    virtual void fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback ) override;
-    virtual void triggerResult( const QgsLocatorResult &result ) override;
+  virtual QgsLocatorFilter *clone() const override;
+  QString name() const override { return QStringLiteral("local-data"); }
+  QString displayName() const override { return tr("Local data"); }
+  virtual Priority priority() const override { return Priority::Medium; }
+  virtual void fetchResults(const QString &string,
+                            const QgsLocatorContext &context,
+                            QgsFeedback *feedback) override;
+  virtual void triggerResult(const QgsLocatorResult &result) override;
 
-
-  private:
-    void buildResult( const QgsFeature &feature, QgsVectorLayer *layer, const QString &searchText );
-    QgsMapCanvas *mMapCanvas = nullptr;
-    static const int sResultCountLimit;
+private:
+  void buildResult(const QgsFeature &feature, QgsVectorLayer *layer,
+                   const QString &searchText);
+  QgsMapCanvas *mMapCanvas = nullptr;
+  static const int sResultCountLimit;
 };
-
 
 #endif // KADASLOCALDATASEARCHPROVIDER_H

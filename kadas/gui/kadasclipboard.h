@@ -27,59 +27,58 @@ class QMimeData;
 class QgsPoint;
 class KadasMapItem;
 
-class KADAS_GUI_EXPORT KadasPasteHandler
-{
-  public:
-    virtual ~KadasPasteHandler() {}
-    virtual void paste( const QString &mimeData, const QByteArray &data, const QgsPointXY *mapPos ) = 0;
+class KADAS_GUI_EXPORT KadasPasteHandler {
+public:
+  virtual ~KadasPasteHandler() {}
+  virtual void paste(const QString &mimeData, const QByteArray &data,
+                     const QgsPointXY *mapPos) = 0;
 };
 
 // Constants used to describe copy-paste MIME types
 #define KADASCLIPBOARD_FEATURESTORE_MIME "application/kadas.featurestore"
 #define KADASCLIPBOARD_ITEMSTORE_MIME "application/kadas.itemstore"
 
-class KADAS_GUI_EXPORT KadasClipboard : public QObject
-{
-    Q_OBJECT
-  public:
-    static KadasClipboard *instance();
+class KADAS_GUI_EXPORT KadasClipboard : public QObject {
+  Q_OBJECT
+public:
+  static KadasClipboard *instance();
 
-    ~KadasClipboard();
+  ~KadasClipboard();
 
-    // Returns whether there is any data in the clipboard
-    bool isEmpty() const;
+  // Returns whether there is any data in the clipboard
+  bool isEmpty() const;
 
-    // Queries whether the clipboard has specified format.
-    bool hasFormat( const QString &format ) const;
+  // Queries whether the clipboard has specified format.
+  bool hasFormat(const QString &format) const;
 
-    // Sets the clipboard contents
-    void setMimeData( QMimeData *mimeData );
+  // Sets the clipboard contents
+  void setMimeData(QMimeData *mimeData);
 
-    // Retreives the clipboard contents
-    const QMimeData *mimeData();
+  // Retreives the clipboard contents
+  const QMimeData *mimeData();
 
-    // Utility function for storing features in clipboard
-    void setStoredFeatures( const QgsFeatureStore &featureStore );
+  // Utility function for storing features in clipboard
+  void setStoredFeatures(const QgsFeatureStore &featureStore);
 
-    // Utility function for getting features from clipboard
-    const QgsFeatureStore &getStoredFeatures() const { return mFeatureStore; }
+  // Utility function for getting features from clipboard
+  const QgsFeatureStore &getStoredFeatures() const { return mFeatureStore; }
 
-    // Utility function fro storing map items in clipboard
-    void setStoredMapItems( const QList<KadasMapItem *> &items );
+  // Utility function fro storing map items in clipboard
+  void setStoredMapItems(const QList<KadasMapItem *> &items);
 
-    // Utility function for getting stored map items from clipboard
-    const QList<KadasMapItem *> &storedMapItems() const { return mItemStore; }
+  // Utility function for getting stored map items from clipboard
+  const QList<KadasMapItem *> &storedMapItems() const { return mItemStore; }
 
-  signals:
-    void dataChanged();
+signals:
+  void dataChanged();
 
-  protected:
-    KadasClipboard();
+protected:
+  KadasClipboard();
 
-    QgsFeatureStore mFeatureStore;
-    QList<KadasMapItem *> mItemStore;
+  QgsFeatureStore mFeatureStore;
+  QList<KadasMapItem *> mItemStore;
 
-    void clear();
+  void clear();
 };
 
 #endif // KADASCLIPBOARD_H

@@ -21,72 +21,99 @@
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/milx/kadasmilxclient.h"
 
+class KADAS_GUI_EXPORT KadasMilxLayer : public KadasItemLayer {
+  Q_OBJECT
 
-class KADAS_GUI_EXPORT KadasMilxLayer : public KadasItemLayer
-{
-    Q_OBJECT
+public:
+  static QString layerType() { return "KadasMilxLayer"; }
 
-  public:
-    static QString layerType() { return "KadasMilxLayer"; }
+  KadasMilxLayer(const QString &name = "MilX");
+  QString layerTypeKey() const override { return layerType(); }
+  bool acceptsItem(const KadasMapItem *item) const override;
 
-    KadasMilxLayer( const QString &name = "MilX" );
-    QString layerTypeKey() const override { return layerType(); }
-    bool acceptsItem( const KadasMapItem *item ) const override;
+  bool readXml(const QDomNode &layer_node,
+               QgsReadWriteContext &context) override;
+  bool writeXml(QDomNode &layer_node, QDomDocument &document,
+                const QgsReadWriteContext &context) const override;
 
-    bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
-    bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const override;
+  QgsMapLayerRenderer *
+  createMapRenderer(QgsRenderContext &rendererContext) override;
+  ItemId pickItem(
+      const KadasMapPos &mapPos, const QgsMapSettings &mapSettings,
+      KadasItemLayer::PickObjective pickObjective =
+          KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY) const override;
 
-    QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
-    ItemId pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY ) const override;
+  void setApproved(bool approved);
+  bool isApproved() const { return mIsApproved; }
 
-    void setApproved( bool approved );
-    bool isApproved() const { return mIsApproved; }
+  void exportToMilxly(QDomElement &milxLayerEl, int dpi);
+  bool importFromMilxly(const QDomElement &milxLayerEl, int dpi,
+                        QString &errorMsg);
 
-    void exportToMilxly( QDomElement &milxLayerEl, int dpi );
-    bool importFromMilxly( const QDomElement &milxLayerEl, int dpi, QString &errorMsg );
+  void setOverrideMilxSymbolSettings(bool overrideSettings) {
+    mOverrideMilxSymbolSettings = overrideSettings;
+  }
+  bool overrideMilxSymbolSettings() const {
+    return mOverrideMilxSymbolSettings;
+  }
 
-    void setOverrideMilxSymbolSettings( bool overrideSettings ) { mOverrideMilxSymbolSettings = overrideSettings; }
-    bool overrideMilxSymbolSettings() const { return mOverrideMilxSymbolSettings; }
+  void setMilxSymbolSize(int symbolSize) {
+    mMilxSymbolSettings.symbolSize = symbolSize;
+  }
+  int milxSymbolSize() const { return mMilxSymbolSettings.symbolSize; }
 
-    void setMilxSymbolSize( int symbolSize ) { mMilxSymbolSettings.symbolSize = symbolSize; }
-    int milxSymbolSize() const { return mMilxSymbolSettings.symbolSize; }
+  void setMilxLineWidth(int lineWidth) {
+    mMilxSymbolSettings.lineWidth = lineWidth;
+  }
+  int milxLineWidth() const { return mMilxSymbolSettings.lineWidth; }
 
-    void setMilxLineWidth( int lineWidth ) { mMilxSymbolSettings.lineWidth = lineWidth; }
-    int milxLineWidth() const { return mMilxSymbolSettings.lineWidth; }
+  void setMilxWorkMode(KadasMilxSymbolSettings::WorkMode workMode) {
+    mMilxSymbolSettings.workMode = workMode;
+  }
+  KadasMilxSymbolSettings::WorkMode milxWorkMode() const {
+    return mMilxSymbolSettings.workMode;
+  }
 
-    void setMilxWorkMode( KadasMilxSymbolSettings::WorkMode workMode ) { mMilxSymbolSettings.workMode = workMode; }
-    KadasMilxSymbolSettings::WorkMode milxWorkMode() const { return mMilxSymbolSettings.workMode; }
+  void setMilxLeaderLineWidth(int width) {
+    mMilxSymbolSettings.leaderLineWidth = width;
+  }
+  int milxLeaderLineWidth() const {
+    return mMilxSymbolSettings.leaderLineWidth;
+  }
 
-    void setMilxLeaderLineWidth( int width ) { mMilxSymbolSettings.leaderLineWidth = width; }
-    int milxLeaderLineWidth() const { return mMilxSymbolSettings.leaderLineWidth; }
+  void setMilxLeaderLineColor(const QColor &color) {
+    mMilxSymbolSettings.leaderLineColor = color;
+  }
+  QColor milxLeaderLineColor() const {
+    return mMilxSymbolSettings.leaderLineColor;
+  }
 
-    void setMilxLeaderLineColor( const QColor &color ) { mMilxSymbolSettings.leaderLineColor = color; }
-    QColor milxLeaderLineColor() const { return mMilxSymbolSettings.leaderLineColor; }
+  const KadasMilxSymbolSettings &milxSymbolSettings() const;
 
-    const KadasMilxSymbolSettings &milxSymbolSettings() const;
+signals:
+  void approvedChanged(bool approved);
 
-  signals:
-    void approvedChanged( bool approved );
+private:
+  class Renderer;
 
-  private:
-    class Renderer;
-
-    bool mIsApproved = false;
-    bool mOverrideMilxSymbolSettings = false;
-    KadasMilxSymbolSettings mMilxSymbolSettings;
+  bool mIsApproved = false;
+  bool mOverrideMilxSymbolSettings = false;
+  KadasMilxSymbolSettings mMilxSymbolSettings;
 };
 
+class KADAS_GUI_EXPORT KadasMilxLayerType : public KadasPluginLayerType {
+  Q_OBJECT
 
-class KADAS_GUI_EXPORT KadasMilxLayerType : public KadasPluginLayerType
-{
-    Q_OBJECT
-
-  public:
-    KadasMilxLayerType()
-      : KadasPluginLayerType( KadasMilxLayer::layerType() ) {}
-    QgsPluginLayer *createLayer() override SIP_FACTORY { return new KadasMilxLayer(); }
-    QgsPluginLayer *createLayer( const QString &uri ) override SIP_FACTORY { return new KadasMilxLayer(); }
-    void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const override;
+public:
+  KadasMilxLayerType() : KadasPluginLayerType(KadasMilxLayer::layerType()) {}
+  QgsPluginLayer *createLayer() override SIP_FACTORY {
+    return new KadasMilxLayer();
+  }
+  QgsPluginLayer *createLayer(const QString &uri) override SIP_FACTORY {
+    return new KadasMilxLayer();
+  }
+  void addLayerTreeMenuActions(QMenu *menu,
+                               QgsPluginLayer *layer) const override;
 };
 
 #endif // KADASMILXLAYER_H

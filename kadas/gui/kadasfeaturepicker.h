@@ -29,49 +29,56 @@
 class QgsMapLayer;
 class QgsMapCanvas;
 
-class KADAS_GUI_EXPORT KadasFeaturePicker
-{
+class KADAS_GUI_EXPORT KadasFeaturePicker {
+public:
+  class PickResult {
   public:
-    class PickResult
-    {
-      public:
-        PickResult() = default;
-        PickResult( const PickResult &other )
-        {
-          layer = other.layer;
-          geom = other.geom ? other.geom->clone() : nullptr;
-          crs = other.crs;
-          feature = other.feature;
-          itemId = other.itemId;
-        }
-        ~PickResult() { delete geom; }
-        const PickResult &operator=( const PickResult &other )
-        {
-          layer = other.layer;
-          geom = other.geom ? other.geom->clone() : nullptr;
-          crs = other.crs;
-          feature = other.feature;
-          itemId = other.itemId;
-          return *this;
-        }
-        bool isEmpty() const { return layer == nullptr; }
+    PickResult() = default;
+    PickResult(const PickResult &other) {
+      layer = other.layer;
+      geom = other.geom ? other.geom->clone() : nullptr;
+      crs = other.crs;
+      feature = other.feature;
+      itemId = other.itemId;
+    }
+    ~PickResult() { delete geom; }
+    const PickResult &operator=(const PickResult &other) {
+      layer = other.layer;
+      geom = other.geom ? other.geom->clone() : nullptr;
+      crs = other.crs;
+      feature = other.feature;
+      itemId = other.itemId;
+      return *this;
+    }
+    bool isEmpty() const { return layer == nullptr; }
 
-        QgsMapLayer *layer = nullptr;
-        QgsAbstractGeometry *geom = nullptr;
-        QgsCoordinateReferenceSystem crs;
-        QgsFeature feature;
-        KadasItemLayer::ItemId itemId = KadasItemLayer::ITEM_ID_NULL;
-    };
+    QgsMapLayer *layer = nullptr;
+    QgsAbstractGeometry *geom = nullptr;
+    QgsCoordinateReferenceSystem crs;
+    QgsFeature feature;
+    KadasItemLayer::ItemId itemId = KadasItemLayer::ITEM_ID_NULL;
+  };
 
-    static PickResult pick( const QgsMapCanvas *canvas, const QgsPointXY &mapPos, Qgis::GeometryType geomType = Qgis::GeometryType::Unknown, KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY );
+  static PickResult
+  pick(const QgsMapCanvas *canvas, const QgsPointXY &mapPos,
+       Qgis::GeometryType geomType = Qgis::GeometryType::Unknown,
+       KadasItemLayer::PickObjective pickObjective =
+           KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY);
 #ifndef SIP_RUN
-    [[deprecated( "Use variant without canvasPos instead" )]]
+  [[deprecated("Use variant without canvasPos instead")]]
 #endif
-    static PickResult pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, Qgis::GeometryType geomType );
+  static PickResult pick(const QgsMapCanvas *canvas, const QPoint &canvasPos,
+                         const QgsPointXY &mapPos, Qgis::GeometryType geomType);
 
-  private:
-    static PickResult pickItemLayer( KadasItemLayer *layer, const QgsMapCanvas *canvas, const KadasMapPos &mapPos, KadasItemLayer::PickObjective pickObjective );
-    static PickResult pickVectorLayer( QgsVectorLayer *vlayer, const QgsMapCanvas *canvas, const QgsPointXY &mapPos, Qgis::GeometryType geomType );
+private:
+  static PickResult pickItemLayer(KadasItemLayer *layer,
+                                  const QgsMapCanvas *canvas,
+                                  const KadasMapPos &mapPos,
+                                  KadasItemLayer::PickObjective pickObjective);
+  static PickResult pickVectorLayer(QgsVectorLayer *vlayer,
+                                    const QgsMapCanvas *canvas,
+                                    const QgsPointXY &mapPos,
+                                    Qgis::GeometryType geomType);
 };
 
 #endif // KADASFEATUREPICKER_H

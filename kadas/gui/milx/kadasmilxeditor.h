@@ -24,27 +24,26 @@ class QLabel;
 class QToolButton;
 class KadasMilxLibrary;
 
+class KADAS_GUI_EXPORT KadasMilxEditor : public KadasMapItemEditor {
+  Q_OBJECT
 
-class KADAS_GUI_EXPORT KadasMilxEditor : public KadasMapItemEditor
-{
-    Q_OBJECT
+public:
+  KadasMilxEditor(KadasMapItem *item, EditorType type,
+                  KadasMilxLibrary *library, QWidget *parent = nullptr);
 
-  public:
-    KadasMilxEditor( KadasMapItem *item, EditorType type, KadasMilxLibrary *library, QWidget *parent = nullptr );
+public slots:
+  void syncItemToWidget() override;
+  void syncWidgetToItem() override;
 
-  public slots:
-    void syncItemToWidget() override;
-    void syncWidgetToItem() override;
+private slots:
+  void toggleLibrary(bool enabled);
+  void symbolSelected(const KadasMilxSymbolDesc &symbolTemplate);
 
-  private slots:
-    void toggleLibrary( bool enabled );
-    void symbolSelected( const KadasMilxSymbolDesc &symbolTemplate );
-
-  private:
-    KadasMilxLibrary *mLibrary = nullptr;
-    QToolButton *mSymbolButton = nullptr;
-    QLabel *mEditLabel = nullptr;
-    KadasMilxSymbolDesc mSelectedSymbol;
+private:
+  KadasMilxLibrary *mLibrary = nullptr;
+  QToolButton *mSymbolButton = nullptr;
+  QLabel *mEditLabel = nullptr;
+  KadasMilxSymbolDesc mSelectedSymbol;
 };
 
 #endif // KADASMILXEDITOR_H

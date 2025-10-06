@@ -26,20 +26,20 @@ class QgsMapLayerConfigWidget;
 class QgsMapLayerConfigWidgetFactory;
 class QgsMapLayer;
 
+class KADAS_GUI_EXPORT KadasLayerPropertiesDialog
+    : public QDialog,
+      protected Ui::KadasLayerPropertiesBase {
+  Q_OBJECT
+public:
+  KadasLayerPropertiesDialog(QgsMapLayer *layer, QWidget *parent = nullptr);
+  void addPropertiesPageFactory(QgsMapLayerConfigWidgetFactory *factory);
 
-class KADAS_GUI_EXPORT KadasLayerPropertiesDialog : public QDialog, protected Ui::KadasLayerPropertiesBase
-{
-    Q_OBJECT
-  public:
-    KadasLayerPropertiesDialog( QgsMapLayer *layer, QWidget *parent = nullptr );
-    void addPropertiesPageFactory( QgsMapLayerConfigWidgetFactory *factory );
+protected slots:
+  virtual void apply();
 
-  protected slots:
-    virtual void apply();
-
-  protected:
-    QgsMapLayer *mLayer = nullptr;
-    QList<QgsMapLayerConfigWidget *> mLayerPropertiesPages;
+protected:
+  QgsMapLayer *mLayer = nullptr;
+  QList<QgsMapLayerConfigWidget *> mLayerPropertiesPages;
 };
 
 #endif // KADASLAYERPROPERTIESDIALOG_H

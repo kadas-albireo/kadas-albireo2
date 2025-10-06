@@ -19,43 +19,44 @@
 
 #include "kadas/gui/mapitems/kadaslineitem.h"
 
-class KADAS_GUI_EXPORT KadasGpxRouteItem : public KadasLineItem
-{
-    Q_OBJECT
-    Q_PROPERTY( QString name READ name WRITE setName )
-    Q_PROPERTY( QString number READ number WRITE setNumber )
-    Q_PROPERTY( QFont labelFont READ labelFont WRITE setLabelFont )
-    Q_PROPERTY( QColor labelColor READ labelColor WRITE setLabelColor )
+class KADAS_GUI_EXPORT KadasGpxRouteItem : public KadasLineItem {
+  Q_OBJECT
+  Q_PROPERTY(QString name READ name WRITE setName)
+  Q_PROPERTY(QString number READ number WRITE setNumber)
+  Q_PROPERTY(QFont labelFont READ labelFont WRITE setLabelFont)
+  Q_PROPERTY(QColor labelColor READ labelColor WRITE setLabelColor)
 
-  public:
-    KadasGpxRouteItem( QObject *parent = nullptr );
+public:
+  KadasGpxRouteItem(QObject *parent = nullptr);
 
-    QString itemName() const override { return tr( "Route" ); }
-    QString exportName() const override;
+  QString itemName() const override { return tr("Route"); }
+  QString exportName() const override;
 
-    const QString &name() const { return mName; }
-    void setName( const QString &name );
+  const QString &name() const { return mName; }
+  void setName(const QString &name);
 
-    const QString &number() const { return mNumber; }
-    void setNumber( const QString &number );
+  const QString &number() const { return mNumber; }
+  void setNumber(const QString &number);
 
-    const QFont &labelFont() const { return mLabelFont; }
-    void setLabelFont( const QFont &labelFont );
+  const QFont &labelFont() const { return mLabelFont; }
+  void setLabelFont(const QFont &labelFont);
 
-    const QColor &labelColor() const { return mLabelColor; }
-    void setLabelColor( const QColor &labelColor );
+  const QColor &labelColor() const { return mLabelColor; }
+  void setLabelColor(const QColor &labelColor);
 
-    Margin margin() const override;
-    void render( QgsRenderContext &context ) const override;
+  Margin margin() const override;
+  void render(QgsRenderContext &context) const override;
 
-  protected:
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasGpxRouteItem(); }
+protected:
+  KadasMapItem *_clone() const override SIP_FACTORY {
+    return new KadasGpxRouteItem();
+  }
 
-    QString mName;
-    QString mNumber;
-    QFont mLabelFont;
-    QSize mLabelSize;
-    QColor mLabelColor;
+  QString mName;
+  QString mNumber;
+  QFont mLabelFont;
+  QSize mLabelSize;
+  QColor mLabelColor;
 };
 
 #endif // KADASGPXROUTEITEM_H

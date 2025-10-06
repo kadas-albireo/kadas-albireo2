@@ -19,28 +19,28 @@
 
 #include <qgis/qgslayertreeview.h>
 
-class KadasLayerTreeViewMenuProvider : public QObject, public QgsLayerTreeViewMenuProvider
-{
-    Q_OBJECT
-  public:
-    KadasLayerTreeViewMenuProvider( QgsLayerTreeView *view );
-    QMenu *createContextMenu() override;
+class KadasLayerTreeViewMenuProvider : public QObject,
+                                       public QgsLayerTreeViewMenuProvider {
+  Q_OBJECT
+public:
+  KadasLayerTreeViewMenuProvider(QgsLayerTreeView *view);
+  QMenu *createContextMenu() override;
 
-  private:
-    QAction *actionLayerTransparency( QMenu *parent );
-    QAction *actionLayerRefreshRate( QMenu *parent );
-    QAction *actionLayerUseAsHeightmap( QMenu *parent );
+private:
+  QAction *actionLayerTransparency(QMenu *parent);
+  QAction *actionLayerRefreshRate(QMenu *parent);
+  QAction *actionLayerUseAsHeightmap(QMenu *parent);
 
-    QgsLayerTreeView *mView = nullptr;
+  QgsLayerTreeView *mView = nullptr;
 
-  private slots:
-    void removeLayerTreeItems();
-    void setLayerTransparency( int value );
-    void setLayerRefreshRate( int value );
-    void setLayerUseAsHeightmap( bool enabled );
-    void showLayerAttributeTable();
-    void showLayerInfo();
-    void showLayerProperties();
+private slots:
+  void removeLayerTreeItems();
+  void setLayerTransparency(int value);
+  void setLayerRefreshRate(int value);
+  void setLayerUseAsHeightmap(bool enabled);
+  void showLayerAttributeTable();
+  void showLayerInfo();
+  void showLayerProperties();
 };
 
 #endif // KADASLAYERTREEVIEWMENUPROVIDER_H

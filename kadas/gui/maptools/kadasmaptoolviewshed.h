@@ -29,62 +29,56 @@ class QDoubleSpinBox;
 class QSlider;
 class QSpinBox;
 
-class KADAS_GUI_EXPORT KadasViewshedDialog : public QDialog
-{
-    Q_OBJECT
-  public:
-    KadasViewshedDialog( double radius, QWidget *parent = 0 );
-    double observerHeight() const;
-    double targetHeight() const;
-    bool observerHeightRelativeToGround() const;
-    bool targetHeightRelativeToGround() const;
-    double observerMinVertAngle() const;
-    double observerMaxVertAngle() const;
-    int accuracyFactor() const;
+class KADAS_GUI_EXPORT KadasViewshedDialog : public QDialog {
+  Q_OBJECT
+public:
+  KadasViewshedDialog(double radius, QWidget *parent = 0);
+  double observerHeight() const;
+  double targetHeight() const;
+  bool observerHeightRelativeToGround() const;
+  bool targetHeightRelativeToGround() const;
+  double observerMinVertAngle() const;
+  double observerMaxVertAngle() const;
+  int accuracyFactor() const;
 
-  signals:
-    void radiusChanged( double radius );
+signals:
+  void radiusChanged(double radius);
 
-  private:
-    enum HeightMode
-    {
-      HeightRelToGround,
-      HeightRelToSeaLevel
-    };
-    QDoubleSpinBox *mSpinBoxObserverHeight = nullptr;
-    QDoubleSpinBox *mSpinBoxTargetHeight = nullptr;
-    QSpinBox *mSpinBoxObserverMinAngle = nullptr;
-    QSpinBox *mSpinBoxObserverMaxAngle = nullptr;
-    QComboBox *mComboObserverHeightMode = nullptr;
-    QComboBox *mComboTargetHeightMode = nullptr;
-    QSlider *mAccuracySlider = nullptr;
-    QCheckBox *mVertRangeCheckbox = nullptr;
+private:
+  enum HeightMode { HeightRelToGround, HeightRelToSeaLevel };
+  QDoubleSpinBox *mSpinBoxObserverHeight = nullptr;
+  QDoubleSpinBox *mSpinBoxTargetHeight = nullptr;
+  QSpinBox *mSpinBoxObserverMinAngle = nullptr;
+  QSpinBox *mSpinBoxObserverMaxAngle = nullptr;
+  QComboBox *mComboObserverHeightMode = nullptr;
+  QComboBox *mComboTargetHeightMode = nullptr;
+  QSlider *mAccuracySlider = nullptr;
+  QCheckBox *mVertRangeCheckbox = nullptr;
 
-  private slots:
-    void adjustMaxAngle();
-    void adjustMinAngle();
+private slots:
+  void adjustMaxAngle();
+  void adjustMinAngle();
 };
 
-class KADAS_GUI_EXPORT KadasMapToolViewshedItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasMapToolViewshedItemInterface( QgsMapCanvas *mapCanvas )
-      : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
-    KadasMapItem *createItem() const override;
+class KADAS_GUI_EXPORT KadasMapToolViewshedItemInterface
+    : public KadasMapItemInterface {
+public:
+  KadasMapToolViewshedItemInterface(QgsMapCanvas *mapCanvas)
+      : KadasMapItemInterface(), mCanvas(mapCanvas) {}
+  KadasMapItem *createItem() const override;
 
-  private:
-    QgsMapCanvas *mCanvas = nullptr;
+private:
+  QgsMapCanvas *mCanvas = nullptr;
 };
 
-class KADAS_GUI_EXPORT KadasMapToolViewshed : public KadasMapToolCreateItem
-{
-    Q_OBJECT
-  public:
-    KadasMapToolViewshed( QgsMapCanvas *mapCanvas );
+class KADAS_GUI_EXPORT KadasMapToolViewshed : public KadasMapToolCreateItem {
+  Q_OBJECT
+public:
+  KadasMapToolViewshed(QgsMapCanvas *mapCanvas);
 
-  private slots:
-    void drawFinished();
-    void adjustRadius( double newRadius );
+private slots:
+  void drawFinished();
+  void adjustRadius(double newRadius);
 };
 
 #endif // KADASMAPTOOLVIEWSHED_H

@@ -18,30 +18,25 @@
 
 #include "ui_kadasmilxexportdialog.h"
 
+class KadasMilxExportDialog : public QDialog {
+  Q_OBJECT
+public:
+  enum class ExportMode { Milx, Kml };
 
-class KadasMilxExportDialog : public QDialog
-{
-    Q_OBJECT
-  public:
-    enum class ExportMode
-    {
-      Milx,
-      Kml
-    };
+  KadasMilxExportDialog(QWidget *parent = 0);
 
-    KadasMilxExportDialog( QWidget *parent = 0 );
+  void setExportMode(ExportMode exportMode);
 
-    void setExportMode( ExportMode exportMode );
+  void setVersions(const QStringList &versionNames,
+                   const QStringList &versionTags);
 
-    void setVersions( const QStringList &versionNames, const QStringList &versionTags );
+  QStringList selectedLayers() const;
+  QString selectedCartoucheLayerId() const;
 
-    QStringList selectedLayers() const;
-    QString selectedCartoucheLayerId() const;
+  QString selectedVersionTag() const;
 
-    QString selectedVersionTag() const;
-
-  private:
-    Ui::KadasMilxExportDialog ui;
+private:
+  Ui::KadasMilxExportDialog ui;
 };
 
 #endif // KADASMILXEXPORTDIALOG_H

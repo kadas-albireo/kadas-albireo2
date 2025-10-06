@@ -26,7 +26,6 @@ class QgsLayerTreeNode;
 class QgsLayerTreeView;
 class QgsMapLayer;
 
-
 /**
  * The QgsLayerTreeViewIndicatorProvider class provides an interface for
  * layer tree indicator providers.
@@ -35,64 +34,69 @@ class QgsMapLayer;
  *
  * - iconName()
  * - tooltipText()
- * - acceptLayer() filter function to determine whether the indicator must be added for the layer
+ * - acceptLayer() filter function to determine whether the indicator must be
+ * added for the layer
  *
  * Subclasses may override:
  *
  * - onIndicatorClicked() default implementation does nothing
- * - connectSignals() default implementation connects layers to dataSourceChanged()
- * - disconnectSignals() default implementation disconnects layers from dataSourceChanged()
+ * - connectSignals() default implementation connects layers to
+ * dataSourceChanged()
+ * - disconnectSignals() default implementation disconnects layers from
+ * dataSourceChanged()
  */
-class QgsLayerTreeViewIndicatorProvider : public QObject
-{
-    Q_OBJECT
-  public:
-    explicit QgsLayerTreeViewIndicatorProvider( QgsLayerTreeView *view );
+class QgsLayerTreeViewIndicatorProvider : public QObject {
+  Q_OBJECT
+public:
+  explicit QgsLayerTreeViewIndicatorProvider(QgsLayerTreeView *view);
 
-  protected:
-    // Subclasses MAY override:
-    //! Connect signals, default implementation connects layers to dataSourceChanged()
-    virtual void connectSignals( QgsMapLayer *layer );
-    //! Disconnect signals, default implementation disconnects layers from dataSourceChanged()
-    virtual void disconnectSignals( QgsMapLayer *layer );
+protected:
+  // Subclasses MAY override:
+  //! Connect signals, default implementation connects layers to
+  //! dataSourceChanged()
+  virtual void connectSignals(QgsMapLayer *layer);
+  //! Disconnect signals, default implementation disconnects layers from
+  //! dataSourceChanged()
+  virtual void disconnectSignals(QgsMapLayer *layer);
 
-    /**
-     * Updates the state of a the indicator for the given \a layer.
-     */
-    void updateLayerIndicator( QgsMapLayer *layer );
+  /**
+   * Updates the state of a the indicator for the given \a layer.
+   */
+  void updateLayerIndicator(QgsMapLayer *layer);
 
-  protected slots:
+protected slots:
 
-    //! Action on indicator clicked, default implementation does nothing
-    virtual void onIndicatorClicked( const QModelIndex &index ) { Q_UNUSED( index ) }
-    // End MAY overrides
+  //! Action on indicator clicked, default implementation does nothing
+  virtual void onIndicatorClicked(const QModelIndex &index) { Q_UNUSED(index) }
+  // End MAY overrides
 
-    //! Connects to signals of layers newly added to the tree
-    void onAddedChildren( QgsLayerTreeNode *node, int indexFrom, int indexTo );
-    //! Disconnects from layers about to be removed from the tree
-    void onWillRemoveChildren( QgsLayerTreeNode *node, int indexFrom, int indexTo );
-    void onLayerLoaded();
-    //! Adds/removes indicator of a layer
-    void onLayerChanged();
+  //! Connects to signals of layers newly added to the tree
+  void onAddedChildren(QgsLayerTreeNode *node, int indexFrom, int indexTo);
+  //! Disconnects from layers about to be removed from the tree
+  void onWillRemoveChildren(QgsLayerTreeNode *node, int indexFrom, int indexTo);
+  void onLayerLoaded();
+  //! Adds/removes indicator of a layer
+  void onLayerChanged();
 
-  private:
-    // Subclasses MUST override:
-    //! Layer filter: layers that pass the test will get the indicator
-    virtual bool acceptLayer( QgsMapLayer *layer ) = 0;
-    //! Returns the icon name for the given \a layer, icon name is passed to QgsApplication::getThemeIcon()
-    virtual QString iconName( QgsMapLayer *layer ) = 0;
-    //! Returns the tooltip text for the given \a layer
-    virtual QString tooltipText( QgsMapLayer *layer ) = 0;
-    // End MUST overrides
+private:
+  // Subclasses MUST override:
+  //! Layer filter: layers that pass the test will get the indicator
+  virtual bool acceptLayer(QgsMapLayer *layer) = 0;
+  //! Returns the icon name for the given \a layer, icon name is passed to
+  //! QgsApplication::getThemeIcon()
+  virtual QString iconName(QgsMapLayer *layer) = 0;
+  //! Returns the tooltip text for the given \a layer
+  virtual QString tooltipText(QgsMapLayer *layer) = 0;
+  // End MUST overrides
 
-    //! Indicator factory
-    std::unique_ptr<QgsLayerTreeViewIndicator> newIndicator( QgsMapLayer *layer );
-    //! Add or remove the indicator to the given node
-    void addOrRemoveIndicator( QgsLayerTreeNode *node, QgsMapLayer *layer );
+  //! Indicator factory
+  std::unique_ptr<QgsLayerTreeViewIndicator> newIndicator(QgsMapLayer *layer);
+  //! Add or remove the indicator to the given node
+  void addOrRemoveIndicator(QgsLayerTreeNode *node, QgsMapLayer *layer);
 
-  protected:
-    QgsLayerTreeView *mLayerTreeView = nullptr;
-    QSet<QgsLayerTreeViewIndicator *> mIndicators;
+protected:
+  QgsLayerTreeView *mLayerTreeView = nullptr;
+  QSet<QgsLayerTreeViewIndicator *> mIndicators;
 };
 
 #endif // QGSLAYERTREEVIEWINDICATORPROVIDER_H

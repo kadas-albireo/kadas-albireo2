@@ -27,69 +27,62 @@ class QgsGeometryRubberBand;
 class KadasItemContextMenuActions;
 class KadasSelectionRectItem;
 
+class KadasCanvasContextMenu : public QMenu {
+  Q_OBJECT
+public:
+  static const QString ACTION_PROPERTY_MAP_POSITION;
 
-class KadasCanvasContextMenu : public QMenu
-{
-    Q_OBJECT
-  public:
-    static const QString ACTION_PROPERTY_MAP_POSITION;
+  enum class Menu { NONE, DRAW, MEASURE, TERRAIN_ANALYSIS };
 
-    enum class Menu
-    {
-      NONE,
-      DRAW,
-      MEASURE,
-      TERRAIN_ANALYSIS
-    };
+  KadasCanvasContextMenu(QgsMapCanvas *canvas, const QgsPointXY &mapPos);
+  ~KadasCanvasContextMenu();
 
-    KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsPointXY &mapPos );
-    ~KadasCanvasContextMenu();
+  static void registerAction(QAction *action,
+                             Menu insertMenu = Menu::TERRAIN_ANALYSIS);
+  static void unRegisterAction(QAction *action);
 
-    static void registerAction( QAction *action, Menu insertMenu = Menu::TERRAIN_ANALYSIS );
-    static void unRegisterAction( QAction *action );
+private slots:
+  void copyCoordinates();
+  void copyMap();
 
-  private slots:
-    void copyCoordinates();
-    void copyMap();
+  void copyFeature();
+  void deleteItems();
+  void editItem();
+  void raiseItem();
+  void lowerItem();
+  void paste();
 
-    void copyFeature();
-    void deleteItems();
-    void editItem();
-    void raiseItem();
-    void lowerItem();
-    void paste();
+  void drawPin();
+  void drawPointMarker();
+  void drawSquareMarker();
+  void drawTriangleMarker();
+  void drawLine();
+  void drawRectangle();
+  void drawPolygon();
+  void drawCircle();
+  void drawText();
+  void drawCoordinateCross();
 
-    void drawPin();
-    void drawPointMarker();
-    void drawSquareMarker();
-    void drawTriangleMarker();
-    void drawLine();
-    void drawRectangle();
-    void drawPolygon();
-    void drawCircle();
-    void drawText();
-    void drawCoordinateCross();
+  void identify();
 
-    void identify();
+  void measureLine();
+  void measurePolygon();
+  void measureCircle();
+  void measureHeightProfile();
+  void measureMinMax();
+  void terrainSlope();
+  void terrainHillshade();
+  void terrainViewshed();
 
-    void measureLine();
-    void measurePolygon();
-    void measureCircle();
-    void measureHeightProfile();
-    void measureMinMax();
-    void terrainSlope();
-    void terrainHillshade();
-    void terrainViewshed();
+  void print();
 
-    void print();
-
-  private:
-    KadasItemContextMenuActions *mItemActions = nullptr;
-    QgsPointXY mMapPos;
-    QgsMapCanvas *mCanvas = nullptr;
-    KadasFeaturePicker::PickResult mPickResult;
-    QgsGeometryRubberBand *mGeomSel = nullptr;
-    KadasSelectionRectItem *mSelRect = nullptr;
+private:
+  KadasItemContextMenuActions *mItemActions = nullptr;
+  QgsPointXY mMapPos;
+  QgsMapCanvas *mCanvas = nullptr;
+  KadasFeaturePicker::PickResult mPickResult;
+  QgsGeometryRubberBand *mGeomSel = nullptr;
+  KadasSelectionRectItem *mSelRect = nullptr;
 };
 
 #endif // KADASCANVASCONTEXTMENU_H

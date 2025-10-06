@@ -21,18 +21,17 @@
 
 #include "kadas/core/kadasfileserver.h"
 
-class KadasHelpViewer : public QObject
-{
-    Q_OBJECT
+class KadasHelpViewer : public QObject {
+  Q_OBJECT
 
-  public:
-    KadasHelpViewer( QObject *parent = nullptr );
+public:
+  KadasHelpViewer(QObject *parent = nullptr);
 
-  public slots:
-    void showHelp() const;
+public slots:
+  void showHelp() const;
 
-  private:
-    KadasFileServer mHelpFileServer;
+private:
+  KadasFileServer mHelpFileServer;
 };
 
 #endif // KADASHELPVIEWER_H

@@ -29,118 +29,114 @@ typedef _object PyObject;
 
 class KadasPluginInterface;
 
+class KadasPythonIntegration : public QObject {
+  Q_OBJECT
 
-class KadasPythonIntegration : public QObject
-{
-    Q_OBJECT
+public:
+  KadasPythonIntegration(QObject *parent = nullptr);
+  ~KadasPythonIntegration();
 
-  public:
-    KadasPythonIntegration( QObject *parent = nullptr );
-    ~KadasPythonIntegration();
+  void initPython(KadasPluginInterface *iface, bool installErrorHook);
+  void exitPython();
+  bool isEnabled();
 
-    void initPython( KadasPluginInterface *iface, bool installErrorHook );
-    void exitPython();
-    bool isEnabled();
+  void showConsole();
 
-    void showConsole();
+  bool runString(const QString &command, QString msgOnError = QString(),
+                 bool single = true);
+  bool runStringUnsafe(const QString &command, bool single = true);
+  bool evalString(const QString &command, QString &result) const;
+  bool getError(QString &errorClassName, QString &errorText);
+  QString getTypeAsString(PyObject *obj);
 
-    bool runString( const QString &command, QString msgOnError = QString(), bool single = true );
-    bool runStringUnsafe( const QString &command, bool single = true );
-    bool evalString( const QString &command, QString &result ) const;
-    bool getError( QString &errorClassName, QString &errorText );
-    QString getTypeAsString( PyObject *obj );
+  QString qgisPythonPath() const;
+  QString qgisPluginsPath() const;
+  QString kadasPythonPath() const;
+  QString kadasPluginsPath() const;
+  QString homePythonPath() const;
+  QString homePluginsPath() const;
 
-    QString qgisPythonPath() const;
-    QString qgisPluginsPath() const;
-    QString kadasPythonPath() const;
-    QString kadasPluginsPath() const;
-    QString homePythonPath() const;
-    QString homePluginsPath() const;
+  void restorePlugins();
 
-    void restorePlugins();
+  bool loadPlugin(const QString &packageName);
+  QString getPluginMetadata(const QString &pluginName,
+                            const QString &function) const;
 
-    bool loadPlugin( const QString &packageName );
-    QString getPluginMetadata( const QString &pluginName, const QString &function ) const;
+  bool canUninstallPlugin(const QString &packageName);
+  bool disablePlugin(const QString &packageName);
+  bool unloadPlugin(const QString &packageName);
+  void unloadAllPlugins();
 
-    bool canUninstallPlugin( const QString &packageName );
-    bool disablePlugin( const QString &packageName );
-    bool unloadPlugin( const QString &packageName );
-    void unloadAllPlugins();
+  QStringList pluginList();
+  QStringList listActivePlugins();
+  bool isPluginLoaded(const QString &packageName) const;
+  bool isPluginEnabled(const QString &packageName) const;
+  bool isPythonPluginCompatible(const QString &packageName) const;
 
-    QStringList pluginList();
-    QStringList listActivePlugins();
-    bool isPluginLoaded( const QString &packageName ) const;
-    bool isPluginEnabled( const QString &packageName ) const;
-    bool isPythonPluginCompatible( const QString &packageName ) const;
+protected:
+  void init();
+  bool checkSystemImports();
+  bool checkQgisUser();
+  void finish();
 
-  protected:
-    void init();
-    bool checkSystemImports();
-    bool checkQgisUser();
-    void finish();
+  void installErrorHook();
+  void uninstallErrorHook();
 
-    void installErrorHook();
-    void uninstallErrorHook();
+  QString getTraceback();
 
-    QString getTraceback();
+  //! convert Python object to QString. If the object isn't unicode/str, it will
+  //! be converted
+  QString PyObjectToQString(PyObject *obj) const;
 
-    //! convert Python object to QString. If the object isn't unicode/str, it will be converted
-    QString PyObjectToQString( PyObject *obj ) const;
+  //! reference to module __main__
+  PyObject *mMainModule = nullptr;
 
-    //! reference to module __main__
-    PyObject *mMainModule = nullptr;
+  //! dictionary of module __main__
+  PyObject *mMainDict = nullptr;
 
-    //! dictionary of module __main__
-    PyObject *mMainDict = nullptr;
+  bool mPythonEnabled = false;
 
-    bool mPythonEnabled = false;
+private:
+  bool checkQgisVersion(const QString &minVersion,
+                        const QString &maxVersion) const;
 
-  private:
-    bool checkQgisVersion( const QString &minVersion, const QString &maxVersion ) const;
-
-    bool mErrorHookInstalled = false;
+  bool mErrorHookInstalled = false;
 };
 
+class KadasPythonRunner : public QgsPythonRunner {
+public:
+  explicit KadasPythonRunner(KadasPythonIntegration *pythonIntegration)
+      : mPythonIntegration(pythonIntegration) {}
 
-class KadasPythonRunner : public QgsPythonRunner
-{
-  public:
-    explicit KadasPythonRunner( KadasPythonIntegration *pythonIntegration )
-      : mPythonIntegration( pythonIntegration ) {}
-
-    bool runCommand( QString command, QString messageOnError = QString() ) override
-    {
-      if ( mPythonIntegration && mPythonIntegration->isEnabled() )
-      {
-        return mPythonIntegration->runString( command, messageOnError, false );
-      }
-      return false;
+  bool runCommand(QString command,
+                  QString messageOnError = QString()) override {
+    if (mPythonIntegration && mPythonIntegration->isEnabled()) {
+      return mPythonIntegration->runString(command, messageOnError, false);
     }
+    return false;
+  }
 
-    bool evalCommand( QString command, QString &result ) override
-    {
-      if ( mPythonIntegration && mPythonIntegration->isEnabled() )
-      {
-        return mPythonIntegration->evalString( command, result );
-      }
-      return false;
+  bool evalCommand(QString command, QString &result) override {
+    if (mPythonIntegration && mPythonIntegration->isEnabled()) {
+      return mPythonIntegration->evalString(command, result);
     }
+    return false;
+  }
 
-    bool runFileCommand( const QString &filename, const QString &messageOnError = QString() )
-    {
-      QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
-      return false;
-    }
+  bool runFileCommand(const QString &filename,
+                      const QString &messageOnError = QString()) {
+    QgsDebugMsgLevel(QString("%1 Not implemented").arg(__func__), 2);
+    return false;
+  }
 
-    bool setArgvCommand( const QStringList &arguments, const QString &messageOnError = QString() )
-    {
-      QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
-      return false;
-    }
+  bool setArgvCommand(const QStringList &arguments,
+                      const QString &messageOnError = QString()) {
+    QgsDebugMsgLevel(QString("%1 Not implemented").arg(__func__), 2);
+    return false;
+  }
 
-  protected:
-    KadasPythonIntegration *mPythonIntegration = nullptr;
+protected:
+  KadasPythonIntegration *mPythonIntegration = nullptr;
 };
-
 
 #endif // KADASPYTHONINTEGRATION_H

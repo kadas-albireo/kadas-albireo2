@@ -16,38 +16,39 @@
 #ifndef KADASPHONGMATERIALWIDGET_H
 #define KADASPHONGMATERIALWIDGET_H
 
-#include "qgsmaterialsettingswidget.h"
 #include "qgsabstractmaterialsettings.h"
+#include "qgsmaterialsettingswidget.h"
 
 #include <ui_phongmaterialwidget.h>
 
 class QgsPhongMaterialSettings;
 
-
 //! Widget for configuration of Phong material settings
-class KadasPhongMaterialWidget : public QgsMaterialSettingsWidget, private Ui::PhongMaterialWidget
-{
-    Q_OBJECT
-    Q_PROPERTY( bool hasOpacity READ hasOpacity WRITE setHasOpacity )
+class KadasPhongMaterialWidget : public QgsMaterialSettingsWidget,
+                                 private Ui::PhongMaterialWidget {
+  Q_OBJECT
+  Q_PROPERTY(bool hasOpacity READ hasOpacity WRITE setHasOpacity)
 
-  public:
-    explicit KadasPhongMaterialWidget( QWidget *parent = nullptr, bool hasOpacity = true );
+public:
+  explicit KadasPhongMaterialWidget(QWidget *parent = nullptr,
+                                    bool hasOpacity = true);
 
-    static QgsMaterialSettingsWidget *create();
+  static QgsMaterialSettingsWidget *create();
 
-    void setTechnique( QgsMaterialSettingsRenderingTechnique technique ) final;
-    void setSettings( const QgsAbstractMaterialSettings *settings, QgsVectorLayer *layer ) final;
-    QgsAbstractMaterialSettings *settings() override;
+  void setTechnique(QgsMaterialSettingsRenderingTechnique technique) final;
+  void setSettings(const QgsAbstractMaterialSettings *settings,
+                   QgsVectorLayer *layer) final;
+  QgsAbstractMaterialSettings *settings() override;
 
-    bool hasOpacity() const { return mHasOpacity; }
-    void setHasOpacity( const bool opacity );
+  bool hasOpacity() const { return mHasOpacity; }
+  void setHasOpacity(const bool opacity);
 
-  private slots:
+private slots:
 
-    void updateWidgetState();
+  void updateWidgetState();
 
-  private:
-    bool mHasOpacity; //! whether to display the opacity slider
+private:
+  bool mHasOpacity; //! whether to display the opacity slider
 };
 
 #endif // KADASPHONGMATERIALWIDGET_H

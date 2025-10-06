@@ -28,51 +28,49 @@ class KadasMapGridLayer;
 class KadasMapGridWidget;
 class KadasLayerSelectionWidget;
 
+class KadasMapToolMapGrid : public QgsMapTool {
+  Q_OBJECT
 
-class KadasMapToolMapGrid : public QgsMapTool
-{
-    Q_OBJECT
+public:
+  KadasMapToolMapGrid(QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView,
+                      QgsMapLayer *layer);
+  ~KadasMapToolMapGrid();
 
-  public:
-    KadasMapToolMapGrid( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QgsMapLayer *layer );
-    ~KadasMapToolMapGrid();
+  void canvasReleaseEvent(QgsMapMouseEvent *e) override;
+  void keyReleaseEvent(QKeyEvent *e) override;
 
-    void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
-    void keyReleaseEvent( QKeyEvent *e ) override;
+private:
+  KadasMapGridWidget *mWidget = nullptr;
+  QAction *mActionEditLayer = nullptr;
 
-  private:
-    KadasMapGridWidget *mWidget = nullptr;
-    QAction *mActionEditLayer = nullptr;
-
-  private slots:
-    void close();
+private slots:
+  void close();
 };
 
-class KadasMapGridWidget : public KadasBottomBar
-{
-    Q_OBJECT
+class KadasMapGridWidget : public KadasBottomBar {
+  Q_OBJECT
 
-  public:
-    KadasMapGridWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QgsMapLayer *layer );
+public:
+  KadasMapGridWidget(QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView,
+                     QgsMapLayer *layer);
 
-    QgsMapLayer *createLayer( QString layerName = QString() );
+  QgsMapLayer *createLayer(QString layerName = QString());
 
-  private:
-    Ui::KadasMapGridWidgetBase ui;
-    KadasLayerSelectionWidget *mLayerSelectionWidget = nullptr;
-    KadasMapGridLayer *mCurrentLayer = nullptr;
+private:
+  Ui::KadasMapGridWidgetBase ui;
+  KadasLayerSelectionWidget *mLayerSelectionWidget = nullptr;
+  KadasMapGridLayer *mCurrentLayer = nullptr;
 
+signals:
+  void close();
 
-  signals:
-    void close();
-
-  private slots:
-    void setCurrentLayer( QgsMapLayer *layer );
-    void updateGrid();
-    void updateType( int idx, bool updateValues );
-    void updateColor( const QColor &color );
-    void updateFontSize( int fontSize );
-    void updateLabeling( int labelingMode );
+private slots:
+  void setCurrentLayer(QgsMapLayer *layer);
+  void updateGrid();
+  void updateType(int idx, bool updateValues);
+  void updateColor(const QColor &color);
+  void updateFontSize(int fontSize);
+  void updateLabeling(int labelingMode);
 };
 
 #endif // KADASMAPTOOLMAPGRID_H

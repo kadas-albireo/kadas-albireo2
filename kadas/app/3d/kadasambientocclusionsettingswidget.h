@@ -19,17 +19,18 @@
 
 #include "qgsambientocclusionsettings.h"
 
-class KadasAmbientOcclusionSettingsWidget : public QWidget, private Ui_KadasAmbientOcclusionSettingsWidget
-{
-    Q_OBJECT
+class KadasAmbientOcclusionSettingsWidget
+    : public QWidget,
+      private Ui_KadasAmbientOcclusionSettingsWidget {
+  Q_OBJECT
 
-  public:
-    explicit KadasAmbientOcclusionSettingsWidget( QWidget *parent = nullptr );
+public:
+  explicit KadasAmbientOcclusionSettingsWidget(QWidget *parent = nullptr);
 
-    //! Sets the ambient occlusion settings in the current widget UI
-    void setAmbientOcclusionSettings( const QgsAmbientOcclusionSettings &settings );
-    //! Returns the ambient occlusion settings from the widget UI
-    QgsAmbientOcclusionSettings toAmbientOcclusionSettings();
+  //! Sets the ambient occlusion settings in the current widget UI
+  void setAmbientOcclusionSettings(const QgsAmbientOcclusionSettings &settings);
+  //! Returns the ambient occlusion settings from the widget UI
+  QgsAmbientOcclusionSettings toAmbientOcclusionSettings();
 };
 
 #endif // KADASAMBIENTOCCLUSIONSETTINGSWIDGET_H

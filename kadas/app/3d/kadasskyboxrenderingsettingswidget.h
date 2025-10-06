@@ -20,22 +20,23 @@
 
 #include "qgsskyboxsettings.h"
 
-class KadasSkyboxRenderingSettingsWidget : public QWidget, private Ui::SkyboxRenderingSettingsWidget
-{
-    Q_OBJECT
+class KadasSkyboxRenderingSettingsWidget
+    : public QWidget,
+      private Ui::SkyboxRenderingSettingsWidget {
+  Q_OBJECT
 
-  public:
-    //! Constructor
-    explicit KadasSkyboxRenderingSettingsWidget( QWidget *parent = nullptr );
+public:
+  //! Constructor
+  explicit KadasSkyboxRenderingSettingsWidget(QWidget *parent = nullptr);
 
-    //! Sets the skybox settings in the current widget UI
-    void setSkyboxSettings( const QgsSkyboxSettings &skyboxSettings );
-    //! Returns the skybox settings from the widget UI
-    QgsSkyboxSettings toSkyboxSettings();
+  //! Sets the skybox settings in the current widget UI
+  void setSkyboxSettings(const QgsSkyboxSettings &skyboxSettings);
+  //! Returns the skybox settings from the widget UI
+  QgsSkyboxSettings toSkyboxSettings();
 
-  private slots:
-    //! Shows settings of the enabled skybox type
-    void showSkyboxSettings( int index );
+private slots:
+  //! Shows settings of the enabled skybox type
+  void showSkyboxSettings(int index);
 };
 
 #endif // SKYBOXRENDERINGSETTINGSWIDGET_H

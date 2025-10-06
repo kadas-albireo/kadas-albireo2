@@ -17,36 +17,33 @@
 #ifndef KADASKMLINTEGRATION_H
 #define KADASKMLINTEGRATION_H
 
-
 #include <QObject>
 
 #include <qgis/qgscustomdrophandler.h>
 
 class QToolButton;
 
-class KadasKmlDropHandler : public QgsCustomDropHandler
-{
-    Q_OBJECT
+class KadasKmlDropHandler : public QgsCustomDropHandler {
+  Q_OBJECT
 
-  public:
-    bool canHandleMimeData( const QMimeData *data ) override;
-    bool handleMimeDataV2( const QMimeData *data ) override;
+public:
+  bool canHandleMimeData(const QMimeData *data) override;
+  bool handleMimeDataV2(const QMimeData *data) override;
 };
 
-class KadasKmlIntegration : public QObject
-{
-    Q_OBJECT
+class KadasKmlIntegration : public QObject {
+  Q_OBJECT
 
-  public:
-    KadasKmlIntegration( QToolButton *kmlButton, QObject *parent = nullptr );
-    ~KadasKmlIntegration();
+public:
+  KadasKmlIntegration(QToolButton *kmlButton, QObject *parent = nullptr);
+  ~KadasKmlIntegration();
 
-  private:
-    void exportToKml();
-    void importFromKml();
+private:
+  void exportToKml();
+  void importFromKml();
 
-    QToolButton *mKMLButton = nullptr;
-    KadasKmlDropHandler mDropHandler;
+  QToolButton *mKMLButton = nullptr;
+  KadasKmlDropHandler mDropHandler;
 };
 
 #endif // KADASKMLINTEGRATION_H

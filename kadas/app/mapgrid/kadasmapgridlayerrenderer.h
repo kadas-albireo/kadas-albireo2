@@ -20,36 +20,47 @@
 #include <qgscoordinateformatter.h>
 #include <qgsmaplayerrenderer.h>
 
-#include "kadasmapgridlayer.h"
 #include "kadas/core/kadaslatlontoutm.h"
+#include "kadasmapgridlayer.h"
 
-class KadasMapGridLayerRenderer : public QgsMapLayerRenderer
-{
-  public:
-    KadasMapGridLayerRenderer( KadasMapGridLayer *layer, QgsRenderContext &rendererContext );
+class KadasMapGridLayerRenderer : public QgsMapLayerRenderer {
+public:
+  KadasMapGridLayerRenderer(KadasMapGridLayer *layer,
+                            QgsRenderContext &rendererContext);
 
-    bool render() override;
+  bool render() override;
 
-  private:
-    KadasMapGridLayer::GridConfig mRenderGridConfig;
-    double mRenderOpacity = 1.;
+private:
+  KadasMapGridLayer::GridConfig mRenderGridConfig;
+  double mRenderOpacity = 1.;
 
-    struct GridLabel
-    {
-        QString text;
-        QPointF screenPos;
-    };
+  struct GridLabel {
+    QString text;
+    QPointF screenPos;
+  };
 
-    void drawCrsGrid( const QString &crs, double segmentLength, QgsCoordinateFormatter::Format format, int precision, QgsCoordinateFormatter::FormatFlags flags );
-    void adjustZoneLabelPos( QPointF &labelPos, const QPointF &maxLabelPos, const QRectF &visibleExtent );
-    QRect computeScreenExtent( const QgsRectangle &mapExtent, const QgsMapToPixel &mapToPixel );
-    void drawMgrsGrid();
-    QRect drawMgrsGridZoneLabel( const KadasLatLonToUTM::ZoneLabel &zoneLabel, bool adaptToScreen, const QgsCoordinateTransform &crst, const QRect &screenExtent, double mapScale, const QColor &bufferColor, const QFont &font, const QList<QRect> &drawnLabelsRects );
-    void drawGridLabel( const QPointF &pos, const QString &text, const QFont &font, const QColor &bufferColor );
+  void drawCrsGrid(const QString &crs, double segmentLength,
+                   QgsCoordinateFormatter::Format format, int precision,
+                   QgsCoordinateFormatter::FormatFlags flags);
+  void adjustZoneLabelPos(QPointF &labelPos, const QPointF &maxLabelPos,
+                          const QRectF &visibleExtent);
+  QRect computeScreenExtent(const QgsRectangle &mapExtent,
+                            const QgsMapToPixel &mapToPixel);
+  void drawMgrsGrid();
+  QRect drawMgrsGridZoneLabel(const KadasLatLonToUTM::ZoneLabel &zoneLabel,
+                              bool adaptToScreen,
+                              const QgsCoordinateTransform &crst,
+                              const QRect &screenExtent, double mapScale,
+                              const QColor &bufferColor, const QFont &font,
+                              const QList<QRect> &drawnLabelsRects);
+  void drawGridLabel(const QPointF &pos, const QString &text, const QFont &font,
+                     const QColor &bufferColor);
 
-    //! creates a pen for the given level and lineWidth as a scale ratio
-    QPen level2pen( KadasLatLonToUTM::Level level, double lineWidth ) const;
-    static double exponentialScale( double value, double domainMin, double domainMax, double rangeMin, double rangeMax, double exponent = 1 );
+  //! creates a pen for the given level and lineWidth as a scale ratio
+  QPen level2pen(KadasLatLonToUTM::Level level, double lineWidth) const;
+  static double exponentialScale(double value, double domainMin,
+                                 double domainMax, double rangeMin,
+                                 double rangeMax, double exponent = 1);
 };
 
 #endif // KADASMAPGRIDLAYERRENDERER_H

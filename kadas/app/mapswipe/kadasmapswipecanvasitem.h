@@ -14,7 +14,6 @@
  *                                                                         *
  ***************************************************************************/
 
-
 #ifndef KADASMAPSWIPECANVASITEM_H
 #define KADASMAPSWIPECANVASITEM_H
 
@@ -25,39 +24,38 @@
 class QgsMapLayer;
 class QgsMapRendererParallelJob;
 
-class KadasMapSwipeCanvasItem : public QgsMapCanvasItem
-{
-  public:
-    KadasMapSwipeCanvasItem( QgsMapCanvas *mapCanvas );
+class KadasMapSwipeCanvasItem : public QgsMapCanvasItem {
+public:
+  KadasMapSwipeCanvasItem(QgsMapCanvas *mapCanvas);
 
-    void enable();
-    void disable( bool clearLayers = false );
+  void enable();
+  void disable(bool clearLayers = false);
 
-    //! Sets the layers which will be removed from rendering
-    void setLayers( const QSet<QgsMapLayer *> &layers );
+  //! Sets the layers which will be removed from rendering
+  void setLayers(const QSet<QgsMapLayer *> &layers);
 
-    void setPixelPosition( int x, int y );
+  void setPixelPosition(int x, int y);
 
-    int pixelLength() const;
+  int pixelLength() const;
 
-    void setVertical( bool vertical );
+  void setVertical(bool vertical);
 
-    bool vertical() const { return mIsVertical; }
+  bool vertical() const { return mIsVertical; }
 
-  public slots:
-    void refreshMap();
+public slots:
+  void refreshMap();
 
-  protected:
-    virtual void paint( QPainter *painter ) override;
+protected:
+  virtual void paint(QPainter *painter) override;
 
-  private:
-    int mPixelLength = -1;
-    QSet<QgsMapLayer *> mRemovedLayers;
-    bool mIsVertical = true;
-    QImage mRenderedMapImage;
-    QgsMapRendererParallelJob *mRenderJob = nullptr;
-    QMetaObject::Connection mRenderJobFinishedConnection;
-    QMetaObject::Connection mRenderJobUpdatedConnection;
+private:
+  int mPixelLength = -1;
+  QSet<QgsMapLayer *> mRemovedLayers;
+  bool mIsVertical = true;
+  QImage mRenderedMapImage;
+  QgsMapRendererParallelJob *mRenderJob = nullptr;
+  QMetaObject::Connection mRenderJobFinishedConnection;
+  QMetaObject::Connection mRenderJobUpdatedConnection;
 };
 
 #endif // KADASMAPSWIPECANVASITEM_H

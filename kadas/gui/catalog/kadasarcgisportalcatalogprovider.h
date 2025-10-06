@@ -17,72 +17,82 @@
 #ifndef KADASARCGISPORTALCATALOGPROVIDER_H
 #define KADASARCGISPORTALCATALOGPROVIDER_H
 
-#include <QSet>
 #include "kadas/gui/kadascatalogprovider.h"
+#include <QSet>
 
 class QStandardItem;
 
-class KADAS_GUI_EXPORT KadasArcGisPortalCatalogProvider : public KadasCatalogProvider
-{
-    Q_OBJECT
-  public:
-    KadasArcGisPortalCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params, const QString &authId = QString() );
+class KADAS_GUI_EXPORT KadasArcGisPortalCatalogProvider
+    : public KadasCatalogProvider {
+  Q_OBJECT
+public:
+  KadasArcGisPortalCatalogProvider(const QString &baseUrl,
+                                   KadasCatalogBrowser *browser,
+                                   const QMap<QString, QString> &params,
+                                   const QString &authId = QString());
 
-    void load() override;
+  void load() override;
 
-  private slots:
-    void replyFinished();
+private slots:
+  void replyFinished();
 
-  private:
-    struct ResultEntry
-    {
-        ResultEntry() {}
-        ResultEntry( const QString &_url, const QString &_id, const QString &_category, const QString &_title, const QString &_sortIndices, const QString &_metadataUrl, const QString &_detailUrl, bool _flatten = false )
-          : url( _url ), id( _id ), category( _category ), title( _title ), sortIndices( _sortIndices ), metadataUrl( _metadataUrl ), detailUrl( _detailUrl ), flatten( _flatten ) {}
-        ResultEntry( const ResultEntry &entry )
-          : url( entry.url ), id( entry.id ), category( entry.category ), title( entry.title ), sortIndices( entry.sortIndices ), metadataUrl( entry.metadataUrl ), detailUrl( entry.detailUrl ), flatten( entry.flatten ) {}
-        QString url;
-        QString id;
-        QString category;
-        QString title;
-        QString sortIndices;
-        QString metadataUrl;
-        QString detailUrl;
-        bool flatten;
-    };
+private:
+  struct ResultEntry {
+    ResultEntry() {}
+    ResultEntry(const QString &_url, const QString &_id,
+                const QString &_category, const QString &_title,
+                const QString &_sortIndices, const QString &_metadataUrl,
+                const QString &_detailUrl, bool _flatten = false)
+        : url(_url), id(_id), category(_category), title(_title),
+          sortIndices(_sortIndices), metadataUrl(_metadataUrl),
+          detailUrl(_detailUrl), flatten(_flatten) {}
+    ResultEntry(const ResultEntry &entry)
+        : url(entry.url), id(entry.id), category(entry.category),
+          title(entry.title), sortIndices(entry.sortIndices),
+          metadataUrl(entry.metadataUrl), detailUrl(entry.detailUrl),
+          flatten(entry.flatten) {}
+    QString url;
+    QString id;
+    QString category;
+    QString title;
+    QString sortIndices;
+    QString metadataUrl;
+    QString detailUrl;
+    bool flatten;
+  };
 
-    struct IsoTopicGroup
-    {
-        QString category;
-        QString sortIndices;
-    };
-    QMap<QString, IsoTopicGroup> mIsoTopics;
+  struct IsoTopicGroup {
+    QString category;
+    QString sortIndices;
+  };
+  QMap<QString, IsoTopicGroup> mIsoTopics;
 
-    QString mBaseUrl;
-    QString mServicePreference;
-    QString mCatalogTag;
-    int mPendingTasks;
+  QString mBaseUrl;
+  QString mServicePreference;
+  QString mCatalogTag;
+  int mPendingTasks;
 
-    QMap<QString, QMap<QString, ResultEntry>> mLayers;
+  QMap<QString, QMap<QString, ResultEntry>> mLayers;
 
-    void endTask();
+  void endTask();
 
-    void readWMTSDetail( const ResultEntry &entry );
-    void readWMSDetail( const ResultEntry &entry );
-    void addVTSlayer( const ResultEntry &entry );
-    void readWMTSCapabilities();
-    void readWMSCapabilities();
-    void readAMSCapabilities( const ResultEntry &entry );
+  void readWMTSDetail(const ResultEntry &entry);
+  void readWMSDetail(const ResultEntry &entry);
+  void addVTSlayer(const ResultEntry &entry);
+  void readWMTSCapabilities();
+  void readWMSCapabilities();
+  void readAMSCapabilities(const ResultEntry &entry);
 
-    void readWMSSublayers( const QDomElement &layerItem, const QString &parentName, QVariantList &sublayers );
+  void readWMSSublayers(const QDomElement &layerItem, const QString &parentName,
+                        QVariantList &sublayers);
 
-  private slots:
-    void readWMTSCapabilitiesDo();
-    void readWMSCapabilitiesDo();
-    void readAMSCapabilitiesDo();
+private slots:
+  void readWMTSCapabilitiesDo();
+  void readWMSCapabilitiesDo();
+  void readAMSCapabilitiesDo();
 
-  private:
-    QString mAuthId;
+private:
+  QString mAuthId;
 };
 
 #endif // KADASARCGISPORTALCATALOGPROVIDER_H

@@ -21,21 +21,20 @@
 
 #include <qgis/qgslayoutview.h>
 
-
 class KadasLayoutDesignerDialog;
 
+class KadasLayoutAppMenuProvider : public QObject,
+                                   public QgsLayoutViewMenuProvider {
+  Q_OBJECT
 
-class KadasLayoutAppMenuProvider : public QObject, public QgsLayoutViewMenuProvider
-{
-    Q_OBJECT
+public:
+  KadasLayoutAppMenuProvider(KadasLayoutDesignerDialog *designer);
 
-  public:
-    KadasLayoutAppMenuProvider( KadasLayoutDesignerDialog *designer );
+  QMenu *createContextMenu(QWidget *parent, QgsLayout *layout,
+                           QPointF layoutPoint) const override;
 
-    QMenu *createContextMenu( QWidget *parent, QgsLayout *layout, QPointF layoutPoint ) const override;
-
-  private:
-    KadasLayoutDesignerDialog *mDesigner = nullptr;
+private:
+  KadasLayoutDesignerDialog *mDesigner = nullptr;
 };
 
 #endif // KADASLAYOUTAPPMENUPROVIDER_H

@@ -19,16 +19,16 @@
 
 #include <qgis/qgsmessagelogviewer.h>
 
-class KadasMessageLogViewer : public QgsMessageLogViewer
-{
-    Q_OBJECT
+class KadasMessageLogViewer : public QgsMessageLogViewer {
+  Q_OBJECT
 
-  public:
-    KadasMessageLogViewer( QWidget *parent, Qt::WindowFlags fl = Qt::WindowFlags() );
+public:
+  KadasMessageLogViewer(QWidget *parent,
+                        Qt::WindowFlags fl = Qt::WindowFlags());
 
-  protected:
-    void closeEvent( QCloseEvent *e ) override;
-    void reject() override;
+protected:
+  void closeEvent(QCloseEvent *e) override;
+  void reject() override;
 };
 
 #endif // KADASMESSAGELOGVIEWER_H

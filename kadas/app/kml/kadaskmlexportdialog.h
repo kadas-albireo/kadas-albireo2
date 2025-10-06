@@ -21,31 +21,33 @@
 
 #include <qgis/qgsrectangle.h>
 
-#include <kml/kadaskmlexport.h>
 #include "ui_kadaskmlexportdialogbase.h"
+#include <kml/kadaskmlexport.h>
 
 class QgsMapLayer;
 class KadasMapToolSelectRect;
 
-class KadasKMLExportDialog : public QDialog, private Ui::KadasKMLExportDialogBase
-{
-    Q_OBJECT
-  public:
-    KadasKMLExportDialog( const QList<QgsMapLayer *> &activeLayers, QWidget *parent = 0, Qt::WindowFlags f = Qt::WindowFlags() );
-    ~KadasKMLExportDialog();
-    QString getFilename() const { return mFileLineEdit->text(); }
-    QList<QgsMapLayer *> getSelectedLayers() const;
-    double getExportScale() const { return mComboBoxExportScale->scale(); }
-    const QgsRectangle &getFilterRect() const;
+class KadasKMLExportDialog : public QDialog,
+                             private Ui::KadasKMLExportDialogBase {
+  Q_OBJECT
+public:
+  KadasKMLExportDialog(const QList<QgsMapLayer *> &activeLayers,
+                       QWidget *parent = 0,
+                       Qt::WindowFlags f = Qt::WindowFlags());
+  ~KadasKMLExportDialog();
+  QString getFilename() const { return mFileLineEdit->text(); }
+  QList<QgsMapLayer *> getSelectedLayers() const;
+  double getExportScale() const { return mComboBoxExportScale->scale(); }
+  const QgsRectangle &getFilterRect() const;
 
-  private slots:
-    void extentChanged( const QgsRectangle &extent );
-    void extentEdited();
-    void extentToggled( bool checked );
-    void selectFile();
+private slots:
+  void extentChanged(const QgsRectangle &extent);
+  void extentEdited();
+  void extentToggled(bool checked);
+  void selectFile();
 
-  private:
-    QPointer<KadasMapToolSelectRect> mRectTool;
+private:
+  QPointer<KadasMapToolSelectRect> mRectTool;
 };
 
 #endif // KADASKMLEXPORTDIALOG_H

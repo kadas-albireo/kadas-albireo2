@@ -34,41 +34,46 @@ class QgsColorButton;
 class QgsMapLayer;
 class KadasMilxLayer;
 
-class KADAS_GUI_EXPORT KadasMilxLayerPropertiesPage : public QgsMapLayerConfigWidget
-{
-    Q_OBJECT
+class KADAS_GUI_EXPORT KadasMilxLayerPropertiesPage
+    : public QgsMapLayerConfigWidget {
+  Q_OBJECT
 
-  public:
-    explicit KadasMilxLayerPropertiesPage( KadasMilxLayer *layer, QgsMapCanvas *canvas, QWidget *parent = nullptr );
+public:
+  explicit KadasMilxLayerPropertiesPage(KadasMilxLayer *layer,
+                                        QgsMapCanvas *canvas,
+                                        QWidget *parent = nullptr);
 
-  public slots:
-    void apply() override;
+public slots:
+  void apply() override;
 
-  private:
-    KadasMilxLayer *mLayer = nullptr;
-    QGroupBox *mGroupBox = nullptr;
-    QSlider *mSymbolSizeSlider = nullptr;
-    QSlider *mLineWidthSlider = nullptr;
-    QComboBox *mWorkModeCombo = nullptr;
-    QSpinBox *mLeaderLineWidthSpin = nullptr;
-    QgsColorButton *mLeaderLineColorButton = nullptr;
+private:
+  KadasMilxLayer *mLayer = nullptr;
+  QGroupBox *mGroupBox = nullptr;
+  QSlider *mSymbolSizeSlider = nullptr;
+  QSlider *mLineWidthSlider = nullptr;
+  QComboBox *mWorkModeCombo = nullptr;
+  QSpinBox *mLeaderLineWidthSpin = nullptr;
+  QgsColorButton *mLeaderLineColorButton = nullptr;
 };
 
+class KADAS_GUI_EXPORT KadasMilxLayerPropertiesPageFactory
+    : public QObject,
+      public QgsMapLayerConfigWidgetFactory {
+  Q_OBJECT
+public:
+  explicit KadasMilxLayerPropertiesPageFactory(QObject *parent = nullptr);
+  QgsMapLayerConfigWidget *createWidget(QgsMapLayer *layer,
+                                        QgsMapCanvas *canvas, bool dockWidget,
+                                        QWidget *parent) const override;
+  QIcon icon() const override;
+  QString title() const override;
+  bool supportLayerPropertiesDialog() const override { return true; }
+  bool supportsLayer(QgsMapLayer *layer) const override;
 
-class KADAS_GUI_EXPORT KadasMilxLayerPropertiesPageFactory : public QObject, public QgsMapLayerConfigWidgetFactory
-{
-    Q_OBJECT
-  public:
-    explicit KadasMilxLayerPropertiesPageFactory( QObject *parent = nullptr );
-    QgsMapLayerConfigWidget *createWidget( QgsMapLayer *layer, QgsMapCanvas *canvas, bool dockWidget, QWidget *parent ) const override;
-    QIcon icon() const override;
-    QString title() const override;
-    bool supportLayerPropertiesDialog() const override { return true; }
-    bool supportsLayer( QgsMapLayer *layer ) const override;
-
-  private slots:
-    void readLayerConfig( QgsMapLayer *mapLayer, const QDomElement &elem );
-    void writeLayerConfig( QgsMapLayer *mapLayer, QDomElement &elem, QDomDocument &doc );
+private slots:
+  void readLayerConfig(QgsMapLayer *mapLayer, const QDomElement &elem);
+  void writeLayerConfig(QgsMapLayer *mapLayer, QDomElement &elem,
+                        QDomDocument &doc);
 };
 
 #endif // KADASGLOBEVECTORLAYERPROPERTIES_H

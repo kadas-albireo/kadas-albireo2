@@ -23,13 +23,12 @@
 
 class QgsMapCanvas;
 
-class KADAS_GUI_EXPORT KadasBottomBar : public QgsFloatingWidget
-{
-  public:
-    KadasBottomBar( QgsMapCanvas *canvas, const QString &color = "orange" );
+class KADAS_GUI_EXPORT KadasBottomBar : public QgsFloatingWidget {
+public:
+  KadasBottomBar(QgsMapCanvas *canvas, const QString &color = "orange");
 
-  protected:
-    QgsMapCanvas *mCanvas;
+protected:
+  QgsMapCanvas *mCanvas;
 };
 
 #endif // KADASBOTTOMBAR_H

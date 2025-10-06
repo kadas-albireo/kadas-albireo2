@@ -26,50 +26,62 @@
 class QgsPointXY;
 class QgsCoordinateReferenceSystem;
 
-class KADAS_CORE_EXPORT KadasCoordinateFormat : public QObject
-{
-    Q_OBJECT
-  public:
-    enum class Format SIP_MONKEYPATCH_SCOPEENUM : int
-    {
-      Default,
-      DegMinSec,
-      DegMin,
-      DecDeg,
-      UTM,
-      MGRS
-    };
-    Q_ENUM( Format )
+class KADAS_CORE_EXPORT KadasCoordinateFormat : public QObject {
+  Q_OBJECT
+public:
+  enum class Format SIP_MONKEYPATCH_SCOPEENUM : int {
+    Default,
+    DegMinSec,
+    DegMin,
+    DecDeg,
+    UTM,
+    MGRS
+  };
+  Q_ENUM(Format)
 
-    static KadasCoordinateFormat *instance();
-    KadasCoordinateFormat::Format getCoordinateDisplayFormat() const;
-    const QString &getCoordinateDisplayCrs() const;
-    Qgis::DistanceUnit getHeightDisplayUnit() const { return mHeightUnit; }
+  static KadasCoordinateFormat *instance();
+  KadasCoordinateFormat::Format getCoordinateDisplayFormat() const;
+  const QString &getCoordinateDisplayCrs() const;
+  Qgis::DistanceUnit getHeightDisplayUnit() const { return mHeightUnit; }
 
-    QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, bool translateDirectionSuffixes = true ) const;
-    static QString getDisplayString( const QgsPointXY &p, const QgsCoordinateReferenceSystem &sSrs, KadasCoordinateFormat::Format format, const QString &epsg, bool translateDirectionSuffixes = true );
+  QString getDisplayString(const QgsPointXY &p,
+                           const QgsCoordinateReferenceSystem &sSrs,
+                           bool translateDirectionSuffixes = true) const;
+  static QString getDisplayString(const QgsPointXY &p,
+                                  const QgsCoordinateReferenceSystem &sSrs,
+                                  KadasCoordinateFormat::Format format,
+                                  const QString &epsg,
+                                  bool translateDirectionSuffixes = true);
 
-    double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, QString *errMsg = 0 );
+  double getHeightAtPos(const QgsPointXY &p,
+                        const QgsCoordinateReferenceSystem &crs,
+                        QString *errMsg = 0);
 
-    //! \deprecated use KadasCoordinateUtils::getHeightAtPos
-    Q_DECL_DEPRECATED static double getHeightAtPos( const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs, Qgis::DistanceUnit unit, QString *errMsg = 0 ) SIP_DEPRECATED;
+  //! \deprecated use KadasCoordinateUtils::getHeightAtPos
+  Q_DECL_DEPRECATED static double
+  getHeightAtPos(const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs,
+                 Qgis::DistanceUnit unit, QString *errMsg = 0) SIP_DEPRECATED;
 
-    QgsPointXY parseCoordinate( const QString &text, KadasCoordinateFormat::Format format, bool &valid ) const;
+  QgsPointXY parseCoordinate(const QString &text,
+                             KadasCoordinateFormat::Format format,
+                             bool &valid) const;
 
-  public slots:
-    void setCoordinateDisplayFormat( KadasCoordinateFormat::Format format, const QString &epsg );
-    void setHeightDisplayUnit( Qgis::DistanceUnit heightUnit );
+public slots:
+  void setCoordinateDisplayFormat(KadasCoordinateFormat::Format format,
+                                  const QString &epsg);
+  void setHeightDisplayUnit(Qgis::DistanceUnit heightUnit);
 
-  signals:
-    void coordinateDisplayFormatChanged( KadasCoordinateFormat::Format format, const QString &epsg );
-    void heightDisplayUnitChanged( Qgis::DistanceUnit heightUnit );
+signals:
+  void coordinateDisplayFormatChanged(KadasCoordinateFormat::Format format,
+                                      const QString &epsg);
+  void heightDisplayUnitChanged(Qgis::DistanceUnit heightUnit);
 
-  private:
-    KadasCoordinateFormat() SIP_FORCE;
+private:
+  KadasCoordinateFormat() SIP_FORCE;
 
-    Format mFormat;
-    QString mEpsg;
-    Qgis::DistanceUnit mHeightUnit;
+  Format mFormat;
+  QString mEpsg;
+  Qgis::DistanceUnit mHeightUnit;
 };
 
 #endif // KADASCOORDINATEFORMAT_H

@@ -19,62 +19,65 @@
 
 #include "kadas/gui/mapitems/kadasanchoreditem.h"
 
+class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem {
+  Q_OBJECT
+  Q_PROPERTY(QString filePath READ filePath WRITE setFilePath)
+  Q_PROPERTY(QString name READ name WRITE setName)
+  Q_PROPERTY(QString remarks READ remarks WRITE setRemarks)
 
-class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
-{
-    Q_OBJECT
-    Q_PROPERTY( QString filePath READ filePath WRITE setFilePath )
-    Q_PROPERTY( QString name READ name WRITE setName )
-    Q_PROPERTY( QString remarks READ remarks WRITE setRemarks )
+public:
+  KadasSymbolItem(const QgsCoordinateReferenceSystem &crs);
+  ~KadasSymbolItem();
+  void setup(const QString &path, double anchorX, double anchorY, int width = 0,
+             int height = 0);
 
-  public:
-    KadasSymbolItem( const QgsCoordinateReferenceSystem &crs );
-    ~KadasSymbolItem();
-    void setup( const QString &path, double anchorX, double anchorY, int width = 0, int height = 0 );
+  QString itemName() const override { return tr("Symbol"); }
 
-    QString itemName() const override { return tr( "Symbol" ); }
+  void setFilePath(const QString &path);
+  const QString &filePath() const { return mFilePath; }
+  void setName(const QString &name);
+  const QString &name() const { return mName; }
+  void setRemarks(const QString &remarks);
+  const QString &remarks() const { return mRemarks; }
 
-    void setFilePath( const QString &path );
-    const QString &filePath() const { return mFilePath; }
-    void setName( const QString &name );
-    const QString &name() const { return mName; }
-    void setRemarks( const QString &remarks );
-    const QString &remarks() const { return mRemarks; }
+  QImage symbolImage() const override { return mImage; }
+  QPointF symbolAnchor() const override {
+    return QPointF(anchorX(), anchorY());
+  }
 
-    QImage symbolImage() const override { return mImage; }
-    QPointF symbolAnchor() const override { return QPointF( anchorX(), anchorY() ); }
-
-    void render( QgsRenderContext &context ) const override;
+  void render(QgsRenderContext &context) const override;
 #ifndef SIP_RUN
-    QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
+  QString asKml(const QgsRenderContext &context,
+                QuaZip *kmzZip = nullptr) const override;
 #endif
 
-    EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
-    void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override;
+  EditContext getEditContext(const KadasMapPos &pos,
+                             const QgsMapSettings &mapSettings) const override;
+  void edit(const EditContext &context, const KadasMapPos &newPoint,
+            const QgsMapSettings &mapSettings) override;
 
-    void setState( const KadasMapItem::State *state ) override;
+  void setState(const KadasMapItem::State *state) override;
 
-  private:
-    QString mFilePath;
-    QString mName;
-    QString mRemarks;
-    QImage mImage;
-    bool mScalable = false;
+private:
+  QString mFilePath;
+  QString mName;
+  QString mRemarks;
+  QImage mImage;
+  bool mScalable = false;
 
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasSymbolItem( crs() ); }
+  KadasMapItem *_clone() const override SIP_FACTORY {
+    return new KadasSymbolItem(crs());
+  }
 };
 
+class KADAS_GUI_EXPORT KadasPinItem : public KadasSymbolItem {
+  Q_OBJECT
 
-class KADAS_GUI_EXPORT KadasPinItem : public KadasSymbolItem
-{
-    Q_OBJECT
+public:
+  KadasPinItem(const QgsCoordinateReferenceSystem &crs);
 
-  public:
-    KadasPinItem( const QgsCoordinateReferenceSystem &crs );
-
-  private slots:
-    void updateTooltip();
+private slots:
+  void updateTooltip();
 };
-
 
 #endif // KADASSYMBOLITEM_H

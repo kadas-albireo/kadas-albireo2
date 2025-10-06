@@ -24,85 +24,107 @@
 class QgsMapTool;
 class QgsPrintLayout;
 
-class KADAS_GUI_EXPORT KadasPluginInterface : public QgisInterface
-{
-    Q_OBJECT
-  public:
-    static KadasPluginInterface *cast( QgisInterface *iface ) { return dynamic_cast<KadasPluginInterface *>( iface ); }
-    // KADAS specific interface
-    enum class ActionRibbonTabLocation SIP_MONKEYPATCH_SCOPEENUM
-    {
-      NO_TAB,
-      MAPS_TAB,
-      VIEW_TAB,
-      ANALYSIS_TAB,
-      DRAW_TAB,
-      GPS_TAB,
-      MSS_TAB,
-      SETTINGS_TAB,
-      HELP_TAB,
-      CUSTOM_TAB
-    };
-    enum class ActionClassicMenuLocation SIP_MONKEYPATCH_SCOPEENUM
-    {
-      NO_MENU,
-      PROJECT_MENU,
-      EDIT_MENU,
-      VIEW_MENU,
-      LAYER_MENU,
-      NEWLAYER_MENU,
-      ADDLAYER_MENU,
-      SETTINGS_MENU,
-      PLUGIN_MENU,
-      RASTER_MENU,
-      DATABASE_MENU,
-      VECTOR_MENU,
-      WEB_MENU,
-      FIRST_RIGHT_STANDARD_MENU,
-      WINDOW_MENU,
-      HELP_MENU,
-      CUSTOM_MENU
-    };
+class KADAS_GUI_EXPORT KadasPluginInterface : public QgisInterface {
+  Q_OBJECT
+public:
+  static KadasPluginInterface *cast(QgisInterface *iface) {
+    return dynamic_cast<KadasPluginInterface *>(iface);
+  }
+  // KADAS specific interface
+  enum class ActionRibbonTabLocation SIP_MONKEYPATCH_SCOPEENUM {
+    NO_TAB,
+    MAPS_TAB,
+    VIEW_TAB,
+    ANALYSIS_TAB,
+    DRAW_TAB,
+    GPS_TAB,
+    MSS_TAB,
+    SETTINGS_TAB,
+    HELP_TAB,
+    CUSTOM_TAB
+  };
+  enum class ActionClassicMenuLocation SIP_MONKEYPATCH_SCOPEENUM {
+    NO_MENU,
+    PROJECT_MENU,
+    EDIT_MENU,
+    VIEW_MENU,
+    LAYER_MENU,
+    NEWLAYER_MENU,
+    ADDLAYER_MENU,
+    SETTINGS_MENU,
+    PLUGIN_MENU,
+    RASTER_MENU,
+    DATABASE_MENU,
+    VECTOR_MENU,
+    WEB_MENU,
+    FIRST_RIGHT_STANDARD_MENU,
+    WINDOW_MENU,
+    HELP_MENU,
+    CUSTOM_MENU
+  };
 
-    virtual QMenu *getClassicMenu( ActionClassicMenuLocation classicMenuLocation, const QString &customName = QString() ) = 0;
-    virtual QMenu *getSubMenu( QMenu *menu, const QString &submenuName ) = 0;
-    virtual QWidget *getRibbonWidget() = 0;
-    virtual QWidget *getRibbonTabWidget( ActionRibbonTabLocation ribbonTabLocation, const QString &customName ) = 0;
+  virtual QMenu *getClassicMenu(ActionClassicMenuLocation classicMenuLocation,
+                                const QString &customName = QString()) = 0;
+  virtual QMenu *getSubMenu(QMenu *menu, const QString &submenuName) = 0;
+  virtual QWidget *getRibbonWidget() = 0;
+  virtual QWidget *getRibbonTabWidget(ActionRibbonTabLocation ribbonTabLocation,
+                                      const QString &customName) = 0;
 
-    //! Generic action adder
-    virtual void addAction( QAction *action, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString(), QgsMapTool *associatedMapTool = nullptr ) = 0;
-    virtual void addActionMenu( const QString &text, const QIcon &icon, QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString() ) = 0;
-    virtual void addActionMapCanvasRightClick( QAction *action ) = 0;
+  //! Generic action adder
+  virtual void addAction(QAction *action,
+                         ActionClassicMenuLocation classicMenuLocation,
+                         ActionRibbonTabLocation ribbonTabLocation,
+                         const QString &customName = QString(),
+                         QgsMapTool *associatedMapTool = nullptr) = 0;
+  virtual void addActionMenu(const QString &text, const QIcon &icon,
+                             QMenu *menu,
+                             ActionClassicMenuLocation classicMenuLocation,
+                             ActionRibbonTabLocation ribbonTabLocation,
+                             const QString &customName = QString()) = 0;
+  virtual void addActionMapCanvasRightClick(QAction *action) = 0;
 
-    //! Generic action remover
-    virtual void removeAction( QAction *action, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString(), QgsMapTool *associatedMapTool = nullptr ) = 0;
-    virtual void removeActionMenu( QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString() ) = 0;
-    virtual void removeActionMapCanvasRightClick( QAction *action ) = 0;
+  //! Generic action remover
+  virtual void removeAction(QAction *action,
+                            ActionClassicMenuLocation classicMenuLocation,
+                            ActionRibbonTabLocation ribbonTabLocation,
+                            const QString &customName = QString(),
+                            QgsMapTool *associatedMapTool = nullptr) = 0;
+  virtual void removeActionMenu(QMenu *menu,
+                                ActionClassicMenuLocation classicMenuLocation,
+                                ActionRibbonTabLocation ribbonTabLocation,
+                                const QString &customName = QString()) = 0;
+  virtual void removeActionMapCanvasRightClick(QAction *action) = 0;
 
-    //! Generic action finder
-    virtual QAction *findAction( const QString &name ) = 0;
+  //! Generic action finder
+  virtual QAction *findAction(const QString &name) = 0;
 
-    //! Generic object finder
-    virtual QObject *findObject( const QString &name ) = 0;
+  //! Generic object finder
+  virtual QObject *findObject(const QString &name) = 0;
 
-    virtual QgsPrintLayout *createNewPrintLayout( const QString &title ) = 0;
-    virtual bool deletePrintLayout( QgsPrintLayout *layout ) = 0;
-    virtual QList<QgsPrintLayout *> printLayouts() const = 0;
-    virtual void showLayoutDesigner( QgsPrintLayout *layout ) = 0;
+  virtual QgsPrintLayout *createNewPrintLayout(const QString &title) = 0;
+  virtual bool deletePrintLayout(QgsPrintLayout *layout) = 0;
+  virtual QList<QgsPrintLayout *> printLayouts() const = 0;
+  virtual void showLayoutDesigner(QgsPrintLayout *layout) = 0;
 
-    virtual bool saveProject() = 0;
+  virtual bool saveProject() = 0;
 
-    virtual QgsVectorLayer *addVectorLayerQuiet( const QString &vectorLayerPath, const QString &baseName, const QString &providerKey ) = 0;
-    virtual QgsRasterLayer *addRasterLayerQuiet( const QString &url, const QString &layerName, const QString &providerKey ) = 0;
-    virtual QgsVectorTileLayer *addVectorTileLayerQuiet( const QString &url, const QString &baseName ) = 0;
-    virtual QgsPointCloudLayer *addPointCloudLayerQuiet( const QString &url, const QString &baseName, const QString &providerKey ) = 0;
+  virtual QgsVectorLayer *addVectorLayerQuiet(const QString &vectorLayerPath,
+                                              const QString &baseName,
+                                              const QString &providerKey) = 0;
+  virtual QgsRasterLayer *addRasterLayerQuiet(const QString &url,
+                                              const QString &layerName,
+                                              const QString &providerKey) = 0;
+  virtual QgsVectorTileLayer *
+  addVectorTileLayerQuiet(const QString &url, const QString &baseName) = 0;
+  virtual QgsPointCloudLayer *
+  addPointCloudLayerQuiet(const QString &url, const QString &baseName,
+                          const QString &providerKey) = 0;
 
-  signals:
-    void printLayoutAdded( QgsPrintLayout *layout );
-    void printLayoutWillBeRemoved( QgsPrintLayout *layout );
-    void projectWillBeClosed();
-    void mainWindowClosed();
+signals:
+  void printLayoutAdded(QgsPrintLayout *layout);
+  void printLayoutWillBeRemoved(QgsPrintLayout *layout);
+  void projectWillBeClosed();
+  void mainWindowClosed();
 };
-
 
 #endif // KADASPLUGININTERFACE_H

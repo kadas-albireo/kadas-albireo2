@@ -21,30 +21,28 @@
 
 #include "kadas/gui/kadas_gui.h"
 
-
 class QgsMapLayer;
 class KadasMapItem;
 
+class KADAS_GUI_EXPORT KadasMapCanvasItem : public QObject,
+                                            public QgsMapCanvasItem {
+  Q_OBJECT
 
-class KADAS_GUI_EXPORT KadasMapCanvasItem : public QObject, public QgsMapCanvasItem
-{
-    Q_OBJECT
+public:
+  KadasMapCanvasItem(const KadasMapItem *item, QgsMapCanvas *canvas);
+  const KadasMapItem *mapItem() const { return mItem; }
+  bool isVisible() const;
 
-  public:
-    KadasMapCanvasItem( const KadasMapItem *item, QgsMapCanvas *canvas );
-    const KadasMapItem *mapItem() const { return mItem; }
-    bool isVisible() const;
+  void paint(QPainter *painter) override;
 
-    void paint( QPainter *painter ) override;
+private:
+  const KadasMapItem *mItem = nullptr;
+  static constexpr double sHandleSize = 8;
 
-  private:
-    const KadasMapItem *mItem = nullptr;
-    static constexpr double sHandleSize = 8;
+  bool layerVisible(QgsMapLayer *layer) const;
 
-    bool layerVisible( QgsMapLayer *layer ) const;
-
-  private slots:
-    void updateRect();
+private slots:
+  void updateRect();
 };
 
 #endif // KADASMAPCANVASITEM_H

@@ -17,8 +17,8 @@
 #ifndef KADASCATALOGPROVIDER_H
 #define KADASCATALOGPROVIDER_H
 
-#include <QObject>
 #include <QMap>
+#include <QObject>
 
 #include "kadas/gui/kadas_gui.h"
 
@@ -29,27 +29,36 @@ class QMimeData;
 class QStandardItem;
 class KadasCatalogBrowser;
 
+class KADAS_GUI_EXPORT KadasCatalogProvider : public QObject {
+  Q_OBJECT
+public:
+  KadasCatalogProvider(KadasCatalogBrowser *browser);
+  virtual void load() = 0;
 
-class KADAS_GUI_EXPORT KadasCatalogProvider : public QObject
-{
-    Q_OBJECT
-  public:
-    KadasCatalogProvider( KadasCatalogBrowser *browser );
-    virtual void load() = 0;
+signals:
+  void finished();
 
-  signals:
-    void finished();
+protected:
+  KadasCatalogBrowser *mBrowser;
 
-  protected:
-    KadasCatalogBrowser *mBrowser;
-
-    QList<QDomNode> childrenByTagName( const QDomElement &element, const QString &tagName ) const;
-    QMap<QString, QString> parseWMTSTileMatrixSets( const QDomDocument &doc ) const;
-    void parseWMTSLayerCapabilities( const QDomNode &layerItem, const QMap<QString, QString> &tileMatrixSetMap, const QString &url, const QString &layerInfoUrl, const QString &extraParams, QString &title, QString &layerid, const QString &authCfg, QMimeData *&mimeData ) const;
-    QStringList parseWMSFormats( const QDomDocument &doc ) const;
-    QString parseWMSNestedLayer( const QDomNode &layerItem ) const;
-    bool parseWMSLayerCapabilities( const QDomNode &layerItem, const QString &title, const QStringList &imgFormats, const QStringList &parentCrs, const QString &url, const QString &layerInfoUrl, const QString &authCfg, QMimeData *&mimeData ) const;
-    QStandardItem *getCategoryItem( const QStringList &titles, const QStringList &sortIndices );
+  QList<QDomNode> childrenByTagName(const QDomElement &element,
+                                    const QString &tagName) const;
+  QMap<QString, QString> parseWMTSTileMatrixSets(const QDomDocument &doc) const;
+  void parseWMTSLayerCapabilities(
+      const QDomNode &layerItem, const QMap<QString, QString> &tileMatrixSetMap,
+      const QString &url, const QString &layerInfoUrl,
+      const QString &extraParams, QString &title, QString &layerid,
+      const QString &authCfg, QMimeData *&mimeData) const;
+  QStringList parseWMSFormats(const QDomDocument &doc) const;
+  QString parseWMSNestedLayer(const QDomNode &layerItem) const;
+  bool
+  parseWMSLayerCapabilities(const QDomNode &layerItem, const QString &title,
+                            const QStringList &imgFormats,
+                            const QStringList &parentCrs, const QString &url,
+                            const QString &layerInfoUrl, const QString &authCfg,
+                            QMimeData *&mimeData) const;
+  QStandardItem *getCategoryItem(const QStringList &titles,
+                                 const QStringList &sortIndices);
 };
 
 #endif // KADASCATALOGPROVIDER_H

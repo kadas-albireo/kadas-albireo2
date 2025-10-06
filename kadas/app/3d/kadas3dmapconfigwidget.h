@@ -29,38 +29,40 @@ class KadasShadowRenderingSettingsWidget;
 class Qgs3DMapCanvas;
 class QgsSkyboxSettings;
 
-class Kadas3DMapConfigWidget : public QWidget, private Ui::Map3DConfigWidget
-{
-    Q_OBJECT
-  public:
-    //! construct widget. does not take ownership of the passed map.
-    explicit Kadas3DMapConfigWidget( Qgs3DMapSettings *map, QgsMapCanvas *mainCanvas, Qgs3DMapCanvas *mapCanvas3D, QWidget *parent = nullptr );
+class Kadas3DMapConfigWidget : public QWidget, private Ui::Map3DConfigWidget {
+  Q_OBJECT
+public:
+  //! construct widget. does not take ownership of the passed map.
+  explicit Kadas3DMapConfigWidget(Qgs3DMapSettings *map,
+                                  QgsMapCanvas *mainCanvas,
+                                  Qgs3DMapCanvas *mapCanvas3D,
+                                  QWidget *parent = nullptr);
 
-    ~Kadas3DMapConfigWidget() override;
+  ~Kadas3DMapConfigWidget() override;
 
-    void apply();
+  void apply();
 
-  signals:
+signals:
 
-    void isValidChanged( bool valid );
+  void isValidChanged(bool valid);
 
-  private slots:
-    void onTerrainTypeChanged();
-    void onTerrainLayerChanged();
-    void updateMaxZoomLevel();
-    void validate();
-    void on3DAxisChanged();
+private slots:
+  void onTerrainTypeChanged();
+  void onTerrainLayerChanged();
+  void updateMaxZoomLevel();
+  void validate();
+  void on3DAxisChanged();
 
-  private:
-    Qgs3DMapSettings *mMap = nullptr;
-    QgsMapCanvas *mMainCanvas = nullptr;
-    Qgs3DMapCanvas *m3DMapCanvas = nullptr;
-    KadasMesh3DSymbolWidget *mMeshSymbolWidget = nullptr;
-    KadasSkyboxRenderingSettingsWidget *mSkyboxSettingsWidget = nullptr;
-    KadasShadowRenderingSettingsWidget *mShadowSettingsWidget = nullptr;
-    QCheckBox *mShowExtentIn2DViewCheckbox = nullptr;
+private:
+  Qgs3DMapSettings *mMap = nullptr;
+  QgsMapCanvas *mMainCanvas = nullptr;
+  Qgs3DMapCanvas *m3DMapCanvas = nullptr;
+  KadasMesh3DSymbolWidget *mMeshSymbolWidget = nullptr;
+  KadasSkyboxRenderingSettingsWidget *mSkyboxSettingsWidget = nullptr;
+  KadasShadowRenderingSettingsWidget *mShadowSettingsWidget = nullptr;
+  QCheckBox *mShowExtentIn2DViewCheckbox = nullptr;
 
-    void init3DAxisPage();
+  void init3DAxisPage();
 };
 
 #endif // KADAS3DMAPCONFIGWIDGET_H

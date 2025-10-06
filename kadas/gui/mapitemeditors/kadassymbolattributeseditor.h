@@ -18,32 +18,30 @@
 #define KADASSYMBOLATTRIBUTESEDITOR_H
 
 #include "kadas/gui/kadas_gui.h"
-#include "kadas/gui/mapitems/kadasmapitem.h"
 #include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
 
 class QLineEdit;
 class KadasRichTextEditor;
 class KadasRichTextEditorToolBar;
 
+class KADAS_GUI_EXPORT KadasSymbolAttributesEditor : public KadasMapItemEditor {
+  Q_OBJECT
 
-class KADAS_GUI_EXPORT KadasSymbolAttributesEditor : public KadasMapItemEditor
-{
-    Q_OBJECT
+public:
+  KadasSymbolAttributesEditor(KadasMapItem *item);
 
-  public:
-    KadasSymbolAttributesEditor( KadasMapItem *item );
+  void setItem(KadasMapItem *item) override;
+  void reset() override;
+  void syncItemToWidget() override;
+  void syncWidgetToItem() override;
 
-    void setItem( KadasMapItem *item ) override;
-    void reset() override;
-    void syncItemToWidget() override;
-    void syncWidgetToItem() override;
+private:
+  void adjustVisiblity();
 
-  private:
-    void adjustVisiblity();
-
-    QLineEdit *mLineEditName = nullptr;
-    KadasRichTextEditor *mTextEditRemarks = nullptr;
-    KadasRichTextEditorToolBar *mEditorToolbar = nullptr;
+  QLineEdit *mLineEditName = nullptr;
+  KadasRichTextEditor *mTextEditRemarks = nullptr;
+  KadasRichTextEditorToolBar *mEditorToolbar = nullptr;
 };
 
 #endif // KADASSYMBOLATTRIBUTESEDITOR_H

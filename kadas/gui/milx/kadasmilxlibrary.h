@@ -28,50 +28,55 @@ class QgsFilterLineEdit;
 
 #include "kadas/gui/milx/kadasmilxclient.h"
 
-class KADAS_GUI_EXPORT KadasMilxLibrary : public QFrame
-{
-    Q_OBJECT
-  public:
-    KadasMilxLibrary( WId winId, QWidget *parent = 0 );
-    ~KadasMilxLibrary();
-    void focusFilter();
+class KADAS_GUI_EXPORT KadasMilxLibrary : public QFrame {
+  Q_OBJECT
+public:
+  KadasMilxLibrary(WId winId, QWidget *parent = 0);
+  ~KadasMilxLibrary();
+  void focusFilter();
 
-  signals:
-    void symbolSelected( const KadasMilxSymbolDesc &symbolDesc );
-    void visibilityChanged( bool visible );
+signals:
+  void symbolSelected(const KadasMilxSymbolDesc &symbolDesc);
+  void visibilityChanged(bool visible);
 
-  protected:
-    void showEvent( QShowEvent * ) { emit visibilityChanged( true ); }
-    void hideEvent( QHideEvent * ) { emit visibilityChanged( false ); }
+protected:
+  void showEvent(QShowEvent *) { emit visibilityChanged(true); }
+  void hideEvent(QHideEvent *) { emit visibilityChanged(false); }
 
-  private:
-    class TreeFilterProxyModel;
-    friend class KadasMilxLibraryLoader;
+private:
+  class TreeFilterProxyModel;
+  friend class KadasMilxLibraryLoader;
 
-    static const int SymbolXmlRole;
-    static const int SymbolMilitaryNameRole;
-    static const int SymbolPointCountRole;
-    static const int SymbolVariablePointsRole;
-    static const int SymbolTypeRole;
+  static const int SymbolXmlRole;
+  static const int SymbolMilitaryNameRole;
+  static const int SymbolPointCountRole;
+  static const int SymbolVariablePointsRole;
+  static const int SymbolTypeRole;
 
-    WId mWinId;
-    QgsFilterLineEdit *mFilterLineEdit = nullptr;
-    QTreeView *mTreeView = nullptr;
-    QStandardItemModel *mGalleryModel = nullptr;
-    QStandardItemModel *mLoadingModel = nullptr;
-    TreeFilterProxyModel *mFilterProxyModel = nullptr;
+  WId mWinId;
+  QgsFilterLineEdit *mFilterLineEdit = nullptr;
+  QTreeView *mTreeView = nullptr;
+  QStandardItemModel *mGalleryModel = nullptr;
+  QStandardItemModel *mLoadingModel = nullptr;
+  TreeFilterProxyModel *mFilterProxyModel = nullptr;
 
-    QAtomicInt mLoaderAborted = 0;
-    QFutureWatcher<QStandardItemModel *> mLibraryFuture;
+  QAtomicInt mLoaderAborted = 0;
+  QFutureWatcher<QStandardItemModel *> mLibraryFuture;
 
-  private slots:
-    void filterChanged( const QString &text );
-    void itemClicked( const QModelIndex &index );
+private slots:
+  void filterChanged(const QString &text);
+  void itemClicked(const QModelIndex &index);
 
-  private:
-    QStandardItemModel *loadLibrary( const QSize &viewIconSize );
-    static QStandardItem *addItem( QStandardItem *parent, const QString &value, const QImage &image = QImage(), const QSize &viewIconSize = QSize(), bool isLeaf = false, const QString &symbolXml = QString(), const QString &symbolMilitaryName = QString(), int symbolPointCount = 0, bool symbolHasVariablePoints = false, const QString &symbolType = QString() );
-    void loaderFinished();
+private:
+  QStandardItemModel *loadLibrary(const QSize &viewIconSize);
+  static QStandardItem *
+  addItem(QStandardItem *parent, const QString &value,
+          const QImage &image = QImage(), const QSize &viewIconSize = QSize(),
+          bool isLeaf = false, const QString &symbolXml = QString(),
+          const QString &symbolMilitaryName = QString(),
+          int symbolPointCount = 0, bool symbolHasVariablePoints = false,
+          const QString &symbolType = QString());
+  void loaderFinished();
 };
 
 #endif // KADASMILXLIBRARY_H

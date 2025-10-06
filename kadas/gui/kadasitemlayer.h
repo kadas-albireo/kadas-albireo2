@@ -129,110 +129,126 @@ class KadasMapPos;
 // clang-format on
 #endif
 
-class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
-{
-    Q_OBJECT
-  public:
-    typedef unsigned ItemId;
-    static constexpr ItemId ITEM_ID_NULL = 0;
+class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer {
+  Q_OBJECT
+public:
+  typedef unsigned ItemId;
+  static constexpr ItemId ITEM_ID_NULL = 0;
 
-    enum class PickObjective SIP_MONKEYPATCH_SCOPEENUM
-    {
-      PICK_OBJECTIVE_ANY,
-      PICK_OBJECTIVE_TOOLTIP
-    };
+  enum class PickObjective SIP_MONKEYPATCH_SCOPEENUM {
+    PICK_OBJECTIVE_ANY,
+    PICK_OBJECTIVE_TOOLTIP
+  };
 
-    static QString layerType() { return "KadasItemLayer"; }
-    KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs );
-    ~KadasItemLayer();
-    QString layerTypeKey() const override { return layerType(); }
-    virtual bool acceptsItem( const KadasMapItem *item ) const { return true; }
+  static QString layerType() { return "KadasItemLayer"; }
+  KadasItemLayer(const QString &name, const QgsCoordinateReferenceSystem &crs);
+  ~KadasItemLayer();
+  QString layerTypeKey() const override { return layerType(); }
+  virtual bool acceptsItem(const KadasMapItem *item) const { return true; }
 
-    ItemId addItem( KadasMapItem *item SIP_TRANSFER );
-    void lowerItem( const ItemId &itemId );
-    void raiseItem( const ItemId &itemId );
-    KadasMapItem *takeItem( const ItemId &itemId ) SIP_TRANSFER;
-    const QMap<KadasItemLayer::ItemId, KadasMapItem *> &items() const { return mItems; }
+  ItemId addItem(KadasMapItem *item SIP_TRANSFER);
+  void lowerItem(const ItemId &itemId);
+  void raiseItem(const ItemId &itemId);
+  KadasMapItem *takeItem(const ItemId &itemId) SIP_TRANSFER;
+  const QMap<KadasItemLayer::ItemId, KadasMapItem *> &items() const {
+    return mItems;
+  }
 
-    KadasItemLayer *clone() const override SIP_FACTORY;
-    QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
-    QgsRectangle extent() const override;
-    bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
-    bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const override;
-    virtual KadasItemLayer::ItemId pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY ) const;
+  KadasItemLayer *clone() const override SIP_FACTORY;
+  QgsMapLayerRenderer *
+  createMapRenderer(QgsRenderContext &rendererContext) override;
+  QgsRectangle extent() const override;
+  bool readXml(const QDomNode &layer_node,
+               QgsReadWriteContext &context) override;
+  bool writeXml(QDomNode &layer_node, QDomDocument &document,
+                const QgsReadWriteContext &context) const override;
+  virtual KadasItemLayer::ItemId
+  pickItem(const KadasMapPos &mapPos, const QgsMapSettings &mapSettings,
+           KadasItemLayer::PickObjective pickObjective =
+               KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY) const;
 #ifndef SIP_RUN
-    [[deprecated( "Use variant taking the mapPos as first parameter instead" )]]
+  [[deprecated("Use variant taking the mapPos as first parameter instead")]]
 #endif
-    KadasItemLayer::ItemId pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
+  KadasItemLayer::ItemId pickItem(const QgsRectangle &pickRect,
+                                  const QgsMapSettings &mapSettings) const;
 
 #ifndef SIP_RUN
-    // TODO: SIP
-    QPair<QgsPointXY, double> snapToVertex( const QgsPointXY &pos, const QgsMapSettings &settings, double tolPixels ) const;
+  // TODO: SIP
+  QPair<QgsPointXY, double> snapToVertex(const QgsPointXY &pos,
+                                         const QgsMapSettings &settings,
+                                         double tolPixels) const;
 #endif
 
 #ifndef SIP_RUN
-    virtual QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr, const QgsRectangle &exportRect = QgsRectangle() ) const;
+  virtual QString asKml(const QgsRenderContext &context,
+                        QuaZip *kmzZip = nullptr,
+                        const QgsRectangle &exportRect = QgsRectangle()) const;
 #endif
 
-    void setSymbolScale( double scale );
-    double symbolScale() const { return mSymbolScale; }
+  void setSymbolScale(double scale);
+  double symbolScale() const { return mSymbolScale; }
 
-  signals:
-    void itemAdded( KadasItemLayer::ItemId itemId );
-    void itemRemoved( KadasItemLayer::ItemId itemId );
+signals:
+  void itemAdded(KadasItemLayer::ItemId itemId);
+  void itemRemoved(KadasItemLayer::ItemId itemId);
 
-  protected:
-    KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs, const QString &layerType );
-    class Renderer;
+protected:
+  KadasItemLayer(const QString &name, const QgsCoordinateReferenceSystem &crs,
+                 const QString &layerType);
+  class Renderer;
 
-    QMap<ItemId, KadasMapItem *> mItems;
-    QList<ItemId> mItemOrder;
-    QMap<ItemId, QgsRectangle> mItemBounds;
-    ItemId mIdCounter = 0;
-    QVector<ItemId> mFreeIds;
-    double mSymbolScale = 1.0;
+  QMap<ItemId, KadasMapItem *> mItems;
+  QList<ItemId> mItemOrder;
+  QMap<ItemId, QgsRectangle> mItemBounds;
+  ItemId mIdCounter = 0;
+  QVector<ItemId> mFreeIds;
+  double mSymbolScale = 1.0;
 };
 
-class KADAS_GUI_EXPORT KadasItemLayerType : public KadasPluginLayerType
-{
-    Q_OBJECT
+class KADAS_GUI_EXPORT KadasItemLayerType : public KadasPluginLayerType {
+  Q_OBJECT
 
-  public:
-    KadasItemLayerType()
-      : KadasPluginLayerType( KadasItemLayer::layerType() ) {}
-    QgsPluginLayer *createLayer() override SIP_FACTORY { return new KadasItemLayer( "Items", QgsCoordinateReferenceSystem( "EPSG:3857" ) ); }
-    QgsPluginLayer *createLayer( const QString &uri ) override SIP_FACTORY { return new KadasItemLayer( "Items", QgsCoordinateReferenceSystem( "EPSG:3857" ) ); }
-    void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const override;
+public:
+  KadasItemLayerType() : KadasPluginLayerType(KadasItemLayer::layerType()) {}
+  QgsPluginLayer *createLayer() override SIP_FACTORY {
+    return new KadasItemLayer("Items",
+                              QgsCoordinateReferenceSystem("EPSG:3857"));
+  }
+  QgsPluginLayer *createLayer(const QString &uri) override SIP_FACTORY {
+    return new KadasItemLayer("Items",
+                              QgsCoordinateReferenceSystem("EPSG:3857"));
+  }
+  void addLayerTreeMenuActions(QMenu *menu,
+                               QgsPluginLayer *layer) const override;
 };
 
-class KADAS_GUI_EXPORT KadasItemLayerRegistry : public QObject
-{
-    Q_OBJECT
-  public:
-    enum class StandardLayer SIP_MONKEYPATCH_SCOPEENUM
-    {
-      RedliningLayer,
-      SymbolsLayer,
-      PicturesLayer,
-      PinsLayer,
-      RoutesLayer
-    };
-    static KadasItemLayer *getOrCreateItemLayer( StandardLayer layer );
-    static const QMap<KadasItemLayerRegistry::StandardLayer, QString> &standardLayerNames();
-    static QList<KadasItemLayer *> getItemLayers();
-    static void init();
+class KADAS_GUI_EXPORT KadasItemLayerRegistry : public QObject {
+  Q_OBJECT
+public:
+  enum class StandardLayer SIP_MONKEYPATCH_SCOPEENUM {
+    RedliningLayer,
+    SymbolsLayer,
+    PicturesLayer,
+    PinsLayer,
+    RoutesLayer
+  };
+  static KadasItemLayer *getOrCreateItemLayer(StandardLayer layer);
+  static const QMap<KadasItemLayerRegistry::StandardLayer, QString> &
+  standardLayerNames();
+  static QList<KadasItemLayer *> getItemLayers();
+  static void init();
 
-  protected:
-    KadasItemLayerRegistry();
+protected:
+  KadasItemLayerRegistry();
 
-  private:
-    static KadasItemLayerRegistry *instance();
-    QMap<StandardLayer, QString> mLayerIdMap;
+private:
+  static KadasItemLayerRegistry *instance();
+  QMap<StandardLayer, QString> mLayerIdMap;
 
-  private slots:
-    void clear();
-    void readFromProject( const QDomDocument &doc );
-    void writeToProject( QDomDocument &doc );
+private slots:
+  void clear();
+  void readFromProject(const QDomDocument &doc);
+  void writeToProject(QDomDocument &doc);
 };
 
 #endif // KADASITEMLAYER_H

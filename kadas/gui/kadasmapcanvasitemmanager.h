@@ -29,30 +29,29 @@ class QgsMapCanvas;
 
 class KadasMapItem;
 
-class KADAS_GUI_EXPORT KadasMapCanvasItemManager : public QObject
-{
-    Q_OBJECT
+class KADAS_GUI_EXPORT KadasMapCanvasItemManager : public QObject {
+  Q_OBJECT
 
-  public:
-    KadasMapCanvasItemManager() SIP_FORCE;
-    static KadasMapCanvasItemManager *instance();
-    static void addItem( KadasMapItem *item );
-    static void removeItem( KadasMapItem *item );
-    static void removeItemAfterRefresh( KadasMapItem *item, QgsMapCanvas *canvas );
-    static const QList<KadasMapItem *> &items();
-    static void clear();
+public:
+  KadasMapCanvasItemManager() SIP_FORCE;
+  static KadasMapCanvasItemManager *instance();
+  static void addItem(KadasMapItem *item);
+  static void removeItem(KadasMapItem *item);
+  static void removeItemAfterRefresh(KadasMapItem *item, QgsMapCanvas *canvas);
+  static const QList<KadasMapItem *> &items();
+  static void clear();
 
-  signals:
-    void itemAdded( const KadasMapItem *item );
-    void itemWillBeRemoved( const KadasMapItem *item );
+signals:
+  void itemAdded(const KadasMapItem *item);
+  void itemWillBeRemoved(const KadasMapItem *item);
 
-  private:
-    QList<KadasMapItem *> mMapItems;
+private:
+  QList<KadasMapItem *> mMapItems;
 
-  private slots:
-    void itemAboutToBeDestroyed();
-    void readFromProject( const QDomDocument &doc );
-    void writeToProject( QDomDocument &doc );
+private slots:
+  void itemAboutToBeDestroyed();
+  void readFromProject(const QDomDocument &doc);
+  void writeToProject(QDomDocument &doc);
 };
 
 #endif // KADASMAPCANVASITEMMANAGER_H

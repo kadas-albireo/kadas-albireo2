@@ -21,26 +21,24 @@
 
 #include "kadas/gui/kadas_gui.h"
 
-class KADAS_GUI_EXPORT KadasRibbonButton : public QToolButton
-{
-    Q_OBJECT
+class KADAS_GUI_EXPORT KadasRibbonButton : public QToolButton {
+  Q_OBJECT
 
-  public:
-    KadasRibbonButton( QWidget *parent = 0 )
-      : QToolButton( parent ) {}
+public:
+  KadasRibbonButton(QWidget *parent = 0) : QToolButton(parent) {}
 
-  signals:
-    void contextMenuRequested( QPoint pos );
+signals:
+  void contextMenuRequested(QPoint pos);
 
-  protected:
-    virtual void paintEvent( QPaintEvent *e ) override;
-    virtual void enterEvent( QEvent *event ) override;
-    virtual void leaveEvent( QEvent *event ) override;
-    virtual void focusInEvent( QFocusEvent *event ) override;
-    virtual void focusOutEvent( QFocusEvent *event ) override;
-    virtual void mouseMoveEvent( QMouseEvent *event ) override;
-    virtual void mousePressEvent( QMouseEvent *event ) override;
-    virtual void contextMenuEvent( QContextMenuEvent *event ) override;
+protected:
+  virtual void paintEvent(QPaintEvent *e) override;
+  virtual void enterEvent(QEvent *event) override;
+  virtual void leaveEvent(QEvent *event) override;
+  virtual void focusInEvent(QFocusEvent *event) override;
+  virtual void focusOutEvent(QFocusEvent *event) override;
+  virtual void mouseMoveEvent(QMouseEvent *event) override;
+  virtual void mousePressEvent(QMouseEvent *event) override;
+  virtual void contextMenuEvent(QContextMenuEvent *event) override;
 };
 
 #endif // KADASRIBBONBUTTON_H

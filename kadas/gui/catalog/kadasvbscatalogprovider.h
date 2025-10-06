@@ -21,46 +21,52 @@
 
 class QStandardItem;
 
-class KADAS_GUI_EXPORT KadasVBSCatalogProvider : public KadasCatalogProvider
-{
-    Q_OBJECT
-  public:
-    KadasVBSCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params );
-    void load() override;
+class KADAS_GUI_EXPORT KadasVBSCatalogProvider : public KadasCatalogProvider {
+  Q_OBJECT
+public:
+  KadasVBSCatalogProvider(const QString &baseUrl, KadasCatalogBrowser *browser,
+                          const QMap<QString, QString> &params);
+  void load() override;
 
-  private slots:
-    void replyFinished();
+private slots:
+  void replyFinished();
 
-  private:
-    struct ResultEntry
-    {
-        ResultEntry() {}
-        ResultEntry( const QString &_category, const QString &_title, const QString &_sortIndices, const QString &_metadataUrl, bool _flatten = false )
-          : category( _category ), title( _title ), sortIndices( _sortIndices ), metadataUrl( _metadataUrl ), flatten( _flatten ) {}
-        ResultEntry( const ResultEntry &entry )
-          : category( entry.category ), title( entry.title ), sortIndices( entry.sortIndices ), metadataUrl( entry.metadataUrl ) {}
-        QString category;
-        QString title;
-        QString sortIndices;
-        QString metadataUrl;
-        bool flatten;
-    };
-    typedef QMap<QString, ResultEntry> EntryMap;
+private:
+  struct ResultEntry {
+    ResultEntry() {}
+    ResultEntry(const QString &_category, const QString &_title,
+                const QString &_sortIndices, const QString &_metadataUrl,
+                bool _flatten = false)
+        : category(_category), title(_title), sortIndices(_sortIndices),
+          metadataUrl(_metadataUrl), flatten(_flatten) {}
+    ResultEntry(const ResultEntry &entry)
+        : category(entry.category), title(entry.title),
+          sortIndices(entry.sortIndices), metadataUrl(entry.metadataUrl) {}
+    QString category;
+    QString title;
+    QString sortIndices;
+    QString metadataUrl;
+    bool flatten;
+  };
+  typedef QMap<QString, ResultEntry> EntryMap;
 
-    QString mBaseUrl;
-    int mPendingTasks;
+  QString mBaseUrl;
+  int mPendingTasks;
 
-    void endTask();
+  void endTask();
 
-    void readWMTSCapabilities( const QString &wmtsUrl, const EntryMap &entries );
-    void readWMSCapabilities( const QString &wmsUrl, const EntryMap &entries );
-    void readAMSCapabilities( const QString &amsUrl, const EntryMap &entries );
-    void searchMatchingWMSLayer( const QDomNode &layerItem, const EntryMap &entries, const QString &url, const QStringList &imgFormats, QStringList parentCrs );
+  void readWMTSCapabilities(const QString &wmtsUrl, const EntryMap &entries);
+  void readWMSCapabilities(const QString &wmsUrl, const EntryMap &entries);
+  void readAMSCapabilities(const QString &amsUrl, const EntryMap &entries);
+  void searchMatchingWMSLayer(const QDomNode &layerItem,
+                              const EntryMap &entries, const QString &url,
+                              const QStringList &imgFormats,
+                              QStringList parentCrs);
 
-  private slots:
-    void readWMTSCapabilitiesDo();
-    void readWMSCapabilitiesDo();
-    void readAMSCapabilitiesDo();
+private slots:
+  void readWMTSCapabilitiesDo();
+  void readWMSCapabilitiesDo();
+  void readAMSCapabilitiesDo();
 };
 
 #endif // KADASVBSCATALOGPROVIDER_H

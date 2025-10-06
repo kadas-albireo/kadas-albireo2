@@ -19,70 +19,87 @@
 
 #include "kadas/gui/mapitems/kadasmapitem.h"
 
-class KADAS_GUI_EXPORT KadasCoordinateCrossItem : public KadasMapItem
-{
-    Q_OBJECT
+class KADAS_GUI_EXPORT KadasCoordinateCrossItem : public KadasMapItem {
+  Q_OBJECT
 
-  public:
-    KadasCoordinateCrossItem( const QgsCoordinateReferenceSystem &crs );
+public:
+  KadasCoordinateCrossItem(const QgsCoordinateReferenceSystem &crs);
 
-    QString itemName() const override { return tr( "Coordinate cross" ); }
+  QString itemName() const override { return tr("Coordinate cross"); }
 
-    KadasItemRect boundingBox() const override;
-    Margin margin() const override;
-    QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
-    bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const override;
-    void render( QgsRenderContext &context ) const override;
+  KadasItemRect boundingBox() const override;
+  Margin margin() const override;
+  QList<KadasMapItem::Node>
+  nodes(const QgsMapSettings &settings) const override;
+  bool intersects(const KadasMapRect &rect, const QgsMapSettings &settings,
+                  bool contains = false) const override;
+  void render(QgsRenderContext &context) const override;
 #ifndef SIP_RUN
-    QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
+  QString asKml(const QgsRenderContext &context,
+                QuaZip *kmzZip = nullptr) const override;
 #endif
 
-    bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) override;
-    bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
-    void setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings ) override;
-    void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
-    bool continuePart( const QgsMapSettings &mapSettings ) override;
-    void endPart() override;
+  bool startPart(const KadasMapPos &firstPoint,
+                 const QgsMapSettings &mapSettings) override;
+  bool startPart(const AttribValues &values,
+                 const QgsMapSettings &mapSettings) override;
+  void setCurrentPoint(const KadasMapPos &p,
+                       const QgsMapSettings &mapSettings) override;
+  void setCurrentAttributes(const AttribValues &values,
+                            const QgsMapSettings &mapSettings) override;
+  bool continuePart(const QgsMapSettings &mapSettings) override;
+  void endPart() override;
 
-    AttribDefs drawAttribs() const override;
-    AttribValues drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
-    KadasMapPos positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
+  AttribDefs drawAttribs() const override;
+  AttribValues
+  drawAttribsFromPosition(const KadasMapPos &pos,
+                          const QgsMapSettings &mapSettings) const override;
+  KadasMapPos
+  positionFromDrawAttribs(const AttribValues &values,
+                          const QgsMapSettings &mapSettings) const override;
 
-    EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
-    void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override;
-    void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) override;
+  EditContext getEditContext(const KadasMapPos &pos,
+                             const QgsMapSettings &mapSettings) const override;
+  void edit(const EditContext &context, const KadasMapPos &newPoint,
+            const QgsMapSettings &mapSettings) override;
+  void edit(const EditContext &context, const AttribValues &values,
+            const QgsMapSettings &mapSettings) override;
 
-    AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
-    KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
+  AttribValues
+  editAttribsFromPosition(const EditContext &context, const KadasMapPos &pos,
+                          const QgsMapSettings &mapSettings) const override;
+  KadasMapPos
+  positionFromEditAttribs(const EditContext &context,
+                          const AttribValues &values,
+                          const QgsMapSettings &mapSettings) const override;
 
-    KadasItemPos position() const override;
-    void setPosition( const KadasItemPos &pos ) override;
+  KadasItemPos position() const override;
+  void setPosition(const KadasItemPos &pos) override;
 
-    struct KADAS_GUI_EXPORT State : KadasMapItem::State
-    {
-        KadasItemPos pos;
-        void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
-        State *clone() const override SIP_FACTORY { return new State( *this ); }
-        QJsonObject serialize() const override;
-        bool deserialize( const QJsonObject &json ) override;
-    };
-    const State *constState() const { return static_cast<State *>( mState ); }
+  struct KADAS_GUI_EXPORT State : KadasMapItem::State {
+    KadasItemPos pos;
+    void assign(const KadasMapItem::State *other) override {
+      *this = *static_cast<const State *>(other);
+    }
+    State *clone() const override SIP_FACTORY { return new State(*this); }
+    QJsonObject serialize() const override;
+    bool deserialize(const QJsonObject &json) override;
+  };
+  const State *constState() const { return static_cast<State *>(mState); }
 
-  protected:
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasCoordinateCrossItem( crs() ); }
-    State *createEmptyState() const override SIP_FACTORY { return new State(); }
+protected:
+  KadasMapItem *_clone() const override SIP_FACTORY {
+    return new KadasCoordinateCrossItem(crs());
+  }
+  State *createEmptyState() const override SIP_FACTORY { return new State(); }
 
-  private:
-    enum AttribIds
-    {
-      AttrX,
-      AttrY
-    };
-    static constexpr int sCrossSize = 80;
-    static constexpr int sFontSize = 24;
+private:
+  enum AttribIds { AttrX, AttrY };
+  static constexpr int sCrossSize = 80;
+  static constexpr int sFontSize = 24;
 
-    State *state() { return static_cast<State *>( mState ); }
-    KadasItemPos roundToKilometre( const KadasItemPos &itemPos ) const;
+  State *state() { return static_cast<State *>(mState); }
+  KadasItemPos roundToKilometre(const KadasItemPos &itemPos) const;
 };
 
 #endif // KADASCOORDINATECROSSITEM_H

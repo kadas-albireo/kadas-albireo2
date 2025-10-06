@@ -27,144 +27,148 @@
 
 struct QgsVertexId;
 
-class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
-{
-    Q_OBJECT
-    Q_PROPERTY( QPen outline READ outline WRITE setOutline )
-    Q_PROPERTY( QBrush fill READ fill WRITE setFill )
-    Q_PROPERTY( int iconSize READ iconSize WRITE setIconSize )
-    Q_PROPERTY( IconType iconType READ iconType WRITE setIconType )
-    Q_PROPERTY( QPen iconOutline READ iconOutline WRITE setIconOutline )
-    Q_PROPERTY( QBrush iconFill READ iconFill WRITE setIconFill )
+class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT {
+  Q_OBJECT
+  Q_PROPERTY(QPen outline READ outline WRITE setOutline)
+  Q_PROPERTY(QBrush fill READ fill WRITE setFill)
+  Q_PROPERTY(int iconSize READ iconSize WRITE setIconSize)
+  Q_PROPERTY(IconType iconType READ iconType WRITE setIconType)
+  Q_PROPERTY(QPen iconOutline READ iconOutline WRITE setIconOutline)
+  Q_PROPERTY(QBrush iconFill READ iconFill WRITE setIconFill)
 
-  public:
-    enum class IconType SIP_MONKEYPATCH_SCOPEENUM
-    {
-      /**
-      * No icon is used
-      */
-      ICON_NONE,
-      /**
-       * A cross is used to highlight points (+)
-       */
-      ICON_CROSS,
-      /**
-       * A cross is used to highlight points (x)
-       */
-      ICON_X,
-      /**
-       * A box is used to highlight points (□)
-       */
-      ICON_BOX,
-      /**
-       * A circle is used to highlight points (○)
-       */
-      ICON_CIRCLE,
-      /**
-       * A full box is used to highlight points (■)
-       */
-      ICON_FULL_BOX,
-      /**
-       * A triangle is used to highlight points (△)
-       */
-      ICON_TRIANGLE,
-      /**
-       * A full triangle is used to highlight points (▲)
-       */
-      ICON_FULL_TRIANGLE
-    };
+public:
+  enum class IconType SIP_MONKEYPATCH_SCOPEENUM {
+    /**
+     * No icon is used
+     */
+    ICON_NONE,
+    /**
+     * A cross is used to highlight points (+)
+     */
+    ICON_CROSS,
+    /**
+     * A cross is used to highlight points (x)
+     */
+    ICON_X,
+    /**
+     * A box is used to highlight points (□)
+     */
+    ICON_BOX,
+    /**
+     * A circle is used to highlight points (○)
+     */
+    ICON_CIRCLE,
+    /**
+     * A full box is used to highlight points (■)
+     */
+    ICON_FULL_BOX,
+    /**
+     * A triangle is used to highlight points (△)
+     */
+    ICON_TRIANGLE,
+    /**
+     * A full triangle is used to highlight points (▲)
+     */
+    ICON_FULL_TRIANGLE
+  };
 
-    KadasGeometryItem( const QgsCoordinateReferenceSystem &crs );
-    ~KadasGeometryItem();
+  KadasGeometryItem(const QgsCoordinateReferenceSystem &crs);
+  ~KadasGeometryItem();
 
-    KadasItemRect boundingBox() const override;
-    Margin margin() const override;
-    QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
-    bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const override;
-    QPair<KadasMapPos, double> closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const override;
-    void render( QgsRenderContext &context ) const override;
+  KadasItemRect boundingBox() const override;
+  Margin margin() const override;
+  QList<KadasMapItem::Node>
+  nodes(const QgsMapSettings &settings) const override;
+  bool intersects(const KadasMapRect &rect, const QgsMapSettings &settings,
+                  bool contains = false) const override;
+  QPair<KadasMapPos, double>
+  closestPoint(const KadasMapPos &pos,
+               const QgsMapSettings &settings) const override;
+  void render(QgsRenderContext &context) const override;
 #ifndef SIP_RUN
-    QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
+  QString asKml(const QgsRenderContext &context,
+                QuaZip *kmzZip = nullptr) const override;
 #endif
 
-    void clear() override;
-    void setState( const State *state ) override;
+  void clear() override;
+  void setState(const State *state) override;
 
-    virtual Qgis::GeometryType geometryType() const = 0;
-    // Geometry in item CRS
-    virtual void addPartFromGeometry( const QgsAbstractGeometry &geom ) = 0;
+  virtual Qgis::GeometryType geometryType() const = 0;
+  // Geometry in item CRS
+  virtual void addPartFromGeometry(const QgsAbstractGeometry &geom) = 0;
 
-    QPen outline() const { return mPen; }
-    void setOutline( const QPen &pen );
-    QBrush fill() const { return mBrush; }
-    void setFill( const QBrush &brush );
-    int iconSize() const { return mIconSize; }
-    void setIconSize( int iconSize );
-    IconType iconType() const { return mIconType; }
-    void setIconType( IconType iconType );
-    QPen iconOutline() const { return mIconPen; }
-    void setIconOutline( const QPen &iconPen );
-    QBrush iconFill() const { return mIconBrush; }
-    void setIconFill( const QBrush &iconBrush );
+  QPen outline() const { return mPen; }
+  void setOutline(const QPen &pen);
+  QBrush fill() const { return mBrush; }
+  void setFill(const QBrush &brush);
+  int iconSize() const { return mIconSize; }
+  void setIconSize(int iconSize);
+  IconType iconType() const { return mIconType; }
+  void setIconType(IconType iconType);
+  QPen iconOutline() const { return mIconPen; }
+  void setIconOutline(const QPen &iconPen);
+  QBrush iconFill() const { return mIconBrush; }
+  void setIconFill(const QBrush &iconBrush);
 
-    void setMeasurementsEnabled( bool enabled, Qgis::DistanceUnit baseUnit = Qgis::DistanceUnit::Meters );
-    QString getTotalMeasurement() const { return mTotalMeasurement; }
+  void setMeasurementsEnabled(
+      bool enabled, Qgis::DistanceUnit baseUnit = Qgis::DistanceUnit::Meters);
+  QString getTotalMeasurement() const { return mTotalMeasurement; }
 
-    // Geometry in item CRS
-    const QgsAbstractGeometry *geometry() const { return mGeometry; }
+  // Geometry in item CRS
+  const QgsAbstractGeometry *geometry() const { return mGeometry; }
 
-  signals:
-    void geometryChanged();
+signals:
+  void geometryChanged();
 
-  protected:
-    QgsAbstractGeometry *mGeometry = nullptr;
+protected:
+  QgsAbstractGeometry *mGeometry = nullptr;
 
-    QPen mPen;
-    QBrush mBrush;
-    int mIconSize;
-    IconType mIconType;
-    QPen mIconPen;
-    QBrush mIconBrush;
+  QPen mPen;
+  QBrush mBrush;
+  int mIconSize;
+  IconType mIconType;
+  QPen mIconPen;
+  QBrush mIconBrush;
 
-    QgsDistanceArea mDa;
-    bool mMeasureGeometry = false;
-    Qgis::DistanceUnit mBaseUnit = Qgis::DistanceUnit::Meters;
+  QgsDistanceArea mDa;
+  bool mMeasureGeometry = false;
+  Qgis::DistanceUnit mBaseUnit = Qgis::DistanceUnit::Meters;
 
-    QString mTotalMeasurement;
+  QString mTotalMeasurement;
 
+  void setInternalGeometry(QgsAbstractGeometry *geom);
 
-    void setInternalGeometry( QgsAbstractGeometry *geom );
+  void drawVertex(QgsRenderContext &context, double x, double y) const;
+  Qgis::DistanceUnit distanceBaseUnit() const;
+  Qgis::AreaUnit areaBaseUnit() const;
+  QString formatLength(double value, Qgis::DistanceUnit unit) const;
+  QString formatArea(double value, Qgis::AreaUnit unit) const;
+  QString formatAngle(double value, Qgis::AngleUnit unit) const;
+  void addMeasurements(const QStringList &measurements,
+                       const KadasItemPos &mapPos, bool center = true);
 
-    void drawVertex( QgsRenderContext &context, double x, double y ) const;
-    Qgis::DistanceUnit distanceBaseUnit() const;
-    Qgis::AreaUnit areaBaseUnit() const;
-    QString formatLength( double value, Qgis::DistanceUnit unit ) const;
-    QString formatArea( double value, Qgis::AreaUnit unit ) const;
-    QString formatAngle( double value, Qgis::AngleUnit unit ) const;
-    void addMeasurements( const QStringList &measurements, const KadasItemPos &mapPos, bool center = true );
+  QgsVertexId insertionPoint(const QList<QList<KadasItemPos>> &points,
+                             const KadasItemPos &testPos) const;
 
-    QgsVertexId insertionPoint( const QList<QList<KadasItemPos>> &points, const KadasItemPos &testPos ) const;
+  virtual void recomputeDerived() = 0;
+  virtual void measureGeometry() {}
 
-    virtual void recomputeDerived() = 0;
-    virtual void measureGeometry() {}
+private slots:
+  void updateMeasurements();
 
-  private slots:
-    void updateMeasurements();
+private:
+  struct MeasurementLabel {
+    QString string;
+    KadasItemPos pos;
+    int width;
+    int height;
+    bool center;
+  };
+  QList<MeasurementLabel> mMeasurementLabels;
 
-  private:
-    struct MeasurementLabel
-    {
-        QString string;
-        KadasItemPos pos;
-        int width;
-        int height;
-        bool center;
-    };
-    QList<MeasurementLabel> mMeasurementLabels;
-
-    static void registerMetaTypes();
+  static void registerMetaTypes();
 };
 
-Q_DECLARE_METATYPE( KadasGeometryItem::IconType )
+Q_DECLARE_METATYPE(KadasGeometryItem::IconType)
 
 #endif // KADASGEOMETRYITEM_H

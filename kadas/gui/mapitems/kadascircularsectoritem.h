@@ -21,82 +21,91 @@
 
 class QgsMultiSurface;
 
-class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
-{
-    Q_OBJECT
+class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem {
+  Q_OBJECT
 
+public:
+  KadasCircularSectorItem(const QgsCoordinateReferenceSystem &crs);
+
+  QString itemName() const override { return tr("Circular Sector"); }
+
+  QList<KadasMapItem::Node>
+  nodes(const QgsMapSettings &settings) const override;
+
+  bool startPart(const KadasMapPos &firstPoint,
+                 const QgsMapSettings &mapSettings) override;
+  bool startPart(const AttribValues &values,
+                 const QgsMapSettings &mapSettings) override;
+  void setCurrentPoint(const KadasMapPos &p,
+                       const QgsMapSettings &mapSettings) override;
+  void setCurrentAttributes(const AttribValues &values,
+                            const QgsMapSettings &mapSettings) override;
+  bool continuePart(const QgsMapSettings &mapSettings) override;
+  void endPart() override;
+
+  AttribDefs drawAttribs() const override;
+  AttribValues
+  drawAttribsFromPosition(const KadasMapPos &pos,
+                          const QgsMapSettings &mapSettings) const override;
+  KadasMapPos
+  positionFromDrawAttribs(const AttribValues &values,
+                          const QgsMapSettings &mapSettings) const override;
+
+  EditContext getEditContext(const KadasMapPos &pos,
+                             const QgsMapSettings &mapSettings) const override;
+  void edit(const EditContext &context, const KadasMapPos &newPoint,
+            const QgsMapSettings &mapSettings) override;
+  void edit(const EditContext &context, const AttribValues &values,
+            const QgsMapSettings &mapSettings) override;
+
+  AttribValues
+  editAttribsFromPosition(const EditContext &context, const KadasMapPos &pos,
+                          const QgsMapSettings &mapSettings) const override;
+  KadasMapPos
+  positionFromEditAttribs(const EditContext &context,
+                          const AttribValues &values,
+                          const QgsMapSettings &mapSettings) const override;
+
+  void addPartFromGeometry(const QgsAbstractGeometry &geom) override;
+  Qgis::GeometryType geometryType() const override {
+    return Qgis::GeometryType::Polygon;
+  }
+
+  KadasItemPos position() const override;
+  void setPosition(const KadasItemPos &pos) override;
+
+  const QgsMultiSurface *geometry() const;
+
+  class KADAS_GUI_EXPORT State : public KadasMapItem::State {
   public:
-    KadasCircularSectorItem( const QgsCoordinateReferenceSystem &crs );
+    enum class SectorStatus { HaveNothing, HaveCenter, HaveRadius };
+    SectorStatus sectorStatus = SectorStatus::HaveNothing;
+    QList<KadasItemPos> centers;
+    QList<double> radii;
+    QList<double> startAngles;
+    QList<double> stopAngles;
+    void assign(const KadasMapItem::State *other) override {
+      *this = *static_cast<const State *>(other);
+    }
+    State *clone() const override SIP_FACTORY { return new State(*this); }
+    QJsonObject serialize() const override;
+    bool deserialize(const QJsonObject &json) override;
+  };
+  const State *constState() const { return static_cast<State *>(mState); }
 
-    QString itemName() const override { return tr( "Circular Sector" ); }
+protected:
+  KadasMapItem *_clone() const override SIP_FACTORY {
+    return new KadasCircularSectorItem(crs());
+  }
+  State *createEmptyState() const override SIP_FACTORY { return new State(); }
+  void recomputeDerived() override;
+  void measureGeometry() override;
 
-    QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
+private:
+  enum AttribIds { AttrX, AttrY, AttrR, AttrA1, AttrA2 };
 
-    bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) override;
-    bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
-    void setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings ) override;
-    void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
-    bool continuePart( const QgsMapSettings &mapSettings ) override;
-    void endPart() override;
-
-    AttribDefs drawAttribs() const override;
-    AttribValues drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
-    KadasMapPos positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
-
-    EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
-    void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override;
-    void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) override;
-
-    AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
-    KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
-
-    void addPartFromGeometry( const QgsAbstractGeometry &geom ) override;
-    Qgis::GeometryType geometryType() const override { return Qgis::GeometryType::Polygon; }
-
-    KadasItemPos position() const override;
-    void setPosition( const KadasItemPos &pos ) override;
-
-    const QgsMultiSurface *geometry() const;
-
-    class KADAS_GUI_EXPORT State : public KadasMapItem::State
-    {
-      public:
-        enum class SectorStatus
-        {
-          HaveNothing,
-          HaveCenter,
-          HaveRadius
-        };
-        SectorStatus sectorStatus = SectorStatus::HaveNothing;
-        QList<KadasItemPos> centers;
-        QList<double> radii;
-        QList<double> startAngles;
-        QList<double> stopAngles;
-        void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
-        State *clone() const override SIP_FACTORY { return new State( *this ); }
-        QJsonObject serialize() const override;
-        bool deserialize( const QJsonObject &json ) override;
-    };
-    const State *constState() const { return static_cast<State *>( mState ); }
-
-  protected:
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasCircularSectorItem( crs() ); }
-    State *createEmptyState() const override SIP_FACTORY { return new State(); }
-    void recomputeDerived() override;
-    void measureGeometry() override;
-
-  private:
-    enum AttribIds
-    {
-      AttrX,
-      AttrY,
-      AttrR,
-      AttrA1,
-      AttrA2
-    };
-
-    QgsMultiSurface *geometry();
-    State *state() { return static_cast<State *>( mState ); }
+  QgsMultiSurface *geometry();
+  State *state() { return static_cast<State *>(mState); }
 };
 
 #endif // KADASCIRCULARSECTORITEM_H

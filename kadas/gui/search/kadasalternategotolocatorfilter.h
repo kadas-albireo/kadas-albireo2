@@ -15,42 +15,48 @@
  *                                                                         *
  ***************************************************************************/
 
-
 #ifndef KADASALTERNATEGOTOLOCATORFILTER_H
 #define KADASALTERNATEGOTOLOCATORFILTER_H
 
 #include <QRegularExpression>
 
-#include <qgis/qgslocatorfilter.h>
 #include "kadas/gui/kadas_gui.h"
+#include <qgis/qgslocatorfilter.h>
 
 class QgsMapCanvas;
 
+class KADAS_GUI_EXPORT KadasAlternateGotoLocatorFilter
+    : public QgsLocatorFilter {
+  Q_OBJECT
 
-class KADAS_GUI_EXPORT KadasAlternateGotoLocatorFilter : public QgsLocatorFilter
-{
-    Q_OBJECT
+public:
+  KadasAlternateGotoLocatorFilter(QgsMapCanvas *mapCanvas,
+                                  QObject *parent = nullptr);
+  KadasAlternateGotoLocatorFilter *clone() const override;
+  virtual QString name() const override { return QStringLiteral("kadasgoto"); }
+  virtual QString displayName() const override {
+    return tr("Go to Coordinate");
+  }
+  virtual Priority priority() const override { return Medium; }
+  QString prefix() const override { return QStringLiteral("go"); }
+  QgsLocatorFilter::Flags flags() const override {
+    return QgsLocatorFilter::FlagFast;
+  }
 
-  public:
-    KadasAlternateGotoLocatorFilter( QgsMapCanvas *mapCanvas, QObject *parent = nullptr );
-    KadasAlternateGotoLocatorFilter *clone() const override;
-    virtual QString name() const override { return QStringLiteral( "kadasgoto" ); }
-    virtual QString displayName() const override { return tr( "Go to Coordinate" ); }
-    virtual Priority priority() const override { return Medium; }
-    QString prefix() const override { return QStringLiteral( "go" ); }
-    QgsLocatorFilter::Flags flags() const override { return QgsLocatorFilter::FlagFast; }
+  void fetchResults(const QString &string, const QgsLocatorContext &context,
+                    QgsFeedback *feedback) override;
+  void triggerResult(const QgsLocatorResult &result) override;
+  virtual void clearPreviousResults() override;
 
-    void fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback ) override;
-    void triggerResult( const QgsLocatorResult &result ) override;
-    virtual void clearPreviousResults() override;
+private:
+  double parseNumber(const QString &string) const;
+  bool matchOneOf(const QString &str,
+                  const QVector<QRegularExpression> &patterns,
+                  QRegularExpressionMatch &match) const;
 
-  private:
-    double parseNumber( const QString &string ) const;
-    bool matchOneOf( const QString &str, const QVector<QRegularExpression> &patterns, QRegularExpressionMatch &match ) const;
+  QgsMapCanvas *mCanvas = nullptr;
 
-    QgsMapCanvas *mCanvas = nullptr;
-
-    QString mPinItemId;
+  QString mPinItemId;
 };
 
 #endif // KADASALTERNATEGOTOLOCATORFILTER_H

@@ -26,41 +26,42 @@ class QgsMesh3DSymbol;
 class QgsMeshLayer;
 
 //! A widget for configuration of 3D symbol for meshes
-class KadasMesh3DSymbolWidget : public QWidget, private Ui::QgsMesh3dPropsWidget
-{
-    Q_OBJECT
-  public:
-    explicit KadasMesh3DSymbolWidget( QgsMeshLayer *meshLayer, QWidget *parent = nullptr );
+class KadasMesh3DSymbolWidget : public QWidget,
+                                private Ui::QgsMesh3dPropsWidget {
+  Q_OBJECT
+public:
+  explicit KadasMesh3DSymbolWidget(QgsMeshLayer *meshLayer,
+                                   QWidget *parent = nullptr);
 
-    std::unique_ptr<QgsMesh3DSymbol> symbol() const;
+  std::unique_ptr<QgsMesh3DSymbol> symbol() const;
 
-    void setLayer( QgsMeshLayer *meshLayer, bool updateSymbol = true );
-    QgsMeshLayer *meshLayer() const;
-    void setSymbol( const QgsMesh3DSymbol *symbol );
+  void setLayer(QgsMeshLayer *meshLayer, bool updateSymbol = true);
+  QgsMeshLayer *meshLayer() const;
+  void setSymbol(const QgsMesh3DSymbol *symbol);
 
-    void configureForTerrain();
-    void configureForDataset();
+  void configureForTerrain();
+  void configureForDataset();
 
-  public slots:
-    void reloadColorRampShaderMinMax();
-    void enableVerticalSetting( bool isEnable );
-    void enableArrowSettings( bool isEnable );
+public slots:
+  void reloadColorRampShaderMinMax();
+  void enableVerticalSetting(bool isEnable);
+  void enableArrowSettings(bool isEnable);
 
-  signals:
-    void changed();
+signals:
+  void changed();
 
-  private slots:
+private slots:
 
-    void onColorRampShaderMinMaxChanged();
-    void onColoringTypeChanged();
-    void onTextureSettingsCollapseStateChanged( bool collapsed );
+  void onColorRampShaderMinMaxChanged();
+  void onColoringTypeChanged();
+  void onTextureSettingsCollapseStateChanged(bool collapsed);
 
-  private:
-    double lineEditValue( const QLineEdit *lineEdit ) const;
-    void setColorRampMinMax( double min, double max );
-    QgsMeshLayer *mLayer = nullptr;
-    QgsMeshDatasetGroupListModel *mDatasetGroupListModel = nullptr;
-    std::unique_ptr<QgsMesh3DSymbol> mSymbol;
+private:
+  double lineEditValue(const QLineEdit *lineEdit) const;
+  void setColorRampMinMax(double min, double max);
+  QgsMeshLayer *mLayer = nullptr;
+  QgsMeshDatasetGroupListModel *mDatasetGroupListModel = nullptr;
+  std::unique_ptr<QgsMesh3DSymbol> mSymbol;
 };
 
 #endif // KADASMESH3DSYMBOLWIDGET_H

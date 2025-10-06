@@ -14,7 +14,6 @@
  *                                                                         *
  ***************************************************************************/
 
-
 #ifndef KADASREMOTEDATASEARCHPROVIDER_H
 #define KADASREMOTEDATASEARCHPROVIDER_H
 
@@ -28,29 +27,28 @@
 
 class QgsMapCanvas;
 
+class KADAS_GUI_EXPORT KadasRemoteDataSearchProvider : public QgsLocatorFilter {
+  Q_OBJECT
+public:
+  KadasRemoteDataSearchProvider(QgsMapCanvas *mapCanvas);
 
-class KADAS_GUI_EXPORT KadasRemoteDataSearchProvider : public QgsLocatorFilter
-{
-    Q_OBJECT
-  public:
-    KadasRemoteDataSearchProvider( QgsMapCanvas *mapCanvas );
+  virtual QgsLocatorFilter *clone() const override;
+  QString name() const override { return QStringLiteral("remote-data"); }
+  QString displayName() const override { return tr("Remote Data"); }
+  virtual Priority priority() const override { return Priority::Medium; }
+  virtual void fetchResults(const QString &string,
+                            const QgsLocatorContext &context,
+                            QgsFeedback *feedback) override;
+  virtual void triggerResult(const QgsLocatorResult &result) override;
+  virtual void clearPreviousResults() override;
 
+private:
+  static const int sSearchTimeout;
+  static const int sResultCountLimit;
+  static const QByteArray sGeoAdminUrl;
 
-    virtual QgsLocatorFilter *clone() const override;
-    QString name() const override { return QStringLiteral( "remote-data" ); }
-    QString displayName() const override { return tr( "Remote Data" ); }
-    virtual Priority priority() const override { return Priority::Medium; }
-    virtual void fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback ) override;
-    virtual void triggerResult( const QgsLocatorResult &result ) override;
-    virtual void clearPreviousResults() override;
-
-  private:
-    static const int sSearchTimeout;
-    static const int sResultCountLimit;
-    static const QByteArray sGeoAdminUrl;
-
-    QgsMapCanvas *mMapCanvas = nullptr;
-    QString mPinItemId;
+  QgsMapCanvas *mMapCanvas = nullptr;
+  QString mPinItemId;
 };
 
 #endif // KADASREMOTEDATASEARCHPROVIDER_H

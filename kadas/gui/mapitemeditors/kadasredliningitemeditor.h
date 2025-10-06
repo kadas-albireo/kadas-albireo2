@@ -18,36 +18,35 @@
 #define KADASREDLININGITEMEDITOR_H
 
 #include "kadas/gui/kadas_gui.h"
-#include "kadas/gui/mapitems/kadasmapitem.h"
 #include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
 #include "kadas/gui/ui_kadasredliningitemeditor.h"
 
-class KADAS_GUI_EXPORT KadasRedliningItemEditor : public KadasMapItemEditor
-{
-    Q_OBJECT
+class KADAS_GUI_EXPORT KadasRedliningItemEditor : public KadasMapItemEditor {
+  Q_OBJECT
 
-  public:
-    KadasRedliningItemEditor( KadasMapItem *item );
-    ~KadasRedliningItemEditor();
+public:
+  KadasRedliningItemEditor(KadasMapItem *item);
+  ~KadasRedliningItemEditor();
 
-    void setItem( KadasMapItem *item ) override;
-    void syncItemToWidget() override;
-    void syncWidgetToItem() override;
+  void setItem(KadasMapItem *item) override;
+  void syncItemToWidget() override;
+  void syncWidgetToItem() override;
 
-  private:
-    Ui::KadasRedliningItemEditorBase mUi;
+private:
+  Ui::KadasRedliningItemEditorBase mUi;
 
-    static QIcon createOutlineStyleIcon( Qt::PenStyle style );
-    static QIcon createFillStyleIcon( Qt::BrushStyle style );
+  static QIcon createOutlineStyleIcon(Qt::PenStyle style);
+  static QIcon createFillStyleIcon(Qt::BrushStyle style);
 
-  signals:
-    void styleChanged();
+signals:
+  void styleChanged();
 
-  private slots:
-    void saveColor();
-    void saveOutlineWidth();
-    void saveStyle();
-    void toggleItemMeasurements( bool enabled );
+private slots:
+  void saveColor();
+  void saveOutlineWidth();
+  void saveStyle();
+  void toggleItemMeasurements(bool enabled);
 };
 
 #endif // KADASREDLININGITEMEDITOR_H

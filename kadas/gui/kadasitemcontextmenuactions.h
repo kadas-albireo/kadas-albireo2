@@ -32,31 +32,30 @@ class KadasMapItem;
 class KadasPinItem;
 class KadasPointItem;
 
-class KADAS_GUI_EXPORT KadasItemContextMenuActions : public QObject
-{
-    Q_OBJECT
-  public:
-    enum ItemParent
-    {
-      ParentIsTool,
-      ParentIsLayer
-    };
-    KadasItemContextMenuActions( QgsMapCanvas *canvas, QMenu *menu, KadasMapItem *item, KadasItemLayer *layer, KadasItemLayer::ItemId layerItemId = KadasItemLayer::ITEM_ID_NULL, QObject *parent = nullptr );
+class KADAS_GUI_EXPORT KadasItemContextMenuActions : public QObject {
+  Q_OBJECT
+public:
+  enum ItemParent { ParentIsTool, ParentIsLayer };
+  KadasItemContextMenuActions(
+      QgsMapCanvas *canvas, QMenu *menu, KadasMapItem *item,
+      KadasItemLayer *layer,
+      KadasItemLayer::ItemId layerItemId = KadasItemLayer::ITEM_ID_NULL,
+      QObject *parent = nullptr);
 
-  private slots:
-    void copyItem();
-    void cutItem();
-    void deleteItem( bool preventAttachmentCleanup = false );
-    void copyItemPosition();
-    void createPolygonFromCircle();
-    void createPinFromPoint();
-    void createWaypointFromPin();
+private slots:
+  void copyItem();
+  void cutItem();
+  void deleteItem(bool preventAttachmentCleanup = false);
+  void copyItemPosition();
+  void createPolygonFromCircle();
+  void createPinFromPoint();
+  void createWaypointFromPin();
 
-  private:
-    QgsMapCanvas *mCanvas = nullptr;
-    KadasMapItem *mItem = nullptr;
-    KadasItemLayer *mLayer = nullptr;
-    KadasItemLayer::ItemId mLayerItemId = KadasItemLayer::ITEM_ID_NULL;
+private:
+  QgsMapCanvas *mCanvas = nullptr;
+  KadasMapItem *mItem = nullptr;
+  KadasItemLayer *mLayer = nullptr;
+  KadasItemLayer::ItemId mLayerItemId = KadasItemLayer::ITEM_ID_NULL;
 };
 
 #endif // SIP_RUN

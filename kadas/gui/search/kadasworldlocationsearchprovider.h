@@ -23,40 +23,43 @@
 
 #include "kadas/gui/kadas_gui.h"
 
-
 class QNetworkReply;
 class QEventLoop;
 
 class QgsMapCanvas;
 
-class KADAS_GUI_EXPORT KadasWorldLocationSearchProvider : public QgsLocatorFilter
-{
-    Q_OBJECT
-  public:
-    KadasWorldLocationSearchProvider( QgsMapCanvas *mapCanvas );
+class KADAS_GUI_EXPORT KadasWorldLocationSearchProvider
+    : public QgsLocatorFilter {
+  Q_OBJECT
+public:
+  KadasWorldLocationSearchProvider(QgsMapCanvas *mapCanvas);
 
-    virtual QgsLocatorFilter *clone() const override;
-    QString name() const override { return QStringLiteral( "world-location-search" ); }
-    QString displayName() const override { return tr( " World Location Search" ); }
-    virtual Priority priority() const override { return Priority::Low; }
-    virtual void fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback ) override;
-    virtual void triggerResult( const QgsLocatorResult &result ) override;
-    virtual void clearPreviousResults() override;
+  virtual QgsLocatorFilter *clone() const override;
+  QString name() const override {
+    return QStringLiteral("world-location-search");
+  }
+  QString displayName() const override { return tr(" World Location Search"); }
+  virtual Priority priority() const override { return Priority::Low; }
+  virtual void fetchResults(const QString &string,
+                            const QgsLocatorContext &context,
+                            QgsFeedback *feedback) override;
+  virtual void triggerResult(const QgsLocatorResult &result) override;
+  virtual void clearPreviousResults() override;
 
-  private slots:
-    void handleNetworkReply();
+private slots:
+  void handleNetworkReply();
 
-  private:
-    static const int sResultCountLimit;
+private:
+  static const int sResultCountLimit;
 
-    QString mPinItemId;
-    QStringList mGeometryItemIds;
-    QgsMapCanvas *mMapCanvas = nullptr;
-    QMap<QString, QPair<QString, int>> mCategoryMap;
+  QString mPinItemId;
+  QStringList mGeometryItemIds;
+  QgsMapCanvas *mMapCanvas = nullptr;
+  QMap<QString, QPair<QString, int>> mCategoryMap;
 
-    QNetworkReply *mCurrentReply = nullptr;
-    QgsFeedback *mFeedback = nullptr;
-    QEventLoop *mEventLoop = nullptr;
+  QNetworkReply *mCurrentReply = nullptr;
+  QgsFeedback *mFeedback = nullptr;
+  QEventLoop *mEventLoop = nullptr;
 };
 
 #endif // KADASWORLDVBSLOCATIONSEARCHPROVIDER_H

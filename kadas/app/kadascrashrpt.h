@@ -18,10 +18,9 @@
 #ifndef KADASCRASHRPT_H
 #define KADASCRASHRPT_H
 
-class KadasCrashRpt
-{
-  public:
-    static bool install();
+class KadasCrashRpt {
+public:
+  static bool install();
 };
 
 #endif // KADASCRASHRPT_H

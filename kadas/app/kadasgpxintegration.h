@@ -23,9 +23,7 @@
 
 #include <qgis/qgscustomdrophandler.h>
 
-
 #include "kadas/gui/kadasmapiteminterface.h"
-
 
 class QAction;
 
@@ -33,48 +31,46 @@ class KadasMapItem;
 class KadasItemLayer;
 class KadasMainWindow;
 
-
-class KadasWayPointInterface : public KadasMapItemInterface
-{
-  public:
-    KadasWayPointInterface() = default;
-    KadasMapItem *createItem() const override;
+class KadasWayPointInterface : public KadasMapItemInterface {
+public:
+  KadasWayPointInterface() = default;
+  KadasMapItem *createItem() const override;
 };
 
-class KadasRouteInterface : public KadasMapItemInterface
-{
-  public:
-    KadasRouteInterface() = default;
-    KadasMapItem *createItem() const override;
+class KadasRouteInterface : public KadasMapItemInterface {
+public:
+  KadasRouteInterface() = default;
+  KadasMapItem *createItem() const override;
 };
 
-class KadasGpxDropHandler : public QgsCustomDropHandler
-{
-    Q_OBJECT
+class KadasGpxDropHandler : public QgsCustomDropHandler {
+  Q_OBJECT
 
-  public:
-    bool canHandleMimeData( const QMimeData *data ) override;
-    bool handleMimeDataV2( const QMimeData *data ) override;
+public:
+  bool canHandleMimeData(const QMimeData *data) override;
+  bool handleMimeDataV2(const QMimeData *data) override;
 };
 
-class KadasGpxIntegration : public QObject
-{
-    Q_OBJECT
-  public:
-    KadasGpxIntegration( QAction *actionWaypoint, QAction *actionRoute, QAction *actionExportGpx, QAction *actionImportGpx, QObject *parent );
-    ~KadasGpxIntegration();
-    KadasItemLayer *getOrCreateLayer();
+class KadasGpxIntegration : public QObject {
+  Q_OBJECT
+public:
+  KadasGpxIntegration(QAction *actionWaypoint, QAction *actionRoute,
+                      QAction *actionExportGpx, QAction *actionImportGpx,
+                      QObject *parent);
+  ~KadasGpxIntegration();
+  KadasItemLayer *getOrCreateLayer();
 
-    static bool importGpx( const QString &filename, QString &errorMsg );
+  static bool importGpx(const QString &filename, QString &errorMsg);
 
-  private:
-    void toggleCreateItem( bool active, std::unique_ptr<KadasMapItemInterface> interface );
+private:
+  void toggleCreateItem(bool active,
+                        std::unique_ptr<KadasMapItemInterface> interface);
 
-    KadasGpxDropHandler mDropHandler;
+  KadasGpxDropHandler mDropHandler;
 
-  private slots:
-    void openGpx();
-    void saveGpx();
+private slots:
+  void openGpx();
+  void saveGpx();
 };
 
 #endif // KADASGPXINTEGRATION_H

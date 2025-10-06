@@ -22,22 +22,21 @@ class QTimer;
 
 #include <QObject>
 
-class KadasLayerRefreshManager : public QObject
-{
-    Q_OBJECT
-  public:
-    KadasLayerRefreshManager( QObject *parent = nullptr );
-    void setLayerRefreshInterval( const QString &layerId, int refreshIntervalSec );
-    int layerRefreshInterval( const QString &layerId ) const;
+class KadasLayerRefreshManager : public QObject {
+  Q_OBJECT
+public:
+  KadasLayerRefreshManager(QObject *parent = nullptr);
+  void setLayerRefreshInterval(const QString &layerId, int refreshIntervalSec);
+  int layerRefreshInterval(const QString &layerId) const;
 
-  private:
-    QMap<QString, QTimer *> mLayerTimers;
+private:
+  QMap<QString, QTimer *> mLayerTimers;
 
-  private slots:
-    void clear();
-    void clearLayer( const QString &layerId );
-    void writeProjectSettings( QDomDocument &doc );
-    void readProjectSettings( const QDomDocument &doc );
+private slots:
+  void clear();
+  void clearLayer(const QString &layerId);
+  void writeProjectSettings(QDomDocument &doc);
+  void readProjectSettings(const QDomDocument &doc);
 };
 
 #endif // KADASLAYERREFRESHMANAGER_H

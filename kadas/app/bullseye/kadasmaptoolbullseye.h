@@ -27,56 +27,55 @@ class KadasBullseyeLayer;
 class KadasBullseyeWidget;
 class KadasLayerSelectionWidget;
 
-class KadasMapToolBullseye : public QgsMapTool
-{
-    Q_OBJECT
-  public:
-    KadasMapToolBullseye( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QgsMapLayer *layer = nullptr );
-    ~KadasMapToolBullseye();
+class KadasMapToolBullseye : public QgsMapTool {
+  Q_OBJECT
+public:
+  KadasMapToolBullseye(QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView,
+                       QgsMapLayer *layer = nullptr);
+  ~KadasMapToolBullseye();
 
-    void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
-    void keyReleaseEvent( QKeyEvent *e ) override;
+  void canvasReleaseEvent(QgsMapMouseEvent *e) override;
+  void keyReleaseEvent(QKeyEvent *e) override;
 
-  private:
-    KadasBullseyeWidget *mWidget;
-    bool mPicking = false;
+private:
+  KadasBullseyeWidget *mWidget;
+  bool mPicking = false;
 
-  private slots:
-    void setPicking( bool picking = true );
-    void close();
+private slots:
+  void setPicking(bool picking = true);
+  void close();
 };
 
+class KadasBullseyeWidget : public KadasBottomBar {
+  Q_OBJECT
 
-class KadasBullseyeWidget : public KadasBottomBar
-{
-    Q_OBJECT
+public:
+  KadasBullseyeWidget(QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView,
+                      QgsMapLayer *layer);
+  void centerPicked(const QgsPointXY &pos);
 
-  public:
-    KadasBullseyeWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QgsMapLayer *layer );
-    void centerPicked( const QgsPointXY &pos );
+public slots:
+  KadasBullseyeLayer *createLayer(QString layerName);
 
-  public slots:
-    KadasBullseyeLayer *createLayer( QString layerName );
+private:
+  Ui::KadasBullseyeWidgetBase ui;
+  KadasLayerSelectionWidget *mLayerSelectionWidget;
+  KadasBullseyeLayer *mCurrentLayer = nullptr;
 
-  private:
-    Ui::KadasBullseyeWidgetBase ui;
-    KadasLayerSelectionWidget *mLayerSelectionWidget;
-    KadasBullseyeLayer *mCurrentLayer = nullptr;
+  void updateGrid();
 
-    void updateGrid();
+signals:
+  void requestPickCenter(bool active = true);
+  void close();
 
-  signals:
-    void requestPickCenter( bool active = true );
-    void close();
-
-  private slots:
-    void setCurrentLayer( QgsMapLayer *layer );
-    void ringUnitChanged();
-    void updateLayer();
-    void updateColor( const QColor &color );
-    void updateFontSize( int fontSize );
-    void updateLabeling();
-    void updateLineWidth( int width );
+private slots:
+  void setCurrentLayer(QgsMapLayer *layer);
+  void ringUnitChanged();
+  void updateLayer();
+  void updateColor(const QColor &color);
+  void updateFontSize(int fontSize);
+  void updateLabeling();
+  void updateLineWidth(int width);
 };
 
 #endif // KADASMAPTOOLBULLSEYE_H

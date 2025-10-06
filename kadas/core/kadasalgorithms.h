@@ -23,21 +23,18 @@
 
 #include "kadas/core/kadas_core.h"
 
-class KADAS_CORE_EXPORT KadasAlgorithms
-{
-  public:
-    struct Rect
-    {
-        int x1, y1, x2, y2;
-        void *data;
-    };
-    struct Cluster
-    {
-        int x1, y1, x2, y2;
-        QList<Rect> rects;
-    };
+class KADAS_CORE_EXPORT KadasAlgorithms {
+public:
+  struct Rect {
+    int x1, y1, x2, y2;
+    void *data;
+  };
+  struct Cluster {
+    int x1, y1, x2, y2;
+    QList<Rect> rects;
+  };
 
-    static QList<Cluster> overlappingRects( const QList<Rect> &rects );
+  static QList<Cluster> overlappingRects(const QList<Rect> &rects);
 };
 
 #endif // SIP_RUN

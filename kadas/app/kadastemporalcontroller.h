@@ -13,22 +13,22 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "ui_kadastemporalcontroller.h"
 #include "kadas/gui/kadasbottombar.h"
+#include "ui_kadastemporalcontroller.h"
 
 class KadasRibbonButton;
 class QgsTemporalControllerWidget;
 
-class KadasTemporalController : public KadasBottomBar, private Ui::KadasTemporalControllerBase
-{
-    Q_OBJECT
-  public:
-    KadasTemporalController( QgsMapCanvas *canvas );
-    ~KadasTemporalController();
+class KadasTemporalController : public KadasBottomBar,
+                                private Ui::KadasTemporalControllerBase {
+  Q_OBJECT
+public:
+  KadasTemporalController(QgsMapCanvas *canvas);
+  ~KadasTemporalController();
 
-  private slots:
-    void on_mCloseButton_clicked();
+private slots:
+  void on_mCloseButton_clicked();
 
-  private:
-    QgsTemporalControllerWidget *mQgsTemporalControllerWidget;
+private:
+  QgsTemporalControllerWidget *mQgsTemporalControllerWidget;
 };

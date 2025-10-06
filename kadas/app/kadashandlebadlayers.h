@@ -24,30 +24,27 @@
 class QTableWidget;
 class QTableWidgetItem;
 
-
-class KadasHandleBadLayersHandler : public QgsProjectBadLayerHandler
-{
-  public:
-    void handleBadLayers( const QList<QDomNode> &layers ) override;
+class KadasHandleBadLayersHandler : public QgsProjectBadLayerHandler {
+public:
+  void handleBadLayers(const QList<QDomNode> &layers) override;
 };
 
-class KadasHandleBadLayers : public QDialog
-{
-    Q_OBJECT
+class KadasHandleBadLayers : public QDialog {
+  Q_OBJECT
 
-  public:
-    KadasHandleBadLayers( const QList<QDomNode> &layers );
+public:
+  KadasHandleBadLayers(const QList<QDomNode> &layers);
 
-  private:
-    static constexpr int LayerIndexRole = Qt::UserRole;
-    static constexpr int ProviderRole = Qt::UserRole + 1;
-    static constexpr int FileBasedRole = Qt::UserRole + 2;
-    const QList<QDomNode> &mLayers;
-    QTableWidget *mLayerList = nullptr;
+private:
+  static constexpr int LayerIndexRole = Qt::UserRole;
+  static constexpr int ProviderRole = Qt::UserRole + 1;
+  static constexpr int FileBasedRole = Qt::UserRole + 2;
+  const QList<QDomNode> &mLayers;
+  QTableWidget *mLayerList = nullptr;
 
-  private slots:
-    void itemClicked( QTableWidgetItem *item );
-    void accept() override;
+private slots:
+  void itemClicked(QTableWidgetItem *item);
+  void accept() override;
 };
 
 #endif // KADASHANDLEBADLAYERS_H

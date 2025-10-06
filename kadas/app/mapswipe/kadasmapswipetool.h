@@ -14,7 +14,6 @@
  *                                                                         *
  ***************************************************************************/
 
-
 #ifndef KADASMAPSWIPETOOL_H
 #define KADASMAPSWIPETOOL_H
 
@@ -24,42 +23,40 @@ class QgsMapCanvas;
 class KadasMapSwipeCanvasItem;
 class QgsMessageBarItem;
 
+class KadasMapSwipeMapTool : public QgsMapTool {
+  Q_OBJECT
 
-class KadasMapSwipeMapTool : public QgsMapTool
-{
-    Q_OBJECT
+public:
+  static void addContextMenuAction(QgsMapLayer *layer, QgsMapCanvas *canvas,
+                                   QMenu *menu, QObject *parent = nullptr);
 
-  public:
-    static void addContextMenuAction( QgsMapLayer *layer, QgsMapCanvas *canvas, QMenu *menu, QObject *parent = nullptr );
+  KadasMapSwipeMapTool(QgsMapCanvas *mapCanvas);
 
-    KadasMapSwipeMapTool( QgsMapCanvas *mapCanvas );
+  ~KadasMapSwipeMapTool();
 
-    ~KadasMapSwipeMapTool();
+  void addLayers(const QList<QgsMapLayer *> &layers);
+  void removeLayers(const QList<QgsMapLayer *> &layers);
 
-    void addLayers( const QList<QgsMapLayer *> &layers );
-    void removeLayers( const QList<QgsMapLayer *> &layers );
+  bool isActive() const;
 
-    bool isActive() const;
+  virtual void activate() override;
+  virtual void deactivate() override;
+  virtual void canvasMoveEvent(QgsMapMouseEvent *e) override;
+  virtual void canvasPressEvent(QgsMapMouseEvent *e) override;
+  virtual void canvasReleaseEvent(QgsMapMouseEvent *e) override;
 
+private:
+  void updateMessageBar();
 
-    virtual void activate() override;
-    virtual void deactivate() override;
-    virtual void canvasMoveEvent( QgsMapMouseEvent *e ) override;
-    virtual void canvasPressEvent( QgsMapMouseEvent *e ) override;
-    virtual void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
-
-  private:
-    void updateMessageBar();
-
-    bool mIsActive;
-    QSet<QgsMapLayer *> mLayers;
-    KadasMapSwipeCanvasItem *mMapCanvasItem = nullptr;
-    QgsMessageBarItem *mMessageBarItem = nullptr;
-    QPoint mFirstPoint;
-    QCursor mCursorV = QCursor( Qt::SplitVCursor );
-    QCursor mCursorH = QCursor( Qt::SplitHCursor );
-    bool mIsSwiping = false;
-    bool mDirectionDefined = false;
+  bool mIsActive;
+  QSet<QgsMapLayer *> mLayers;
+  KadasMapSwipeCanvasItem *mMapCanvasItem = nullptr;
+  QgsMessageBarItem *mMessageBarItem = nullptr;
+  QPoint mFirstPoint;
+  QCursor mCursorV = QCursor(Qt::SplitVCursor);
+  QCursor mCursorH = QCursor(Qt::SplitHCursor);
+  bool mIsSwiping = false;
+  bool mDirectionDefined = false;
 };
 
 #endif // KADASMAPSWIPETOOL_H

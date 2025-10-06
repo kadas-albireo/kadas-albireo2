@@ -21,19 +21,22 @@
 
 class QStandardItem;
 
-class KADAS_GUI_EXPORT KadasGeoAdminRestCatalogProvider : public KadasCatalogProvider
-{
-    Q_OBJECT
-  public:
-    KadasGeoAdminRestCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params );
-    void load() override;
-  private slots:
-    void replyFinished();
+class KADAS_GUI_EXPORT KadasGeoAdminRestCatalogProvider
+    : public KadasCatalogProvider {
+  Q_OBJECT
+public:
+  KadasGeoAdminRestCatalogProvider(const QString &baseUrl,
+                                   KadasCatalogBrowser *browser,
+                                   const QMap<QString, QString> &params);
+  void load() override;
+private slots:
+  void replyFinished();
 
-  private:
-    QString mBaseUrl;
+private:
+  QString mBaseUrl;
 
-    void parseTheme( QStandardItem *parent, const QDomElement &theme, QMap<QString, QStandardItem *> &layerParentMap );
+  void parseTheme(QStandardItem *parent, const QDomElement &theme,
+                  QMap<QString, QStandardItem *> &layerParentMap);
 };
 
 #endif // KADASGEOADMINRESTCATALOGPROVIDER_H
