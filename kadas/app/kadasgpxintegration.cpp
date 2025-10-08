@@ -27,7 +27,6 @@
 #include <qgis/qgsmultilinestring.h>
 #include <qgis/qgsmultipoint.h>
 #include <qgis/qgsproject.h>
-//#include <qgis/gui/>
 
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/kadaslayerselectionwidget.h"
@@ -228,7 +227,6 @@ void KadasGpxIntegration::saveGpx()
     }
     return false;
   } );
-
   layerSelectionWidget->setLabel( tr( "Select layer to export:" ) );
   dialog.layout()->addWidget( layerSelectionWidget );
   QDialogButtonBox *bbox = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal );

@@ -121,17 +121,12 @@ if(QGIS_INCLUDE_DIR)
   )
 endif()
 
-message("${QGIS_INCLUDE_DIR} qgis include dir")
-
 foreach(_component ${QGIS_FIND_COMPONENTS})
   if(${_component} STREQUAL "Python")
-
     set(QGIS_PYTHON_MODULE_DIR
         ""
         CACHE PATH "Path to QGIS Python Modules"
     )
-
-    message("${QGIS_INCLUDE_DIR} qgis include dir")
     if(QGIS_PYTHON_MODULE_DIR STREQUAL "")
       set(CMD ${Python_EXECUTABLE} -c
               "import os\;import qgis\;print(os.path.dirname(qgis.__file__))"

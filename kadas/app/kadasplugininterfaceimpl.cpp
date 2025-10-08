@@ -544,7 +544,7 @@ QMenu *KadasPluginInterfaceImpl::getClassicMenu( ActionClassicMenuLocation class
       menuName = tr( "New layer" );
       break;
     case ActionClassicMenuLocation::ADDLAYER_MENU:
-      menuName = tr( "Add layertest" );
+      menuName = tr( "Add layer" );
       break;
     case ActionClassicMenuLocation::SETTINGS_MENU:
       menuName = tr( "Settings" );
