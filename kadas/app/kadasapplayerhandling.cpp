@@ -751,16 +751,11 @@ QList<QgsMapLayer *> KadasAppLayerHandling::addSublayers( const QList<QgsProvide
     else
     {
       if ( layerName != baseName && !layerName.isEmpty() && !baseName.isEmpty() )
-      {
-        QString fullName = QString::fromUtf8( "%1 — %2" ).arg( baseName, layerName );
-        layer->setName( fullName );
-      }
+        layer->setName( QStringLiteral( "%1 — %2" ).arg( baseName, layerName ) );
       else if ( !layerName.isEmpty() )
         layer->setName( layerName );
       else if ( !baseName.isEmpty() )
         layer->setName( baseName );
-
-
       QgsProject::instance()->addMapLayer( layer.release() );
     }
 
