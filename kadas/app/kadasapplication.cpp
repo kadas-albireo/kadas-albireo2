@@ -53,7 +53,6 @@
 #include <qgis/qgspluginlayerregistry.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsproviderregistry.h>
-#include <qgis/qgsvectorlayer3drendererwidget.h>
 #include <qgis/qgsproviderutils.h>
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgsrasterlayerproperties.h>
@@ -435,7 +434,7 @@ void KadasApplication::init()
   // Setup layout item widgets
   QgsLayoutGuiUtils::registerGuiForKnownItemTypes( mMainWindow->mapCanvas() );
 
-  registerMapLayerPropertiesFactory( new QgsVectorLayer3DRendererWidgetFactory( this ) );
+  //registerMapLayerPropertiesFactory( new QgsVectorLayer3DRendererWidgetFactory( this ) );
 
   // Init KadasItemLayerRegistry
   KadasItemLayerRegistry::init();
