@@ -150,8 +150,7 @@ void KadasAppLayerHandling::postProcessAddedLayer( QgsMapLayer *layer )
       };
 
       QgsVectorLayer *vl = qobject_cast<QgsVectorLayer *>( layer );
-      if vl
-        ->geometryType() != Qgis::GeometryType::Polygon
+      if ( vl->geometryType() != Qgis::GeometryType::Polygon )
         {
           // currently only polygon layers get a default 3D style
           QgsPhongMaterialSettings materialSettings;
