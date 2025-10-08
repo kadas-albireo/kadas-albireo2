@@ -151,21 +151,21 @@ void KadasAppLayerHandling::postProcessAddedLayer( QgsMapLayer *layer )
 
       QgsVectorLayer *vl = qobject_cast<QgsVectorLayer *>( layer );
       if ( vl->geometryType() != Qgis::GeometryType::Polygon )
-        {
-          // currently only polygon layers get a default 3D style
-          QgsPhongMaterialSettings materialSettings;
-          materialSettings.setAmbient( pickColorFromVectorLayer( vl ) );
-          materialSettings.setOpacity( 0.80f );
-          QgsPolygon3DSymbol *symbol3d = new QgsPolygon3DSymbol;
-          symbol3d->setMaterialSettings( materialSettings.clone() );
+      {
+        // currently only polygon layers get a default 3D style
+        QgsPhongMaterialSettings materialSettings;
+        materialSettings.setAmbient( pickColorFromVectorLayer( vl ) );
+        materialSettings.setOpacity( 0.80f );
+        QgsPolygon3DSymbol *symbol3d = new QgsPolygon3DSymbol;
+        symbol3d->setMaterialSettings( materialSettings.clone() );
 
-          QgsPropertyCollection properties = symbol3d->dataDefinedProperties();
-          properties.setProperty( QgsAbstract3DSymbol::Property::ExtrusionHeight, QgsProperty::fromExpression( "z_max( @geometry )" ) );
-          symbol3d->setDataDefinedProperties( properties );
+        QgsPropertyCollection properties = symbol3d->dataDefinedProperties();
+        properties.setProperty( QgsAbstract3DSymbol::Property::ExtrusionHeight, QgsProperty::fromExpression( "z_max( @geometry )" ) );
+        symbol3d->setDataDefinedProperties( properties );
 
-          QgsVectorLayer3DRenderer *renderer = new QgsVectorLayer3DRenderer( symbol3d );
-          layer->setRenderer3D( renderer );
-        }
+        QgsVectorLayer3DRenderer *renderer = new QgsVectorLayer3DRenderer( symbol3d );
+        layer->setRenderer3D( renderer );
+      }
 
       break;
     }
