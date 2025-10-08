@@ -125,24 +125,23 @@ void KadasAppLayerHandling::postProcessAddedLayer( QgsMapLayer *layer )
       * Use an heuristic to find the color assignated by default
       */
       auto pickColorFromVectorLayer = []( QgsVectorLayer *vl ) {
-
         QgsFeatureRenderer *renderer2D = vl->renderer();
         if ( renderer2D->type() == QLatin1String( "embeddedSymbol" ) )
         {
-            QgsEmbeddedSymbolRenderer *embeddedRenderer = dynamic_cast<QgsEmbeddedSymbolRenderer *>( renderer2D );
-            QgsFeature feature = vl->getFeature( 0 );
-            if ( feature.isValid() )
-            {
+          QgsEmbeddedSymbolRenderer *embeddedRenderer = dynamic_cast<QgsEmbeddedSymbolRenderer *>( renderer2D );
+          QgsFeature feature = vl->getFeature( 0 );
+          if ( feature.isValid() )
+          {
             // Have a pick at the first feature and assume it's the same for each
             // TODO Would be better to have a `QgsEmbeddedSymbol3DRenderer` for each features directly in QGIS
             qDebug() << " feature.embeddedSymbol()" << feature.embeddedSymbol();
             return embeddedRenderer->symbolForFeature( feature, QgsRenderContext() )->color();
-            }
+          }
         }
         else if ( renderer2D->type() == QLatin1String( "singleSymbol" ) )
         {
-            QgsSingleSymbolRenderer *singleSymbolRendered = dynamic_cast<QgsSingleSymbolRenderer *>( renderer2D );
-            return singleSymbolRendered->symbol()->color();
+          QgsSingleSymbolRenderer *singleSymbolRendered = dynamic_cast<QgsSingleSymbolRenderer *>( renderer2D );
+          return singleSymbolRendered->symbol()->color();
         }
 
         // Should not happen, upon loading a layer the renderer should be only one of the above
@@ -151,22 +150,23 @@ void KadasAppLayerHandling::postProcessAddedLayer( QgsMapLayer *layer )
       };
 
       QgsVectorLayer *vl = qobject_cast<QgsVectorLayer *>( layer );
-      if vl->geometryType() != Qgis::GeometryType::Polygon
-      {
-        // currently only polygon layers get a default 3D style
-        QgsPhongMaterialSettings materialSettings;
-        materialSettings.setAmbient( pickColorFromVectorLayer( vl ) );
-        materialSettings.setOpacity( 0.80f );
-        QgsPolygon3DSymbol *symbol3d = new QgsPolygon3DSymbol;
-        symbol3d->setMaterialSettings( materialSettings.clone() );
+      if vl
+        ->geometryType() != Qgis::GeometryType::Polygon
+        {
+          // currently only polygon layers get a default 3D style
+          QgsPhongMaterialSettings materialSettings;
+          materialSettings.setAmbient( pickColorFromVectorLayer( vl ) );
+          materialSettings.setOpacity( 0.80f );
+          QgsPolygon3DSymbol *symbol3d = new QgsPolygon3DSymbol;
+          symbol3d->setMaterialSettings( materialSettings.clone() );
 
-        QgsPropertyCollection properties = symbol3d->dataDefinedProperties();
-        properties.setProperty( QgsAbstract3DSymbol::Property::ExtrusionHeight, QgsProperty::fromExpression( "z_max( @geometry )" ) );
-        symbol3d->setDataDefinedProperties( properties );
+          QgsPropertyCollection properties = symbol3d->dataDefinedProperties();
+          properties.setProperty( QgsAbstract3DSymbol::Property::ExtrusionHeight, QgsProperty::fromExpression( "z_max( @geometry )" ) );
+          symbol3d->setDataDefinedProperties( properties );
 
-        QgsVectorLayer3DRenderer *renderer = new QgsVectorLayer3DRenderer( symbol3d );
-        layer->setRenderer3D( renderer );
-      }
+          QgsVectorLayer3DRenderer *renderer = new QgsVectorLayer3DRenderer( symbol3d );
+          layer->setRenderer3D( renderer );
+        }
 
       break;
     }
@@ -753,15 +753,13 @@ QList<QgsMapLayer *> KadasAppLayerHandling::addSublayers( const QList<QgsProvide
       if ( layerName != baseName && !layerName.isEmpty() && !baseName.isEmpty() )
       {
         QString fullName = QString::fromUtf8( "%1 — %2" ).arg( baseName, layerName );
-        layer->setName( fullName ); 
+        layer->setName( fullName );
       }
       else if ( !layerName.isEmpty() )
         layer->setName( layerName );
       else if ( !baseName.isEmpty() )
         layer->setName( baseName );
 
-
-      
 
       QgsProject::instance()->addMapLayer( layer.release() );
     }
