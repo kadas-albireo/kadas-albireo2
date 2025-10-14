@@ -2,12 +2,12 @@
 <context>
     <name>Kadas3DIntegration</name>
     <message>
-        <location filename="../kadas/app/3d/kadas3dintegration.cpp" line="165"/>
+        <location filename="../kadas/app/3d/kadas3dintegration.cpp" line="166"/>
         <source>New 3D Map View</source>
         <translation>Neue 3D Kartenansicht</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dintegration.cpp" line="165"/>
+        <location filename="../kadas/app/3d/kadas3dintegration.cpp" line="166"/>
         <source>Project extent is not valid. Please add or activate a layer to render.</source>
         <translation>Projekt Ausdehnung ist ungültig. Bitte Ebene aktivieren oder hinzufügen.</translation>
     </message>
@@ -168,136 +168,136 @@ Möglicherweise möchten Sie den Detailierungsgrad heruntersetzen oder die Limit
 <context>
     <name>Kadas3DMapConfigWidget</name>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="55"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="57"/>
         <source>Terrain Based</source>
         <translation>Geländebasiert</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="56"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="58"/>
         <source>Walk Mode (First Person)</source>
         <translation>Gehmodus (erste Person)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="76"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="78"/>
         <source>Perspective Projection</source>
         <translation>Perspektivische Projektion</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="77"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="79"/>
         <source>Orthogonal Projection</source>
         <translation>Orthogonale Projektion</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="99"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="101"/>
         <source>Flat Terrain</source>
         <translation>Flaches Gelände</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="100"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="102"/>
         <source>DEM (Raster Layer)</source>
         <translation>Digitales Höhenmodell (Raster)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="101"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="103"/>
         <source>Online</source>
         <translation>Online</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="102"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="104"/>
         <source>Mesh</source>
         <translation>Mesh</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="103"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="105"/>
         <source>Quantized Mesh</source>
         <translation>Quantisiertes Mesh</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="205"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="217"/>
         <source>Coordinate Reference System</source>
         <translation>Koordinatenreferenzsystem</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="206"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="218"/>
         <source>Cube</source>
         <translation>Kubus</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="208"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="220"/>
         <source>Left</source>
         <translation>Links</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="209"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="221"/>
         <source>Center</source>
         <translation>Mittig ausrichten</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="210"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="222"/>
         <source>Right</source>
         <translation>Rechts</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="212"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="224"/>
         <source>Top</source>
         <translation>Oben</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="213"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="225"/>
         <source>Middle</source>
         <translation>Mitte</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="214"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="226"/>
         <source>Bottom</source>
         <translation>Unten</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="232"/>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="237"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="244"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="249"/>
         <source>Top Left</source>
         <translation>Oben links</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="233"/>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="238"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="245"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="250"/>
         <source>Top Right</source>
         <translation>Oben rechts</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="234"/>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="239"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="246"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="251"/>
         <source>Bottom Left</source>
         <translation>Unten links</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="235"/>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="240"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="247"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="252"/>
         <source>Bottom Right</source>
         <translation>Unten rechts</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="263"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="275"/>
         <source>Show in 2D map view</source>
         <translation>In 2D Kartenansicht anzeigen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="485"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="484"/>
         <source>An elevation layer must be selected for a DEM terrain</source>
         <translation>Eine Höhenebene (DHM) muss für das Gelände ausgewählt sein</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="493"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="492"/>
         <source>An elevation layer must be selected for a mesh terrain</source>
         <translation>Eine Höhenebene muss für ein Mesh-Gelände zuerst ausgewählt werden. </translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="501"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="500"/>
         <source>An elevation layer must be selected for a quantized mesh terrain</source>
         <translation>quantisiertes Netz</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="512"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="511"/>
         <source>No lights exist in the scene</source>
         <translation>Keine Beleuchtung in dieser Szene vorhanden</translation>
     </message>
@@ -382,14 +382,25 @@ Möglicherweise möchten Sie den Detailierungsgrad heruntersetzen oder die Limit
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="472"/>
-        <source>at scale 1:%1 </source>
-        <translation>im Massstab 1:%1</translation>
+        <source>at scale 1:%1</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="621"/>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="656"/>
+        <source>Go to %1, %2 (%3 %4%5)</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="624"/>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="659"/>
         <source>zone</source>
         <translation>Zone</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="695"/>
+        <source>Go to %1%2%3 %4 %5</source>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.h" line="38"/>
@@ -4245,17 +4256,17 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
 <context>
     <name>KadasMapToolCreateItem</name>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="105"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="106"/>
         <source>Undo</source>
         <translation>Rückgängig</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="113"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="114"/>
         <source>Redo</source>
         <translation>Wiederholen</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="122"/>
+        <location filename="../kadas/gui/maptools/kadasmaptoolcreateitem.cpp" line="123"/>
         <source>Close</source>
         <translation>Schliessen</translation>
     </message>
@@ -5172,7 +5183,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
 <context>
     <name>KadasNewsPopup</name>
     <message>
-        <location filename="../kadas/app/kadasnewspopup.cpp" line="196"/>
+        <location filename="../kadas/app/kadasnewspopup.cpp" line="159"/>
         <source>KADAS Newsletter</source>
         <translation>KADAS Newsletter</translation>
     </message>

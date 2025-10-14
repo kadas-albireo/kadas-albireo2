@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: 🐣 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install PowerShell
         uses: PSModule/install-powershell@v1
@@ -51,6 +51,8 @@ jobs:
 
       - name: 🌱 Install dependencies and generate project files
         shell: bash
+        env:
+          X_VCPKG_ASSET_SOURCES: x-azurl,https://assetcache.open-vcpkg.org/assetcache,,read
         run: |
           if [[ -n "${{ github.event.pull_request.number }}" ]]; then
             # Pull Request Build: Use PR number as patch version
@@ -88,7 +90,6 @@ jobs:
                 -D INSTALL_DEMO_DATA=ON \
                 -D VCPKG_TARGET_TRIPLET="x64-windows" \
                 -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=C:/src" \
-                -D SIP_BUILD_EXECUTABLE="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\Scripts\sip-build.bat" \
                 -D QGIS_PYTHON_MODULE_DIR="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\Lib\site-packages\qgis" \
                 -D CPACK_PACKAGE_FILE_NAME="kadas-win64-$(date +'%Y-%m-%d_%H%M')" \
                 -D NUGET_USERNAME=kadas-albireo \
@@ -131,6 +132,12 @@ jobs:
       - name: 🌋 Build
         run: |
           cmake --build build --config Release
+
+      - name: 🧪 Run CTest
+        env:
+          QT_LOGGING_TO_CONSOLE: "1"
+        run: |
+          ctest --test-dir build --output-on-failure --config Release
 
       - name: 📦 Package
         run: |

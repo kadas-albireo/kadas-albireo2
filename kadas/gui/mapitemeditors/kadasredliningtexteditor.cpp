@@ -30,8 +30,7 @@ KadasRedliningTextEditor::KadasRedliningTextEditor( KadasMapItem *item )
   connect( mUi.mLineEditText, &QLineEdit::textChanged, this, &KadasRedliningTextEditor::saveText );
 
   QFont font;
-  font.setPointSize( 20 );
-  font.fromString( QgsSettings().value( "/Redlining/font", QFont().toString() ).toString() );
+  font.fromString( QgsSettings().value( "/Redlining/font", "Arial,12" ).toString() );
 
   QFont fontFamily;
   fontFamily.setFamily( font.family() );
@@ -49,12 +48,12 @@ KadasRedliningTextEditor::KadasRedliningTextEditor( KadasMapItem *item )
 
   mUi.mToolButtonBorderColor->setAllowOpacity( true );
   mUi.mToolButtonBorderColor->setShowNoColor( true );
-  QColor initialOutlineColor = QgsSymbolLayerUtils::decodeColor( QgsSettings().value( "/Redlining/text_outline_color", "0,0,0,0" ).toString() );
+  QColor initialOutlineColor = QgsSymbolLayerUtils::decodeColor( QgsSettings().value( "/Redlining/text_outline_color", "255,255,255,255" ).toString() );
   mUi.mToolButtonBorderColor->setColor( initialOutlineColor );
   connect( mUi.mToolButtonBorderColor, &QgsColorButton::colorChanged, this, &KadasRedliningTextEditor::saveOutlineColor );
 
   mUi.mToolButtonFillColor->setAllowOpacity( true );
-  QColor initialFillColor = QgsSymbolLayerUtils::decodeColor( QgsSettings().value( "/Redlining/text_color", "255,0,0,255" ).toString() );
+  QColor initialFillColor = QgsSymbolLayerUtils::decodeColor( QgsSettings().value( "/Redlining/text_color", "0,0,0,255" ).toString() );
   mUi.mToolButtonFillColor->setColor( initialFillColor );
   connect( mUi.mToolButtonFillColor, &QgsColorButton::colorChanged, this, &KadasRedliningTextEditor::saveFillColor );
 
@@ -112,10 +111,15 @@ void KadasRedliningTextEditor::syncWidgetToItem()
   {
     return;
   }
+
+  disconnect( mItemConnection );
+
   textItem->setText( mUi.mLineEditText->text() );
   textItem->setOutlineColor( mUi.mToolButtonBorderColor->color() );
   textItem->setFillColor( mUi.mToolButtonFillColor->color() );
   textItem->setFont( currentFont() );
+
+  mItemConnection = connect( textItem, &KadasTextItem::propertyChanged, this, &KadasRedliningTextEditor::syncItemToWidget );
 }
 
 void KadasRedliningTextEditor::setItem( KadasMapItem *item )

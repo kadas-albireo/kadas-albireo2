@@ -4,14 +4,6 @@ set(VCPKG_TAG e3ad383ceb886677eb181e16adeeb4d4a2c2d4c4)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
-set(WITH_QTWEBKIT
-    ON
-    CACHE BOOL "Use Qt Webkit"
-)
-if(WITH_QTWEBKIT)
-  list(APPEND VCPKG_MANIFEST_FEATURES "webkit")
-endif()
-
 set(WITH_BINDINGS
     ON
     CACHE BOOL "Build with python bindings"
@@ -112,11 +104,6 @@ if(WITH_BINDINGS)
   endif()
 endif()
 
-if(WITH_QTWEBKIT)
-  find_package(Qt5WebKitWidgets REQUIRED)
-  add_definitions(-DWITH_QTWEBKIT)
-endif()
-
 set(CMAKE_AUTOMOC ON)
 
 get_target_property(QMAKE_EXECUTABLE Qt5::qmake LOCATION)
@@ -146,6 +133,11 @@ add_subdirectory(kadas)
 
 if(WITH_BINDINGS)
   add_subdirectory(python)
+endif()
+
+include(CTest)
+if(BUILD_TESTING)
+  add_subdirectory(tests)
 endif()
 
 option(INSTALL_DEMO_DATA "Install settings and templates" OFF)
