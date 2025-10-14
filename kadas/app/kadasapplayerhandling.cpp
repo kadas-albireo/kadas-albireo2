@@ -128,13 +128,18 @@ void KadasAppLayerHandling::postProcessAddedLayer( QgsMapLayer *layer )
         QgsFeatureRenderer *renderer2D = vl->renderer();
         if ( renderer2D->type() == QLatin1String( "embeddedSymbol" ) )
         {
+          QgsFeatureRequest req;
+          req.setFlags( Qgis::FeatureRequestFlag::EmbeddedSymbols | Qgis::FeatureRequestFlag::NoGeometry );
+          req.setNoAttributes();
+          req.setLimit( 1 );
+          QgsFeatureIterator it = vl->getFeatures( req );
+          QgsFeature feature;
+
           QgsEmbeddedSymbolRenderer *embeddedRenderer = dynamic_cast<QgsEmbeddedSymbolRenderer *>( renderer2D );
-          QgsFeature feature = vl->getFeature( 0 );
-          if ( feature.isValid() )
+          if ( it.nextFeature( feature ) && feature.isValid() )
           {
             // Have a pick at the first feature and assume it's the same for each
             // TODO Would be better to have a `QgsEmbeddedSymbol3DRenderer` for each features directly in QGIS
-            qDebug() << " feature.embeddedSymbol()" << feature.embeddedSymbol();
             return embeddedRenderer->symbolForFeature( feature, QgsRenderContext() )->color();
           }
         }
@@ -150,7 +155,7 @@ void KadasAppLayerHandling::postProcessAddedLayer( QgsMapLayer *layer )
       };
 
       QgsVectorLayer *vl = qobject_cast<QgsVectorLayer *>( layer );
-      if ( vl->geometryType() != Qgis::GeometryType::Polygon )
+      if ( vl->geometryType() == Qgis::GeometryType::Polygon )
       {
         // currently only polygon layers get a default 3D style
         QgsPhongMaterialSettings materialSettings;
@@ -159,9 +164,6 @@ void KadasAppLayerHandling::postProcessAddedLayer( QgsMapLayer *layer )
         QgsPolygon3DSymbol *symbol3d = new QgsPolygon3DSymbol;
         symbol3d->setMaterialSettings( materialSettings.clone() );
 
-        QgsPropertyCollection properties = symbol3d->dataDefinedProperties();
-        properties.setProperty( QgsAbstract3DSymbol::Property::ExtrusionHeight, QgsProperty::fromExpression( "z_max( @geometry )" ) );
-        symbol3d->setDataDefinedProperties( properties );
 
         QgsVectorLayer3DRenderer *renderer = new QgsVectorLayer3DRenderer( symbol3d );
         layer->setRenderer3D( renderer );
