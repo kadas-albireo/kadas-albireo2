@@ -21,6 +21,8 @@ jobs:
     steps:
       - name: 🐣 Checkout
         uses: actions/checkout@v5
+        with:
+          lfs: 'true'
 
       - name: Install PowerShell
         uses: PSModule/install-powershell@v1
@@ -87,7 +89,8 @@ jobs:
                 -D CMAKE_BUILD_TYPE=Release \
                 -D CMAKE_INSTALL_PREFIX="C:\kadas" \
                 -D WITH_BINDINGS=ON \
-                -D INSTALL_DEMO_DATA=ON \
+                -D INSTALL_SWISS_DTM=ON \
+                -D INSTALL_ALBIREO_SETTINGS=ON \
                 -D VCPKG_TARGET_TRIPLET="x64-windows" \
                 -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=C:/src" \
                 -D QGIS_PYTHON_MODULE_DIR="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\Lib\site-packages\qgis" \
