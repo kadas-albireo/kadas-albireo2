@@ -145,7 +145,9 @@ set(INSTALL_SWISS_DTM
     CACHE BOOL "Install dtm_swiss_only.tif."
 )
 if(INSTALL_SWISS_DTM)
-  install(FILES "share/geodata/dtm_swiss_only.tif" DESTINATION "share/kadas/geodata/")
+  install(FILES "share/geodata/dtm_swiss_only.tif"
+          DESTINATION "share/kadas/geodata/"
+  )
 endif()
 set(INSTALL_ALBIREO_SETTINGS
     TRUE
