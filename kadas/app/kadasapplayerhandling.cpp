@@ -54,6 +54,16 @@
 #include <qgis/qgsmaplayerutils.h>
 #include <qgis/qgsfieldformatter.h>
 #include <qgis/qgsabstractdatabaseproviderconnection.h>
+
+#include <qgis/qgsembeddedsymbolrenderer.h>
+#include <qgis/qgssinglesymbolrenderer.h>
+#include <qgis/qgssymbol.h>
+
+#include <qgis/qgis_3d.h>
+#include <qgis/qgspolygon3dsymbol.h>
+#include <qgis/qgsvectorlayer3drenderer.h>
+
+
 #include <qgis/qgsprovidersublayersdialog.h>
 #include <qgis/qgsvectortileutils.h>
 
@@ -98,7 +108,6 @@ void KadasAppLayerHandling::postProcessAddedLayer( QgsMapLayer *layer )
 {
   switch ( layer->type() )
   {
-    case Qgis::LayerType::Vector:
     case Qgis::LayerType::Raster:
     {
       bool ok = false;
@@ -106,7 +115,62 @@ void KadasAppLayerHandling::postProcessAddedLayer( QgsMapLayer *layer )
       layer->loadDefaultMetadata( ok );
       break;
     }
+    case Qgis::LayerType::Vector:
+    {
+      bool ok = false;
+      layer->loadDefaultStyle( ok );
+      layer->loadDefaultMetadata( ok );
 
+      /*
+      * Use an heuristic to find the color assignated by default
+      */
+      auto pickColorFromVectorLayer = []( QgsVectorLayer *vl ) {
+        QgsFeatureRenderer *renderer2D = vl->renderer();
+        if ( renderer2D->type() == QLatin1String( "embeddedSymbol" ) )
+        {
+          QgsFeatureRequest req;
+          req.setFlags( Qgis::FeatureRequestFlag::EmbeddedSymbols | Qgis::FeatureRequestFlag::NoGeometry );
+          req.setNoAttributes();
+          req.setLimit( 1 );
+          QgsFeatureIterator it = vl->getFeatures( req );
+          QgsFeature feature;
+
+          QgsEmbeddedSymbolRenderer *embeddedRenderer = dynamic_cast<QgsEmbeddedSymbolRenderer *>( renderer2D );
+          if ( it.nextFeature( feature ) && feature.isValid() )
+          {
+            // Have a pick at the first feature and assume it's the same for each
+            // TODO Would be better to have a `QgsEmbeddedSymbol3DRenderer` for each features directly in QGIS
+            return embeddedRenderer->symbolForFeature( feature, QgsRenderContext() )->color();
+          }
+        }
+        else if ( renderer2D->type() == QLatin1String( "singleSymbol" ) )
+        {
+          QgsSingleSymbolRenderer *singleSymbolRendered = dynamic_cast<QgsSingleSymbolRenderer *>( renderer2D );
+          return singleSymbolRendered->symbol()->color();
+        }
+
+        // Should not happen, upon loading a layer the renderer should be only one of the above
+        // but just in case
+        return QColor( Qt::GlobalColor::darkGray );
+      };
+
+      QgsVectorLayer *vl = qobject_cast<QgsVectorLayer *>( layer );
+      if ( vl->geometryType() == Qgis::GeometryType::Polygon )
+      {
+        // currently only polygon layers get a default 3D style
+        QgsPhongMaterialSettings materialSettings;
+        materialSettings.setAmbient( pickColorFromVectorLayer( vl ) );
+        materialSettings.setOpacity( 0.80f );
+        QgsPolygon3DSymbol *symbol3d = new QgsPolygon3DSymbol;
+        symbol3d->setMaterialSettings( materialSettings.clone() );
+
+
+        QgsVectorLayer3DRenderer *renderer = new QgsVectorLayer3DRenderer( symbol3d );
+        layer->setRenderer3D( renderer );
+      }
+
+      break;
+    }
     case Qgis::LayerType::Plugin:
       break;
 
