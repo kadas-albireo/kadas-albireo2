@@ -1,8 +1,9 @@
 string(REPLACE "." "_" TAG ${VERSION})
 
-set(QGIS_REF final-${TAG})
+# set(QGIS_REF final-${TAG})
+set(QGIS_REF ad73a3c59047194dd89b3c23365ef5f4a1140204)
 set(QGIS_SHA512
-    78327b7af6a54daa43caa4b7976859bf2d0dd840bd8dba35586af0d4741422c9d6d30a1fc2ad8f00f7a7a97ca4b22752bf580993e6527c643850f1c556e0a2d5
+    1aa9f285b8ee0fc5c1b213b67653f544425859ce22b48a35b40ae4022fd018c139a46554373192a02a7116fa1f6c8cd39cd14b855a9a8a361615d3bea5a48d70
 )
 
 vcpkg_from_github(
@@ -20,20 +21,15 @@ vcpkg_from_github(
   # Make qgis support python's debug library
   qgspython.patch
   libxml2.patch
-  exiv2.patch
   crssync.patch
   # bigobj.patch
   mesh.patch
-  bindings-install.patch
   sipcxx17.patch
   # nlohmann-json.patch
   qgis-debug.patch
-  62506.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1262
-  sync_2d_3d.patch # https://github.com/qgis/QGIS/pull/62530
   3dfrustumfix.patch
   3dchunkloaderconcurrency.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1278
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
-  mounteverest.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1278
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
 )
 
@@ -55,6 +51,7 @@ if("bindings" IN_LIST FEATURES)
   # TODO ... we want this to be extracted via python command ?
   vcpkg_add_to_path(PREPEND "${CURRENT_INSTALLED_DIR}/tools/python3/Scripts")
   list(APPEND QGIS_OPTIONS -DWITH_BINDINGS:BOOL=ON)
+  list(APPEND QGIS_OPTIONS -DSIP_GLOBAL_INSTALL:BOOL=ON)
 
   list(APPEND QGIS_OPTIONS
        "-DQGIS_PYTHON_DIR=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/qgis"
@@ -92,6 +89,7 @@ list(APPEND QGIS_OPTIONS "-DQGIS_MACAPP_FRAMEWORK=FALSE")
 # QGIS will also do that starting from protobuf version 4.23
 list(APPEND QGIS_OPTIONS "-DProtobuf_LITE_LIBRARY=protobuf::libprotobuf-lite")
 list(APPEND QGIS_OPTIONS "-DWITH_INTERNAL_NLOHMANN_JSON:BOOL=OFF")
+list(APPEND QGIS_OPTIONS "-DWITH_QTWEBENGINE:BOOL=OFF")
 
 if("opencl" IN_LIST FEATURES)
   list(APPEND QGIS_OPTIONS -DUSE_OPENCL:BOOL=ON)
