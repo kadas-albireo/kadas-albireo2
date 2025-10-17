@@ -35,6 +35,7 @@ vcpkg_from_github(
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
   mounteverest.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1278
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
+  moveNetworkloggerToGui.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
