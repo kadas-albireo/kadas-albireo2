@@ -71,6 +71,9 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasMapItem
     QColor strokeColor() const { return mStrokeColor; }
     void setStrokeWidth( double width );
     double strokeWidth() const { return mStrokeWidth; }
+    void setStrokeStyle( const Qt::PenStyle &style );
+    Qt::PenStyle strokeStyle() const { return mStrokeStyle; }
+
 
     //Qgis::GeometryType geometryType() const override { return Qgis::GeometryType::Point; }
     //void addPartFromGeometry( const QgsAbstractGeometry &geom ) override;
@@ -102,6 +105,7 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasMapItem
     QColor mStrokeColor = Qt::red;
     double mStrokeWidth = 1;
     QColor mFillColor = Qt::white;
+    Qt::PenStyle mStrokeStyle = Qt::PenStyle::SolidLine;
 
     enum AttribIds
     {

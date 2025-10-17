@@ -44,11 +44,11 @@ KadasRedliningItemEditor::KadasRedliningItemEditor( KadasMapItem *item )
   connect( mUi.mToolButtonBorderColor, &QgsColorButton::colorChanged, this, &KadasRedliningItemEditor::saveColor );
 
   mUi.mComboBoxOutlineStyle->setProperty( "settings_key", "outline_style" );
-  mUi.mComboBoxOutlineStyle->addItem( createOutlineStyleIcon( Qt::NoPen ), QString(), static_cast<int>( Qt::NoPen ) );
-  mUi.mComboBoxOutlineStyle->addItem( createOutlineStyleIcon( Qt::SolidLine ), QString(), static_cast<int>( Qt::SolidLine ) );
-  mUi.mComboBoxOutlineStyle->addItem( createOutlineStyleIcon( Qt::DashLine ), QString(), static_cast<int>( Qt::DashLine ) );
-  mUi.mComboBoxOutlineStyle->addItem( createOutlineStyleIcon( Qt::DashDotLine ), QString(), static_cast<int>( Qt::DashDotLine ) );
-  mUi.mComboBoxOutlineStyle->addItem( createOutlineStyleIcon( Qt::DotLine ), QString(), static_cast<int>( Qt::DotLine ) );
+  mUi.mComboBoxOutlineStyle->addItem( createOutlineStyleIcon( Qt::NoPen ), QString(), QVariant::fromValue( Qt::NoPen ) );
+  mUi.mComboBoxOutlineStyle->addItem( createOutlineStyleIcon( Qt::SolidLine ), QString(), QVariant::fromValue( Qt::SolidLine ) );
+  mUi.mComboBoxOutlineStyle->addItem( createOutlineStyleIcon( Qt::DashLine ), QString(), QVariant::fromValue( Qt::DashLine ) );
+  mUi.mComboBoxOutlineStyle->addItem( createOutlineStyleIcon( Qt::DashDotLine ), QString(), QVariant::fromValue( Qt::DashDotLine ) );
+  mUi.mComboBoxOutlineStyle->addItem( createOutlineStyleIcon( Qt::DotLine ), QString(), QVariant::fromValue( Qt::DotLine ) );
   mUi.mComboBoxOutlineStyle->setCurrentIndex( QgsSettings().value( "/Redlining/outline_style", "1" ).toInt() );
   connect( mUi.mComboBoxOutlineStyle, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasRedliningItemEditor::saveStyle );
 
@@ -60,15 +60,15 @@ KadasRedliningItemEditor::KadasRedliningItemEditor( KadasMapItem *item )
   connect( mUi.mToolButtonFillColor, &QgsColorButton::colorChanged, this, &KadasRedliningItemEditor::saveColor );
 
   mUi.mComboBoxFillStyle->setProperty( "settings_key", "fill_style" );
-  mUi.mComboBoxFillStyle->addItem( createFillStyleIcon( Qt::NoBrush ), QString(), static_cast<int>( Qt::NoBrush ) );
-  mUi.mComboBoxFillStyle->addItem( createFillStyleIcon( Qt::SolidPattern ), QString(), static_cast<int>( Qt::SolidPattern ) );
-  mUi.mComboBoxFillStyle->addItem( createFillStyleIcon( Qt::HorPattern ), QString(), static_cast<int>( Qt::HorPattern ) );
-  mUi.mComboBoxFillStyle->addItem( createFillStyleIcon( Qt::VerPattern ), QString(), static_cast<int>( Qt::VerPattern ) );
-  mUi.mComboBoxFillStyle->addItem( createFillStyleIcon( Qt::BDiagPattern ), QString(), static_cast<int>( Qt::BDiagPattern ) );
-  mUi.mComboBoxFillStyle->addItem( createFillStyleIcon( Qt::DiagCrossPattern ), QString(), static_cast<int>( Qt::DiagCrossPattern ) );
-  mUi.mComboBoxFillStyle->addItem( createFillStyleIcon( Qt::FDiagPattern ), QString(), static_cast<int>( Qt::FDiagPattern ) );
-  mUi.mComboBoxFillStyle->addItem( createFillStyleIcon( Qt::CrossPattern ), QString(), static_cast<int>( Qt::CrossPattern ) );
-  mUi.mComboBoxFillStyle->setCurrentIndex( QgsSettings().value( "/Redlining/fill_style", "1" ).toInt() );
+  mUi.mComboBoxFillStyle->addItem( createFillStyleIcon( Qt::NoBrush ), QString(), QVariant::fromValue( Qt::NoBrush ) );
+  mUi.mComboBoxFillStyle->addItem( createFillStyleIcon( Qt::SolidPattern ), QString(), QVariant::fromValue( Qt::SolidPattern ) );
+  mUi.mComboBoxFillStyle->addItem( createFillStyleIcon( Qt::HorPattern ), QString(), QVariant::fromValue( Qt::HorPattern ) );
+  mUi.mComboBoxFillStyle->addItem( createFillStyleIcon( Qt::VerPattern ), QString(), QVariant::fromValue( Qt::VerPattern ) );
+  mUi.mComboBoxFillStyle->addItem( createFillStyleIcon( Qt::BDiagPattern ), QString(), QVariant::fromValue( Qt::BDiagPattern ) );
+  mUi.mComboBoxFillStyle->addItem( createFillStyleIcon( Qt::DiagCrossPattern ), QString(), QVariant::fromValue( Qt::DiagCrossPattern ) );
+  mUi.mComboBoxFillStyle->addItem( createFillStyleIcon( Qt::FDiagPattern ), QString(), QVariant::fromValue( Qt::FDiagPattern ) );
+  mUi.mComboBoxFillStyle->addItem( createFillStyleIcon( Qt::CrossPattern ), QString(), QVariant::fromValue( Qt::CrossPattern ) );
+  mUi.mComboBoxFillStyle->setCurrentIndex( QgsSettings().value( "/Redlining/fill_style", 1 ).toInt() );
   connect( mUi.mComboBoxFillStyle, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasRedliningItemEditor::saveStyle );
 
   if ( geometryItem && geometryItem->geometryType() == Qgis::GeometryType::Line )
@@ -106,13 +106,13 @@ void KadasRedliningItemEditor::syncItemToWidget()
     mUi.mToolButtonFillColor->setColor( pointItem->color() );
     mUi.mToolButtonFillColor->blockSignals( false );
 
-    // mUi.mComboBoxOutlineStyle->blockSignals( true );
-    // mUi.mComboBoxOutlineStyle->setCurrentIndex( mUi.mComboBoxOutlineStyle->findData( static_cast<int>( geometryItem->outline().style() ) ) );
-    // mUi.mComboBoxOutlineStyle->blockSignals( false );
+    mUi.mComboBoxOutlineStyle->blockSignals( true );
+    mUi.mComboBoxOutlineStyle->setCurrentIndex( mUi.mComboBoxOutlineStyle->findData( QVariant::fromValue( pointItem->strokeStyle() ) ) );
+    mUi.mComboBoxOutlineStyle->blockSignals( false );
 
-    // mUi.mComboBoxFillStyle->blockSignals( true );
-    // mUi.mComboBoxFillStyle->setCurrentIndex( mUi.mComboBoxFillStyle->findData( static_cast<int>( geometryItem->fill().style() ) ) );
-    // mUi.mComboBoxFillStyle->blockSignals( false );
+    //   mUi.mComboBoxFillStyle->blockSignals( true );
+    //   mUi.mComboBoxFillStyle->setCurrentIndex( mUi.mComboBoxFillStyle->findData( QVariant::fromValue( pointItem->fill().style() ) ) );
+    //   mUi.mComboBoxFillStyle->blockSignals( false );
   }
   else if ( KadasGeometryItem *geometryItem = dynamic_cast<KadasGeometryItem *>( mItem ) )
   {
@@ -129,11 +129,11 @@ void KadasRedliningItemEditor::syncItemToWidget()
     mUi.mToolButtonFillColor->blockSignals( false );
 
     mUi.mComboBoxOutlineStyle->blockSignals( true );
-    mUi.mComboBoxOutlineStyle->setCurrentIndex( mUi.mComboBoxOutlineStyle->findData( static_cast<int>( geometryItem->outline().style() ) ) );
+    mUi.mComboBoxOutlineStyle->setCurrentIndex( mUi.mComboBoxOutlineStyle->findData( QVariant::fromValue( geometryItem->outline().style() ) ) );
     mUi.mComboBoxOutlineStyle->blockSignals( false );
 
     mUi.mComboBoxFillStyle->blockSignals( true );
-    mUi.mComboBoxFillStyle->setCurrentIndex( mUi.mComboBoxFillStyle->findData( static_cast<int>( geometryItem->fill().style() ) ) );
+    mUi.mComboBoxFillStyle->setCurrentIndex( mUi.mComboBoxFillStyle->findData( QVariant::fromValue( geometryItem->fill().style() ) ) );
     mUi.mComboBoxFillStyle->blockSignals( false );
   }
 }
@@ -145,12 +145,13 @@ void KadasRedliningItemEditor::syncWidgetToItem()
     int size = mUi.mSpinBoxSize->value();
     QColor outlineColor = mUi.mToolButtonBorderColor->color();
     QColor fillColor = mUi.mToolButtonFillColor->color();
-    // Qt::PenStyle lineStyle = static_cast<Qt::PenStyle>( mUi.mComboBoxOutlineStyle->itemData( mUi.mComboBoxOutlineStyle->currentIndex() ).toInt() );
-    // Qt::BrushStyle brushStyle = static_cast<Qt::BrushStyle>( mUi.mComboBoxFillStyle->itemData( mUi.mComboBoxFillStyle->currentIndex() ).toInt() );
+    Qt::PenStyle lineStyle = mUi.mComboBoxOutlineStyle->currentData().value<Qt::PenStyle>();
+    //Qt::BrushStyle brushStyle = static_cast<Qt::BrushStyle>( mUi.mComboBoxFillStyle->itemData( mUi.mComboBoxFillStyle->currentIndex() ).toInt() );
 
     pointItem->blockSignals( true );
     pointItem->setColor( fillColor );
     pointItem->setStrokeColor( outlineColor );
+    pointItem->setStrokeStyle( lineStyle );
     pointItem->setIconSize( size );
     pointItem->blockSignals( false );
     emit pointItem->changed();
@@ -161,7 +162,7 @@ void KadasRedliningItemEditor::syncWidgetToItem()
     int outlineWidth = mUi.mSpinBoxSize->value();
     QColor outlineColor = mUi.mToolButtonBorderColor->color();
     QColor fillColor = mUi.mToolButtonFillColor->color();
-    Qt::PenStyle lineStyle = static_cast<Qt::PenStyle>( mUi.mComboBoxOutlineStyle->itemData( mUi.mComboBoxOutlineStyle->currentIndex() ).toInt() );
+    Qt::PenStyle lineStyle = mUi.mComboBoxOutlineStyle->currentData().value<Qt::PenStyle>();
     Qt::BrushStyle brushStyle = static_cast<Qt::BrushStyle>( mUi.mComboBoxFillStyle->itemData( mUi.mComboBoxFillStyle->currentIndex() ).toInt() );
 
     geometryItem->blockSignals( true );

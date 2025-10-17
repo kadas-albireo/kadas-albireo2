@@ -120,6 +120,12 @@ void KadasPointItem::setStrokeWidth( double width )
   updateSymbol();
 }
 
+void KadasPointItem::setStrokeStyle( const Qt::PenStyle &style )
+{
+  mStrokeStyle = style;
+  updateSymbol();
+}
+
 bool KadasPointItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
   state()->drawStatus = State::DrawStatus::Drawing;
@@ -231,7 +237,7 @@ void KadasPointItem::updateSymbol()
   symbolLayer->setStrokeWidth( mStrokeWidth );
   symbolLayer->setStrokeColor( mStrokeColor );
   symbolLayer->setColor( mFillColor );
-
+  symbolLayer->setStrokeStyle( mStrokeStyle );
   mQgsItem->setSymbol( new QgsMarkerSymbol( { symbolLayer } ) );
 
   update();
