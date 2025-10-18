@@ -21,8 +21,6 @@ jobs:
     steps:
       - name: 🐣 Checkout
         uses: actions/checkout@v5
-        with:
-          lfs: 'true'
 
       - name: Install PowerShell
         uses: PSModule/install-powershell@v1
@@ -50,6 +48,13 @@ jobs:
         shell: bash
         run: |
           echo "DEBUG_OPTIONS=-D SHOW_CONSOLE=ON" >> $GITHUB_ENV
+
+      - name: Setup oras
+        uses: oras-project/setup-oras@v1
+
+      - name: Fetch tif
+        run: |
+          oras pull ghcr.io/kadas-albireo/kadas-albireo2/dtm-swiss-only:1.0 -o .
 
       - name: 🌱 Install dependencies and generate project files
         shell: bash
