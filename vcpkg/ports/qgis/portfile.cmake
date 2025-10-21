@@ -52,11 +52,18 @@ if("bindings" IN_LIST FEATURES)
   # TODO ... we want this to be extracted via python command ?
   vcpkg_add_to_path(PREPEND "${CURRENT_INSTALLED_DIR}/tools/python3/Scripts")
   list(APPEND QGIS_OPTIONS -DWITH_BINDINGS:BOOL=ON)
-  list(APPEND QGIS_OPTIONS -DSIP_GLOBAL_INSTALL:BOOL=ON)
+  list(APPEND QGIS_OPTIONS -DSIP_GLOBAL_INSTALL:BOOL=OFF)
 
-  list(APPEND QGIS_OPTIONS
-       "-DQGIS_PYTHON_DIR=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/qgis"
-  )
+  if(NOT VCPKG_TARGET_IS_OSX)
+    # We are relying on some qgis hacks in here In QGIS, when not on macos, we
+    # do not have DEFAULT_PYTHON_SUBDIR set. If SIP_GLOBAL_INSTALL=OFF and
+    # DEFAULT_PYTHON_SUBDIR is set, this is used instead. If this breaks in the
+    # future, we should consider adding an explicit override for the sip
+    # installation dir in QGIS.
+    list(APPEND QGIS_OPTIONS
+         "-DDEFAULT_PYTHON_SUBDIR=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}"
+    )
+  endif()
 else()
   vcpkg_find_acquire_program(PYTHON3)
   list(APPEND QGIS_OPTIONS "-DPython_EXECUTABLE=${PYTHON3}")
@@ -86,7 +93,6 @@ list(APPEND QGIS_OPTIONS "-DFLEX_EXECUTABLE=${FLEX}")
 # at a predictable location
 list(APPEND QGIS_OPTIONS "-DQGIS_INCLUDE_SUBDIR=include/qgis")
 list(APPEND QGIS_OPTIONS "-DBUILD_WITH_QT6=OFF")
-list(APPEND QGIS_OPTIONS "-DQGIS_MACAPP_FRAMEWORK=FALSE")
 # QGIS will also do that starting from protobuf version 4.23
 list(APPEND QGIS_OPTIONS "-DProtobuf_LITE_LIBRARY=protobuf::libprotobuf-lite")
 list(APPEND QGIS_OPTIONS "-DWITH_INTERNAL_NLOHMANN_JSON:BOOL=OFF")
