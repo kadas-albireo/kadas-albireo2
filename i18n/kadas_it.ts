@@ -6964,113 +6964,113 @@ geolocazione</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="134"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="198"/>
         <source>Error loading style</source>
         <translation>Impossibile caricare lo stile</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="137"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="201"/>
         <source>Error loading layer metadata</source>
         <translation>Errure durante il caricamento dei metadati del layer</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="263"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1048"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="327"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1112"/>
         <source>Remote layer</source>
         <translation>Layer remoto</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="263"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1048"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="327"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1112"/>
         <source>loading %1, please wait …</source>
         <translation>Caricando %1, attendere...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="344"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="463"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="987"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1313"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="408"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="527"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1051"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1377"/>
         <source>%1 is not a valid or recognized data source.</source>
         <translation>%1 è una sorgente dati non valida o sconosciuta.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="346"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="354"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="409"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="464"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="988"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1314"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="410"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="418"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="473"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="528"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1052"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1378"/>
         <source>Invalid Data Source</source>
         <translation>Sorgente dati non valida</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="346"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="410"/>
         <source>Download with &quot;Protocol&quot; source type has failed, do you want to try the &quot;File&quot; source type?</source>
         <translation>Il download con il tipo di sorgente &quot;Protocollo&quot; non è riuscito, volete provare con il tipo di sorgente &quot;File&quot;?</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="408"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="472"/>
         <source>%1 is not a valid or recognized data source, error: &quot;%2&quot;</source>
         <translation>%1 è una sorgente dati non valida o sconosciuta, errore: &quot;%2&quot;</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="985"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1049"/>
         <source>Unable to load %1</source>
         <translation>Impossibile caricare %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1096"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1160"/>
         <source>%1 is not a supported raster data source</source>
         <translation>%1 non è una sorgente dati raster supportata</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1100"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1164"/>
         <source>Unsupported Data Source</source>
         <translation>Sorgente dati non supportata</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1122"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1186"/>
         <source>The layer is not a valid layer and can not be added to the map</source>
         <translation>Il livello non è valido e non può essere aggiunto alla mappa.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1123"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1187"/>
         <source>Layer is not valid</source>
         <translation>Livello non valido</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1174"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1238"/>
         <source>Error loading layer definition</source>
         <translation>Errure durante il caricamento della definizione del livello</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1237"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1301"/>
         <source>%1 is an invalid layer - not loaded</source>
         <translation>%1 è un livello non valido - non caricato</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1238"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1302"/>
         <source>%1 is an invalid layer and cannot be loaded.</source>
         <translation>%1 è un livello non valido e non è stato possibile caricarlo.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1582"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1646"/>
         <source>layer &apos;%1&apos; requires layer &apos;%2&apos; to be loaded but &apos;%2&apos; could not be found, please load it manually if possible.</source>
         <translation>Il livello &apos;%1&apos; richiede il caricamento del livello &apos;%2&apos;, ma &apos;%2&apos; non è stato trovato; se possibile, caricarlo manualmente.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1583"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1587"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1647"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1651"/>
         <source>Missing layer form dependency</source>
         <translation>Formulario mancante per il livello</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1587"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1651"/>
         <source>Layer dependency &apos;%2&apos; required by &apos;%1&apos; was automatically loaded.</source>
         <translation>La dipendenza del livello &apos;%2&apos; richiesta da &apos;%1&apos; è stata caricata automaticamente.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1618"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1682"/>
         <source>Invalid relationship %1</source>
         <translation>Relazione non valida %1</translation>
     </message>
