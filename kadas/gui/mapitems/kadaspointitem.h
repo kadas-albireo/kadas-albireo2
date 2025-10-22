@@ -24,6 +24,12 @@
 class KADAS_GUI_EXPORT KadasPointItem : public KadasMapItem
 {
     Q_OBJECT
+    Q_PROPERTY( Qgis::MarkerShape mShape READ shape WRITE setShape )
+    Q_PROPERTY( int mIconSize READ iconSize WRITE setIconSize )
+    Q_PROPERTY( QColor mFillColor READ color WRITE setColor )
+    Q_PROPERTY( QColor mStrokeColor READ strokeColor WRITE setStrokeColor )
+    Q_PROPERTY( double mStrokeWidth READ strokeWidth WRITE setStrokeWidth )
+    Q_PROPERTY( Qt::PenStyle mStrokeStyle READ strokeStyle WRITE setStrokeStyle )
 
   public:
     KadasPointItem( const QgsCoordinateReferenceSystem &crs, Qgis::MarkerShape icon = Qgis::MarkerShape::Circle );
@@ -31,8 +37,6 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasMapItem
     virtual QgsAnnotationMarkerItem *annotationItem() const override { return mQgsItem; }
 
     QString itemName() const override { return tr( "Point" ); }
-
-    void setShape( Qgis::MarkerShape shape );
 
     bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) override;
     bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
@@ -59,10 +63,14 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasMapItem
     KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
 
     QgsPointXY point() const;
-    void setPoint( const QgsPoint &point );
+    void setPoint( const QgsPointXY &point );
 
     virtual void translate( double dx, double dy ) override;
 
+    virtual void setState( const KadasMapItem::State *state ) override;
+
+    void setShape( Qgis::MarkerShape shape );
+    Qgis::MarkerShape shape() const { return mShape; }
     void setIconSize( int size );
     int iconSize() const { return mIconSize; }
     void setColor( const QColor &color );
@@ -78,23 +86,27 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasMapItem
     //Qgis::GeometryType geometryType() const override { return Qgis::GeometryType::Point; }
     //void addPartFromGeometry( const QgsAbstractGeometry &geom ) override;
 
-    struct KADAS_GUI_EXPORT State : KadasMapItem::State
-    {
-        QList<KadasItemPos> points;
-        void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
-        State *clone() const override SIP_FACTORY { return new State( *this ); }
-        QJsonObject serialize() const override;
-        bool deserialize( const QJsonObject &json ) override;
-    };
-    const State *constState() const { return static_cast<State *>( mState ); }
+    // struct KADAS_GUI_EXPORT State : KadasMapItem::State
+    // {
+    //     QList<QgsPointXY> points;
+    //     void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
+    //     State *clone() const override SIP_FACTORY { return new State( *this ); }
+    //     QJsonObject serialize() const override;
+    //     bool deserialize( const QJsonObject &json ) override;
+    // };
+    // const State *constState() const { return static_cast<State *>( mState ); }
 
     QColor fillColor() const;
     void setFillColor( const QColor &newFillColor );
 
   protected:
-    State *createEmptyState() const override SIP_FACTORY { return new State(); }
+    //State *createEmptyState() const override SIP_FACTORY { return new State(); }
     KadasMapItem *_clone() const override;
     // void recomputeDerived() override;
+
+    bool useProperties() const override { return false; }
+    void writeXmlPrivate( QDomElement &element ) const override;
+    void readXmlPrivate( const QDomElement &element ) override;
 
   private:
     void updateSymbol();

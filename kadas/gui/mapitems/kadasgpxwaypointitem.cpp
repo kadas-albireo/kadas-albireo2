@@ -89,9 +89,9 @@ void KadasGpxWaypointItem::render( QgsRenderContext &context ) const
   KadasPointItem::render( context );
 
   // Draw name label
-  if ( !mName.isEmpty() && !constState()->points.isEmpty() )
+  if ( !mName.isEmpty() && !point().isEmpty() )
   {
-    QPointF pos = context.mapToPixel().transform( context.coordinateTransform().transform( constState()->points.front() ) ).toQPointF();
+    QPointF pos = context.mapToPixel().transform( context.coordinateTransform().transform( point() ) ).toQPointF();
     pos += QPointF( 0.5 * iconSize(), -0.5 * iconSize() );
     QColor bufferColor = ( 0.2126 * color().red() + 0.7152 * color().green() + 0.0722 * color().blue() ) > 128 ? Qt::black : Qt::white;
 

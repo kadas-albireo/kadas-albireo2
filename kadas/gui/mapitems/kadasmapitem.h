@@ -531,7 +531,18 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     KadasItemLayer *mOwnerLayer = nullptr;
     bool mIsPointSymbol = false;
 
-    virtual KadasMapItem::State *createEmptyState() const = 0 SIP_FACTORY;
+    // TODO: remove when all annotations are migrated
+    virtual KadasMapItem::State *createEmptyState() const { return nullptr; }
+    SIP_FACTORY;
+
+    // Old annotations use QObject properties
+    // New ones should not rely on this
+    // TODO: remove when all annotations are migrated
+    virtual bool useProperties() const { return true; }
+
+    // TODO: make this pure virtual when all annotations are migrated
+    virtual void writeXmlPrivate( QDomElement &element ) const {}
+    virtual void readXmlPrivate( const QDomElement &element ) {}
 
     static void defaultNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
     static void anchorNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
@@ -539,6 +550,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     static double getTextRenderScale( const QgsRenderContext &context );
 
     KadasMapPos toMapPos( const KadasItemPos &itemPos, const QgsMapSettings &settings ) const;
+    QgsPointXY toMapPos( const QgsPointXY &itemPos, const QgsMapSettings &settings ) const;
     KadasItemPos toItemPos( const KadasMapPos &mapPos, const QgsMapSettings &settings ) const;
     QgsRectangle toMapRect( const QgsRectangle &itemRect, const QgsMapSettings &settings ) const;
     KadasItemRect toItemRect( const KadasMapRect &itemRect, const QgsMapSettings &settings ) const;

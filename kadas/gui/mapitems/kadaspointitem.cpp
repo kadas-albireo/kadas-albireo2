@@ -27,35 +27,6 @@
 #include "kadas/gui/mapitems/kadaspointitem.h"
 
 
-QJsonObject KadasPointItem::State::serialize() const
-{
-  QJsonArray pts;
-  for ( const KadasItemPos &pos : points )
-  {
-    QJsonArray p;
-    p.append( pos.x() );
-    p.append( pos.y() );
-    pts.append( p );
-  }
-  QJsonObject json;
-  json["status"] = static_cast<int>( drawStatus );
-  json["points"] = pts;
-  return json;
-}
-
-bool KadasPointItem::State::deserialize( const QJsonObject &json )
-{
-  drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
-  points.clear();
-  QJsonArray pts = json["points"].toArray();
-  for ( QJsonValue pValue : pts )
-  {
-    QJsonArray p = pValue.toArray();
-    points.append( KadasItemPos( p.at( 0 ).toDouble(), p.at( 1 ).toDouble() ) );
-  }
-  return true;
-}
-
 KadasPointItem::KadasPointItem( const QgsCoordinateReferenceSystem &crs, Qgis::MarkerShape icon )
   : KadasMapItem( crs )
 {
@@ -77,23 +48,6 @@ void KadasPointItem::translate( double dx, double dy )
   mQgsItem->setGeometry( *qgsgeometry_cast<const QgsPoint *>( geom.constGet() ) );
 
   update();
-
-  /*
-    // to be used for other geometry types
-    QgsGeometry geom;
-    geom.set(lineItem->geometry()->clone());
-    geom.translate(pastePos.x()-center.x(), pastePos.y()-center.y());
-    markerItem->setGeometry(*qgsgeometry_cast<const QgsPoint*>(geom.constGet()));
-
-    QgsGeometry geom;
-    geom.set(polygonItem->geometry()->clone());
-    geom.translate(pastePos.x()-center.x(), pastePos.y()-center.y());
-    markerItem->setGeometry(*qgsgeometry_cast<const QgsPoint*>(geom.constGet()));
-
-    QgsGeometry geom = QgsGeometry::fromPointXY(textItem->point());
-    geom.translate(pastePos.x()-center.x(), pastePos.y()-center.y());
-    markerItem->setGeometry(*qgsgeometry_cast<const QgsPoint*>(geom.constGet()));
-    */
 }
 
 void KadasPointItem::setIconSize( int size )
@@ -129,7 +83,6 @@ void KadasPointItem::setStrokeStyle( const Qt::PenStyle &style )
 bool KadasPointItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
   state()->drawStatus = State::DrawStatus::Drawing;
-  state()->points.append( toItemPos( firstPoint, mapSettings ) );
   setPoint( QgsPoint( firstPoint ) );
   return false;
 }
@@ -183,24 +136,17 @@ KadasMapPos KadasPointItem::positionFromDrawAttribs( const AttribValues &values,
 
 KadasMapItem::EditContext KadasPointItem::getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
-  for ( int i = 0, n = constState()->points.size(); i < n; ++i )
+  QgsPointXY testPos = toMapPos( point(), mapSettings );
+  if ( pos.sqrDist( KadasMapPos::fromPoint( testPos ) ) < pickTolSqr( mapSettings ) )
   {
-    KadasMapPos testPos = toMapPos( constState()->points[i], mapSettings );
-    if ( pos.sqrDist( testPos ) < pickTolSqr( mapSettings ) )
-    {
-      return EditContext( QgsVertexId( i, 0, 0 ), testPos, drawAttribs() );
-    }
+    return EditContext( QgsVertexId( 0, 0, 0 ), KadasMapPos::fromPoint( testPos ), drawAttribs() );
   }
   return EditContext();
 }
 
 void KadasPointItem::edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings )
 {
-  if ( context.vidx.part >= 0 && context.vidx.part < state()->points.size() )
-  {
-    state()->points[context.vidx.part] = toItemPos( newPoint, mapSettings );
-    setPoint( QgsPoint( newPoint ) );
-  }
+  setPoint( QgsPoint( toItemPos( newPoint, mapSettings ) ) );
 }
 
 void KadasPointItem::edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings )
@@ -223,9 +169,9 @@ QgsPointXY KadasPointItem::point() const
   return mQgsItem->geometry();
 }
 
-void KadasPointItem::setPoint( const QgsPoint &point )
+void KadasPointItem::setPoint( const QgsPointXY &point )
 {
-  mQgsItem->setGeometry( point );
+  mQgsItem->setGeometry( QgsPoint( point ) );
   update();
 }
 
@@ -258,6 +204,26 @@ KadasMapItem *KadasPointItem::_clone() const SIP_FACTORY
   item->mStrokeWidth = mStrokeWidth;
   item->mFillColor = mFillColor;
   return item;
+}
+
+void KadasPointItem::writeXmlPrivate( QDomElement &element ) const
+{
+  //element.setAttribute("status", static_cast<int>( state().drawStatus ));
+  element.setAttribute( "shape", qgsEnumValueToKey( mShape ) );
+  element.setAttribute( "size", mIconSize );
+  element.setAttribute( "stroke_color", mStrokeColor.name() );
+  element.setAttribute( "stroke_width", mStrokeWidth );
+  element.setAttribute( "fill_color", mFillColor.name() );
+}
+
+void KadasPointItem::readXmlPrivate( const QDomElement &element )
+{
+  mShape = qgsEnumKeyToValue( element.attribute( "shape", qgsEnumValueToKey( Qgis::MarkerShape::Circle ) ), Qgis::MarkerShape::Circle );
+  mIconSize = element.attribute( "size", "4" ).toInt();
+  mStrokeColor = QColor( element.attribute( "stroke_color", QColor( Qt::red ).name() ) );
+  mStrokeWidth = element.attribute( "stroke_width", "1" ).toInt();
+  mFillColor = QColor( element.attribute( "fill_color", QColor( Qt::white ).name() ) );
+  updateSymbol();
 }
 
 
@@ -313,4 +279,11 @@ QString KadasPointItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip )
   outStream << "</Placemark>\n";
   outStream.flush();
   return outString;
+}
+
+
+void KadasPointItem::setState( const KadasMapItem::State *state )
+{
+  KadasMapItem::setState( state );
+  updateSymbol();
 }

@@ -109,6 +109,7 @@ bool KadasMapItem::deserialize( const QJsonObject &json )
   {
     QMetaProperty prop = metaObject()->property( i );
     QJsonValue value = props[prop.name()];
+    qDebug() << prop.name();
     QVariant variant( prop.type() );
     // TODO: use custom type
     if ( prop.name() == QString( "filePath" ) )
@@ -135,6 +136,7 @@ bool KadasMapItem::deserialize( const QJsonObject &json )
     }
     else
     {
+      qDebug() << value.toVariant();
       prop.write( this, value.toVariant() );
     }
   }
@@ -235,6 +237,11 @@ KadasMapPos KadasMapItem::toMapPos( const KadasItemPos &itemPos, const QgsMapSet
 {
   QgsPointXY pos = QgsCoordinateTransform( mCrs, settings.destinationCrs(), settings.transformContext() ).transform( itemPos );
   return KadasMapPos( pos.x(), pos.y() );
+}
+
+QgsPointXY KadasMapItem::toMapPos( const QgsPointXY &itemPos, const QgsMapSettings &settings ) const
+{
+  return QgsCoordinateTransform( mCrs, settings.destinationCrs(), settings.transformContext() ).transform( itemPos );
 }
 
 KadasItemPos KadasMapItem::toItemPos( const KadasMapPos &mapPos, const QgsMapSettings &settings ) const
@@ -380,8 +387,15 @@ QDomElement KadasMapItem::writeXml( QDomDocument &document ) const
     itemEl.setAttribute( "associatedLayer", associatedLayer()->id() );
   }
   QJsonDocument doc;
-  doc.setObject( serialize() );
-  itemEl.appendChild( document.createCDATASection( doc.toJson( QJsonDocument::Compact ) ) );
+  if ( useProperties() )
+  {
+    doc.setObject( serialize() );
+    itemEl.appendChild( document.createCDATASection( doc.toJson( QJsonDocument::Compact ) ) );
+  }
+  else
+  {
+    writeXmlPrivate( itemEl );
+  }
   return itemEl;
 }
 
@@ -392,7 +406,6 @@ KadasMapItem *KadasMapItem::fromXml( const QDomElement &element )
   QString crs = itemEl.attribute( "crs" );
   QString editor = itemEl.attribute( "editor" );
   QString layerId = itemEl.attribute( "associatedLayer" );
-  QJsonDocument data = QJsonDocument::fromJson( itemEl.firstChild().toCDATASection().data().toLocal8Bit() );
   KadasMapItem::RegistryItemFactory factory = KadasMapItem::registry()->value( name );
   if ( factory )
   {
@@ -402,14 +415,22 @@ KadasMapItem *KadasMapItem::fromXml( const QDomElement &element )
     {
       item->associateToLayer( QgsProject::instance()->mapLayer( layerId ) );
     }
-    if ( item->deserialize( data.object() ) )
+    if ( item->useProperties() )
     {
-      return item;
+      QJsonDocument data = QJsonDocument::fromJson( itemEl.firstChild().toCDATASection().data().toLocal8Bit() );
+      if ( item->deserialize( data.object() ) )
+      {
+        return item;
+      }
+      else
+      {
+        delete item;
+        QgsDebugMsgLevel( QString( "Item deserialization failed: %1" ).arg( name ), 2 );
+      }
     }
     else
     {
-      delete item;
-      QgsDebugMsgLevel( QString( "Item deserialization failed: %1" ).arg( name ), 2 );
+      item->readXmlPrivate( element );
     }
   }
   else
