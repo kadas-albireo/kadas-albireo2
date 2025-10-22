@@ -382,6 +382,7 @@ QDomElement KadasMapItem::writeXml( QDomDocument &document ) const
   itemEl.setAttribute( "name", metaObject()->className() );
   itemEl.setAttribute( "crs", crs().authid() );
   itemEl.setAttribute( "editor", editor() );
+  itemEl.setAttribute( "draw_status", qgsEnumValueToKey( mDrawStatus ) );
   if ( associatedLayer() )
   {
     itemEl.setAttribute( "associatedLayer", associatedLayer()->id() );
@@ -406,6 +407,7 @@ KadasMapItem *KadasMapItem::fromXml( const QDomElement &element )
   QString crs = itemEl.attribute( "crs" );
   QString editor = itemEl.attribute( "editor" );
   QString layerId = itemEl.attribute( "associatedLayer" );
+  DrawStatus status = qgsEnumKeyToValue( itemEl.attribute( "draw_status", qgsEnumValueToKey( DrawStatus::Finished ) ), DrawStatus::Finished );
   KadasMapItem::RegistryItemFactory factory = KadasMapItem::registry()->value( name );
   if ( factory )
   {

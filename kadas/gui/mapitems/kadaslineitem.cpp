@@ -47,14 +47,14 @@ QJsonObject KadasLineItem::State::serialize() const
     pts.append( prt );
   }
   QJsonObject json;
-  json["status"] = static_cast<int>( drawStatus );
+  //json["status"] = static_cast<int>( drawStatus );
   json["points"] = pts;
   return json;
 }
 
 bool KadasLineItem::State::deserialize( const QJsonObject &json )
 {
-  drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
+  //drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
   points.clear();
   QJsonArray pts = json["points"].toArray();
   for ( QJsonValue prtValue : pts )
@@ -138,7 +138,7 @@ QList<KadasMapItem::Node> KadasLineItem::nodes( const QgsMapSettings &settings )
 bool KadasLineItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
   KadasItemPos itemPos = toItemPos( firstPoint, mapSettings );
-  state()->drawStatus = State::DrawStatus::Drawing;
+  mDrawStatus = DrawStatus::Drawing;
   state()->points.append( QList<KadasItemPos>() );
   state()->points.last().append( itemPos );
   state()->points.last().append( itemPos );
@@ -180,7 +180,7 @@ bool KadasLineItem::continuePart( const QgsMapSettings &mapSettings )
 
 void KadasLineItem::endPart()
 {
-  state()->drawStatus = State::DrawStatus::Finished;
+  mDrawStatus = DrawStatus::Finished;
 }
 
 KadasMapItem::AttribDefs KadasLineItem::drawAttribs() const

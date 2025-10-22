@@ -81,7 +81,7 @@ QJsonObject KadasCircularSectorItem::State::serialize() const
     a2.append( stopAngle );
   }
   QJsonObject json;
-  json["status"] = static_cast<int>( drawStatus );
+  //json["status"] = static_cast<int>( drawStatus );
   json["centers"] = c;
   json["radii"] = r;
   json["startAngles"] = a1;
@@ -97,7 +97,7 @@ bool KadasCircularSectorItem::State::deserialize( const QJsonObject &json )
   startAngles.clear();
   stopAngles.clear();
 
-  drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
+  //drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
   for ( QJsonValue val : json["centers"].toArray() )
   {
     QJsonArray pos = val.toArray();
@@ -167,7 +167,7 @@ QList<KadasMapItem::Node> KadasCircularSectorItem::nodes( const QgsMapSettings &
 
 bool KadasCircularSectorItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
-  state()->drawStatus = State::DrawStatus::Drawing;
+  mDrawStatus = DrawStatus::Drawing;
   state()->sectorStatus = State::SectorStatus::HaveCenter;
   state()->centers.append( toItemPos( firstPoint, mapSettings ) );
   state()->radii.append( 0 );
@@ -181,7 +181,7 @@ bool KadasCircularSectorItem::startPart( const AttribValues &values, const QgsMa
 {
   KadasItemPos center = toItemPos( KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
   KadasItemPos rPos = toItemPos( KadasMapPos( values[AttrX] + values[AttrR], values[AttrY] ), mapSettings );
-  state()->drawStatus = State::DrawStatus::Drawing;
+  mDrawStatus = DrawStatus::Drawing;
   state()->sectorStatus = values[AttrR] > 0 ? State::SectorStatus::HaveRadius : State::SectorStatus::HaveCenter;
   state()->centers.append( center );
   state()->radii.append( std::sqrt( center.sqrDist( rPos ) ) );
@@ -261,7 +261,7 @@ bool KadasCircularSectorItem::continuePart( const QgsMapSettings &mapSettings )
 
 void KadasCircularSectorItem::endPart()
 {
-  state()->drawStatus = State::DrawStatus::Finished;
+  mDrawStatus = DrawStatus::Finished;
 }
 
 KadasMapItem::AttribDefs KadasCircularSectorItem::drawAttribs() const
@@ -278,7 +278,7 @@ KadasMapItem::AttribDefs KadasCircularSectorItem::drawAttribs() const
 KadasMapItem::AttribValues KadasCircularSectorItem::drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
   AttribValues attributes;
-  if ( constState()->drawStatus == State::DrawStatus::Empty )
+  if ( mDrawStatus == DrawStatus::Empty )
   {
     attributes.insert( AttrX, pos.x() );
     attributes.insert( AttrY, pos.y() );

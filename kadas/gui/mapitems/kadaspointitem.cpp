@@ -82,7 +82,7 @@ void KadasPointItem::setStrokeStyle( const Qt::PenStyle &style )
 
 bool KadasPointItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
-  state()->drawStatus = State::DrawStatus::Drawing;
+  mDrawStatus = DrawStatus::Drawing;
   setPoint( QgsPoint( firstPoint ) );
   return false;
 }
@@ -110,7 +110,7 @@ bool KadasPointItem::continuePart( const QgsMapSettings &mapSettings )
 
 void KadasPointItem::endPart()
 {
-  state()->drawStatus = State::DrawStatus::Finished;
+  mDrawStatus = DrawStatus::Finished;
 }
 
 KadasMapItem::AttribDefs KadasPointItem::drawAttribs() const

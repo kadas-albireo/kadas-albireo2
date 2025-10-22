@@ -81,7 +81,7 @@ QJsonObject KadasMilxItem::State::serialize() const
   marginArray.append( margin.bottom );
 
   QJsonObject json;
-  json["status"] = static_cast<int>( drawStatus );
+  // TODO json["status"] = static_cast<int>( drawStatus );
   json["points"] = pts;
   json["attributes"] = attrs;
   json["attributePoints"] = attrPts;
@@ -99,7 +99,7 @@ bool KadasMilxItem::State::deserialize( const QJsonObject &json )
   attributePoints.clear();
   controlPoints.clear();
 
-  drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
+  // TODO drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
   for ( QJsonValue val : json["points"].toArray() )
   {
     QJsonArray pos = val.toArray();
@@ -489,7 +489,7 @@ bool KadasMilxItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettin
   {
     return false;
   }
-  state()->drawStatus = State::DrawStatus::Drawing;
+  mDrawStatus = DrawStatus::Drawing;
   state()->points.append( toItemPos( firstPoint, mapSettings ) );
   state()->pressedPoints = 1;
 
@@ -560,7 +560,7 @@ void KadasMilxItem::endPart()
 {
   if ( !mMssString.isEmpty() )
   {
-    state()->drawStatus = State::DrawStatus::Finished;
+    mDrawStatus = DrawStatus::Finished;
     mIsPointSymbol = !isMultiPoint();
   }
 }
@@ -864,7 +864,7 @@ KadasMilxClient::NPointSymbol KadasMilxItem::toSymbol( const QgsMapToPixel &mapT
   QgsCoordinateTransform mapCrst( mCrs, mapCrs, QgsProject::instance()->transformContext() );
   QList<QPoint> points = computeScreenPoints( mapToPixel, mapCrst );
   QList<QPair<int, double>> screenAttribs = computeScreenAttributes( mapToPixel, mapCrst );
-  bool finalized = constState()->drawStatus == State::DrawStatus::Finished;
+  bool finalized = mDrawStatus == DrawStatus::Finished;
   return KadasMilxClient::NPointSymbol( mMssString, points, constState()->controlPoints, screenAttribs, finalized, colored );
 }
 
@@ -1030,7 +1030,7 @@ void KadasMilxItem::finalize( KadasMilxItem *item, bool isCorridor )
     KadasMilxClient::getMilitaryName( item->mMssString, item->mMilitaryName );
   }
 
-  item->state()->drawStatus = State::DrawStatus::Finished;
+  item->setDrawStatus( DrawStatus::Finished );
   item->mIsPointSymbol = !item->isMultiPoint();
 
   KadasMilxClient::NPointSymbol symbol( item->mMssString, QList<QPoint>() << QPoint( 0, 0 ), QList<int>(), QList<QPair<int, double>>(), true, true );

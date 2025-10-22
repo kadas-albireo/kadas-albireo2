@@ -285,6 +285,14 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     Q_PROPERTY( QString tooltip READ tooltip WRITE setTooltip )
 
   public:
+    enum class DrawStatus
+    {
+      Empty,
+      Drawing,
+      Finished
+    };
+    Q_ENUM( DrawStatus )
+
     KadasMapItem( const QgsCoordinateReferenceSystem &crs );
     ~KadasMapItem();
     KadasMapItem *clone() const;
@@ -341,6 +349,9 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     virtual QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const = 0;
 #endif
 
+    DrawStatus drawStatus() const { return mDrawStatus; }
+    void setDrawStatus( DrawStatus status ) { mDrawStatus = status; }
+
     /* Associate to layer */
     void associateToLayer( QgsMapLayer *layer );
     QgsMapLayer *associatedLayer() const { return mAssociatedLayer; }
@@ -384,16 +395,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     class State : public KadasStateHistory::State
     {
       public:
-        // clang-format off
-        enum class DrawStatus SIP_MONKEYPATCH_SCOPEENUM_UNNEST( KadasMapItem.DrawStatus, DrawStatus )
-        {
-          Empty,
-          Drawing,
-          Finished
-        };
-        //< clang-format on
-
-        DrawStatus drawStatus = DrawStatus::Empty;
         virtual void assign( const State *other ) = 0;
         virtual State *clone() const = 0 SIP_FACTORY;
         virtual QJsonObject serialize() const = 0;
@@ -530,6 +531,8 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     QgsMapLayer *mAssociatedLayer = nullptr;
     KadasItemLayer *mOwnerLayer = nullptr;
     bool mIsPointSymbol = false;
+    DrawStatus mDrawStatus = DrawStatus::Empty;
+
 
     // TODO: remove when all annotations are migrated
     virtual KadasMapItem::State *createEmptyState() const { return nullptr; }

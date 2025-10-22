@@ -47,7 +47,7 @@ QJsonObject KadasCircleItem::State::serialize() const
     r.append( p );
   }
   QJsonObject json;
-  json["status"] = static_cast<int>( drawStatus );
+  //json["status"] = static_cast<int>( drawStatus );
   ;
   json["centers"] = c;
   json["ringpos"] = r;
@@ -59,7 +59,7 @@ bool KadasCircleItem::State::deserialize( const QJsonObject &json )
   centers.clear();
   ringpos.clear();
 
-  drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
+  //drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
   for ( QJsonValue val : json["centers"].toArray() )
   {
     QJsonArray pos = val.toArray();
@@ -131,7 +131,7 @@ QList<KadasMapItem::Node> KadasCircleItem::nodes( const QgsMapSettings &settings
 
 bool KadasCircleItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
-  state()->drawStatus = State::DrawStatus::Drawing;
+  mDrawStatus = DrawStatus::Drawing;
   state()->centers.append( toItemPos( firstPoint, mapSettings ) );
   state()->ringpos.append( toItemPos( firstPoint, mapSettings ) );
   recomputeDerived();
@@ -167,7 +167,7 @@ bool KadasCircleItem::continuePart( const QgsMapSettings &mapSettings )
 
 void KadasCircleItem::endPart()
 {
-  state()->drawStatus = State::DrawStatus::Finished;
+  mDrawStatus = DrawStatus::Finished;
 }
 
 KadasMapItem::AttribDefs KadasCircleItem::drawAttribs() const
@@ -182,7 +182,7 @@ KadasMapItem::AttribDefs KadasCircleItem::drawAttribs() const
 KadasMapItem::AttribValues KadasCircleItem::drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
 {
   AttribValues values;
-  if ( constState()->drawStatus == State::DrawStatus::Drawing )
+  if ( mDrawStatus == DrawStatus::Drawing )
   {
     KadasMapPos mapCenter = toMapPos( constState()->centers.last(), mapSettings );
     KadasItemPos itemRingPos = toItemPos( pos, mapSettings );
