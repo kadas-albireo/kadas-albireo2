@@ -69,13 +69,18 @@ KadasMapItem::~KadasMapItem()
 KadasMapItem *KadasMapItem::clone() const
 {
   KadasMapItem *item = _clone();
-  for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
+  item->mDrawStatus = mDrawStatus;
+  if ( useProperties() )
   {
-    QMetaProperty prop = metaObject()->property( i );
-    prop.write( item, prop.read( this ) );
+    for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
+    {
+      QMetaProperty prop = metaObject()->property( i );
+      prop.write( item, prop.read( this ) );
+    }
   }
   if ( mState )
-    item->setState( mState->clone() );
+    item->mState = mState->clone();
+
   return item;
 }
 

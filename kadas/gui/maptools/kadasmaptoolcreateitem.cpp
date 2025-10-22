@@ -295,14 +295,14 @@ KadasMapPos KadasMapToolCreateItem::transformMousePoint( QgsPointXY mapPos ) con
   return KadasMapPos( mapPos.x(), mapPos.y() );
 }
 
-KadasMapItem *KadasMapToolCreateItem::takeItem()
-{
-  KadasMapItem *item = mItem;
-  KadasMapCanvasItemManager::removeItem( item );
-  mItem = nullptr;
-  clear();
-  return item;
-}
+// KadasMapItem *KadasMapToolCreateItem::takeItem()
+// {
+//   KadasMapItem *item = mItem;
+//   KadasMapCanvasItemManager::removeItem( item );
+//   mItem = nullptr;
+//   clear();
+//   return item;
+// }
 
 void KadasMapToolCreateItem::addPoint( const KadasMapPos &pos )
 {
@@ -523,7 +523,14 @@ void KadasMapToolCreateItem::stateChanged( KadasStateHistory::ChangeType changeT
     mEditor->syncItemToWidget();
     mCurrentItemData = newToolState->itemData;
   }
-  mItem = newToolState->itemState;
+  mItem = newToolState->itemState->clone();
+  if ( mEditor )
+  {
+    // TODO: useful?
+    mEditor->setItem( mItem );
+    mEditor->reset();
+    mEditor->syncWidgetToItem();
+  }
 }
 
 void KadasMapToolCreateItem::setTargetLayer( QgsMapLayer *layer )

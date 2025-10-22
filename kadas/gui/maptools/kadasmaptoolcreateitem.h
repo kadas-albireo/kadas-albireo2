@@ -51,7 +51,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     void keyPressEvent( QKeyEvent *e ) override;
 
     const KadasMapItem *currentItem() const { return mItem; }
-    KadasMapItem *takeItem();
+    // KadasMapItem *takeItem();
     const KadasMapItemEditor *currentEditor() const { return mEditor; }
 
     void setMultipart( bool multipart ) { mMultipart = multipart; }
