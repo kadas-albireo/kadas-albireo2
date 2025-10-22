@@ -214,6 +214,7 @@ void KadasPointItem::writeXmlPrivate( QDomElement &element ) const
   element.setAttribute( "stroke_color", mStrokeColor.name() );
   element.setAttribute( "stroke_width", mStrokeWidth );
   element.setAttribute( "fill_color", mFillColor.name() );
+  element.setAttribute( "geometry", point().asWkt() );
 }
 
 void KadasPointItem::readXmlPrivate( const QDomElement &element )
@@ -223,6 +224,7 @@ void KadasPointItem::readXmlPrivate( const QDomElement &element )
   mStrokeColor = QColor( element.attribute( "stroke_color", QColor( Qt::red ).name() ) );
   mStrokeWidth = element.attribute( "stroke_width", "1" ).toInt();
   mFillColor = QColor( element.attribute( "fill_color", QColor( Qt::white ).name() ) );
+  setPoint( QgsGeometry::fromWkt( element.attribute( "geometry" ) ).asPoint() );
   updateSymbol();
 }
 

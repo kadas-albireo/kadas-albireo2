@@ -319,7 +319,7 @@ void KadasMapToolCreateItem::addPoint( const KadasMapPos &pos )
     }
     else
     {
-      mStateHistory->push( new ToolState( mItem->constState()->clone(), mCurrentItemData ) );
+      mStateHistory->push( new ToolState( mItem->clone(), mCurrentItemData ) );
     }
   }
   else if ( mItem->drawStatus() == KadasMapItem::DrawStatus::Finished )
@@ -359,7 +359,7 @@ void KadasMapToolCreateItem::startPart( const KadasMapPos &pos )
   }
   else
   {
-    mStateHistory->push( new ToolState( mItem->constState()->clone(), mCurrentItemData ) );
+    mStateHistory->push( new ToolState( mItem->clone(), mCurrentItemData ) );
   }
 }
 
@@ -371,14 +371,14 @@ void KadasMapToolCreateItem::startPart( const KadasMapItem::AttribValues &attrib
   }
   else
   {
-    mStateHistory->push( new ToolState( mItem->constState()->clone(), mCurrentItemData ) );
+    mStateHistory->push( new ToolState( mItem->clone(), mCurrentItemData ) );
   }
 }
 
 void KadasMapToolCreateItem::finishPart()
 {
   mItem->endPart();
-  mStateHistory->push( new ToolState( mItem->constState()->clone(), mCurrentItemData ) );
+  mStateHistory->push( new ToolState( mItem->clone(), mCurrentItemData ) );
   emit partFinished();
   if ( !mInterface )
   {
@@ -408,7 +408,7 @@ void KadasMapToolCreateItem::addPartFromGeometry( const QgsAbstractGeometry &geo
     {
       static_cast<KadasGeometryItem *>( mItem )->addPartFromGeometry( geom );
     }
-    mStateHistory->push( new ToolState( mItem->constState()->clone(), mCurrentItemData ) );
+    mStateHistory->push( new ToolState( mItem->clone(), mCurrentItemData ) );
     emit partFinished();
   }
 }
@@ -523,7 +523,7 @@ void KadasMapToolCreateItem::stateChanged( KadasStateHistory::ChangeType changeT
     mEditor->syncItemToWidget();
     mCurrentItemData = newToolState->itemData;
   }
-  mItem->setState( static_cast<const KadasMapItem::State *>( newToolState->itemState ) );
+  mItem = newToolState->itemState;
 }
 
 void KadasMapToolCreateItem::setTargetLayer( QgsMapLayer *layer )

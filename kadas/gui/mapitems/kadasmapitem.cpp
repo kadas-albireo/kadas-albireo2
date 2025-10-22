@@ -74,7 +74,8 @@ KadasMapItem *KadasMapItem::clone() const
     QMetaProperty prop = metaObject()->property( i );
     prop.write( item, prop.read( this ) );
   }
-  item->setState( constState()->clone() );
+  if ( mState )
+    item->setState( mState->clone() );
   return item;
 }
 
@@ -433,6 +434,7 @@ KadasMapItem *KadasMapItem::fromXml( const QDomElement &element )
     else
     {
       item->readXmlPrivate( element );
+      return item;
     }
   }
   else
