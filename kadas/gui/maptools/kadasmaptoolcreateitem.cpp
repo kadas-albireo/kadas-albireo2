@@ -63,7 +63,7 @@ KadasMapToolCreateItem::~KadasMapToolCreateItem()
 void KadasMapToolCreateItem::activate()
 {
   mStateHistory = new KadasStateHistory( this );
-  mCurrentItemData = QSharedPointer<ItemData>( new ItemData );
+  mCurrentItemId = KadasItemLayer::ITEM_ID_NULL;
   connect( mStateHistory, &KadasStateHistory::stateChanged, this, &KadasMapToolCreateItem::stateChanged );
   createItem();
   setupNumericInputWidget();
@@ -168,7 +168,7 @@ void KadasMapToolCreateItem::showLayerSelection( bool enabled, QgsLayerTreeView 
 void KadasMapToolCreateItem::clear()
 {
   commitItem();
-  mCurrentItemData = QSharedPointer<ItemData>( new ItemData );
+  mCurrentItemId = KadasItemLayer::ITEM_ID_NULL;
   createItem();
   if ( mEditor )
   {
@@ -295,15 +295,6 @@ KadasMapPos KadasMapToolCreateItem::transformMousePoint( QgsPointXY mapPos ) con
   return KadasMapPos( mapPos.x(), mapPos.y() );
 }
 
-// KadasMapItem *KadasMapToolCreateItem::takeItem()
-// {
-//   KadasMapItem *item = mItem;
-//   KadasMapCanvasItemManager::removeItem( item );
-//   mItem = nullptr;
-//   clear();
-//   return item;
-// }
-
 void KadasMapToolCreateItem::addPoint( const KadasMapPos &pos )
 {
   if ( mItem->drawStatus() == KadasMapItem::DrawStatus::Empty )
@@ -319,7 +310,7 @@ void KadasMapToolCreateItem::addPoint( const KadasMapPos &pos )
     }
     else
     {
-      mStateHistory->push( new ToolState( mItem->clone(), mCurrentItemData ) );
+      mStateHistory->push( new ToolState( mItem->clone(), mCurrentItemId ) );
     }
   }
   else if ( mItem->drawStatus() == KadasMapItem::DrawStatus::Finished )
@@ -340,14 +331,12 @@ void KadasMapToolCreateItem::createItem()
   }
   else if ( mItem )
   {
-    KadasMapItem::State *state = mItem->constState()->clone();
+    //KadasMapItem::State *state = mItem->constState()->clone();
     mItem->setDrawStatus( KadasMapItem::DrawStatus::Drawing );
-    mItem->setState( state );
-    delete state;
+    //mItem->setState( state );
+    //delete state;
   }
   mItem->setSelected( mSelectItems );
-  mCurrentItemData->props = mItem->getProps();
-  connect( mItem, &KadasMapItem::propertyChanged, this, &KadasMapToolCreateItem::storeItemProps );
   KadasMapCanvasItemManager::addItem( mItem );
 }
 
@@ -359,7 +348,7 @@ void KadasMapToolCreateItem::startPart( const KadasMapPos &pos )
   }
   else
   {
-    mStateHistory->push( new ToolState( mItem->clone(), mCurrentItemData ) );
+    mStateHistory->push( new ToolState( mItem->clone(), mCurrentItemId ) );
   }
 }
 
@@ -371,14 +360,14 @@ void KadasMapToolCreateItem::startPart( const KadasMapItem::AttribValues &attrib
   }
   else
   {
-    mStateHistory->push( new ToolState( mItem->clone(), mCurrentItemData ) );
+    mStateHistory->push( new ToolState( mItem->clone(), mCurrentItemId ) );
   }
 }
 
 void KadasMapToolCreateItem::finishPart()
 {
   mItem->endPart();
-  mStateHistory->push( new ToolState( mItem->clone(), mCurrentItemData ) );
+  mStateHistory->push( new ToolState( mItem->clone(), mCurrentItemId ) );
   emit partFinished();
   if ( !mInterface )
   {
@@ -408,7 +397,7 @@ void KadasMapToolCreateItem::addPartFromGeometry( const QgsAbstractGeometry &geo
     {
       static_cast<KadasGeometryItem *>( mItem )->addPartFromGeometry( geom );
     }
-    mStateHistory->push( new ToolState( mItem->clone(), mCurrentItemData ) );
+    mStateHistory->push( new ToolState( mItem->clone(), mCurrentItemId ) );
     emit partFinished();
   }
 }
@@ -420,14 +409,13 @@ void KadasMapToolCreateItem::commitItem()
     return;
   }
   mItem->setSelected( false );
-  disconnect( mItem, &KadasMapItem::propertyChanged, this, &KadasMapToolCreateItem::storeItemProps );
   if ( mEditor )
   {
     mEditor->setItem( nullptr );
   }
   if ( mLayer && mItem->drawStatus() == KadasMapItem::DrawStatus::Finished )
   {
-    mCurrentItemData->itemId = mLayer->addItem( mItem );
+    mCurrentItemId = mLayer->addItem( mItem );
     mLayer->triggerRepaint();
     KadasMapCanvasItemManager::removeItemAfterRefresh( mItem, mCanvas );
   }
@@ -483,7 +471,7 @@ void KadasMapToolCreateItem::acceptInput()
     }
     else
     {
-      mStateHistory->push( mItem->constState()->clone() );
+      mStateHistory->push( new ToolState( mItem->clone(), mCurrentItemId ) );
     }
   }
   else if ( mItem->drawStatus() == KadasMapItem::DrawStatus::Finished )
@@ -500,7 +488,7 @@ void KadasMapToolCreateItem::stateChanged( KadasStateHistory::ChangeType changeT
 {
   ToolState *newToolState = static_cast<ToolState *>( state );
   ToolState *prevToolState = static_cast<ToolState *>( prevState );
-  if ( newToolState->itemData->itemId != prevToolState->itemData->itemId )
+  if ( newToolState->itemId != prevToolState->itemId )
   {
     if ( changeType == KadasStateHistory::ChangeType::Undo )
     {
@@ -512,21 +500,21 @@ void KadasMapToolCreateItem::stateChanged( KadasStateHistory::ChangeType changeT
       delete mItem;
       mItem = nullptr;
       clear();
-      delete mLayer->takeItem( newToolState->itemData->itemId );
+      delete mLayer->takeItem( newToolState->itemId );
       mLayer->triggerRepaint( true );
     }
     else if ( changeType == KadasStateHistory::ChangeType::Redo )
     {
       clear();
     }
-    mItem->setProps( newToolState->itemData->props );
     mEditor->syncItemToWidget();
-    mCurrentItemData = newToolState->itemData;
+    mCurrentItemId = newToolState->itemId;
   }
+  KadasMapCanvasItemManager::removeItem( mItem );
   mItem = newToolState->itemState->clone();
+  KadasMapCanvasItemManager::addItem( mItem );
   if ( mEditor )
   {
-    // TODO: useful?
     mEditor->setItem( mItem );
     mEditor->reset();
     mEditor->syncWidgetToItem();
@@ -537,11 +525,6 @@ void KadasMapToolCreateItem::setTargetLayer( QgsMapLayer *layer )
 {
   mLayer = dynamic_cast<KadasItemLayer *>( layer );
   emit targetLayerChanged( layer );
-}
-
-void KadasMapToolCreateItem::storeItemProps()
-{
-  mCurrentItemData->props = mItem->getProps();
 }
 
 void KadasMapToolCreateItem::setupNumericInputWidget()

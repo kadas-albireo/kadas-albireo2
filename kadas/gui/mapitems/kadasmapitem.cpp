@@ -81,6 +81,8 @@ KadasMapItem *KadasMapItem::clone() const
   if ( mState )
     item->mState = mState->clone();
 
+  item->update();
+
   return item;
 }
 
