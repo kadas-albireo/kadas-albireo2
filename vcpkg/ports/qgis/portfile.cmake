@@ -20,13 +20,12 @@ vcpkg_from_github(
   PATCHES
   # Make qgis support python's debug library
   qgspython.patch
+  bindings-install.patch
   libxml2.patch
   exiv2.patch
   crssync.patch
-  # bigobj.patch
   mesh.patch
   sipcxx17.patch
-  # nlohmann-json.patch
   qgis-debug.patch
   3dfrustumfix.patch
   3dchunkloaderconcurrency.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1278

@@ -1,0 +1,19 @@
+diff --git a/python/CMakeLists.txt b/python/CMakeLists.txt
+index 4b41dc6faa5..5ba7ef5ee5a 100644
+--- a/python/CMakeLists.txt
++++ b/python/CMakeLists.txt
+@@ -463,11 +463,9 @@ foreach(module ${PY_MODULES})
+   install(FILES ${BINDING_FILES_ROOT_DIR}/${module}/class_map.yaml DESTINATION "${QGIS_PYTHON_DIR}/${module_name}")
+ 
+   # install source sip files
+-  if(SIP_GLOBAL_INSTALL)
+-    file(GLOB sip_files ${CMAKE_CURRENT_BINARY_DIR}/${module}/*.sip)
+-    install(FILES ${sip_files} DESTINATION ${SIP_DEFAULT_SIP_DIR}/qgis/${module})
+-    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${module}/auto_generated DESTINATION ${SIP_DEFAULT_SIP_DIR}/qgis/${module})
+-  endif()
++  file(GLOB sip_files ${CMAKE_CURRENT_BINARY_DIR}/${module}/*.sip)
++  install(FILES ${sip_files} DESTINATION ${QGIS_PYTHON_DIR}/${module})
++  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${module}/auto_generated DESTINATION ${QGIS_PYTHON_DIR}/${module})
+ endforeach(module)
+ 
+ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml.in ${CMAKE_CURRENT_BINARY_DIR}/pyproject.toml @ONLY)
