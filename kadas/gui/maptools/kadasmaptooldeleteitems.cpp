@@ -28,9 +28,9 @@
 #include "kadas/gui/maptools/kadasmaptooldeleteitems.h"
 
 
-KadasMapItem *KadasMapToolDeleteItemsInterface::createItem() const
+KadasMapItem *KadasMapToolDeleteItemsInterface::createItem( const QgsCoordinateReferenceSystem &crs ) const
 {
-  KadasRectangleItem *item = new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
+  KadasRectangleItem *item = new KadasRectangleItem( crs );
   item->setFill( Qt::NoBrush );
   item->setOutline( QPen( Qt::black, 2, Qt::DashLine ) );
   return item;

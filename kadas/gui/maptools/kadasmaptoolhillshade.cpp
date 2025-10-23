@@ -34,9 +34,9 @@
 #include "kadas/gui/maptools/kadasmaptoolhillshade.h"
 
 
-KadasMapItem *KadasMapToolHillshadeItemInterface::createItem() const
+KadasMapItem *KadasMapToolHillshadeItemInterface::createItem( const QgsCoordinateReferenceSystem &crs ) const
 {
-  KadasRectangleItem *item = new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
+  KadasRectangleItem *item = new KadasRectangleItem( crs );
   return item;
 }
 

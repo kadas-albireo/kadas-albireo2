@@ -39,74 +39,65 @@
 #include "kadasredliningintegration.h"
 
 
-KadasMapItem *KadasPointItemInterface::createItem() const
+KadasMapItem *KadasPointItemInterface::createItem( const QgsCoordinateReferenceSystem &crs ) const
 {
-  QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
   KadasMapItem *item = new KadasPointItem( crs, Qgis::MarkerShape::Circle );
   item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
   return item;
 }
 
-KadasMapItem *KadasSquareItemInterface::createItem() const
+KadasMapItem *KadasSquareItemInterface::createItem( const QgsCoordinateReferenceSystem &crs ) const
 {
-  QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
   KadasMapItem *item = new KadasPointItem( crs, Qgis::MarkerShape::Square );
   item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
   return item;
 };
 
-KadasMapItem *KadasTriangleItemInterface::createItem() const
+KadasMapItem *KadasTriangleItemInterface::createItem( const QgsCoordinateReferenceSystem &crs ) const
 {
-  QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
   KadasMapItem *item = new KadasPointItem( crs, Qgis::MarkerShape::Triangle );
   item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
   return item;
 };
 
-KadasMapItem *KadasLineItemInterface::createItem() const
+KadasMapItem *KadasLineItemInterface::createItem( const QgsCoordinateReferenceSystem &crs ) const
 {
-  QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
   KadasMapItem *item = new KadasLineItem( crs );
   item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
   return item;
 };
 
-KadasMapItem *KadasRectangleItemInterface::createItem() const
+KadasMapItem *KadasRectangleItemInterface::createItem( const QgsCoordinateReferenceSystem &crs ) const
 {
-  QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
   KadasMapItem *item = new KadasRectangleItem( crs );
   item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
   return item;
 };
 
 
-KadasMapItem *KadasPolygonItemInterface::createItem() const
+KadasMapItem *KadasPolygonItemInterface::createItem( const QgsCoordinateReferenceSystem &crs ) const
 {
-  QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
   KadasMapItem *item = new KadasPolygonItem( crs );
   item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
   return item;
 };
 
-KadasMapItem *KadasCircleItemInterface::createItem() const
+KadasMapItem *KadasCircleItemInterface::createItem( const QgsCoordinateReferenceSystem &crs ) const
 {
-  QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
   KadasMapItem *item = new KadasCircleItem( crs );
   item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
   return item;
 };
 
-KadasMapItem *KadasTextItemInterface::createItem() const
+KadasMapItem *KadasTextItemInterface::createItem( const QgsCoordinateReferenceSystem &crs ) const
 {
-  QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
   KadasTextItem *item = new KadasTextItem( crs );
   item->setEditor( KadasMapItemEditor::REDLINING_TEXT );
   return item;
 };
 
-KadasMapItem *KadasCoordCrossItemInterface::createItem() const
+KadasMapItem *KadasCoordCrossItemInterface::createItem( const QgsCoordinateReferenceSystem &crs ) const
 {
-  QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
   KadasMapItem *item = new KadasCoordinateCrossItem( crs );
   return item;
 };

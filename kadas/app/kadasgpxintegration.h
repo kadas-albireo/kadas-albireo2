@@ -38,14 +38,14 @@ class KadasWayPointInterface : public KadasMapItemInterface
 {
   public:
     KadasWayPointInterface() = default;
-    KadasMapItem *createItem() const override;
+    KadasMapItem *createItem( const QgsCoordinateReferenceSystem &crs ) const override;
 };
 
 class KadasRouteInterface : public KadasMapItemInterface
 {
   public:
     KadasRouteInterface() = default;
-    KadasMapItem *createItem() const override;
+    KadasMapItem *createItem( const QgsCoordinateReferenceSystem &crs ) const override;
 };
 
 class KadasGpxDropHandler : public QgsCustomDropHandler

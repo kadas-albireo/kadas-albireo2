@@ -27,6 +27,7 @@
 class QAction;
 class QToolButton;
 
+class QgsCoordinateReferenceSystem;
 class QgsMapCanvas;
 class QgsMapLayer;
 
@@ -39,56 +40,56 @@ class KadasPointItemInterface : public KadasMapItemInterface
 {
   public:
     KadasPointItemInterface() = default;
-    KadasMapItem *createItem() const override;
+    KadasMapItem *createItem( const QgsCoordinateReferenceSystem &crs ) const override;
 };
 
 class KadasSquareItemInterface : public KadasMapItemInterface
 {
   public:
     KadasSquareItemInterface() = default;
-    KadasMapItem *createItem() const override;
+    KadasMapItem *createItem( const QgsCoordinateReferenceSystem &crs ) const override;
 };
 class KadasTriangleItemInterface : public KadasMapItemInterface
 {
   public:
     KadasTriangleItemInterface() = default;
-    KadasMapItem *createItem() const override;
+    KadasMapItem *createItem( const QgsCoordinateReferenceSystem &crs ) const override;
 };
 class KadasLineItemInterface : public KadasMapItemInterface
 {
   public:
     KadasLineItemInterface() = default;
-    KadasMapItem *createItem() const override;
+    KadasMapItem *createItem( const QgsCoordinateReferenceSystem &crs ) const override;
 };
 class KadasRectangleItemInterface : public KadasMapItemInterface
 {
   public:
     KadasRectangleItemInterface() = default;
-    KadasMapItem *createItem() const override;
+    KadasMapItem *createItem( const QgsCoordinateReferenceSystem &crs ) const override;
 };
 class KadasPolygonItemInterface : public KadasMapItemInterface
 {
   public:
     KadasPolygonItemInterface() = default;
-    KadasMapItem *createItem() const override;
+    KadasMapItem *createItem( const QgsCoordinateReferenceSystem &crs ) const override;
 };
 class KadasCircleItemInterface : public KadasMapItemInterface
 {
   public:
     KadasCircleItemInterface() = default;
-    KadasMapItem *createItem() const override;
+    KadasMapItem *createItem( const QgsCoordinateReferenceSystem &crs ) const override;
 };
 class KadasTextItemInterface : public KadasMapItemInterface
 {
   public:
     KadasTextItemInterface() = default;
-    KadasMapItem *createItem() const override;
+    KadasMapItem *createItem( const QgsCoordinateReferenceSystem &crs ) const override;
 };
 class KadasCoordCrossItemInterface : public KadasMapItemInterface
 {
   public:
     KadasCoordCrossItemInterface() = default;
-    KadasMapItem *createItem() const override;
+    KadasMapItem *createItem( const QgsCoordinateReferenceSystem &crs ) const override;
 };
 
 

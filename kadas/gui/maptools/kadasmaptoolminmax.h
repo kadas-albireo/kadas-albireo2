@@ -66,7 +66,7 @@ class KADAS_GUI_EXPORT KadasMapToolMinMaxItemInterface : public KadasMapItemInte
   public:
     KadasMapToolMinMaxItemInterface( QgsMapCanvas *mapCanvas )
       : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
-    KadasMapItem *createItem() const override;
+    KadasMapItem *createItem( const QgsCoordinateReferenceSystem &crs ) const override;
     void setFilterType( KadasMapToolMinMax::FilterType filterType );
 
   private:

@@ -104,7 +104,7 @@
 #include "milx/kadasmilxintegration.h"
 
 
-KadasMapItem *KadasSymbolAttributesEditorInterface::createItem() const
+KadasMapItem *KadasSymbolAttributesEditorInterface::createItem( const QgsCoordinateReferenceSystem &crs ) const
 {
   KadasPinItem *item = new KadasPinItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
   item->setEditor( "KadasSymbolAttributesEditor" );

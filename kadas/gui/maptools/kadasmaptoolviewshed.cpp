@@ -182,7 +182,7 @@ void KadasViewshedDialog::adjustMinAngle()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-KadasMapItem *KadasMapToolViewshedItemInterface::createItem() const
+KadasMapItem *KadasMapToolViewshedItemInterface::createItem( const QgsCoordinateReferenceSystem &crs ) const
 {
   KadasCircularSectorItem *item = new KadasCircularSectorItem( mCanvas->mapSettings().destinationCrs() );
   return item;

@@ -42,12 +42,12 @@
 #include "kadasmainwindow.h"
 
 
-KadasMapItem *KadasWayPointInterface::createItem() const
+KadasMapItem *KadasWayPointInterface::createItem( const QgsCoordinateReferenceSystem &crs ) const
 {
   return new KadasGpxWaypointItem();
 }
 
-KadasMapItem *KadasRouteInterface::createItem() const
+KadasMapItem *KadasRouteInterface::createItem( const QgsCoordinateReferenceSystem &crs ) const
 {
   return new KadasGpxRouteItem();
 }

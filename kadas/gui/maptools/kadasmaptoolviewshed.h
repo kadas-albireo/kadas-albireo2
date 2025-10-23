@@ -70,7 +70,7 @@ class KADAS_GUI_EXPORT KadasMapToolViewshedItemInterface : public KadasMapItemIn
   public:
     KadasMapToolViewshedItemInterface( QgsMapCanvas *mapCanvas )
       : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
-    KadasMapItem *createItem() const override;
+    KadasMapItem *createItem( const QgsCoordinateReferenceSystem &crs ) const override;
 
   private:
     QgsMapCanvas *mCanvas = nullptr;

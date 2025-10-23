@@ -51,7 +51,9 @@ class KadasSymbolAttributesEditorInterface : public KadasMapItemInterface
 {
   public:
     KadasSymbolAttributesEditorInterface() = default;
-    KadasMapItem *createItem() const override;
+
+    // CRS is not used, it will be 3857 in any case
+    KadasMapItem *createItem( const QgsCoordinateReferenceSystem &crs ) const override;
 };
 
 

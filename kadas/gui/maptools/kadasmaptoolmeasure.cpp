@@ -192,16 +192,16 @@ void KadasMeasureWidget::updateTotal()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-KadasMapItem *KadasMapToolMeasureItemInterface::createItem() const
+KadasMapItem *KadasMapToolMeasureItemInterface::createItem( const QgsCoordinateReferenceSystem &crs ) const
 {
   switch ( mMeasureMode )
   {
     case KadasMapToolMeasure::MeasureMode::MeasureLine:
-      return setupItem( new KadasLineItem( mCanvas->mapSettings().destinationCrs(), true ) );
+      return setupItem( new KadasLineItem( crs, true ) );
     case KadasMapToolMeasure::MeasureMode::MeasurePolygon:
-      return setupItem( new KadasPolygonItem( mCanvas->mapSettings().destinationCrs(), true ) );
+      return setupItem( new KadasPolygonItem( crs, true ) );
     case KadasMapToolMeasure::MeasureMode::MeasureCircle:
-      return setupItem( new KadasCircleItem( mCanvas->mapSettings().destinationCrs(), true ) );
+      return setupItem( new KadasCircleItem( crs, true ) );
   }
   return nullptr;
 }
