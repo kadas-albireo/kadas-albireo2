@@ -106,7 +106,7 @@ class KADAS_GUI_EXPORT KadasMapToolMeasureItemInterface : public KadasMapItemInt
   public:
     KadasMapToolMeasureItemInterface( QgsMapCanvas *mapCanvas, KadasMapToolMeasure::MeasureMode measureMode )
       : KadasMapItemInterface(), mCanvas( mapCanvas ), mMeasureMode( measureMode ) {}
-    KadasMapItem *createItem( const QgsCoordinateReferenceSystem &crs ) const override;
+    KadasMapItem *createItem() const override;
 
   private:
     KadasGeometryItem *setupItem( KadasGeometryItem *item ) const;

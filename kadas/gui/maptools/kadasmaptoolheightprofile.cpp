@@ -26,9 +26,9 @@
 #include "kadas/gui/mapitems/kadaslineitem.h"
 #include "kadas/gui/maptools/kadasmaptoolheightprofile.h"
 
-KadasMapItem *KadasMapToolHeightProfileItemInterface::createItem( const QgsCoordinateReferenceSystem &crs ) const
+KadasMapItem *KadasMapToolHeightProfileItemInterface::createItem() const
 {
-  KadasLineItem *item = new KadasLineItem( crs );
+  KadasLineItem *item = new KadasLineItem( mCanvas->mapSettings().destinationCrs() );
   item->setIconType( KadasGeometryItem::IconType::ICON_CIRCLE );
   return item;
 }

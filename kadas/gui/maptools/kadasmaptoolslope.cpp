@@ -29,9 +29,9 @@
 #include "kadas/gui/mapitems/kadasrectangleitem.h"
 #include "kadas/gui/maptools/kadasmaptoolslope.h"
 
-KadasMapItem *KadasMapToolSlopeItemInterface::createItem( const QgsCoordinateReferenceSystem &crs ) const
+KadasMapItem *KadasMapToolSlopeItemInterface::createItem() const
 {
-  KadasRectangleItem *item = new KadasRectangleItem( crs );
+  KadasRectangleItem *item = new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
   return item;
 }
 

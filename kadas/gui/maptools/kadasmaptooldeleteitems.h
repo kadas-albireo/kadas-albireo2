@@ -26,7 +26,7 @@ class KADAS_GUI_EXPORT KadasMapToolDeleteItemsInterface : public KadasMapItemInt
   public:
     KadasMapToolDeleteItemsInterface( QgsMapCanvas *mapCanvas )
       : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
-    KadasMapItem *createItem( const QgsCoordinateReferenceSystem &crs ) const override;
+    KadasMapItem *createItem() const override;
 
   private:
     QgsMapCanvas *mCanvas = nullptr;

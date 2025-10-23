@@ -41,7 +41,7 @@
 #include "milx/kadasmilxexportdialog.h"
 
 
-KadasMapItem *KadasMilxInterface::createItem( const QgsCoordinateReferenceSystem &crs ) const
+KadasMapItem *KadasMilxInterface::createItem() const
 {
   return new KadasMilxItem();
 }

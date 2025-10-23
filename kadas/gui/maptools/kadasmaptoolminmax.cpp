@@ -42,16 +42,16 @@
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
 
 
-KadasMapItem *KadasMapToolMinMaxItemInterface::createItem( const QgsCoordinateReferenceSystem &crs ) const
+KadasMapItem *KadasMapToolMinMaxItemInterface::createItem() const
 {
   switch ( mFilterType )
   {
     case KadasMapToolMinMax::FilterType::FilterRect:
-      return new KadasRectangleItem( crs );
+      return new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
     case KadasMapToolMinMax::FilterType::FilterPoly:
-      return new KadasPolygonItem( crs );
+      return new KadasPolygonItem( mCanvas->mapSettings().destinationCrs() );
     case KadasMapToolMinMax::FilterType::FilterCircle:
-      return new KadasCircleItem( crs );
+      return new KadasCircleItem( mCanvas->mapSettings().destinationCrs() );
   }
   return nullptr;
 }

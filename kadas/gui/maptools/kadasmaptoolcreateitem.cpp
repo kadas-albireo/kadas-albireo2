@@ -327,8 +327,7 @@ void KadasMapToolCreateItem::createItem()
 {
   if ( !mItem && mInterface )
   {
-    const QgsCoordinateReferenceSystem crs = mLayer ? mLayer->crs() : canvas()->mapSettings().destinationCrs();
-    mItem = mInterface->createItem( crs );
+    mItem = mInterface->createItem();
   }
   else if ( mItem )
   {

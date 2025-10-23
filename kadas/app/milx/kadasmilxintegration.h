@@ -40,7 +40,7 @@ class KadasMilxInterface : public KadasMapItemInterface
 {
   public:
     KadasMilxInterface() = default;
-    KadasMapItem *createItem( const QgsCoordinateReferenceSystem &crs ) const override;
+    KadasMapItem *createItem() const override;
 };
 
 class KadasMilxDropHandler : public QgsCustomDropHandler
