@@ -178,7 +178,6 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     void acceptInput();
     void stateChanged( KadasStateHistory::ChangeType changeType, KadasStateHistory::State *state, KadasStateHistory::State *prevState );
     void setTargetLayer( QgsMapLayer *layer );
-    //void storeItemChange();
 };
 
 #endif // KADASMAPTOOLCREATEITEM_H

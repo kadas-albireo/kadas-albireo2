@@ -70,6 +70,7 @@ KadasMapItem *KadasMapItem::clone() const
 {
   KadasMapItem *item = _clone();
   item->mDrawStatus = mDrawStatus;
+  item->mEditor = mEditor;
   if ( useProperties() )
   {
     for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
@@ -421,6 +422,7 @@ KadasMapItem *KadasMapItem::fromXml( const QDomElement &element )
   {
     KadasMapItem *item = factory( QgsCoordinateReferenceSystem( crs ) );
     item->setEditor( editor );
+    item->setDrawStatus( status );
     if ( !layerId.isEmpty() )
     {
       item->associateToLayer( QgsProject::instance()->mapLayer( layerId ) );
