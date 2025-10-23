@@ -132,6 +132,7 @@ void KadasMapToolEditItemGroup::canvasPressEvent( QgsMapMouseEvent *e )
     if ( mSelectionRect->hitTest( hitPos, mCanvas->mapSettings() ) )
     {
       mMoveRefPos = e->mapPoint();
+      mMoveRefPos2 = e->mapPoint();
       for ( KadasMapItem *item : std::as_const( mItems ) )
       {
         QgsCoordinateTransform crst( item->crs(), mCanvas->mapSettings().destinationCrs(), QgsProject::instance() );
@@ -151,7 +152,7 @@ void KadasMapToolEditItemGroup::canvasPressEvent( QgsMapMouseEvent *e )
       // Special actions
       int nPoints = 0;
       int nPins = 0;
-      for ( const KadasMapItem *item : mItems )
+      for ( const KadasMapItem *item : std::as_const( mItems ) )
       {
         if ( dynamic_cast<const KadasPointItem *>( item ) )
         {
@@ -185,11 +186,20 @@ void KadasMapToolEditItemGroup::canvasMoveEvent( QgsMapMouseEvent *e )
   if ( e->buttons() == Qt::LeftButton && e->modifiers() == Qt::NoModifier && !mItemRefPos.isEmpty() )
   {
     QgsVector delta = e->mapPoint() - mMoveRefPos;
+    QgsVector delta2 = e->mapPoint() - mMoveRefPos2;
+    mMoveRefPos2 = e->mapPoint();
     for ( int i = 0, n = mItems.size(); i < n; ++i )
     {
       QgsCoordinateTransform crst( mCanvas->mapSettings().destinationCrs(), mItems[i]->crs(), QgsProject::instance() );
       QgsPointXY newPos = crst.transform( mItemRefPos[i] + delta );
-      mItems[i]->setPosition( KadasItemPos::fromPoint( newPos ) );
+      if ( mItems[i]->annotationItem() )
+      {
+        mItems[i]->translate( delta2.x(), delta2.y() );
+      }
+      else
+      {
+        mItems[i]->setPosition( KadasItemPos::fromPoint( newPos ) );
+      }
     }
     mSelectionRect->update();
   }
@@ -258,7 +268,7 @@ void KadasMapToolEditItemGroup::createWaypointsFromPins()
     KadasGpxWaypointItem *waypoint = new KadasGpxWaypointItem();
     waypoint->setName( pin->name() );
     QgsCoordinateTransform crst( pin->crs(), waypoint->crs(), QgsProject::instance()->transformContext() );
-    waypoint->setPosition( KadasItemPos::fromPoint( crst.transform( pin->position() ) ) );
+    waypoint->setPoint( QgsPoint( crst.transform( pin->position() ) ) );
     KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::RoutesLayer )->addItem( waypoint );
   }
   KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::RoutesLayer )->triggerRepaint();
