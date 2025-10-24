@@ -106,6 +106,19 @@ jobs:
                 ${CREATE_MSI_CMAKE_VAR}\
                 ${DEBUG_OPTIONS}
 
+      - name: 📋 Display vcpkg error logs
+        if: failure()
+        shell: bash
+        run: |
+          echo "::group::Searching for vcpkg error logs"
+          find C:/src -name "*.log" -type f
+          echo "::endgroup::"
+          for log_file in $(find C:/src -name "*.log" -type f); do
+            echo "::group::Contents of $log_file"
+            cat "$log_file" || echo "Failed to read $log_file"
+            echo "::endgroup::"
+          done
+
       - name: 📑 Upload vcpkg build logs
         uses: actions/upload-artifact@v4
         if: failure()
