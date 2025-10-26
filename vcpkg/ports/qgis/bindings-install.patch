@@ -14,7 +14,7 @@ index 4b41dc6faa5..7e3f2690c9d 100644
 +  file(GLOB sip_files ${CMAKE_CURRENT_BINARY_DIR}/${module}/*.sip)
 +  install(FILES ${sip_files} DESTINATION ${QGIS_PYTHON_DIR}/bindings/${module})
 +  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${module}/auto_generated DESTINATION ${QGIS_PYTHON_DIR}/bindings/${module})
-+  message(FATAL_ERROR "install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${module}/auto_generated DESTINATION ${QGIS_PYTHON_DIR}/bindings/${module})")
++  # message(FATAL_ERROR "install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${module}/auto_generated DESTINATION ${QGIS_PYTHON_DIR}/bindings/${module})")
  endforeach(module)
  
  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml.in ${CMAKE_CURRENT_BINARY_DIR}/pyproject.toml @ONLY)
