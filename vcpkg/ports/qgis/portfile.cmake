@@ -22,6 +22,7 @@ vcpkg_from_github(
   qgspython.patch
   ui-hdrs-install.patch
   bindings-install.patch
+  test-hdrs-install.patch
   libxml2.patch
   exiv2.patch
   crssync.patch
