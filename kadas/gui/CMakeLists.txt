@@ -175,7 +175,6 @@ pkg_search_module(SVG2SVGT IMPORTED_TARGET svg2svgt REQUIRED)
 
 find_package(Qwt REQUIRED)
 find_package(GeographicLib REQUIRED)
-find_package(exiv2 REQUIRED)
 
 target_link_libraries(
   kadas_gui

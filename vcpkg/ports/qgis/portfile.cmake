@@ -1,8 +1,9 @@
 string(REPLACE "." "_" TAG ${VERSION})
 
-set(QGIS_REF final-${TAG})
+# set(QGIS_REF final-${TAG})
+set(QGIS_REF 25d28abfdad830c079d5bab019e5a78e320dd09b)
 set(QGIS_SHA512
-    78327b7af6a54daa43caa4b7976859bf2d0dd840bd8dba35586af0d4741422c9d6d30a1fc2ad8f00f7a7a97ca4b22752bf580993e6527c643850f1c556e0a2d5
+    6c53e58cfa6987a2e2eb4d6e430052927359d3e936377a20380d4f1c3597a7b39d7618c860a48bec6b29c7707de938195eae1e1cfd94af6eb9ef984be2a2978b
 )
 
 vcpkg_from_github(
@@ -19,21 +20,18 @@ vcpkg_from_github(
   PATCHES
   # Make qgis support python's debug library
   qgspython.patch
+  ui-hdrs-install.patch
+  bindings-install.patch
+  test-hdrs-install.patch
   libxml2.patch
   exiv2.patch
   crssync.patch
-  # bigobj.patch
   mesh.patch
-  bindings-install.patch
   sipcxx17.patch
-  # nlohmann-json.patch
   qgis-debug.patch
-  62506.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1262
-  sync_2d_3d.patch # https://github.com/qgis/QGIS/pull/62530
   3dfrustumfix.patch
   3dchunkloaderconcurrency.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1278
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
-  mounteverest.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1278
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
 )
 
@@ -55,10 +53,18 @@ if("bindings" IN_LIST FEATURES)
   # TODO ... we want this to be extracted via python command ?
   vcpkg_add_to_path(PREPEND "${CURRENT_INSTALLED_DIR}/tools/python3/Scripts")
   list(APPEND QGIS_OPTIONS -DWITH_BINDINGS:BOOL=ON)
+  list(APPEND QGIS_OPTIONS -DSIP_GLOBAL_INSTALL:BOOL=OFF)
 
-  list(APPEND QGIS_OPTIONS
-       "-DQGIS_PYTHON_DIR=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/qgis"
-  )
+  if(NOT VCPKG_TARGET_IS_OSX)
+    # We are relying on some qgis hacks in here In QGIS, when not on macos, we
+    # do not have DEFAULT_PYTHON_SUBDIR set. If SIP_GLOBAL_INSTALL=OFF and
+    # DEFAULT_PYTHON_SUBDIR is set, this is used instead. If this breaks in the
+    # future, we should consider adding an explicit override for the sip
+    # installation dir in QGIS.
+    list(APPEND QGIS_OPTIONS
+         "-DDEFAULT_PYTHON_SUBDIR=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}"
+    )
+  endif()
 else()
   vcpkg_find_acquire_program(PYTHON3)
   list(APPEND QGIS_OPTIONS "-DPython_EXECUTABLE=${PYTHON3}")
@@ -88,10 +94,10 @@ list(APPEND QGIS_OPTIONS "-DFLEX_EXECUTABLE=${FLEX}")
 # at a predictable location
 list(APPEND QGIS_OPTIONS "-DQGIS_INCLUDE_SUBDIR=include/qgis")
 list(APPEND QGIS_OPTIONS "-DBUILD_WITH_QT6=OFF")
-list(APPEND QGIS_OPTIONS "-DQGIS_MACAPP_FRAMEWORK=FALSE")
 # QGIS will also do that starting from protobuf version 4.23
 list(APPEND QGIS_OPTIONS "-DProtobuf_LITE_LIBRARY=protobuf::libprotobuf-lite")
 list(APPEND QGIS_OPTIONS "-DWITH_INTERNAL_NLOHMANN_JSON:BOOL=OFF")
+list(APPEND QGIS_OPTIONS "-DWITH_QTWEBENGINE:BOOL=OFF")
 
 if("opencl" IN_LIST FEATURES)
   list(APPEND QGIS_OPTIONS -DUSE_OPENCL:BOOL=ON)
