@@ -79,12 +79,14 @@ void read3DMapViewSettings( Kadas3DMapCanvasWidget *widget, QDomElement &elem3DM
 #endif
   map->setOutputDpi( QGuiApplication::primaryScreen()->logicalDotsPerInch() );
 
+  QgsVector3D savedOrigin = map->origin();
+
   widget->setMapSettings( map );
 
   QDomElement elemCamera = elem3DMap.firstChildElement( QStringLiteral( "camera" ) );
   if ( !elemCamera.isNull() )
   {
-    widget->mapCanvas3D()->cameraController()->readXml( elemCamera );
+    widget->mapCanvas3D()->cameraController()->readXml( elemCamera, savedOrigin );
   }
 
   widget->dockableWidgetHelper()->readXml( elem3DMap );
