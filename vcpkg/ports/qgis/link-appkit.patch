@@ -1,0 +1,16 @@
+diff --git a/src/native/CMakeLists.txt b/src/native/CMakeLists.txt
+index 266ca925614..c1d5f57d86d 100644
+--- a/src/native/CMakeLists.txt
++++ b/src/native/CMakeLists.txt
+@@ -114,6 +114,11 @@ if (MSVC AND NOT BUILD_WITH_QT6)
+   target_link_libraries(qgis_native ${QT_VERSION_BASE}::WinExtras)
+ 
+ endif()
++
++if(APPLE)
++  target_link_libraries(qgis_native "-framework AppKit")
++endif()
++
+ # install
+ if(NOT QGIS_MAC_BUNDLE)
+   install(FILES ${QGIS_NATIVE_HDRS} DESTINATION ${QGIS_INCLUDE_DIR})

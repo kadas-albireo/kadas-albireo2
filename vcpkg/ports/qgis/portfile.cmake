@@ -23,6 +23,7 @@ vcpkg_from_github(
   ui-hdrs-install.patch
   bindings-install.patch
   test-hdrs-install.patch
+  link-appkit.patch
   libxml2.patch
   exiv2.patch
   crssync.patch
