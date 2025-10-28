@@ -2,12 +2,12 @@
 <context>
     <name>Kadas3DIntegration</name>
     <message>
-        <location filename="../kadas/app/3d/kadas3dintegration.cpp" line="166"/>
+        <location filename="../kadas/app/3d/kadas3dintegration.cpp" line="168"/>
         <source>New 3D Map View</source>
         <translation>Neue 3D Kartenansicht</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dintegration.cpp" line="166"/>
+        <location filename="../kadas/app/3d/kadas3dintegration.cpp" line="168"/>
         <source>Project extent is not valid. Please add or activate a layer to render.</source>
         <translation>Projekt Ausdehnung ist ungültig. Bitte Ebene aktivieren oder hinzufügen.</translation>
     </message>
