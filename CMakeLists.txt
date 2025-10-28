@@ -8,9 +8,11 @@ string(JSON VCPKG_CONFIG GET "${JSON_CONTENT}" vcpkg-configuration)
 string(JSON VCPKG_DEFAULT_REG GET "${VCPKG_CONFIG}" default-registry)
 string(JSON VCPKG_BASELINE GET "${VCPKG_DEFAULT_REG}" baseline)
 if(NOT "${VCPKG_TAG}" STREQUAL "${VCPKG_BASELINE}")
-  message(FATAL_ERROR
-    "VCPKG_TAG (${VCPKG_TAG}) does not match vcpkg/vcpkg.json baseline (${VCPKG_BASELINE}).\n"
-    "Update VCPKG_TAG or reset the vcpkg submodule to the expected baseline.")
+  message(
+    FATAL_ERROR
+      "VCPKG_TAG (${VCPKG_TAG}) does not match vcpkg/vcpkg.json baseline (${VCPKG_BASELINE}).\n"
+      "Update VCPKG_TAG or reset the vcpkg submodule to the expected baseline."
+  )
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
