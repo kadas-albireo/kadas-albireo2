@@ -28,10 +28,13 @@ class KADAS_GUI_EXPORT KadasGeoAdminRestCatalogProvider : public KadasCatalogPro
     KadasGeoAdminRestCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params );
     void load() override;
   private slots:
-    void replyFinished();
+    void replyGeoCatalogFinished();
+    void replyWMSGeoAdminFinished();
 
   private:
     QString mBaseUrl;
+
+    QMap<QString, QString> mMapLayerCategory;
 
     void parseTheme( QStandardItem *parent, const QDomElement &theme, QMap<QString, QStandardItem *> &layerParentMap );
 };
