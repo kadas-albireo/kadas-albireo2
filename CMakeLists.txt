@@ -2,6 +2,17 @@ cmake_minimum_required(VERSION 3.27.0)
 
 set(VCPKG_TAG e3ad383ceb886677eb181e16adeeb4d4a2c2d4c4)
 
+# Check that VCPKG_TAG matches the vcpkg.json baseline
+file(READ "${CMAKE_SOURCE_DIR}/vcpkg/vcpkg.json" JSON_CONTENT)
+string(JSON VCPKG_CONFIG GET "${JSON_CONTENT}" vcpkg-configuration)
+string(JSON VCPKG_DEFAULT_REG GET "${VCPKG_CONFIG}" default-registry)
+string(JSON VCPKG_BASELINE GET "${VCPKG_DEFAULT_REG}" baseline)
+if(NOT "${VCPKG_TAG}" STREQUAL "${VCPKG_BASELINE}")
+  message(FATAL_ERROR
+    "VCPKG_TAG (${VCPKG_TAG}) does not match vcpkg/vcpkg.json baseline (${VCPKG_BASELINE}).\n"
+    "Update VCPKG_TAG or reset the vcpkg submodule to the expected baseline.")
+endif()
+
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 set(WITH_BINDINGS
