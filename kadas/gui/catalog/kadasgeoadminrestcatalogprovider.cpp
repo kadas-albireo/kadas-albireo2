@@ -76,6 +76,8 @@ void KadasGeoAdminRestCatalogProvider::replyGeoCatalogFinished()
 
   QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
   QVariantList topCategories = rootMap.value( "results" ).toMap().value( "root" ).toMap().value( "children" ).toList();
+  int topCategoriesIndice = 1;
+
   for ( const QVariant &topCategorie : topCategories )
   {
     QString topCategoryLabel = topCategorie.toMap().value( "label" ).toString();
@@ -83,15 +85,16 @@ void KadasGeoAdminRestCatalogProvider::replyGeoCatalogFinished()
 
     QStandardItem *topCategoryItem = mBrowser->addItem( 0, topCategoryLabel, 0, false );
 
-
+    int subCategoriesIndice = 1;
     for ( const QVariant &subCategory : subCategories )
     {
       //layerObj.toMap()
       //mBrowser->addItem()
       QString subCategoryLabel = subCategory.toMap().value( "label" ).toString();
-      QStandardItem *subCategoryItem = mBrowser->addItem( topCategoryItem, subCategoryLabel, 0, false );
+      //QStandardItem *subCategoryItem = mBrowser->addItem( topCategoryItem, subCategoryLabel, 0, false );
 
       QVariantList layerList = subCategory.toMap().value( "children" ).toList();
+      int layerIndice = 1;
       for ( const QVariant &layerObj : layerList )
       {
         //QString layerLabel = layerObj.toMap().value( "label" ).toString();
@@ -100,12 +103,19 @@ void KadasGeoAdminRestCatalogProvider::replyGeoCatalogFinished()
 
         //mimeData = QgsMimeDataUtils::Uri(layerObj.toMap().value( "layerBodId" ).toString());
         //mBrowser->addItem( subCategoryItem, layerBodId, 0, false /*,  mimeData */ );
+        QString sortIndices = QString( "%1/%2/%3" ).arg( topCategoriesIndice ).arg( subCategoriesIndice ).arg( layerIndice );
+        qDebug() << "res sort indices " << sortIndices;
+        //const entry = ResultEntry( layerBodId, topCategoryLabel + "/" + subCategoryLabel, sortIndices );
+        ResultEntry entry = ResultEntry( layerBodId, topCategoryLabel + "/" + subCategoryLabel, sortIndices );
+        //mLayersEntriesMap.insert( layerBodId, topCategoryLabel + "/" + subCategoryLabel );
+        mLayersEntriesMap.insert( layerBodId, entry );
 
-        mMapLayerCategory.insert( layerBodId, topCategoryLabel + "/" + subCategoryLabel );
+        layerIndice++;
       }
-
+      subCategoriesIndice++;
       //mBrowser->addItem( 0, tr( "Uncategorized" ), -1 );
     }
+    topCategoriesIndice++;
   }
 
   // QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap()
@@ -212,16 +222,20 @@ void KadasGeoAdminRestCatalogProvider::replyWMSGeoAdminFinished()
     parseWMSLayerCapabilities( layerItem, title, imgFormats, parentCrs, url, "", QString(), mimeData );
 
     QStandardItem *parent;
-    if ( mMapLayerCategory.contains( layerBodId ) )
+    ResultEntry entry = mLayersEntriesMap.value( layerBodId );
+    if ( mLayersEntriesMap.contains( layerBodId ) )
     {
-      parent = getCategoryItem( mMapLayerCategory.value( layerBodId ).split( "/" ), QStringList() );
+      parent = getCategoryItem( entry.category.split( "/" ), entry.sortIndices.split( "/" ) );
     }
     else
     {
       parent = mBrowser->addItem( 0, tr( "Uncategorized" ), -1 );
     }
     //mBrowser->addItem( 0, title, -1, true, mimeData );
-    mBrowser->addItem( parent, title, -1, true, mimeData );
+
+    mBrowser->addItem( parent, title, entry.sortIndices.split( "/" ).last().toInt(), true, mimeData );
+
+
     //mBrowser->addItem( /*getCategoryItem( catTitles, QStringList() )*/ 0, title, -1, mimeData );
   }
   emit finished();

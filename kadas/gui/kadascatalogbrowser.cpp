@@ -247,6 +247,7 @@ void KadasCatalogBrowser::providerFinished()
     {
       mFilterProxyModel->setSourceModel( mCatalogModel );
       mFilterProxyModel->sort( 0 );
+      mFilterProxyModel->setSortRole( CatalogItem::s_sortIndexRole );
       mTreeView->setModel( mFilterProxyModel );
     }
     else
@@ -283,5 +284,7 @@ void KadasCatalogBrowser::itemDoubleClicked( const QModelIndex &index )
 
 QStandardItem *KadasCatalogBrowser::addItem( QStandardItem *parent, QString text, int sortIndex, bool isLeaf, QMimeData *mimeData )
 {
+  qDebug() << "title:" << text;
+  qDebug() << "sortindex: " << sortIndex;
   return mCatalogModel->addItem( parent, text, sortIndex, isLeaf, mimeData );
 }

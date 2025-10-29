@@ -34,7 +34,7 @@ class KADAS_GUI_EXPORT KadasGeoAdminRestCatalogProvider : public KadasCatalogPro
   private:
     QString mBaseUrl;
 
-    QMap<QString, QString> mMapLayerCategory;
+    QMap<QString, ResultEntry> mLayersEntriesMap;
 
     void parseTheme( QStandardItem *parent, const QDomElement &theme, QMap<QString, QStandardItem *> &layerParentMap );
 };
