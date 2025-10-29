@@ -80,7 +80,7 @@ void KadasGeoAdminRestCatalogProvider::replyGeoCatalogFinished()
         QString layerBodId = layerObj.toMap().value( "layerBodId" ).toString();
 
         QString sortIndices = QString( "%1/%2/%3" ).arg( topCategoriesIndice ).arg( subCategoriesIndice ).arg( layerIndice );
-        ResultEntry entry = ResultEntry( layerBodId, topCategoryLabel + "/" + subCategoryLabel, sortIndices );
+        ResultEntry entry = ResultEntry( layerBodId, topCategoryLabel + "/%/" + subCategoryLabel, sortIndices );
 
         mLayersEntriesMap.insert( layerBodId, entry );
 
@@ -139,14 +139,15 @@ void KadasGeoAdminRestCatalogProvider::replyWMSGeoAdminFinished()
     ResultEntry entry = mLayersEntriesMap.value( layerBodId );
     if ( mLayersEntriesMap.contains( layerBodId ) )
     {
-      parent = getCategoryItem( entry.category.split( "/" ), entry.sortIndices.split( "/" ) );
+      parent = getCategoryItem( entry.category.split( "/%/" ), entry.sortIndices.split( "/%/" ) );
     }
     else
     {
+      // Add at the bottom
       parent = mBrowser->addItem( 0, tr( "Uncategorized" ), mLastTopCategoriesIndice + 1 );
     }
 
-    mBrowser->addItem( parent, title, entry.sortIndices.split( "/" ).last().toInt(), true, mimeData );
+    mBrowser->addItem( parent, title, entry.sortIndices.split( "/%/" ).last().toInt(), true, mimeData );
   }
   emit finished();
 }
