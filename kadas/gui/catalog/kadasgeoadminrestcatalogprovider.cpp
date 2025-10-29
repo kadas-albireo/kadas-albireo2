@@ -21,8 +21,6 @@
 #include <QUrlQuery>
 #include <QNetworkReply>
 
-#include <QFile>
-
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgssettings.h>
 
@@ -47,21 +45,6 @@ void KadasGeoAdminRestCatalogProvider::load()
   connect( reply, &QNetworkReply::finished, this, &KadasGeoAdminRestCatalogProvider::replyGeoCatalogFinished );
 }
 
-void KadasGeoAdminRestCatalogProvider::parseTheme( QStandardItem *parent, const QDomElement &theme, QMap<QString, QStandardItem *> &layerParentMap )
-{
-  parent = mBrowser->addItem( parent, theme.firstChildElement( "ows:Title" ).text(), -1 );
-  QDomNodeList layerRefs = theme.toElement().elementsByTagName( "LayerRef" );
-  for ( int iLayerRef = 0, nLayerRefs = layerRefs.count(); iLayerRef < nLayerRefs; ++iLayerRef )
-  {
-    QDomNode layerRef = layerRefs.item( iLayerRef );
-    layerParentMap.insert( layerRef.toElement().text(), parent );
-  }
-
-  for ( const QDomNode &theme : childrenByTagName( theme.toElement(), "Theme" ) )
-  {
-    parseTheme( parent, theme.toElement(), layerParentMap );
-  }
-}
 
 void KadasGeoAdminRestCatalogProvider::replyGeoCatalogFinished()
 {
@@ -118,21 +101,6 @@ void KadasGeoAdminRestCatalogProvider::replyGeoCatalogFinished()
     topCategoriesIndice++;
   }
 
-  // QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap()
-  QVariantList layers = rootMap.value( "layers" ).toList();
-  for ( const QVariant &layerObj : layers )
-  {
-    QVariantMap layerMap = layerObj.toMap();
-    //QVariantMap layerMap = layerObj.toMap();
-  }
-
-  //for ( QVariantMap::const_iterator iter = map.begin(); iter != map.end(); ++iter )
-  //{
-  // qDebug() << iter.key() << iter.value();
-  //}
-  qDebug() << "id?:" << rootMap.value( "results" ).toMap().value( "root" ).toMap().value( "id" ).toString();
-
-
   QUrl url( "https://wms.geo.admin.ch/?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities" );
   QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toLower();
   QUrlQuery query( url );
@@ -167,50 +135,6 @@ void KadasGeoAdminRestCatalogProvider::replyWMSGeoAdminFinished()
   }
 
 
-  QFile file( "C:\\Users\\Valentin\\Documents\\kadas\\simple.xml" );
-  if ( !file.open( QIODevice::WriteOnly | QIODevice::Text ) )
-  {
-    qDebug( "Failed to open file for writing." );
-  }
-  QTextStream stream( &file );
-  stream << doc.toString();
-  file.close();
-
-
-  QString referer = QgsSettings().value( "search/referer", "http://localhost" ).toString();
-
-  // Categories
-  QMap<QString, QStandardItem *> layerParentMap;
-  QDomElement themes = doc.firstChildElement( "Capabilities" ).firstChildElement( "Themes" );
-  for ( const QDomNode &theme : childrenByTagName( themes, "Theme" ) )
-  {
-    parseTheme( 0, theme.toElement(), layerParentMap );
-  }
-
-  // Tile matrix sets
-  QMap<QString, QString> tileMatrixSetMap = parseWMTSTileMatrixSets( doc );
-
-  //// Layers
-  //QList<QDomNode> layerItems = childrenByTagName( doc.firstChildElement( "Capabilities" ).firstChildElement( "Contents" ), "Layer" );
-  //for ( const QDomNode &layerItem : layerItems )
-  //{
-  //  QString title, layerid;
-  //  QMimeData *mimeData;
-  //  parseWMTSLayerCapabilities( layerItem, tileMatrixSetMap, mBaseUrl, "", QString( "&referer=%1" ).arg( referer ), title, layerid, QString(), mimeData );
-
-  //  // Determine parent
-  //  QStandardItem *parent = 0;
-  //  if ( layerParentMap.contains( layerid ) )
-  //  {
-  //    parent = layerParentMap.value( layerid );
-  //  }
-  //  else
-  //  {
-  //    parent = mBrowser->addItem( 0, tr( "Uncategorized" ), -1 );
-  //  }
-  //  mBrowser->addItem( parent, title, true, mimeData );
-  //}
-
   QStringList imgFormats = parseWMSFormats( doc );
   QStringList parentCrs;
   for ( const QDomNode &layerItem : childrenByTagName( doc.firstChildElement( "WMS_Capabilities" ).firstChildElement( "Capability" ).firstChildElement( "Layer" ), "Layer" ) )
@@ -218,7 +142,6 @@ void KadasGeoAdminRestCatalogProvider::replyWMSGeoAdminFinished()
     QMimeData *mimeData;
     QString title = layerItem.firstChildElement( "Title" ).text();
     QString layerBodId = layerItem.firstChildElement( "Name" ).text();
-
     parseWMSLayerCapabilities( layerItem, title, imgFormats, parentCrs, url, "", QString(), mimeData );
 
     QStandardItem *parent;
@@ -231,12 +154,8 @@ void KadasGeoAdminRestCatalogProvider::replyWMSGeoAdminFinished()
     {
       parent = mBrowser->addItem( 0, tr( "Uncategorized" ), -1 );
     }
-    //mBrowser->addItem( 0, title, -1, true, mimeData );
 
     mBrowser->addItem( parent, title, entry.sortIndices.split( "/" ).last().toInt(), true, mimeData );
-
-
-    //mBrowser->addItem( /*getCategoryItem( catTitles, QStringList() )*/ 0, title, -1, mimeData );
   }
   emit finished();
 }
