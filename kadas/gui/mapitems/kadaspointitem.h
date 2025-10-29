@@ -82,27 +82,11 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasMapItem
     void setStrokeStyle( const Qt::PenStyle &style );
     Qt::PenStyle strokeStyle() const { return mStrokeStyle; }
 
-
-    //Qgis::GeometryType geometryType() const override { return Qgis::GeometryType::Point; }
-    //void addPartFromGeometry( const QgsAbstractGeometry &geom ) override;
-
-    // struct KADAS_GUI_EXPORT State : KadasMapItem::State
-    // {
-    //     QList<QgsPointXY> points;
-    //     void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
-    //     State *clone() const override SIP_FACTORY { return new State( *this ); }
-    //     QJsonObject serialize() const override;
-    //     bool deserialize( const QJsonObject &json ) override;
-    // };
-    // const State *constState() const { return static_cast<State *>( mState ); }
-
     QColor fillColor() const;
     void setFillColor( const QColor &newFillColor );
 
   protected:
-    //State *createEmptyState() const override SIP_FACTORY { return new State(); }
     KadasMapItem *_clone() const override;
-    // void recomputeDerived() override;
 
     bool useProperties() const override { return false; }
     void writeXmlPrivate( QDomElement &element ) const override;
