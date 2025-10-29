@@ -71,35 +71,26 @@ void KadasGeoAdminRestCatalogProvider::replyGeoCatalogFinished()
     int subCategoriesIndice = 1;
     for ( const QVariant &subCategory : subCategories )
     {
-      //layerObj.toMap()
-      //mBrowser->addItem()
       QString subCategoryLabel = subCategory.toMap().value( "label" ).toString();
-      //QStandardItem *subCategoryItem = mBrowser->addItem( topCategoryItem, subCategoryLabel, 0, false );
 
       QVariantList layerList = subCategory.toMap().value( "children" ).toList();
       int layerIndice = 1;
       for ( const QVariant &layerObj : layerList )
       {
-        //QString layerLabel = layerObj.toMap().value( "label" ).toString();
         QString layerBodId = layerObj.toMap().value( "layerBodId" ).toString();
-        QMimeData *mimeData = nullptr;
 
-        //mimeData = QgsMimeDataUtils::Uri(layerObj.toMap().value( "layerBodId" ).toString());
-        //mBrowser->addItem( subCategoryItem, layerBodId, 0, false /*,  mimeData */ );
         QString sortIndices = QString( "%1/%2/%3" ).arg( topCategoriesIndice ).arg( subCategoriesIndice ).arg( layerIndice );
-        qDebug() << "res sort indices " << sortIndices;
-        //const entry = ResultEntry( layerBodId, topCategoryLabel + "/" + subCategoryLabel, sortIndices );
         ResultEntry entry = ResultEntry( layerBodId, topCategoryLabel + "/" + subCategoryLabel, sortIndices );
-        //mLayersEntriesMap.insert( layerBodId, topCategoryLabel + "/" + subCategoryLabel );
+
         mLayersEntriesMap.insert( layerBodId, entry );
 
         layerIndice++;
       }
       subCategoriesIndice++;
-      //mBrowser->addItem( 0, tr( "Uncategorized" ), -1 );
     }
     topCategoriesIndice++;
   }
+
 
   QUrl url( "https://wms.geo.admin.ch/?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities" );
   QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toLower();
