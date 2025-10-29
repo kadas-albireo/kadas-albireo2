@@ -181,12 +181,12 @@ void KadasMapItem::setSelected( bool selected )
   update();
 }
 
-void KadasMapItem::setAuthId( const QString &authId )
-{
-  mCrs = QgsCoordinateReferenceSystem( authId );
-  update();
-  emit propertyChanged();
-}
+// void KadasMapItem::setAuthId( const QString &authId )
+// {
+//   mCrs = QgsCoordinateReferenceSystem( authId );
+//   update();
+//   emit propertyChanged();
+// }
 
 void KadasMapItem::setZIndex( int zIndex )
 {
@@ -413,14 +413,15 @@ KadasMapItem *KadasMapItem::fromXml( const QDomElement &element )
 {
   QDomElement itemEl = element;
   QString name = itemEl.attribute( "name" );
-  QString crs = itemEl.attribute( "crs" );
+  QString crsCode = itemEl.attribute( "crs" );
   QString editor = itemEl.attribute( "editor" );
   QString layerId = itemEl.attribute( "associatedLayer" );
   DrawStatus status = qgsEnumKeyToValue( itemEl.attribute( "draw_status", qgsEnumValueToKey( DrawStatus::Finished ) ), DrawStatus::Finished );
   KadasMapItem::RegistryItemFactory factory = KadasMapItem::registry()->value( name );
   if ( factory )
   {
-    KadasMapItem *item = factory( QgsCoordinateReferenceSystem( crs ) );
+    QgsCoordinateReferenceSystem crs( crsCode );
+    KadasMapItem *item = factory( crs );
     item->setEditor( editor );
     item->setDrawStatus( status );
     if ( !layerId.isEmpty() )

@@ -349,6 +349,13 @@ void KadasLineItem::setMeasurementMode( MeasurementMode measurementMode, Qgis::A
   emit geometryChanged(); // Trigger re-measurement
 }
 
+KadasMapItem *KadasLineItem::_clone() const
+{
+  KadasLineItem *item = new KadasLineItem( crs() );
+  item->mGeometry = mGeometry->clone();
+  return item;
+}
+
 void KadasLineItem::measureGeometry()
 {
   double totalLength = 0;

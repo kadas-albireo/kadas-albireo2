@@ -52,6 +52,8 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
         {
           renderContext()->painter()->save();
           renderContext()->painter()->setOpacity( mRenderOpacity );
+          qDebug() << "item crs " << item->crs().authid();
+          qDebug() << "context crs " << renderContext()->coordinateTransform().destinationCrs().authid();
           renderContext()->setCoordinateTransform( QgsCoordinateTransform( item->crs(), renderContext()->coordinateTransform().destinationCrs(), renderContext()->transformContext() ) );
           item->render( *renderContext() );
           renderContext()->painter()->restore();

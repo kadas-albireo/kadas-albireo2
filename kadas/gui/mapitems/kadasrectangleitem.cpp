@@ -320,6 +320,13 @@ void KadasRectangleItem::measureGeometry()
   mTotalMeasurement = formatArea( totalArea, areaBaseUnit() );
 }
 
+KadasMapItem *KadasRectangleItem::_clone() const
+{
+  KadasRectangleItem *item = new KadasRectangleItem( crs() );
+  item->mGeometry = mGeometry->clone();
+  return item;
+}
+
 void KadasRectangleItem::recomputeDerived()
 {
   QgsGeometryCollection *multiGeom = new QgsMultiPolygon();

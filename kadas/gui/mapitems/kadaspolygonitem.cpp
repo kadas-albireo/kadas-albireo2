@@ -327,6 +327,13 @@ const QgsMultiPolygon *KadasPolygonItem::geometry() const
   return static_cast<QgsMultiPolygon *>( mGeometry );
 }
 
+KadasMapItem *KadasPolygonItem::_clone() const
+{
+  KadasPolygonItem *item = new KadasPolygonItem( crs() );
+  item->mGeometry = mGeometry->clone();
+  return item;
+}
+
 QgsMultiPolygon *KadasPolygonItem::geometry()
 {
   return static_cast<QgsMultiPolygon *>( mGeometry );

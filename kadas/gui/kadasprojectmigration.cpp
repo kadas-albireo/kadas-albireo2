@@ -316,7 +316,7 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
 
       QDomElement mapItemEl = doc.createElement( "MapItem" );
       mapItemEl.setAttribute( "name", item->metaObject()->className() );
-      mapItemEl.setAttribute( "crs", item->authId() );
+      mapItemEl.setAttribute( "crs", item->crs().authid() );
       QJsonDocument jsonDoc;
       jsonDoc.setObject( item->serialize() );
       mapItemEl.appendChild( doc.createCDATASection( jsonDoc.toJson( QJsonDocument::Compact ) ) );

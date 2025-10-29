@@ -352,6 +352,13 @@ const QgsMultiSurface *KadasCircularSectorItem::geometry() const
   return static_cast<QgsMultiSurface *>( mGeometry );
 }
 
+KadasMapItem *KadasCircularSectorItem::_clone() const
+{
+  KadasCircularSectorItem *item = new KadasCircularSectorItem( crs() );
+  item->mGeometry = mGeometry->clone();
+  return item;
+}
+
 QgsMultiSurface *KadasCircularSectorItem::geometry()
 {
   return static_cast<QgsMultiSurface *>( mGeometry );
