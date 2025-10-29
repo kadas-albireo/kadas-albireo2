@@ -33,7 +33,7 @@ vcpkg_from_github(
   3dchunkloaderconcurrency.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1278
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
-  moveNetworkloggerToGui.patch
+  moveNetworkloggerToGui.patch # https://github.com/qgis/QGIS/pull/63269
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
