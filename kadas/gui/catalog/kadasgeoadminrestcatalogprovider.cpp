@@ -90,7 +90,7 @@ void KadasGeoAdminRestCatalogProvider::replyGeoCatalogFinished()
     }
     topCategoriesIndice++;
   }
-
+  mLastTopCategoriesIndice = topCategoriesIndice;
 
   QUrl url( "https://wms.geo.admin.ch/?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities" );
   QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toLower();
@@ -143,7 +143,7 @@ void KadasGeoAdminRestCatalogProvider::replyWMSGeoAdminFinished()
     }
     else
     {
-      parent = mBrowser->addItem( 0, tr( "Uncategorized" ), -1 );
+      parent = mBrowser->addItem( 0, tr( "Uncategorized" ), mLastTopCategoriesIndice + 1 );
     }
 
     mBrowser->addItem( parent, title, entry.sortIndices.split( "/" ).last().toInt(), true, mimeData );

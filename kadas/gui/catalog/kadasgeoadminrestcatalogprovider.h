@@ -33,6 +33,7 @@ class KADAS_GUI_EXPORT KadasGeoAdminRestCatalogProvider : public KadasCatalogPro
 
   private:
     QString mBaseUrl;
+    int mLastTopCategoriesIndice = -1;
 
     QMap<QString, ResultEntry> mLayersEntriesMap;
 };
