@@ -523,6 +523,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
   protected:
     State *mState = nullptr;
     QgsCoordinateReferenceSystem mCrs;
+    QString mEditor;
     bool mSelected = false;
     int mZIndex = 0;
     QString mTooltip;
@@ -562,7 +563,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     void cleanupAttachment( const QString &filePath ) const;
 
   private:
-    QString mEditor;
     bool mDontCleanupAttachment = false;
 
     QJsonValue serializeProperty( const QString &name, const QVariant &variant ) const;

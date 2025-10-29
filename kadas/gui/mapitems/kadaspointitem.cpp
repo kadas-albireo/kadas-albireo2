@@ -219,12 +219,77 @@ void KadasPointItem::writeXmlPrivate( QDomElement &element ) const
 
 void KadasPointItem::readXmlPrivate( const QDomElement &element )
 {
-  mShape = qgsEnumKeyToValue( element.attribute( "shape", qgsEnumValueToKey( Qgis::MarkerShape::Circle ) ), Qgis::MarkerShape::Circle );
-  mIconSize = element.attribute( "size", "4" ).toInt();
-  mStrokeColor = QColor( element.attribute( "stroke_color", QColor( Qt::red ).name() ) );
-  mStrokeWidth = element.attribute( "stroke_width", "1" ).toInt();
-  mFillColor = QColor( element.attribute( "fill_color", QColor( Qt::white ).name() ) );
-  setPoint( QgsGeometry::fromWkt( element.attribute( "geometry" ) ).asPoint() );
+  if ( !element.hasAttribute( "shape" ) )
+  {
+    // migration code
+    QJsonObject data = QJsonDocument::fromJson( element.firstChild().toCDATASection().data().toLocal8Bit() ).object();
+    if ( data.contains( "props" ) )
+    {
+      QJsonObject props = data["props"].toObject();
+
+      mCrs = QgsCoordinateReferenceSystem( props.value( "authId" ).toString() );
+      mEditor = props.value( "editor" ).toString();
+      mIconSize = props.value( "iconSize" ).toInt();
+
+      QStringList brushStr = props.value( "iconFill" ).toString().split( ";" );
+      if ( brushStr.size() )
+        mFillColor = QColor( brushStr[0] );
+
+      QStringList penStr = props.value( "iconOutline" ).toString().split( ";" );
+      if ( penStr.size() > 1 )
+      {
+        mStrokeColor = QColor( penStr[0] );
+        mStrokeWidth = penStr[1].toInt();
+      }
+
+      // this must be done at the end
+      switch ( props.value( "iconType" ).toInt( 1 ) )
+      {
+        case 1:
+          mShape = Qgis::MarkerShape::Cross;
+          break;
+        case 2:
+          mShape = Qgis::MarkerShape::Cross2;
+          break;
+        case 3:
+          mShape = Qgis::MarkerShape::Square;
+          break;
+        case 4:
+          mShape = Qgis::MarkerShape::Circle;
+          break;
+        case 5:
+          mShape = Qgis::MarkerShape::Square;
+          // full square
+          mFillColor = mStrokeColor;
+          break;
+        case 6:
+          mShape = Qgis::MarkerShape::Triangle;
+          break;
+        case 7:
+          mShape = Qgis::MarkerShape::Triangle;
+          // full square
+          mFillColor = mStrokeColor;
+          break;
+        default:
+          mShape = Qgis::MarkerShape::Circle;
+          break;
+      }
+    }
+    if ( data.contains( "state" ) )
+    {
+      const QJsonArray point = data.value( "state" ).toObject().value( "points" ).toArray().first().toArray();
+      setPoint( QgsPointXY( point.at( 0 ).toDouble(), point.at( 1 ).toDouble() ) );
+    }
+  }
+  else
+  {
+    mShape = qgsEnumKeyToValue( element.attribute( "shape", qgsEnumValueToKey( Qgis::MarkerShape::Circle ) ), Qgis::MarkerShape::Circle );
+    mIconSize = element.attribute( "size", "4" ).toInt();
+    mStrokeColor = QColor( element.attribute( "stroke_color", QColor( Qt::red ).name() ) );
+    mStrokeWidth = element.attribute( "stroke_width", "1" ).toInt();
+    mFillColor = QColor( element.attribute( "fill_color", QColor( Qt::white ).name() ) );
+    setPoint( QgsGeometry::fromWkt( element.attribute( "geometry" ) ).asPoint() );
+  }
   updateSymbol();
 }
 

@@ -118,7 +118,6 @@ bool KadasMapItem::deserialize( const QJsonObject &json )
   {
     QMetaProperty prop = metaObject()->property( i );
     QJsonValue value = props[prop.name()];
-    qDebug() << prop.name();
     QVariant variant( prop.type() );
     // TODO: use custom type
     if ( prop.name() == QString( "filePath" ) )
@@ -145,7 +144,6 @@ bool KadasMapItem::deserialize( const QJsonObject &json )
     }
     else
     {
-      qDebug() << value.toVariant();
       prop.write( this, value.toVariant() );
     }
   }
