@@ -35,7 +35,6 @@ vcpkg_from_github(
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
 file(REMOVE ${SOURCE_PATH}/cmake/FindGEOS.cmake)
-file(REMOVE ${SOURCE_PATH}/cmake/FindEXIV2.cmake)
 file(REMOVE ${SOURCE_PATH}/cmake/FindExpat.cmake)
 file(REMOVE ${SOURCE_PATH}/cmake/FindIconv.cmake)
 file(REMOVE ${SOURCE_PATH}/cmake/FindPoly2Tri.cmake)
@@ -96,6 +95,7 @@ list(APPEND QGIS_OPTIONS "-DBUILD_WITH_QT6=OFF")
 list(APPEND QGIS_OPTIONS "-DProtobuf_LITE_LIBRARY=protobuf::libprotobuf-lite")
 list(APPEND QGIS_OPTIONS "-DWITH_INTERNAL_NLOHMANN_JSON:BOOL=OFF")
 list(APPEND QGIS_OPTIONS "-DWITH_QTWEBENGINE:BOOL=OFF")
+list(APPEND QGIS_OPTIONS "-DQGIS_MAC_BUNDLE:BOOL=OFF")
 
 if("opencl" IN_LIST FEATURES)
   list(APPEND QGIS_OPTIONS -DUSE_OPENCL:BOOL=ON)
