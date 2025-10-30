@@ -20,12 +20,9 @@ vcpkg_from_github(
   PATCHES
   # Make qgis support python's debug library
   qgspython.patch
-  ui-hdrs-install.patch
   bindings-install.patch
-  test-hdrs-install.patch
   link-appkit.patch
   libxml2.patch
-  exiv2.patch
   crssync.patch
   mesh.patch
   sipcxx17.patch
