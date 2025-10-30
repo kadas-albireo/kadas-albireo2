@@ -140,6 +140,10 @@ jobs:
         run: |
           cmake --build build
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: always()
+        
       - name: 🧪 Run CTest
         run: |
           ctest --test-dir build --output-on-failure
