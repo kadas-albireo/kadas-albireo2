@@ -2,7 +2,7 @@
   "vcpkg-configuration": {
     "default-registry": {
       "kind": "git",
-      "baseline": "230d85084ca006926d51c3d332c94298fb3bd56c",
+      "baseline": "0cb190f9915b6464662450af376581c408c5790c",
       "repository": "https://github.com/microsoft/vcpkg"
     },
     "registries": [
@@ -133,5 +133,11 @@
         }
       ]
     }
-  }
+  },
+  "overrides": [
+    {
+      "name": "libspatialindex",
+      "version": "2.0.0"
+    }
+  ]
 }

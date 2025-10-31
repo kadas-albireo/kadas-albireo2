@@ -25,7 +25,7 @@ jobs:
       - name: Install PowerShell
         uses: PSModule/install-powershell@v1
         with:
-          Version: 7.4.12
+          Version: 7.4.13
 
       - name: 🐩 Install CMake and Ninja
         uses: lukka/get-cmake@latest
@@ -154,6 +154,10 @@ jobs:
         run: |
           cmake --build build --config Release
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: always()
+        
       - name: 🧪 Run CTest
         env:
           QT_LOGGING_TO_CONSOLE: "1"
