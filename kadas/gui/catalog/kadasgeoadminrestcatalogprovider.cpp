@@ -15,6 +15,7 @@
 
 #include <QDomDocument>
 #include <QDomElement>
+#include <QDomNodeList>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QNetworkRequest>
@@ -35,7 +36,7 @@ KadasGeoAdminRestCatalogProvider::KadasGeoAdminRestCatalogProvider( const QStrin
 void KadasGeoAdminRestCatalogProvider::load()
 {
   QUrl url( mBaseUrl );
-  QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toUpper();
+  QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toLower();
   QUrlQuery query( url );
   query.addQueryItem( "lang", lang );
   url.setQuery( query );
@@ -59,7 +60,7 @@ void KadasGeoAdminRestCatalogProvider::replyGeoCatalogFinished()
 
   QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
   QVariantList topCategories = rootMap.value( "results" ).toMap().value( "root" ).toMap().value( "children" ).toList();
-  int topCategoriesIndice = 1;
+  int topCategoriesIndice = 0;
 
   for ( const QVariant &topCategorie : topCategories )
   {
@@ -68,19 +69,19 @@ void KadasGeoAdminRestCatalogProvider::replyGeoCatalogFinished()
 
     QStandardItem *topCategoryItem = mBrowser->addItem( 0, topCategoryLabel, 0, false );
 
-    int subCategoriesIndice = 1;
+    int subCategoriesIndice = 0;
     for ( const QVariant &subCategory : subCategories )
     {
       QString subCategoryLabel = subCategory.toMap().value( "label" ).toString();
 
       QVariantList layerList = subCategory.toMap().value( "children" ).toList();
-      int layerIndice = 1;
+      int layerIndice = 0;
       for ( const QVariant &layerObj : layerList )
       {
         QString layerBodId = layerObj.toMap().value( "layerBodId" ).toString();
 
-        QString sortIndices = QString( "%1/%2/%3" ).arg( topCategoriesIndice ).arg( subCategoriesIndice ).arg( layerIndice );
-        ResultEntry entry = ResultEntry( layerBodId, topCategoryLabel + "/%/" + subCategoryLabel, sortIndices );
+        QString sortIndices = QString( "%1|%2|%3" ).arg( topCategoriesIndice ).arg( subCategoriesIndice ).arg( layerIndice );
+        ResultEntry entry = ResultEntry( layerBodId, topCategoryLabel + "|" + subCategoryLabel, sortIndices );
 
         mLayersEntriesMap.insert( layerBodId, entry );
 
@@ -128,18 +129,29 @@ void KadasGeoAdminRestCatalogProvider::replyWMSGeoAdminFinished()
 
   QStringList imgFormats = parseWMSFormats( doc );
   QStringList parentCrs;
-  for ( const QDomNode &layerItem : childrenByTagName( doc.firstChildElement( "WMS_Capabilities" ).firstChildElement( "Capability" ).firstChildElement( "Layer" ), "Layer" ) )
+
+  QDomNodeList layerItems = doc.firstChildElement( "WMS_Capabilities" ).firstChildElement( "Capability" ).firstChildElement( "Layer" ).elementsByTagName( "Layer" );
+  for ( int i = 0, n = layerItems.size(); i < n; ++i )
   {
+    QDomNode layerItem = layerItems.at( i );
     QMimeData *mimeData;
     QString title = layerItem.firstChildElement( "Title" ).text();
     QString layerBodId = layerItem.firstChildElement( "Name" ).text();
+
+    bool hasSubLayer = !layerItem.firstChildElement( "Layer" ).isNull();
+    if ( hasSubLayer )
+    {
+      // This is not an end node layer, continue the loop so the sublayers are handled in a next loop iteration
+      continue;
+    }
+
     parseWMSLayerCapabilities( layerItem, title, imgFormats, parentCrs, url, "", QString(), mimeData );
 
     QStandardItem *parent;
     ResultEntry entry = mLayersEntriesMap.value( layerBodId );
     if ( mLayersEntriesMap.contains( layerBodId ) )
     {
-      parent = getCategoryItem( entry.category.split( "/%/" ), entry.sortIndices.split( "/%/" ) );
+      parent = getCategoryItem( entry.category.split( "|" ), entry.sortIndices.split( "|" ) );
     }
     else
     {
@@ -147,7 +159,7 @@ void KadasGeoAdminRestCatalogProvider::replyWMSGeoAdminFinished()
       parent = mBrowser->addItem( 0, tr( "Uncategorized" ), mLastTopCategoriesIndice + 1 );
     }
 
-    mBrowser->addItem( parent, title, entry.sortIndices.split( "/%/" ).last().toInt(), true, mimeData );
+    mBrowser->addItem( parent, title, entry.sortIndices.split( "|" ).last().toInt(), true, mimeData );
   }
   emit finished();
 }
