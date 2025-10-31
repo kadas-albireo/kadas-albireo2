@@ -536,8 +536,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
 
     // TODO: remove when all annotations are migrated
-    virtual KadasMapItem::State *createEmptyState() const { return nullptr; }
-    SIP_FACTORY;
+    virtual KadasMapItem::State *createEmptyState() const SIP_FACTORY { return nullptr; }
 
     // Old annotations use QObject properties
     // New ones should not rely on this
