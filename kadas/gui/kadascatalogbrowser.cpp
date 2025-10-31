@@ -284,7 +284,5 @@ void KadasCatalogBrowser::itemDoubleClicked( const QModelIndex &index )
 
 QStandardItem *KadasCatalogBrowser::addItem( QStandardItem *parent, QString text, int sortIndex, bool isLeaf, QMimeData *mimeData )
 {
-  qDebug() << "title:" << text;
-  qDebug() << "sortindex: " << sortIndex;
   return mCatalogModel->addItem( parent, text, sortIndex, isLeaf, mimeData );
 }

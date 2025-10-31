@@ -346,21 +346,14 @@ void KadasMainWindow::init()
   connect( mRibbonWidget, &QTabWidget::tabBarClicked, this, &KadasMainWindow::endFullscreen );
 
 
-  //QStringList catalogUris = QgsSettings().value( "/kadas/geodatacatalogs" ).toString().split( ";;" );
-
-  // QStringList catalogUris = QStringLiteral( "type=geoadmin&url=https://api3.geo.admin.ch/rest/services/api/MapServer" ).split( ";;" );
-  //QStringList catalogUris = QStringLiteral( "type=arcgisrest&url=https://api3.geo.admin.ch/rest/services/api/MapServer" ).split( ";;" );
+  // QStringList catalogUris = QgsSettings().value( "/kadas/geodatacatalogs").toString().split( ";;" );
   QStringList catalogUris = QStringLiteral( "type=geoadmin&url=https://api3.geo.admin.ch/rest/services/ech/CatalogServer" ).split( ";;" );
-  //QStringList catalogUris = QStringLiteral( "type=arcgisportal&url=https://wms.geo.admin.ch" ).split( ";;" );
 
-  // https://api3.geo.admin.ch/rest/services/ech/CatalogServer?lang=en
   for ( const QString &catalogUri : catalogUris )
   {
-    qDebug() << "catalogUri:" << catalogUri;
     QUrlQuery query( QUrl::fromEncoded( "?" + catalogUri.toLocal8Bit() ) );
     QString type = query.queryItemValue( "type" );
     QString url = query.queryItemValue( "url" );
-    qDebug() << "url:" << url;
     QMap<QString, QString> params;
     for ( const auto &pair : query.queryItems() )
     {
