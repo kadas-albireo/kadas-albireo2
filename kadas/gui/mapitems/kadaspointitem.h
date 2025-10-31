@@ -21,6 +21,9 @@
 
 #include "kadas/gui/mapitems/kadasmapitem.h"
 
+class QuaZip;
+
+
 class KADAS_GUI_EXPORT KadasPointItem : public KadasMapItem
 {
     Q_OBJECT
