@@ -189,11 +189,6 @@ void KadasPointItem::updateSymbol()
   update();
 }
 
-void KadasPointItem::setFillColor( const QColor &newFillColor )
-{
-  mFillColor = newFillColor;
-}
-
 KadasMapItem *KadasPointItem::_clone() const SIP_FACTORY
 {
   KadasPointItem *item = new KadasPointItem( crs() );

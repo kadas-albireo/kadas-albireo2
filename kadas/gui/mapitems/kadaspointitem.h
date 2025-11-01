@@ -88,9 +88,6 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasMapItem
     void setStrokeStyle( const Qt::PenStyle &style );
     Qt::PenStyle strokeStyle() const { return mStrokeStyle; }
 
-    QColor fillColor() const;
-    void setFillColor( const QColor &newFillColor );
-
   protected:
     KadasMapItem *_clone() const override;
 
