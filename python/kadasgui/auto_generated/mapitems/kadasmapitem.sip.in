@@ -464,7 +464,7 @@ Once every item has been migrated this should become pure virtual
   protected:
 
 
-    virtual KadasMapItem::State *createEmptyState()  const /Factory/;
+    virtual KadasMapItem::State *createEmptyState() const /Factory/;
 
     virtual bool useProperties() const;
 

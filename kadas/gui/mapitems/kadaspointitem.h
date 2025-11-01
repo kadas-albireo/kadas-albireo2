@@ -52,7 +52,7 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasMapItem
     virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
     virtual bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const override;
     virtual void render( QgsRenderContext &context ) const override;
-    virtual QString asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const override;
+    virtual QString asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const override SIP_SKIP;
 
     AttribDefs drawAttribs() const override;
     AttribValues drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
