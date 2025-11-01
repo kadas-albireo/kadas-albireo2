@@ -17,6 +17,9 @@
 #ifndef KADASPOINTITEM_H
 #define KADASPOINTITEM_H
 
+#include <QColor>
+
+
 #include "qgis/qgsannotationmarkeritem.h"
 
 #include "kadas/gui/mapitems/kadasmapitem.h"
