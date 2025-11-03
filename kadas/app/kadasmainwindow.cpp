@@ -50,6 +50,7 @@
 #include "kadas/gui/kadasclipboard.h"
 #include "kadas/gui/kadascoordinatedisplayer.h"
 #include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/kadascatalogbrowser.h"
 #include "kadas/gui/kadasmapcanvasitem.h"
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/kadasprojecttemplateselectiondialog.h"
@@ -1213,7 +1214,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     QVariantMap sublayer = sublayers[0].toMap();
 
     QgsMapLayer *layer = nullptr;
-    if ( uri.providerKey == "arcgismapserver" )
+    if ( uri.providerKey == "arcgismapserver" || ( uri.providerKey == "arcgisfeatureserver" && KadasCatalogBrowser::sSettingLoadArcgiseatureserverLayersAsRaster->value() ) )
     {
       QgsDataSourceUri dataSource( adjustedUri );
       dataSource.removeParam( "layer" );
@@ -1299,7 +1300,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
         QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( parent, parent == rootGroup ? rootInsCount++ : parent->children().count() ) );
 
         QgsMapLayer *layer = nullptr;
-        if ( uri.providerKey == "arcgismapserver" )
+        if ( uri.providerKey == "arcgismapserver" || ( uri.providerKey == "arcgisfeatureserver" && KadasCatalogBrowser::sSettingLoadArcgiseatureserverLayersAsRaster->value() ) )
         {
           QgsDataSourceUri dataSource( adjustedUri );
           dataSource.removeParam( "layer" );
