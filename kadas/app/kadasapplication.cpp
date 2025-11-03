@@ -1139,7 +1139,7 @@ int KadasApplication::dialogPanelIndex( const QString &name, QStackedWidget *sta
 void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
 {
   QString layerUrl;
-  if ( layer->providerType() == "arcgismapserver" )
+  if ( layer->providerType() == "arcgismapserver" || ( layer->providerType() == "arcgisfeatureserver" && KadasCatalogBrowser::sSettingLoadArcgiseatureserverLayersAsRaster->value() ) )
   {
     layerUrl = QgsDataSourceUri( layer->source() ).param( "url" );
   }
