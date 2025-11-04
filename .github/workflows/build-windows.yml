@@ -25,7 +25,7 @@ jobs:
       - name: Install PowerShell
         uses: PSModule/install-powershell@v1
         with:
-          Version: 7.4.12
+          Version: 7.4.13
 
       - name: 🐩 Install CMake and Ninja
         uses: lukka/get-cmake@latest
