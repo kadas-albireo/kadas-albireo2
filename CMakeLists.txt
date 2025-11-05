@@ -160,9 +160,13 @@ if(INSTALL_ALBIREO_SETTINGS)
   install(DIRECTORY "share/project_templates" DESTINATION "share/kadas/")
 endif()
 
-install( DIRECTORY "share/" DESTINATION "share/kadas/" PATTERN
-"settings_patch.ini" EXCLUDE PATTERN "project_templates" EXCLUDE
-PATTERN "geodata/" EXCLUDE )
+install(
+  DIRECTORY "share/"
+  DESTINATION "share/kadas/"
+  PATTERN "settings_patch.ini" EXCLUDE
+  PATTERN "project_templates" EXCLUDE
+  PATTERN "geodata/" EXCLUDE
+)
 
 if(WITH_VCPKG)
   message("Install VCPKG deps")
