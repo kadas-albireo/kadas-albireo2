@@ -442,24 +442,26 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
     {
       mimeDataUri.layerType = "vector";
       mimeDataUri.providerKey = "arcgisfeatureserver";
-      mimeDataUri.uri = QString( "crs='%1' url='%2' authcfg=%3" ).arg( crs.authid() ).arg( url ).arg( mAuthId );
+
+      // Check settings load vector layers as raster
+      // NOTE: It would be more clean to set the uri only at the time when adding the layer to the project
+      if ( KadasCatalogBrowser::sSettingLoadArcgiseatureserverLayersAsRaster->value() )
+      {
+        QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png32" ) ? "png32" : filteredEncodings.values().front();
+        mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='0' authcfg=%4" ).arg( crs.authid() ).arg( format ).arg( url ).arg( mAuthId );
+      }
+      else
+      {
+        mimeDataUri.uri = QString( "crs='%1' url='%2' authcfg=%3" ).arg( crs.authid() ).arg( url ).arg( mAuthId );
+      }
     }
     else
     {
       mimeDataUri.layerType = "raster";
       mimeDataUri.providerKey = "arcgismapserver";
 
-      // Check settings load vector layers as raster
-      // NOTE: It would be more clean to set the uri only at the time when adding the layer to the project
-      if ( KadasCatalogBrowser::sSettingLoadArcgiseatureserverLayersAsRaster.value() )
-      {
-        mimeDataUri.uri = QString( "crs='%1' url='%2' authcfg=%3" ).arg( crs.authid() ).arg( url ).arg( mAuthId );
-      }
-      else
-      {
-        QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png32" ) ? "png32" : filteredEncodings.values().front();
-        mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='0' authcfg=%4" ).arg( crs.authid() ).arg( format ).arg( url ).arg( mAuthId );
-      }
+      QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png32" ) ? "png32" : filteredEncodings.values().front();
+      mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='0' authcfg=%4" ).arg( crs.authid() ).arg( format ).arg( url ).arg( mAuthId );
     }
 
     QMimeData *mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
