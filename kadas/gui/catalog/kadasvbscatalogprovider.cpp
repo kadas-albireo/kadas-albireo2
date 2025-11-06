@@ -283,24 +283,26 @@ void KadasVBSCatalogProvider::readAMSCapabilitiesDo()
       {
         mimeDataUri.layerType = "vector";
         mimeDataUri.providerKey = "arcgisfeatureserver";
-        mimeDataUri.uri = QString( "crs='%1' url='%2/0' layer='%3'" ).arg( crs.authid() ).arg( url ).arg( layerName );
+
+        // Check settings load vector layers as raster
+        // NOTE: It would be more clean to set the uri only at the time when adding the layer to the project
+        if ( KadasCatalogBrowser::sSettingLoadArcgiseatureserverLayersAsRaster->value() )
+        {
+          QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png" ) ? "png" : filteredEncodings.values().front();
+          mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='%4'" ).arg( crs.authid() ).arg( format ).arg( url ).arg( layerName );
+        }
+        else
+        {
+          mimeDataUri.uri = QString( "crs='%1' url='%2/0' layer='%3'" ).arg( crs.authid() ).arg( url ).arg( layerName );
+        }
       }
       else
       {
         mimeDataUri.layerType = "raster";
         mimeDataUri.providerKey = "arcgismapserver";
 
-        // Check settings load vector layers as raster
-        // NOTE: It would be more clean to set the uri only at the time when adding the layer to the project
-        if ( KadasCatalogBrowser::sSettingLoadArcgiseatureserverLayersAsRaster.value() )
-        {
-          mimeDataUri.uri = QString( "crs='%1' url='%2/0' layer='%3'" ).arg( crs.authid() ).arg( url ).arg( layerName );
-        }
-        else
-        {
-          QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png" ) ? "png" : filteredEncodings.values().front();
-          mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='%4'" ).arg( crs.authid() ).arg( format ).arg( url ).arg( layerName );
-        }
+        QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png" ) ? "png" : filteredEncodings.values().front();
+        mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='%4'" ).arg( crs.authid() ).arg( format ).arg( url ).arg( layerName );
       }
 
       const ResultEntry &entry = ( *entries )[layerName];
