@@ -14,4 +14,4 @@ jobs:
       - name: Backport
         uses: m-kuhn/backport@v1.2.7
         with:
-          github_token: ${{ secrets.NINJA_TOKEN }}
+          github_token: ${{ secrets.GH_GEONINJA_TOKEN }}
