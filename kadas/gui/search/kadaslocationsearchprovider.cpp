@@ -40,6 +40,7 @@
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmarkersymbol.h>
 #include <qgis/qgsmarkersymbollayer.h>
+#include <qgis/qgsmulticurve.h>
 #include <qgis/qgsmultisurface.h>
 #include <qgis/qgssettings.h>
 #include <qgis/qgsnetworkaccessmanager.h>
@@ -294,10 +295,24 @@ void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )
         }
         case Qgis::GeometryType::Line:
         {
-          QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.constGet()->clone() );
-          QgsAnnotationLineItem *item = new QgsAnnotationLineItem( curve );
-          item->setZIndex( 0 );
-          mGeometryItemIds << QgsProject::instance()->mainAnnotationLayer()->addItem( item );
+          if ( geometry.isMultipart() )
+          {
+            const QgsMultiCurve *mc = qgsgeometry_cast<const QgsMultiCurve *>( geometry.constGet() );
+            for ( int p = 0; p < mc->numGeometries(); p++ )
+            {
+              QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( mc->geometryN( p )->clone() );
+              curve->transform( annotationLayerTransform );
+              QgsAnnotationLineItem *item = new QgsAnnotationLineItem( curve );
+              mGeometryItemIds << QgsProject::instance()->mainAnnotationLayer()->addItem( item );
+            }
+          }
+          else
+          {
+            QgsCurve *curve = qgsgeometry_cast<QgsCurve *>( geometry.constGet()->clone() );
+            QgsAnnotationLineItem *item = new QgsAnnotationLineItem( curve );
+            item->setZIndex( 0 );
+            mGeometryItemIds << QgsProject::instance()->mainAnnotationLayer()->addItem( item );
+          }
           break;
         }
         case Qgis::GeometryType::Polygon:
