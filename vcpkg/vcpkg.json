@@ -2,7 +2,7 @@
   "vcpkg-configuration": {
     "default-registry": {
       "kind": "git",
-      "baseline": "0cb190f9915b6464662450af376581c408c5790c",
+      "baseline": "2d5710a07221274f0f3313f62dc9bd4f7f593850",
       "repository": "https://github.com/microsoft/vcpkg"
     },
     "registries": [
@@ -15,21 +15,21 @@
           "py-pyqt5-sip",
           "py-qscintilla-qt5",
           "qscintilla-qt5",
+          "qt5-webkit",
           "vcpkg-qmake-qt5"
         ]
       },
       {
         "kind": "git",
-        "baseline": "df20cabbf820245aff3286b521bb5f19bc6d1d86",
+        "baseline": "945f8fd57e754cb9fcc4187fc0ec90e83eb847f4",
         "repository": "https://github.com/open-vcpkg/python-registry",
         "packages": [
           "python3",
           "py-*",
           "gdal",
-          "vcpkg-tool-mercurial",
-          "pybind11",
           "vcpkg-python-scripts",
-          "vcpkg-tool-rust"
+          "vcpkg-tool-mercurial",
+          "pybind11"
         ]
       }
     ],
