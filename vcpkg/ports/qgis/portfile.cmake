@@ -53,16 +53,13 @@ if("bindings" IN_LIST FEATURES)
   list(APPEND QGIS_OPTIONS -DWITH_BINDINGS:BOOL=ON)
   list(APPEND QGIS_OPTIONS -DSIP_GLOBAL_INSTALL:BOOL=OFF)
 
-  if(NOT VCPKG_TARGET_IS_OSX)
-    # We are relying on some qgis hacks in here In QGIS, when not on macos, we
-    # do not have DEFAULT_PYTHON_SUBDIR set. If SIP_GLOBAL_INSTALL=OFF and
-    # DEFAULT_PYTHON_SUBDIR is set, this is used instead. If this breaks in the
-    # future, we should consider adding an explicit override for the sip
-    # installation dir in QGIS.
-    list(APPEND QGIS_OPTIONS
-         "-DDEFAULT_PYTHON_SUBDIR=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}"
-    )
-  endif()
+  # We are relying on some qgis hacks in here In QGIS. If SIP_GLOBAL_INSTALL=OFF and
+  # DEFAULT_PYTHON_SUBDIR is set, this is used instead. If this breaks in the
+  # future, we should consider adding an explicit override for the sip
+  # installation dir in QGIS.
+  list(APPEND QGIS_OPTIONS
+    "-DDEFAULT_PYTHON_SUBDIR=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}"
+  )
 else()
   vcpkg_find_acquire_program(PYTHON3)
   list(APPEND QGIS_OPTIONS "-DPython_EXECUTABLE=${PYTHON3}")
