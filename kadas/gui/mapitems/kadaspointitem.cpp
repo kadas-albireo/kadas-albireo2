@@ -178,9 +178,11 @@ void KadasPointItem::setPoint( const QgsPointXY &point )
 void KadasPointItem::updateSymbol()
 {
   QgsSimpleMarkerSymbolLayer *symbolLayer = new QgsSimpleMarkerSymbolLayer();
+  symbolLayer->setSizeUnit( Qgis::RenderUnit::Points );
   symbolLayer->setShape( mShape );
   symbolLayer->setSize( mIconSize );
   symbolLayer->setStrokeWidth( mStrokeWidth );
+  symbolLayer->setStrokeWidthUnit( Qgis::RenderUnit::Points );
   symbolLayer->setStrokeColor( mStrokeColor );
   symbolLayer->setColor( mFillColor );
   symbolLayer->setStrokeStyle( mStrokeStyle );
@@ -254,16 +256,12 @@ void KadasPointItem::readXmlPrivate( const QDomElement &element )
           break;
         case 5:
           mShape = Qgis::MarkerShape::Square;
-          // full square
-          mFillColor = mStrokeColor;
           break;
         case 6:
           mShape = Qgis::MarkerShape::Triangle;
           break;
         case 7:
           mShape = Qgis::MarkerShape::Triangle;
-          // full square
-          mFillColor = mStrokeColor;
           break;
         default:
           mShape = Qgis::MarkerShape::Circle;
