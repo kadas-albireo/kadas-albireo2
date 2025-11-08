@@ -3857,37 +3857,37 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
 <context>
     <name>KadasLocationSearchFilter</name>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="78"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="79"/>
         <source>Municipalities</source>
         <translation>Comuni</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="79"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="80"/>
         <source>Districts</source>
         <translation>Distretti</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="80"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="81"/>
         <source>Cantons</source>
         <translation>Cantoni</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="81"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="82"/>
         <source>Places</source>
         <translation>Luoghi</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="82"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="83"/>
         <source>Zip Codes</source>
         <translation>Codici NPA</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="83"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="84"/>
         <source>Address</source>
         <translation>Indirizzo</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="84"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.cpp" line="85"/>
         <source>General place name directory</source>
         <translation>Inventario generale luoghi</translation>
     </message>
