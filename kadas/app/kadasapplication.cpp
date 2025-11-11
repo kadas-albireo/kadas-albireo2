@@ -207,10 +207,9 @@ void KadasApplication::init()
   {
     locale = settings.value( "/locale/userLocale", locale ).toString();
   }
-  else
-  {
-    settings.setValue( "/locale/userLocale", locale );
-  }
+  // Set locale in settings eitherway, in case kadas was started for the first time
+  settings.setValue( "/locale/userLocale", locale );
+
   KadasApplication::setTranslation( locale );
 
   QTranslator *translator = new QTranslator( this );
