@@ -18,6 +18,7 @@
 #define KADASGEOADMINRESTCATALOGPROVIDER_H
 
 #include "kadas/gui/kadascatalogprovider.h"
+#include "qgis/qgis.h"
 
 class QStandardItem;
 
@@ -27,6 +28,14 @@ class KADAS_GUI_EXPORT KadasGeoAdminRestCatalogProvider : public KadasCatalogPro
   public:
     KadasGeoAdminRestCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params );
     void load() override;
+
+  signals:
+    /**
+     * Emitted when a \a message should be shown to the user in the application message bar.
+     *
+     * \see messageDiscarded()
+     */
+    void messageEmitted( const QString &message, Qgis::MessageLevel level = Qgis::MessageLevel::Info );
   private slots:
     void replyGeoCatalogFinished();
     void replyWMSGeoAdminFinished();
