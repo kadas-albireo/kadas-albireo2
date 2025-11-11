@@ -289,7 +289,6 @@ void KadasVBSCatalogProvider::readAMSCapabilitiesDo()
       {
         mimeDataUri.layerType = "raster";
         mimeDataUri.providerKey = "arcgismapserver";
-
         QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png" ) ? "png" : filteredEncodings.values().front();
         mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='%4'" ).arg( crs.authid() ).arg( format ).arg( url ).arg( layerName );
       }
