@@ -142,4 +142,4 @@ jobs:
 
       - name: 🧪 Run CTest
         run: |
-          ctest --test-dir build --output-on-failure
+          ctest --test-dir build --output-on-failure -LE "NO_CI"

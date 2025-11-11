@@ -1,7 +1,6 @@
 find_package(Python3 3.7 REQUIRED COMPONENTS Interpreter Development)
 
 set(kadas_SRC
-    main.cpp
     kadasapplayerhandling.cpp
     kadasapplication.cpp
     kadasbookmarksmenu.cpp
@@ -206,9 +205,8 @@ if(WIN32)
   endif()
 endif(WIN32)
 
-add_executable(
-  kadas
-  ${WIN32_SHOW_CONSOLE}
+add_library(
+  kadas_app
   ${kadas_SRC}
   ${kadas_HDR}
   ${kadas_UI}
@@ -219,7 +217,7 @@ add_executable(
 )
 
 target_link_libraries(
-  kadas
+  kadas_app
   Qt5::Widgets
   Qt5::Network
   Qt5::Xml
@@ -239,7 +237,7 @@ target_link_libraries(
 )
 
 target_include_directories(
-  kadas
+  kadas_app
   PUBLIC ${CMAKE_SOURCE_DIR}/kadas/app
          ${CMAKE_SOURCE_DIR}/kadas/app/3d
          ${CMAKE_SOURCE_DIR}/kadas/app/bullseye
@@ -274,5 +272,16 @@ file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kadassourcedir.txt
      ${PROJECT_SOURCE_DIR}
 )
 
-install(TARGETS kadas DESTINATION bin)
 install(FILES ${KADAS_QM} DESTINATION share/kadas/i18n)
+
+generate_export_header(
+  kadas_app BASE_NAME KADAS_APP EXPORT_FILE_NAME kadas_app.h
+)
+set(kadas_HDR ${kadas_HDR} ${CMAKE_CURRENT_BINARY_DIR}/kadas_app.h)
+
+install(
+  TARGETS kadas_app
+  RUNTIME DESTINATION bin
+  ARCHIVE DESTINATION lib${LIB_SUFFIX}
+  LIBRARY DESTINATION lib${LIB_SUFFIX}
+)

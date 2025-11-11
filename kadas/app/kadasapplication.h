@@ -24,6 +24,8 @@
 #include <qgis/qgsapplication.h>
 #include <qgis/qgslayertreeregistrybridge.h>
 
+#include "kadas/app/kadas_app.h"
+#include "kadas/core/kadassettingstree.h"
 #include "kadas/gui/kadasfeaturepicker.h"
 
 class QNetworkRequest;
@@ -55,16 +57,17 @@ class KadasRedliningIntegration;
 
 #define kApp KadasApplication::instance()
 
-class KadasApplication : public QgsApplication
+class KADAS_APP_EXPORT KadasApplication : public QgsApplication
 {
     Q_OBJECT
 
   public:
-    static const QgsSettingsEntryBool *settingsTokenCreateCookies;
-    static const QgsSettingsEntryBool *settingsTokenUseEsriAuth;
-    static const QgsSettingsEntryStringList *settingsPortalCookieUrls;
-    static const QgsSettingsEntryString *settingsPortalTokenUrl;
-    static const QString sEsriAuthCfgId;
+    static const inline QgsSettingsEntryBool *settingsTokenCreateCookies = new QgsSettingsEntryBool( QStringLiteral( "token-create-cookies" ), KadasSettingsTree::sTreePortal, true, QStringLiteral( "Create cookies using the ESRI token." ) );
+    static const inline QgsSettingsEntryBool *settingsTokenUseEsriAuth = new QgsSettingsEntryBool( QStringLiteral( "token-use-esri-auth" ), KadasSettingsTree::sTreePortal, true, QStringLiteral( "Create cookies using the ESRI token." ) );
+    static const inline QgsSettingsEntryStringList *settingsPortalCookieUrls = new QgsSettingsEntryStringList( QStringLiteral( "cookie-urls" ), KadasSettingsTree::sTreePortal, {}, QStringLiteral( "URLs for which the ERSI portal TOKEN will be set in a cookie." ) );
+    static const inline QgsSettingsEntryString *settingsPortalTokenUrl = new QgsSettingsEntryString( QStringLiteral( "token-url" ), KadasSettingsTree::sTreePortal, QString(), QStringLiteral( "URL to retrieve ESRI portal TOKEN from." ) );
+
+    static const inline QString sEsriAuthCfgId = QStringLiteral( "kadas_esri_token" );
 
     static KadasApplication *instance();
     static bool isRunningFromBuildDir();
