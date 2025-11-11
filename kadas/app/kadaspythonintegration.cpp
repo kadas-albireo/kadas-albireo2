@@ -562,7 +562,7 @@ void KadasPythonIntegration::restorePlugins()
   {
     // check if the plugin was active on last session
     if (
-      settings.value( "/PythonPlugins/" + packageName ).toBool() || defaultSettings.value( "/PythonPlugins/" + packageName ).toBool()    
+      settings.value( "/PythonPlugins/" + packageName ).toBool() || defaultSettings.value( "/PythonPlugins/" + packageName ).toBool()
     )
     {
       loadPlugin( packageName );
@@ -572,10 +572,10 @@ void KadasPythonIntegration::restorePlugins()
 
 bool KadasPythonIntegration::loadPlugin( const QString &packageName )
 {
-  QgsDebugMsgLevel( QStringLiteral( "Trying to load plugin %1" ).arg( packageName ) , 2 );
+  QgsDebugMsgLevel( QStringLiteral( "Trying to load plugin %1" ).arg( packageName ), 2 );
   if ( !mPythonEnabled )
   {
-    QgsDebugMsgLevel( QStringLiteral( "Not loading plugin. Python is not enabled" ) , 2 );
+    QgsDebugMsgLevel( QStringLiteral( "Not loading plugin. Python is not enabled" ), 2 );
     return false;
   }
 
@@ -584,7 +584,7 @@ bool KadasPythonIntegration::loadPlugin( const QString &packageName )
 
   if ( isPluginLoaded( packageName ) )
   {
-    QgsDebugMsgLevel( QStringLiteral( "Not loading plugin. It is already loaded." ) , 2 );
+    QgsDebugMsgLevel( QStringLiteral( "Not loading plugin. It is already loaded." ), 2 );
     return true;
   }
 
@@ -605,7 +605,7 @@ bool KadasPythonIntegration::loadPlugin( const QString &packageName )
   {
     success = isPythonPluginCompatible( packageName );
     if ( !success )
-      QgsDebugMsgLevel( QStringLiteral( "Not loading plugin. Version is not compatible." ) , 2 );
+      QgsDebugMsgLevel( QStringLiteral( "Not loading plugin. Version is not compatible." ), 2 );
   }
 
   if ( success )
@@ -745,7 +745,7 @@ bool KadasPythonIntegration::isPythonPluginCompatible( const QString &packageNam
 
 bool KadasPythonIntegration::checkQgisVersion( const QString &minVersion, const QString &maxVersion ) const
 {
-  QgsDebugMsgLevel( QStringLiteral( "Min Version %1, max version %2." ).arg( minVersion ).arg( maxVersion ) , 2 );
+  QgsDebugMsgLevel( QStringLiteral( "Min Version %1, max version %2." ).arg( minVersion ).arg( maxVersion ), 2 );
   // Parse qgisMinVersion. Must be in form x.y.z or just x.y
   QStringList minVersionParts = minVersion.split( '.' );
   if ( minVersionParts.count() != 2 && minVersionParts.count() != 3 )
@@ -796,7 +796,7 @@ bool KadasPythonIntegration::checkQgisVersion( const QString &minVersion, const 
 
   // our qgis version - cut release name after version number
   QString qgisVersion = QString( _QGIS_VERSION ).section( '-', 0, 0 );
-  QgsDebugMsgLevel( QStringLiteral( "QGIS Version %1." ).arg( qgisVersion ) , 2 );
+  QgsDebugMsgLevel( QStringLiteral( "QGIS Version %1." ).arg( qgisVersion ), 2 );
 
   QStringList qgisVersionParts = qgisVersion.split( '.' );
 
