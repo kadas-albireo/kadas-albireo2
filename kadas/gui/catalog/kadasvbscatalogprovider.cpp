@@ -279,7 +279,7 @@ void KadasVBSCatalogProvider::readAMSCapabilitiesDo()
     {
       QgsMimeDataUtils::Uri mimeDataUri;
 
-      if ( typeVector )
+      if ( typeVector && !KadasCatalogBrowser::sSettingLoadArcgiseatureserverLayersAsRaster->value() )
       {
         mimeDataUri.layerType = "vector";
         mimeDataUri.providerKey = "arcgisfeatureserver";
