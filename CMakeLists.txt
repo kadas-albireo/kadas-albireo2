@@ -163,9 +163,9 @@ endif()
 install(
   DIRECTORY "share/"
   DESTINATION "share/kadas/"
-  PATTERN "share/settings_patch.ini" EXCLUDE
-  PATTERN "share/project_templates" EXCLUDE
-  PATTERN "share/geodata/" EXCLUDE
+  PATTERN "settings_patch.ini" EXCLUDE
+  PATTERN "project_templates" EXCLUDE
+  PATTERN "geodata" EXCLUDE
 )
 
 if(WITH_VCPKG)
