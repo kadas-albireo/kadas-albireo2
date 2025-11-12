@@ -605,7 +605,7 @@ bool KadasPythonIntegration::loadPlugin( const QString &packageName )
   {
     if ( !isPythonPluginCompatible( packageName ) )
       QgsDebugMsgLevel( QStringLiteral( "Warning: Plugin version is not compatible." ), 1 );
-      
+
     evalString( QStringLiteral( "qgis.utils.loadPlugin('%1')" ).arg( packageName ), output );
     success = ( output == QLatin1String( "True" ) );
   }
