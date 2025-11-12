@@ -572,8 +572,10 @@ void KadasPythonIntegration::restorePlugins()
 
 bool KadasPythonIntegration::loadPlugin( const QString &packageName )
 {
+  QgsDebugMsgLevel( QStringLiteral( "Loading plugin %1" ).arg( packageName ), 2 );
   if ( !mPythonEnabled )
   {
+    QgsDebugMsgLevel( QStringLiteral( "Not loading plugin. Python is not enabled" ), 2 );
     return false;
   }
 
@@ -582,6 +584,7 @@ bool KadasPythonIntegration::loadPlugin( const QString &packageName )
 
   if ( isPluginLoaded( packageName ) )
   {
+    QgsDebugMsgLevel( QStringLiteral( "Not loading plugin. It is already loaded." ), 2 );
     return true;
   }
 
@@ -600,11 +603,9 @@ bool KadasPythonIntegration::loadPlugin( const QString &packageName )
 
   if ( success )
   {
-    success = isPythonPluginCompatible( packageName );
-  }
+    if ( !isPythonPluginCompatible( packageName ) )
+      QgsDebugMsgLevel( QStringLiteral( "Warning: Plugin version is not compatible." ), 1 );
 
-  if ( success )
-  {
     evalString( QStringLiteral( "qgis.utils.loadPlugin('%1')" ).arg( packageName ), output );
     success = ( output == QLatin1String( "True" ) );
   }
@@ -790,6 +791,8 @@ bool KadasPythonIntegration::checkQgisVersion( const QString &minVersion, const 
 
   // our qgis version - cut release name after version number
   QString qgisVersion = QString( _QGIS_VERSION ).section( '-', 0, 0 );
+
+  QgsDebugMsgLevel( QStringLiteral( "Min Version %1, max version %2, QGIS Version %3" ).arg( minVersion ).arg( maxVersion ).arg( qgisVersion ), 2 );
 
   QStringList qgisVersionParts = qgisVersion.split( '.' );
 
