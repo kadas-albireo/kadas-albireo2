@@ -7145,12 +7145,12 @@ geolocazione</translation>
         <translation>Errore python</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="593"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="596"/>
         <source>Error when reading metadata of plugin %1</source>
         <translation>Errore durante la lettura dei metadati del plugin %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="593"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="596"/>
         <source>Plugins</source>
         <translation>Plugin</translation>
     </message>

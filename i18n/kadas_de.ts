@@ -7149,12 +7149,12 @@ bewegen</translation>
         <translation>Python-Fehler</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="593"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="596"/>
         <source>Error when reading metadata of plugin %1</source>
         <translation>Fehler beim Lesen der Metadaten der Erweiterung %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="593"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="596"/>
         <source>Plugins</source>
         <translation>Erweiterungen</translation>
     </message>

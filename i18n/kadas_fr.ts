@@ -7149,12 +7149,12 @@ avec géoloc.</translation>
         <translation>Erreur Python</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="593"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="596"/>
         <source>Error when reading metadata of plugin %1</source>
         <translation>Erreur lors de la lecture des métadonnées de l&apos;extension %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="593"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="596"/>
         <source>Plugins</source>
         <translation>Extensions</translation>
     </message>
