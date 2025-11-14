@@ -345,7 +345,10 @@ void KadasMainWindow::init()
   connect( mRibbonbarButton, &QPushButton::clicked, this, &KadasMainWindow::toggleFullscreen );
   connect( mRibbonWidget, &QTabWidget::tabBarClicked, this, &KadasMainWindow::endFullscreen );
 
-  QStringList catalogUris = QgsSettings().value( "/kadas/geodatacatalogs" ).toString().split( ";;" );
+
+  //QStringList catalogUris = QgsSettings().value( "/kadas/geodatacatalogs" ).toString().split( ";;" );
+  QStringList catalogUris = QStringLiteral( "type=geoadmin&url=https://api3.geo.admin.ch/rest/services/ech/CatalogServer" ).split( ";;" );
+
   for ( const QString &catalogUri : catalogUris )
   {
     QUrlQuery query( QUrl::fromEncoded( "?" + catalogUri.toLocal8Bit() ) );
@@ -358,7 +361,12 @@ void KadasMainWindow::init()
     }
     if ( type == "geoadmin" )
     {
-      mCatalogBrowser->addProvider( new KadasGeoAdminRestCatalogProvider( url, mCatalogBrowser, params ) );
+      kApp->mainWindow()->messageBar()->pushMessage( tr( "Add geoadmin catalog provider" ), "", Qgis::Critical, -1 );
+
+      //connect( newTool, &QgsMapTool::messageEmitted, this, &KadasApplication::displayMessage );
+      auto provider = new KadasGeoAdminRestCatalogProvider( url, mCatalogBrowser, params );
+      connect( provider, &KadasGeoAdminRestCatalogProvider::messageEmitted, kApp, &KadasApplication::displayMessage );
+      mCatalogBrowser->addProvider( provider );
     }
     else if ( type == "arcgisrest" )
     {

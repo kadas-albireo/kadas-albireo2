@@ -209,10 +209,9 @@ void KadasApplication::init()
   {
     locale = settings.value( "/locale/userLocale", locale ).toString();
   }
-  else
-  {
-    settings.setValue( "/locale/userLocale", locale );
-  }
+  // Set locale in settings eitherway, in case kadas was started for the first time
+  settings.setValue( "/locale/userLocale", locale );
+
   KadasApplication::setTranslation( locale );
 
   QTranslator *translator = new QTranslator( this );
@@ -1254,7 +1253,7 @@ void KadasApplication::showLayoutDesigner( QgsPrintLayout *layout )
 
 void KadasApplication::displayMessage( const QString &message, Qgis::MessageLevel level )
 {
-  mMainWindow->messageBar()->pushMessage( message, level, mMainWindow->messageTimeout() );
+  mMainWindow->messageBar()->pushMessage( message, level, -1 );
 }
 
 void KadasApplication::projectDirtySet()
