@@ -51,7 +51,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     void keyPressEvent( QKeyEvent *e ) override;
 
     const KadasMapItem *currentItem() const { return mItem; }
-    KadasMapItem *takeItem();
+    // KadasMapItem *takeItem();
     const KadasMapItemEditor *currentEditor() const { return mEditor; }
 
     void setMultipart( bool multipart ) { mMultipart = multipart; }
@@ -141,21 +141,17 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     KadasMapItem *mItem = nullptr;
     KadasItemLayer *mLayer = nullptr;
 
-    struct ItemData
-    {
-        KadasItemLayer::ItemId itemId = KadasItemLayer::ITEM_ID_NULL;
-        QMap<QString, QVariant> props;
-    };
     struct ToolState : KadasStateHistory::State
     {
-        ToolState( State *_itemState, QSharedPointer<ItemData> _itemData )
-          : itemState( _itemState ), itemData( _itemData ) {}
+        ToolState( KadasMapItem *item, KadasItemLayer::ItemId itemId = KadasItemLayer::ITEM_ID_NULL )
+          : itemState( item )
+          , itemId( itemId ) {}
         ~ToolState() { delete itemState; }
-        State *itemState = nullptr;
-        QSharedPointer<ItemData> itemData;
+        KadasMapItem *itemState = nullptr;
+        KadasItemLayer::ItemId itemId = KadasItemLayer::ITEM_ID_NULL;
     };
     KadasStateHistory *mStateHistory = nullptr;
-    QSharedPointer<ItemData> mCurrentItemData;
+    KadasItemLayer::ItemId mCurrentItemId = KadasItemLayer::ITEM_ID_NULL;
 
     KadasFloatingInputWidget *mInputWidget = nullptr;
     KadasMapItem::AttribDefs mDrawAttribs;
@@ -182,7 +178,6 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     void acceptInput();
     void stateChanged( KadasStateHistory::ChangeType changeType, KadasStateHistory::State *state, KadasStateHistory::State *prevState );
     void setTargetLayer( QgsMapLayer *layer );
-    void storeItemProps();
 };
 
 #endif // KADASMAPTOOLCREATEITEM_H

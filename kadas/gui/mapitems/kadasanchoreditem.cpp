@@ -35,7 +35,7 @@ QJsonObject KadasAnchoredItem::State::serialize() const
   s.append( size.height() );
 
   QJsonObject json;
-  json["status"] = static_cast<int>( drawStatus );
+  //json["status"] = static_cast<int>( drawStatus );
   ;
   json["pos"] = p;
   json["angle"] = angle;
@@ -45,7 +45,7 @@ QJsonObject KadasAnchoredItem::State::serialize() const
 
 bool KadasAnchoredItem::State::deserialize( const QJsonObject &json )
 {
-  drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
+  //drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
   QJsonArray p = json["pos"].toArray();
   pos = KadasItemPos( p.at( 0 ).toDouble(), p.at( 1 ).toDouble() );
   angle = json["angle"].toDouble();
@@ -79,7 +79,7 @@ void KadasAnchoredItem::setAnchorY( double anchorY )
 void KadasAnchoredItem::setPosition( const KadasItemPos &pos )
 {
   state()->pos = pos;
-  state()->drawStatus = State::DrawStatus::Finished;
+  mDrawStatus = DrawStatus::Finished;
   update();
 }
 
@@ -89,9 +89,9 @@ void KadasAnchoredItem::setAngle( double angle )
   update();
 }
 
-KadasItemRect KadasAnchoredItem::boundingBox() const
+QgsRectangle KadasAnchoredItem::boundingBox() const
 {
-  return KadasItemRect( constState()->pos, constState()->pos );
+  return QgsRectangle( constState()->pos, constState()->pos );
 }
 
 QList<KadasMapPos> KadasAnchoredItem::rotatedCornerPoints( double angle, const QgsMapSettings &settings ) const
@@ -139,7 +139,7 @@ KadasMapItem::Margin KadasAnchoredItem::margin() const
 QList<KadasMapItem::Node> KadasAnchoredItem::nodes( const QgsMapSettings &settings ) const
 {
   QList<Node> nodes;
-  if ( constState()->drawStatus == State::DrawStatus::Empty )
+  if ( mDrawStatus == DrawStatus::Empty )
   {
     return nodes;
   }
@@ -153,7 +153,7 @@ QList<KadasMapItem::Node> KadasAnchoredItem::nodes( const QgsMapSettings &settin
   return nodes;
 }
 
-bool KadasAnchoredItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains ) const
+bool KadasAnchoredItem::intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const
 {
   if ( constState()->size.isEmpty() )
   {
@@ -177,7 +177,7 @@ bool KadasAnchoredItem::intersects( const KadasMapRect &rect, const QgsMapSettin
 
 bool KadasAnchoredItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
-  state()->drawStatus = State::DrawStatus::Drawing;
+  mDrawStatus = DrawStatus::Drawing;
   state()->pos = toItemPos( firstPoint, mapSettings );
   update();
   return false;
@@ -206,7 +206,7 @@ bool KadasAnchoredItem::continuePart( const QgsMapSettings &mapSettings )
 
 void KadasAnchoredItem::endPart()
 {
-  state()->drawStatus = State::DrawStatus::Finished;
+  mDrawStatus = DrawStatus::Finished;
 }
 
 KadasMapItem::AttribDefs KadasAnchoredItem::drawAttribs() const

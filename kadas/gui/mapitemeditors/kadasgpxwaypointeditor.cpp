@@ -70,11 +70,11 @@ void KadasGpxWaypointEditor::syncItemToWidget()
   }
 
   mUi.mSpinBoxSize->blockSignals( true );
-  mUi.mSpinBoxSize->setValue( waypointItem->outline().width() );
+  mUi.mSpinBoxSize->setValue( waypointItem->strokeWidth() );
   mUi.mSpinBoxSize->blockSignals( false );
 
   mUi.mToolButtonColor->blockSignals( true );
-  mUi.mToolButtonColor->setColor( waypointItem->fill().color() );
+  mUi.mToolButtonColor->setColor( waypointItem->color() );
   mUi.mToolButtonColor->blockSignals( false );
 
   mUi.mLineEditName->blockSignals( true );
@@ -115,12 +115,10 @@ void KadasGpxWaypointEditor::syncWidgetToItem()
   int size = mUi.mSpinBoxSize->value();
   QColor color = mUi.mToolButtonColor->color();
 
-  waypointItem->setOutline( QPen( color, size ) );
-  waypointItem->setFill( QBrush( color ) );
-
+  waypointItem->setColor( color );
+  waypointItem->setStrokeWidth( size );
+  waypointItem->setStrokeColor( color );
   waypointItem->setIconSize( 10 + 2 * size );
-  waypointItem->setIconOutline( QPen( Qt::black, size / 2 ) );
-  waypointItem->setIconFill( QBrush( color ) );
 
   waypointItem->setName( mUi.mLineEditName->text() );
 
