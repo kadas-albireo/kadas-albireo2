@@ -37,15 +37,12 @@ void KadasGeoAdminRestCatalogProvider::load()
 {
   QUrl url( mBaseUrl );
   QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toLower();
-  emit messageEmitted( QString( "lang: %1" ).arg( lang ), Qgis::Critical );
   QUrlQuery query( url );
   query.addQueryItem( "lang", lang );
   url.setQuery( query );
   QNetworkRequest req( url );
   req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
-  //kApp->mainWindow()->messageBar()->pushMessage( tr( "start fetching geo admin categories" ), "", Qgis::Critical, -1 );
-  emit messageEmitted( "start fetching geo admin categories", Qgis::Critical );
   connect( reply, &QNetworkReply::finished, this, &KadasGeoAdminRestCatalogProvider::replyGeoCatalogFinished );
 }
 
@@ -70,7 +67,7 @@ void KadasGeoAdminRestCatalogProvider::replyGeoCatalogFinished()
     QString topCategoryLabel = topCategorie.toMap().value( "label" ).toString();
     QVariantList subCategories = topCategorie.toMap().value( "children" ).toList();
 
-    //QStandardItem *topCategoryItem = mBrowser->addItem( 0, topCategoryLabel, 0, false );
+    QStandardItem *topCategoryItem = mBrowser->addItem( 0, topCategoryLabel, 0, false );
 
     int subCategoriesIndice = 0;
     for ( const QVariant &subCategory : subCategories )
@@ -96,9 +93,6 @@ void KadasGeoAdminRestCatalogProvider::replyGeoCatalogFinished()
   }
   mLastTopCategoriesIndice = topCategoriesIndice;
 
-  emit messageEmitted( QString( "nb catalog layer n : %1" ).arg( mLayersEntriesMap.size() ), Qgis::Critical );
-
-
   QUrl url( "https://wms.geo.admin.ch/?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities" );
   QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toLower();
   QUrlQuery query( url );
@@ -108,7 +102,6 @@ void KadasGeoAdminRestCatalogProvider::replyGeoCatalogFinished()
   req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
   QNetworkReply *replyWMS = QgsNetworkAccessManager::instance()->get( req );
   replyWMS->setProperty( "url", url );
-  emit messageEmitted( "start fetching wms layers", Qgis::Critical );
   connect( replyWMS, &QNetworkReply::finished, this, &KadasGeoAdminRestCatalogProvider::replyWMSGeoAdminFinished );
 }
 
@@ -138,8 +131,6 @@ void KadasGeoAdminRestCatalogProvider::replyWMSGeoAdminFinished()
   QStringList parentCrs;
 
   QDomNodeList layerItems = doc.firstChildElement( "WMS_Capabilities" ).firstChildElement( "Capability" ).firstChildElement( "Layer" ).elementsByTagName( "Layer" );
-
-  emit messageEmitted( QString( "nb of layers fetched: %1" ).arg( layerItems.size() ), Qgis::Critical );
   for ( int i = 0, n = layerItems.size(); i < n; ++i )
   {
     QDomNode layerItem = layerItems.at( i );
@@ -161,8 +152,6 @@ void KadasGeoAdminRestCatalogProvider::replyWMSGeoAdminFinished()
     if ( mLayersEntriesMap.contains( layerBodId ) )
     {
       parent = getCategoryItem( entry.category.split( "|" ), entry.sortIndices.split( "|" ) );
-      if ( layerBodId == "ch.swisstopo.pixelkarte-farbe-pk1000.noscale" )
-        emit messageEmitted( QString( "add layer: %1" ).arg( title ), Qgis::Critical );
     }
     else
     {

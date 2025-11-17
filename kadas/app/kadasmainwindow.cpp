@@ -346,8 +346,7 @@ void KadasMainWindow::init()
   connect( mRibbonWidget, &QTabWidget::tabBarClicked, this, &KadasMainWindow::endFullscreen );
 
 
-  //QStringList catalogUris = QgsSettings().value( "/kadas/geodatacatalogs" ).toString().split( ";;" );
-  QStringList catalogUris = QStringLiteral( "type=geoadmin&url=https://api3.geo.admin.ch/rest/services/ech/CatalogServer" ).split( ";;" );
+  QStringList catalogUris = QgsSettings().value( "/kadas/geodatacatalogs" ).toString().split( ";;" );
 
   for ( const QString &catalogUri : catalogUris )
   {
@@ -361,12 +360,7 @@ void KadasMainWindow::init()
     }
     if ( type == "geoadmin" )
     {
-      kApp->mainWindow()->messageBar()->pushMessage( tr( "Add geoadmin catalog provider" ), "", Qgis::Critical, -1 );
-
-      //connect( newTool, &QgsMapTool::messageEmitted, this, &KadasApplication::displayMessage );
-      auto provider = new KadasGeoAdminRestCatalogProvider( url, mCatalogBrowser, params );
-      connect( provider, &KadasGeoAdminRestCatalogProvider::messageEmitted, kApp, &KadasApplication::displayMessage );
-      mCatalogBrowser->addProvider( provider );
+      mCatalogBrowser->addProvider( new KadasGeoAdminRestCatalogProvider( url, mCatalogBrowser, params ) );
     }
     else if ( type == "arcgisrest" )
     {

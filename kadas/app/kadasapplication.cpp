@@ -1248,7 +1248,7 @@ void KadasApplication::showLayoutDesigner( QgsPrintLayout *layout )
 
 void KadasApplication::displayMessage( const QString &message, Qgis::MessageLevel level )
 {
-  mMainWindow->messageBar()->pushMessage( message, level, -1 );
+  mMainWindow->messageBar()->pushMessage( message, level, mMainWindow->messageTimeout() );
 }
 
 void KadasApplication::projectDirtySet()
