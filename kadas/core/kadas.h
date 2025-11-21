@@ -68,6 +68,9 @@ class KADAS_CORE_EXPORT Kadas
     // Path where project templates are stored
     static QString projectTemplatesPath();
 
+    // Returns the kadas locale or the language currently set or the default system language
+    static QString locale( bool languageOnly = false );
+
     // Returns gdal source string for raster layer or null string in case of error
     static GDALDatasetH gdalOpenForLayer( const QgsRasterLayer *layer, QString *errMsg = nullptr );
 

@@ -36,7 +36,7 @@ KadasGeoAdminRestCatalogProvider::KadasGeoAdminRestCatalogProvider( const QStrin
 void KadasGeoAdminRestCatalogProvider::load()
 {
   QUrl url( mBaseUrl );
-  QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toLower();
+  QString lang = Kadas::locale( true );
   QUrlQuery query( url );
   query.addQueryItem( "lang", lang );
   url.setQuery( query );
@@ -94,7 +94,7 @@ void KadasGeoAdminRestCatalogProvider::replyGeoCatalogFinished()
   mLastTopCategoriesIndice = topCategoriesIndice;
 
   QUrl url( "https://wms.geo.admin.ch/?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities" );
-  QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toLower();
+  QString lang = Kadas::locale( true );
   QUrlQuery query( url );
   query.addQueryItem( "lang", lang );
   url.setQuery( query );

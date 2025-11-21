@@ -43,7 +43,7 @@ KadasArcGisPortalCatalogProvider::KadasArcGisPortalCatalogProvider( const QStrin
   , mCatalogTag( params.value( "tag", "milcatalog" ) )
   , mAuthId( authId )
 {
-  QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toLower();
+  QString lang = Kadas::locale( true );
   QFile isoTopics( QDir( Kadas::pkgDataPath() ).absoluteFilePath( QString( "catalog/isoTopics_%1.csv" ).arg( lang ) ) );
   if ( isoTopics.open( QIODevice::ReadOnly ) )
   {
@@ -65,7 +65,7 @@ void KadasArcGisPortalCatalogProvider::load()
 
   mPendingTasks = 1;
   QUrl url( mBaseUrl );
-  QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toUpper();
+  QString lang = Kadas::locale( true ).toUpper();
   QUrlQuery query( url );
   query.addQueryItem( "lang", lang );
   query.addQueryItem( "timestamp", QString::number( QDateTime::currentSecsSinceEpoch() ) );
