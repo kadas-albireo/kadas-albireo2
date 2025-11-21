@@ -42,7 +42,7 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasMapItem
 
     virtual QgsAnnotationMarkerItem *annotationItem() const override { return mQgsItem; }
 
-    QString itemName() const override { return tr( "Point" ); }
+    virtual QString itemName() const override { return tr( "Point" ); }
 
     bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) override;
     bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
@@ -68,8 +68,8 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasMapItem
     AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
     KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
 
-    QgsPointXY point() const;
-    void setPoint( const QgsPointXY &point );
+    virtual QgsPointXY point() const;
+    virtual void setPoint( const QgsPointXY &point );
 
     virtual void translate( double dx, double dy ) override;
 
@@ -89,14 +89,13 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasMapItem
     Qt::PenStyle strokeStyle() const { return mStrokeStyle; }
 
   protected:
-    KadasMapItem *_clone() const override;
-
     bool useProperties() const override { return false; }
-    void writeXmlPrivate( QDomElement &element ) const override;
-    void readXmlPrivate( const QDomElement &element ) override;
+    virtual KadasMapItem *_clone() const override;
+    virtual void writeXmlPrivate( QDomElement &element ) const override;
+    virtual void readXmlPrivate( const QDomElement &element ) override;
 
   private:
-    void updateSymbol();
+    virtual void updateQgsAnnotation();
 
     QgsAnnotationMarkerItem *mQgsItem = nullptr;
     Qgis::MarkerShape mShape = Qgis::MarkerShape::Circle;

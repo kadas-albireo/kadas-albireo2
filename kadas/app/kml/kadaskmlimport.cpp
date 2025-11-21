@@ -213,7 +213,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
             KadasTextItem *item = new KadasTextItem( itemLayer->crs() );
             item->setEditor( "KadasRedliningTextEditor" );
             item->setText( name );
-            item->setFillColor( style.labelColor );
+            item->setColor( style.labelColor );
             QFont font = item->font();
             font.setPointSizeF( font.pointSizeF() * style.labelScale );
             item->setFont( font );

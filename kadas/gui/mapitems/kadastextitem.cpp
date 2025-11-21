@@ -18,114 +18,133 @@
 #include <QAction>
 #include <QMenu>
 
-#include <qgis/qgsgeometryengine.h>
-#include <qgis/qgslinestring.h>
-#include <qgis/qgsmapsettings.h>
-#include <qgis/qgspolygon.h>
+#include <qgis/qgsannotationpointtextitem.h>
+#include <qgis/qgsfeedback.h>
 #include <qgis/qgsproject.h>
-#include <qgis/qgsrendercontext.h>
-#include <qgis/qgstextdocument.h>
-#include <qgis/qgstextrenderer.h>
 
 #include "kadas/gui/mapitems/kadastextitem.h"
 
 
 KadasTextItem::KadasTextItem( const QgsCoordinateReferenceSystem &crs )
-  : KadasRectangleItemBase( crs )
+  : KadasPointItem( crs )
 {
+  mQgsItem = new QgsAnnotationPointTextItem( QString(), QgsPoint() );
 }
 
 void KadasTextItem::setText( const QString &text )
 {
   mText = text;
-  QFontMetrics metrics( mFont );
-  if ( mFrameAutoResize )
-  {
-    state()->mSize.setWidth( metrics.horizontalAdvance( mText ) );
-    state()->mSize.setHeight( metrics.height() );
-  }
-  update();
-  emit propertyChanged();
-}
-
-void KadasTextItem::setAngle( double angle )
-{
-  state()->mAngle = angle;
+  mQgsItem->setText( text );
   update();
 }
 
-void KadasTextItem::setFillColor( const QColor &c )
+QgsPointXY KadasTextItem::point() const
 {
-  mFillColor = c;
-  update();
-  emit propertyChanged();
+  return mQgsItem->point();
 }
 
-void KadasTextItem::setOutlineColor( const QColor &c )
+void KadasTextItem::setPoint( const QgsPointXY &point )
 {
-  mOutlineColor = c;
+  mQgsItem->setPoint( QgsPoint( point ) );
   update();
-  emit propertyChanged();
 }
 
 void KadasTextItem::setFont( const QFont &font )
 {
   mFont = font;
-  QFontMetrics metrics( mFont );
-  if ( mFrameAutoResize )
-  {
-    state()->mSize.setWidth( metrics.horizontalAdvance( mText ) );
-    state()->mSize.setHeight( metrics.height() );
-  }
+  updateQgsAnnotation();
+}
+
+void KadasTextItem::setColor( const QColor &color )
+{
+  mColor = color;
+  updateQgsAnnotation();
+}
+
+
+void KadasTextItem::updateQgsAnnotation()
+{
+  QgsTextFormat fmt;
+  fmt.setFont( mFont );
+  fmt.setSize( mFont.pointSize() );
+  fmt.setSizeUnit( Qgis::RenderUnit::Points );
+  fmt.setColor( mColor );
+  mQgsItem->setFormat( fmt );
   update();
-  emit propertyChanged();
 }
 
-void KadasTextItem::setFrameAutoResize( bool frameAutoResize )
+KadasMapItem *KadasTextItem::_clone() const SIP_FACTORY
 {
-  mFrameAutoResize = frameAutoResize;
-  emit propertyChanged();
-  if ( mFrameAutoResize )
-    setFont( mFont );
+  KadasTextItem *item = new KadasTextItem( crs() );
+  item->mQgsItem = mQgsItem->clone();
+  item->mText = mText;
+  item->mFont = mFont;
+  item->mColor = mColor;
+  return item;
 }
 
-QImage KadasTextItem::symbolImage() const
+QgsRectangle KadasTextItem::boundingBox() const
 {
-  // TODO: remove, this seems unused
-  QImage image( constState()->mSize, QImage::Format_ARGB32 );
-  image.fill( Qt::transparent );
-  QPainter painter( &image );
-
-  painter.setBrush( QBrush( mFillColor ) );
-  painter.setPen( QPen( mOutlineColor, mFont.pointSizeF() / 15., Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin ) );
-  painter.setFont( mFont );
-  painter.drawText( QRect( 0, 0, constState()->mSize.width(), constState()->mSize.height() ), mText );
-  return image;
+  return mQgsItem->boundingBox();
 }
 
-void KadasTextItem::renderPrivate( QgsRenderContext &context, const QPointF &center, const QRect &rect, double dpiScale ) const
+void KadasTextItem::render( QgsRenderContext &context ) const
 {
-  QFont font = mFont;
-  font.setPointSizeF( font.pointSizeF() * outputDpiScale( context ) );
-  QFontMetrics metrics( font );
-  QPointF baseLineCenter = center + QPointF( 0, metrics.descent() );
-
-  double scale = getTextRenderScale( context );
-
-  QgsTextFormat format;
-  format.setFont( font );
-  format.setSize( font.pointSize() * scale );
-  format.setColor( mFillColor );
-  format.setOpacity( mFillColor.alpha() / 255.0 );
-  QgsTextBufferSettings bs;
-  bs.setColor( mOutlineColor );
-  bs.setOpacity( mOutlineColor.alpha() / 255.0 );
-  bs.setSize( 1 );
-  bs.setEnabled( true );
-  format.setBuffer( bs );
-
-  QgsTextRenderer::drawText( baseLineCenter, -constState()->mAngle, Qgis::TextHorizontalAlignment::Center, { mText }, context, format, false );
+  QgsFeedback fb;
+  mQgsItem->render( context, &fb );
 }
+
+
+void KadasTextItem::writeXmlPrivate( QDomElement &element ) const
+{
+  //element.setAttribute("status", static_cast<int>( state().drawStatus ));
+  element.setAttribute( "text", mText );
+  element.setAttribute( "font", mFont.toString() );
+  element.setAttribute( "color", mColor.name() );
+  element.setAttribute( "geometry", point().asWkt() );
+}
+
+void KadasTextItem::readXmlPrivate( const QDomElement &element )
+{
+  if ( 0 )
+  {
+    // migration code
+    QJsonObject data = QJsonDocument::fromJson( element.firstChild().toCDATASection().data().toLocal8Bit() ).object();
+    if ( data.contains( "props" ) )
+    {
+      QJsonObject props = data["props"].toObject();
+
+      mCrs = QgsCoordinateReferenceSystem( props.value( "authId" ).toString() );
+      mEditor = props.value( "editor" ).toString();
+      // mIconSize = props.value( "iconSize" ).toInt();
+
+      // QStringList brushStr = props.value( "iconFill" ).toString().split( ";" );
+      // if ( brushStr.size() )
+      //   mFillColor = QColor( brushStr[0] );
+
+      // QStringList penStr = props.value( "iconOutline" ).toString().split( ";" );
+      // if ( penStr.size() > 1 )
+      // {
+      //   mStrokeColor = QColor( penStr[0] );
+      //   mStrokeWidth = penStr[1].toInt();
+      // }
+    }
+    if ( data.contains( "state" ) )
+    {
+      // const QJsonArray point = data.value( "state" ).toObject().value( "points" ).toArray().first().toArray();
+      // setPoint( QgsPointXY( point.at( 0 ).toDouble(), point.at( 1 ).toDouble() ) );
+    }
+  }
+  else
+  {
+    setText( element.attribute( "text" ) );
+    mColor = QColor( element.attribute( "color", QColor( Qt::red ).name() ) );
+    mFont.fromString( element.attribute( "font" ) );
+    setPoint( QgsGeometry::fromWkt( element.attribute( "geometry" ) ).asPoint() );
+  }
+  updateQgsAnnotation();
+}
+
 
 QString KadasTextItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const
 {
@@ -137,45 +156,9 @@ QString KadasTextItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) 
   outStream << "<Placemark>" << "\n";
   outStream << QString( "<name>%1</name>\n" ).arg( mText );
   outStream << "<Style>";
-  outStream << QString( "<IconStyle><scale>0</scale></IconStyle><LabelStyle><color>%1</color><scale>%2</scale></LabelStyle></Style>" ).arg( color2hex( mFillColor ) ).arg( mFont.pointSizeF() / QFont().pointSizeF() );
+  outStream << QString( "<IconStyle><scale>0</scale></IconStyle><LabelStyle><color>%1</color><scale>%2</scale></LabelStyle></Style>" ).arg( color2hex( mColor ) ).arg( mFont.pointSizeF() / QFont().pointSizeF() );
   outStream << QString( "<Point><coordinates>%1,%2</coordinates></Point>" ).arg( QString::number( pos.x(), 'f', 10 ) ).arg( QString::number( pos.y(), 'f', 10 ) );
   outStream << "</Placemark>" << "\n";
   outStream.flush();
   return outString;
-}
-
-void KadasTextItem::editPrivate( const KadasMapPos &newPoint, const QgsMapSettings &mapSettings )
-{
-  QSize oldSize = state()->mSize;
-
-  double scale = mapSettings.mapUnitsPerPixel() * mSymbolScale;
-  KadasMapPos mapPos = toMapPos( constState()->mPos, mapSettings );
-  KadasMapPos frameCenter( mapPos.x() + constState()->mOffsetX * scale, mapPos.y() + constState()->mOffsetY * scale );
-
-  QgsVector halfSize = ( mapSettings.mapToPixel().transform( newPoint ) - mapSettings.mapToPixel().transform( frameCenter ) ) / mSymbolScale;
-
-  double ratio = std::min( 2 * qAbs( halfSize.x() / oldSize.width() ), 2 * qAbs( halfSize.y() / oldSize.height() ) );
-
-  if ( mFrameAutoResize )
-  {
-    QFont font = mFont;
-    font.setPointSizeF( font.pointSizeF() * ratio );
-    setFont( font );
-  }
-  else
-  {
-    state()->mSize.setWidth( 2 * qAbs( halfSize.x() ) );
-    state()->mSize.setHeight( 2 * qAbs( halfSize.y() ) );
-    update();
-  }
-}
-
-void KadasTextItem::populateContextMenuPrivate( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings )
-{
-  if ( frameVisible() )
-  {
-    QAction *lockedAction = menu->addAction( tr( "Auto resize frame" ), [this]( bool autoResize ) { setFrameAutoResize( autoResize ); } );
-    lockedAction->setCheckable( true );
-    lockedAction->setChecked( mFrameAutoResize );
-  }
 }

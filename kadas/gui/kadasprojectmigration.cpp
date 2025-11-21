@@ -169,11 +169,11 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
         KadasTextItem *textItem = new KadasTextItem( crs );
         textItem->setText( redliningItemEl.attribute( "text" ) );
         textItem->setPosition( KadasItemPos::fromPoint( point ) );
-        textItem->setAngle( flags["rotation"].toDouble() );
-        textItem->setOutlineColor( outline );
-        textItem->setFillColor( fill );
-        textItem->state()->mRectangleCenterPoint.setX( 0 );
-        textItem->state()->mRectangleCenterPoint.setY( 1. );
+        //textItem->setAngle( flags["rotation"].toDouble() );
+        //textItem->setOutlineColor( outline );
+        textItem->setColor( fill );
+        // textItem->state()->mRectangleCenterPoint.setX( 0 );
+        // textItem->state()->mRectangleCenterPoint.setY( 1. );
 
         QFont font;
         font.setBold( flags["bold"].toInt() != 0 );

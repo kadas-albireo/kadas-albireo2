@@ -38,7 +38,7 @@ KadasPointItem::KadasPointItem( const QgsCoordinateReferenceSystem &crs, Qgis::M
 void KadasPointItem::setShape( Qgis::MarkerShape shape )
 {
   mShape = shape;
-  updateSymbol();
+  updateQgsAnnotation();
 }
 
 void KadasPointItem::translate( double dx, double dy )
@@ -53,31 +53,31 @@ void KadasPointItem::translate( double dx, double dy )
 void KadasPointItem::setIconSize( int size )
 {
   mIconSize = size;
-  updateSymbol();
+  updateQgsAnnotation();
 }
 
 void KadasPointItem::setColor( const QColor &color )
 {
   mFillColor = color;
-  updateSymbol();
+  updateQgsAnnotation();
 }
 
 void KadasPointItem::setStrokeColor( const QColor &strokeColor )
 {
   mStrokeColor = strokeColor;
-  updateSymbol();
+  updateQgsAnnotation();
 }
 
 void KadasPointItem::setStrokeWidth( double width )
 {
   mStrokeWidth = width;
-  updateSymbol();
+  updateQgsAnnotation();
 }
 
 void KadasPointItem::setStrokeStyle( const Qt::PenStyle &style )
 {
   mStrokeStyle = style;
-  updateSymbol();
+  updateQgsAnnotation();
 }
 
 bool KadasPointItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
@@ -175,7 +175,7 @@ void KadasPointItem::setPoint( const QgsPointXY &point )
   update();
 }
 
-void KadasPointItem::updateSymbol()
+void KadasPointItem::updateQgsAnnotation()
 {
   QgsSimpleMarkerSymbolLayer *symbolLayer = new QgsSimpleMarkerSymbolLayer();
   symbolLayer->setSizeUnit( Qgis::RenderUnit::Points );
@@ -283,7 +283,7 @@ void KadasPointItem::readXmlPrivate( const QDomElement &element )
     mFillColor = QColor( element.attribute( "fill_color", QColor( Qt::white ).name() ) );
     setPoint( QgsGeometry::fromWkt( element.attribute( "geometry" ) ).asPoint() );
   }
-  updateSymbol();
+  updateQgsAnnotation();
 }
 
 
@@ -294,7 +294,7 @@ QgsRectangle KadasPointItem::boundingBox() const
 
 QList<KadasMapItem::Node> KadasPointItem::nodes( const QgsMapSettings &settings ) const
 {
-  return { { toMapPos( KadasItemPos::fromPoint( mQgsItem->geometry() ), settings ) } };
+  return { { toMapPos( KadasItemPos::fromPoint( point() ), settings ) } };
 }
 
 bool KadasPointItem::intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const
@@ -345,5 +345,5 @@ QString KadasPointItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip )
 void KadasPointItem::setState( const KadasMapItem::State *state )
 {
   KadasMapItem::setState( state );
-  updateSymbol();
+  updateQgsAnnotation();
 }
