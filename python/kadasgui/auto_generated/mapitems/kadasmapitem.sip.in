@@ -233,11 +233,20 @@ class KadasMapItem : QObject /Abstract/
 #include "kadas/gui/mapitems/kadasmapitem.h"
 %End
   public:
+    enum class DrawStatus
+    {
+      Empty,
+      Drawing,
+      Finished
+    };
+
     KadasMapItem( const QgsCoordinateReferenceSystem &crs );
     ~KadasMapItem();
     KadasMapItem *clone() const;
     QJsonObject serialize() const;
     bool deserialize( const QJsonObject &json );
+
+    virtual QgsAnnotationItem *annotationItem() const;
 
     virtual QString itemName() const = 0;
     virtual QString exportName() const;
@@ -247,7 +256,7 @@ class KadasMapItem : QObject /Abstract/
 The item crs */
 %End
 
-    virtual KadasItemRect boundingBox() const = 0;
+    virtual QgsRectangle boundingBox() const = 0;
 %Docstring
 Bounding box in geographic coordinates */
 %End
@@ -269,7 +278,7 @@ Bounding box in geographic coordinates */
 
     virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const = 0;
 
-    virtual bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const = 0;
+    virtual bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains = false ) const = 0;
 %Docstring
 Hit test, rect in item crs */
 %End
@@ -285,6 +294,9 @@ Return the item point to the specified one */
 Render the item */
 %End
 
+
+    DrawStatus drawStatus() const;
+    void setDrawStatus( DrawStatus status );
 
     void associateToLayer( QgsMapLayer *layer );
 %Docstring
@@ -316,11 +328,6 @@ symbol scale */
 %End
     double symbolScale() const;
 
-    void setAuthId( const QString &authId );
-%Docstring
-authid */
-%End
-    QString authId() const;
 
     void setTooltip( const QString &tooltip );
 %Docstring
@@ -350,14 +357,6 @@ Trigger a redraw */
 #include "kadas/gui/mapitems/kadasmapitem.h"
 %End
       public:
-        enum class DrawStatus
-        {
-          Empty,
-          Drawing,
-          Finished
-        };
-
-        DrawStatus drawStatus;
         virtual void assign( const State *other ) = 0;
         virtual State *clone() const = 0 /Factory/;
         virtual QJsonObject serialize() const = 0;
@@ -437,8 +436,16 @@ Trigger a redraw */
     void setEditor( const QString &editor );
     const QString &editor() const;
 
-    virtual KadasItemPos position() const = 0;
-    virtual void setPosition( const KadasItemPos &pos ) = 0;
+    virtual KadasItemPos position() const;
+%Docstring
+Once every item has been migrated this should be dropped
+%End
+    virtual void setPosition( const KadasItemPos &pos );
+
+    virtual void translate( double dx, double dy );
+%Docstring
+Once every item has been migrated this should become pure virtual
+%End
 
 
     QDomElement writeXml( QDomDocument &document ) const;
@@ -456,7 +463,13 @@ Trigger a redraw */
 
   protected:
 
-    virtual KadasMapItem::State *createEmptyState() const = 0 /Factory/;
+
+    virtual KadasMapItem::State *createEmptyState() const /Factory/;
+
+    virtual bool useProperties() const;
+
+    virtual void writeXmlPrivate( QDomElement &element ) const;
+    virtual void readXmlPrivate( const QDomElement &element );
 
     static void defaultNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
     static void anchorNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
@@ -464,8 +477,9 @@ Trigger a redraw */
     static double getTextRenderScale( const QgsRenderContext &context );
 
     KadasMapPos toMapPos( const KadasItemPos &itemPos, const QgsMapSettings &settings ) const;
+    QgsPointXY toMapPos( const QgsPointXY &itemPos, const QgsMapSettings &settings ) const;
     KadasItemPos toItemPos( const KadasMapPos &mapPos, const QgsMapSettings &settings ) const;
-    KadasMapRect toMapRect( const KadasItemRect &itemRect, const QgsMapSettings &settings ) const;
+    QgsRectangle toMapRect( const QgsRectangle &itemRect, const QgsMapSettings &settings ) const;
     KadasItemRect toItemRect( const KadasMapRect &itemRect, const QgsMapSettings &settings ) const;
     double pickTolSqr( const QgsMapSettings &settings ) const;
     double pickTol( const QgsMapSettings &settings ) const;

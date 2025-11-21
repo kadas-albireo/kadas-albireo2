@@ -35,10 +35,10 @@ class KADAS_GUI_EXPORT KadasAnchoredItem : public KadasMapItem SIP_ABSTRACT
     double anchorY() const { return mAnchorY; }
     void setAnchorY( double anchorY );
 
-    KadasItemRect boundingBox() const override;
+    QgsRectangle boundingBox() const override;
     Margin margin() const override;
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
-    bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const override;
+    bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains = false ) const override;
 
     bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) override;
     bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
