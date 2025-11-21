@@ -74,8 +74,8 @@ the Free Software Foundation; either version 2 of the License, or     *
     virtual KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const;
 
 
-    QgsPointXY point() const;
-    void setPoint( const QgsPointXY &point );
+    virtual QgsPointXY point() const;
+    virtual void setPoint( const QgsPointXY &point );
 
     virtual void translate( double dx, double dy );
 
@@ -93,16 +93,12 @@ the Free Software Foundation; either version 2 of the License, or     *
     double strokeWidth() const;
     void setStrokeStyle( const Qt::PenStyle &style );
     Qt::PenStyle strokeStyle() const;
-    
+
   protected:
-    virtual KadasMapItem *_clone() const;
-
-
     virtual bool useProperties() const;
+    virtual KadasMapItem *_clone() const;
     virtual void writeXmlPrivate( QDomElement &element ) const;
-
     virtual void readXmlPrivate( const QDomElement &element );
-
 
 };
 
