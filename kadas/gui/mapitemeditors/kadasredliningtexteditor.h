@@ -42,8 +42,7 @@ class KADAS_GUI_EXPORT KadasRedliningTextEditor : public KadasMapItemEditor
     QFont currentFont() const;
 
   private slots:
-    void saveFillColor();
-    void saveOutlineColor();
+    void saveColor();
     void saveFont();
     void saveText();
 };
