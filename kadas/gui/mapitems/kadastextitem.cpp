@@ -16,6 +16,7 @@
 
 
 #include <QAction>
+#include <QJsonArray>
 #include <QMenu>
 
 #include <qgis/qgsannotationpointtextitem.h>
@@ -106,7 +107,7 @@ void KadasTextItem::writeXmlPrivate( QDomElement &element ) const
 
 void KadasTextItem::readXmlPrivate( const QDomElement &element )
 {
-  if ( 0 )
+  if ( !element.hasAttribute( "text" ) )
   {
     // migration code
     QJsonObject data = QJsonDocument::fromJson( element.firstChild().toCDATASection().data().toLocal8Bit() ).object();
@@ -116,23 +117,15 @@ void KadasTextItem::readXmlPrivate( const QDomElement &element )
 
       mCrs = QgsCoordinateReferenceSystem( props.value( "authId" ).toString() );
       mEditor = props.value( "editor" ).toString();
-      // mIconSize = props.value( "iconSize" ).toInt();
 
-      // QStringList brushStr = props.value( "iconFill" ).toString().split( ";" );
-      // if ( brushStr.size() )
-      //   mFillColor = QColor( brushStr[0] );
-
-      // QStringList penStr = props.value( "iconOutline" ).toString().split( ";" );
-      // if ( penStr.size() > 1 )
-      // {
-      //   mStrokeColor = QColor( penStr[0] );
-      //   mStrokeWidth = penStr[1].toInt();
-      // }
+      setText( props.value( "text" ).toString() );
+      mColor = QColor( props.value( "fillColor" ).toString() );
+      mFont.fromString( props.value( "font" ).toString() );
     }
     if ( data.contains( "state" ) )
     {
-      // const QJsonArray point = data.value( "state" ).toObject().value( "points" ).toArray().first().toArray();
-      // setPoint( QgsPointXY( point.at( 0 ).toDouble(), point.at( 1 ).toDouble() ) );
+      const QJsonArray point = data.value( "state" ).toObject().value( "pos" ).toArray();
+      setPoint( QgsPointXY( point.at( 0 ).toDouble(), point.at( 1 ).toDouble() ) );
     }
   }
   else
