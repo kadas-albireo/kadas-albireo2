@@ -20,6 +20,8 @@
 #include <QObject>
 #include <QMap>
 
+#include "kadas/core/kadas.h"
+
 #include "kadas/gui/kadas_gui.h"
 
 class QDomDocument;

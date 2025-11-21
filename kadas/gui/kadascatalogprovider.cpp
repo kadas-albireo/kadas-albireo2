@@ -20,7 +20,6 @@
 #include <qgis/qgsmimedatautils.h>
 #include <qgis/qgslogger.h>
 
-#include "kadas/core/kadas.h"
 #include "kadas/gui/kadascatalogbrowser.h"
 #include "kadas/gui/kadascatalogprovider.h"
 
