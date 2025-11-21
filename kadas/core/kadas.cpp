@@ -126,6 +126,22 @@ QString Kadas::projectTemplatesPath()
   return QDir( pkgDataPath() ).absoluteFilePath( "project_templates" );
 }
 
+QString Kadas::locale( bool languageOnly )
+{
+  QgsSettings settings;
+
+  QString locale = QLocale::system().name();
+  if ( settings.value( "/locale/overrideFlag", false ).toBool() )
+  {
+    locale = settings.value( "/locale/userLocale", locale ).toString();
+  }
+  if ( languageOnly )
+  {
+    return locale.left( 2 ).toLower();
+  }
+  return locale;
+}
+
 GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errMsg )
 {
   if ( !layer )
