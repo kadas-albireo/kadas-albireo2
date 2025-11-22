@@ -28,8 +28,13 @@
 #include <QUrlQuery>
 #include <quazip/quazipfile.h>
 
+#include <qgis/qgsannotationlineitem.h>
+#include <qgis/qgsannotationpointtextitem.h>
+#include <qgis/qgsannotationpolygonitem.h>
 #include <qgis/qgsauthguiutils.h>
 #include <qgis/qgsauthmanager.h>
+#include <qgis/qgscurve.h>
+#include <qgis/qgscurvepolygon.h>
 #include <qgis/qgsdataitem.h>
 #include <qgis/qgsdatumtransformdialog.h>
 #include <qgis/qgsgdalutils.h>
@@ -1383,8 +1388,15 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
     for ( int i = 0, n = items.size(); i < n; ++i )
     {
       QgsCoordinateTransform crst( mapCrs, items[i]->crs(), QgsProject::instance() );
-      QgsPointXY pos = pastePos + QgsVector( itemPos[i].x() - center.x(), itemPos[i].y() - center.y() );
-      items[i]->setPosition( KadasItemPos::fromPoint( crst.transform( pos ) ) );
+      if ( items[i]->annotationItem() )
+      {
+        items[i]->translate( pastePos.x() - center.x(), pastePos.y() - center.y() );
+      }
+      else
+      {
+        QgsPointXY pos = pastePos + QgsVector( itemPos[i].x() - center.x(), itemPos[i].y() - center.y() );
+        items[i]->setPosition( KadasItemPos::fromPoint( crst.transform( pos ) ) );
+      }
     }
     KadasItemLayer *layer = kApp->selectPasteTargetItemLayer( items );
     if ( !layer )
@@ -1410,7 +1422,7 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
       if ( feature.geometry().type() == Qgis::GeometryType::Point )
       {
         KadasPointItem *item = new KadasPointItem( featureStore.crs() );
-        item->addPartFromGeometry( *feature.geometry().constGet() );
+        item->setPoint( *qgsgeometry_cast<const QgsPoint *>( feature.geometry().constGet() ) );
         items.append( item );
       }
       else if ( feature.geometry().type() == Qgis::GeometryType::Line )

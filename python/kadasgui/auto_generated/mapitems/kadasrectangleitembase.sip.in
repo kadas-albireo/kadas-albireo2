@@ -35,13 +35,13 @@ the Free Software Foundation; either version 2 of the License, or     *
     bool positionLocked() const;
     void setPositionLocked( bool locked );
 
-    virtual KadasItemRect boundingBox() const;
+    virtual QgsRectangle boundingBox() const;
 
     virtual Margin margin() const;
 
     virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const;
 
-    virtual bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const;
+    virtual bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains = false ) const;
 
     virtual void render( QgsRenderContext &context ) const;
 
@@ -94,6 +94,9 @@ the Free Software Foundation; either version 2 of the License, or     *
         double mOffsetX;
         double mOffsetY;
         QSize mSize;
+        bool mFrame;
+
+        bool frame() const;
         virtual void assign( const KadasMapItem::State *other );
         virtual State *clone() const /Factory/;
         virtual QJsonObject serialize() const;
@@ -104,6 +107,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 
   protected:
     State *state();
+    const State *consState();
     virtual State *createEmptyState() const /Factory/;
 
 
