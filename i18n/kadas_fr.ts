@@ -1092,7 +1092,7 @@ Veuillez annuler ces tâches et réessayer.</translation>
 <context>
     <name>KadasGeoAdminRestCatalogProvider</name>
     <message>
-        <location filename="../kadas/gui/catalog/kadasgeoadminrestcatalogprovider.cpp" line="103"/>
+        <location filename="../kadas/gui/catalog/kadasgeoadminrestcatalogprovider.cpp" line="159"/>
         <source>Uncategorized</source>
         <translation>Pas de catégorie</translation>
     </message>
@@ -3993,62 +3993,62 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation>Niveau de la loupe</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="712"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="714"/>
         <source>Choose file...</source>
         <translation>Choisir un fichier...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="713"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="715"/>
         <source>Enter URL...</source>
         <translation>Entrer l&apos;URL...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1147"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1149"/>
         <source>Language Changed</source>
         <translation>La langue a changé</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1147"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1149"/>
         <source>The language will be changed at the next program launch.</source>
         <translation>La langue sera modifiée au prochain démarrage du programme.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1169"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1171"/>
         <source>Remove</source>
         <translation>Supprimer</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1173"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1175"/>
         <source>Favorite</source>
         <translation>Favori</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1381"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1383"/>
         <source>Manually set projection</source>
         <translation>Sélectionner manuellement la projection</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1384"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1386"/>
         <source>Unknown layer projection</source>
         <translation>Projection de la couche inconnue</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1385"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1387"/>
         <source>The projection of the layer %1 could not be recognized, its features might be misplaced.</source>
         <translation>La projection de la couche %1 ne peut pas être reconnue, les objets peuvent être placés incorrectement.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1465"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1467"/>
         <source>Select Image</source>
         <translation>Sélectionnez une image</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1500"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1502"/>
         <source>Downloading...</source>
         <translation>Chargement...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1510"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1512"/>
         <source>Unable to download image (%1).</source>
         <translation>Impossible de télécharger l&apos;image (%1).</translation>
     </message>
@@ -4057,22 +4057,22 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation type="vanished">Impossible de télécharger l&apos;image</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1519"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1521"/>
         <source>Unable to save downloaded image</source>
         <translation>Impossible d&apos;enregistrer l&apos;image téléchargée</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1553"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1555"/>
         <source>Authenticated as:</source>
         <translation>Authentifié comme:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1643"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1645"/>
         <source>Font scaling setting changed</source>
         <translation>Configuration modifiée de l&apos;échelle des caractères</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1643"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1645"/>
         <source>The font scaling change will be applied at the next program launch.</source>
         <translation>La modification de l&apos;échelle des polices sera appliquée lors du prochain lancement du programme.</translation>
     </message>
@@ -6960,7 +6960,7 @@ avec géoloc.</translation>
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="../kadas/core/kadas.cpp" line="242"/>
+        <location filename="../kadas/core/kadas.cpp" line="258"/>
         <source>Failed to open raster file: %1</source>
         <translation>Impossible d&apos;ouvrir le fichier raster: %1</translation>
     </message>

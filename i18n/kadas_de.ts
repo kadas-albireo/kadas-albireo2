@@ -1093,7 +1093,7 @@ Bitte brechen Sie diese Aufgaben ab und versuchen Sie es erneut.</translation>
 <context>
     <name>KadasGeoAdminRestCatalogProvider</name>
     <message>
-        <location filename="../kadas/gui/catalog/kadasgeoadminrestcatalogprovider.cpp" line="103"/>
+        <location filename="../kadas/gui/catalog/kadasgeoadminrestcatalogprovider.cpp" line="159"/>
         <source>Uncategorized</source>
         <translation>Ohne Kategorie</translation>
     </message>
@@ -3992,62 +3992,62 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <translation>Vergrösserungsstufe</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="712"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="714"/>
         <source>Choose file...</source>
         <translation>Datei auswählen...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="713"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="715"/>
         <source>Enter URL...</source>
         <translation>URL eingeben...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1147"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1149"/>
         <source>Language Changed</source>
         <translation>Sprache geändert</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1147"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1149"/>
         <source>The language will be changed at the next program launch.</source>
         <translation>Die Sprache wird beim nächsten Programmstart geändert.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1169"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1171"/>
         <source>Remove</source>
         <translation>Entfernen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1173"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1175"/>
         <source>Favorite</source>
         <translation>Favorit</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1381"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1383"/>
         <source>Manually set projection</source>
         <translation>Projektion manuell auswählen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1384"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1386"/>
         <source>Unknown layer projection</source>
         <translation>Unbekannte Ebenenprojektion</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1385"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1387"/>
         <source>The projection of the layer %1 could not be recognized, its features might be misplaced.</source>
         <translation>Die Projektion der Ebene %1 ist unbekannt, möglicherweise sind die Objekte falsch platziert.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1465"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1467"/>
         <source>Select Image</source>
         <translation>Bild auswählen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1500"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1502"/>
         <source>Downloading...</source>
         <translation>Herunterladen...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1510"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1512"/>
         <source>Unable to download image (%1).</source>
         <translation>Bild (%1) konnte nicht heruntergeladen werden. </translation>
     </message>
@@ -4056,22 +4056,22 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <translation type="vanished">Datei konnte nicht heruntergeladen werden</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1519"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1521"/>
         <source>Unable to save downloaded image</source>
         <translation>Heruntergeladenes Bild kann nicht gespeichert werden</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1553"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1555"/>
         <source>Authenticated as:</source>
         <translation>Authentifiziert als:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1643"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1645"/>
         <source>Font scaling setting changed</source>
         <translation>Fontskalierung Konfiguration geändert</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1643"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1645"/>
         <source>The font scaling change will be applied at the next program launch.</source>
         <translation>Die Änderung der Schriftskalierung wird beim nächsten Programmstart übernommen.</translation>
     </message>
@@ -6960,7 +6960,7 @@ bewegen</translation>
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="../kadas/core/kadas.cpp" line="242"/>
+        <location filename="../kadas/core/kadas.cpp" line="258"/>
         <source>Failed to open raster file: %1</source>
         <translation>Die Rasterdatei konnte nicht geöffnet werden: %1</translation>
     </message>
