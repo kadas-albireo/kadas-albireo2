@@ -1,0 +1,11 @@
+diff --git a/images/icons/mac/CMakeLists.txt b/images/icons/mac/CMakeLists.txt
+index 89b80eab585..ac88ff3d92e 100644
+--- a/images/icons/mac/CMakeLists.txt
++++ b/images/icons/mac/CMakeLists.txt
+@@ -2,5 +2,5 @@
+ if (WITH_DESKTOP)
+   file (GLOB ICONS *.icns)
+   install (FILES ${ICONS}
+-           DESTINATION ${APP_RESOURCES_DIR})
++           DESTINATION "${DEFAULT_DATA_SUBDIR}")
+ endif()
