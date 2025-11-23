@@ -153,10 +153,6 @@ jobs:
       - name: 🌋 Build
         run: |
           cmake --build build --config Release
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        if: always()
         
       - name: 🧪 Run CTest
         env:
