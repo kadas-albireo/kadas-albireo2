@@ -53,6 +53,7 @@ class KADAS_GUI_EXPORT KadasCatalogProvider : public QObject
     bool parseWMSLayerCapabilities( const QDomNode &layerItem, const QString &title, const QStringList &imgFormats, const QStringList &parentCrs, const QString &url, const QString &layerInfoUrl, const QString &authCfg, QMimeData *&mimeData ) const;
     QStandardItem *getCategoryItem( const QStringList &titles, const QStringList &sortIndices );
 
+#ifndef SIP_RUN
     struct ResultEntry
     {
         ResultEntry() {}
@@ -94,6 +95,7 @@ class KADAS_GUI_EXPORT KadasCatalogProvider : public QObject
         bool flatten;
     };
     typedef QMap<QString, ResultEntry> EntryMap;
+#endif
 };
 
 #endif // KADASCATALOGPROVIDER_H

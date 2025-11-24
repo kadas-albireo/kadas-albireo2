@@ -46,24 +46,6 @@ the Free Software Foundation; either version 2 of the License, or     *
     bool parseWMSLayerCapabilities( const QDomNode &layerItem, const QString &title, const QStringList &imgFormats, const QStringList &parentCrs, const QString &url, const QString &layerInfoUrl, const QString &authCfg, QMimeData *&mimeData ) const;
     QStandardItem *getCategoryItem( const QStringList &titles, const QStringList &sortIndices );
 
-    struct ResultEntry
-    {
-        ResultEntry();
-        ResultEntry( const QString &_id, const QString &_category, const QString &_sortIndices );
-
-        ResultEntry( const QString &_url, const QString &_id, const QString &_category, const QString &_title, const QString &_sortIndices, const QString &_metadataUrl, const QString &_detailUrl, bool _flatten = false );
-
-        ResultEntry( const ResultEntry &entry );
-
-        QString url;
-        QString id;
-        QString category;
-        QString title;
-        QString sortIndices;
-        QString metadataUrl;
-        QString detailUrl;
-        bool flatten;
-    };
 };
 
 /************************************************************************
