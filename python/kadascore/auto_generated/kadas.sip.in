@@ -39,6 +39,8 @@ class Kadas
 
     static QString projectTemplatesPath();
 
+    static QString locale( bool languageOnly = false );
+
     static GDALDatasetH gdalOpenForLayer( const QgsRasterLayer *layer, QString *errMsg = 0 );
 
     static void importSslCertificates();

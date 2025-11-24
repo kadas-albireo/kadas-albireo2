@@ -4,6 +4,7 @@ try:
     Kadas.pkgDataPath = staticmethod(Kadas.pkgDataPath)
     Kadas.pkgResourcePath = staticmethod(Kadas.pkgResourcePath)
     Kadas.projectTemplatesPath = staticmethod(Kadas.projectTemplatesPath)
+    Kadas.locale = staticmethod(Kadas.locale)
     Kadas.gdalOpenForLayer = staticmethod(Kadas.gdalOpenForLayer)
     Kadas.importSslCertificates = staticmethod(Kadas.importSslCertificates)
 except AttributeError:

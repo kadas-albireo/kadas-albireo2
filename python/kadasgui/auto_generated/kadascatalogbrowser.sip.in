@@ -13,6 +13,7 @@
 
 
 
+
 class KadasCatalogBrowser : QWidget
 {
 %Docstring(signature="appended")
@@ -30,6 +31,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/kadascatalogbrowser.h"
 %End
   public:
+
     KadasCatalogBrowser( QWidget *parent = 0 );
     void addProvider( KadasCatalogProvider *provider );
     QStandardItem *addItem( QStandardItem *parent, QString text, int sortIndex, bool isLeaf = false, QMimeData *mimeData = 0 );

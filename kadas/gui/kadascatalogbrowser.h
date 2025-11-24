@@ -36,7 +36,7 @@ class KADAS_GUI_EXPORT KadasCatalogBrowser : public QWidget
 {
     Q_OBJECT
   public:
-    static const inline QgsSettingsEntryBool *sSettingLoadArcgiseatureserverLayersAsRaster = new QgsSettingsEntryBool( QStringLiteral( "load-arcgisfeatureserver-layers-as-raster" ), KadasSettingsTree::sTreePortal, true );
+    static const inline QgsSettingsEntryBool *sSettingLoadArcgiseatureserverLayersAsRaster = new QgsSettingsEntryBool( QStringLiteral( "load-arcgisfeatureserver-layers-as-raster" ), KadasSettingsTree::sTreePortal, true ) SIP_SKIP;
 
     KadasCatalogBrowser( QWidget *parent = 0 );
     void addProvider( KadasCatalogProvider *provider ) { mProviders.append( provider ); }
