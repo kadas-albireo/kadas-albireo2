@@ -53,15 +53,38 @@ class KADAS_GUI_EXPORT KadasCatalogProvider : public QObject
     bool parseWMSLayerCapabilities( const QDomNode &layerItem, const QString &title, const QStringList &imgFormats, const QStringList &parentCrs, const QString &url, const QString &layerInfoUrl, const QString &authCfg, QMimeData *&mimeData ) const;
     QStandardItem *getCategoryItem( const QStringList &titles, const QStringList &sortIndices );
 
+#ifndef SIP_RUN
     struct ResultEntry
     {
         ResultEntry() {}
         ResultEntry( const QString &_id, const QString &_category, const QString &_sortIndices )
-          : id( _id ), category( _category ), sortIndices( _sortIndices ) {}
+          : id( _id )
+          , category( _category )
+          , sortIndices( _sortIndices )
+        {}
+
         ResultEntry( const QString &_url, const QString &_id, const QString &_category, const QString &_title, const QString &_sortIndices, const QString &_metadataUrl, const QString &_detailUrl, bool _flatten = false )
-          : url( _url ), id( _id ), category( _category ), title( _title ), sortIndices( _sortIndices ), metadataUrl( _metadataUrl ), detailUrl( _detailUrl ), flatten( _flatten ) {}
+          : url( _url )
+          , id( _id )
+          , category( _category )
+          , title( _title )
+          , sortIndices( _sortIndices )
+          , metadataUrl( _metadataUrl )
+          , detailUrl( _detailUrl )
+          , flatten( _flatten )
+        {}
+
         ResultEntry( const ResultEntry &entry )
-          : url( entry.url ), id( entry.id ), category( entry.category ), title( entry.title ), sortIndices( entry.sortIndices ), metadataUrl( entry.metadataUrl ), detailUrl( entry.detailUrl ), flatten( entry.flatten ) {}
+          : url( entry.url )
+          , id( entry.id )
+          , category( entry.category )
+          , title( entry.title )
+          , sortIndices( entry.sortIndices )
+          , metadataUrl( entry.metadataUrl )
+          , detailUrl( entry.detailUrl )
+          , flatten( entry.flatten )
+        {}
+
         QString url;
         QString id;
         QString category;
@@ -72,6 +95,7 @@ class KADAS_GUI_EXPORT KadasCatalogProvider : public QObject
         bool flatten;
     };
     typedef QMap<QString, ResultEntry> EntryMap;
+#endif
 };
 
 #endif // KADASCATALOGPROVIDER_H
