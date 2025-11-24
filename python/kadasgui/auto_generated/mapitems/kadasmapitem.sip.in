@@ -246,6 +246,8 @@ class KadasMapItem : QObject /Abstract/
     QJsonObject serialize() const;
     bool deserialize( const QJsonObject &json );
 
+    virtual bool useQgisAnnotations() const;
+
     virtual QgsAnnotationItem *annotationItem() const;
 
     virtual QString itemName() const = 0;
@@ -460,13 +462,12 @@ Once every item has been migrated this should become pure virtual
     void aboutToBeDestroyed();
     void changed();
     void propertyChanged();
+    void zIndexChanged( int index );
 
   protected:
 
 
     virtual KadasMapItem::State *createEmptyState() const /Factory/;
-
-    virtual bool useProperties() const;
 
     virtual void writeXmlPrivate( QDomElement &element ) const;
     virtual void readXmlPrivate( const QDomElement &element );

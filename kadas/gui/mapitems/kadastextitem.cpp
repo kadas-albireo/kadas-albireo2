@@ -27,9 +27,10 @@
 
 
 KadasTextItem::KadasTextItem( const QgsCoordinateReferenceSystem &crs )
-  : KadasPointItem( crs )
+  : KadasAbstractPointItem( crs )
 {
   mQgsItem = new QgsAnnotationPointTextItem( QString(), QgsPoint() );
+  connect( this, &KadasMapItem::zIndexChanged, this, [=]( int index ) { mQgsItem->setZIndex( index ); } );
 }
 
 void KadasTextItem::setText( const QString &text )
@@ -39,12 +40,7 @@ void KadasTextItem::setText( const QString &text )
   update();
 }
 
-QgsPointXY KadasTextItem::point() const
-{
-  return mQgsItem->point();
-}
-
-void KadasTextItem::setPoint( const QgsPointXY &point )
+void KadasTextItem::setItemGeometry( const QgsPointXY &point )
 {
   mQgsItem->setPoint( QgsPoint( point ) );
   update();

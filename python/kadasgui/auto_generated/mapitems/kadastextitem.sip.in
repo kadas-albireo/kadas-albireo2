@@ -10,7 +10,8 @@
 
 
 
-class KadasTextItem : KadasPointItem
+
+class KadasTextItem : KadasAbstractPointItem
 {
 %Docstring(signature="appended")
 *************************************************************************
@@ -31,13 +32,12 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     virtual QString itemName() const;
 
+    virtual void setItemGeometry( const QgsPointXY &point );
+
+    virtual QgsAnnotationPointTextItem *annotationItem() const;
+
     void setText( const QString &text );
     const QString &text() const;
-
-    virtual void setPoint( const QgsPointXY &point );
-
-    virtual QgsPointXY point() const;
-
 
     void setColor( const QColor &color );
     QColor color() const;

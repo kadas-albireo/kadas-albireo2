@@ -65,7 +65,6 @@ the Free Software Foundation; either version 2 of the License, or     *
         QString detailUrl;
         bool flatten;
     };
-    typedef QMap<QString, ResultEntry> EntryMap;
 };
 
 /************************************************************************

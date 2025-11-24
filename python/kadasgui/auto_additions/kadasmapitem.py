@@ -62,6 +62,7 @@ try:
     KadasMapItem.anchorNodeRenderer = staticmethod(KadasMapItem.anchorNodeRenderer)
     KadasMapItem.outputDpiScale = staticmethod(KadasMapItem.outputDpiScale)
     KadasMapItem.getTextRenderScale = staticmethod(KadasMapItem.getTextRenderScale)
+    KadasMapItem.__signal_arguments__ = {'zIndexChanged': ['index: int']}
 except AttributeError:
     pass
 try:

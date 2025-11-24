@@ -278,7 +278,7 @@ class KADAS_GUI_EXPORT KadasItemRect
 class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 {
     Q_OBJECT
-    Q_PROPERTY( int zIndex READ zIndex WRITE setZIndex )
+    Q_PROPERTY( int zIndex READ zIndex WRITE setZIndex NOTIFY zIndexChanged )
     Q_PROPERTY( double symbolScale READ symbolScale WRITE setSymbolScale )
     Q_PROPERTY( QString editor READ editor WRITE setEditor )
     //Q_PROPERTY( QString authId READ authId WRITE setAuthId )
@@ -298,6 +298,10 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     KadasMapItem *clone() const;
     QJsonObject serialize() const;
     bool deserialize( const QJsonObject &json );
+
+    // Old annotations use QObject properties
+    // TODO: remove when all annotations are migrated
+    virtual bool useQgisAnnotations() const { return false; }
 
     virtual QgsAnnotationItem *annotationItem() const { return nullptr; }
 
@@ -519,6 +523,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     void aboutToBeDestroyed();
     void changed();
     void propertyChanged();
+    void zIndexChanged( int index );
 
   protected:
     State *mState = nullptr;
@@ -537,11 +542,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
     // TODO: remove when all annotations are migrated
     virtual KadasMapItem::State *createEmptyState() const SIP_FACTORY { return nullptr; }
-
-    // Old annotations use QObject properties
-    // New ones should not rely on this
-    // TODO: remove when all annotations are migrated
-    virtual bool useProperties() const { return true; }
 
     // TODO: make this pure virtual when all annotations are migrated
     virtual void writeXmlPrivate( QDomElement &element ) const {}

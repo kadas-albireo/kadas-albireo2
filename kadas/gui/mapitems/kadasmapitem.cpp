@@ -71,7 +71,7 @@ KadasMapItem *KadasMapItem::clone() const
   KadasMapItem *item = _clone();
   item->mDrawStatus = mDrawStatus;
   item->mEditor = mEditor;
-  if ( useProperties() )
+  if ( !useQgisAnnotations() )
   {
     for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
     {
@@ -190,6 +190,7 @@ void KadasMapItem::setZIndex( int zIndex )
 {
   mZIndex = zIndex;
   update();
+  emit zIndexChanged( zIndex );
   emit propertyChanged();
 }
 
@@ -395,7 +396,7 @@ QDomElement KadasMapItem::writeXml( QDomDocument &document ) const
     itemEl.setAttribute( "associatedLayer", associatedLayer()->id() );
   }
   QJsonDocument doc;
-  if ( useProperties() )
+  if ( !useQgisAnnotations() )
   {
     doc.setObject( serialize() );
     itemEl.appendChild( document.createCDATASection( doc.toJson( QJsonDocument::Compact ) ) );
@@ -426,7 +427,7 @@ KadasMapItem *KadasMapItem::fromXml( const QDomElement &element )
     {
       item->associateToLayer( QgsProject::instance()->mapLayer( layerId ) );
     }
-    if ( item->useProperties() )
+    if ( !item->useQgisAnnotations() )
     {
       QJsonDocument data = QJsonDocument::fromJson( itemEl.firstChild().toCDATASection().data().toLocal8Bit() );
       if ( item->deserialize( data.object() ) )

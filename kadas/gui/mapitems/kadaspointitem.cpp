@@ -26,13 +26,140 @@
 
 #include "kadas/gui/mapitems/kadaspointitem.h"
 
-
-KadasPointItem::KadasPointItem( const QgsCoordinateReferenceSystem &crs, Qgis::MarkerShape icon )
+KadasAbstractPointItem::KadasAbstractPointItem( const QgsCoordinateReferenceSystem &crs )
   : KadasMapItem( crs )
 {
-  mQgsItem = new QgsAnnotationMarkerItem( QgsPoint() );
-  setShape( icon );
   clear();
+}
+
+void KadasAbstractPointItem::translate( double dx, double dy )
+{
+  QgsGeometry geom = QgsGeometry::fromPointXY( mPoint );
+  geom.translate( dx, dy );
+  setItemGeometry( *qgsgeometry_cast<const QgsPoint *>( geom.constGet() ) );
+  update();
+}
+
+
+void KadasAbstractPointItem::setPoint( const QgsPointXY &point )
+{
+  mPoint = point;
+  setItemGeometry( point );
+  update();
+}
+
+void KadasAbstractPointItem::setState( const KadasMapItem::State *state )
+{
+  KadasMapItem::setState( state );
+  updateQgsAnnotation();
+}
+
+bool KadasAbstractPointItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
+{
+  mDrawStatus = DrawStatus::Drawing;
+  setPoint( QgsPoint( firstPoint ) );
+  return false;
+}
+
+bool KadasAbstractPointItem::startPart( const AttribValues &values, const QgsMapSettings &mapSettings )
+{
+  return startPart( KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
+}
+
+void KadasAbstractPointItem::setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings )
+{
+  // Do nothing
+}
+
+void KadasAbstractPointItem::setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings )
+{
+  // Do nothing
+}
+
+bool KadasAbstractPointItem::continuePart( const QgsMapSettings &mapSettings )
+{
+  // No further action allowed
+  return false;
+}
+
+void KadasAbstractPointItem::endPart()
+{
+  mDrawStatus = DrawStatus::Finished;
+}
+
+KadasMapItem::AttribDefs KadasAbstractPointItem::drawAttribs() const
+{
+  AttribDefs attributes;
+  attributes.insert( AttrX, NumericAttribute { "x" } );
+  attributes.insert( AttrY, NumericAttribute { "y" } );
+  return attributes;
+}
+
+KadasMapItem::AttribValues KadasAbstractPointItem::drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
+{
+  AttribValues values;
+  values.insert( AttrX, pos.x() );
+  values.insert( AttrY, pos.y() );
+  return values;
+}
+
+KadasMapPos KadasAbstractPointItem::positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const
+{
+  return KadasMapPos( values[AttrX], values[AttrY] );
+}
+
+KadasMapItem::EditContext KadasAbstractPointItem::getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
+{
+  QgsPointXY testPos = toMapPos( point(), mapSettings );
+  if ( pos.sqrDist( KadasMapPos::fromPoint( testPos ) ) < pickTolSqr( mapSettings ) )
+  {
+    return EditContext( QgsVertexId( 0, 0, 0 ), KadasMapPos::fromPoint( testPos ), drawAttribs() );
+  }
+  return EditContext();
+}
+
+void KadasAbstractPointItem::edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings )
+{
+  setPoint( QgsPoint( toItemPos( newPoint, mapSettings ) ) );
+}
+
+void KadasAbstractPointItem::edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings )
+{
+  edit( context, KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
+}
+
+KadasMapItem::AttribValues KadasAbstractPointItem::editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
+{
+  return drawAttribsFromPosition( pos, mapSettings );
+}
+
+KadasMapPos KadasAbstractPointItem::positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const
+{
+  return positionFromDrawAttribs( values, mapSettings );
+}
+
+QgsPointXY KadasAbstractPointItem::point() const
+{
+  return mPoint;
+}
+
+QList<KadasMapItem::Node> KadasAbstractPointItem::nodes( const QgsMapSettings &settings ) const
+{
+  return { { toMapPos( KadasItemPos::fromPoint( point() ), settings ) } };
+}
+
+bool KadasAbstractPointItem::intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const
+{
+  return rect.intersects( boundingBox() );
+}
+
+
+KadasPointItem::KadasPointItem( const QgsCoordinateReferenceSystem &crs, Qgis::MarkerShape icon )
+  : KadasAbstractPointItem( crs )
+{
+  mQgsItem = new QgsAnnotationMarkerItem( QgsPoint() );
+  connect( this, &KadasMapItem::zIndexChanged, this, [=]( int index ) { mQgsItem->setZIndex( index ); } );
+  setShape( icon );
 }
 
 void KadasPointItem::setShape( Qgis::MarkerShape shape )
@@ -41,14 +168,6 @@ void KadasPointItem::setShape( Qgis::MarkerShape shape )
   updateQgsAnnotation();
 }
 
-void KadasPointItem::translate( double dx, double dy )
-{
-  QgsGeometry geom = QgsGeometry::fromPointXY( mQgsItem->geometry() );
-  geom.translate( dx, dy );
-  mQgsItem->setGeometry( *qgsgeometry_cast<const QgsPoint *>( geom.constGet() ) );
-
-  update();
-}
 
 void KadasPointItem::setIconSize( int size )
 {
@@ -80,99 +199,9 @@ void KadasPointItem::setStrokeStyle( const Qt::PenStyle &style )
   updateQgsAnnotation();
 }
 
-bool KadasPointItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
-{
-  mDrawStatus = DrawStatus::Drawing;
-  setPoint( QgsPoint( firstPoint ) );
-  return false;
-}
-
-bool KadasPointItem::startPart( const AttribValues &values, const QgsMapSettings &mapSettings )
-{
-  return startPart( KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
-}
-
-void KadasPointItem::setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings )
-{
-  // Do nothing
-}
-
-void KadasPointItem::setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings )
-{
-  // Do nothing
-}
-
-bool KadasPointItem::continuePart( const QgsMapSettings &mapSettings )
-{
-  // No further action allowed
-  return false;
-}
-
-void KadasPointItem::endPart()
-{
-  mDrawStatus = DrawStatus::Finished;
-}
-
-KadasMapItem::AttribDefs KadasPointItem::drawAttribs() const
-{
-  AttribDefs attributes;
-  attributes.insert( AttrX, NumericAttribute { "x" } );
-  attributes.insert( AttrY, NumericAttribute { "y" } );
-  return attributes;
-}
-
-KadasMapItem::AttribValues KadasPointItem::drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
-{
-  AttribValues values;
-  values.insert( AttrX, pos.x() );
-  values.insert( AttrY, pos.y() );
-  return values;
-}
-
-KadasMapPos KadasPointItem::positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const
-{
-  return KadasMapPos( values[AttrX], values[AttrY] );
-}
-
-KadasMapItem::EditContext KadasPointItem::getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
-{
-  QgsPointXY testPos = toMapPos( point(), mapSettings );
-  if ( pos.sqrDist( KadasMapPos::fromPoint( testPos ) ) < pickTolSqr( mapSettings ) )
-  {
-    return EditContext( QgsVertexId( 0, 0, 0 ), KadasMapPos::fromPoint( testPos ), drawAttribs() );
-  }
-  return EditContext();
-}
-
-void KadasPointItem::edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings )
-{
-  setPoint( QgsPoint( toItemPos( newPoint, mapSettings ) ) );
-}
-
-void KadasPointItem::edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings )
-{
-  edit( context, KadasMapPos( values[AttrX], values[AttrY] ), mapSettings );
-}
-
-KadasMapItem::AttribValues KadasPointItem::editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const
-{
-  return drawAttribsFromPosition( pos, mapSettings );
-}
-
-KadasMapPos KadasPointItem::positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const
-{
-  return positionFromDrawAttribs( values, mapSettings );
-}
-
-QgsPointXY KadasPointItem::point() const
-{
-  return mQgsItem->geometry();
-}
-
-void KadasPointItem::setPoint( const QgsPointXY &point )
+void KadasPointItem::setItemGeometry( const QgsPointXY &point )
 {
   mQgsItem->setGeometry( QgsPoint( point ) );
-  update();
 }
 
 void KadasPointItem::updateQgsAnnotation()
@@ -292,16 +321,6 @@ QgsRectangle KadasPointItem::boundingBox() const
   return mQgsItem->boundingBox();
 }
 
-QList<KadasMapItem::Node> KadasPointItem::nodes( const QgsMapSettings &settings ) const
-{
-  return { { toMapPos( KadasItemPos::fromPoint( point() ), settings ) } };
-}
-
-bool KadasPointItem::intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const
-{
-  return rect.intersects( boundingBox() );
-}
-
 void KadasPointItem::render( QgsRenderContext &context ) const
 {
   QgsFeedback fb;
@@ -339,11 +358,4 @@ QString KadasPointItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip )
   outStream << "</Placemark>\n";
   outStream.flush();
   return outString;
-}
-
-
-void KadasPointItem::setState( const KadasMapItem::State *state )
-{
-  KadasMapItem::setState( state );
-  updateQgsAnnotation();
 }

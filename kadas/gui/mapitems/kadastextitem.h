@@ -17,11 +17,12 @@
 #ifndef KADASTEXTITEM_H
 #define KADASTEXTITEM_H
 
+#include <qgis/qgsannotationpointtextitem.h>
+
 #include "kadas/gui/mapitems/kadaspointitem.h"
 
-class QgsAnnotationPointTextItem;
 
-class KADAS_GUI_EXPORT KadasTextItem : public KadasPointItem
+class KADAS_GUI_EXPORT KadasTextItem : public KadasAbstractPointItem
 {
     Q_OBJECT
     Q_PROPERTY( QString text READ text WRITE setText )
@@ -33,11 +34,12 @@ class KADAS_GUI_EXPORT KadasTextItem : public KadasPointItem
 
     QString itemName() const override { return tr( "Text" ); }
 
+    virtual void setItemGeometry( const QgsPointXY &point ) override;
+
+    virtual QgsAnnotationPointTextItem *annotationItem() const override { return mQgsItem; }
+
     void setText( const QString &text );
     const QString &text() const { return mText; }
-
-    void setPoint( const QgsPointXY &point ) override;
-    QgsPointXY point() const override;
 
     void setColor( const QColor &color );
     QColor color() const { return mColor; }

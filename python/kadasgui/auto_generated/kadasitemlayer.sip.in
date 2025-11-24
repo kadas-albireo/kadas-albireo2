@@ -126,6 +126,11 @@ class KadasItemLayer : KadasPluginLayer
       PICK_OBJECTIVE_TOOLTIP
     };
 
+    QgsAnnotationLayer *qgisAnnotationLayer() const /Factory/;
+%Docstring
+The QGIS annotation layer will only contain items/annotations inheriting from :py:class:`QgsAnnotationItem`.
+%End
+
     static QString layerType();
     KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs );
     ~KadasItemLayer();

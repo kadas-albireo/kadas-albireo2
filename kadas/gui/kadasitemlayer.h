@@ -25,6 +25,7 @@
 
 class QMenu;
 class QuaZip;
+class QgsAnnotationLayer;
 class KadasMapItem;
 class KadasMapPos;
 
@@ -141,6 +142,12 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
       PICK_OBJECTIVE_ANY,
       PICK_OBJECTIVE_TOOLTIP
     };
+
+    //! Create and return a QGIS annotation layer
+    //! In the future, Kadas would use only annotation layers
+    //! Until the migration is complete we can dynamically create annotation layers for specific use-cases such as 3D rendering
+    //! The QGIS annotation layer will only contain items/annotations inheriting from QgsAnnotationItem.
+    QgsAnnotationLayer *qgisAnnotationLayer() const SIP_FACTORY;
 
     static QString layerType() { return "KadasItemLayer"; }
     KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs );
