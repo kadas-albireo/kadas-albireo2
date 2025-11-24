@@ -1,9 +1,9 @@
 string(REPLACE "." "_" TAG ${VERSION})
 
 # set(QGIS_REF final-${TAG})
-set(QGIS_REF 25d28abfdad830c079d5bab019e5a78e320dd09b)
+set(QGIS_REF e1a48d4f4cbfc5808c7edd0dc255337ee031420f)
 set(QGIS_SHA512
-    6c53e58cfa6987a2e2eb4d6e430052927359d3e936377a20380d4f1c3597a7b39d7618c860a48bec6b29c7707de938195eae1e1cfd94af6eb9ef984be2a2978b
+    0c9068503b83bc035bc5ef2e06588b793757640c576b893e9114f2a43615e544bacbecb7935a9cab06fb2ac2b4f2baad5d4806ec8d21fea279204dfc33f13941
 )
 
 vcpkg_from_github(
@@ -20,11 +20,9 @@ vcpkg_from_github(
   PATCHES
   # Make qgis support python's debug library
   qgspython.patch
-  ui-hdrs-install.patch
   bindings-install.patch
-  test-hdrs-install.patch
+  link-appkit.patch
   libxml2.patch
-  exiv2.patch
   crssync.patch
   mesh.patch
   sipcxx17.patch
@@ -33,11 +31,11 @@ vcpkg_from_github(
   3dchunkloaderconcurrency.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1278
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
+  mac_install_images.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
 file(REMOVE ${SOURCE_PATH}/cmake/FindGEOS.cmake)
-file(REMOVE ${SOURCE_PATH}/cmake/FindEXIV2.cmake)
 file(REMOVE ${SOURCE_PATH}/cmake/FindExpat.cmake)
 file(REMOVE ${SOURCE_PATH}/cmake/FindIconv.cmake)
 file(REMOVE ${SOURCE_PATH}/cmake/FindPoly2Tri.cmake)
@@ -55,16 +53,13 @@ if("bindings" IN_LIST FEATURES)
   list(APPEND QGIS_OPTIONS -DWITH_BINDINGS:BOOL=ON)
   list(APPEND QGIS_OPTIONS -DSIP_GLOBAL_INSTALL:BOOL=OFF)
 
-  if(NOT VCPKG_TARGET_IS_OSX)
-    # We are relying on some qgis hacks in here In QGIS, when not on macos, we
-    # do not have DEFAULT_PYTHON_SUBDIR set. If SIP_GLOBAL_INSTALL=OFF and
-    # DEFAULT_PYTHON_SUBDIR is set, this is used instead. If this breaks in the
-    # future, we should consider adding an explicit override for the sip
-    # installation dir in QGIS.
-    list(APPEND QGIS_OPTIONS
-         "-DDEFAULT_PYTHON_SUBDIR=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}"
-    )
-  endif()
+  # We are relying on some qgis hacks in here In QGIS. If SIP_GLOBAL_INSTALL=OFF
+  # and DEFAULT_PYTHON_SUBDIR is set, this is used instead. If this breaks in
+  # the future, we should consider adding an explicit override for the sip
+  # installation dir in QGIS.
+  list(APPEND QGIS_OPTIONS
+       "-DDEFAULT_PYTHON_SUBDIR=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}"
+  )
 else()
   vcpkg_find_acquire_program(PYTHON3)
   list(APPEND QGIS_OPTIONS "-DPython_EXECUTABLE=${PYTHON3}")
@@ -98,6 +93,7 @@ list(APPEND QGIS_OPTIONS "-DBUILD_WITH_QT6=OFF")
 list(APPEND QGIS_OPTIONS "-DProtobuf_LITE_LIBRARY=protobuf::libprotobuf-lite")
 list(APPEND QGIS_OPTIONS "-DWITH_INTERNAL_NLOHMANN_JSON:BOOL=OFF")
 list(APPEND QGIS_OPTIONS "-DWITH_QTWEBENGINE:BOOL=OFF")
+list(APPEND QGIS_OPTIONS "-DQGIS_MAC_BUNDLE:BOOL=OFF")
 
 if("opencl" IN_LIST FEATURES)
   list(APPEND QGIS_OPTIONS -DUSE_OPENCL:BOOL=ON)

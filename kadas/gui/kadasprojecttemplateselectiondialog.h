@@ -25,7 +25,7 @@
 class QDir;
 class QFileIconProvider;
 
-class KADAS_GUI_EXPORT KadasProjectTemplateSelectionDialog : public QDialog, private Ui::KadasProjectTemplateSelectionDialogBase
+class KADAS_GUI_EXPORT KadasProjectTemplateSelectionDialog : public QDialog
 {
     Q_OBJECT
   public:
@@ -35,6 +35,7 @@ class KADAS_GUI_EXPORT KadasProjectTemplateSelectionDialog : public QDialog, pri
     void templateSelected( const QString &templateFile, const QUrl &templateUrl );
 
   private:
+    Ui::KadasProjectTemplateSelectionDialogBase mUi;
     QAbstractButton *mCreateButton = nullptr;
 
     void populateFileTree( const QDir &dir, QTreeWidgetItem *parent, const QFileIconProvider &iconProvider );

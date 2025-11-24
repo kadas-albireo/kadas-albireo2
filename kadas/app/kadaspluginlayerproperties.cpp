@@ -60,9 +60,9 @@ KadasPluginLayerProperties::KadasPluginLayerProperties( KadasPluginLayer *layer,
   item->setText( tr( "Rendering" ) );
   item->setToolTip( tr( "Rendering" ) );
 
-  mOptionsListWidget->addItem( item );
+  mUi.mOptionsListWidget->addItem( item );
 
   QgsMapLayerConfigWidget *itemLayerRenderingWidget = new KadasPluginLayerRenderingPropertiesWidget( layer, canvas, this );
   mLayerPropertiesPages << itemLayerRenderingWidget;
-  mOptionsStackedWidget->addWidget( itemLayerRenderingWidget );
+  mUi.mOptionsStackedWidget->addWidget( itemLayerRenderingWidget );
 }

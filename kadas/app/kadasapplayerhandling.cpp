@@ -140,7 +140,8 @@ void KadasAppLayerHandling::postProcessAddedLayer( QgsMapLayer *layer )
           {
             // Have a pick at the first feature and assume it's the same for each
             // TODO Would be better to have a `QgsEmbeddedSymbol3DRenderer` for each features directly in QGIS
-            return embeddedRenderer->symbolForFeature( feature, QgsRenderContext() )->color();
+            QgsRenderContext context;
+            return embeddedRenderer->symbolForFeature( feature, context )->color();
           }
         }
         else if ( renderer2D->type() == QLatin1String( "singleSymbol" ) )
