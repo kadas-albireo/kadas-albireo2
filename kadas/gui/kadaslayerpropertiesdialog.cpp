@@ -27,12 +27,12 @@ KadasLayerPropertiesDialog::KadasLayerPropertiesDialog( QgsMapLayer *layer, QWid
   : QDialog( parent )
   , mLayer( layer )
 {
-  setupUi( this );
+  mUi.setupUi( this );
 
-  connect( mButtonBox, &QDialogButtonBox::accepted, this, &QDialog::accept );
-  connect( mButtonBox, &QDialogButtonBox::accepted, this, &KadasLayerPropertiesDialog::apply );
-  connect( mButtonBox, &QDialogButtonBox::rejected, this, &QDialog::reject );
-  connect( mButtonBox->button( QDialogButtonBox::Apply ), &QPushButton::clicked, this, &KadasLayerPropertiesDialog::apply );
+  connect( mUi.mButtonBox, &QDialogButtonBox::accepted, this, &QDialog::accept );
+  connect( mUi.mButtonBox, &QDialogButtonBox::accepted, this, &KadasLayerPropertiesDialog::apply );
+  connect( mUi.mButtonBox, &QDialogButtonBox::rejected, this, &QDialog::reject );
+  connect( mUi.mButtonBox->button( QDialogButtonBox::Apply ), &QPushButton::clicked, this, &KadasLayerPropertiesDialog::apply );
   connect( this, &QDialog::accepted, this, &KadasLayerPropertiesDialog::apply );
 }
 
@@ -48,11 +48,11 @@ void KadasLayerPropertiesDialog::addPropertiesPageFactory( QgsMapLayerConfigWidg
   item->setText( factory->title() );
   item->setToolTip( factory->title() );
 
-  mOptionsListWidget->addItem( item );
+  mUi.mOptionsListWidget->addItem( item );
 
   QgsMapLayerConfigWidget *page = factory->createWidget( mLayer, nullptr, false, this );
   mLayerPropertiesPages << page;
-  mOptionsStackedWidget->addWidget( page );
+  mUi.mOptionsStackedWidget->addWidget( page );
 }
 
 void KadasLayerPropertiesDialog::apply()

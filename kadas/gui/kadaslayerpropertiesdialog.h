@@ -27,7 +27,7 @@ class QgsMapLayerConfigWidgetFactory;
 class QgsMapLayer;
 
 
-class KADAS_GUI_EXPORT KadasLayerPropertiesDialog : public QDialog, protected Ui::KadasLayerPropertiesBase
+class KADAS_GUI_EXPORT KadasLayerPropertiesDialog : public QDialog
 {
     Q_OBJECT
   public:
@@ -40,6 +40,8 @@ class KADAS_GUI_EXPORT KadasLayerPropertiesDialog : public QDialog, protected Ui
   protected:
     QgsMapLayer *mLayer = nullptr;
     QList<QgsMapLayerConfigWidget *> mLayerPropertiesPages;
+
+    Ui::KadasLayerPropertiesBase mUi;
 };
 
 #endif // KADASLAYERPROPERTIESDIALOG_H

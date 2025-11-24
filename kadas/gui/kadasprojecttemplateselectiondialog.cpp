@@ -36,7 +36,7 @@
 KadasProjectTemplateSelectionDialog::KadasProjectTemplateSelectionDialog( QWidget *parent )
   : QDialog( parent )
 {
-  setupUi( this );
+  mUi.setupUi( this );
 
   QString serviceUrl = QgsSettings().value( "kadas/project_template_service" ).toString();
   bool offline = QgsSettings().value( "/kadas/isOffline" ).toBool();
@@ -50,13 +50,13 @@ KadasProjectTemplateSelectionDialog::KadasProjectTemplateSelectionDialog( QWidge
   {
     QFileIconProvider provider;
     QDir projectTemplatesDir( Kadas::projectTemplatesPath() );
-    populateFileTree( projectTemplatesDir, mTreeWidget->invisibleRootItem(), provider );
+    populateFileTree( projectTemplatesDir, mUi.mTreeWidget->invisibleRootItem(), provider );
   }
 
-  connect( mTreeWidget, &QTreeWidget::itemClicked, this, &KadasProjectTemplateSelectionDialog::itemClicked );
-  connect( mTreeWidget, &QTreeWidget::itemDoubleClicked, this, &KadasProjectTemplateSelectionDialog::itemDoubleClicked );
+  connect( mUi.mTreeWidget, &QTreeWidget::itemClicked, this, &KadasProjectTemplateSelectionDialog::itemClicked );
+  connect( mUi.mTreeWidget, &QTreeWidget::itemDoubleClicked, this, &KadasProjectTemplateSelectionDialog::itemDoubleClicked );
 
-  mCreateButton = mButtonBox->addButton( tr( "Create" ), QDialogButtonBox::AcceptRole );
+  mCreateButton = mUi.mButtonBox->addButton( tr( "Create" ), QDialogButtonBox::AcceptRole );
   mCreateButton->setEnabled( false );
   connect( mCreateButton, &QAbstractButton::clicked, this, &KadasProjectTemplateSelectionDialog::createProject );
 }
@@ -77,7 +77,7 @@ void KadasProjectTemplateSelectionDialog::parseServiceReply()
 
     QTreeWidgetItem *remoteItem = new QTreeWidgetItem( QStringList() << tr( "Remote templates" ) );
     remoteItem->setIcon( 0, iconProvider.icon( QFileIconProvider::Network ) );
-    mTreeWidget->invisibleRootItem()->addChild( remoteItem );
+    mUi.mTreeWidget->invisibleRootItem()->addChild( remoteItem );
     remoteItem->setExpanded( true );
     for ( const QJsonValue &value : results )
     {
@@ -91,7 +91,7 @@ void KadasProjectTemplateSelectionDialog::parseServiceReply()
 
   QTreeWidgetItem *localItem = new QTreeWidgetItem( QStringList() << tr( "Local templates" ) );
   localItem->setIcon( 0, iconProvider.icon( QFileIconProvider::Folder ) );
-  mTreeWidget->invisibleRootItem()->addChild( localItem );
+  mUi.mTreeWidget->invisibleRootItem()->addChild( localItem );
   localItem->setExpanded( true );
   QDir projectTemplatesDir( Kadas::projectTemplatesPath() );
   populateFileTree( projectTemplatesDir, localItem, iconProvider );
@@ -134,7 +134,7 @@ void KadasProjectTemplateSelectionDialog::itemDoubleClicked( QTreeWidgetItem *it
 
 void KadasProjectTemplateSelectionDialog::createProject()
 {
-  QTreeWidgetItem *item = mTreeWidget->currentItem();
+  QTreeWidgetItem *item = mUi.mTreeWidget->currentItem();
   if ( !item )
   {
     return;
