@@ -1,9 +1,9 @@
 string(REPLACE "." "_" TAG ${VERSION})
 
 # set(QGIS_REF final-${TAG})
-set(QGIS_REF 4c0c6f47f43d2e476a290dbd3f60d6adf66601ef)
+set(QGIS_REF 8b44b4a994e990392e1002a7d029b8ce1bd87702)
 set(QGIS_SHA512
-    d8f595c4e3a7d24c8b676b42c5eae17f946a20d238b94385465f364d9d7ad8c546a3238bea391da58668f659ccbb14cee8573da9fb28134b698c70221139e46f
+    a26696a4767b937295ee96e98f4f289a20fa1f8bf063e2b338812f3895fd0fd2354df4e23d56414edec612a895bf9e3e2de247eb4462d25d82db126128fc6337
 )
 
 vcpkg_from_github(
@@ -32,7 +32,7 @@ vcpkg_from_github(
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
   mac_install_images.patch
-  blanksegments.patch
+  sipconcat.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
