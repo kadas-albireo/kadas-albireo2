@@ -120,6 +120,8 @@ set(KADAS_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${KADAS_OUTPUT_DIRECTORY}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${KADAS_OUTPUT_DIRECTORY}/lib)
 
+include(InstallDeps)
+
 file(WRITE "${CMAKE_BINARY_DIR}/output/bin/.kadasbuilddir" )
 
 set(MILX_LICENSE_KEY CACHE STRING "")
@@ -140,8 +142,20 @@ if(BUILD_TESTING)
   add_subdirectory(tests)
 endif()
 
-option(INSTALL_DEMO_DATA "Install settings and templates" OFF)
-if(INSTALL_DEMO_DATA)
+set(INSTALL_SWISS_DTM
+    TRUE
+    CACHE BOOL "Install dtm_swiss_only.tif."
+)
+if(INSTALL_SWISS_DTM)
+  install(FILES "share/geodata/dtm_swiss_only.tif"
+          DESTINATION "share/kadas/geodata/"
+  )
+endif()
+set(INSTALL_ALBIREO_SETTINGS
+    TRUE
+    CACHE BOOL "Install Albireo Settings."
+)
+if(INSTALL_ALBIREO_SETTINGS)
   install(FILES "share/settings_patch.ini" DESTINATION "share/kadas/")
   install(DIRECTORY "share/project_templates" DESTINATION "share/kadas/")
 endif()
@@ -149,8 +163,9 @@ endif()
 install(
   DIRECTORY "share/"
   DESTINATION "share/kadas/"
-  PATTERN "share/settings_patch.ini" EXCLUDE
-  PATTERN "share/project_templates" EXCLUDE
+  PATTERN "settings_patch.ini" EXCLUDE
+  PATTERN "project_templates" EXCLUDE
+  PATTERN "geodata" EXCLUDE
 )
 
 if(WITH_VCPKG)
