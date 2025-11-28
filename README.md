@@ -100,6 +100,8 @@ More tools like hillshade and viewshed analysis are available as well.
 
 ![print](https://github.com/kadas-albireo/kadas-albireo2/blob/gh-pages/images/print.png)
 
+## publiccode.yaml
+This file adds the repository to catalogs like the [OSS Catalogue](https://opensource.admin.ch/) by the Swiss Confederation. It follows a [metadata standard](https://yml.publiccode.tools/) for repositories with software developed by public administrations. It has been created with [the publiccode editor](https://swiss.github.io/publiccode-editor/).
 
 ## Feedback and support:
 
