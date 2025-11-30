@@ -1,0 +1,76 @@
+From cb7bafe6a5344be17849bcd3ff33b61eb5a3a99a Mon Sep 17 00:00:00 2001
+From: Damiano Lombardi <damiano@opengis.ch>
+Date: Sun, 30 Nov 2025 22:42:42 +0100
+Subject: [PATCH] Use WebEngine if available to display raster layer
+ informations
+
+---
+ src/gui/raster/qgsrasterlayerproperties.cpp | 9 +++++++++
+ src/gui/raster/qgsrasterlayerproperties.h   | 8 +++++++-
+ 2 files changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/src/gui/raster/qgsrasterlayerproperties.cpp b/src/gui/raster/qgsrasterlayerproperties.cpp
+index 4c12478e4db..bbd2cc683ee 100644
+--- a/src/gui/raster/qgsrasterlayerproperties.cpp
++++ b/src/gui/raster/qgsrasterlayerproperties.cpp
+@@ -96,6 +96,10 @@
+ #include <QRegularExpressionValidator>
+ #include <QRegularExpression>
+ 
++#ifdef HAVE_WEBENGINE
++#include <QtWebEngineWidgets/QWebEngineView>
++#endif
++
+ QgsRasterLayerProperties::QgsRasterLayerProperties( QgsMapLayer *lyr, QgsMapCanvas *canvas, QWidget *parent, Qt::WindowFlags fl )
+   : QgsLayerPropertiesDialog( lyr, canvas, QStringLiteral( "RasterLayerProperties" ), parent, fl )
+   // Constant that signals property not used.
+@@ -114,7 +118,12 @@ QgsRasterLayerProperties::QgsRasterLayerProperties( QgsMapLayer *lyr, QgsMapCanv
+ 
+   setupUi( this );
+ 
++#ifdef HAVE_WEBENGINE
++  mMetadataViewer = new QWebEngineView( this );
++#else
+   mMetadataViewer = new QgsWebView( this );
++#endif
++
+   mOptsPage_Information->layout()->addWidget( mMetadataViewer );
+ 
+   mRasterTransparencyWidget = new QgsRasterTransparencyWidget( mRasterLayer, canvas, this );
+diff --git a/src/gui/raster/qgsrasterlayerproperties.h b/src/gui/raster/qgsrasterlayerproperties.h
+index da23045a9b0..c94e30ed3c1 100644
+--- a/src/gui/raster/qgsrasterlayerproperties.h
++++ b/src/gui/raster/qgsrasterlayerproperties.h
+@@ -34,7 +34,6 @@ class QgsRasterRenderer;
+ class QgsRasterRendererWidget;
+ class QgsRasterHistogramWidget;
+ class QgsRasterLayerTemporalPropertiesWidget;
+-class QgsWebView;
+ class QgsProviderSourceWidget;
+ class QgsMapLayerConfigWidgetFactory;
+ class QgsMapLayerConfigWidget;
+@@ -43,6 +42,9 @@ class QgsRasterTransparencyWidget;
+ class QgsRasterAttributeTableWidget;
+ class QgsWebView;
+ class QgsRasterLabelingWidget;
++#ifdef HAVE_WEBENGINE
++class QWebEngineView;
++#endif
+ 
+ /**
+  * \ingroup gui
+@@ -246,7 +248,11 @@ class GUI_EXPORT QgsRasterLayerProperties : public QgsLayerPropertiesDialog, pri
+ 
+     QgsProviderSourceWidget *mSourceWidget = nullptr;
+ 
++#ifdef HAVE_WEBENGINE
++    QWebEngineView *mMetadataViewer = nullptr;
++#else
+     QgsWebView *mMetadataViewer = nullptr;
++#endif
+ 
+     QgsExpressionContext mContext;
+ 
+-- 
+2.52.0
+
