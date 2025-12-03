@@ -55,7 +55,7 @@ jobs:
 
       - name: Fetch tif
         run: |
-          oras pull ghcr.io/kadas-albireo/kadas-albireo2/dtm-swiss-only:1.0 -o .
+          oras pull ghcr.io/kadas-albireo/kadas-albireo2/dtm_analysis:1.0 -o .
 
       - name: 🌱 Install dependencies and generate project files
         shell: bash
@@ -95,7 +95,7 @@ jobs:
                 -D CMAKE_BUILD_TYPE=Release \
                 -D CMAKE_INSTALL_PREFIX="C:\kadas" \
                 -D WITH_BINDINGS=ON \
-                -D INSTALL_SWISS_DTM=ON \
+                -D INSTALL_DTM=ON \
                 -D INSTALL_ALBIREO_SETTINGS=ON \
                 -D VCPKG_TARGET_TRIPLET="x64-windows" \
                 -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=C:/src" \
@@ -154,7 +154,7 @@ jobs:
       - name: 🌋 Build
         run: |
           cmake --build build --config Release
-
+        
       - name: 🧪 Run CTest
         env:
           QT_LOGGING_TO_CONSOLE: "1"
