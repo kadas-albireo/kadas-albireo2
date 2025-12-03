@@ -142,12 +142,12 @@ if(BUILD_TESTING)
   add_subdirectory(tests)
 endif()
 
-set(INSTALL_SWISS_DTM
+set(INSTALL_DTM
     TRUE
-    CACHE BOOL "Install dtm_swiss_only.tif."
+    CACHE BOOL "Install dtm_analysis.tif."
 )
-if(INSTALL_SWISS_DTM)
-  install(FILES "share/geodata/dtm_swiss_only.tif"
+if(INSTALL_DTM)
+  install(FILES "share/geodata/dtm_analysis.tif"
           DESTINATION "share/kadas/geodata/"
   )
 endif()

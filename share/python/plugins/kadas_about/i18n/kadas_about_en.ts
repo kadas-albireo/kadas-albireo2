@@ -16,5 +16,10 @@
         <source>This software is released under the &lt;a href=&quot;http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html&quot;&gt;GNU Public License (GPL) Version 2&lt;/a&gt;</source>
         <translation>This software is released under the &lt;a href=&quot;http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html&quot;&gt;GNU Public License (GPL) Version 2&lt;/a&gt;</translation>
     </message>
+    <message>
+        <location filename="../about_dialog.py" line="77"/>
+        <source>swissALTIRegio usage disclaimer</source>
+        <translation>swissALTIRegio usage disclaimer</translation>
+    </message>
 </context>
 </TS>
