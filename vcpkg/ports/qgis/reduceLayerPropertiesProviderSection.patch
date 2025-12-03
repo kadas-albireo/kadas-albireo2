@@ -1,0 +1,26 @@
+From 1818696027ec5f54b9d8bfa64066db37d217e9a0 Mon Sep 17 00:00:00 2001
+From: Damiano Lombardi <damiano@opengis.ch>
+Date: Mon, 1 Dec 2025 00:06:39 +0100
+Subject: [PATCH] Reduce provider informations for RasterLayerProperties dlg
+
+---
+ src/core/raster/qgsrasterlayer.cpp | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/src/core/raster/qgsrasterlayer.cpp b/src/core/raster/qgsrasterlayer.cpp
+index f719f6b2797..49c437d6219 100644
+--- a/src/core/raster/qgsrasterlayer.cpp
++++ b/src/core/raster/qgsrasterlayer.cpp
+@@ -490,9 +490,6 @@ QString QgsRasterLayer::htmlMetadata() const
+   }
+   myMetadata += QStringLiteral( "</td></tr>\n" ) %
+ 
+-                // Insert provider-specific (e.g. WMS-specific) metadata
+-                mDataProvider->htmlMetadata() %
+-
+                 // End Provider section
+                 QStringLiteral( "</table>\n<br><br>" );
+ 
+-- 
+2.52.0
+
