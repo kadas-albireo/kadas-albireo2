@@ -41,6 +41,15 @@ class AboutDialog(QDialog):
         licenseLabel.setWordWrap(True)
         l.addWidget(licenseLabel, l.rowCount(), 0, 1, 1)
 
+        dtmLinkMap = {"en": "https://www.swisstopo.admin.ch/en/height-model-swissaltiregio",
+                             "de": "https://www.swisstopo.admin.ch/de/hoehenmodell-swissaltiregio",
+                             "it": "https://www.swisstopo.admin.ch/it/modello-altimetrico-swissaltiregio",
+                             "fr": "https://www.swisstopo.admin.ch/fr/modele-altimetrique-swissaltiregio"}
+        dtmLink = QLabel("<a href=\"%s\">%s<a>" % (dtmLinkMap[locale], self.tr("swissALTIRegio usage disclaimer")))
+        dtmLink.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        dtmLink.setOpenExternalLinks(True)
+        l.addWidget(dtmLink, l.rowCount(), 0, 1, 1)
+
         bbox = QDialogButtonBox(QDialogButtonBox.Close)
         bbox.accepted.connect(self.accept)
         bbox.rejected.connect(self.reject)
