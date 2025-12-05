@@ -45,7 +45,7 @@ QJsonObject KadasRectangleItem::State::serialize() const
     pt2.append( p );
   }
   QJsonObject json;
-  json["status"] = static_cast<int>( drawStatus );
+  //json["status"] = static_cast<int>( drawStatus );
   json["p1"] = pt1;
   json["p2"] = pt2;
   return json;
@@ -56,7 +56,7 @@ bool KadasRectangleItem::State::deserialize( const QJsonObject &json )
   p1.clear();
   p2.clear();
 
-  drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
+  //drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
   for ( QJsonValue val : json["p1"].toArray() )
   {
     QJsonArray pos = val.toArray();
@@ -119,7 +119,7 @@ void KadasRectangleItem::setPosition( const KadasItemPos &pos )
 bool KadasRectangleItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
   KadasItemPos itemPos = toItemPos( firstPoint, mapSettings );
-  state()->drawStatus = State::DrawStatus::Drawing;
+  mDrawStatus = DrawStatus::Drawing;
   state()->p1.append( itemPos );
   state()->p2.append( itemPos );
   recomputeDerived();
@@ -150,7 +150,7 @@ bool KadasRectangleItem::continuePart( const QgsMapSettings &mapSettings )
 
 void KadasRectangleItem::endPart()
 {
-  state()->drawStatus = State::DrawStatus::Finished;
+  mDrawStatus = DrawStatus::Finished;
 }
 
 KadasMapItem::AttribDefs KadasRectangleItem::drawAttribs() const
@@ -318,6 +318,13 @@ void KadasRectangleItem::measureGeometry()
     totalArea += area;
   }
   mTotalMeasurement = formatArea( totalArea, areaBaseUnit() );
+}
+
+KadasMapItem *KadasRectangleItem::_clone() const
+{
+  KadasRectangleItem *item = new KadasRectangleItem( crs() );
+  item->mGeometry = mGeometry->clone();
+  return item;
 }
 
 void KadasRectangleItem::recomputeDerived()

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>392</width>
-    <height>55</height>
+    <height>68</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -67,7 +67,7 @@
    <item row="1" column="2">
     <widget class="QPushButton" name="mPushButtonBold">
      <property name="icon">
-      <iconset resource="../../resources/resources.qrc">
+      <iconset>
        <normaloff>:/kadas/icons/textBold</normaloff>:/kadas/icons/textBold</iconset>
      </property>
      <property name="checkable">
@@ -78,7 +78,7 @@
    <item row="1" column="3">
     <widget class="QPushButton" name="mPushButtonItalic">
      <property name="icon">
-      <iconset resource="../../resources/resources.qrc">
+      <iconset>
        <normaloff>:/kadas/icons/textItalic</normaloff>:/kadas/icons/textItalic</iconset>
      </property>
      <property name="checkable">
@@ -89,7 +89,7 @@
    <item row="0" column="1" colspan="3">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLabel" name="mLabelFillColor">
+      <widget class="QLabel" name="mLabelColor">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -102,42 +102,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QgsColorButton" name="mToolButtonFillColor">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>32</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>48</width>
-         <height>16777215</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="mLabelBorderColor">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Outline:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QgsColorButton" name="mToolButtonBorderColor">
+      <widget class="QgsColorButton" name="mToolButtonColor">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -172,15 +137,12 @@
  </customwidgets>
  <tabstops>
   <tabstop>mLineEditText</tabstop>
-  <tabstop>mToolButtonFillColor</tabstop>
-  <tabstop>mToolButtonBorderColor</tabstop>
+  <tabstop>mToolButtonColor</tabstop>
   <tabstop>mFontComboBox</tabstop>
   <tabstop>mSpinBoxSize</tabstop>
   <tabstop>mPushButtonBold</tabstop>
   <tabstop>mPushButtonItalic</tabstop>
  </tabstops>
- <resources>
-  <include location="../../resources/resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
