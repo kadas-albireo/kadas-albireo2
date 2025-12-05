@@ -97,7 +97,7 @@ void KadasMilxEditor::symbolSelected( const KadasMilxSymbolDesc &symbolTemplate 
     mSymbolButton->setText( tr( "Select..." ) );
   }
   mSelectedSymbol = symbolTemplate;
-  if ( dynamic_cast<KadasMilxItem *>( mItem ) && mItem->constState()->drawStatus == KadasMapItem::State::DrawStatus::Empty )
+  if ( dynamic_cast<KadasMilxItem *>( mItem ) && mItem->drawStatus() == KadasMapItem::DrawStatus::Empty )
   {
     static_cast<KadasMilxItem *>( mItem )->setSymbol( symbolTemplate );
   }

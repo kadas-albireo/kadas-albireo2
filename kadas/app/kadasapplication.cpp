@@ -29,8 +29,13 @@
 #include <QUrlQuery>
 #include <quazip/quazipfile.h>
 
+#include <qgis/qgsannotationlineitem.h>
+#include <qgis/qgsannotationpointtextitem.h>
+#include <qgis/qgsannotationpolygonitem.h>
 #include <qgis/qgsauthguiutils.h>
 #include <qgis/qgsauthmanager.h>
+#include <qgis/qgscurve.h>
+#include <qgis/qgscurvepolygon.h>
 #include <qgis/qgsdataitem.h>
 #include <qgis/qgsdatumtransformdialog.h>
 #include <qgis/qgsgdalutils.h>
@@ -104,6 +109,18 @@
 #include "kadasbullseyelayer.h"
 #include "kadasguidegridlayer.h"
 #include "kadasmapgridlayer.h"
+
+
+const QgsSettingsEntryStringList *KadasApplication::settingsPortalCookieUrls
+  = new QgsSettingsEntryStringList( QStringLiteral( "cookie-urls" ), KadasSettingsTree::sTreePortal, {}, QStringLiteral( "URLs for which the ERSI portal TOKEN will be set in a cookie." ) );
+const QgsSettingsEntryString *KadasApplication::settingsPortalTokenUrl
+  = new QgsSettingsEntryString( QStringLiteral( "token-url" ), KadasSettingsTree::sTreePortal, QString(), QStringLiteral( "URL to retrieve ESRI portal TOKEN from." ) );
+const QgsSettingsEntryBool *KadasApplication::settingsTokenCreateCookies
+  = new QgsSettingsEntryBool( QStringLiteral( "token-create-cookies" ), KadasSettingsTree::sTreePortal, true, QStringLiteral( "Create cookies using the ESRI token." ) );
+const QgsSettingsEntryBool *KadasApplication::settingsTokenUseEsriAuth
+  = new QgsSettingsEntryBool( QStringLiteral( "token-use-esri-auth" ), KadasSettingsTree::sTreePortal, true, QStringLiteral( "Create cookies using the ESRI token." ) );
+
+const QString KadasApplication::sEsriAuthCfgId = QStringLiteral( "kadas_esri_token" );
 
 
 static QStringList splitSubLayerDef( const QString &subLayerDef )
@@ -1360,8 +1377,15 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
     for ( int i = 0, n = items.size(); i < n; ++i )
     {
       QgsCoordinateTransform crst( mapCrs, items[i]->crs(), QgsProject::instance() );
-      QgsPointXY pos = pastePos + QgsVector( itemPos[i].x() - center.x(), itemPos[i].y() - center.y() );
-      items[i]->setPosition( KadasItemPos::fromPoint( crst.transform( pos ) ) );
+      if ( items[i]->useQgisAnnotations() )
+      {
+        items[i]->translate( pastePos.x() - center.x(), pastePos.y() - center.y() );
+      }
+      else
+      {
+        QgsPointXY pos = pastePos + QgsVector( itemPos[i].x() - center.x(), itemPos[i].y() - center.y() );
+        items[i]->setPosition( KadasItemPos::fromPoint( crst.transform( pos ) ) );
+      }
     }
     KadasItemLayer *layer = kApp->selectPasteTargetItemLayer( items );
     if ( !layer )
@@ -1387,7 +1411,7 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
       if ( feature.geometry().type() == Qgis::GeometryType::Point )
       {
         KadasPointItem *item = new KadasPointItem( featureStore.crs() );
-        item->addPartFromGeometry( *feature.geometry().constGet() );
+        item->setPoint( *qgsgeometry_cast<const QgsPoint *>( feature.geometry().constGet() ) );
         items.append( item );
       }
       else if ( feature.geometry().type() == Qgis::GeometryType::Line )

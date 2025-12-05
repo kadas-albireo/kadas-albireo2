@@ -25,9 +25,12 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrendercontext.h>
 #include <qgis/qgssettings.h>
+#include <qgis/qgsannotationlayer.h>
+#include <qgis/qgsannotationitem.h>
 
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/mapitems/kadasmapitem.h"
+#include "kadas/gui/3d/kadasmapitemlayer3drenderer.h"
 
 
 class KadasItemLayer::Renderer : public QgsMapLayerRenderer
@@ -71,6 +74,14 @@ KadasItemLayer::KadasItemLayer( const QString &name, const QgsCoordinateReferenc
 {
   setCrs( crs );
   mValid = true;
+
+  std::unique_ptr<KadasMapItemLayer3DRenderer> r = std::make_unique<KadasMapItemLayer3DRenderer>();
+  r->setLayer( this );
+  QgsTextFormat format = r->textFormat();
+  format.setColor( QColor( Qt::yellow ) );
+  r->setTextFormat( format );
+  r->setCalloutLineColor( QColor( Qt::yellow ) );
+  setRenderer3D( r.release() );
 }
 
 KadasItemLayer::KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs, const QString &layerType )
@@ -78,11 +89,39 @@ KadasItemLayer::KadasItemLayer( const QString &name, const QgsCoordinateReferenc
 {
   setCrs( crs );
   mValid = true;
+
+  std::unique_ptr<KadasMapItemLayer3DRenderer> r = std::make_unique<KadasMapItemLayer3DRenderer>();
+  r->setLayer( this );
+  setRenderer3D( r.release() );
 }
 
 KadasItemLayer::~KadasItemLayer()
 {
   qDeleteAll( mItems );
+  mItems.clear();
+}
+
+QgsAnnotationLayer *KadasItemLayer::qgisAnnotationLayer( const QgsCoordinateReferenceSystem &crs ) const
+{
+  QgsAnnotationLayer::LayerOptions lo( QgsProject::instance()->transformContext() );
+  QgsAnnotationLayer *al = new QgsAnnotationLayer( name(), lo );
+  al->setCrs( crs );
+
+  QList<QgsAnnotationItem *> items;
+
+  for ( ItemId id : std::as_const( mItemOrder ) )
+  {
+    if ( !mItems[id]->useQgisAnnotations() )
+      continue;
+
+    items << mItems[id]->annotationItem( crs );
+  }
+  std::stable_sort( items.begin(), items.end(), []( QgsAnnotationItem *a, QgsAnnotationItem *b ) { return a->zIndex() < b->zIndex(); } );
+
+  for ( QgsAnnotationItem *item : std::as_const( items ) )
+    al->addItem( item );
+
+  return al;
 }
 
 KadasItemLayer::ItemId KadasItemLayer::addItem( KadasMapItem *item )

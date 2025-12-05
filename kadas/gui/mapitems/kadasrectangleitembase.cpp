@@ -58,7 +58,7 @@ QJsonObject KadasRectangleItemBase::State::serialize() const
   rectCenterPoint.append( mRectangleCenterPoint.y() );
 
   QJsonObject json;
-  json["status"] = static_cast<int>( drawStatus );
+  //json["status"] = static_cast<int>( drawStatus );
   json["pos"] = pos;
   json["angle"] = mAngle;
   json["offsetX"] = mOffsetX;
@@ -75,7 +75,7 @@ bool KadasRectangleItemBase::State::deserialize( const QJsonObject &json )
   // frame is enable by default, but for openng of older projects with texts (that had no frame), we disable it
   mFrame = json.contains( "frame" ) ? json["frame"].toBool() : false;
 
-  drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
+  //drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
   QJsonArray p = json["pos"].toArray();
   mPos = KadasItemPos( p.at( 0 ).toDouble(), p.at( 1 ).toDouble() );
   mAngle = json["angle"].toDouble();
@@ -131,7 +131,7 @@ void KadasRectangleItemBase::setPosition( const KadasItemPos &pos )
   if ( !mPosLocked )
   {
     state()->mPos = pos;
-    state()->drawStatus = State::DrawStatus::Finished;
+    mDrawStatus = DrawStatus::Finished;
     update();
   }
 }
@@ -141,7 +141,7 @@ void KadasRectangleItemBase::setState( const KadasMapItem::State *state )
   KadasMapItem::setState( state );
 }
 
-KadasItemRect KadasRectangleItemBase::boundingBox() const
+QgsRectangle KadasRectangleItemBase::boundingBox() const
 {
   double xmin = constState()->mPos.x(), xmax = constState()->mPos.x();
   double ymin = constState()->mPos.y(), ymax = constState()->mPos.y();
@@ -152,7 +152,7 @@ KadasItemRect KadasRectangleItemBase::boundingBox() const
     ymin = std::min( ymin, p.y() );
     ymax = std::max( ymax, p.y() );
   }
-  return KadasItemRect( xmin, ymin, xmax, ymax );
+  return QgsRectangle( xmin, ymin, xmax, ymax );
 }
 
 KadasMapItem::Margin KadasRectangleItemBase::margin() const
@@ -193,7 +193,7 @@ QList<KadasMapItem::Node> KadasRectangleItemBase::nodes( const QgsMapSettings &s
   return nodes;
 }
 
-bool KadasRectangleItemBase::intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains ) const
+bool KadasRectangleItemBase::intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const
 {
   if ( constState()->mSize.isEmpty() )
   {
@@ -357,7 +357,7 @@ void KadasRectangleItemBase::render( QgsRenderContext &context ) const
 
 bool KadasRectangleItemBase::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
-  state()->drawStatus = State::DrawStatus::Drawing;
+  mDrawStatus = DrawStatus::Drawing;
   state()->mPos = toItemPos( firstPoint, mapSettings );
   update();
   return false;
@@ -386,7 +386,7 @@ bool KadasRectangleItemBase::continuePart( const QgsMapSettings &mapSettings )
 
 void KadasRectangleItemBase::endPart()
 {
-  state()->drawStatus = State::DrawStatus::Finished;
+  mDrawStatus = DrawStatus::Finished;
 }
 
 KadasMapItem::AttribDefs KadasRectangleItemBase::drawAttribs() const

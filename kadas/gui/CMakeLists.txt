@@ -23,6 +23,7 @@ set(kadas_gui_SRC
     kadasribbonbutton.cpp
     kadasrichtexteditor.cpp
     kadastextbrowser.cpp
+    3d/kadasmapitemlayer3drenderer.cpp
     maptools/kadasmaptoolcreateitem.cpp
     maptools/kadasmaptooldeleteitems.cpp
     maptools/kadasmaptooledititem.cpp
@@ -104,6 +105,7 @@ set(kadas_gui_HDR
     kadasrichtexteditor.h
     kadassearchprovider.h
     kadastextbrowser.h
+    3d/kadasmapitemlayer3drenderer.h
     maptools/kadasmaptoolcreateitem.h
     maptools/kadasmaptooldeleteitems.h
     maptools/kadasmaptooledititem.h
@@ -184,6 +186,7 @@ target_link_libraries(
   Qt6::Concurrent
   QuaZip::QuaZip
   QGIS::Gui
+  QGIS::3D
   ${GeographicLib_LIBRARIES}
   PkgConfig::LIBRSVG
   PkgConfig::CAIRO
