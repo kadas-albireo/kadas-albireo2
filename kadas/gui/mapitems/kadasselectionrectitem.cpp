@@ -31,13 +31,13 @@
 QJsonObject KadasSelectionRectItem::State::serialize() const
 {
   QJsonObject json;
-  json["status"] = static_cast<int>( drawStatus );
+  //json["status"] = static_cast<int>( drawStatus );
   return json;
 }
 
 bool KadasSelectionRectItem::State::deserialize( const QJsonObject &json )
 {
-  drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
+  //drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
   return true;
 }
 
@@ -54,7 +54,7 @@ void KadasSelectionRectItem::setSelectedItems( const QList<KadasMapItem *> &item
   update();
 }
 
-KadasItemRect KadasSelectionRectItem::boundingBox() const
+QgsRectangle KadasSelectionRectItem::boundingBox() const
 {
   if ( mItems.isEmpty() )
   {
@@ -70,7 +70,7 @@ KadasItemRect KadasSelectionRectItem::boundingBox() const
     rect.setXMaximum( std::max( rect.xMaximum(), itemRect.xMaximum() ) );
     rect.setYMaximum( std::max( rect.yMaximum(), itemRect.yMaximum() ) );
   }
-  return KadasItemRect( rect.xMinimum(), rect.yMinimum(), rect.xMaximum(), rect.yMaximum() );
+  return rect;
 }
 
 KadasMapItem::Margin KadasSelectionRectItem::margin() const
@@ -117,7 +117,7 @@ KadasMapRect KadasSelectionRectItem::itemsRect( const QgsCoordinateReferenceSyst
   return rect;
 }
 
-bool KadasSelectionRectItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains ) const
+bool KadasSelectionRectItem::intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const
 {
   if ( mItems.isEmpty() )
   {

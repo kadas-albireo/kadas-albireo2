@@ -47,6 +47,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditItemGroup : public QgsMapTool
     QList<KadasMapItem *> mItems;
     KadasItemLayer *mLayer;
     QgsPointXY mMoveRefPos;
+    QgsPointXY mMoveRefPos2;
     QList<QgsPointXY> mItemRefPos;
     KadasBottomBar *mBottomBar = nullptr;
     QLabel *mStatusLabel = nullptr;
