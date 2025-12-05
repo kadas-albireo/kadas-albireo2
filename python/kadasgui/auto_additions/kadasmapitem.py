@@ -1,15 +1,9 @@
 # The following has been generated automatically from kadas/gui/mapitems/kadasmapitem.h
 # monkey patching scoped based enum
-KadasMapItem.State.Empty = KadasMapItem.State.DrawStatus.Empty
-KadasMapItem.State.Empty.is_monkey_patched = True
-KadasMapItem.State.DrawStatus.Empty.__doc__ = ""
-KadasMapItem.State.Drawing = KadasMapItem.State.DrawStatus.Drawing
-KadasMapItem.State.Drawing.is_monkey_patched = True
-KadasMapItem.State.DrawStatus.Drawing.__doc__ = ""
-KadasMapItem.State.Finished = KadasMapItem.State.DrawStatus.Finished
-KadasMapItem.State.Finished.is_monkey_patched = True
-KadasMapItem.State.DrawStatus.Finished.__doc__ = ""
-KadasMapItem.State.DrawStatus.__doc__ = """
+KadasMapItem.DrawStatus.Empty.__doc__ = ""
+KadasMapItem.DrawStatus.Drawing.__doc__ = ""
+KadasMapItem.DrawStatus.Finished.__doc__ = ""
+KadasMapItem.DrawStatus.__doc__ = """
 
 * ``Empty``: 
 * ``Drawing``: 
@@ -17,6 +11,7 @@ KadasMapItem.State.DrawStatus.__doc__ = """
 
 """
 # --
+KadasMapItem.DrawStatus.baseClass = KadasMapItem
 # monkey patching scoped based enum
 KadasMapItem.NumericAttribute.TypeCoordinate = KadasMapItem.NumericAttribute.Type.TypeCoordinate
 KadasMapItem.NumericAttribute.TypeCoordinate.is_monkey_patched = True
@@ -67,6 +62,7 @@ try:
     KadasMapItem.anchorNodeRenderer = staticmethod(KadasMapItem.anchorNodeRenderer)
     KadasMapItem.outputDpiScale = staticmethod(KadasMapItem.outputDpiScale)
     KadasMapItem.getTextRenderScale = staticmethod(KadasMapItem.getTextRenderScale)
+    KadasMapItem.__signal_arguments__ = {'zIndexChanged': ['index: int']}
 except AttributeError:
     pass
 try:

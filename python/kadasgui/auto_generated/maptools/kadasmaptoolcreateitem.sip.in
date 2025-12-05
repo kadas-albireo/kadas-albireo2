@@ -49,7 +49,6 @@ the Free Software Foundation; either version 2 of the License, or     *
 
 
     const KadasMapItem *currentItem() const;
-    KadasMapItem *takeItem();
     const KadasMapItemEditor *currentEditor() const;
 
     void setMultipart( bool multipart );

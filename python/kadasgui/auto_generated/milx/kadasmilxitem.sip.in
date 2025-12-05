@@ -37,7 +37,7 @@ class KadasMilxItem : KadasMapItem
 
     virtual QPointF symbolAnchor() const;
 
-    virtual KadasItemRect boundingBox() const;
+    virtual QgsRectangle boundingBox() const;
 
     virtual Margin margin() const;
 
@@ -45,7 +45,7 @@ class KadasMilxItem : KadasMapItem
     virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const;
 
 
-    virtual bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const;
+    virtual bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains = false ) const;
 
     virtual bool hitTest( const KadasMapPos &pos, const QgsMapSettings &settings ) const;
 
