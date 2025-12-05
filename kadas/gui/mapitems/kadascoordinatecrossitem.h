@@ -28,10 +28,10 @@ class KADAS_GUI_EXPORT KadasCoordinateCrossItem : public KadasMapItem
 
     QString itemName() const override { return tr( "Coordinate cross" ); }
 
-    KadasItemRect boundingBox() const override;
+    QgsRectangle boundingBox() const override;
     Margin margin() const override;
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
-    bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const override;
+    bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains = false ) const override;
     void render( QgsRenderContext &context ) const override;
 #ifndef SIP_RUN
     QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
