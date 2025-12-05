@@ -1,0 +1,62 @@
+From 0e10a84b958e12ba9f03bddb29fe479e1fcf3de1 Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Fri, 28 Nov 2025 07:30:02 +0100
+Subject: [PATCH 1/2] Add _3D_EXPORT to annotation layer classes
+
+---
+ src/3d/qgsannotationlayerchunkloader_p.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/3d/qgsannotationlayerchunkloader_p.h b/src/3d/qgsannotationlayerchunkloader_p.h
+index 80406f4ae614..ac358ed7379e 100644
+--- a/src/3d/qgsannotationlayerchunkloader_p.h
++++ b/src/3d/qgsannotationlayerchunkloader_p.h
+@@ -53,7 +53,7 @@ namespace Qt3DCore
+  *
+  * \since QGIS 4.0
+  */
+-class QgsAnnotationLayerChunkLoaderFactory : public QgsQuadtreeChunkLoaderFactory
++class _3D_EXPORT QgsAnnotationLayerChunkLoaderFactory : public QgsQuadtreeChunkLoaderFactory
+ {
+     Q_OBJECT
+ 
+@@ -83,7 +83,7 @@ class QgsAnnotationLayerChunkLoaderFactory : public QgsQuadtreeChunkLoaderFactor
+  *
+  * \since QGIS 4.0
+  */
+-class QgsAnnotationLayerChunkLoader : public QgsChunkLoader
++class _3D_EXPORT QgsAnnotationLayerChunkLoader : public QgsChunkLoader
+ {
+     Q_OBJECT
+ 
+@@ -126,7 +126,7 @@ class QgsAnnotationLayerChunkLoader : public QgsChunkLoader
+  *
+  * \since QGIS 4.0
+  */
+-class QgsAnnotationLayerChunkedEntity : public QgsChunkedEntity
++class _3D_EXPORT QgsAnnotationLayerChunkedEntity : public QgsChunkedEntity
+ {
+     Q_OBJECT
+   public:
+
+From 78d849c21aaccf4bdc0b76637b50e6d565e1d33a Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Fri, 28 Nov 2025 08:12:55 +0100
+Subject: [PATCH 2/2] Add include for qgis_3d.h in chunk loader header
+
+---
+ src/3d/qgsannotationlayerchunkloader_p.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/3d/qgsannotationlayerchunkloader_p.h b/src/3d/qgsannotationlayerchunkloader_p.h
+index ac358ed7379e..b2ed78c166e2 100644
+--- a/src/3d/qgsannotationlayerchunkloader_p.h
++++ b/src/3d/qgsannotationlayerchunkloader_p.h
+@@ -27,6 +27,7 @@
+ // version without notice, or even be removed.
+ //
+ 
++#include "qgis_3d.h"
+ #include "qgschunkloader.h"
+ #include "qgschunkedentity.h"
+ #include "qgs3drendercontext.h"
