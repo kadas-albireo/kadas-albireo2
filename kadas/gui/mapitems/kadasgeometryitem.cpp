@@ -269,7 +269,7 @@ void KadasGeometryItem::setInternalGeometry( QgsAbstractGeometry *geom )
   emit geometryChanged();
 }
 
-bool KadasGeometryItem::intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains ) const
+bool KadasGeometryItem::intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const
 {
   if ( !mGeometry )
   {
@@ -379,10 +379,10 @@ void KadasGeometryItem::setIconFill( const QBrush &iconBrush )
   emit propertyChanged();
 }
 
-KadasItemRect KadasGeometryItem::boundingBox() const
+QgsRectangle KadasGeometryItem::boundingBox() const
 {
   QgsRectangle bbox = mGeometry ? mGeometry->boundingBox() : QgsRectangle();
-  return KadasItemRect( bbox.xMinimum(), bbox.yMinimum(), bbox.xMaximum(), bbox.yMaximum() );
+  return bbox;
 }
 
 QList<KadasMapItem::Node> KadasGeometryItem::nodes( const QgsMapSettings &settings ) const
