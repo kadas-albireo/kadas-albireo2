@@ -303,7 +303,8 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     // TODO: remove when all annotations are migrated
     virtual bool useQgisAnnotations() const { return false; }
 
-    virtual QgsAnnotationItem *annotationItem() const { return nullptr; }
+    //! Returns the QgsAnnotationItem in the given crs (if not specified, no transformation occurs)
+    virtual QgsAnnotationItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const SIP_FACTORY { return nullptr; }
 
     virtual QString itemName() const = 0;
     virtual QString exportName() const;
@@ -496,7 +497,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     }
     virtual void setPosition( const KadasItemPos &pos ) { Q_ASSERT( false ); }
 
-    //! This shoulb be reimplemented for QgsAnnotation based items
+    //! This should be reimplemented for QgsAnnotation based items
     //! Once every item has been migrated this should become pure virtual
     virtual void translate( double dx, double dy ) { Q_ASSERT( false ); }
 

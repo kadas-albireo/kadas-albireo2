@@ -64,7 +64,7 @@ class KadasMapItemLayer3DRenderer : QgsAbstract3DRenderer
   public:
     KadasMapItemLayer3DRenderer();
 
-    void setLayer( KadasItemLayer* layer );
+    void setLayer( KadasItemLayer *layer );
 
 
     virtual QString type() const;

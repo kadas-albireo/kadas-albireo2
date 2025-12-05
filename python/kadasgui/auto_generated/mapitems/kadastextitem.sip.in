@@ -34,7 +34,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     virtual void setItemGeometry( const QgsPointXY &point );
 
-    virtual QgsAnnotationPointTextItem *annotationItem() const;
+    virtual QgsAnnotationPointTextItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const /Factory/;
 
     void setText( const QString &text );
     const QString &text() const;

@@ -101,10 +101,11 @@ KadasItemLayer::~KadasItemLayer()
   mItems.clear();
 }
 
-QgsAnnotationLayer *KadasItemLayer::qgisAnnotationLayer() const
+QgsAnnotationLayer *KadasItemLayer::qgisAnnotationLayer( const QgsCoordinateReferenceSystem &crs ) const
 {
   QgsAnnotationLayer::LayerOptions lo( QgsProject::instance()->transformContext() );
   QgsAnnotationLayer *al = new QgsAnnotationLayer( name(), lo );
+  al->setCrs( crs );
 
   QList<QgsAnnotationItem *> items;
 
@@ -113,8 +114,7 @@ QgsAnnotationLayer *KadasItemLayer::qgisAnnotationLayer() const
     if ( !mItems[id]->useQgisAnnotations() )
       continue;
 
-    // TODO: we need to handle different CRS here!
-    items << mItems[id]->annotationItem()->clone();
+    items << mItems[id]->annotationItem( crs );
   }
   std::stable_sort( items.begin(), items.end(), []( QgsAnnotationItem *a, QgsAnnotationItem *b ) { return a->zIndex() < b->zIndex(); } );
 

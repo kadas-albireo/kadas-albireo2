@@ -1388,7 +1388,7 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
     for ( int i = 0, n = items.size(); i < n; ++i )
     {
       QgsCoordinateTransform crst( mapCrs, items[i]->crs(), QgsProject::instance() );
-      if ( items[i]->annotationItem() )
+      if ( items[i]->useQgisAnnotations() )
       {
         items[i]->translate( pastePos.x() - center.x(), pastePos.y() - center.y() );
       }

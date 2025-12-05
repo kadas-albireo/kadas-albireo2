@@ -93,7 +93,7 @@ class KadasPointItem : KadasAbstractPointItem
   public:
     KadasPointItem( const QgsCoordinateReferenceSystem &crs, Qgis::MarkerShape icon = Qgis::MarkerShape::Circle );
 
-    virtual QgsAnnotationMarkerItem *annotationItem() const;
+    virtual QgsAnnotationMarkerItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const /Factory/;
 
     virtual QString itemName() const;
 
@@ -101,7 +101,7 @@ class KadasPointItem : KadasAbstractPointItem
 
     virtual QgsRectangle boundingBox() const;
 
-   virtual void render( QgsRenderContext &context ) const;
+    virtual void render( QgsRenderContext &context ) const;
 
     void setShape( Qgis::MarkerShape shape );
     Qgis::MarkerShape shape() const;

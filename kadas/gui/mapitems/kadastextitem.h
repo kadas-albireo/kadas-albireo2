@@ -36,7 +36,7 @@ class KADAS_GUI_EXPORT KadasTextItem : public KadasAbstractPointItem
 
     virtual void setItemGeometry( const QgsPointXY &point ) override;
 
-    virtual QgsAnnotationPointTextItem *annotationItem() const override { return mQgsItem; }
+    virtual QgsAnnotationPointTextItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const override SIP_FACTORY;
 
     void setText( const QString &text );
     const QString &text() const { return mText; }

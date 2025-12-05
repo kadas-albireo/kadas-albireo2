@@ -3,6 +3,7 @@
 
 #include <qgis/qgsstyle.h>
 #include <qgis/qgsannotationlayerchunkloader_p.h>
+#include <qgis/qgs3dmapsettings.h>
 
 #include "kadasmapitemlayer3drenderer.h"
 #include "kadas/gui/kadasitemlayer.h"
@@ -111,7 +112,7 @@ Qt3DCore::QEntity *KadasMapItemLayer3DRenderer::createEntity( Qgs3DMapSettings *
   if ( !itemLayer )
     return nullptr;
 
-  QgsAnnotationLayer *annotationLayer = itemLayer->qgisAnnotationLayer();
+  QgsAnnotationLayer *annotationLayer = itemLayer->qgisAnnotationLayer( map->crs() );
 
   // For some cases we start with a maximal z range because we can't know this upfront, as it potentially involves terrain heights.
   // This range will be refined after populating the nodes to the actual z range of the generated chunks nodes.

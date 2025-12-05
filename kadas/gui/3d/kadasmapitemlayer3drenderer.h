@@ -57,7 +57,6 @@ class KADAS_GUI_EXPORT KadasMapItemLayer3DRenderer : public QgsAbstract3DRendere
     SIP_END
 #endif
 
-
   public:
     KadasMapItemLayer3DRenderer();
 

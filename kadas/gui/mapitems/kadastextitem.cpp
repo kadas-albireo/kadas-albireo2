@@ -46,6 +46,17 @@ void KadasTextItem::setItemGeometry( const QgsPointXY &point )
   update();
 }
 
+QgsAnnotationPointTextItem *KadasTextItem::annotationItem( const QgsCoordinateReferenceSystem &crs ) const
+{
+  QgsAnnotationPointTextItem *item = mQgsItem->clone();
+  if ( mCrs != crs )
+  {
+    QgsCoordinateTransform ct( mCrs, crs, QgsProject::instance() );
+    item->setPoint( ct.transform( item->point() ) );
+  }
+  return item;
+}
+
 void KadasTextItem::setFont( const QFont &font )
 {
   mFont = font;

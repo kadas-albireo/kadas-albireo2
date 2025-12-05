@@ -156,10 +156,21 @@ bool KadasAbstractPointItem::intersects( const QgsRectangle &rect, const QgsMapS
 
 KadasPointItem::KadasPointItem( const QgsCoordinateReferenceSystem &crs, Qgis::MarkerShape icon )
   : KadasAbstractPointItem( crs )
+  , mShape( icon )
 {
   mQgsItem = new QgsAnnotationMarkerItem( QgsPoint() );
   connect( this, &KadasMapItem::zIndexChanged, this, [=]( int index ) { mQgsItem->setZIndex( index ); } );
-  setShape( icon );
+}
+
+QgsAnnotationMarkerItem *KadasPointItem::annotationItem( const QgsCoordinateReferenceSystem &crs ) const
+{
+  QgsAnnotationMarkerItem *item = mQgsItem->clone();
+  if ( mCrs != crs )
+  {
+    QgsCoordinateTransform ct( mCrs, crs, QgsProject::instance() );
+    item->setGeometry( QgsPoint( ct.transform( item->geometry() ) ) );
+  }
+  return item;
 }
 
 void KadasPointItem::setShape( Qgis::MarkerShape shape )

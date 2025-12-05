@@ -147,7 +147,7 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     //! In the future, Kadas would use only annotation layers
     //! Until the migration is complete we can dynamically create annotation layers for specific use-cases such as 3D rendering
     //! The QGIS annotation layer will only contain items/annotations inheriting from QgsAnnotationItem.
-    QgsAnnotationLayer *qgisAnnotationLayer() const SIP_FACTORY;
+    QgsAnnotationLayer *qgisAnnotationLayer( const QgsCoordinateReferenceSystem &crs ) const SIP_FACTORY;
 
     static QString layerType() { return "KadasItemLayer"; }
     KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs );

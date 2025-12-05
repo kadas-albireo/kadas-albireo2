@@ -248,7 +248,10 @@ class KadasMapItem : QObject /Abstract/
 
     virtual bool useQgisAnnotations() const;
 
-    virtual QgsAnnotationItem *annotationItem() const;
+    virtual QgsAnnotationItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const /Factory/;
+%Docstring
+Returns the :py:class:`QgsAnnotationItem` in the given crs (if not specified, no transformation occurs)
+%End
 
     virtual QString itemName() const = 0;
     virtual QString exportName() const;
