@@ -1,55 +1,28 @@
-From 0e10a84b958e12ba9f03bddb29fe479e1fcf3de1 Mon Sep 17 00:00:00 2001
+From 0075118d55e1bcd61d61273b0a00b633615c4a92 Mon Sep 17 00:00:00 2001
 From: Denis Rouzaud <denis.rouzaud@gmail.com>
 Date: Fri, 28 Nov 2025 07:30:02 +0100
-Subject: [PATCH 1/2] Add _3D_EXPORT to annotation layer classes
+Subject: [PATCH] Add QGIS_3D_EXPORT to annotation layer classes
 
 ---
- src/3d/qgsannotationlayerchunkloader_p.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ src/3d/chunks/qgschunkedentity.h         | 2 +-
+ src/3d/qgsannotationlayerchunkloader_p.h | 7 ++++---
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/src/3d/qgsannotationlayerchunkloader_p.h b/src/3d/qgsannotationlayerchunkloader_p.h
-index 80406f4ae614..ac358ed7379e 100644
---- a/src/3d/qgsannotationlayerchunkloader_p.h
-+++ b/src/3d/qgsannotationlayerchunkloader_p.h
-@@ -53,7 +53,7 @@ namespace Qt3DCore
-  *
-  * \since QGIS 4.0
+diff --git a/src/3d/chunks/qgschunkedentity.h b/src/3d/chunks/qgschunkedentity.h
+index 46c7f88ff03c..1f5fe6abbdef 100644
+--- a/src/3d/chunks/qgschunkedentity.h
++++ b/src/3d/chunks/qgschunkedentity.h
+@@ -57,7 +57,7 @@ class QgsRayCastContext;
+  * \brief Implementation of entity that handles chunks of data organized in quadtree with loading data when necessary
+  * based on data error and unloading of data when data are not necessary anymore
   */
--class QgsAnnotationLayerChunkLoaderFactory : public QgsQuadtreeChunkLoaderFactory
-+class _3D_EXPORT QgsAnnotationLayerChunkLoaderFactory : public QgsQuadtreeChunkLoaderFactory
- {
-     Q_OBJECT
- 
-@@ -83,7 +83,7 @@ class QgsAnnotationLayerChunkLoaderFactory : public QgsQuadtreeChunkLoaderFactor
-  *
-  * \since QGIS 4.0
-  */
--class QgsAnnotationLayerChunkLoader : public QgsChunkLoader
-+class _3D_EXPORT QgsAnnotationLayerChunkLoader : public QgsChunkLoader
- {
-     Q_OBJECT
- 
-@@ -126,7 +126,7 @@ class QgsAnnotationLayerChunkLoader : public QgsChunkLoader
-  *
-  * \since QGIS 4.0
-  */
--class QgsAnnotationLayerChunkedEntity : public QgsChunkedEntity
-+class _3D_EXPORT QgsAnnotationLayerChunkedEntity : public QgsChunkedEntity
+-class QgsChunkedEntity : public Qgs3DMapSceneEntity
++class _3D_EXPORT QgsChunkedEntity : public Qgs3DMapSceneEntity
  {
      Q_OBJECT
    public:
-
-From 78d849c21aaccf4bdc0b76637b50e6d565e1d33a Mon Sep 17 00:00:00 2001
-From: Denis Rouzaud <denis.rouzaud@gmail.com>
-Date: Fri, 28 Nov 2025 08:12:55 +0100
-Subject: [PATCH 2/2] Add include for qgis_3d.h in chunk loader header
-
----
- src/3d/qgsannotationlayerchunkloader_p.h | 1 +
- 1 file changed, 1 insertion(+)
-
 diff --git a/src/3d/qgsannotationlayerchunkloader_p.h b/src/3d/qgsannotationlayerchunkloader_p.h
-index ac358ed7379e..b2ed78c166e2 100644
+index 80406f4ae614..20976adf01c8 100644
 --- a/src/3d/qgsannotationlayerchunkloader_p.h
 +++ b/src/3d/qgsannotationlayerchunkloader_p.h
 @@ -27,6 +27,7 @@
@@ -60,3 +33,30 @@ index ac358ed7379e..b2ed78c166e2 100644
  #include "qgschunkloader.h"
  #include "qgschunkedentity.h"
  #include "qgs3drendercontext.h"
+@@ -53,7 +54,7 @@ namespace Qt3DCore
+  *
+  * \since QGIS 4.0
+  */
+-class QgsAnnotationLayerChunkLoaderFactory : public QgsQuadtreeChunkLoaderFactory
++class _3D_EXPORT QgsAnnotationLayerChunkLoaderFactory : public QgsQuadtreeChunkLoaderFactory
+ {
+     Q_OBJECT
+ 
+@@ -83,7 +84,7 @@ class QgsAnnotationLayerChunkLoaderFactory : public QgsQuadtreeChunkLoaderFactor
+  *
+  * \since QGIS 4.0
+  */
+-class QgsAnnotationLayerChunkLoader : public QgsChunkLoader
++class _3D_EXPORT QgsAnnotationLayerChunkLoader : public QgsChunkLoader
+ {
+     Q_OBJECT
+ 
+@@ -126,7 +127,7 @@ class QgsAnnotationLayerChunkLoader : public QgsChunkLoader
+  *
+  * \since QGIS 4.0
+  */
+-class QgsAnnotationLayerChunkedEntity : public QgsChunkedEntity
++class _3D_EXPORT QgsAnnotationLayerChunkedEntity : public QgsChunkedEntity
+ {
+     Q_OBJECT
+   public:
