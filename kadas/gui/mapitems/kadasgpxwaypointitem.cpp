@@ -27,7 +27,7 @@
 
 
 KadasGpxWaypointItem::KadasGpxWaypointItem()
-  : KadasPointItem( QgsCoordinateReferenceSystem( "EPSG:4326" ), IconType::ICON_CIRCLE )
+  : KadasPointItem( QgsCoordinateReferenceSystem( "EPSG:4326" ), Qgis::MarkerShape::Circle )
 {
   setEditor( KadasMapItemEditor::GPX_WAYPOINT );
   mLabelFont.setPointSize( 10 );
@@ -37,12 +37,11 @@ KadasGpxWaypointItem::KadasGpxWaypointItem()
   int size = 2;
   QColor color = Qt::yellow;
 
-  setOutline( QPen( color, size ) );
-  setFill( QBrush( color ) );
+  setColor( color );
+  setStrokeColor( color );
+  setStrokeWidth( size );
 
   setIconSize( 10 + 2 * size );
-  setIconOutline( QPen( Qt::black, size / 2 ) );
-  setIconFill( QBrush( color ) );
 }
 
 QString KadasGpxWaypointItem::exportName() const
@@ -79,8 +78,8 @@ KadasMapItem::Margin KadasGpxWaypointItem::margin() const
   Margin m = KadasPointItem::margin();
   if ( !mName.isEmpty() )
   {
-    m.right = std::max( m.right, mLabelSize.width() + mIconSize / 2 + 1 );
-    m.top = std::max( m.top, mLabelSize.height() + mIconSize / 2 + 1 );
+    m.right = std::max( m.right, mLabelSize.width() + iconSize() / 2 + 1 );
+    m.top = std::max( m.top, mLabelSize.height() + iconSize() / 2 + 1 );
   }
   return m;
 }
@@ -90,11 +89,11 @@ void KadasGpxWaypointItem::render( QgsRenderContext &context ) const
   KadasPointItem::render( context );
 
   // Draw name label
-  if ( !mName.isEmpty() && !constState()->points.isEmpty() )
+  if ( !mName.isEmpty() && !point().isEmpty() )
   {
-    QPointF pos = context.mapToPixel().transform( context.coordinateTransform().transform( constState()->points.front() ) ).toQPointF();
-    pos += QPointF( 0.5 * mIconSize, -0.5 * mIconSize );
-    QColor bufferColor = ( 0.2126 * mIconBrush.color().red() + 0.7152 * mIconBrush.color().green() + 0.0722 * mIconBrush.color().blue() ) > 128 ? Qt::black : Qt::white;
+    QPointF pos = context.mapToPixel().transform( context.coordinateTransform().transform( point() ) ).toQPointF();
+    pos += QPointF( 0.5 * iconSize(), -0.5 * iconSize() );
+    QColor bufferColor = ( 0.2126 * color().red() + 0.7152 * color().green() + 0.0722 * color().blue() ) > 128 ? Qt::black : Qt::white;
 
     QFont font = mLabelFont;
     font.setPointSizeF( font.pointSizeF() * outputDpiScale( context ) );
@@ -109,7 +108,7 @@ void KadasGpxWaypointItem::render( QgsRenderContext &context ) const
     if ( mLabelColor.isValid() )
       format.setColor( mLabelColor );
     else
-      format.setColor( mIconBrush.color() );
+      format.setColor( color() );
     QgsTextBufferSettings bs;
     bs.setColor( bufferColor );
     bs.setSize( 1 );
@@ -122,7 +121,7 @@ void KadasGpxWaypointItem::render( QgsRenderContext &context ) const
 
 QString KadasGpxWaypointItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const
 {
-  if ( !mGeometry )
+  if ( annotationItem()->geometry().isEmpty() )
   {
     return QString();
   }
@@ -135,7 +134,7 @@ QString KadasGpxWaypointItem::asKml( const QgsRenderContext &context, QuaZip *km
   outStream << QString( "<name>%1</name>\n" ).arg( exportName() );
   outStream << "<Style>\n";
   outStream << QString( "<IconStyle>" );
-  outStream << QString( "<color>%1</color>" ).arg( color2hex( fill().color() ) );
+  outStream << QString( "<color>%1</color>" ).arg( color2hex( color() ) );
   // With icon scale=1 google earth normalize the icon to 32 pixels
   outStream << QString( "<scale>%1</scale>" ).arg( iconSize() / 32.0 );
   outStream << QString( "</IconStyle>\n" );
@@ -158,15 +157,14 @@ QString KadasGpxWaypointItem::asKml( const QgsRenderContext &context, QuaZip *km
   outStream << "</Style>\n";
   outStream << "<ExtendedData>\n";
   outStream << "<SchemaData schemaUrl=\"#KadasGeometryItem\">\n";
-  outStream << QString( "<SimpleData name=\"icon_type\">%1</SimpleData>\n" ).arg( static_cast<int>( mIconType ) );
-  outStream << QString( "<SimpleData name=\"outline_style\">%1</SimpleData>\n" ).arg( QgsSymbolLayerUtils::encodePenStyle( mPen.style() ) );
-  outStream << QString( "<SimpleData name=\"fill_style\">%1</SimpleData>\n" ).arg( QgsSymbolLayerUtils::encodeBrushStyle( mBrush.style() ) );
+  outStream << QString( "<SimpleData name=\"icon_type\">%1</SimpleData>\n" ).arg( static_cast<int>( iconSize() ) );
+  outStream << QString( "<SimpleData name=\"outline_style\">%1</SimpleData>\n" ).arg( QgsSymbolLayerUtils::encodePenStyle( QPen( strokeColor(), strokeWidth() ).style() ) );
+  outStream << QString( "<SimpleData name=\"fill_style\">%1</SimpleData>\n" ).arg( QgsSymbolLayerUtils::encodeBrushStyle( QBrush( color() ).style() ) );
   outStream << "</SchemaData>\n";
   outStream << "</ExtendedData>\n";
-  QgsAbstractGeometry *geom = mGeometry->segmentize();
-  geom->transform( QgsCoordinateTransform( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() ) );
-  outStream << geom->asKml( 6 ) << "\n";
-  delete geom;
+  QgsPoint point = QgsPoint( annotationItem()->geometry() );
+  point.transform( QgsCoordinateTransform( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() ) );
+  outStream << point.asKml( 6 ) << "\n";
   outStream << "</Placemark>\n";
   outStream.flush();
   return outString;

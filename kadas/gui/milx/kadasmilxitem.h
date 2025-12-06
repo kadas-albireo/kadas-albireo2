@@ -51,12 +51,12 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     QImage symbolImage() const override;
     QPointF symbolAnchor() const override { return mSymbolAnchor; }
 
-    KadasItemRect boundingBox() const override;
+    QgsRectangle boundingBox() const override;
     Margin margin() const override;
 
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
 
-    bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const override;
+    bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains = false ) const override;
     bool hitTest( const KadasMapPos &pos, const QgsMapSettings &settings ) const override;
     QPair<KadasMapPos, double> closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const override;
 

@@ -35,6 +35,7 @@ class QuaZip;
 class KadasItemLayer;
 class KadasMapItem;
 
+class QgsAnnotationItem;
 class QgsRenderContext;
 class QgsMapSettings;
 class QgsMapLayer;
@@ -277,18 +278,33 @@ class KADAS_GUI_EXPORT KadasItemRect
 class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 {
     Q_OBJECT
-    Q_PROPERTY( int zIndex READ zIndex WRITE setZIndex )
+    Q_PROPERTY( int zIndex READ zIndex WRITE setZIndex NOTIFY zIndexChanged )
     Q_PROPERTY( double symbolScale READ symbolScale WRITE setSymbolScale )
     Q_PROPERTY( QString editor READ editor WRITE setEditor )
-    Q_PROPERTY( QString authId READ authId WRITE setAuthId )
+    //Q_PROPERTY( QString authId READ authId WRITE setAuthId )
     Q_PROPERTY( QString tooltip READ tooltip WRITE setTooltip )
 
   public:
+    enum class DrawStatus
+    {
+      Empty,
+      Drawing,
+      Finished
+    };
+    Q_ENUM( DrawStatus )
+
     KadasMapItem( const QgsCoordinateReferenceSystem &crs );
     ~KadasMapItem();
     KadasMapItem *clone() const;
     QJsonObject serialize() const;
     bool deserialize( const QJsonObject &json );
+
+    // Old annotations use QObject properties
+    // TODO: remove when all annotations are migrated
+    virtual bool useQgisAnnotations() const { return false; }
+
+    //! Returns the QgsAnnotationItem in the given crs (if not specified, no transformation occurs)
+    virtual QgsAnnotationItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const SIP_FACTORY { return nullptr; }
 
     virtual QString itemName() const = 0;
     virtual QString exportName() const;
@@ -297,7 +313,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     const QgsCoordinateReferenceSystem &crs() const { return mCrs; }
 
     /* Bounding box in geographic coordinates */
-    virtual KadasItemRect boundingBox() const = 0;
+    virtual QgsRectangle boundingBox() const = 0;
 
     /* Margin in screen units */
     struct Margin
@@ -324,7 +340,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const = 0;
 
     /* Hit test, rect in item crs */
-    virtual bool intersects( const KadasMapRect &rect, const QgsMapSettings &settings, bool contains = false ) const = 0;
+    virtual bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains = false ) const = 0;
     virtual bool hitTest( const KadasMapPos &pos, const QgsMapSettings &settings ) const;
 
     /* Return the item point to the specified one */
@@ -337,6 +353,9 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     /* Create KML representation */
     virtual QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const = 0;
 #endif
+
+    DrawStatus drawStatus() const { return mDrawStatus; }
+    void setDrawStatus( DrawStatus status ) { mDrawStatus = status; }
 
     /* Associate to layer */
     void associateToLayer( QgsMapLayer *layer );
@@ -359,8 +378,8 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     double symbolScale() const { return mSymbolScale; }
 
     /* authid */
-    void setAuthId( const QString &authId );
-    QString authId() const { return mCrs.authid(); }
+    //void setAuthId( const QString &authId );
+    //QString authId() const { return mCrs.authid(); }
 
     /* tooltip */
     void setTooltip( const QString &tooltip );
@@ -381,16 +400,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     class State : public KadasStateHistory::State
     {
       public:
-        // clang-format off
-        enum class DrawStatus SIP_MONKEYPATCH_SCOPEENUM_UNNEST( KadasMapItem.DrawStatus, DrawStatus )
-        {
-          Empty,
-          Drawing,
-          Finished
-        };
-        //< clang-format on
-
-        DrawStatus drawStatus = DrawStatus::Empty;
         virtual void assign( const State *other ) = 0;
         virtual State *clone() const = 0 SIP_FACTORY;
         virtual QJsonObject serialize() const = 0;
@@ -479,9 +488,18 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     void setEditor( const QString &editor ) { mEditor = editor; }
     const QString &editor() const { return mEditor; }
 
-    // Position interface
-    virtual KadasItemPos position() const = 0;
-    virtual void setPosition( const KadasItemPos &pos ) = 0;
+    //! Position interface is implemented for non QgsAnnotationItem based items
+    //! Once every item has been migrated this should be dropped
+    virtual KadasItemPos position() const
+    {
+      Q_ASSERT( false );
+      return KadasItemPos();
+    }
+    virtual void setPosition( const KadasItemPos &pos ) { Q_ASSERT( false ); }
+
+    //! This should be reimplemented for QgsAnnotation based items
+    //! Once every item has been migrated this should become pure virtual
+    virtual void translate( double dx, double dy ) { Q_ASSERT( false ); }
 
     // TODO: SIP
 #ifndef SIP_RUN
@@ -506,10 +524,12 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     void aboutToBeDestroyed();
     void changed();
     void propertyChanged();
+    void zIndexChanged( int index );
 
   protected:
     State *mState = nullptr;
     QgsCoordinateReferenceSystem mCrs;
+    QString mEditor;
     bool mSelected = false;
     int mZIndex = 0;
     QString mTooltip;
@@ -518,8 +538,15 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     QgsMapLayer *mAssociatedLayer = nullptr;
     KadasItemLayer *mOwnerLayer = nullptr;
     bool mIsPointSymbol = false;
+    DrawStatus mDrawStatus = DrawStatus::Empty;
 
-    virtual KadasMapItem::State *createEmptyState() const = 0 SIP_FACTORY;
+
+    // TODO: remove when all annotations are migrated
+    virtual KadasMapItem::State *createEmptyState() const SIP_FACTORY { return nullptr; }
+
+    // TODO: make this pure virtual when all annotations are migrated
+    virtual void writeXmlPrivate( QDomElement &element ) const {}
+    virtual void readXmlPrivate( const QDomElement &element ) {}
 
     static void defaultNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
     static void anchorNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
@@ -527,15 +554,15 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     static double getTextRenderScale( const QgsRenderContext &context );
 
     KadasMapPos toMapPos( const KadasItemPos &itemPos, const QgsMapSettings &settings ) const;
+    QgsPointXY toMapPos( const QgsPointXY &itemPos, const QgsMapSettings &settings ) const;
     KadasItemPos toItemPos( const KadasMapPos &mapPos, const QgsMapSettings &settings ) const;
-    KadasMapRect toMapRect( const KadasItemRect &itemRect, const QgsMapSettings &settings ) const;
+    QgsRectangle toMapRect( const QgsRectangle &itemRect, const QgsMapSettings &settings ) const;
     KadasItemRect toItemRect( const KadasMapRect &itemRect, const QgsMapSettings &settings ) const;
     double pickTolSqr( const QgsMapSettings &settings ) const;
     double pickTol( const QgsMapSettings &settings ) const;
     void cleanupAttachment( const QString &filePath ) const;
 
   private:
-    QString mEditor;
     bool mDontCleanupAttachment = false;
 
     QJsonValue serializeProperty( const QString &name, const QVariant &variant ) const;
