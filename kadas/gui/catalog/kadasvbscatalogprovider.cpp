@@ -41,7 +41,7 @@ KadasVBSCatalogProvider::KadasVBSCatalogProvider( const QString &baseUrl, KadasC
 
 void KadasVBSCatalogProvider::load()
 {
-  QString lang = QgsSettings().value( "/locale/userLocale", "en" ).toString().left( 2 ).toLower();
+  QString lang = Kadas::locale( true );
   mPendingTasks = 1;
   QString baseUrl = mBaseUrl;
   baseUrl.replace( "{lang}", lang );

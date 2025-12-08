@@ -12,6 +12,7 @@
 
 
 
+
 class KadasCatalogProvider : QObject
 {
 %Docstring(signature="appended")
@@ -44,6 +45,7 @@ the Free Software Foundation; either version 2 of the License, or     *
     QString parseWMSNestedLayer( const QDomNode &layerItem ) const;
     bool parseWMSLayerCapabilities( const QDomNode &layerItem, const QString &title, const QStringList &imgFormats, const QStringList &parentCrs, const QString &url, const QString &layerInfoUrl, const QString &authCfg, QMimeData *&mimeData ) const;
     QStandardItem *getCategoryItem( const QStringList &titles, const QStringList &sortIndices );
+
 };
 
 /************************************************************************

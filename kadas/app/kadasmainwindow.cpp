@@ -345,7 +345,9 @@ void KadasMainWindow::init()
   connect( mRibbonbarButton, &QPushButton::clicked, this, &KadasMainWindow::toggleFullscreen );
   connect( mRibbonWidget, &QTabWidget::tabBarClicked, this, &KadasMainWindow::endFullscreen );
 
+
   QStringList catalogUris = QgsSettings().value( "/kadas/geodatacatalogs" ).toString().split( ";;" );
+
   for ( const QString &catalogUri : catalogUris )
   {
     QUrlQuery query( QUrl::fromEncoded( "?" + catalogUri.toLocal8Bit() ) );
