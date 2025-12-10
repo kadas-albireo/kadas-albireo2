@@ -19,7 +19,7 @@
     <message>
         <location filename="../about_dialog.py" line="77"/>
         <source>swissALTIRegio usage disclaimer</source>
-        <translation type="unfinished"/>
+        <translation>Conditions d&apos;utilisation swissALTIRegio</translation>
     </message>
 </context>
 </TS>
