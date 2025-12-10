@@ -3,6 +3,7 @@ SOURCES += about_plugin.py \
 
 
 
-TRANSLATIONS += i18n/kadas_about_de.ts \
+TRANSLATIONS += i18n/kadas_about_en.ts \
+                i18n/kadas_about_de.ts \
                 i18n/kadas_about_it.ts \
                 i18n/kadas_about_fr.ts
