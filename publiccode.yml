@@ -1,8 +1,8 @@
 publiccodeYmlVersion: 0.5.0
 name: Kadas Albireo
 url: https://github.com/kadas-albireo/kadas-albireo2
-softwareVersion: 2.3.17
-releaseDate: 2025-11-27
+softwareVersion: 2.3.18
+releaseDate: 2025-12-11
 logo: https://raw.githubusercontent.com/kadas-albireo/kadas-albireo2/refs/heads/main/kadas/resources/logo.png
 platforms:
   - windows
