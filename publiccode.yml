@@ -23,31 +23,15 @@ description:
     localisedName: KADAS Albireo
     shortDescription: KADAS is a standard application used by the armed forces to
       work with digital maps and geoinformation.
-    longDescription: >-
-      KADAS is a standard application used by the armed forces to work with
-      digital maps and geoinformation. It provides direct access to the military
-      spatial data infrastructure (MSDI) across a number of topics. 
-
-      KADAS makes it easier for the armed forces to access a wide range of
-      geoservices, especially those provided by the military spatial data
-      infrastructure (MSDI). This simplifies the process of analysing the
-      landscape and creating plans for tactical operations. This information and
-      these plans can be exchanged between the various systems.
-      
-      KADAS also works offline. To make this possible, the application comes
-      with a basic data package of digital maps. This allows the maps to be used
-      offline during tactical operations where there is no network connection.
-      Additional offline data packages are available on request.The integration
-      of symbols and tactical graphics allows KADAS to exchange situational
-      information with the armed forces’ command and control systems. This means
-      that members of the armed forces who do not have access to these systems
-      can use KADAS. This helps them to prepare operations and further training
-      service.
-
-      KADAS was developed on the basis of the QGIS open-source solution. The
-      source code is publicly available for use by others. swisstopo supports
-      the armed forces and other users within the Federal Administration with
-      the operation and development of this software.
+    longDescription: KADAS Albireo is a mapping application based on QGIS and
+      targeted at non-specialized users, providing enhanced functionalities in
+      areas such as drawing, measuring, terrain analysis. It is primarily used
+      by the Swiss Armed Forces to access geoservices, create operational plans,
+      analyze the terrain and the environment efficiently. The software supports
+      offline use when data is available, and its open-source foundation ensures
+      the source code is publicly accessible. KADAS is maintained and advanced
+      with the support of swisstopo, serving both the Armed Forces and other
+      federal administration users.
     features:
       - GIS
       - Mapping
@@ -55,32 +39,16 @@ description:
     localisedName: KADAS Albireo
     shortDescription: KADAS ist die Standardapplikation für das Arbeiten mit
       digitalen Karten und Geoinformationen in der Armee.
-    longDescription: >-
-      KADAS ist die Standardapplikation für das Arbeiten mit digitalen Karten
-      und Geoinformationen in der Armee. Sie bietet direkten Zugriff auf die
-      militärische Geodateninfrastruktur (MGDI) mit einer Vielzahl an
-      thematischen Ebenen. 
-
-      KADAS vereinfacht den Zugriff auf ein breites Angebot an Geodiensten
-      insbesondere aus der Militärischen Geodaten-Infrastruktur (MGDI). So
-      können auf einfache Weise Analysen der Landschaft gemacht und taktische
-      Einsatzpläne erstellt werden. Diese Informationen und Pläne lassen sich
-      zwischen den verschiedenen Systemen austauschen.
-
-      KADAS funktioniert auch offline. Dafür wird ein entsprechender
-      Grunddatensatz an digitalen Karten mit der Applikation verteilt. Dies
-      ermöglicht die Nutzung bei Einsätzen ohne Netzwerkverbindung. Bei Bedarf
-      können weitere Offline-Datenpakete zur Verfügung gestellt werden.Dank der
-      Integration von Symbolen und taktischen Zeichen verfügt KADAS über die
-      Möglichkeit, Lageinformationen mit Führungsinformationssystemen der Armee
-      auszutauschen. Damit können auch Angehörige der Armee, die keinen Zugriff
-      auf die erwähnten Systeme haben, KADAS nutzen. Dies unterstützt die
-      Vorbereitung von Einsätzen und Fortbildungsdiensten.
-
-      KADAS wurde auf der Basis der Open-Source Lösung QGIS entwickelt. Der
-      Source-Code steht zur Weiterwendung öffentlich zur Verfügung. swisstopo
-      unterstützt die Armee und weitere Nutzer innerhalb der Bundesverwaltung
-      beim Betrieb und der Weiterentwicklung dieser Software. 
+    longDescription: KADAS Albireo ist eine auf QGIS basierende Kartierungsanwendung
+      für nicht spezialisierte Benutzer, die erweiterte Funktionen in Bereichen
+      wie Zeichnen, Messen und Geländanalyse bietet. Sie wird in erster Linie
+      von der Schweizer Armee verwendet, um auf Geodienste zuzugreifen,
+      Einsatzpläne zu erstellen und das Gelände und die Umgebung effizient zu
+      analysieren. Die Software unterstützt die Offline-Nutzung, wenn Daten
+      verfügbar sind, und dank ihrer Open-Source-Basis ist der Quellcode
+      öffentlich zugänglich. KADAS wird mit Unterstützung von swisstopo gepflegt
+      und weiterentwickelt und dient sowohl der Armee als auch anderen Nutzern
+      der Bundesverwaltung.
     features:
       - GIS
       - Mapping
@@ -89,33 +57,17 @@ description:
     localisedName: KADAS Albireo
     shortDescription: KADAS est une application permettant de travailler avec les
       cartes et les géoinformations numériques dans l’armée.
-    longDescription: >-
-      KADAS est une application permettant de travailler avec les cartes et les
-      géoinformations numériques dans l’armée. Elle permet d’accéder directement
-      à l’infrastructure de géodonnées militaires (IDGM) qui comprend un grand
-      nombre de niveaux thématiques. 
-
-      KADAS facilite l’accès à une vaste offre de géoservices, notamment de
-      l’infrastructure de géodonnées militaires (IDGM). Il est ainsi possible
-      d’analyser facilement la topographie et d’élaborer des plans
-      d’intervention tactiques. Ces informations et ces plans peuvent être
-      échangés entre les différents systèmes.
-       
-      KADAS fonctionne également hors ligne. À cet effet, un jeu de données de
-      base de cartes numériques est diffusé au moyen de l’application pour
-      permettre de les utiliser lors d’interventions sans connexion à un réseau.
-      Si nécessaire, d’autres jeux de données hors ligne peuvent être mis à
-      disposition.Grâce à l’intégration de symboles et de caractères tactiques,
-      KADAS a la possibilité d’échanger des informations sur la situation avec
-      les systèmes d’information et de conduite de l’armée. Les membres de
-      l’armée qui n’ont pas accès aux systèmes mentionnés peuvent ainsi utiliser
-      KADAS. Cela les aide à préparer les engagements et les services de
-      formation continue.
-
-      L’application KADAS a été développée sur la base de la solution open
-      source de QGIS. Le code source public peut être utilisé. swisstopo
-      soutient l’armée et d’autres utilisateurs au sein de l’administration
-      fédérale dans l’exploitation et le développement de ce logiciel. 
+    longDescription: KADAS Albireo est une application cartographique basée sur QGIS
+      et destinée à des utilisateurs non spécialisés, qui offre des
+      fonctionnalités étendues dans des domaines tels que le dessin, la mesure
+      et l'analyse du terrain. Elle est principalement utilisée par les Forces
+      armées suisses pour accéder à des géoservices, créer des plans
+      opérationnels et analyser efficacement le terrain et l'environnement. Le
+      logiciel prend en charge l'utilisation hors ligne lorsque les données sont
+      disponibles, et sa base open source garantit que le code source est
+      accessible au public. KADAS est maintenu et développé avec le soutien de
+      swisstopo, au service des Forces armées et d'autres utilisateurs de
+      l'administration fédérale.
     features:
       - SIG
       - GIS
@@ -124,32 +76,16 @@ description:
     localisedName: KADAS Albireo
     shortDescription: KADAS è l’applicazione che permette di lavorare con carte
       digitali e geoinformazioni all’interno dell’esercito.
-    longDescription: >-
-      KADAS è l’applicazione che permette di lavorare con carte digitali e
-      geoinformazioni all’interno dell’esercito. Essa fornisce un accesso
-      diretto all’infrastruttura militare di dati geografici (IMDG) che
-      comprende un gran numero di livelli tematici. 
-
-      KADAS facilita l’accesso a un’ampia gamma di geoservizi, in particolare
-      dall’infrastruttura militare di dati geografici (IMDG). In questo modo, è
-      possibile analizzare facilmente la topografia e sviluppare piani di
-      intervento tattici. Questi piani e informazioni possono essere scambiati
-      tra i diversi sistemi.
-
-      KADAS funziona anche offline. A questo scopo, un set di dati di base di
-      carte digitali viene distribuito insieme all’applicazione per consentirne
-      l’impiego durante gli interventi senza una connessione di rete. Se
-      necessario, è possibile fornire ulteriori pacchetti di dati offline.
-      Grazie all’integrazione di simboli e cartteri tattici, KADAS è in grado di
-      scambiare informazioni sulla situazione con i sistemi di informazione di
-      condotta dell’esercito. Ciò significa che anche i soldati che non hanno
-      accesso ai sistemi sopra menzionati possono usare KADAS. Questo li aiuta a
-      preparare le operazioni tattiche e l’ulteriore addestramento.
-
-      KADAS è stato sviluppato sulla base della soluzione open source QGIS. È
-      possibile utilizzare il codice sorgente pubblico. swisstopo supporta
-      l’esercito e altri utenti dell’Amministrazione federale nella gestione e
-      nello sviluppo di questo software.
+    longDescription: KADAS Albireo è un'applicazione di mappatura basata su QGIS e
+      destinata a utenti non specializzati, che offre funzionalità avanzate in
+      settori quali il disegno, la misurazione e l'analisi del terreno. È
+      utilizzata principalmente dalle Forze armate svizzere per accedere ai
+      geoservizi, creare piani operativi e analizzare in modo efficiente il
+      terreno e l'ambiente. Il software supporta l'uso offline quando i dati
+      sono disponibili e la sua base open source garantisce che il codice
+      sorgente sia accessibile al pubblico. KADAS è gestito e sviluppato con il
+      supporto di swisstopo, al servizio sia delle forze armate che di altri
+      utenti dell'amministrazione federale.
     features:
       - cartografia
       - SIG
