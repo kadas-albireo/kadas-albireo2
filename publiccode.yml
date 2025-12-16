@@ -1,5 +1,5 @@
 publiccodeYmlVersion: 0.5.0
-name: Kadas Albireo
+name: KADAS Albireo
 url: https://github.com/kadas-albireo/kadas-albireo2
 softwareVersion: 2.3.18
 releaseDate: 2025-12-11
@@ -20,7 +20,7 @@ organisation:
   name: Groupement Défense
 description:
   en:
-    localisedName: Kadas Albireo
+    localisedName: KADAS Albireo
     shortDescription: KADAS is a standard application used by the armed forces to
       work with digital maps and geoinformation.
     longDescription: >-
@@ -52,7 +52,7 @@ description:
       - GIS
       - Mapping
   de:
-    localisedName: Kadas Albireo
+    localisedName: KADAS Albireo
     shortDescription: KADAS ist die Standardapplikation für das Arbeiten mit
       digitalen Karten und Geoinformationen in der Armee.
     longDescription: >-
@@ -86,7 +86,7 @@ description:
       - Mapping
       - Kartographie
   fr:
-    localisedName: Kadas Albireo
+    localisedName: KADAS Albireo
     shortDescription: KADAS est une application permettant de travailler avec les
       cartes et les géoinformations numériques dans l’armée.
     longDescription: >-
@@ -121,7 +121,7 @@ description:
       - GIS
       - Cartographie
   it:
-    localisedName: Kadas Albireo
+    localisedName: KADAS Albireo
     shortDescription: KADAS è l’applicazione che permette di lavorare con carte
       digitali e geoinformazioni all’interno dell’esercito.
     longDescription: >-
