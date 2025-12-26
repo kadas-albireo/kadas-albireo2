@@ -202,7 +202,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
         for ( QgsAbstractGeometry *geom : geoms )
         {
           geom->transform( itemCrst );
-          KadasGeometryItem::IconType iconType = static_cast<KadasGeometryItem::IconType>( attributes.value( "icon_type" ).toInt() );
+          Qgis::MarkerShape iconType = static_cast<Qgis::MarkerShape>( attributes.value( "icon_type" ).toInt() );
           Qt::PenStyle outlineStyle = QgsSymbolLayerUtils::decodePenStyle( attributes.value( "outline_style" ) );
           Qt::BrushStyle fillStyle = QgsSymbolLayerUtils::decodeBrushStyle( attributes.value( "fill_style" ) );
           bool hasZ = false;
@@ -213,7 +213,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
             KadasTextItem *item = new KadasTextItem( itemLayer->crs() );
             item->setEditor( "KadasRedliningTextEditor" );
             item->setText( name );
-            item->setFillColor( style.labelColor );
+            item->setColor( style.labelColor );
             QFont font = item->font();
             font.setPointSizeF( font.pointSizeF() * style.labelScale );
             item->setFont( font );
@@ -224,11 +224,12 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
           {
             KadasPointItem *item = new KadasPointItem( itemLayer->crs() );
             item->setEditor( "KadasRedliningItemEditor" );
-            item->addPartFromGeometry( *geom );
-            item->setIconType( iconType );
+            item->setPoint( *qgsgeometry_cast<const QgsPoint *>( geom ) );
+            item->setShape( iconType );
             item->setIconSize( 10 + 2 * style.outlineSize );
-            item->setIconOutline( QPen( style.outlineColor, style.outlineSize / 4, outlineStyle ) );
-            item->setIconFill( QBrush( style.fillColor, fillStyle ) );
+            item->setStrokeColor( style.outlineColor );
+            item->setStrokeWidth( style.outlineSize / 4 );
+            item->setColor( style.fillColor );
             itemLayer->addItem( item );
           }
           else if ( dynamic_cast<QgsLineString *>( geom ) || dynamic_cast<QgsMultiLineString *>( geom ) )
