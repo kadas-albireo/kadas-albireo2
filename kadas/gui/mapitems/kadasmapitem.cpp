@@ -280,12 +280,13 @@ bool KadasMapItem::hitTest( const KadasMapPos &pos, const QgsMapSettings &settin
   QgsRenderContext renderContext = QgsRenderContext::fromMapSettings( settings );
   double radiusmm = QgsSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
   radiusmm = radiusmm > 0 ? radiusmm : Qgis::DEFAULT_SEARCH_RADIUS_MM;
-  double radiusmu = radiusmm * renderContext.scaleFactor() * renderContext.mapToPixel().mapUnitsPerPixel();
+  double radiusmu = radiusmm * renderContext.scaleFactor() * renderContext.devicePixelRatio() * renderContext.mapToPixel().mapUnitsPerPixel();
   KadasMapRect filterRect;
   filterRect.setXMinimum( pos.x() - radiusmu );
   filterRect.setXMaximum( pos.x() + radiusmu );
   filterRect.setYMinimum( pos.y() - radiusmu );
   filterRect.setYMaximum( pos.y() + radiusmu );
+
   return intersects( filterRect, settings );
 }
 

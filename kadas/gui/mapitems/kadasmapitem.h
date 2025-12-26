@@ -339,8 +339,8 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
     virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const = 0;
 
-    /* Hit test, rect in item crs */
     virtual bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains = false ) const = 0;
+
     virtual bool hitTest( const KadasMapPos &pos, const QgsMapSettings &settings ) const;
 
     /* Return the item point to the specified one */

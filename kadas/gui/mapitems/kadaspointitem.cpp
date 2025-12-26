@@ -150,7 +150,8 @@ QList<KadasMapItem::Node> KadasAbstractPointItem::nodes( const QgsMapSettings &s
 
 bool KadasAbstractPointItem::intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const
 {
-  return rect.intersects( boundingBox() );
+  QgsRectangle itemRect = QgsCoordinateTransform( settings.destinationCrs(), mCrs, QgsProject::instance() ).transform( rect );
+  return itemRect.intersects( boundingBox() );
 }
 
 
