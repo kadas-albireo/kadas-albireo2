@@ -64,7 +64,7 @@ void KadasMapToolEditItem::activate()
   QgsMapTool::activate();
   setCursor( Qt::ArrowCursor );
   mStateHistory = new KadasStateHistory( this );
-  mStateHistory->push( mItem->constState()->clone() );
+  mStateHistory->push( new ToolState( mItem->clone() ) );
   connect( mStateHistory, &KadasStateHistory::stateChanged, this, &KadasMapToolEditItem::stateChanged );
 
   mSnapping = QgsSettings().value( "/kadas/snapping_enabled", false ).toBool();
