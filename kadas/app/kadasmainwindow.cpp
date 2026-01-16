@@ -407,6 +407,8 @@ void KadasMainWindow::init()
 
   QShortcut *networkLoggerShortcut = new QShortcut( QKeySequence( Qt::Key_F12 ), this );
   connect( networkLoggerShortcut, &QShortcut::activated, kApp, &KadasApplication::showNetworkLogger );
+  QShortcut *alternativeNetworkLoggerShortcut = new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_F12 ), this );
+  connect( alternativeNetworkLoggerShortcut, &QShortcut::activated, kApp, &KadasApplication::showNetworkLogger );
 
   // Restore geometry
   restoreGeometry( QgsSettings().value( "/kadas/windowgeometry" ).toByteArray() );
