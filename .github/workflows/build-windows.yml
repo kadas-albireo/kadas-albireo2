@@ -92,7 +92,7 @@ jobs:
                 -D INSTALL_DTM=ON \
                 -D INSTALL_ALBIREO_SETTINGS=ON \
                 -D VCPKG_TARGET_TRIPLET="x64-windows" \
-                -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=C:/src --x-abi-tools-use-exact-versions" \
+                -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=C:/src;--x-abi-tools-use-exact-versions" \
                 -D QGIS_PYTHON_MODULE_DIR="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\Lib\site-packages\qgis" \
                 -D CPACK_PACKAGE_FILE_NAME="kadas-win64-$(date +'%Y-%m-%d_%H%M')" \
                 -D NUGET_USERNAME=kadas-albireo \
