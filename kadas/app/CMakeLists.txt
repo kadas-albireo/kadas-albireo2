@@ -57,6 +57,8 @@ set(kadas_SRC
     mapswipe/kadasmapswipetool.cpp
     milx/kadasmilxexportdialog.cpp
     milx/kadasmilxintegration.cpp
+    auth/kadasappauthrequesthandler.cpp
+    auth/kadasportalauth.cpp
 )
 
 set(kadas_HDR
@@ -95,6 +97,8 @@ set(kadas_HDR
     3d/kadasphongmaterialwidget.h
     3d/kadasshadowrenderingsettingswidget.h
     3d/kadasskyboxrenderingsettingswidget.h
+    auth/kadasappauthrequesthandler.h
+    auth/kadasportalauth.h
     bullseye/kadasbullseyelayer.h
     bullseye/kadasmaptoolbullseye.h
     external/qgis/app/qgslayertreeviewindicatorprovider.h
@@ -131,6 +135,7 @@ list(SORT kadas_HDR)
 file(
   GLOB
   kadas_UI
+  autht/*.ui
   ui/*.ui
   kml/*.ui
   bullseye/*.ui
@@ -239,6 +244,7 @@ target_include_directories(
   kadas
   PUBLIC ${CMAKE_SOURCE_DIR}/kadas/app
          ${CMAKE_SOURCE_DIR}/kadas/app/3d
+         ${CMAKE_SOURCE_DIR}/kadas/app/auth
          ${CMAKE_SOURCE_DIR}/kadas/app/bullseye
          ${CMAKE_SOURCE_DIR}/kadas/app/external/qgis
          ${CMAKE_SOURCE_DIR}/kadas/app/guidegrid

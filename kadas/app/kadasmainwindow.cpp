@@ -102,6 +102,7 @@
 #include "kml/kadaskmlintegration.h"
 #include "mapgrid/kadasmaptoolmapgrid.h"
 #include "milx/kadasmilxintegration.h"
+#include "portal/kadasportal.h"
 
 
 KadasMapItem *KadasSymbolAttributesEditorInterface::createItem() const
@@ -373,7 +374,7 @@ void KadasMainWindow::init()
     }
     else if ( type == "arcgisportal" )
     {
-      KadasArcGisPortalCatalogProvider *portalprovider = new KadasArcGisPortalCatalogProvider( url, mCatalogBrowser, params, kApp->sEsriAuthCfgId );
+      KadasArcGisPortalCatalogProvider *portalprovider = new KadasArcGisPortalCatalogProvider( url, mCatalogBrowser, params, KadasPortal::ESRI_AUTH_CFG_ID );
       mCatalogBrowser->addProvider( portalprovider );
     }
   }
