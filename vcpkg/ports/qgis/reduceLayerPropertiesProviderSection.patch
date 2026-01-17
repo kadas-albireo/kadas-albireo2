@@ -1,17 +1,18 @@
-From 1818696027ec5f54b9d8bfa64066db37d217e9a0 Mon Sep 17 00:00:00 2001
+From f5706380d4464b6250e2c9c4b7747d166f2b7e8a Mon Sep 17 00:00:00 2001
 From: Damiano Lombardi <damiano@opengis.ch>
 Date: Mon, 1 Dec 2025 00:06:39 +0100
-Subject: [PATCH] Reduce provider informations for RasterLayerProperties dlg
+Subject: [PATCH 1/2] Reduce provider informations for RasterLayerProperties
+ dlg
 
 ---
  src/core/raster/qgsrasterlayer.cpp | 3 ---
  1 file changed, 3 deletions(-)
 
 diff --git a/src/core/raster/qgsrasterlayer.cpp b/src/core/raster/qgsrasterlayer.cpp
-index f719f6b2797..49c437d6219 100644
+index 9ebcdeabf47..253fceabb4d 100644
 --- a/src/core/raster/qgsrasterlayer.cpp
 +++ b/src/core/raster/qgsrasterlayer.cpp
-@@ -490,9 +490,6 @@ QString QgsRasterLayer::htmlMetadata() const
+@@ -492,9 +492,6 @@ QString QgsRasterLayer::htmlMetadata() const
    }
    myMetadata += QStringLiteral( "</td></tr>\n" ) %
  
@@ -21,6 +22,57 @@ index f719f6b2797..49c437d6219 100644
                  // End Provider section
                  QStringLiteral( "</table>\n<br><br>" );
  
+-- 
+2.52.0
+
+
+From e72fdee8c43bda47e50146b75cd3e095f321765d Mon Sep 17 00:00:00 2001
+From: Damiano Lombardi <damiano@opengis.ch>
+Date: Wed, 10 Dec 2025 15:19:43 +0100
+Subject: [PATCH 2/2] Limit "Other layers" amount to avoid freezes in rendering
+
+---
+ src/core/raster/qgsrasterlayer.cpp   |  3 +++
+ src/providers/wms/qgswmsprovider.cpp | 11 +++++++++--
+ 2 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/src/core/raster/qgsrasterlayer.cpp b/src/core/raster/qgsrasterlayer.cpp
+index 253fceabb4d..9ebcdeabf47 100644
+--- a/src/core/raster/qgsrasterlayer.cpp
++++ b/src/core/raster/qgsrasterlayer.cpp
+@@ -492,6 +492,9 @@ QString QgsRasterLayer::htmlMetadata() const
+   }
+   myMetadata += QStringLiteral( "</td></tr>\n" ) %
+ 
++                // Insert provider-specific (e.g. WMS-specific) metadata
++                mDataProvider->htmlMetadata() %
++
+                 // End Provider section
+                 QStringLiteral( "</table>\n<br><br>" );
+ 
+diff --git a/src/providers/wms/qgswmsprovider.cpp b/src/providers/wms/qgswmsprovider.cpp
+index 6df6f136349..5230e594600 100644
+--- a/src/providers/wms/qgswmsprovider.cpp
++++ b/src/providers/wms/qgswmsprovider.cpp
+@@ -2688,9 +2688,16 @@ QString QgsWmsProvider::htmlMetadata() const
+     // Layer properties
+     if ( n < mCaps.mLayersSupported.size() )
+     {
+-      metadata += QStringLiteral( "<tr><th class=\"strong\" id=\"otherlayers\">" ) % tr( "Other Layers" ) % QStringLiteral( "</th></tr>" );
++      static const int MAX_OTHERLAYERS_COUNT = 10;
++      QString description = tr( "Other Layers" );
++      if ( mCaps.mLayersSupported.size() > MAX_OTHERLAYERS_COUNT )
++      {
++        description += tr( " (only the first %1 are listed)" ).arg( MAX_OTHERLAYERS_COUNT );
++      }
++
++      metadata += QStringLiteral( "<tr><th class=\"strong\" id=\"otherlayers\">" ) % description % QStringLiteral( "</th></tr>" );
+ 
+-      for ( int i = 0; i < mCaps.mLayersSupported.size(); i++ )
++      for ( int i = 0; i < std::min( static_cast<int>( mCaps.mLayersSupported.size() ), MAX_OTHERLAYERS_COUNT ); i++ )
+       {
+         if ( !mSettings.mActiveSubLayers.contains( mCaps.mLayersSupported[i].name ) )
+         {
 -- 
 2.52.0
 
