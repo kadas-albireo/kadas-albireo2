@@ -43,6 +43,7 @@
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgsauthguiutils.h>
 #include <qgis/qgslayerdefinition.h>
+#include <qgis/qgsmapcanvas.h>
 #include <qgis/qgspluginlayer.h>
 #include <qgis/qgspluginlayerregistry.h>
 #include <qgis/qgsprovidersublayersdialog.h>

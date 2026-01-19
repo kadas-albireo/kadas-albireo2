@@ -9,7 +9,11 @@
 
 
 
-class KadasPointItem : KadasGeometryItem
+
+
+
+
+class KadasAbstractPointItem : KadasMapItem /Abstract/
 {
 %Docstring(signature="appended")
 *************************************************************************
@@ -26,9 +30,15 @@ the Free Software Foundation; either version 2 of the License, or     *
 #include "kadas/gui/mapitems/kadaspointitem.h"
 %End
   public:
-    KadasPointItem( const QgsCoordinateReferenceSystem &crs, KadasGeometryItem::IconType icon = KadasGeometryItem::IconType::ICON_CIRCLE );
+    KadasAbstractPointItem( const QgsCoordinateReferenceSystem &crs );
 
-    virtual QString itemName() const;
+    virtual QgsPointXY point() const;
+    virtual void setPoint( const QgsPointXY &point );
+
+    virtual void setItemGeometry( const QgsPointXY &point ) = 0;
+
+    virtual void translate( double dx, double dy );
+    virtual void setState( const KadasMapItem::State *state );
 
     virtual bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings );
 
@@ -43,12 +53,9 @@ the Free Software Foundation; either version 2 of the License, or     *
     virtual void endPart();
 
 
-    virtual AttribDefs drawAttribs() const;
+    virtual bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const;
 
-    virtual AttribValues drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const;
-
-    virtual KadasMapPos positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const;
-
+    virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const;
 
     virtual EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const;
 
@@ -57,39 +64,62 @@ the Free Software Foundation; either version 2 of the License, or     *
     virtual void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings );
 
 
+    virtual AttribDefs drawAttribs() const;
+
+    virtual AttribValues drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const;
+
+    virtual KadasMapPos positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const;
+
+
     virtual AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const;
 
     virtual KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const;
 
 
-    virtual KadasItemPos position() const;
-
-    virtual void setPosition( const KadasItemPos &pos );
-
-
-    virtual Qgis::GeometryType geometryType() const;
-    virtual void addPartFromGeometry( const QgsAbstractGeometry &geom );
+  protected:
+    virtual bool useQgisAnnotations() const;
+    virtual void updateQgsAnnotation() = 0;
 
 
-    const QgsMultiPoint *geometry() const;
+};
 
-    struct State : KadasMapItem::State
-    {
-        QList<KadasItemPos> points;
-        virtual void assign( const KadasMapItem::State *other );
-        virtual State *clone() const /Factory/;
-        virtual QJsonObject serialize() const;
 
-        virtual bool deserialize( const QJsonObject &json );
+class KadasPointItem : KadasAbstractPointItem
+{
 
-    };
-    const State *constState() const;
+%TypeHeaderCode
+#include "kadas/gui/mapitems/kadaspointitem.h"
+%End
+  public:
+    KadasPointItem( const QgsCoordinateReferenceSystem &crs, Qgis::MarkerShape icon = Qgis::MarkerShape::Circle );
+
+    virtual QgsAnnotationMarkerItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const /Factory/;
+
+    virtual QString itemName() const;
+
+    virtual void setItemGeometry( const QgsPointXY &point );
+
+    virtual QgsRectangle boundingBox() const;
+
+    virtual void render( QgsRenderContext &context ) const;
+
+    void setShape( Qgis::MarkerShape shape );
+    Qgis::MarkerShape shape() const;
+    void setIconSize( int size );
+    int iconSize() const;
+    void setColor( const QColor &color );
+    QColor color() const;
+    void setStrokeColor( const QColor &strokeColor );
+    QColor strokeColor() const;
+    void setStrokeWidth( double width );
+    double strokeWidth() const;
+    void setStrokeStyle( const Qt::PenStyle &style );
+    Qt::PenStyle strokeStyle() const;
 
   protected:
-    virtual KadasMapItem *_clone() const /Factory/;
-    virtual State *createEmptyState() const /Factory/;
-    virtual void recomputeDerived();
-
+    virtual KadasMapItem *_clone() const;
+    virtual void writeXmlPrivate( QDomElement &element ) const;
+    virtual void readXmlPrivate( const QDomElement &element );
 
 };
 

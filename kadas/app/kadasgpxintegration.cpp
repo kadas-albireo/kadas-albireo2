@@ -158,7 +158,7 @@ bool KadasGpxIntegration::importGpx( const QString &filename, QString &errorMsg 
 
     KadasGpxWaypointItem *waypoint = new KadasGpxWaypointItem();
     waypoint->setName( name );
-    waypoint->addPartFromGeometry( QgsPoint( lon, lat ) );
+    waypoint->setPoint( QgsPoint( lon, lat ) );
     layer->addItem( waypoint );
   }
   QDomNodeList rtes = doc.elementsByTagName( "rte" );
@@ -270,7 +270,7 @@ void KadasGpxIntegration::saveGpx()
     if ( dynamic_cast<const KadasGpxWaypointItem *>( item ) )
     {
       const KadasGpxWaypointItem *waypoint = static_cast<const KadasGpxWaypointItem *>( item );
-      QgsPoint pt = waypoint->geometry()->vertexAt( QgsVertexId( 0, 0, 0 ) );
+      QgsPoint pt = QgsPoint( waypoint->point() );
       QDomElement wptEl = doc.createElement( "wpt" );
       wptEl.setAttribute( "lon", pt.x() );
       wptEl.setAttribute( "lat", pt.y() );

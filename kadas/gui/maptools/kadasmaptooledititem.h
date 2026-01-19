@@ -46,6 +46,14 @@ class KADAS_GUI_EXPORT KadasMapToolEditItem : public QgsMapTool
     void keyPressEvent( QKeyEvent *e ) override;
 
   private:
+    struct ToolState : KadasStateHistory::State
+    {
+        ToolState( KadasMapItem *item )
+          : itemState( item ) {}
+        ~ToolState() { delete itemState; }
+        KadasMapItem *itemState = nullptr;
+    };
+
     KadasStateHistory *mStateHistory = nullptr;
     KadasBottomBar *mBottomBar = nullptr;
     KadasItemLayer *mLayer = nullptr;
