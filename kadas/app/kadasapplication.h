@@ -48,7 +48,7 @@ class KadasLayerRefreshManager;
 class KadasMainWindow;
 class KadasMapToolPan;
 class KadasMessageLogViewer;
-class KadasNetworkLoggerDockWidget;
+class KadasDeveloperToolsDockWidget;
 class KadasPluginInterface;
 class KadasPythonIntegration;
 class KadasRedliningIntegration;
@@ -159,7 +159,7 @@ class KadasApplication : public QgsApplication
     QList<QgsPluginLayerType *> mKadasPluginLayerTypes;
     QTemporaryDir *mProjectTempDir = nullptr;
     QgsNetworkLogger *mNetworkLogger = nullptr;
-    KadasNetworkLoggerDockWidget *mNetworkLoggerDockWidget = nullptr;
+    KadasDeveloperToolsDockWidget *mNetworkLoggerDockWidget = nullptr;
 
     void loadPythonSupport();
     QString migrateDatasource( const QString &path ) const;

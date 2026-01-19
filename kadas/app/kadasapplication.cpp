@@ -65,7 +65,7 @@
 #include <qgis/qgsziputils.h>
 #include <qgis/qgsdockablewidgethelper.h>
 
-#include "kadas/app/devtools/kadasnetworkloggerdockwidget.h"
+#include "kadas/app/devtools/kadasdevelopertoolsdockwidget.h"
 #include "kadas/core/kadas.h"
 #include "kadas/gui/kadasattributetabledialog.h"
 #include "kadas/gui/kadasclipboard.h"
@@ -1690,7 +1690,7 @@ void KadasApplication::showNetworkLogger()
 {
   if ( mNetworkLoggerDockWidget == nullptr )
   {
-    mNetworkLoggerDockWidget = new KadasNetworkLoggerDockWidget( mNetworkLogger, mMainWindow );
+    mNetworkLoggerDockWidget = new KadasDeveloperToolsDockWidget( mNetworkLogger, mMainWindow );
     mMainWindow->addDockWidget( Qt::RightDockWidgetArea, mNetworkLoggerDockWidget );
   }
 
