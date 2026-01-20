@@ -159,7 +159,7 @@ jobs:
         env:
           QT_LOGGING_TO_CONSOLE: "1"
         run: |
-          ctest --test-dir build --output-on-failure --config Release
+          ctest --test-dir build --output-on-failure --config Release -LE "NO_CI"
 
       - name: 📦 Package
         run: |

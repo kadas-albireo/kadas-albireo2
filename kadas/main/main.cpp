@@ -14,7 +14,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <csignal>
 #include <fstream>
 #include <QDir>
 #include <QSettings>
@@ -26,8 +25,8 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsuserprofilemanager.h>
 
+#include "kadas/app/kadasapplication.h"
 #include "kadas/core/kadas.h"
-#include "kadasapplication.h"
 
 int main( int argc, char *argv[] )
 {
