@@ -64,8 +64,8 @@
 #include <qgis/qgsziputils.h>
 #include <qgis/qgsdockablewidgethelper.h>
 
-#include "kadas/app/portal/kadasportal.h"
-#include "kadas/app/portal/kadasappauthrequesthandler.h"
+#include "kadas/app/auth/kadasportalauth.h"
+#include "kadas/app/auth/kadasappauthrequesthandler.h"
 #include "kadas/core/kadas.h"
 #include "kadas/gui/kadasattributetabledialog.h"
 #include "kadas/gui/kadasclipboard.h"
@@ -300,65 +300,12 @@ void KadasApplication::init()
     QgsDebugMsgLevel( QString( "Network request: %1" ).arg( req->url().toString() ), 2 );
   } );
 
-<<<<<<< HEAD
-  // Extract portal token before loading catalog
-  const QString tokenUrl = settingsPortalTokenUrl->value();
-  if ( !tokenUrl.isEmpty() )
-  {
-    QgsDebugMsgLevel( QStringLiteral( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
-
-    QNetworkRequest req = QNetworkRequest( QUrl( tokenUrl ) );
-    QgsNetworkReplyContent content = QgsNetworkAccessManager::instance()->blockingGet( req );
-    QString token;
-    if ( content.error() == QNetworkReply::NoError )
-    {
-      QJsonParseError err;
-      QJsonDocument doc = QJsonDocument::fromJson( content.content(), &err );
-      if ( !doc.isNull() )
-      {
-        QJsonObject obj = doc.object();
-        if ( obj.contains( QStringLiteral( "token" ) ) )
-        {
-          token = obj[QStringLiteral( "token" )].toString();
-          QgsDebugMsgLevel( QString( "ESRI Token found" ), 1 );
-          if ( settingsTokenCreateCookies->value() )
-          {
-            // If we create the cookies directly,
-            // it does not work in the same event loop
-            // so we need to delay it a bit
-            QTimer::singleShot( 1, this, [=]() {
-              createCookies( token );
-            } );
-          }
-          if ( settingsTokenUseEsriAuth->value() )
-            createEsriAuth( token );
-        }
-      }
-      else
-      {
-        QgsDebugMsgLevel( QString( "could not read TOKEN from response: %1" ).arg( err.errorString() ), 1 );
-      }
-    }
-    else
-    {
-      QgsDebugMsgLevel( QString( "error fetching token: %1" ).arg( content.errorString() ), 1 );
-    }
-  }
-  else
-  {
-    QgsDebugMsgLevel( QString( "No TOKEN url defined for portal" ), 1 );
-  }
-=======
   // Set the authentication handler
   QgsNetworkAccessManager::instance()->setAuthHandler( std::make_unique<KadasAppAuthRequestHandler>() );
 
-  // Start the network logger early, we want all requests logged!
-  mNetworkLogger = new QgsNetworkLogger( QgsNetworkAccessManager::instance(), this );
-
   // Setup authentication before loading catalog
-  mPortal = new KadasPortal();
+  mPortal = new KadasPortalAuth();
   mPortal->setupAuthentication();
->>>>>>> 64de585b (OIDC support)
 
   // Create main window
   QSplashScreen splash( QPixmap( ":/kadas/splash" ) );

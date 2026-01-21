@@ -1,6 +1,6 @@
 /***************************************************************************
-  kadasportal.h
-  -------------
+  kadasappauthrequesthandler.h
+  ----------------------------
   Date                 : January 2026
   Copyright            : (C) 2025 by Damiano Lombardi
   Email                : damiano@opengis.ch

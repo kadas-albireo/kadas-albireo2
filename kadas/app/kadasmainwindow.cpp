@@ -96,13 +96,13 @@
 #include "kadaspythonintegration.h"
 #include "kadas3dintegration.h"
 #include "kadasredliningintegration.h"
+#include "auth/kadasportalauth.h"
 #include "bullseye/kadasmaptoolbullseye.h"
 #include "guidegrid/kadasmaptoolguidegrid.h"
 #include "iamauth/kadasiamauth.h"
 #include "kml/kadaskmlintegration.h"
 #include "mapgrid/kadasmaptoolmapgrid.h"
 #include "milx/kadasmilxintegration.h"
-#include "portal/kadasportal.h"
 
 
 KadasMapItem *KadasSymbolAttributesEditorInterface::createItem() const
@@ -374,7 +374,7 @@ void KadasMainWindow::init()
     }
     else if ( type == "arcgisportal" )
     {
-      KadasArcGisPortalCatalogProvider *portalprovider = new KadasArcGisPortalCatalogProvider( url, mCatalogBrowser, params, KadasPortal::ESRI_AUTH_CFG_ID );
+      KadasArcGisPortalCatalogProvider *portalprovider = new KadasArcGisPortalCatalogProvider( url, mCatalogBrowser, params, KadasPortalAuth::ESRI_AUTH_CFG_ID );
       mCatalogBrowser->addProvider( portalprovider );
     }
   }
