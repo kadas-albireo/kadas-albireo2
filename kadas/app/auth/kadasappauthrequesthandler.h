@@ -28,9 +28,9 @@
  */
 class KadasAppAuthRequestHandler : public QgsNetworkAuthenticationHandler
 {
-public:
-  void handleAuthRequestOpenBrowser( const QUrl &url ) override;
-  void handleAuthRequestCloseBrowser() override;
+  public:
+    void handleAuthRequestOpenBrowser( const QUrl &url ) override;
+    void handleAuthRequestCloseBrowser() override;
 };
 
 
