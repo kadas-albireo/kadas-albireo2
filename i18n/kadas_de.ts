@@ -1091,6 +1091,24 @@ Bitte brechen Sie diese Aufgaben ab und versuchen Sie es erneut.</translation>
     </message>
 </context>
 <context>
+    <name>KadasDeveloperToolsDockWidget</name>
+    <message>
+        <location filename="../kadas/app/devtools/kadasdevelopertoolsdockwidget.cpp" line="15"/>
+        <source>Developer Tools</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/app/devtools/kadasdevelopertoolsdockwidget.cpp" line="22"/>
+        <source>Network Logger</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/app/devtools/kadasdevelopertoolsdockwidget.cpp" line="26"/>
+        <source>Settings</source>
+        <translation>Einstellungen</translation>
+    </message>
+</context>
+<context>
     <name>KadasGeoAdminRestCatalogProvider</name>
     <message>
         <location filename="../kadas/gui/catalog/kadasgeoadminrestcatalogprovider.cpp" line="159"/>
