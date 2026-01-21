@@ -66,8 +66,8 @@
 #include <qgis/qgsdockablewidgethelper.h>
 
 #include "kadas/app/devtools/kadasdevelopertoolsdockwidget.h"
-#include "kadas/app/portal/kadasportal.h"
-#include "kadas/app/portal/kadasappauthrequesthandler.h"
+#include "kadas/app/auth/kadasportalauth.h"
+#include "kadas/app/auth/kadasappauthrequesthandler.h"
 #include "kadas/core/kadas.h"
 #include "kadas/gui/kadasattributetabledialog.h"
 #include "kadas/gui/kadasclipboard.h"
@@ -309,7 +309,7 @@ void KadasApplication::init()
   mNetworkLogger = new QgsNetworkLogger( QgsNetworkAccessManager::instance(), this );
 
   // Setup authentication before loading catalog
-  mPortal = new KadasPortal();
+  mPortal = new KadasPortalAuth();
   mPortal->setupAuthentication();
 
   // Create main window

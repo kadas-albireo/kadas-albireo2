@@ -50,7 +50,7 @@ class KadasMapToolPan;
 class KadasMessageLogViewer;
 class KadasDeveloperToolsDockWidget;
 class KadasPluginInterface;
-class KadasPortal;
+class KadasPortalAuth;
 class KadasPythonIntegration;
 class KadasRedliningIntegration;
 
@@ -154,7 +154,7 @@ class KadasApplication : public QgsApplication
     QList<QgsPluginLayerType *> mKadasPluginLayerTypes;
     QTemporaryDir *mProjectTempDir = nullptr;
     QgsNetworkLogger *mNetworkLogger = nullptr;
-    KadasPortal *mPortal = nullptr;
+    KadasPortalAuth *mPortal = nullptr;
     KadasDeveloperToolsDockWidget *mNetworkLoggerDockWidget = nullptr;
 
     void loadPythonSupport();
