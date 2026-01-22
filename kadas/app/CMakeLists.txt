@@ -37,6 +37,8 @@ set(kadas_SRC
     3d/kadasphongmaterialwidget.cpp
     3d/kadasshadowrenderingsettingswidget.cpp
     3d/kadasskyboxrenderingsettingswidget.cpp
+    auth/kadasappauthrequesthandler.cpp
+    auth/kadasportalauth.cpp
     bullseye/kadasbullseyelayer.cpp
     bullseye/kadasmaptoolbullseye.cpp
     devtools/kadasdevelopertoolsdockwidget.cpp
@@ -58,8 +60,6 @@ set(kadas_SRC
     mapswipe/kadasmapswipetool.cpp
     milx/kadasmilxexportdialog.cpp
     milx/kadasmilxintegration.cpp
-    auth/kadasappauthrequesthandler.cpp
-    auth/kadasportalauth.cpp
 )
 
 set(kadas_HDR
@@ -137,7 +137,7 @@ list(SORT kadas_HDR)
 file(
   GLOB
   kadas_UI
-  autht/*.ui
+  auth/*.ui
   ui/*.ui
   kml/*.ui
   bullseye/*.ui
