@@ -96,6 +96,7 @@
 #include "kadaspythonintegration.h"
 #include "kadas3dintegration.h"
 #include "kadasredliningintegration.h"
+#include "auth/kadasportalauth.h"
 #include "bullseye/kadasmaptoolbullseye.h"
 #include "guidegrid/kadasmaptoolguidegrid.h"
 #include "iamauth/kadasiamauth.h"
@@ -373,7 +374,7 @@ void KadasMainWindow::init()
     }
     else if ( type == "arcgisportal" )
     {
-      KadasArcGisPortalCatalogProvider *portalprovider = new KadasArcGisPortalCatalogProvider( url, mCatalogBrowser, params, kApp->sEsriAuthCfgId );
+      KadasArcGisPortalCatalogProvider *portalprovider = new KadasArcGisPortalCatalogProvider( url, mCatalogBrowser, params, KadasPortalAuth::ESRI_AUTH_CFG_ID );
       mCatalogBrowser->addProvider( portalprovider );
     }
   }

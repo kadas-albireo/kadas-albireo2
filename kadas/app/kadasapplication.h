@@ -48,6 +48,7 @@ class KadasMainWindow;
 class KadasMapToolPan;
 class KadasMessageLogViewer;
 class KadasPluginInterface;
+class KadasPortalAuth;
 class KadasPythonIntegration;
 class KadasRedliningIntegration;
 
@@ -58,12 +59,6 @@ class KadasApplication : public QgsApplication
     Q_OBJECT
 
   public:
-    static const QgsSettingsEntryBool *settingsTokenCreateCookies;
-    static const QgsSettingsEntryBool *settingsTokenUseEsriAuth;
-    static const QgsSettingsEntryStringList *settingsPortalCookieUrls;
-    static const QgsSettingsEntryString *settingsPortalTokenUrl;
-    static const QString sEsriAuthCfgId;
-
     static KadasApplication *instance();
     static bool isRunningFromBuildDir();
 
@@ -155,6 +150,7 @@ class KadasApplication : public QgsApplication
     bool mAutosaving = false;
     QList<QgsPluginLayerType *> mKadasPluginLayerTypes;
     QTemporaryDir *mProjectTempDir = nullptr;
+    KadasPortalAuth *mPortal = nullptr;
 
     void loadPythonSupport();
     QString migrateDatasource( const QString &path ) const;
@@ -165,9 +161,6 @@ class KadasApplication : public QgsApplication
 
     static QgsMessageOutput *messageOutputViewer();
     static void injectAuthToken( QNetworkRequest *request );
-
-    void createCookies( const QString &token );
-    void createEsriAuth( const QString &token );
 
 
   private slots:
