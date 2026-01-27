@@ -37,6 +37,8 @@ set(kadas_SRC
     3d/kadasphongmaterialwidget.cpp
     3d/kadasshadowrenderingsettingswidget.cpp
     3d/kadasskyboxrenderingsettingswidget.cpp
+    auth/kadasappauthrequesthandler.cpp
+    auth/kadasportalauth.cpp
     bullseye/kadasbullseyelayer.cpp
     bullseye/kadasmaptoolbullseye.cpp
     devtools/kadasdevelopertoolsdockwidget.cpp
@@ -96,6 +98,8 @@ set(kadas_HDR
     3d/kadasphongmaterialwidget.h
     3d/kadasshadowrenderingsettingswidget.h
     3d/kadasskyboxrenderingsettingswidget.h
+    auth/kadasappauthrequesthandler.h
+    auth/kadasportalauth.h
     bullseye/kadasbullseyelayer.h
     bullseye/kadasmaptoolbullseye.h
     devtools/kadasdevelopertoolsdockwidget.h
@@ -133,6 +137,7 @@ list(SORT kadas_HDR)
 file(
   GLOB
   kadas_UI
+  auth/*.ui
   ui/*.ui
   kml/*.ui
   bullseye/*.ui
@@ -242,6 +247,7 @@ target_include_directories(
   kadas
   PUBLIC ${CMAKE_SOURCE_DIR}/kadas/app
          ${CMAKE_SOURCE_DIR}/kadas/app/3d
+         ${CMAKE_SOURCE_DIR}/kadas/app/auth
          ${CMAKE_SOURCE_DIR}/kadas/app/bullseye
          ${CMAKE_SOURCE_DIR}/kadas/app/external/qgis
          ${CMAKE_SOURCE_DIR}/kadas/app/guidegrid

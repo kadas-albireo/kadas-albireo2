@@ -96,6 +96,7 @@
 #include "kadaspythonintegration.h"
 #include "kadas3dintegration.h"
 #include "kadasredliningintegration.h"
+#include "auth/kadasportalauth.h"
 #include "bullseye/kadasmaptoolbullseye.h"
 #include "guidegrid/kadasmaptoolguidegrid.h"
 #include "iamauth/kadasiamauth.h"
@@ -373,7 +374,7 @@ void KadasMainWindow::init()
     }
     else if ( type == "arcgisportal" )
     {
-      KadasArcGisPortalCatalogProvider *portalprovider = new KadasArcGisPortalCatalogProvider( url, mCatalogBrowser, params, kApp->sEsriAuthCfgId );
+      KadasArcGisPortalCatalogProvider *portalprovider = new KadasArcGisPortalCatalogProvider( url, mCatalogBrowser, params, KadasPortalAuth::ESRI_AUTH_CFG_ID );
       mCatalogBrowser->addProvider( portalprovider );
     }
   }
@@ -407,6 +408,8 @@ void KadasMainWindow::init()
 
   QShortcut *networkLoggerShortcut = new QShortcut( QKeySequence( Qt::Key_F12 ), this );
   connect( networkLoggerShortcut, &QShortcut::activated, kApp, &KadasApplication::showNetworkLogger );
+  QShortcut *alternativeNetworkLoggerShortcut = new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_F12 ), this );
+  connect( alternativeNetworkLoggerShortcut, &QShortcut::activated, kApp, &KadasApplication::showNetworkLogger );
 
   // Restore geometry
   restoreGeometry( QgsSettings().value( "/kadas/windowgeometry" ).toByteArray() );
