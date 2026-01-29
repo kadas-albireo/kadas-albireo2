@@ -65,7 +65,6 @@
 #include <qgis/qgsdockablewidgethelper.h>
 
 #include "kadas/app/auth/kadasportalauth.h"
-#include "kadas/app/auth/kadasappauthrequesthandler.h"
 #include "kadas/core/kadas.h"
 #include "kadas/gui/kadasattributetabledialog.h"
 #include "kadas/gui/kadasclipboard.h"
@@ -300,12 +299,9 @@ void KadasApplication::init()
     QgsDebugMsgLevel( QString( "Network request: %1" ).arg( req->url().toString() ), 2 );
   } );
 
-  // Set the authentication handler
-  QgsNetworkAccessManager::instance()->setAuthHandler( std::make_unique<KadasAppAuthRequestHandler>() );
-
   // Setup authentication before loading catalog
-  mPortal = new KadasPortalAuth();
-  mPortal->setupAuthentication();
+  mPortalAuth = new KadasPortalAuth();
+  mPortalAuth->setupAuthentication();
 
   // Create main window
   QSplashScreen splash( QPixmap( ":/kadas/splash" ) );
