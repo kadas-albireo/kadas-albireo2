@@ -2,7 +2,7 @@
   kadasportalauth.cpp
   -------------------
   Date                 : January 2026
-  Copyright            : (C) 2025 by Damiano Lombardi
+  Copyright            : (C) 2026 by Damiano Lombardi
   Email                : damiano@opengis.ch
  ***************************************************************************/
 
@@ -31,6 +31,9 @@
 
 #include "kadasportalauth.h"
 
+#include "kadas/app/kadasapplication.h"
+#include "kadas/app/auth/kadasappauthrequesthandler.h"
+
 
 const QgsSettingsEntryString *KadasPortalAuth::settingsPortalTokenUrl = new QgsSettingsEntryString( QStringLiteral( "token-url" ), KadasSettingsTree::sTreePortal, QString(), QStringLiteral( "URL to retrieve ESRI portal TOKEN from." ) );
 const QgsSettingsEntryStringList *KadasPortalAuth::settingsPortalCookieUrls = new QgsSettingsEntryStringList( QStringLiteral( "cookie-urls" ), KadasSettingsTree::sTreePortal, {}, QStringLiteral( "URLs for which the ERSI portal TOKEN will be set in a cookie." ) );
@@ -47,7 +50,23 @@ const QString KadasPortalAuth::ESRI_AUTH_CFG_ID = QStringLiteral( "kadas_esri_to
 
 KadasPortalAuth::KadasPortalAuth( QObject *parent )
   : QObject { parent }
+  , mRequestRunningMessageBox( QMessageBox::Icon::Information,
+      tr( "OAuth2 Authentication" ),
+      tr( "Your browser has been opened for authentication.\n\n"
+          "Please complete the authentication in your browser.\n"
+          "This dialog will close automatically when authentication is complete." ),
+      QMessageBox::StandardButton::Cancel )
 {
+  mRequestRunningMessageBox.setModal( true );
+
+  // Keep raw pointer before transferring ownership
+  auto handler = std::make_unique<KadasAppAuthRequestHandler>( this );
+  mAppAuthRequestHandler = handler.get();
+  QgsNetworkAccessManager::instance()->setAuthHandler( std::move( handler ) );
+
+  connect( mAppAuthRequestHandler, &KadasAppAuthRequestHandler::browserOpened, this, &KadasPortalAuth::authRequestHandlerBrowserOpened );
+  connect( mAppAuthRequestHandler, &KadasAppAuthRequestHandler::browserClosed, this, &KadasPortalAuth::authRequestHandlerBrowserClosed );
+  connect( &mRequestRunningMessageBox, &QMessageBox::rejected, mAppAuthRequestHandler, &KadasAppAuthRequestHandler::abortAuth );
 }
 
 void KadasPortalAuth::setupAuthentication()
@@ -104,6 +123,16 @@ void KadasPortalAuth::setupAuthentication()
   {
     QgsDebugMsgLevel( QString( "No TOKEN url or OAuth2 configured for portal" ), 1 );
   }
+}
+
+void KadasPortalAuth::authRequestHandlerBrowserOpened()
+{
+  mRequestRunningMessageBox.show();
+}
+
+void KadasPortalAuth::authRequestHandlerBrowserClosed()
+{
+  mRequestRunningMessageBox.hide();
 }
 
 void KadasPortalAuth::createCookies( const QString &token )

@@ -154,7 +154,7 @@ class KadasApplication : public QgsApplication
     QList<QgsPluginLayerType *> mKadasPluginLayerTypes;
     QTemporaryDir *mProjectTempDir = nullptr;
     QgsNetworkLogger *mNetworkLogger = nullptr;
-    KadasPortalAuth *mPortal = nullptr;
+    KadasPortalAuth *mPortalAuth = nullptr;
     KadasDeveloperToolsDockWidget *mNetworkLoggerDockWidget = nullptr;
 
     void loadPythonSupport();

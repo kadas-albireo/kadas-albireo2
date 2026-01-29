@@ -2,7 +2,7 @@
   kadasappauthrequesthandler.cpp
   ------------------------------
   Date                 : January 2026
-  Copyright            : (C) 2025 by Damiano Lombardi
+  Copyright            : (C) 2026 by Damiano Lombardi
   Email                : damiano@opengis.ch
  ***************************************************************************/
 
@@ -14,20 +14,37 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+
 #include "kadasappauthrequesthandler.h"
 
 #include <QDesktopServices>
 
+#include <qgis/qgslogger.h>
+#include <qgis/qgsnetworkaccessmanager.h>
+
 #include "kadasapplication.h"
 #include "kadasmainwindow.h"
+
+KadasAppAuthRequestHandler::KadasAppAuthRequestHandler( QObject *parent )
+  : QObject( parent )
+  , QgsNetworkAuthenticationHandler()
+{
+}
 
 void KadasAppAuthRequestHandler::handleAuthRequestOpenBrowser( const QUrl &url )
 {
   QDesktopServices::openUrl( url );
+  QgsDebugMsgLevel( QString( "Opening OAuth2 URL in system browser: %1" ).arg( url.toString() ), 1 );
+
+  emit browserOpened();
 }
 
 void KadasAppAuthRequestHandler::handleAuthRequestCloseBrowser()
 {
+  QgsDebugMsgLevel( QString( "OAuth2 handle close browser" ), 1 );
+
+  emit browserClosed();
+
   // Bring focus back to KADAS app
   if ( KadasApplication::instance() )
   {
@@ -36,4 +53,10 @@ void KadasAppAuthRequestHandler::handleAuthRequestCloseBrowser()
     mainWindow->activateWindow();
     mainWindow->show();
   }
+}
+
+void KadasAppAuthRequestHandler::abortAuth()
+{
+  QgsDebugMsgLevel( QString( "OAuth2 authentication canceled by user" ), 1 );
+  QgsNetworkAccessManager::instance()->abortAuthBrowser();
 }
