@@ -155,6 +155,7 @@ class KadasApplication : public QgsApplication
     bool mAutosaving = false;
     QList<QgsPluginLayerType *> mKadasPluginLayerTypes;
     QTemporaryDir *mProjectTempDir = nullptr;
+    KadasPortalAuth *mPortalAuth = nullptr;
 
     void loadPythonSupport();
     QString migrateDatasource( const QString &path ) const;

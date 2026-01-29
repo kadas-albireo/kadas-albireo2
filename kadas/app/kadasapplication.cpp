@@ -64,6 +64,7 @@
 #include <qgis/qgsziputils.h>
 #include <qgis/qgsdockablewidgethelper.h>
 
+#include "kadas/app/auth/kadasportalauth.h"
 #include "kadas/core/kadas.h"
 #include "kadas/gui/kadasattributetabledialog.h"
 #include "kadas/gui/kadasclipboard.h"
@@ -306,6 +307,7 @@ void KadasApplication::init()
     QgsDebugMsgLevel( QString( "Network request: %1" ).arg( req->url().toString() ), 2 );
   } );
 
+<<<<<<< HEAD
   // Extract portal token before loading catalog
   const QString tokenUrl = settingsPortalTokenUrl->value();
   if ( !tokenUrl.isEmpty() )
@@ -353,6 +355,14 @@ void KadasApplication::init()
   {
     QgsDebugMsgLevel( QString( "No TOKEN url defined for portal" ), 1 );
   }
+=======
+  // Start the network logger early, we want all requests logged!
+  mNetworkLogger = new QgsNetworkLogger( QgsNetworkAccessManager::instance(), this );
+
+  // Setup authentication before loading catalog
+  mPortalAuth = new KadasPortalAuth();
+  mPortalAuth->setupAuthentication();
+>>>>>>> 6a194f8e (Cancellable dialog during OAuth2 handshake)
 
   // Create main window
   QSplashScreen splash( QPixmap( ":/kadas/splash" ) );
