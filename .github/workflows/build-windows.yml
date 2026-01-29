@@ -23,17 +23,11 @@ jobs:
       - name: 🐣 Checkout
         uses: actions/checkout@v5
 
-      - name: Install PowerShell
-        uses: PSModule/install-powershell@v1
-        with:
-          Version: 7.4.13
-
       - name: 🐩 Install CMake and Ninja
         uses: lukka/get-cmake@latest
         with:
-          # Pin to specific version to avoid rebuilding too often
           # Also helps to avoid spurious build failures like https://github.com/qgis/QGIS/pull/47098
-          cmakeVersion: 3.29.0
+          cmakeVersion: 3.31.10
 
       - name: 🧽 Developer Command Prompt for Microsoft Visual C++
         uses: ilammy/msvc-dev-cmd@v1
@@ -98,7 +92,7 @@ jobs:
                 -D INSTALL_DTM=ON \
                 -D INSTALL_ALBIREO_SETTINGS=ON \
                 -D VCPKG_TARGET_TRIPLET="x64-windows" \
-                -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=C:/src" \
+                -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=C:/src;--x-abi-tools-use-exact-versions" \
                 -D QGIS_PYTHON_MODULE_DIR="$(pwd)\build\vcpkg_installed\x64-windows\tools\python3\Lib\site-packages\qgis" \
                 -D CPACK_PACKAGE_FILE_NAME="kadas-win64-$(date +'%Y-%m-%d_%H%M')" \
                 -D NUGET_USERNAME=kadas-albireo \
@@ -159,7 +153,7 @@ jobs:
         env:
           QT_LOGGING_TO_CONSOLE: "1"
         run: |
-          ctest --test-dir build --output-on-failure --config Release
+          ctest --test-dir build --output-on-failure -C Release
 
       - name: 📦 Package
         run: |
