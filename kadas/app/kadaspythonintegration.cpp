@@ -527,7 +527,14 @@ QString KadasPythonIntegration::kadasPythonPath() const
 {
   if ( KadasApplication::isRunningFromBuildDir() )
   {
-    return KadasApplication::applicationDirPath() + QStringLiteral( "/../python" );
+    // Go up one directory if inside a build subfolder (e.g., bin/RelWithDebInfo)
+    QDir appDir( QCoreApplication::applicationDirPath() );
+    if ( appDir.dirName().compare( "RelWithDebInfo", Qt::CaseInsensitive ) == 0 || appDir.dirName().compare( "Debug", Qt::CaseInsensitive ) == 0 || appDir.dirName().compare( "Release", Qt::CaseInsensitive ) == 0 )
+    {
+      appDir.cdUp();
+    }
+    appDir.cd( QStringLiteral( "/../python" ) );
+    return appDir.absolutePath();
   }
   else
   {
