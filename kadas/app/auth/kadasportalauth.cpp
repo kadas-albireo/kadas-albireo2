@@ -50,12 +50,10 @@ const QString KadasPortalAuth::ESRI_AUTH_CFG_ID = QStringLiteral( "kadas_esri_to
 
 KadasPortalAuth::KadasPortalAuth( QObject *parent )
   : QObject { parent }
-  , mRequestRunningMessageBox( QMessageBox::Icon::Information,
-      tr( "OAuth2 Authentication" ),
-      tr( "Your browser has been opened for authentication.\n\n"
-          "Please complete the authentication in your browser.\n"
-          "This dialog will close automatically when authentication is complete." ),
-      QMessageBox::StandardButton::Cancel )
+  , mRequestRunningMessageBox( QMessageBox::Icon::Information, tr( "OAuth2 Authentication" ), tr( "Your browser has been opened for authentication.\n\n"
+                                                                                                  "Please complete the authentication in your browser.\n"
+                                                                                                  "This dialog will close automatically when authentication is complete." ),
+                               QMessageBox::StandardButton::Cancel )
 {
   mRequestRunningMessageBox.setModal( true );
 
