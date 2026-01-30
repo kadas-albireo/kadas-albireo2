@@ -382,13 +382,13 @@
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="472"/>
         <source>at scale 1:%1</source>
-        <translation type="unfinished"/>
+        <translation>à l’échelle 1:%1</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="621"/>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="656"/>
         <source>Go to %1, %2 (%3 %4%5)</source>
-        <translation type="unfinished"/>
+        <translation>Aller à %1, %2 (%3 %4%5)</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="624"/>
@@ -399,7 +399,7 @@
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="695"/>
         <source>Go to %1%2%3 %4 %5</source>
-        <translation type="unfinished"/>
+        <translation>Aller à %1%2%3 %4 %5</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.h" line="38"/>
@@ -5527,6 +5527,25 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <location filename="../kadas/gui/mapitems/kadaspolygonitem.h" line="35"/>
         <source>Polygon</source>
         <translation>Polygone</translation>
+    </message>
+</context>
+<context>
+    <name>KadasPortalAuth</name>
+    <message>
+        <location filename="../kadas/app/auth/kadasportalauth.cpp" line="53"/>
+        <source>OAuth2 Authentication</source>
+        <translation>Authentification OAuth2</translation>
+    </message>
+    <message>
+        <location filename="../kadas/app/auth/kadasportalauth.cpp" line="53"/>
+        <source>Your browser has been opened for authentication.
+
+Please complete the authentication in your browser.
+This dialog will close automatically when authentication is complete.</source>
+        <translation>Votre navigateur a été ouvert pour l’authentification.
+
+Veuillez terminer l’authentification dans votre navigateur.
+Cette fenêtre se fermera automatiquement une fois l’authentification terminée.</translation>
     </message>
 </context>
 <context>

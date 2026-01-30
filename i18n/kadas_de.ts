@@ -383,13 +383,13 @@ Möglicherweise möchten Sie den Detailierungsgrad heruntersetzen oder die Limit
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="472"/>
         <source>at scale 1:%1</source>
-        <translation type="unfinished"/>
+        <translation>bei Maßstab 1:%1</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="621"/>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="656"/>
         <source>Go to %1, %2 (%3 %4%5)</source>
-        <translation type="unfinished"/>
+        <translation>Gehe zu %1, %2 (%3 %4%5)</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="624"/>
@@ -400,7 +400,7 @@ Möglicherweise möchten Sie den Detailierungsgrad heruntersetzen oder die Limit
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="695"/>
         <source>Go to %1%2%3 %4 %5</source>
-        <translation type="unfinished"/>
+        <translation>Gehe zu %1%2%3 %4 %5</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.h" line="38"/>
@@ -5526,6 +5526,25 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <location filename="../kadas/gui/mapitems/kadaspolygonitem.h" line="35"/>
         <source>Polygon</source>
         <translation>Polygon</translation>
+    </message>
+</context>
+<context>
+    <name>KadasPortalAuth</name>
+    <message>
+        <location filename="../kadas/app/auth/kadasportalauth.cpp" line="53"/>
+        <source>OAuth2 Authentication</source>
+        <translation>OAuth2-Authentifizierung</translation>
+    </message>
+    <message>
+        <location filename="../kadas/app/auth/kadasportalauth.cpp" line="53"/>
+        <source>Your browser has been opened for authentication.
+
+Please complete the authentication in your browser.
+This dialog will close automatically when authentication is complete.</source>
+        <translation>Ihr Browser wurde zur Authentifizierung geöffnet.
+
+Bitte schließen Sie die Authentifizierung in Ihrem Browser ab.
+Dieses Dialogfeld schließt sich automatisch, sobald die Authentifizierung abgeschlossen ist.</translation>
     </message>
 </context>
 <context>
