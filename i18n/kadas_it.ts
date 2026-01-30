@@ -5527,6 +5527,25 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
     </message>
 </context>
 <context>
+    <name>KadasPortalAuth</name>
+    <message>
+        <location filename="../kadas/app/auth/kadasportalauth.cpp" line="53"/>
+        <source>OAuth2 Authentication</source>
+        <translation>Autenticazione OAuth2</translation>
+    </message>
+    <message>
+        <location filename="../kadas/app/auth/kadasportalauth.cpp" line="53"/>
+        <source>Your browser has been opened for authentication.
+
+Please complete the authentication in your browser.
+This dialog will close automatically when authentication is complete.</source>
+        <translation>Il browser è stato aperto per l&apos;autenticazione.
+
+Si prega di completare l&apos;autenticazione nel browser.
+Questo dialogo si chiuderà automaticamente quando l&apos;autenticazione è completa.</translation>
+    </message>
+</context>
+<context>
     <name>KadasProjectTemplateSelectionDialog</name>
     <message>
         <location filename="../kadas/gui/kadasprojecttemplateselectiondialog.cpp" line="59"/>

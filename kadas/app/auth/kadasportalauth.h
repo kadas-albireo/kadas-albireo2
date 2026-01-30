@@ -2,7 +2,7 @@
   kadasportalauth.h
   -----------------
   Date                 : January 2026
-  Copyright            : (C) 2025 by Damiano Lombardi
+  Copyright            : (C) 2026 by Damiano Lombardi
   Email                : damiano@opengis.ch
  ***************************************************************************/
 
@@ -19,6 +19,7 @@
 #define KADASPORTALAUTH_H
 
 #include <QObject>
+#include <QMessageBox>
 
 #include "kadas/core/kadassettingstree.h"
 
@@ -26,6 +27,7 @@ class QgsSettingsEntryBool;
 class QgsSettingsEntryString;
 class QgsSettingsEntryStringList;
 class QgsSettingsTreeNode;
+class KadasAppAuthRequestHandler;
 
 class KadasPortalAuth : public QObject
 {
@@ -49,10 +51,17 @@ class KadasPortalAuth : public QObject
 
     void setupAuthentication();
 
+  private slots:
+    void authRequestHandlerBrowserOpened();
+    void authRequestHandlerBrowserClosed();
+
   private:
     void createCookies( const QString &token );
     void createEsriAuth( const QString &token );
     void createOAuth2Auth( const QString &requestUrl, const QString &tokenUrl, const QString &clientId, const QString &clientSecret );
+
+    QMessageBox mRequestRunningMessageBox;
+    KadasAppAuthRequestHandler *mAppAuthRequestHandler;
 };
 
 #endif // KADASPORTALAUTH_H

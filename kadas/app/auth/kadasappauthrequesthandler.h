@@ -2,7 +2,7 @@
   kadasappauthrequesthandler.h
   ----------------------------
   Date                 : January 2026
-  Copyright            : (C) 2025 by Damiano Lombardi
+  Copyright            : (C) 2026 by Damiano Lombardi
   Email                : damiano@opengis.ch
  ***************************************************************************/
 
@@ -26,11 +26,22 @@
  * \brief Reimplement open/close browser method for OAuth2 authentication
  * \see QgsAppAuthRequestHandler
  */
-class KadasAppAuthRequestHandler : public QgsNetworkAuthenticationHandler
+class KadasAppAuthRequestHandler : public QObject, public QgsNetworkAuthenticationHandler
 {
+    Q_OBJECT
+
   public:
+    explicit KadasAppAuthRequestHandler( QObject *parent = nullptr );
+
     void handleAuthRequestOpenBrowser( const QUrl &url ) override;
     void handleAuthRequestCloseBrowser() override;
+
+  public slots:
+    void abortAuth();
+
+  signals:
+    void browserOpened();
+    void browserClosed();
 };
 
 
