@@ -282,7 +282,7 @@ void KadasMapToolMinMax::canvasPressEvent( QgsMapMouseEvent *e )
   {
     return;
   }
-  if ( currentItem() && currentItem()->constState()->drawStatus != KadasMapItem::State::DrawStatus::Drawing && mPinMin && mPinMax )
+  if ( currentItem() && currentItem()->drawStatus() != KadasMapItem::DrawStatus::Drawing && mPinMin && mPinMax )
   {
     QgsPointXY mapPos = toMapCoordinates( e->pos() );
     if ( mPinMax->hitTest( KadasMapPos::fromPoint( mapPos ), mCanvas->mapSettings() ) )
