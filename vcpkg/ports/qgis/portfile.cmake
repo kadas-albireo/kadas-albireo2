@@ -1,9 +1,9 @@
 string(REPLACE "." "_" TAG ${VERSION})
 
 # set(QGIS_REF final-${TAG})
-set(QGIS_REF e1a48d4f4cbfc5808c7edd0dc255337ee031420f)
+set(QGIS_REF a4666d590d5737537f737d58bc6bd333fc69dbeb)
 set(QGIS_SHA512
-    0c9068503b83bc035bc5ef2e06588b793757640c576b893e9114f2a43615e544bacbecb7935a9cab06fb2ac2b4f2baad5d4806ec8d21fea279204dfc33f13941
+    4e365e1b7b178a93248e028c2f8de148789c475c4fe8ceaae08671452680bc0140f28da7bc32f621b1fd0bd668d6420bdc84ee518ce4abc91f1034d43c1c5340
 )
 
 vcpkg_from_github(
@@ -89,7 +89,6 @@ list(APPEND QGIS_OPTIONS "-DFLEX_EXECUTABLE=${FLEX}")
 # "include/qgis" everywhere else let's keep things clean and tidy and put them
 # at a predictable location
 list(APPEND QGIS_OPTIONS "-DQGIS_INCLUDE_SUBDIR=include/qgis")
-list(APPEND QGIS_OPTIONS "-DBUILD_WITH_QT6=OFF")
 # QGIS will also do that starting from protobuf version 4.23
 list(APPEND QGIS_OPTIONS "-DProtobuf_LITE_LIBRARY=protobuf::libprotobuf-lite")
 list(APPEND QGIS_OPTIONS "-DWITH_INTERNAL_NLOHMANN_JSON:BOOL=OFF")
@@ -113,8 +112,6 @@ else()
   endif()
   list(APPEND QGIS_OPTIONS -DWITH_GUI:BOOL=OFF)
 endif()
-
-list(APPEND QGIS_OPTIONS -DWITH_QTWEBKIT:BOOL=OFF)
 
 if("desktop" IN_LIST FEATURES)
   list(APPEND QGIS_OPTIONS -DWITH_DESKTOP:BOOL=ON)
