@@ -1,12 +1,11 @@
 diff --git a/src/native/CMakeLists.txt b/src/native/CMakeLists.txt
-index 266ca925614..c1d5f57d86d 100644
+index 8631b5ae49d..467abd10aff 100644
 --- a/src/native/CMakeLists.txt
 +++ b/src/native/CMakeLists.txt
-@@ -114,6 +114,11 @@ if (MSVC AND NOT BUILD_WITH_QT6)
-   target_link_libraries(qgis_native ${QT_VERSION_BASE}::WinExtras)
- 
+@@ -106,6 +106,10 @@ if (UNIX AND NOT APPLE AND NOT ANDROID)
+   target_link_libraries(qgis_native ${QT_VERSION_BASE}::DBus)
  endif()
-+
+ 
 +if(APPLE)
 +  target_link_libraries(qgis_native "-framework AppKit")
 +endif()

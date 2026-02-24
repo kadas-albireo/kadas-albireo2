@@ -2,26 +2,13 @@
   "vcpkg-configuration": {
     "default-registry": {
       "kind": "git",
-      "baseline": "2d5710a07221274f0f3313f62dc9bd4f7f593850",
+      "baseline": "b42b19a62b63514ed9fa2a81e07ce75e613c83c0",
       "repository": "https://github.com/microsoft/vcpkg"
     },
     "registries": [
       {
         "kind": "git",
-        "baseline": "6ede4a1108756899e55fe4d308aaa25410e8e12f",
-        "repository": "https://github.com/open-vcpkg/qt5-registry",
-        "packages": [
-          "py-pyqt5",
-          "py-pyqt5-sip",
-          "py-qscintilla-qt5",
-          "qscintilla-qt5",
-          "qt5-webkit",
-          "vcpkg-qmake-qt5"
-        ]
-      },
-      {
-        "kind": "git",
-        "baseline": "4e73518faee954f3469342cd8c28389ea9a97de3",
+        "baseline": "2d2485873f139e16ff09169bc3a3274ff08048c0",
         "repository": "https://github.com/open-vcpkg/python-registry",
         "packages": [
           "python3",
@@ -67,12 +54,7 @@
         "gui"
       ]
     },
-    {
-      "name": "qt5-activeqt",
-      "platform": "windows"
-    },
-    "quazip-qt5",
-    "svg2svgt-qt5",
+    "quazip",
     "zonedetect"
   ],
   "features": {
@@ -115,10 +97,10 @@
         "py-pip",
         "py-pip-system-certs",
         "py-psycopg2",
-        "py-pyqt5",
+        "py-pyqt6",
         "py-pytz",
         "py-pyyaml",
-        "py-qscintilla-qt5",
+        "py-qscintilla",
         {
           "name": "py-requests-kerberos",
           "platform": "windows"
