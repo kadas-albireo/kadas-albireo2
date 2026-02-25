@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.27.0)
 
-set(VCPKG_TAG 0cb190f9915b6464662450af376581c408c5790c)
+set(VCPKG_TAG b42b19a62b63514ed9fa2a81e07ce75e613c83c0)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
@@ -78,20 +78,20 @@ execute_process(
 )
 
 find_package(PkgConfig REQUIRED)
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5Network REQUIRED)
-find_package(Qt5DBus REQUIRED)
-find_package(Qt5OpenGL REQUIRED)
-find_package(Qt5PrintSupport REQUIRED)
-find_package(Qt5LinguistTools REQUIRED)
-find_package(Qt5Sql REQUIRED)
-find_package(Qt5Svg REQUIRED)
-find_package(Qt5Xml REQUIRED)
-find_package(Qt5Concurrent REQUIRED)
+find_package(Qt6Widgets REQUIRED)
+find_package(Qt6Network REQUIRED)
+find_package(Qt6DBus REQUIRED)
+find_package(Qt6OpenGL REQUIRED)
+find_package(Qt6PrintSupport REQUIRED)
+find_package(Qt6LinguistTools REQUIRED)
+find_package(Qt6Sql REQUIRED)
+find_package(Qt6Svg REQUIRED)
+find_package(Qt6Xml REQUIRED)
+find_package(Qt6Concurrent REQUIRED)
 find_package(QGIS REQUIRED COMPONENTS Core Analysis Gui 3D)
 
 find_package(GDAL CONFIG REQUIRED)
-find_package(QuaZip-Qt5 REQUIRED)
+find_package(QuaZip-Qt6 REQUIRED)
 find_package(OpenSSL REQUIRED)
 if(WITH_BINDINGS)
   find_package(Python 3.7 REQUIRED COMPONENTS Interpreter Development)
@@ -106,7 +106,7 @@ endif()
 
 set(CMAKE_AUTOMOC ON)
 
-get_target_property(QMAKE_EXECUTABLE Qt5::qmake LOCATION)
+get_target_property(QMAKE_EXECUTABLE Qt6::qmake LOCATION)
 
 set(CRASHRPT_LIBRARY
     "GdbCrashHandler"

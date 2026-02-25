@@ -1,4 +1,4 @@
-find_package(Qt5 REQUIRED COMPONENTS Test)
+find_package(Qt6 REQUIRED COMPONENTS Test)
 
 # create a variable to specify where our test data is so that unit tests can use
 # TEST_DATA_DIR to locate the test data. See CMakeLists in test dirs for more

@@ -1,8 +1,8 @@
 diff --git a/python/CMakeLists.txt b/python/CMakeLists.txt
-index 4b41dc6faa5..7e3f2690c9d 100644
+index 4a642696c43..f1b75c5de88 100644
 --- a/python/CMakeLists.txt
 +++ b/python/CMakeLists.txt
-@@ -463,11 +463,10 @@ foreach(module ${PY_MODULES})
+@@ -444,11 +444,9 @@ foreach(module ${PY_MODULES})
    install(FILES ${BINDING_FILES_ROOT_DIR}/${module}/class_map.yaml DESTINATION "${QGIS_PYTHON_DIR}/${module_name}")
  
    # install source sip files
@@ -12,9 +12,8 @@ index 4b41dc6faa5..7e3f2690c9d 100644
 -    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${module}/auto_generated DESTINATION ${SIP_DEFAULT_SIP_DIR}/qgis/${module})
 -  endif()
 +  file(GLOB sip_files ${CMAKE_CURRENT_BINARY_DIR}/${module}/*.sip)
-+  install(FILES ${sip_files} DESTINATION ${QGIS_PYTHON_DIR}/bindings/${module})
-+  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${module}/auto_generated DESTINATION ${QGIS_PYTHON_DIR}/bindings/${module})
-+  # message(FATAL_ERROR "install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${module}/auto_generated DESTINATION ${QGIS_PYTHON_DIR}/bindings/${module})")
- endforeach(module)
++  install(FILES ${sip_files} DESTINATION ${SIP_DEFAULT_SIP_DIR}/qgis/${module})
++  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${module}/auto_generated DESTINATION ${SIP_DEFAULT_SIP_DIR}/qgis/${module})
  
- configure_file(${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml.in ${CMAKE_CURRENT_BINARY_DIR}/pyproject.toml @ONLY)
+   if(SIP_BUILD_EXECUTABLE)
+     add_custom_command(TARGET py${module}

@@ -163,7 +163,7 @@ set(kadas_gui_HDR
 file(GLOB kadas_gui_UI ui/*.ui)
 list(SORT kadas_gui_UI)
 
-qt5_wrap_ui(kadas_gui_UI_HDR ${kadas_gui_UI})
+qt_wrap_ui(kadas_gui_UI_HDR ${kadas_gui_UI})
 
 set_property(SOURCE ${kadas_gui_UI} PROPERTY SKIP_AUTOMOC ON)
 
@@ -178,11 +178,11 @@ find_package(GeographicLib REQUIRED)
 
 target_link_libraries(
   kadas_gui
-  Qt5::Widgets
-  Qt5::Network
-  Qt5::Svg
-  Qt5::Xml
-  Qt5::Concurrent
+  Qt6::Widgets
+  Qt6::Network
+  Qt6::Svg
+  Qt6::Xml
+  Qt6::Concurrent
   QuaZip::QuaZip
   QGIS::Gui
   ${GeographicLib_LIBRARIES}

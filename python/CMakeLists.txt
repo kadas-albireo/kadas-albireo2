@@ -1,5 +1,5 @@
 find_package(SIP REQUIRED)
-find_package(PyQt5 REQUIRED)
+find_package(PyQt6 REQUIRED)
 include(PythonMacros)
 include(SIPMacros)
 
@@ -12,7 +12,7 @@ set(DEFAULTDOCSTRINGSIGNATURE "%DefaultDocstringSignature \"prepended\"")
 set(DOCSTRINGSTEMPLATE "")
 set(SIP_FINAL "final")
 
-if((${PYQT5_VERSION_STR} VERSION_EQUAL 5.15) OR (${PYQT5_VERSION_STR}
+if((${PYQT6_VERSION_STR} VERSION_EQUAL 5.15) OR (${PYQT6_VERSION_STR}
                                                  VERSION_GREATER 5.15)
 )
   set(SIP_DISABLE_FEATURES ${SIP_DISABLE_FEATURES} VECTOR_MAPPED_TYPE)
@@ -34,19 +34,19 @@ macro(PY_COMPILE TARGET_NAME RESOURCE_PATHS)
   endif()
 endmacro(PY_COMPILE)
 
-separate_arguments(PYQT5_SIP_FLAGS_args UNIX_COMMAND "${PYQT5_SIP_FLAGS}")
+separate_arguments(PYQT6_SIP_FLAGS_args UNIX_COMMAND "${PYQT6_SIP_FLAGS}")
 
 # core module
 file(GLOB_RECURSE sip_files_core kadascore/*.sip kadascore/*.sip.in)
 set(SIP_EXTRA_FILES_DEPEND ${sip_files_core})
 set(SIP_EXTRA_OPTIONS
-    ${PYQT5_SIP_FLAGS_args}
+    ${PYQT6_SIP_FLAGS_args}
     -g
     -o
     -a
     ${CMAKE_BINARY_DIR}/python/kadas.kadascore.api
     -n
-    ${PYQT5_SIP_IMPORT}
+    ${PYQT6_SIP_IMPORT}
     -y
     ${KADAS_PYTHON_OUTPUT_DIRECTORY}/_kadascore.pyi
 )
@@ -71,13 +71,13 @@ build_sip_python_module(
 file(GLOB_RECURSE sip_files_analysis kadasanalysis/*.sip kadasanalysis/*.sip.in)
 set(SIP_EXTRA_FILES_DEPEND ${sip_files_analysis})
 set(SIP_EXTRA_OPTIONS
-    ${PYQT5_SIP_FLAGS_args}
+    ${PYQT6_SIP_FLAGS_args}
     -g
     -o
     -a
     ${CMAKE_BINARY_DIR}/python/kadas.kadasanalysis.api
     -n
-    ${PYQT5_SIP_IMPORT}
+    ${PYQT6_SIP_IMPORT}
     -y
     ${KADAS_PYTHON_OUTPUT_DIRECTORY}/_kadasanalysis.pyi
 )
@@ -107,13 +107,13 @@ build_sip_python_module(
 file(GLOB_RECURSE sip_files_gui kadasgui/*.sip kadasgui/*.sip.in)
 set(SIP_EXTRA_FILES_DEPEND ${sip_files_gui})
 set(SIP_EXTRA_OPTIONS
-    ${PYQT5_SIP_FLAGS_args}
+    ${PYQT6_SIP_FLAGS_args}
     -g
     -o
     -a
     ${CMAKE_BINARY_DIR}/python/kadas.kadasgui.api
     -n
-    ${PYQT5_SIP_IMPORT}
+    ${PYQT6_SIP_IMPORT}
     -y
     ${KADAS_PYTHON_OUTPUT_DIRECTORY}/_kadasgui.pyi
 )

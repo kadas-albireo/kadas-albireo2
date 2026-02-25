@@ -1,25 +1,25 @@
 diff --git a/src/gui/qgsowssourceselect.cpp b/src/gui/qgsowssourceselect.cpp
-index 63d40fc843e..3e57741a3b4 100644
+index d18a00c5065..ed2bf7d2605 100644
 --- a/src/gui/qgsowssourceselect.cpp
 +++ b/src/gui/qgsowssourceselect.cpp
 @@ -34,6 +34,7 @@
- #include "qgsowssourceselect.h"
- #include "moc_qgsowssourceselect.cpp"
+ #include "qgsprojectionselectiondialog.h"
+ #include "qgsproviderregistry.h"
  #include "qgssettings.h"
 +#include "qgssettingsentryimpl.h"
- #include "qgsgui.h"
+ #include "qgstreewidgetitem.h"
  
  #include <QButtonGroup>
-@@ -52,6 +53,8 @@
- #include <QNetworkReply>
- #include <QRegularExpression>
+@@ -57,6 +58,8 @@
  
-+const QgsSettingsEntryBool *QgsOWSSourceSelect::settingsSpatialExtentBoxChecked = new QgsSettingsEntryBool( QStringLiteral( "spatial-extent-box-checked" ), sTreeOWSConnectionDialog, true );
+ using namespace Qt::StringLiterals;
+ 
++const QgsSettingsEntryBool *QgsOWSSourceSelect::settingsSpatialExtentBoxChecked = new QgsSettingsEntryBool( u"spatial-extent-box-checked"_s, sTreeOWSConnectionDialog, true );
 +
  QgsOWSSourceSelect::QgsOWSSourceSelect( const QString &service, QWidget *parent, Qt::WindowFlags fl, QgsProviderRegistry::WidgetMode theWidgetMode )
    : QgsAbstractDataSourceWidget( parent, fl, theWidgetMode )
    , mService( service )
-@@ -110,12 +113,24 @@ QgsOWSSourceSelect::QgsOWSSourceSelect( const QString &service, QWidget *parent,
+@@ -115,12 +118,24 @@ QgsOWSSourceSelect::QgsOWSSourceSelect( const QString &service, QWidget *parent,
  
    // set up the WMS connections we already know about
    populateConnectionList();
@@ -44,7 +44,7 @@ index 63d40fc843e..3e57741a3b4 100644
  }
  
  void QgsOWSSourceSelect::prepareExtent()
-@@ -694,6 +709,11 @@ void QgsOWSSourceSelect::mLayerDownButton_clicked()
+@@ -700,6 +715,11 @@ void QgsOWSSourceSelect::mLayerDownButton_clicked()
    selectedItem->setSelected( true );
  }
  
@@ -57,18 +57,18 @@ index 63d40fc843e..3e57741a3b4 100644
  {
    return QList<SupportedFormat>();
 diff --git a/src/gui/qgsowssourceselect.h b/src/gui/qgsowssourceselect.h
-index 2fe929fab6c..0423d212d00 100644
+index d16a8000ece..2216b3b6958 100644
 --- a/src/gui/qgsowssourceselect.h
 +++ b/src/gui/qgsowssourceselect.h
-@@ -25,6 +25,7 @@
+@@ -27,6 +27,7 @@
+ #include "qgsdatasourceuri.h"
  #include "qgsguiutils.h"
  #include "qgsproviderregistry.h"
- #include "qgsabstractdatasourcewidget.h"
 +#include "qgssettingstree.h"
  
- #include <QStringList>
+ #include <QNetworkRequest>
  #include <QPushButton>
-@@ -37,6 +38,7 @@ class QgsTreeWidgetItem;
+@@ -38,6 +39,7 @@ class QgsTreeWidgetItem;
  class QDomDocument;
  class QDomElement;
  class QgsOWSSourceWidget;
@@ -76,7 +76,7 @@ index 2fe929fab6c..0423d212d00 100644
  
  
  /**
-@@ -61,6 +63,12 @@ class GUI_EXPORT QgsOWSSourceSelect : public QgsAbstractDataSourceWidget, protec
+@@ -62,6 +64,12 @@ class GUI_EXPORT QgsOWSSourceSelect : public QgsAbstractDataSourceWidget, public
          QString label;
      };
  
@@ -89,7 +89,7 @@ index 2fe929fab6c..0423d212d00 100644
      //! Constructor
      QgsOWSSourceSelect( const QString &service, QWidget *parent SIP_TRANSFERTHIS = nullptr, Qt::WindowFlags fl = QgsGuiUtils::ModalDialogFlags, QgsProviderRegistry::WidgetMode widgetMode = QgsProviderRegistry::WidgetMode::Standalone );
  
-@@ -236,6 +244,7 @@ class GUI_EXPORT QgsOWSSourceSelect : public QgsAbstractDataSourceWidget, protec
+@@ -237,6 +245,7 @@ class GUI_EXPORT QgsOWSSourceSelect : public QgsAbstractDataSourceWidget, public
      void mTilesetsTableWidget_itemClicked( QTableWidgetItem *item );
      void mLayerUpButton_clicked();
      void mLayerDownButton_clicked();

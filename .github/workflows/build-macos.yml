@@ -104,8 +104,6 @@ jobs:
                 
                 fdupes -r -1 build/vcpkg_installed/arm64-osx-dynamic/lib | grep libQt | while read line; do master=""; for file in ${line[*]}; do if  [[ "x${master}" == "x" ]]; then master=$file; else rm "${file}"; ln -s $(basename "${master}") "${file}"; fi; done; done
                 
-                cmake -D VCPKG_INSTALL_OPTIONS="" build
-
       - name: 📑 Upload vcpkg build logs
         uses: actions/upload-artifact@v6
         if: failure()
@@ -126,6 +124,9 @@ jobs:
           name: kadas-albireo2-sdk-${{ matrix.triplet }}
           path: |
             sdk/vcpkg-export-*.zip
+
+      - name: build
+        run: cmake -D VCPKG_INSTALL_OPTIONS="" build
 
       - name: Compile plugins translation
         run: |
