@@ -122,8 +122,8 @@ if(FALSE) # Should be "if qgis is built statically" -- leaving this cleanup as
   # spatialite) target_link_libraries(qgis_core INTERFACE PkgConfig::spatialite)
   # endif()
 
-  _find_and_link_library(qscintilla2_qt5 QGIS::Gui)
-  find_package(Qt5 REQUIRED COMPONENTS UiTools)
+  _find_and_link_library(qscintilla2_qt6 QGIS::Gui)
+  find_package(Qt6 REQUIRED COMPONENTS UiTools)
   target_link_libraries(QGIS::Gui INTERFACE Qt::UiTools)
   _find_and_link_library(provider_postgres_gui_a QGIS::Gui)
   _find_and_link_library(provider_wms_gui_a QGIS::Gui)
@@ -171,7 +171,7 @@ else()
   _find_and_link_library(spatialindex QGIS::Core)
 endif()
 
-get_target_property(QT_LINKAGE Qt5::Core TYPE)
+get_target_property(QT_LINKAGE Qt6::Core TYPE)
 if(NOT QT_LINKAGE STREQUAL STATIC_LIBRARY)
   find_package(poly2tri CONFIG)
   target_link_libraries(QGIS::Core INTERFACE poly2tri::poly2tri)
@@ -179,14 +179,10 @@ endif()
 pkg_check_modules(freexl REQUIRED IMPORTED_TARGET freexl)
 target_link_libraries(QGIS::Core INTERFACE PkgConfig::freexl)
 
-if(BUILD_WITH_QT6)
-  _qgis_core_add_dependency(Qt6Keychain::Qt6Keychain Qt6Keychain)
-else()
-  _qgis_core_add_dependency(Qt5Keychain::Qt5Keychain Qt5Keychain)
-endif()
+_qgis_core_add_dependency(Qt6Keychain::Qt6Keychain Qt6Keychain)
 
 find_package(
-  Qt5
+  Qt6
   COMPONENTS Core
              Gui
              Network
@@ -216,13 +212,13 @@ target_link_libraries(
             Qt::QuickWidgets
 )
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "iOS")
-  find_package(Qt5 COMPONENTS SerialPort)
-  target_link_libraries(QGIS::Core INTERFACE Qt5::SerialPort)
+  find_package(Qt6 COMPONENTS SerialPort)
+  target_link_libraries(QGIS::Core INTERFACE Qt6::SerialPort)
 endif()
 if(APPLE)
   if(NOT BUILD_WITH_QT6)
-    find_package(Qt5 COMPONENTS MacExtras)
-    target_link_libraries(QGIS::Core INTERFACE Qt5::MacExtras)
+    find_package(Qt6 COMPONENTS MacExtras)
+    target_link_libraries(QGIS::Core INTERFACE Qt6::MacExtras)
   endif()
   pkg_check_modules(libtasn1 REQUIRED IMPORTED_TARGET libtasn1)
   target_link_libraries(QGIS::Core INTERFACE PkgConfig::libtasn1)
@@ -237,10 +233,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 
   # QtKeychain
   find_package(
-    Qt5
+    Qt6
     COMPONENTS DBus
     REQUIRED
   )
-  target_link_libraries(QGIS::Core INTERFACE Qt5::DBus)
+  target_link_libraries(QGIS::Core INTERFACE Qt6::DBus)
 endif()
 target_link_libraries(QGIS::Analysis INTERFACE QGIS::Core)

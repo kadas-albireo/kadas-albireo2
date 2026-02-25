@@ -14,7 +14,7 @@ macro(add_kadas_test TESTSRC)
   add_executable(${TESTNAME} ${TESTSRC} ${util_SRCS})
   set_target_properties(${TESTNAME} PROPERTIES AUTORCC TRUE)
   target_link_libraries(${TESTNAME} ${ARG_QGIS_TEST_LINKEDLIBRARIES})
-  target_link_libraries(${TESTNAME} Qt5::Test)
+  target_link_libraries(${TESTNAME} Qt6::Test)
   add_test(${TESTNAME} ${CMAKE_BINARY_DIR}/output/bin/${TESTNAME} -maxwarnings
            10000
   )

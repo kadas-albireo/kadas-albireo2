@@ -23,7 +23,7 @@ vcpkg_cmake_configure(
 
 vcpkg_cmake_install()
 vcpkg_cmake_config_fixup(
-  CONFIG_PATH lib/cmake/QuaZip-Qt5-1.4 PACKAGE_NAME quazip-qt5
+  CONFIG_PATH lib/cmake/QuaZip-Qt6-1.4 PACKAGE_NAME quazip-qt6
 )
 vcpkg_copy_pdbs()
 # Qt6 pkg-config files not installed

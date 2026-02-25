@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 #   Copyright (c) 2007, Simon Edwards <simon@simonzone.com>
 #    All rights reserved.
@@ -31,29 +30,31 @@
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
 import os.path
-import PyQt5.QtCore
-import sipconfig
 import sys
+
+import PyQt6.QtCore
+import sipconfig
 
 cfg = sipconfig.Configuration()
 sip_dir = cfg.default_sip_dir
-for p in (os.path.join(sip_dir, "PyQt5"),
-          os.path.join(sip_dir, "PyQt5-3"),
-          sip_dir,
-          os.path.join(cfg.default_mod_dir, "PyQt5", "bindings")):
+for p in (
+    os.path.join(sip_dir, "PyQt6"),
+    os.path.join(sip_dir, "PyQt6-3"),
+    sip_dir,
+    os.path.join(cfg.default_mod_dir, "PyQt6", "bindings"),
+):
     if os.path.exists(os.path.join(p, "QtCore", "QtCoremod.sip")):
         sip_dir = p
         break
 
-print("pyqt_version_str:%s" % PyQt5.QtCore.PYQT_VERSION_STR)
-print("pyqt_mod_dir:%s" % os.path.join(cfg.default_mod_dir, "PyQt5"))
+print("pyqt_version_str:%s" % PyQt6.QtCore.PYQT_VERSION_STR)
+print("pyqt_mod_dir:%s" % os.path.join(cfg.default_mod_dir, "PyQt6"))
 print("pyqt_sip_dir:%s" % sip_dir)
-print("pyqt_sip_flags:%s" % PyQt5.QtCore.PYQT_CONFIGURATION['sip_flags'])
 print("pyqt_bin_dir:%s" % cfg.default_bin_dir)
 
 try:
-    import PyQt5.sip
+    import PyQt6.sip
 
-    print("pyqt_sip_module:PyQt5.sip")
-except:
+    print("pyqt_sip_module:PyQt6.sip")
+except Exception as e:
     print("pyqt_sip_module:sip")

@@ -42,10 +42,10 @@ target_link_libraries(
   GDAL::GDAL
   ${CRYPT_LIBRARIES}
   zonedetect::ZoneDetect
-  Qt5::Widgets
-  Qt5::Network
-  Qt5::Svg
-  Qt5::Xml
+  Qt6::Widgets
+  Qt6::Network
+  Qt6::Svg
+  Qt6::Xml
   OpenSSL::SSL
   OpenSSL::Crypto
 )

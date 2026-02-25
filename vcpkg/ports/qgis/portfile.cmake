@@ -198,13 +198,13 @@ if(VCPKG_TARGET_IS_WINDOWS)
   list(
     APPEND
     QGIS_OPTIONS
-    -DQT_LRELEASE_EXECUTABLE=${CURRENT_INSTALLED_DIR}/tools/qt5-tools/bin/lrelease.exe
+    -DQT_LRELEASE_EXECUTABLE=${CURRENT_INSTALLED_DIR}/tools/qt6-tools/bin/lrelease.exe
   )
 else()
   list(
     APPEND
     QGIS_OPTIONS
-    -DQT_LRELEASE_EXECUTABLE=${CURRENT_INSTALLED_DIR}/tools/qt5-tools/bin/lrelease.exe
+    -DQT_LRELEASE_EXECUTABLE=${CURRENT_INSTALLED_DIR}/tools/qt6-tools/bin/lrelease.exe
   )
 endif()
 

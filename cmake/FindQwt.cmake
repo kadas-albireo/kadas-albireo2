@@ -34,7 +34,7 @@ if(TARGET unofficial::qwt::qwt) # vcpkg version
   set(Qwt_FOUND TRUE)
 else() # pkgconfig
   find_package(PkgConfig REQUIRED)
-  pkg_search_module(PC_Qwt IMPORTED_TARGET Qt5Qwt6)
+  pkg_search_module(PC_Qwt IMPORTED_TARGET Qt6Qwt6)
   if(PC_Qwt_FOUND)
     add_library(Qwt::Qwt ALIAS PkgConfig::PC_Qwt)
     set(Qwt_FOUND TRUE)
