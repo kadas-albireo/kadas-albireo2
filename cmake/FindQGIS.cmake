@@ -106,10 +106,10 @@ if(Gui IN_LIST QGIS_FIND_COMPONENTS)
 endif()
 if(3D IN_LIST QGIS_FIND_COMPONENTS)
   _find_qgis_library(3d 3D)
-  find_package(Qt5 COMPONENTS 3DCore 3DRender 3DInput 3DLogic 3DExtras)
+  find_package(Qt6 COMPONENTS 3DCore 3DRender 3DInput 3DLogic 3DExtras)
   target_link_libraries(
-    QGIS::3D INTERFACE QGIS::Core Qt5::3DCore Qt5::3DRender Qt5::3DInput
-                       Qt5::3DLogic Qt5::3DExtras
+    QGIS::3D INTERFACE QGIS::Core Qt6::3DCore Qt6::3DRender Qt6::3DInput
+                       Qt6::3DLogic Qt6::3DExtras
   )
 endif()
 
@@ -173,10 +173,10 @@ if(WITH_VCPKG)
   include("cmake/qgis-cmake-wrapper.cmake")
 else()
   target_include_directories(QGIS::Core INTERFACE ${GDAL_INCLUDE_DIR})
-  find_package(Qca-qt5 REQUIRED)
-  target_link_libraries(QGIS::Core INTERFACE qca-qt5)
-  find_package(Qt5Keychain REQUIRED)
+  find_package(Qca-qt6 REQUIRED)
+  target_link_libraries(QGIS::Core INTERFACE qca-qt6)
+  find_package(Qt6Keychain REQUIRED)
   target_include_directories(QGIS::Core INTERFACE ${QTKEYCHAIN_INCLUDE_DIR})
-  find_package(Qt5SerialPort REQUIRED)
-  target_link_libraries(QGIS::Core INTERFACE Qt5::SerialPort)
+  find_package(Qt6SerialPort REQUIRED)
+  target_link_libraries(QGIS::Core INTERFACE Qt6::SerialPort)
 endif()

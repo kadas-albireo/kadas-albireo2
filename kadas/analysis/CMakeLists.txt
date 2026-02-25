@@ -7,7 +7,7 @@ list(SORT kadas_analysis_HDR)
 add_library(kadas_analysis ${kadas_analysis_SRC} ${kadas_analysis_HDR})
 
 target_link_libraries(
-  kadas_analysis Qt5::Widgets Qt5::Network Qt5::Xml kadas_core
+  kadas_analysis Qt6::Widgets Qt6::Network Qt6::Xml kadas_core
 )
 
 target_include_directories(kadas_analysis PRIVATE ${CMAKE_CURRENT_BINARY_DIR})

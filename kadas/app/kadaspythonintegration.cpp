@@ -118,7 +118,7 @@ bool KadasPythonIntegration::checkSystemImports()
     }
   }
   // import Qt bindings
-  if ( !runString( QStringLiteral( "from PyQt5 import QtCore, QtGui" ), QObject::tr( "Couldn't load PyQt." ) + '\n' + QObject::tr( "Python support will be disabled." ) ) )
+  if ( !runString( QStringLiteral( "from PyQt6 import QtCore, QtGui" ), QObject::tr( "Couldn't load PyQt." ) + '\n' + QObject::tr( "Python support will be disabled." ) ) )
   {
     return false;
   }

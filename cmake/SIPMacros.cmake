@@ -112,7 +112,7 @@ macro(GENERATE_SIP_PYTHON_MODULE_CODE MODULE_NAME MODULE_SIP SIP_FILES
         --qmake=${QMAKE_EXECUTABLE}
         --include-dir=${CMAKE_CURRENT_BINARY_DIR}
         --include-dir=${QGIS_SIP_DIR}
-        --include-dir=${PYQT5_SIP_DIR}
+        --include-dir=${PYQT6_SIP_DIR}
     )
 
     add_custom_command(
