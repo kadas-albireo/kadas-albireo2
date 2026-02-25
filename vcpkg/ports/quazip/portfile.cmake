@@ -18,7 +18,7 @@ vcpkg_check_features(
 
 vcpkg_cmake_configure(
   SOURCE_PATH "${SOURCE_PATH}" OPTIONS ${FEATURE_OPTIONS}
-  -DQUAZIP_QT_MAJOR_VERSION=5 -DQUAZIP_FETCH_LIBS=OFF
+  -DQUAZIP_FETCH_LIBS=OFF
 )
 
 vcpkg_cmake_install()
