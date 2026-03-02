@@ -88,6 +88,7 @@ find_package(Qt6Sql REQUIRED)
 find_package(Qt6Svg REQUIRED)
 find_package(Qt6Xml REQUIRED)
 find_package(Qt6Concurrent REQUIRED)
+set(BUILD_WITH_QT6 ON)
 find_package(QGIS REQUIRED COMPONENTS Core Analysis Gui 3D)
 
 find_package(GDAL CONFIG REQUIRED)
