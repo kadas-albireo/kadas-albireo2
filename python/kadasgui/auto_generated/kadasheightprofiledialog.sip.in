@@ -20,16 +20,16 @@ class KadasHeightProfileDialog : QDialog
 %Docstring(signature="appended")
 *************************************************************************
 
-This program is free software; you can redistribute it and/or modify  *
-it under the terms of the GNU General Public License as published by  *
-the Free Software Foundation; either version 2 of the License, or     *
-(at your option) any later version.                                   *
+This program is free software; you can redistribute it and/or modify *
+it under the terms of the GNU General Public License as published by *
+the Free Software Foundation; either version 2 of the License, or * (at
+your option) any later version. *
 
 **************************************************************************
 %End
 
 %TypeHeaderCode
-#include "kadas/gui/kadasheightprofiledialog.h"
+#include "kadasheightprofiledialog.h"
 %End
   public:
     KadasHeightProfileDialog( KadasMapToolHeightProfile *tool, QWidget *parent = 0, Qt::WindowFlags f = Qt::WindowFlags() );

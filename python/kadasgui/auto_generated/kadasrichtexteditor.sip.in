@@ -17,16 +17,16 @@ class KadasRichTextEditor : QTextEdit
 %Docstring(signature="appended")
 *************************************************************************
 
-This program is free software; you can redistribute it and/or modify  *
-it under the terms of the GNU General Public License as published by  *
-the Free Software Foundation; either version 2 of the License, or     *
-(at your option) any later version.                                   *
+This program is free software; you can redistribute it and/or modify *
+it under the terms of the GNU General Public License as published by *
+the Free Software Foundation; either version 2 of the License, or * (at
+your option) any later version. *
 
 **************************************************************************
 %End
 
 %TypeHeaderCode
-#include "kadas/gui/kadasrichtexteditor.h"
+#include "kadasrichtexteditor.h"
 %End
   public:
     explicit KadasRichTextEditor( QWidget *parent = 0 );
@@ -52,9 +52,8 @@ the Free Software Foundation; either version 2 of the License, or     *
 
 class KadasColorAction : QAction
 {
-
 %TypeHeaderCode
-#include "kadas/gui/kadasrichtexteditor.h"
+#include "kadasrichtexteditor.h"
 %End
   public:
     KadasColorAction( QObject *parent );
@@ -68,9 +67,8 @@ class KadasColorAction : QAction
 
 class KadasAddLinkDialog : QDialog
 {
-
 %TypeHeaderCode
-#include "kadas/gui/kadasrichtexteditor.h"
+#include "kadasrichtexteditor.h"
 %End
   public:
     KadasAddLinkDialog( KadasRichTextEditor *editor, QWidget *parent = 0 );
@@ -84,9 +82,8 @@ class KadasAddLinkDialog : QDialog
 
 class KadasAddImageDialog : QDialog
 {
-
 %TypeHeaderCode
-#include "kadas/gui/kadasrichtexteditor.h"
+#include "kadasrichtexteditor.h"
 %End
   public:
     KadasAddImageDialog( KadasRichTextEditor *editor, QWidget *parent = 0 );
@@ -99,9 +96,8 @@ class KadasAddImageDialog : QDialog
 
 class KadasRichTextEditorToolBar : QToolBar
 {
-
 %TypeHeaderCode
-#include "kadas/gui/kadasrichtexteditor.h"
+#include "kadasrichtexteditor.h"
 %End
   public:
     KadasRichTextEditorToolBar( KadasRichTextEditor *editor, QWidget *parent = 0 );

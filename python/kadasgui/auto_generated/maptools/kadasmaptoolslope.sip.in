@@ -14,27 +14,28 @@ class KadasMapToolSlopeItemInterface : KadasMapItemInterface
 %Docstring(signature="appended")
 *************************************************************************
 
-This program is free software; you can redistribute it and/or modify  *
-it under the terms of the GNU General Public License as published by  *
-the Free Software Foundation; either version 2 of the License, or     *
-(at your option) any later version.                                   *
+This program is free software; you can redistribute it and/or modify *
+it under the terms of the GNU General Public License as published by *
+the Free Software Foundation; either version 2 of the License, or * (at
+your option) any later version. *
 
 **************************************************************************
 %End
 
 %TypeHeaderCode
-#include "kadas/gui/maptools/kadasmaptoolslope.h"
+#include "kadasmaptoolslope.h"
 %End
   public:
     KadasMapToolSlopeItemInterface( QgsMapCanvas *mapCanvas );
+    virtual KadasMapItem *createItem() const;
+
 
 };
 
 class KadasMapToolSlope : KadasMapToolCreateItem
 {
-
 %TypeHeaderCode
-#include "kadas/gui/maptools/kadasmaptoolslope.h"
+#include "kadasmaptoolslope.h"
 %End
   public:
     KadasMapToolSlope( QgsMapCanvas *mapCanvas );

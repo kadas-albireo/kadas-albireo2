@@ -11,9 +11,8 @@
 
 class KadasMilxItem : KadasMapItem
 {
-
 %TypeHeaderCode
-#include "kadas/gui/milx/kadasmilxitem.h"
+#include "kadasmilxitem.h"
 %End
   public:
     KadasMilxItem();

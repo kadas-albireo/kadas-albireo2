@@ -16,7 +16,7 @@ KadasSettingsTree holds the tree structure for the settings
 %End
 
 %TypeHeaderCode
-#include "kadas/core/kadassettingstree.h"
+#include "kadassettingstree.h"
 %End
   public:
 

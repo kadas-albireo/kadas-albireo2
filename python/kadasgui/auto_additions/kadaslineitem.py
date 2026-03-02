@@ -25,3 +25,7 @@ KadasLineItem.MeasurementMode.__doc__ = """
 
 """
 # --
+try:
+    KadasLineItem.__overridden_methods__ = ['itemName', 'nodes', 'startPart', 'setCurrentPoint', 'setCurrentAttributes', 'continuePart', 'endPart', 'drawAttribs', 'drawAttribsFromPosition', 'positionFromDrawAttribs', 'getEditContext', 'edit', 'populateContextMenu', 'editAttribsFromPosition', 'positionFromEditAttribs', 'position', 'setPosition', 'geometryType', 'addPartFromGeometry', 'assign', 'clone', 'serialize', 'deserialize', '_clone', 'createEmptyState', 'recomputeDerived', 'measureGeometry']
+except (NameError, AttributeError):
+    pass

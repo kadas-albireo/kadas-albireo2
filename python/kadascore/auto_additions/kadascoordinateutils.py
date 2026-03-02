@@ -2,5 +2,5 @@
 try:
     KadasCoordinateUtils.getHeightAtPos = staticmethod(KadasCoordinateUtils.getHeightAtPos)
     KadasCoordinateUtils.getTimezoneAtPos = staticmethod(KadasCoordinateUtils.getTimezoneAtPos)
-except AttributeError:
+except (NameError, AttributeError):
     pass

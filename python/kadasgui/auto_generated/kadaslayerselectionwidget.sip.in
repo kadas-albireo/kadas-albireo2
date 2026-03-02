@@ -17,16 +17,16 @@ class KadasLayerSelectionWidget : QWidget
 %Docstring(signature="appended")
 *************************************************************************
 
-This program is free software; you can redistribute it and/or modify  *
-it under the terms of the GNU General Public License as published by  *
-the Free Software Foundation; either version 2 of the License, or     *
-(at your option) any later version.                                   *
+This program is free software; you can redistribute it and/or modify *
+it under the terms of the GNU General Public License as published by *
+the Free Software Foundation; either version 2 of the License, or * (at
+your option) any later version. *
 
 **************************************************************************
 %End
 
 %TypeHeaderCode
-#include "kadas/gui/kadaslayerselectionwidget.h"
+#include "kadaslayerselectionwidget.h"
 %End
   public:
     KadasLayerSelectionWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, SIP_PYCALLABLE filter, SIP_PYCALLABLE creator, QWidget *parent = 0 )[( QgsMapCanvas *, QgsLayerTreeView *, LayerFilter, LayerCreator, QWidget * )];
@@ -84,6 +84,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
 
     KadasLayerSelectionWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QWidget *parent = 0 );
+
 
     void createLayerIfEmpty( const QString &name );
     void setLabel( const QString &label );
