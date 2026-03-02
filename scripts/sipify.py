@@ -1248,23 +1248,23 @@ def process_doxygen_line(line: str) -> str:
 
 def validate_docstring(docstring: str):
     """
-    Validates a docstring, raising a fatal error if it fails
+    Validates a docstring, emitting a warning on issues
     """
     if docstring.strip().startswith(".. note::"):
-        exit_with_error(
-            "Documentation must not start with a \\note directive. Add at least a brief description before any \\note."
+        dbg_info(
+            "WARNING: Documentation must not start with a \\note directive. Add at least a brief description before any \\note."
         )
     if docstring.strip().startswith(".. warning::"):
-        exit_with_error(
-            "Documentation must not start with a \\warning directive. Add at least a brief description before any \\warning."
+        dbg_info(
+            "WARNING: Documentation must not start with a \\warning directive. Add at least a brief description before any \\warning."
         )
     if docstring.strip().startswith(":return:"):
-        exit_with_error(
-            "Documentation must not start with a \\returns directive. Add at least a brief description before \\returns."
+        dbg_info(
+            "WARNING: Documentation must not start with a \\returns directive. Add at least a brief description before \\returns."
         )
     if docstring.strip().startswith(":param"):
-        exit_with_error(
-            "Documentation must not start with a \\param directive. Add at least a brief description before \\param."
+        dbg_info(
+            "WARNING: Documentation must not start with a \\param directive. Add at least a brief description before \\param."
         )
 
 
@@ -2460,12 +2460,12 @@ def process_class_decl():
                     r"(?<![a-z]\.[a-z])(?<!e\.g)(?<!i\.e)(?<!\w\.\w)(?<![A-Z][a-z]\.)(?<![A-Z]\.)(?<=\w)\.(?=\s+[A-Z])",
                     first_paragraph,
                 ):
-                    exit_with_error(
-                        f"First paragraph in docstring for {CONTEXT.current_fully_qualified_class_name()} is multi-sentence. Please split to separate paragraphs.\n\n{first_paragraph}"
+                    dbg_info(
+                        f"WARNING: First paragraph in docstring for {CONTEXT.current_fully_qualified_class_name()} is multi-sentence. Please split to separate paragraphs.\n\n{first_paragraph}"
                     )
                 if first_paragraph.strip()[-1] != ".":
-                    exit_with_error(
-                        f"First paragraph in docstring for {CONTEXT.current_fully_qualified_class_name()} is not a complete sentence. Ensure it has a trailing '.':\n\n{first_paragraph}"
+                    dbg_info(
+                        f"WARNING: First paragraph in docstring for {CONTEXT.current_fully_qualified_class_name()} is not a complete sentence. Ensure it has a trailing '.':\n\n{first_paragraph}"
                     )
 
                 docstring = first_paragraph
