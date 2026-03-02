@@ -25,8 +25,7 @@
 KadasLayerTreeViewTemporalIndicator::KadasLayerTreeViewTemporalIndicator( QgsLayerTreeView *view, KadasTemporalController *kadasTemporalController )
   : QgsLayerTreeViewIndicatorProvider( view )
   , mKadasTemporalController( kadasTemporalController )
-{
-}
+{}
 
 void KadasLayerTreeViewTemporalIndicator::connectSignals( QgsMapLayer *layer )
 {

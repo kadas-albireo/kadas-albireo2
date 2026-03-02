@@ -97,7 +97,8 @@ class KADAS_GUI_EXPORT KadasLayerSelectionWidget : public QWidget
     // clang-format on
 
     KadasLayerSelectionWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QWidget *parent = nullptr )
-      : KadasLayerSelectionWidget( canvas, layerTreeView, nullptr, nullptr, parent ) {}
+      : KadasLayerSelectionWidget( canvas, layerTreeView, nullptr, nullptr, parent )
+    {}
 
 
     void createLayerIfEmpty( const QString &name );

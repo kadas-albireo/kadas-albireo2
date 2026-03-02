@@ -111,9 +111,7 @@ void KadasMapSwipeCanvasItem::refreshMap()
     mRenderJob->deleteLater();
     mRenderJob = nullptr;
   } );
-  mRenderJobUpdatedConnection = QObject::connect( mRenderJob, &QgsMapRendererJob::renderingLayersFinished, [this] {
-    mRenderedMapImage = mRenderJob->renderedImage();
-  } );
+  mRenderJobUpdatedConnection = QObject::connect( mRenderJob, &QgsMapRendererJob::renderingLayersFinished, [this] { mRenderedMapImage = mRenderJob->renderedImage(); } );
 }
 
 
@@ -139,11 +137,7 @@ void KadasMapSwipeCanvasItem::paint( QPainter *painter )
     rect = QRect( 0, h, mRenderedMapImage.width(), mRenderedMapImage.height() - h );
   }
 
-  painter->drawImage(
-    rect,
-    mRenderedMapImage.scaled( mRenderedMapImage.width() / mRenderedMapImage.devicePixelRatioF(), mRenderedMapImage.height() / mRenderedMapImage.devicePixelRatioF() ),
-    rect
-  );
+  painter->drawImage( rect, mRenderedMapImage.scaled( mRenderedMapImage.width() / mRenderedMapImage.devicePixelRatioF(), mRenderedMapImage.height() / mRenderedMapImage.devicePixelRatioF() ), rect );
 
   QPen pen( Qt::black, 3, Qt::SolidLine );
   painter->setPen( pen );

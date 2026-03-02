@@ -31,7 +31,13 @@ class KADAS_ANALYSIS_EXPORT KadasNineCellFilter SIP_ABSTRACT
 {
   public:
     /**Constructor that takes input file, output file and output format (GDAL string)*/
-    KadasNineCellFilter( const QgsRasterLayer *layer, const QString &outputFile, const QString &outputFormat, const QgsRectangle &filterRegion = QgsRectangle(), const QgsCoordinateReferenceSystem &filterRegionCrs = QgsCoordinateReferenceSystem() );
+    KadasNineCellFilter(
+      const QgsRasterLayer *layer,
+      const QString &outputFile,
+      const QString &outputFormat,
+      const QgsRectangle &filterRegion = QgsRectangle(),
+      const QgsCoordinateReferenceSystem &filterRegionCrs = QgsCoordinateReferenceSystem()
+    );
     virtual ~KadasNineCellFilter() = default;
 
     /**Starts the calculation, reads from mInputFile and stores the result in mOutputFile
@@ -55,14 +61,12 @@ class KADAS_ANALYSIS_EXPORT KadasNineCellFilter SIP_ABSTRACT
 
     //! Calculates output value from nine input values. The input values and the output value can be equal to the
     //! nodata value if not present or outside of the border. Must be implemented by subclasses
-    virtual float processNineCellWindow(
-      float *x11, float *x21, float *x31,
-      float *x12, float *x22, float *x32,
-      float *x13, float *x23, float *x33
-    ) = 0;
+    virtual float processNineCellWindow( float *x11, float *x21, float *x31, float *x12, float *x22, float *x32, float *x13, float *x23, float *x33 ) = 0;
 
     //! Computes the window of the raster which contains the specified region of the raster
-    static bool computeWindow( GDALDatasetH dataset, const QgsCoordinateReferenceSystem &datasetCrs, const QgsRectangle &region, const QgsCoordinateReferenceSystem &regionCrs, int &rowStart, int &rowEnd, int &colStart, int &colEnd );
+    static bool computeWindow(
+      GDALDatasetH dataset, const QgsCoordinateReferenceSystem &datasetCrs, const QgsRectangle &region, const QgsCoordinateReferenceSystem &regionCrs, int &rowStart, int &rowEnd, int &colStart, int &colEnd
+    );
 
   private:
     /**Opens the input file and returns the dataset handle and the number of pixels in x-/y- direction*/

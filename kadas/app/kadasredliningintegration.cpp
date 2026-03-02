@@ -113,7 +113,8 @@ KadasMapItem *KadasCoordCrossItemInterface::createItem() const
 
 
 KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObject, QObject *parent )
-  : QObject( parent ), mButtonNewObject( buttonNewObject )
+  : QObject( parent )
+  , mButtonNewObject( buttonNewObject )
 {
   QAction *actionNewMarker = new QAction( QIcon( ":/kadas/icons/redlining_point" ), tr( "Marker" ), this );
 
@@ -136,7 +137,9 @@ KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObje
 
   mActionNewRectangle = new QAction( QIcon( ":/kadas/icons/redlining_rectangle" ), tr( "Rectangle" ), this );
   mActionNewRectangle->setCheckable( true );
-  connect( mActionNewRectangle, &QAction::triggered, this, [=]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasRectangleItemInterface>( KadasRectangleItemInterface() ) ) ); } );
+  connect( mActionNewRectangle, &QAction::triggered, this, [=]( bool active ) {
+    toggleCreateItem( active, std::move( std::make_unique<KadasRectangleItemInterface>( KadasRectangleItemInterface() ) ) );
+  } );
   connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_R ), kApp->mainWindow() ), &QShortcut::activated, mActionNewRectangle, &QAction::trigger );
 
   mActionNewPolygon = new QAction( QIcon( ":/kadas/icons/redlining_polygon" ), tr( "Polygon" ), this );
@@ -156,7 +159,9 @@ KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObje
 
   mActionNewCoordCross = new QAction( QIcon( ":/kadas/icons/coord_cross" ), tr( "Coordinate Cross" ), this );
   mActionNewCoordCross->setCheckable( true );
-  connect( mActionNewCoordCross, &QAction::triggered, this, [=]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasCoordCrossItemInterface>( KadasCoordCrossItemInterface() ) ) ); } );
+  connect( mActionNewCoordCross, &QAction::triggered, this, [=]( bool active ) {
+    toggleCreateItem( active, std::move( std::make_unique<KadasCoordCrossItemInterface>( KadasCoordCrossItemInterface() ) ) );
+  } );
   connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_O ), kApp->mainWindow() ), &QShortcut::activated, mActionNewCoordCross, &QAction::trigger );
 
   QMenu *menuNewMarker = new QMenu();
@@ -195,7 +200,9 @@ void KadasRedliningIntegration::toggleCreateItem( bool active, std::unique_ptr<K
   {
     KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, std::move( interface ), getOrCreateLayer() );
 
-    KadasLayerSelectionWidget::LayerFilter filter = []( QgsMapLayer *layer ) { return dynamic_cast<KadasItemLayer *>( layer ) && static_cast<KadasItemLayer *>( layer )->layerTypeKey() == QString( "KadasItemLayer" ); };
+    KadasLayerSelectionWidget::LayerFilter filter = []( QgsMapLayer *layer ) {
+      return dynamic_cast<KadasItemLayer *>( layer ) && static_cast<KadasItemLayer *>( layer )->layerTypeKey() == QString( "KadasItemLayer" );
+    };
     KadasLayerSelectionWidget::LayerCreator creator = []( const QString &name ) {
       return QgsProject::instance()->addMapLayer( new KadasItemLayer( name, QgsCoordinateReferenceSystem( "EPSG:3857" ) ) );
     };

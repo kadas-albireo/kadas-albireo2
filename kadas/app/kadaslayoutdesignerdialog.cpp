@@ -275,9 +275,7 @@ KadasLayoutDesignerDialog::KadasLayoutDesignerDialog( QWidget *parent, Qt::Windo
   connect( backSpace, &QShortcut::activated, mActionDeleteSelection, &QAction::trigger );
 
   mActionPreviewModeOff->setChecked( true );
-  connect( mActionPreviewModeOff, &QAction::triggered, this, [=] {
-    mView->setPreviewModeEnabled( false );
-  } );
+  connect( mActionPreviewModeOff, &QAction::triggered, this, [=] { mView->setPreviewModeEnabled( false ); } );
   connect( mActionPreviewModeGrayscale, &QAction::triggered, this, [=] {
     mView->setPreviewMode( QgsPreviewEffect::PreviewGrayscale );
     mView->setPreviewModeEnabled( true );
@@ -322,63 +320,25 @@ KadasLayoutDesignerDialog::KadasLayoutDesignerDialog( QWidget *parent, Qt::Windo
   connect( mActionLowerItems, &QAction::triggered, mView, &QgsLayoutView::lowerSelectedItems );
   connect( mActionMoveItemsToTop, &QAction::triggered, mView, &QgsLayoutView::moveSelectedItemsToTop );
   connect( mActionMoveItemsToBottom, &QAction::triggered, mView, &QgsLayoutView::moveSelectedItemsToBottom );
-  connect( mActionAlignLeft, &QAction::triggered, this, [=] {
-    mView->alignSelectedItems( QgsLayoutAligner::AlignLeft );
-  } );
-  connect( mActionAlignHCenter, &QAction::triggered, this, [=] {
-    mView->alignSelectedItems( QgsLayoutAligner::AlignHCenter );
-  } );
-  connect( mActionAlignRight, &QAction::triggered, this, [=] {
-    mView->alignSelectedItems( QgsLayoutAligner::AlignRight );
-  } );
-  connect( mActionAlignTop, &QAction::triggered, this, [=] {
-    mView->alignSelectedItems( QgsLayoutAligner::AlignTop );
-  } );
-  connect( mActionAlignVCenter, &QAction::triggered, this, [=] {
-    mView->alignSelectedItems( QgsLayoutAligner::AlignVCenter );
-  } );
-  connect( mActionAlignBottom, &QAction::triggered, this, [=] {
-    mView->alignSelectedItems( QgsLayoutAligner::AlignBottom );
-  } );
-  connect( mActionDistributeLeft, &QAction::triggered, this, [=] {
-    mView->distributeSelectedItems( QgsLayoutAligner::DistributeLeft );
-  } );
-  connect( mActionDistributeHCenter, &QAction::triggered, this, [=] {
-    mView->distributeSelectedItems( QgsLayoutAligner::DistributeHCenter );
-  } );
-  connect( mActionDistributeHSpace, &QAction::triggered, this, [=] {
-    mView->distributeSelectedItems( QgsLayoutAligner::DistributeHSpace );
-  } );
-  connect( mActionDistributeRight, &QAction::triggered, this, [=] {
-    mView->distributeSelectedItems( QgsLayoutAligner::DistributeRight );
-  } );
-  connect( mActionDistributeTop, &QAction::triggered, this, [=] {
-    mView->distributeSelectedItems( QgsLayoutAligner::DistributeTop );
-  } );
-  connect( mActionDistributeVCenter, &QAction::triggered, this, [=] {
-    mView->distributeSelectedItems( QgsLayoutAligner::DistributeVCenter );
-  } );
-  connect( mActionDistributeVSpace, &QAction::triggered, this, [=] {
-    mView->distributeSelectedItems( QgsLayoutAligner::DistributeVSpace );
-  } );
-  connect( mActionDistributeBottom, &QAction::triggered, this, [=] {
-    mView->distributeSelectedItems( QgsLayoutAligner::DistributeBottom );
-  } );
-  connect( mActionResizeNarrowest, &QAction::triggered, this, [=] {
-    mView->resizeSelectedItems( QgsLayoutAligner::ResizeNarrowest );
-  } );
-  connect( mActionResizeWidest, &QAction::triggered, this, [=] {
-    mView->resizeSelectedItems( QgsLayoutAligner::ResizeWidest );
-  } );
-  connect( mActionResizeShortest, &QAction::triggered, this, [=] {
-    mView->resizeSelectedItems( QgsLayoutAligner::ResizeShortest );
-  } );
-  connect( mActionResizeTallest, &QAction::triggered, this, [=] {
-    mView->resizeSelectedItems( QgsLayoutAligner::ResizeTallest );
-  } );
-  connect( mActionResizeToSquare, &QAction::triggered, this, [=] {
-    mView->resizeSelectedItems( QgsLayoutAligner::ResizeToSquare );
-  } );
+  connect( mActionAlignLeft, &QAction::triggered, this, [=] { mView->alignSelectedItems( QgsLayoutAligner::AlignLeft ); } );
+  connect( mActionAlignHCenter, &QAction::triggered, this, [=] { mView->alignSelectedItems( QgsLayoutAligner::AlignHCenter ); } );
+  connect( mActionAlignRight, &QAction::triggered, this, [=] { mView->alignSelectedItems( QgsLayoutAligner::AlignRight ); } );
+  connect( mActionAlignTop, &QAction::triggered, this, [=] { mView->alignSelectedItems( QgsLayoutAligner::AlignTop ); } );
+  connect( mActionAlignVCenter, &QAction::triggered, this, [=] { mView->alignSelectedItems( QgsLayoutAligner::AlignVCenter ); } );
+  connect( mActionAlignBottom, &QAction::triggered, this, [=] { mView->alignSelectedItems( QgsLayoutAligner::AlignBottom ); } );
+  connect( mActionDistributeLeft, &QAction::triggered, this, [=] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeLeft ); } );
+  connect( mActionDistributeHCenter, &QAction::triggered, this, [=] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeHCenter ); } );
+  connect( mActionDistributeHSpace, &QAction::triggered, this, [=] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeHSpace ); } );
+  connect( mActionDistributeRight, &QAction::triggered, this, [=] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeRight ); } );
+  connect( mActionDistributeTop, &QAction::triggered, this, [=] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeTop ); } );
+  connect( mActionDistributeVCenter, &QAction::triggered, this, [=] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeVCenter ); } );
+  connect( mActionDistributeVSpace, &QAction::triggered, this, [=] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeVSpace ); } );
+  connect( mActionDistributeBottom, &QAction::triggered, this, [=] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeBottom ); } );
+  connect( mActionResizeNarrowest, &QAction::triggered, this, [=] { mView->resizeSelectedItems( QgsLayoutAligner::ResizeNarrowest ); } );
+  connect( mActionResizeWidest, &QAction::triggered, this, [=] { mView->resizeSelectedItems( QgsLayoutAligner::ResizeWidest ); } );
+  connect( mActionResizeShortest, &QAction::triggered, this, [=] { mView->resizeSelectedItems( QgsLayoutAligner::ResizeShortest ); } );
+  connect( mActionResizeTallest, &QAction::triggered, this, [=] { mView->resizeSelectedItems( QgsLayoutAligner::ResizeTallest ); } );
+  connect( mActionResizeToSquare, &QAction::triggered, this, [=] { mView->resizeSelectedItems( QgsLayoutAligner::ResizeToSquare ); } );
 
   connect( mActionAddPages, &QAction::triggered, this, &KadasLayoutDesignerDialog::addPages );
 
@@ -391,12 +351,8 @@ KadasLayoutDesignerDialog::KadasLayoutDesignerDialog( QWidget *parent, Qt::Windo
     else
       mView->deleteSelectedItems();
   } );
-  connect( mActionGroupItems, &QAction::triggered, this, [=] {
-    mView->groupSelectedItems();
-  } );
-  connect( mActionUngroupItems, &QAction::triggered, this, [=] {
-    mView->ungroupSelectedItems();
-  } );
+  connect( mActionGroupItems, &QAction::triggered, this, [=] { mView->groupSelectedItems(); } );
+  connect( mActionUngroupItems, &QAction::triggered, this, [=] { mView->ungroupSelectedItems(); } );
 
   //cut/copy/paste actions. Note these are not included in the ui file
   //as ui files have no support for QKeySequence shortcuts
@@ -404,17 +360,13 @@ KadasLayoutDesignerDialog::KadasLayoutDesignerDialog( QWidget *parent, Qt::Windo
   mActionCut->setShortcuts( QKeySequence::Cut );
   mActionCut->setStatusTip( tr( "Cut" ) );
   mActionCut->setIcon( QgsApplication::getThemeIcon( QStringLiteral( "/mActionEditCut.svg" ) ) );
-  connect( mActionCut, &QAction::triggered, this, [=] {
-    mView->copySelectedItems( QgsLayoutView::ClipboardCut );
-  } );
+  connect( mActionCut, &QAction::triggered, this, [=] { mView->copySelectedItems( QgsLayoutView::ClipboardCut ); } );
 
   mActionCopy = new QAction( tr( "&Copy" ), this );
   mActionCopy->setShortcuts( QKeySequence::Copy );
   mActionCopy->setStatusTip( tr( "Copy" ) );
   mActionCopy->setIcon( QgsApplication::getThemeIcon( QStringLiteral( "/mActionEditCopy.svg" ) ) );
-  connect( mActionCopy, &QAction::triggered, this, [=] {
-    mView->copySelectedItems( QgsLayoutView::ClipboardCopy );
-  } );
+  connect( mActionCopy, &QAction::triggered, this, [=] { mView->copySelectedItems( QgsLayoutView::ClipboardCopy ); } );
 
   mActionPaste = new QAction( tr( "&Paste" ), this );
   mActionPaste->setShortcuts( QKeySequence::Paste );
@@ -491,9 +443,7 @@ KadasLayoutDesignerDialog::KadasLayoutDesignerDialog( QWidget *parent, Qt::Windo
   connect( mHorizontalRuler, &QgsLayoutRuler::cursorPosChanged, this, &KadasLayoutDesignerDialog::updateStatusCursorPos );
   connect( mVerticalRuler, &QgsLayoutRuler::cursorPosChanged, this, &KadasLayoutDesignerDialog::updateStatusCursorPos );
 
-  connect( mView, &QgsLayoutView::itemFocused, this, [=]( QgsLayoutItem *item ) {
-    showItemOptions( item, false );
-  } );
+  connect( mView, &QgsLayoutView::itemFocused, this, [=]( QgsLayoutItem *item ) { showItemOptions( item, false ); } );
 
   // Panel and toolbar submenus
   mToolbarMenu->addAction( mLayoutToolbar->toggleViewAction() );
@@ -515,9 +465,7 @@ KadasLayoutDesignerDialog::KadasLayoutDesignerDialog( QWidget *parent, Qt::Windo
   mGeneralPropertiesStack = new QgsPanelWidgetStack();
   mGeneralDock->setWidget( mGeneralPropertiesStack );
   mPanelsMenu->addAction( mGeneralDock->toggleViewAction() );
-  connect( mActionLayoutProperties, &QAction::triggered, this, [=] {
-    mGeneralDock->setUserVisible( true );
-  } );
+  connect( mActionLayoutProperties, &QAction::triggered, this, [=] { mGeneralDock->setUserVisible( true ); } );
 
   mItemDock = new QgsDockWidget( tr( "Item Properties" ), this );
   mItemDock->setObjectName( QStringLiteral( "ItemDock" ) );
@@ -532,9 +480,7 @@ KadasLayoutDesignerDialog::KadasLayoutDesignerDialog( QWidget *parent, Qt::Windo
   mGuideStack = new QgsPanelWidgetStack();
   mGuideDock->setWidget( mGuideStack );
   mPanelsMenu->addAction( mGuideDock->toggleViewAction() );
-  connect( mActionManageGuides, &QAction::triggered, this, [=] {
-    mGuideDock->setUserVisible( true );
-  } );
+  connect( mActionManageGuides, &QAction::triggered, this, [=] { mGuideDock->setUserVisible( true ); } );
 
   mUndoDock = new QgsDockWidget( tr( "Undo History" ), this );
   mUndoDock->setObjectName( QStringLiteral( "UndoDock" ) );
@@ -638,9 +584,7 @@ void KadasLayoutDesignerDialog::setCurrentLayout( QgsPrintLayout *layout )
     mLayoutToolbar->addAction( mRedoAction );
 
     connect( mLayout->undoStack(), &QgsLayoutUndoStack::undoRedoOccurredForItems, this, &KadasLayoutDesignerDialog::undoRedoOccurredForItems );
-    connect( mActionClearGuides, &QAction::triggered, &mLayout->guides(), [=] {
-      mLayout->guides().clear();
-    } );
+    connect( mActionClearGuides, &QAction::triggered, &mLayout->guides(), [=] { mLayout->guides().clear(); } );
 
     mActionShowGrid->setChecked( mLayout->renderContext().gridVisible() );
     mActionSnapGrid->setChecked( mLayout->snapper().snapToGrid() );
@@ -706,9 +650,7 @@ void KadasLayoutDesignerDialog::showItemOptions( QgsLayoutItem *item, bool bring
   widget->setMasterLayout( mLayout );
 
   widget->setDockMode( true );
-  connect( item, &QgsLayoutItem::destroyed, widget.get(), [this] {
-    delete mItemPropertiesStack->takeMainPanel();
-  } );
+  connect( item, &QgsLayoutItem::destroyed, widget.get(), [this] { delete mItemPropertiesStack->takeMainPanel(); } );
 
   mItemPropertiesStack->setMainPanel( widget.release() );
   if ( bringPanelToFront )
@@ -871,9 +813,7 @@ void KadasLayoutDesignerDialog::itemTypeAdded( int id )
   else
     mToolsToolbar->addAction( action );
 
-  connect( action, &QAction::triggered, this, [this, id, nodeBased]() {
-    activateNewItemCreationTool( id, nodeBased );
-  } );
+  connect( action, &QAction::triggered, this, [this, id, nodeBased]() { activateNewItemCreationTool( id, nodeBased ); } );
 }
 
 void KadasLayoutDesignerDialog::statusZoomCombo_currentIndexChanged( int index )
@@ -1038,12 +978,7 @@ void KadasLayoutDesignerDialog::saveAsTemplate()
   //show file dialog
   QgsSettings settings;
   QString lastSaveDir = settings.value( QStringLiteral( "lastComposerTemplateDir" ), QDir::homePath(), QgsSettings::App ).toString();
-  QString saveFileName = QFileDialog::getSaveFileName(
-    this,
-    tr( "Save template" ),
-    lastSaveDir,
-    tr( "Layout templates" ) + " (*.qpt *.QPT)"
-  );
+  QString saveFileName = QFileDialog::getSaveFileName( this, tr( "Save template" ), lastSaveDir, tr( "Layout templates" ) + " (*.qpt *.QPT)" );
   if ( saveFileName.isEmpty() )
     return;
 
@@ -1233,10 +1168,17 @@ void KadasLayoutDesignerDialog::print()
 
     case QgsLayoutExporter::MemoryError:
       cursorOverride.release();
-      QMessageBox::warning( this, tr( "Memory Allocation Error" ), tr( "Printing the layout "
-                                                                       "resulted in a memory overflow.\n\n"
-                                                                       "Please try a lower resolution or a smaller paper size." ),
-                            QMessageBox::Ok, QMessageBox::Ok );
+      QMessageBox::warning(
+        this,
+        tr( "Memory Allocation Error" ),
+        tr(
+          "Printing the layout "
+          "resulted in a memory overflow.\n\n"
+          "Please try a lower resolution or a smaller paper size."
+        ),
+        QMessageBox::Ok,
+        QMessageBox::Ok
+      );
       break;
 
     case QgsLayoutExporter::FileError:
@@ -1283,7 +1225,8 @@ void KadasLayoutDesignerDialog::exportToRaster()
   switch ( result )
   {
     case QgsLayoutExporter::Success:
-      mMessageBar->pushMessage( tr( "Export layout" ), tr( "Successfully exported layout to <a href=\"%1\">%2</a>" ).arg( QUrl::fromLocalFile( fileNExt.first ).toString(), QDir::toNativeSeparators( fileNExt.first ) ), Qgis::Success, 0 );
+      mMessageBar
+        ->pushMessage( tr( "Export layout" ), tr( "Successfully exported layout to <a href=\"%1\">%2</a>" ).arg( QUrl::fromLocalFile( fileNExt.first ).toString(), QDir::toNativeSeparators( fileNExt.first ) ), Qgis::Success, 0 );
       break;
 
     case QgsLayoutExporter::PrintError:
@@ -1295,19 +1238,27 @@ void KadasLayoutDesignerDialog::exportToRaster()
 
     case QgsLayoutExporter::FileError:
       cursorOverride.release();
-      QMessageBox::warning( this, tr( "Image Export Error" ), tr( "Cannot write to %1.\n\nThis file may be open in another application." ).arg( QDir::toNativeSeparators( exporter.errorFile() ) ), QMessageBox::Ok, QMessageBox::Ok );
+      QMessageBox::
+        warning( this, tr( "Image Export Error" ), tr( "Cannot write to %1.\n\nThis file may be open in another application." ).arg( QDir::toNativeSeparators( exporter.errorFile() ) ), QMessageBox::Ok, QMessageBox::Ok );
       break;
 
     case QgsLayoutExporter::MemoryError:
       cursorOverride.release();
-      QMessageBox::warning( this, tr( "Image Export Error" ), tr( "Trying to create image %1 (%2×%3 @ %4dpi ) "
-                                                                  "resulted in a memory overflow.\n\n"
-                                                                  "Please try a lower resolution or a smaller paper size." )
-                                                                .arg( QDir::toNativeSeparators( exporter.errorFile() ) )
-                                                                .arg( imageSize.width() )
-                                                                .arg( imageSize.height() )
-                                                                .arg( settings.dpi ),
-                            QMessageBox::Ok, QMessageBox::Ok );
+      QMessageBox::warning(
+        this,
+        tr( "Image Export Error" ),
+        tr(
+          "Trying to create image %1 (%2×%3 @ %4dpi ) "
+          "resulted in a memory overflow.\n\n"
+          "Please try a lower resolution or a smaller paper size."
+        )
+          .arg( QDir::toNativeSeparators( exporter.errorFile() ) )
+          .arg( imageSize.width() )
+          .arg( imageSize.height() )
+          .arg( settings.dpi ),
+        QMessageBox::Ok,
+        QMessageBox::Ok
+      );
       break;
   }
   mView->setPaintingEnabled( true );
@@ -1318,12 +1269,7 @@ void KadasLayoutDesignerDialog::exportToPdf()
   const QString exportPath = defaultExportPath();
   QString outputFileName = exportPath + '/' + QgsFileUtils::stringToSafeFilename( mLayout->name() ) + QStringLiteral( ".pdf" );
 
-  outputFileName = QFileDialog::getSaveFileName(
-    this,
-    tr( "Export to PDF" ),
-    outputFileName,
-    tr( "PDF Format" ) + " (*.pdf *.PDF)"
-  );
+  outputFileName = QFileDialog::getSaveFileName( this, tr( "Export to PDF" ), outputFileName, tr( "PDF Format" ) + " (*.pdf *.PDF)" );
   this->activateWindow();
   if ( outputFileName.isEmpty() )
   {
@@ -1356,7 +1302,8 @@ void KadasLayoutDesignerDialog::exportToPdf()
   {
     case QgsLayoutExporter::Success:
     {
-      mMessageBar->pushMessage( tr( "Export layout" ), tr( "Successfully exported layout to <a href=\"%1\">%2</a>" ).arg( QUrl::fromLocalFile( outputFileName ).toString(), QDir::toNativeSeparators( outputFileName ) ), Qgis::Success, 0 );
+      mMessageBar
+        ->pushMessage( tr( "Export layout" ), tr( "Successfully exported layout to <a href=\"%1\">%2</a>" ).arg( QUrl::fromLocalFile( outputFileName ).toString(), QDir::toNativeSeparators( outputFileName ) ), Qgis::Success, 0 );
       break;
     }
 
@@ -1373,10 +1320,17 @@ void KadasLayoutDesignerDialog::exportToPdf()
 
     case QgsLayoutExporter::MemoryError:
       cursorOverride.release();
-      QMessageBox::warning( this, tr( "Export to PDF" ), tr( "Exporting the PDF "
-                                                             "resulted in a memory overflow.\n\n"
-                                                             "Please try a lower resolution or a smaller paper size." ),
-                            QMessageBox::Ok, QMessageBox::Ok );
+      QMessageBox::warning(
+        this,
+        tr( "Export to PDF" ),
+        tr(
+          "Exporting the PDF "
+          "resulted in a memory overflow.\n\n"
+          "Please try a lower resolution or a smaller paper size."
+        ),
+        QMessageBox::Ok,
+        QMessageBox::Ok
+      );
       break;
 
     case QgsLayoutExporter::SvgLayerError:
@@ -1515,7 +1469,9 @@ void KadasLayoutDesignerDialog::initializeRegistry()
     return newWidget.release();
   } );
 
-  QgsGui::layoutItemGuiRegistry()->addLayoutItemGuiMetadata( new QgsLayoutItemGuiMetadata( QgsLayoutItemRegistry::LayoutPage, QObject::tr( "Page" ), QIcon(), createPageWidget, nullptr, QString(), false, QgsLayoutItemAbstractGuiMetadata::FlagNoCreationTools ) );
+  QgsGui::layoutItemGuiRegistry()->addLayoutItemGuiMetadata(
+    new QgsLayoutItemGuiMetadata( QgsLayoutItemRegistry::LayoutPage, QObject::tr( "Page" ), QIcon(), createPageWidget, nullptr, QString(), false, QgsLayoutItemAbstractGuiMetadata::FlagNoCreationTools )
+  );
 }
 
 bool KadasLayoutDesignerDialog::getRasterExportSettings( QgsLayoutExporter::ImageExportSettings &settings, QSize &imageSize )

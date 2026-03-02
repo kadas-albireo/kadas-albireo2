@@ -31,8 +31,7 @@
 KadasLayoutAppMenuProvider::KadasLayoutAppMenuProvider( KadasLayoutDesignerDialog *designer )
   : QObject( nullptr )
   , mDesigner( designer )
-{
-}
+{}
 
 QMenu *KadasLayoutAppMenuProvider::createContextMenu( QWidget *parent, QgsLayout *layout, QPointF layoutPoint ) const
 {
@@ -51,9 +50,7 @@ QMenu *KadasLayoutAppMenuProvider::createContextMenu( QWidget *parent, QgsLayout
     if ( selectedItems.count() > 1 )
     {
       QAction *groupAction = new QAction( tr( "Group" ), menu );
-      connect( groupAction, &QAction::triggered, this, [this]() {
-        mDesigner->view()->groupSelectedItems();
-      } );
+      connect( groupAction, &QAction::triggered, this, [this]() { mDesigner->view()->groupSelectedItems(); } );
       menu->addAction( groupAction );
       addedGroupAction = true;
     }
@@ -71,9 +68,7 @@ QMenu *KadasLayoutAppMenuProvider::createContextMenu( QWidget *parent, QgsLayout
     if ( foundSelectedGroup )
     {
       QAction *ungroupAction = new QAction( tr( "Ungroup" ), menu );
-      connect( ungroupAction, &QAction::triggered, this, [this]() {
-        mDesigner->view()->ungroupSelectedItems();
-      } );
+      connect( ungroupAction, &QAction::triggered, this, [this]() { mDesigner->view()->ungroupSelectedItems(); } );
       menu->addAction( ungroupAction );
       addedGroupAction = true;
     }
@@ -82,14 +77,10 @@ QMenu *KadasLayoutAppMenuProvider::createContextMenu( QWidget *parent, QgsLayout
       menu->addSeparator();
 
     QAction *copyAction = new QAction( tr( "Copy" ), menu );
-    connect( copyAction, &QAction::triggered, this, [this]() {
-      mDesigner->view()->copySelectedItems( QgsLayoutView::ClipboardCopy );
-    } );
+    connect( copyAction, &QAction::triggered, this, [this]() { mDesigner->view()->copySelectedItems( QgsLayoutView::ClipboardCopy ); } );
     menu->addAction( copyAction );
     QAction *cutAction = new QAction( tr( "Cut" ), menu );
-    connect( cutAction, &QAction::triggered, this, [this]() {
-      mDesigner->view()->copySelectedItems( QgsLayoutView::ClipboardCut );
-    } );
+    connect( cutAction, &QAction::triggered, this, [this]() { mDesigner->view()->copySelectedItems( QgsLayoutView::ClipboardCut ); } );
     menu->addAction( cutAction );
     menu->addSeparator();
   }
@@ -110,9 +101,7 @@ QMenu *KadasLayoutAppMenuProvider::createContextMenu( QWidget *parent, QgsLayout
   {
     const int pageNumber = layout->pageCollection()->pageNumber( page );
     QAction *pagePropertiesAction = new QAction( tr( "Page Properties…" ), menu );
-    connect( pagePropertiesAction, &QAction::triggered, this, [this, page]() {
-      mDesigner->showItemOptions( page, true );
-    } );
+    connect( pagePropertiesAction, &QAction::triggered, this, [this, page]() { mDesigner->showItemOptions( page, true ); } );
     menu->addAction( pagePropertiesAction );
 
     if ( mDesigner->guideWidget() )
@@ -130,8 +119,7 @@ QMenu *KadasLayoutAppMenuProvider::createContextMenu( QWidget *parent, QgsLayout
     }
     QAction *removePageAction = new QAction( tr( "Remove Page" ), menu );
     connect( removePageAction, &QAction::triggered, this, [layout, page]() {
-      if ( QMessageBox::question( nullptr, tr( "Remove Page" ), tr( "Remove page from layout?" ), QMessageBox::Yes | QMessageBox::No )
-           == QMessageBox::Yes )
+      if ( QMessageBox::question( nullptr, tr( "Remove Page" ), tr( "Remove page from layout?" ), QMessageBox::Yes | QMessageBox::No ) == QMessageBox::Yes )
       {
         layout->pageCollection()->deletePage( page );
       }
@@ -147,9 +135,7 @@ QMenu *KadasLayoutAppMenuProvider::createContextMenu( QWidget *parent, QgsLayout
   {
     QAction *itemPropertiesAction = new QAction( tr( "Item Properties…" ), menu );
     QgsLayoutItem *item = selectedItems.at( 0 );
-    connect( itemPropertiesAction, &QAction::triggered, this, [this, item]() {
-      mDesigner->showItemOptions( item, true );
-    } );
+    connect( itemPropertiesAction, &QAction::triggered, this, [this, item]() { mDesigner->showItemOptions( item, true ); } );
     menu->addAction( itemPropertiesAction );
   }
 

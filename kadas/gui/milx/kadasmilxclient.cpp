@@ -39,8 +39,7 @@
 
 KadasMilxClientWorker::KadasMilxClientWorker( bool sync )
   : mSync( sync )
-{
-}
+{}
 
 void KadasMilxClientWorker::cleanup()
 {
@@ -92,9 +91,7 @@ bool KadasMilxClientWorker::initialize()
   {
     mProcess = new QProcess( this );
     connect( mProcess, qOverload<int, QProcess::ExitStatus>( &QProcess::finished ), this, &KadasMilxClientWorker::cleanup );
-    connect( mProcess, &QProcess::errorOccurred, this, []( QProcess::ProcessError error ) {
-      qWarning() << QStringLiteral( "Could not start milxserver: Error %1" ).arg( error );
-    } );
+    connect( mProcess, &QProcess::errorOccurred, this, []( QProcess::ProcessError error ) { qWarning() << QStringLiteral( "Could not start milxserver: Error %1" ).arg( error ); } );
 
     const QString serverPath = QCoreApplication::applicationDirPath() + QStringLiteral( "/milxserver.exe" );
     mProcess->setProgram( serverPath );
@@ -322,7 +319,8 @@ KadasMilxClient *KadasMilxClient::instance()
 }
 
 KadasMilxClient::KadasMilxClient()
-  : mAsyncWorker( false ), mSyncWorker( true )
+  : mAsyncWorker( false )
+  , mSyncWorker( true )
 {
   mSyncWorker.moveToThread( this );
   start();
@@ -342,7 +340,8 @@ bool KadasMilxClient::processRequest( const QByteArray &request, QByteArray &res
   if ( QThread::currentThread() != qApp->thread() || !async )
   {
     bool result;
-    QMetaObject::invokeMethod( &mSyncWorker, "processRequest", Qt::BlockingQueuedConnection, Q_RETURN_ARG( bool, result ), Q_ARG( const QByteArray &, request ), Q_ARG( QByteArray &, response ), Q_ARG( quint8, expectedReply ) );
+    QMetaObject::
+      invokeMethod( &mSyncWorker, "processRequest", Qt::BlockingQueuedConnection, Q_RETURN_ARG( bool, result ), Q_ARG( const QByteArray &, request ), Q_ARG( QByteArray &, response ), Q_ARG( quint8, expectedReply ) );
     return result;
   }
   else
@@ -443,7 +442,20 @@ bool KadasMilxClient::appendPoint( const QRect &visibleExtent, int dpi, const NP
 {
   QByteArray request;
   QDataStream istream( &request, QIODevice::WriteOnly );
-  istream << MILX_REQUEST_APPEND_POINT << visibleExtent << dpi << symbol.xml << symbol.points << symbol.controlPoints << symbol.attributes << symbol.finalized << symbol.colored << newPoint << settings.symbolSize << settings.lineWidth << settings.workMode;
+  istream
+    << MILX_REQUEST_APPEND_POINT
+    << visibleExtent
+    << dpi
+    << symbol.xml
+    << symbol.points
+    << symbol.controlPoints
+    << symbol.attributes
+    << symbol.finalized
+    << symbol.colored
+    << newPoint
+    << settings.symbolSize
+    << settings.lineWidth
+    << settings.workMode;
 
   QByteArray response;
   if ( !instance()->processRequest( request, response, MILX_REPLY_APPEND_POINT ) )
@@ -462,7 +474,20 @@ bool KadasMilxClient::insertPoint( const QRect &visibleExtent, int dpi, const NP
 {
   QByteArray request;
   QDataStream istream( &request, QIODevice::WriteOnly );
-  istream << MILX_REQUEST_INSERT_POINT << visibleExtent << dpi << symbol.xml << symbol.points << symbol.controlPoints << symbol.attributes << symbol.finalized << symbol.colored << newPoint << settings.symbolSize << settings.lineWidth << settings.workMode;
+  istream
+    << MILX_REQUEST_INSERT_POINT
+    << visibleExtent
+    << dpi
+    << symbol.xml
+    << symbol.points
+    << symbol.controlPoints
+    << symbol.attributes
+    << symbol.finalized
+    << symbol.colored
+    << newPoint
+    << settings.symbolSize
+    << settings.lineWidth
+    << settings.workMode;
 
   QByteArray response;
   if ( !instance()->processRequest( request, response, MILX_REPLY_INSERT_POINT ) )
@@ -481,7 +506,21 @@ bool KadasMilxClient::movePoint( const QRect &visibleExtent, int dpi, const NPoi
 {
   QByteArray request;
   QDataStream istream( &request, QIODevice::WriteOnly );
-  istream << MILX_REQUEST_MOVE_POINT << visibleExtent << dpi << symbol.xml << symbol.points << symbol.controlPoints << symbol.attributes << symbol.finalized << symbol.colored << index << newPos << settings.symbolSize << settings.lineWidth << settings.workMode;
+  istream
+    << MILX_REQUEST_MOVE_POINT
+    << visibleExtent
+    << dpi
+    << symbol.xml
+    << symbol.points
+    << symbol.controlPoints
+    << symbol.attributes
+    << symbol.finalized
+    << symbol.colored
+    << index
+    << newPos
+    << settings.symbolSize
+    << settings.lineWidth
+    << settings.workMode;
 
   QByteArray response;
   if ( !instance()->processRequest( request, response, MILX_REPLY_MOVE_POINT ) )
@@ -500,7 +539,21 @@ bool KadasMilxClient::moveAttributePoint( const QRect &visibleExtent, int dpi, c
 {
   QByteArray request;
   QDataStream istream( &request, QIODevice::WriteOnly );
-  istream << MILX_REQUEST_MOVE_ATTRIBUTE_POINT << visibleExtent << dpi << symbol.xml << symbol.points << symbol.controlPoints << symbol.attributes << symbol.finalized << symbol.colored << attr << newPos << settings.symbolSize << settings.lineWidth << settings.workMode;
+  istream
+    << MILX_REQUEST_MOVE_ATTRIBUTE_POINT
+    << visibleExtent
+    << dpi
+    << symbol.xml
+    << symbol.points
+    << symbol.controlPoints
+    << symbol.attributes
+    << symbol.finalized
+    << symbol.colored
+    << attr
+    << newPos
+    << settings.symbolSize
+    << settings.lineWidth
+    << settings.workMode;
 
   QByteArray response;
   if ( !instance()->processRequest( request, response, MILX_REPLY_MOVE_ATTRIBUTE_POINT ) )
@@ -538,7 +591,20 @@ bool KadasMilxClient::deletePoint( const QRect &visibleExtent, int dpi, const NP
 {
   QByteArray request;
   QDataStream istream( &request, QIODevice::WriteOnly );
-  istream << MILX_REQUEST_DELETE_POINT << visibleExtent << dpi << symbol.xml << symbol.points << symbol.controlPoints << symbol.attributes << symbol.finalized << symbol.colored << index << settings.symbolSize << settings.lineWidth << settings.workMode;
+  istream
+    << MILX_REQUEST_DELETE_POINT
+    << visibleExtent
+    << dpi
+    << symbol.xml
+    << symbol.points
+    << symbol.controlPoints
+    << symbol.attributes
+    << symbol.finalized
+    << symbol.colored
+    << index
+    << settings.symbolSize
+    << settings.lineWidth
+    << settings.workMode;
 
   QByteArray response;
   if ( !instance()->processRequest( request, response, MILX_REPLY_DELETE_POINT ) )
@@ -553,7 +619,9 @@ bool KadasMilxClient::deletePoint( const QRect &visibleExtent, int dpi, const NP
   return true;
 }
 
-bool KadasMilxClient::editSymbol( const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, QString &newSymbolXml, QString &newSymbolMilitaryName, const KadasMilxSymbolSettings &settings, NPointSymbolGraphic &result, WId parentWid )
+bool KadasMilxClient::editSymbol(
+  const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, QString &newSymbolXml, QString &newSymbolMilitaryName, const KadasMilxSymbolSettings &settings, NPointSymbolGraphic &result, WId parentWid
+)
 {
 #ifdef Q_OS_WIN
   WId wid = parentWid;
@@ -564,7 +632,20 @@ bool KadasMilxClient::editSymbol( const QRect &visibleExtent, int dpi, const NPo
 
   QByteArray request;
   QDataStream istream( &request, QIODevice::WriteOnly );
-  istream << MILX_REQUEST_EDIT_SYMBOL << visibleExtent << dpi << symbol.xml << symbol.points << symbol.controlPoints << symbol.attributes << symbol.finalized << symbol.colored << settings.symbolSize << settings.lineWidth << settings.workMode << wid;
+  istream
+    << MILX_REQUEST_EDIT_SYMBOL
+    << visibleExtent
+    << dpi
+    << symbol.xml
+    << symbol.points
+    << symbol.controlPoints
+    << symbol.attributes
+    << symbol.finalized
+    << symbol.colored
+    << settings.symbolSize
+    << settings.lineWidth
+    << settings.workMode
+    << wid;
 
   QByteArray response;
   if ( !instance()->processRequest( request, response, MILX_REPLY_EDIT_SYMBOL, true ) )
@@ -840,7 +921,9 @@ bool KadasMilxClient::getControlPointIndices( const QString &symbolXml, int nPoi
   return true;
 }
 
-bool KadasMilxClient::getControlPoints( const QString &symbolXml, QList<QPoint> &points, const QList<QPair<int, double>> &attributes, QList<int> &controlPoints, bool isCorridor, const KadasMilxSymbolSettings &settings )
+bool KadasMilxClient::getControlPoints(
+  const QString &symbolXml, QList<QPoint> &points, const QList<QPair<int, double>> &attributes, QList<int> &controlPoints, bool isCorridor, const KadasMilxSymbolSettings &settings
+)
 {
   QByteArray request;
   QDataStream istream( &request, QIODevice::WriteOnly );

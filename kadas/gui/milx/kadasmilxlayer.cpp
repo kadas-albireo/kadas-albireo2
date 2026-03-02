@@ -100,8 +100,7 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
 
 KadasMilxLayer::KadasMilxLayer( const QString &name )
   : KadasItemLayer( name, QgsCoordinateReferenceSystem( "EPSG:4326" ), layerType() )
-{
-}
+{}
 
 bool KadasMilxLayer::acceptsItem( const KadasMapItem *item ) const
 {
@@ -265,9 +264,7 @@ void KadasMilxLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *l
   if ( dynamic_cast<KadasMilxLayer *>( layer ) )
   {
     KadasMilxLayer *milxLayer = static_cast<KadasMilxLayer *>( layer );
-    QAction *action = menu->addAction( tr( "Approved layer" ), [milxLayer] {
-      milxLayer->setApproved( !milxLayer->isApproved() );
-    } );
+    QAction *action = menu->addAction( tr( "Approved layer" ), [milxLayer] { milxLayer->setApproved( !milxLayer->isApproved() ); } );
     action->setCheckable( true );
     action->setChecked( milxLayer->isApproved() );
   }

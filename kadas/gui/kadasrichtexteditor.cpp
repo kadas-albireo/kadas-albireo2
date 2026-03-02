@@ -395,7 +395,12 @@ void KadasColorAction::chooseColor()
 ///////////////////////////////////////////////////////////////////////////////
 
 KadasRichTextEditorToolBar::KadasRichTextEditorToolBar( KadasRichTextEditor *editor, QWidget *parent )
-  : QToolBar( parent ), m_link_action( new QAction( this ) ), m_image_action( new QAction( this ) ), m_color_action( new KadasColorAction( this ) ), m_font_size_input( new QComboBox ), m_editor( editor )
+  : QToolBar( parent )
+  , m_link_action( new QAction( this ) )
+  , m_image_action( new QAction( this ) )
+  , m_color_action( new KadasColorAction( this ) )
+  , m_font_size_input( new QComboBox )
+  , m_editor( editor )
 {
   // Font size combo box
   m_font_size_input->setEditable( false );

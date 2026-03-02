@@ -347,7 +347,12 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual void unregisterProjectPropertiesWidgetFactory( QgsOptionsWidgetFactory *factory ) override {};
     virtual void registerDevToolWidgetFactory( QgsDevToolWidgetFactory *factory ) override {};
     virtual void unregisterDevToolWidgetFactory( QgsDevToolWidgetFactory *factory ) override {};
-    virtual void showApiDocumentation( Qgis::DocumentationApi api = Qgis::DocumentationApi::PyQgis, Qgis::DocumentationBrowser browser = Qgis::DocumentationBrowser::DeveloperToolsPanel, const QString &object = QString(), const QString &module = QString() ) override;
+    virtual void showApiDocumentation(
+      Qgis::DocumentationApi api = Qgis::DocumentationApi::PyQgis,
+      Qgis::DocumentationBrowser browser = Qgis::DocumentationBrowser::DeveloperToolsPanel,
+      const QString &object = QString(),
+      const QString &module = QString()
+    ) override;
     virtual void registerApplicationExitBlocker( QgsApplicationExitBlockerInterface *blocker ) override {};
     virtual void unregisterApplicationExitBlocker( QgsApplicationExitBlockerInterface *blocker ) override {};
     virtual void registerMapToolHandler( QgsAbstractMapToolHandler *handler ) override {};
@@ -366,12 +371,18 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     QWidget *getRibbonTabWidget( ActionRibbonTabLocation ribbonTabLocation, const QString &customName ) override;
 
     //! Generic action adder
-    void addAction( QAction *action, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString(), QgsMapTool *associatedMapTool = nullptr ) override;
-    void addActionMenu( const QString &text, const QIcon &icon, QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString() ) override;
+    void addAction(
+      QAction *action, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString(), QgsMapTool *associatedMapTool = nullptr
+    ) override;
+    void addActionMenu(
+      const QString &text, const QIcon &icon, QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString()
+    ) override;
     void addActionMapCanvasRightClick( QAction *action ) override;
 
     //! Generic action remover
-    void removeAction( QAction *action, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString(), QgsMapTool *associatedMapTool = nullptr ) override;
+    void removeAction(
+      QAction *action, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString(), QgsMapTool *associatedMapTool = nullptr
+    ) override;
     void removeActionMenu( QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName = QString() ) override;
     void removeActionMapCanvasRightClick( QAction *action ) override;
 

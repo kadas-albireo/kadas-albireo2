@@ -577,14 +577,7 @@ void KadasMainWindow::dropEvent( QDropEvent *event )
     mapItemFormats.insert( ".svg" ); // Ensure svg is present
     mapItemFormats.remove( ".tif" ); // Remove tif to ensure it is opened as raster layer
 
-    static QMap<QString, QString> worldFileSuffixes = {
-      { "gif", "gfw" },
-      { "jpg", "jgw" },
-      { "jp2", "j2w" },
-      { "png", "pgw" },
-      { "tif", "tfw" },
-      { "tiff", "tfw" }
-    };
+    static QMap<QString, QString> worldFileSuffixes = { { "gif", "gfw" }, { "jpg", "jgw" }, { "jp2", "j2w" }, { "png", "pgw" }, { "tif", "tfw" }, { "tiff", "tfw" } };
 
     for ( const QUrl &url : event->mimeData()->urls() )
     {
@@ -708,7 +701,9 @@ void KadasMainWindow::configureButtons()
   setActionToButton( mAction3D, m3DButton, QKeySequence( Qt::CTRL + Qt::Key_W, Qt::CTRL + Qt::Key_3 ) );
   // signal connected by plugin
 
-  setActionToButton( mActionGrid, mGridButton, QKeySequence( Qt::CTRL + Qt::Key_W, Qt::CTRL + Qt::Key_G ), [this] { return new KadasMapToolMapGrid( mMapCanvas, mLayerTreeView, mLayerTreeView->currentLayer() ); } );
+  setActionToButton( mActionGrid, mGridButton, QKeySequence( Qt::CTRL + Qt::Key_W, Qt::CTRL + Qt::Key_G ), [this] {
+    return new KadasMapToolMapGrid( mMapCanvas, mLayerTreeView, mLayerTreeView->currentLayer() );
+  } );
 
   // Draw tab
   setActionToButton( mActionPin, mPinButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_M ), [this] { return addPinTool(); } );
@@ -720,9 +715,13 @@ void KadasMainWindow::configureButtons()
   mAddImageButton->setPopupMode( QToolButton::InstantPopup );
   mAddImageButton->setIcon( QIcon( ":/kadas/icons/picture" ) );
 
-  setActionToButton( mActionGuideGrid, mGuideGridButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_G ), [this] { return new KadasMapToolGuideGrid( mMapCanvas, mLayerTreeView, mLayerTreeView->currentLayer() ); } );
+  setActionToButton( mActionGuideGrid, mGuideGridButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_G ), [this] {
+    return new KadasMapToolGuideGrid( mMapCanvas, mLayerTreeView, mLayerTreeView->currentLayer() );
+  } );
 
-  setActionToButton( mActionBullseye, mBullseyeButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_B ), [this] { return new KadasMapToolBullseye( mMapCanvas, mLayerTreeView, mLayerTreeView->currentLayer() ); } );
+  setActionToButton( mActionBullseye, mBullseyeButton, QKeySequence( Qt::CTRL + Qt::Key_D, Qt::CTRL + Qt::Key_B ), [this] {
+    return new KadasMapToolBullseye( mMapCanvas, mLayerTreeView, mLayerTreeView->currentLayer() );
+  } );
 
   setActionToButton( mActionPaste, mPasteButton, QKeySequence( Qt::CTRL + Qt::Key_V ), [] { return kApp->paste(); } );
   mActionPaste->setEnabled( !KadasClipboard::instance()->isEmpty() );
@@ -730,11 +729,17 @@ void KadasMainWindow::configureButtons()
   setActionToButton( mActionDeleteItems, mDeleteItemsButton, QKeySequence(), [this] { return new KadasMapToolDeleteItems( mapCanvas() ); } );
 
   // Analysis tab
-  setActionToButton( mActionDistance, mDistanceButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_D ), [this] { return new KadasMapToolMeasure( mapCanvas(), KadasMapToolMeasure::MeasureMode::MeasureLine ); } );
+  setActionToButton( mActionDistance, mDistanceButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_D ), [this] {
+    return new KadasMapToolMeasure( mapCanvas(), KadasMapToolMeasure::MeasureMode::MeasureLine );
+  } );
 
-  setActionToButton( mActionArea, mAreaButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_A ), [this] { return new KadasMapToolMeasure( mapCanvas(), KadasMapToolMeasure::MeasureMode::MeasurePolygon ); } );
+  setActionToButton( mActionArea, mAreaButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_A ), [this] {
+    return new KadasMapToolMeasure( mapCanvas(), KadasMapToolMeasure::MeasureMode::MeasurePolygon );
+  } );
 
-  setActionToButton( mActionCircle, mMeasureCircleButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_C ), [this] { return new KadasMapToolMeasure( mapCanvas(), KadasMapToolMeasure::MeasureMode::MeasureCircle ); } );
+  setActionToButton( mActionCircle, mMeasureCircleButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_C ), [this] {
+    return new KadasMapToolMeasure( mapCanvas(), KadasMapToolMeasure::MeasureMode::MeasureCircle );
+  } );
 
   setActionToButton( mActionProfile, mProfileButton, QKeySequence( Qt::CTRL + Qt::Key_A, Qt::CTRL + Qt::Key_P ), [this] { return new KadasMapToolHeightProfile( mapCanvas() ); } );
 
@@ -823,9 +828,7 @@ void KadasMainWindow::setActionToButton( QAction *action, QToolButton *button, c
     }
     else
     {
-      connect( action, &QAction::triggered, this, [this, toolFactory] {
-        mMapCanvas->setMapTool( toolFactory() );
-      } );
+      connect( action, &QAction::triggered, this, [this, toolFactory] { mMapCanvas->setMapTool( toolFactory() ); } );
     }
   }
   if ( !shortcut.isEmpty() )
@@ -1056,13 +1059,19 @@ void KadasMainWindow::showSourceSelectDialog( const QString &providerName )
   // TODO
   //  connect(dialog, &QgsAbstractDataSourceWidget::addDatabaseLayers, kApp, &KadasApplication::addDatabaseLayers);
   //  connect(dialog, &QgsAbstractDataSourceWidget::addMeshLayer, kApp, &KadasApplication::addMeshLayer);
-  connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayer, kApp, []( const QString &uri, const QString &baseName, const QString &providerKey ) { kApp->addRasterLayer( uri, baseName, providerKey ); } );
+  connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayer, kApp, []( const QString &uri, const QString &baseName, const QString &providerKey ) {
+    kApp->addRasterLayer( uri, baseName, providerKey );
+  } );
   connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayer, dialog, &QDialog::accept );
-  connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayer, kApp, [=]( const QString &uri, const QString &layerName, const QString &providerKey ) { kApp->addVectorLayer( uri, layerName, !providerKey.isEmpty() ? providerKey : sourceProvider ); } );
+  connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayer, kApp, [=]( const QString &uri, const QString &layerName, const QString &providerKey ) {
+    kApp->addVectorLayer( uri, layerName, !providerKey.isEmpty() ? providerKey : sourceProvider );
+  } );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayer, dialog, &QDialog::accept );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorTileLayer, kApp, []( const QString &url, const QString &baseName ) { kApp->addVectorTileLayer( url, baseName ); } );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorTileLayer, dialog, &QDialog::accept );
-  connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayers, kApp, []( const QStringList &layerUris, const QString &enc, const QString &dataSourceType ) { kApp->addVectorLayers( layerUris, enc, dataSourceType ); } );
+  connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayers, kApp, []( const QStringList &layerUris, const QString &enc, const QString &dataSourceType ) {
+    kApp->addVectorLayers( layerUris, enc, dataSourceType );
+  } );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayers, dialog, &QDialog::accept );
   connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayers, []( const QStringList &layerUris ) { kApp->addRasterLayers( layerUris ); } );
   connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayers, dialog, &QDialog::accept );
@@ -1385,11 +1394,8 @@ void KadasMainWindow::checkLayerProjection( QgsMapLayer *layer )
   {
     QPushButton *btn = new QPushButton( tr( "Manually set projection" ) );
     btn->setFlat( true );
-    QgsMessageBarItem *item = new QgsMessageBarItem(
-      tr( "Unknown layer projection" ),
-      tr( "The projection of the layer %1 could not be recognized, its features might be misplaced." ).arg( layer->name() ),
-      btn, Qgis::Warning, messageTimeout()
-    );
+    QgsMessageBarItem *item
+      = new QgsMessageBarItem( tr( "Unknown layer projection" ), tr( "The projection of the layer %1 could not be recognized, its features might be misplaced." ).arg( layer->name() ), btn, Qgis::Warning, messageTimeout() );
     connect( btn, &QPushButton::clicked, [=] {
       mInfoBar->popWidget( item );
       kApp->showLayerProperties( layer );

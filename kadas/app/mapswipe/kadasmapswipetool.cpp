@@ -55,9 +55,7 @@ void KadasMapSwipeMapTool::addContextMenuAction( QgsMapLayer *layer, QgsMapCanva
     }
     else
     {
-      auto lambda = [tool, canvas, layer]() {
-        tool->addLayers( { layer } );
-      };
+      auto lambda = [tool, canvas, layer]() { tool->addLayers( { layer } ); };
       menu->addAction( icon, tr( "&Add to Comparison with Swipe Tool" ), parent, lambda );
     }
   }
@@ -79,8 +77,7 @@ KadasMapSwipeMapTool::KadasMapSwipeMapTool( QgsMapCanvas *mapCanvas )
 }
 
 KadasMapSwipeMapTool::~KadasMapSwipeMapTool()
-{
-}
+{}
 
 void KadasMapSwipeMapTool::addLayers( const QList<QgsMapLayer *> &layers )
 {

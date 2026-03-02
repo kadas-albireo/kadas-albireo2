@@ -357,10 +357,7 @@ void KadasKMLImport::buildVSIVRT( const QString &name, OverlayData &overlayData,
 
   // Get total size by assuming all tiles have same resolution
   const TileData &firstTile = overlayData.tiles.front();
-  QSize totSize(
-    qRound( firstTile.size.width() / firstTile.bbox.width() * overlayData.bbox.width() ),
-    qRound( firstTile.size.height() / firstTile.bbox.height() * overlayData.bbox.height() )
-  );
+  QSize totSize( qRound( firstTile.size.width() / firstTile.bbox.width() * overlayData.bbox.width() ), qRound( firstTile.size.height() / firstTile.bbox.height() * overlayData.bbox.height() ) );
 
   // Compute image rectangles and merge overlapping images
   QList<KadasAlgorithms::Rect> rects;
@@ -440,7 +437,8 @@ void KadasKMLImport::buildVSIVRT( const QString &name, OverlayData &overlayData,
   vrtStream << "  " << overlayData.bbox.yMaximum() << ", 0," << ( -overlayData.bbox.height() / totSize.height() ) << Qt::endl;
   vrtStream << " </GeoTransform>" << Qt::endl;
 
-  for ( const QPair<int, QString> &band : QList<QPair<int, QString>> { qMakePair( 1, QString( "Red" ) ), qMakePair( 2, QString( "Green" ) ), qMakePair( 3, QString( "Blue" ) ), qMakePair( 4, QString( "Alpha" ) ) } )
+  for ( const QPair<int, QString> &band :
+        QList<QPair<int, QString>> { qMakePair( 1, QString( "Red" ) ), qMakePair( 2, QString( "Green" ) ), qMakePair( 3, QString( "Blue" ) ), qMakePair( 4, QString( "Alpha" ) ) } )
   {
     vrtStream << " <VRTRasterBand dataType=\"Byte\" band=\"" << band.first << "\">" << Qt::endl;
     vrtStream << "  <ColorInterp>" << band.second << "</ColorInterp>" << Qt::endl;
@@ -451,7 +449,15 @@ void KadasKMLImport::buildVSIVRT( const QString &name, OverlayData &overlayData,
       vrtStream << "  <SimpleSource>" << Qt::endl;
       vrtStream << "   <SourceFilename relativeToVRT=\"1\">" << tile.iconHref << "</SourceFilename>" << Qt::endl;
       vrtStream << "   <SourceBand>" << band.first << "</SourceBand>" << Qt::endl;
-      vrtStream << "   <SourceProperties RasterXSize=\"" << tile.size.width() << "\" RasterYSize=\"" << tile.size.height() << "\" DataType=\"Byte\" BlockXSize=\"" << tile.size.width() << "\" BlockYSize=\"1\" />" << Qt::endl;
+      vrtStream
+        << "   <SourceProperties RasterXSize=\""
+        << tile.size.width()
+        << "\" RasterYSize=\""
+        << tile.size.height()
+        << "\" DataType=\"Byte\" BlockXSize=\""
+        << tile.size.width()
+        << "\" BlockYSize=\"1\" />"
+        << Qt::endl;
       vrtStream << "   <SrcRect xOff=\"0\" yOff=\"0\" xSize=\"" << tile.size.width() << "\" ySize=\"" << tile.size.height() << "\" />" << Qt::endl;
       vrtStream << "   <DstRect xOff=\"" << i << "\" yOff=\"" << j << "\" xSize=\"" << tile.size.width() << "\" ySize=\"" << tile.size.height() << "\" />" << Qt::endl;
       vrtStream << "  </SimpleSource>" << Qt::endl;

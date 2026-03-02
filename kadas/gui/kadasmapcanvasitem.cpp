@@ -22,7 +22,8 @@
 #include "kadas/gui/mapitems/kadasmapitem.h"
 
 KadasMapCanvasItem::KadasMapCanvasItem( const KadasMapItem *item, QgsMapCanvas *canvas )
-  : QgsMapCanvasItem( canvas ), mItem( item )
+  : QgsMapCanvasItem( canvas )
+  , mItem( item )
 {
   setZValue( mItem->zIndex() );
   connect( item, &KadasMapItem::changed, this, &KadasMapCanvasItem::updateRect );
@@ -33,9 +34,7 @@ KadasMapCanvasItem::KadasMapCanvasItem( const KadasMapItem *item, QgsMapCanvas *
 
 bool KadasMapCanvasItem::isVisible() const
 {
-  if (
-    ( mItem->associatedLayer() && !layerVisible( mItem->associatedLayer() ) ) || ( mItem->ownerLayer() && !layerVisible( mItem->ownerLayer() ) )
-  )
+  if ( ( mItem->associatedLayer() && !layerVisible( mItem->associatedLayer() ) ) || ( mItem->ownerLayer() && !layerVisible( mItem->ownerLayer() ) ) )
   {
     return false;
   }
@@ -46,9 +45,7 @@ void KadasMapCanvasItem::paint( QPainter *painter )
 {
   if ( mItem && mItem->isVisible() )
   {
-    if (
-      ( mItem->associatedLayer() && !layerVisible( mItem->associatedLayer() ) ) || ( mItem->ownerLayer() && !layerVisible( mItem->ownerLayer() ) )
-    )
+    if ( ( mItem->associatedLayer() && !layerVisible( mItem->associatedLayer() ) ) || ( mItem->ownerLayer() && !layerVisible( mItem->ownerLayer() ) ) )
     {
       return;
     }

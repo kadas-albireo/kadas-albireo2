@@ -127,7 +127,9 @@ QString KadasGpxWaypointItem::asKml( const QgsRenderContext &context, QuaZip *km
     return QString();
   }
 
-  auto color2hex = []( const QColor &c ) { return QString( "%1%2%3%4" ).arg( c.alpha(), 2, 16, QChar( '0' ) ).arg( c.blue(), 2, 16, QChar( '0' ) ).arg( c.green(), 2, 16, QChar( '0' ) ).arg( c.red(), 2, 16, QChar( '0' ) ); };
+  auto color2hex = []( const QColor &c ) {
+    return QString( "%1%2%3%4" ).arg( c.alpha(), 2, 16, QChar( '0' ) ).arg( c.blue(), 2, 16, QChar( '0' ) ).arg( c.green(), 2, 16, QChar( '0' ) ).arg( c.red(), 2, 16, QChar( '0' ) );
+  };
 
   QString outString;
   QTextStream outStream( &outString );

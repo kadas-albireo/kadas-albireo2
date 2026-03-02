@@ -49,12 +49,18 @@ class KADAS_CORE_EXPORT Kadas
 
 
     static inline QgsSettingsTreeNode *sTreeGdalProxy = KadasSettingsTree::treeRoot()->createChildNode( QStringLiteral( "proxy" ) ) SIP_SKIP;
-    static const inline QgsSettingsEntryString *settingsGdalProxyHttp = new QgsSettingsEntryString( QStringLiteral( "http-proxy" ), sTreeGdalProxy, QString(), QStringLiteral( "this will be used to set GDAL_HTTP_PROXY env variable." ) ) SIP_SKIP;
-    static const inline QgsSettingsEntryString *settingsGdalProxyAuth = new QgsSettingsEntryString( QStringLiteral( "proxy-auth" ), sTreeGdalProxy, QString(), QStringLiteral( "this will be used to set GDAL_HTTP_PROXY_AUTH env variable." ) ) SIP_SKIP;
-    static const inline QgsSettingsEntryString *settingsGdalProxyUserPassword = new QgsSettingsEntryString( QStringLiteral( "proxy-user-password" ), sTreeGdalProxy, QString(), QStringLiteral( "this will be used to set GDAL_HTTP_PROXYUSERPWD env variable." ) ) SIP_SKIP;
-    static const inline QgsSettingsEntryString *settingsGdalHttpAuth = new QgsSettingsEntryString( QStringLiteral( "http-auth" ), sTreeGdalProxy, QString(), QStringLiteral( "this will be used to set GDAL_HTTP_AUTH env variable." ) ) SIP_SKIP;
-    static const inline QgsSettingsEntryString *settingsGdalHttpUserPassword = new QgsSettingsEntryString( QStringLiteral( "http-user-password" ), sTreeGdalProxy, QString(), QStringLiteral( "this will be used to set GDAL_HTTP_USERPWD env variable." ) ) SIP_SKIP;
-    static const inline QgsSettingsEntryBool *settingsGdalUnsetEnvVar = new QgsSettingsEntryBool( QStringLiteral( "unset-env-vars" ), sTreeGdalProxy, false, QStringLiteral( "if this is set, the environment variable GDAL_PROXY_AUTH will be unset." ) ) SIP_SKIP;
+    static const inline QgsSettingsEntryString *settingsGdalProxyHttp
+      = new QgsSettingsEntryString( QStringLiteral( "http-proxy" ), sTreeGdalProxy, QString(), QStringLiteral( "this will be used to set GDAL_HTTP_PROXY env variable." ) ) SIP_SKIP;
+    static const inline QgsSettingsEntryString *settingsGdalProxyAuth
+      = new QgsSettingsEntryString( QStringLiteral( "proxy-auth" ), sTreeGdalProxy, QString(), QStringLiteral( "this will be used to set GDAL_HTTP_PROXY_AUTH env variable." ) ) SIP_SKIP;
+    static const inline QgsSettingsEntryString *settingsGdalProxyUserPassword
+      = new QgsSettingsEntryString( QStringLiteral( "proxy-user-password" ), sTreeGdalProxy, QString(), QStringLiteral( "this will be used to set GDAL_HTTP_PROXYUSERPWD env variable." ) ) SIP_SKIP;
+    static const inline QgsSettingsEntryString *settingsGdalHttpAuth
+      = new QgsSettingsEntryString( QStringLiteral( "http-auth" ), sTreeGdalProxy, QString(), QStringLiteral( "this will be used to set GDAL_HTTP_AUTH env variable." ) ) SIP_SKIP;
+    static const inline QgsSettingsEntryString *settingsGdalHttpUserPassword
+      = new QgsSettingsEntryString( QStringLiteral( "http-user-password" ), sTreeGdalProxy, QString(), QStringLiteral( "this will be used to set GDAL_HTTP_USERPWD env variable." ) ) SIP_SKIP;
+    static const inline QgsSettingsEntryBool *settingsGdalUnsetEnvVar
+      = new QgsSettingsEntryBool( QStringLiteral( "unset-env-vars" ), sTreeGdalProxy, false, QStringLiteral( "if this is set, the environment variable GDAL_PROXY_AUTH will be unset." ) ) SIP_SKIP;
 
     // Path where user-configuration is stored
     static QString configPath();

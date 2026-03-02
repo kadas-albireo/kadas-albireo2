@@ -120,9 +120,7 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
 
   mMilxLibrary = new KadasMilxLibrary( kApp->mainWindow()->winId() );
 
-  KadasMapItemEditor::registry()->insert( "KadasMilxEditor", [this]( KadasMapItem *item, KadasMapItemEditor::EditorType type ) {
-    return new KadasMilxEditor( item, type, mMilxLibrary );
-  } );
+  KadasMapItemEditor::registry()->insert( "KadasMilxEditor", [this]( KadasMapItem *item, KadasMapItemEditor::EditorType type ) { return new KadasMilxEditor( item, type, mMilxLibrary ); } );
 
   kApp->mainWindow()->addCustomDropHandler( &mDropHandler );
 

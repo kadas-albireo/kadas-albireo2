@@ -65,12 +65,8 @@ class KadasHeightProfileDialog::ScaleDraw : public QwtScaleDraw
   public:
     ScaleDraw( double maxVal, int nSamples )
       : mFactor( maxVal / nSamples )
-    {
-    }
-    QwtText label( double value ) const override
-    {
-      return QLocale::system().toString( value * mFactor );
-    }
+    {}
+    QwtText label( double value ) const override { return QLocale::system().toString( value * mFactor ); }
 
   private:
     double mFactor;
@@ -80,7 +76,8 @@ class PaddedPlotMarker : public QwtPlotMarker
 {
   public:
     PaddedPlotMarker()
-      : QwtPlotMarker() {}
+      : QwtPlotMarker()
+    {}
     void getCanvasMarginHint( const QwtScaleMap & /*xMap*/, const QwtScaleMap & /*yMap*/, const QRectF & /*canvasSize*/, double &left, double &top, double &right, double &bottom ) const override
     {
       left = 15;
@@ -517,8 +514,7 @@ void KadasHeightProfileDialog::replot()
           double lambdaR = row - std::floor( row );
           double lambdaC = col - std::floor( col );
 
-          double value = ( pixValues[0] * ( 1. - lambdaC ) + pixValues[1] * lambdaC ) * ( 1. - lambdaR )
-                         + ( pixValues[2] * ( 1. - lambdaC ) + pixValues[3] * lambdaC ) * ( lambdaR );
+          double value = ( pixValues[0] * ( 1. - lambdaC ) + pixValues[1] * lambdaC ) * ( 1. - lambdaR ) + ( pixValues[2] * ( 1. - lambdaC ) + pixValues[3] * lambdaC ) * ( lambdaR );
           mPlotSamples.append( QPointF( mPlotSamples.size(), value * heightConversion ) );
 
           if ( mStatisticsValues.contains( Statistics::MinHeight ) )

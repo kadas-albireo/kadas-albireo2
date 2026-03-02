@@ -142,10 +142,7 @@ void KadasMapToolPan::canvasReleaseEvent( QgsMapMouseEvent *e )
 
         QgsPointXY c = mCanvas->getCoordinateTransform()->toMapCoordinates( mExtentRect.center() );
         QgsRectangle oe = mCanvas->mapSettings().extent();
-        QgsRectangle e(
-          c.x() - oe.width() / 2.0, c.y() - oe.height() / 2.0,
-          c.x() + oe.width() / 2.0, c.y() + oe.height() / 2.0
-        );
+        QgsRectangle e( c.x() - oe.width() / 2.0, c.y() - oe.height() / 2.0, c.x() + oe.width() / 2.0, c.y() + oe.height() / 2.0 );
         e.scale( scaleFactor, &c );
         mCanvas->setExtent( e, true );
         mCanvas->refresh();

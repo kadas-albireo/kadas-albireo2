@@ -318,12 +318,8 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
     area = area.buffered( area.width() );
   }
 
-  KadasLatLonToUTM::Grid grid = KadasLatLonToUTM::computeGrid(
-    area,
-    mapScale,
-    mRenderGridConfig.gridType == KadasMapGridLayer::GridMGRS ? KadasLatLonToUTM::GridMode::GridMGRS : KadasLatLonToUTM::GridMode::GridUTM,
-    mRenderGridConfig.cellSize
-  );
+  KadasLatLonToUTM::Grid grid = KadasLatLonToUTM::
+    computeGrid( area, mapScale, mRenderGridConfig.gridType == KadasMapGridLayer::GridMGRS ? KadasLatLonToUTM::GridMode::GridMGRS : KadasLatLonToUTM::GridMode::GridUTM, mRenderGridConfig.cellSize );
 
   // Draw grid lines
   for ( const auto &gridLine : std::as_const( grid.lines ) )
@@ -439,7 +435,16 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
   }
 }
 
-QRect KadasMapGridLayerRenderer::drawMgrsGridZoneLabel( const KadasLatLonToUTM::ZoneLabel &zoneLabel, bool adaptToScreen, const QgsCoordinateTransform &crst, const QRect &screenExtent, double mapScale, const QColor &bufferColor, const QFont &font, const QList<QRect> &drawnLabelsRects )
+QRect KadasMapGridLayerRenderer::drawMgrsGridZoneLabel(
+  const KadasLatLonToUTM::ZoneLabel &zoneLabel,
+  bool adaptToScreen,
+  const QgsCoordinateTransform &crst,
+  const QRect &screenExtent,
+  double mapScale,
+  const QColor &bufferColor,
+  const QFont &font,
+  const QList<QRect> &drawnLabelsRects
+)
 {
   double zoneFontSize = exponentialScale( mapScale, zoneLabel.fontSizeMaxScale, zoneLabel.fontSizeMinScale, zoneLabel.fontSizeMax, zoneLabel.fontSizeMin );
 

@@ -35,7 +35,8 @@ class KADAS_CORE_EXPORT KadasPluginLayer : public QgsPluginLayer
 
   public:
     KadasPluginLayer( const QString &layerType, const QString &layerName = QString() )
-      : QgsPluginLayer( layerType, layerName ) {}
+      : QgsPluginLayer( layerType, layerName )
+    {}
 
 
     virtual QString layerTypeKey() const = 0;
@@ -51,7 +52,10 @@ class KADAS_CORE_EXPORT KadasPluginLayer : public QgsPluginLayer
     {
       public:
         IdentifyResult( const QString &featureName, const QMap<QString, QVariant> &attributes, const QgsGeometry &geom )
-          : mFeatureName( featureName ), mAttributes( attributes ), mGeom( geom ) {}
+          : mFeatureName( featureName )
+          , mAttributes( attributes )
+          , mGeom( geom )
+        {}
         const QString &featureName() const { return mFeatureName; }
         const QMap<QString, QVariant> &attributes() const { return mAttributes; }
         const QgsGeometry &geometry() const { return mGeom; }
@@ -73,7 +77,8 @@ class KADAS_CORE_EXPORT KadasPluginLayerType : public QObject, public QgsPluginL
 {
   public:
     KadasPluginLayerType( const QString &name )
-      : QgsPluginLayerType( name ) {}
+      : QgsPluginLayerType( name )
+    {}
 
     virtual void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const {};
 

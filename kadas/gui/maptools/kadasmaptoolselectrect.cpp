@@ -23,8 +23,7 @@
 
 KadasMapToolSelectRect::KadasMapToolSelectRect( QgsMapCanvas *mapCanvas )
   : QgsMapTool( mapCanvas )
-{
-}
+{}
 
 void KadasMapToolSelectRect::setRect( const QgsRectangle &rect )
 {

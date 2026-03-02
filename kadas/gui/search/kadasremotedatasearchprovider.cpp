@@ -199,12 +199,7 @@ void KadasRemoteDataSearchProvider::triggerResult( const QgsLocatorResult &resul
   QgsPointXY pos = data.value( QStringLiteral( "pos" ) ).value<QgsPointXY>();
   QString crs = data.value( QStringLiteral( "crs" ) ).toString();
 
-  QgsPointXY itemPos = QgsCoordinateTransform(
-                         QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ),
-                         mMapCanvas->mapSettings().destinationCrs(),
-                         QgsProject::instance()
-  )
-                         .transform( pos );
+  QgsPointXY itemPos = QgsCoordinateTransform( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), mMapCanvas->mapSettings().destinationCrs(), QgsProject::instance() ).transform( pos );
 
   QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( QgsPoint( itemPos ) );
   QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );
