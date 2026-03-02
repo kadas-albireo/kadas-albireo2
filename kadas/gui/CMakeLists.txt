@@ -171,7 +171,6 @@ add_library(kadas_gui ${kadas_gui_SRC} ${kadas_gui_HDR} ${kadas_gui_UI})
 
 pkg_search_module(CAIRO IMPORTED_TARGET cairo REQUIRED)
 pkg_search_module(LIBRSVG IMPORTED_TARGET librsvg-2.0 REQUIRED)
-pkg_search_module(SVG2SVGT IMPORTED_TARGET svg2svgt REQUIRED)
 
 find_package(Qwt REQUIRED)
 find_package(GeographicLib REQUIRED)
@@ -187,7 +186,6 @@ target_link_libraries(
   QGIS::Gui
   ${GeographicLib_LIBRARIES}
   PkgConfig::LIBRSVG
-  PkgConfig::SVG2SVGT
   PkgConfig::CAIRO
   Exiv2::exiv2lib
   Qwt::Qwt
