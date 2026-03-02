@@ -141,8 +141,8 @@ jobs:
           # lrelease is run from cmake for app
           # plugins need to be handled
           export PATH="${{ github.workspace }}\build\vcpkg_installed\x64-windows\tools\Qt6\bin:${PATH}"
-          for PLUGIN in about gpkg print; do
-            lrelease share/python/plugins/kadas_${PLUGIN}/kadas_${PLUGIN}_ts.pro
+          for PLUGIN in about gpkg print ephem; do
+            lrelease share/python/plugins/kadas_${PLUGIN}/i18n/*.ts
           done
 
       - name: 🌋 Build
