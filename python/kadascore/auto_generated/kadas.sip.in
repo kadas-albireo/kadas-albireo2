@@ -17,9 +17,8 @@ typedef void *GDALDatasetH;
 
 class Kadas
 {
-
 %TypeHeaderCode
-#include "kadas/core/kadas.h"
+#include "kadas.h"
 %End
   public:
     static const char *KADAS_VERSION;

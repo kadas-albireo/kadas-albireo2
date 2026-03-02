@@ -37,3 +37,9 @@ KadasGeometryItem.IconType.__doc__ = """A full triangle is used to highlight poi
 
 """
 # --
+try:
+    KadasGeometryItem.__virtual_methods__ = ['measureGeometry']
+    KadasGeometryItem.__abstract_methods__ = ['geometryType', 'addPartFromGeometry', 'recomputeDerived']
+    KadasGeometryItem.__overridden_methods__ = ['boundingBox', 'margin', 'nodes', 'intersects', 'closestPoint', 'render', 'clear', 'setState']
+except (NameError, AttributeError):
+    pass

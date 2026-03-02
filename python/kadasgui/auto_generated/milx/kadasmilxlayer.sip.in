@@ -15,16 +15,16 @@ class KadasMilxLayer : KadasItemLayer
 %Docstring(signature="appended")
 *************************************************************************
 
-This program is free software; you can redistribute it and/or modify  *
-it under the terms of the GNU General Public License as published by  *
-the Free Software Foundation; either version 2 of the License, or     *
-(at your option) any later version.                                   *
+This program is free software; you can redistribute it and/or modify *
+it under the terms of the GNU General Public License as published by *
+the Free Software Foundation; either version 2 of the License, or * (at
+your option) any later version. *
 
 **************************************************************************
 %End
 
 %TypeHeaderCode
-#include "kadas/gui/milx/kadasmilxlayer.h"
+#include "kadasmilxlayer.h"
 %End
   public:
     static QString layerType();
@@ -78,12 +78,12 @@ the Free Software Foundation; either version 2 of the License, or     *
 
 class KadasMilxLayerType : KadasPluginLayerType
 {
-
 %TypeHeaderCode
-#include "kadas/gui/milx/kadasmilxlayer.h"
+#include "kadasmilxlayer.h"
 %End
   public:
     KadasMilxLayerType();
+    virtual QgsPluginLayer *createLayer() /Factory/;
     virtual QgsPluginLayer *createLayer( const QString &uri ) /Factory/;
     virtual void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const;
 

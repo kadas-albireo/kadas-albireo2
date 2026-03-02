@@ -1,5 +1,6 @@
 # The following has been generated automatically from kadas/gui/kadasattributetabledialog.h
 try:
     KadasAttributeTableDialog.createFromXml = staticmethod(KadasAttributeTableDialog.createFromXml)
-except AttributeError:
+    KadasAttributeTableDialog.__overridden_methods__ = ['showEvent']
+except (NameError, AttributeError):
     pass
