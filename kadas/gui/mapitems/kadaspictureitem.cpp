@@ -52,10 +52,7 @@ class QVector3 : public QGenericMatrix<1, 3, float>
       return *this;
     }
     float operator[]( int idx ) const { return ( *this )( idx, 0 ); }
-    operator std::array<float, 3>() const
-    {
-      return { ( *this )[0], ( *this )[1], ( *this )[2] };
-    }
+    operator std::array<float, 3>() const { return { ( *this )[0], ( *this )[1], ( *this )[2] }; }
 };
 
 
@@ -76,8 +73,7 @@ bool KadasPictureItem::State::deserialize( const QJsonObject &json )
 
 KadasPictureItem::KadasPictureItem( const QgsCoordinateReferenceSystem &crs )
   : KadasRectangleItemBase( crs )
-{
-}
+{}
 
 KadasPictureItem::~KadasPictureItem()
 {
@@ -267,9 +263,15 @@ static QMatrix3x3 rotAngleAxis( const std::array<float, 3> &u, float angle )
   float cosa = std::cos( angle );
   return QMatrix3x3(
     std::array<float, 9> {
-      cosa + u[0] * u[0] * ( 1 - cosa ), u[0] * u[1] * ( 1 - cosa ) - u[2] * sina, u[0] * u[2] * ( 1 - cosa ) + u[1] * sina,
-      u[0] * u[1] * ( 1 - cosa ) + u[2] * sina, cosa + u[1] * u[1] * ( 1 - cosa ), u[1] * u[2] * ( 1 - cosa ) - u[0] * sina,
-      u[0] * u[2] * ( 1 - cosa ) - u[1] * sina, u[1] * u[2] * ( 1 - cosa ) + u[0] * sina, cosa + u[2] * u[2] * ( 1 - cosa )
+      cosa + u[0] * u[0] * ( 1 - cosa ),
+      u[0] * u[1] * ( 1 - cosa ) - u[2] * sina,
+      u[0] * u[2] * ( 1 - cosa ) + u[1] * sina,
+      u[0] * u[1] * ( 1 - cosa ) + u[2] * sina,
+      cosa + u[1] * u[1] * ( 1 - cosa ),
+      u[1] * u[2] * ( 1 - cosa ) - u[0] * sina,
+      u[0] * u[2] * ( 1 - cosa ) - u[1] * sina,
+      u[1] * u[2] * ( 1 - cosa ) + u[0] * sina,
+      cosa + u[2] * u[2] * ( 1 - cosa )
     }
       .data()
   );

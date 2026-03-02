@@ -354,12 +354,10 @@ QgsMeshLayer *KadasPluginInterfaceImpl::addMeshLayer( const QString &url, const 
 }
 
 void KadasPluginInterfaceImpl::addPluginToMeshMenu( const QString &, QAction * )
-{
-}
+{}
 
 void KadasPluginInterfaceImpl::removePluginMeshMenu( const QString &, QAction * )
-{
-}
+{}
 
 QgsVectorTileLayer *KadasPluginInterfaceImpl::addVectorTileLayer( const QString &url, const QString &baseName )
 {
@@ -672,7 +670,9 @@ void KadasPluginInterfaceImpl::addAction( QAction *action, ActionClassicMenuLoca
   }
 }
 
-void KadasPluginInterfaceImpl::addActionMenu( const QString &text, const QIcon &icon, QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName )
+void KadasPluginInterfaceImpl::addActionMenu(
+  const QString &text, const QIcon &icon, QMenu *menu, ActionClassicMenuLocation classicMenuLocation, ActionRibbonTabLocation ribbonTabLocation, const QString &customName
+)
 {
   if ( ribbonTabLocation != ActionRibbonTabLocation::NO_TAB )
   {

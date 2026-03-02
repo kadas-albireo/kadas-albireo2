@@ -37,7 +37,11 @@
 
 
 KadasItemContextMenuActions::KadasItemContextMenuActions( QgsMapCanvas *canvas, QMenu *menu, KadasMapItem *item, KadasItemLayer *layer, KadasItemLayer::ItemId layerItemId, QObject *parent )
-  : QObject( parent ), mCanvas( canvas ), mItem( item ), mLayer( layer ), mLayerItemId( layerItemId )
+  : QObject( parent )
+  , mCanvas( canvas )
+  , mItem( item )
+  , mLayer( layer )
+  , mLayerItemId( layerItemId )
 {
   if ( dynamic_cast<KadasPinItem *>( mItem ) )
   {
@@ -102,9 +106,7 @@ void KadasItemContextMenuActions::copyItemPosition()
   {
     posStr = QString( "%1 (%2)" ).arg( mapPos.toString() ).arg( mapCrs.authid() );
   }
-  QString text = QString( "%1\n%2" )
-                   .arg( posStr )
-                   .arg( KadasCoordinateFormat::instance()->getHeightAtPos( mapPos, mapCrs ) );
+  QString text = QString( "%1\n%2" ).arg( posStr ).arg( KadasCoordinateFormat::instance()->getHeightAtPos( mapPos, mapCrs ) );
   QApplication::clipboard()->setText( text );
 }
 

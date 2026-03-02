@@ -27,8 +27,7 @@
 KadasPinSearchProvider::KadasPinSearchProvider( QgsMapCanvas *mapCanvas )
   : QgsLocatorFilter()
   , mMapCanvas( mapCanvas )
-{
-}
+{}
 
 QgsLocatorFilter *KadasPinSearchProvider::clone() const
 {
@@ -78,12 +77,7 @@ void KadasPinSearchProvider::triggerResult( const QgsLocatorResult &result )
   QgsPointXY pos = data.value( QStringLiteral( "pos" ) ).value<QgsPointXY>();
   QString crsIs = data.value( QStringLiteral( "crs" ) ).toString();
 
-  QgsPointXY itemPos = QgsCoordinateTransform(
-                         QgsCoordinateReferenceSystem( crsIs ),
-                         mMapCanvas->mapSettings().destinationCrs(),
-                         QgsProject::instance()
-  )
-                         .transform( pos );
+  QgsPointXY itemPos = QgsCoordinateTransform( QgsCoordinateReferenceSystem( crsIs ), mMapCanvas->mapSettings().destinationCrs(), QgsProject::instance() ).transform( pos );
 
   mMapCanvas->setCenter( itemPos );
 }

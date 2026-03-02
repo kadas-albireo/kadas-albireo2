@@ -95,7 +95,8 @@ void KadasPluginManagerInstallButton::setStatus( Status status, int progress )
 
 
 KadasPluginManager::KadasPluginManager( QgsMapCanvas *canvas, QAction *action )
-  : KadasBottomBar( canvas ), mAction( action )
+  : KadasBottomBar( canvas )
+  , mAction( action )
 {
   setupUi( this );
   setFixedWidth( 700 );
@@ -206,7 +207,9 @@ void KadasPluginManager::installMandatoryPlugins()
 
       if ( !success )
       {
-        kApp->mainWindow()->messageBar()->pushMessage( tr( "Mandatory plugin installation error" ), tr( "Plugin '%1' couldn't be installed" ).arg( pluginName ), Qgis::Warning, kApp->mainWindow()->messageTimeout() );
+        kApp->mainWindow()
+          ->messageBar()
+          ->pushMessage( tr( "Mandatory plugin installation error" ), tr( "Plugin '%1' couldn't be installed" ).arg( pluginName ), Qgis::Warning, kApp->mainWindow()->messageTimeout() );
       }
     }
   }
@@ -238,7 +241,9 @@ void KadasPluginManager::updateAllPlugins()
       bool success = updatePlugin( installedPluginName, moduleName, availablePluginInfo.downloadLink, availablePluginInfo.description, availablePluginInfo.version, button );
 
       if ( success )
-        kApp->mainWindow()->messageBar()->pushMessage( tr( "Plugin update" ), tr( "Plugin '%1' has been updated to version %2" ).arg( installedPluginName, availablePluginInfo.version ), Qgis::Info, kApp->mainWindow()->messageTimeout() );
+        kApp->mainWindow()
+          ->messageBar()
+          ->pushMessage( tr( "Plugin update" ), tr( "Plugin '%1' has been updated to version %2" ).arg( installedPluginName, availablePluginInfo.version ), Qgis::Info, kApp->mainWindow()->messageTimeout() );
       else
         kApp->mainWindow()->messageBar()->pushMessage( tr( "Plugin update error" ), tr( "Plugin '%1' update failed" ).arg( installedPluginName ), Qgis::Warning, kApp->mainWindow()->messageTimeout() );
     }
@@ -249,8 +254,7 @@ void KadasPluginManager::updateAllPlugins()
 
 KadasPluginManager::KadasPluginManager()
   : KadasBottomBar( nullptr )
-{
-}
+{}
 
 QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugins()
 {
@@ -484,9 +488,7 @@ bool KadasPluginManager::installPlugin( const QString &pluginName, const QString
   QUrl repositoryUrl( downloadUrl );
   QEventLoop e;
   nf.fetchContent( repositoryUrl );
-  connect( &nf, &QgsNetworkContentFetcher::downloadProgress, [b]( qint64 rec, qint64 tot ) {
-    b->setStatus( KadasPluginManagerInstallButton::Installing, double( rec ) / tot * 100 );
-  } );
+  connect( &nf, &QgsNetworkContentFetcher::downloadProgress, [b]( qint64 rec, qint64 tot ) { b->setStatus( KadasPluginManagerInstallButton::Installing, double( rec ) / tot * 100 ); } );
   QObject::connect( &nf, &QgsNetworkContentFetcher::finished, &e, &QEventLoop::quit );
   e.exec();
 
@@ -601,7 +603,9 @@ bool KadasPluginManager::uninstallPlugin( const QString &pluginName, const QStri
   return true;
 }
 
-bool KadasPluginManager::updatePlugin( const QString &pluginName, const QString &moduleName, const QString &downloadUrl, const QString &pluginTooltip, const QString &pluginVersion, KadasPluginManagerInstallButton *b )
+bool KadasPluginManager::updatePlugin(
+  const QString &pluginName, const QString &moduleName, const QString &downloadUrl, const QString &pluginTooltip, const QString &pluginVersion, KadasPluginManagerInstallButton *b
+)
 {
   uninstallPlugin( pluginName, moduleName, b );
   return installPlugin( pluginName, downloadUrl, pluginTooltip, pluginVersion, b );

@@ -47,10 +47,7 @@ class StackedDialog : public QDialog
       mLayout = new QStackedLayout();
       setLayout( mLayout );
     }
-    void pushWidget( QWidget *widget )
-    {
-      mLayout->setCurrentIndex( mLayout->addWidget( widget ) );
-    }
+    void pushWidget( QWidget *widget ) { mLayout->setCurrentIndex( mLayout->addWidget( widget ) ); }
     void popWidget( QWidget *widget )
     {
       if ( mLayout->currentWidget() == widget )
@@ -76,14 +73,8 @@ class WebWidget : public QAxWidget
       setControl( QString::fromUtf8( "{8856F961-340A-11D0-A96B-00C04FD705A2}" ) );
     }
 
-    void navigate( const QString &location )
-    {
-      dynamicCall( "Navigate(const QString&)", location );
-    }
-    QString location()
-    {
-      return dynamicCall( "LocationURL()" ).toString();
-    }
+    void navigate( const QString &location ) { dynamicCall( "Navigate(const QString&)", location ); }
+    QString location() { return dynamicCall( "LocationURL()" ).toString(); }
     QStringList cookies()
     {
       QAxObject *document = querySubObject( "Document()" );
@@ -113,7 +104,10 @@ class WebWidget : public QWidget
 #endif
 
 KadasIamAuth::KadasIamAuth( QToolButton *loginButton, QToolButton *logoutButton, QToolButton *refreshButton, QObject *parent )
-  : QObject( parent ), mLoginButton( loginButton ), mLogoutButton( logoutButton ), mRefreshButton( refreshButton )
+  : QObject( parent )
+  , mLoginButton( loginButton )
+  , mLogoutButton( logoutButton )
+  , mRefreshButton( refreshButton )
 {
   mLogoutButton->hide();
 #ifdef Q_OS_WIN

@@ -25,7 +25,8 @@
 
 
 KadasCatalogProvider::KadasCatalogProvider( KadasCatalogBrowser *browser )
-  : QObject( browser ), mBrowser( browser )
+  : QObject( browser )
+  , mBrowser( browser )
 {}
 
 QList<QDomNode> KadasCatalogProvider::childrenByTagName( const QDomElement &element, const QString &tagName ) const
@@ -53,7 +54,17 @@ QMap<QString, QString> KadasCatalogProvider::parseWMTSTileMatrixSets( const QDom
   return tileMatrixSetMap;
 }
 
-void KadasCatalogProvider::parseWMTSLayerCapabilities( const QDomNode &layerItem, const QMap<QString, QString> &tileMatrixSetMap, const QString &url, const QString &layerInfoUrl, const QString &extraParams, QString &title, QString &layerid, const QString &authCfg, QMimeData *&mimeData ) const
+void KadasCatalogProvider::parseWMTSLayerCapabilities(
+  const QDomNode &layerItem,
+  const QMap<QString, QString> &tileMatrixSetMap,
+  const QString &url,
+  const QString &layerInfoUrl,
+  const QString &extraParams,
+  QString &title,
+  QString &layerid,
+  const QString &authCfg,
+  QMimeData *&mimeData
+) const
 {
   layerid = layerItem.firstChildElement( "ows:Identifier" ).text();
   QString imgFormat = layerItem.firstChildElement( "Format" ).text();
@@ -97,10 +108,7 @@ void KadasCatalogProvider::parseWMTSLayerCapabilities( const QDomNode &layerItem
 QStringList KadasCatalogProvider::parseWMSFormats( const QDomDocument &doc ) const
 {
   QStringList formats;
-  QDomElement getMapItem = doc.firstChildElement( "WMS_Capabilities" )
-                             .firstChildElement( "Capability" )
-                             .firstChildElement( "Request" )
-                             .firstChildElement( "GetMap" );
+  QDomElement getMapItem = doc.firstChildElement( "WMS_Capabilities" ).firstChildElement( "Capability" ).firstChildElement( "Request" ).firstChildElement( "GetMap" );
   for ( const QDomNode &formatItem : childrenByTagName( getMapItem, "Format" ) )
   {
     formats.append( formatItem.toElement().text() );
@@ -121,7 +129,9 @@ QString KadasCatalogProvider::parseWMSNestedLayer( const QDomNode &layerItem ) c
   return subLayerParams;
 }
 
-bool KadasCatalogProvider::parseWMSLayerCapabilities( const QDomNode &layerItem, const QString &title, const QStringList &imgFormats, const QStringList &parentCrs, const QString &url, const QString &layerInfoUrl, const QString &authCfg, QMimeData *&mimeData ) const
+bool KadasCatalogProvider::parseWMSLayerCapabilities(
+  const QDomNode &layerItem, const QString &title, const QStringList &imgFormats, const QStringList &parentCrs, const QString &url, const QString &layerInfoUrl, const QString &authCfg, QMimeData *&mimeData
+) const
 {
   QString layerid = layerItem.firstChildElement( "Name" ).text();
   QString subLayerParams = QString( "&layers=%1&styles=" ).arg( layerid );

@@ -134,7 +134,9 @@ class KADAS_CORE_EXPORT KadasLatLonToUTM
     static double minNorthing( int zoneLetter );
     typedef ZoneLabel( zoneLabelCallback_t )( double, double, double, double );
     typedef GridLabel( gridLabelCallback_t )( double, double, int, bool, int );
-    static Grid computeSubGrid( int cellSize, Level level, double xMin, double xMax, double yMin, double yMax, zoneLabelCallback_t *zoneLabelCallback = nullptr, gridLabelCallback_t *lineLabelCallback = nullptr );
+    static Grid computeSubGrid(
+      int cellSize, Level level, double xMin, double xMax, double yMin, double yMax, zoneLabelCallback_t *zoneLabelCallback = nullptr, gridLabelCallback_t *lineLabelCallback = nullptr
+    );
     static ZoneLabel mgrs100kIDLabelCallback( double posX, double posY, double maxLon, double maxLat );
     static GridLabel utmGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx );
     static GridLabel mgrsGridLabelCallback( double lon, double lat, int cellSize, bool horiz, int lineIdx );

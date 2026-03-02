@@ -45,7 +45,9 @@ class KADAS_GUI_EXPORT KadasMapPos
     static KadasMapPos fromPoint( const QgsPointXY &pos ) { return KadasMapPos( pos.x(), pos.y() ); }
 
     KadasMapPos( double x = 0., double y = 0. )
-      : mX( x ), mY( y ) {}
+      : mX( x )
+      , mY( y )
+    {}
     double x() const { return mX; }
     void setX( double x ) { mX = x; }
     double y() const { return mY; }
@@ -62,7 +64,10 @@ class KADAS_GUI_EXPORT KadasMapRect
 {
   public:
     KadasMapRect( double xMin = 0., double yMin = 0., double xMax = 0., double yMax = 0. )
-      : mXmin( xMin ), mYmin( yMin ), mXmax( xMax ), mYmax( yMax )
+      : mXmin( xMin )
+      , mYmin( yMin )
+      , mXmax( xMax )
+      , mYmax( yMax )
     {}
 
     KadasMapRect( const KadasMapPos &p1, const KadasMapPos &p2 )
@@ -73,7 +78,10 @@ class KADAS_GUI_EXPORT KadasMapRect
     {}
 
     KadasMapRect( const KadasMapPos &center, double span )
-      : mXmin( center.x() - span ), mYmin( center.y() - span ), mXmax( center.x() + span ), mYmax( center.y() + span )
+      : mXmin( center.x() - span )
+      , mYmin( center.y() - span )
+      , mXmax( center.x() + span )
+      , mYmax( center.y() + span )
     {}
 
     double xMinimum() const { return mXmin; }
@@ -106,10 +114,7 @@ class KADAS_GUI_EXPORT KadasItemPos
       , mZ( z )
     {}
 
-    bool operator==( const KadasItemPos &other ) const SIP_SKIP
-    {
-      return mX == other.mX && mY == other.mY && hasZ() == other.hasZ() && ( !hasZ() || mZ == other.mZ );
-    }
+    bool operator==( const KadasItemPos &other ) const SIP_SKIP { return mX == other.mX && mY == other.mY && hasZ() == other.hasZ() && ( !hasZ() || mZ == other.mZ ); }
 
     double x() const { return mX; }
     void setX( double x ) { mX = x; }
@@ -493,10 +498,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     QDomElement writeXml( QDomDocument &document ) const;
     static KadasMapItem *fromXml( const QDomElement &element );
 
-    void preventAttachmentCleanup()
-    {
-      mDontCleanupAttachment = true;
-    }
+    void preventAttachmentCleanup() { mDontCleanupAttachment = true; }
 
     // Props
     QMap<QString, QVariant> getProps() const;

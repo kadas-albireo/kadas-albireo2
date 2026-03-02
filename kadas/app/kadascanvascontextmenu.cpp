@@ -47,7 +47,8 @@ typedef QMap<QAction *, KadasCanvasContextMenu::Menu> RegisteredAction;
 Q_GLOBAL_STATIC( RegisteredAction, sRegisteredActions )
 
 KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsPointXY &mapPos )
-  : mMapPos( mapPos ), mCanvas( canvas )
+  : mMapPos( mapPos )
+  , mCanvas( canvas )
 {
   mPickResult = KadasFeaturePicker::pick( mCanvas, mapPos );
   KadasMapItem *pickedItem = mPickResult.itemId != KadasItemLayer::ITEM_ID_NULL ? static_cast<KadasItemLayer *>( mPickResult.layer )->items()[mPickResult.itemId] : nullptr;
@@ -220,9 +221,7 @@ void KadasCanvasContextMenu::copyCoordinates()
   {
     posStr = QString( "%1 (%2)" ).arg( mMapPos.toString() ).arg( mapCrs.authid() );
   }
-  QString text = QString( "%1\n%2" )
-                   .arg( posStr )
-                   .arg( KadasCoordinateFormat::instance()->getHeightAtPos( mMapPos, mapCrs ) );
+  QString text = QString( "%1\n%2" ).arg( posStr ).arg( KadasCoordinateFormat::instance()->getHeightAtPos( mMapPos, mapCrs ) );
   QApplication::clipboard()->setText( text );
 }
 

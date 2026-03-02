@@ -177,7 +177,10 @@ void KadasMeasureWidget::setAzimuthNorth( int index )
   if ( dynamic_cast<KadasLineItem *>( mItem ) )
   {
     KadasLineItem *lineItem = static_cast<KadasLineItem *>( mItem );
-    lineItem->setMeasurementMode( north == AzimuthNorth::AzimuthGeoNorth ? KadasLineItem::MeasurementMode::MeasureLineAndSegmentsAndAzimuthGeoNorth : KadasLineItem::MeasurementMode::MeasureLineAndSegmentsAndAzimuthMapNorth, lineItem->angleUnit() );
+    lineItem->setMeasurementMode(
+      north == AzimuthNorth::AzimuthGeoNorth ? KadasLineItem::MeasurementMode::MeasureLineAndSegmentsAndAzimuthGeoNorth : KadasLineItem::MeasurementMode::MeasureLineAndSegmentsAndAzimuthMapNorth,
+      lineItem->angleUnit()
+    );
   }
 }
 
@@ -266,7 +269,8 @@ void KadasMapToolMeasure::canvasReleaseEvent( QgsMapMouseEvent *e )
   }
   else
   {
-    KadasFeaturePicker::PickResult pickResult = KadasFeaturePicker::pick( mCanvas, toMapCoordinates( e->pos() ), mMeasureMode == MeasureMode::MeasureLine ? Qgis::GeometryType::Line : Qgis::GeometryType::Polygon );
+    KadasFeaturePicker::PickResult pickResult
+      = KadasFeaturePicker::pick( mCanvas, toMapCoordinates( e->pos() ), mMeasureMode == MeasureMode::MeasureLine ? Qgis::GeometryType::Line : Qgis::GeometryType::Polygon );
     if ( pickResult.geom )
     {
       addPartFromGeometry( *pickResult.geom, pickResult.crs );

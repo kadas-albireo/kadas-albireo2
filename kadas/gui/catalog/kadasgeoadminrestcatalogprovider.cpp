@@ -29,9 +29,9 @@
 #include "kadas/gui/catalog/kadasgeoadminrestcatalogprovider.h"
 
 KadasGeoAdminRestCatalogProvider::KadasGeoAdminRestCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> & /*params*/ )
-  : KadasCatalogProvider( browser ), mBaseUrl( baseUrl )
-{
-}
+  : KadasCatalogProvider( browser )
+  , mBaseUrl( baseUrl )
+{}
 
 void KadasGeoAdminRestCatalogProvider::load()
 {

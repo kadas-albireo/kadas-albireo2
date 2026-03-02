@@ -27,7 +27,8 @@ class KADAS_GUI_EXPORT KadasRibbonButton : public QToolButton
 
   public:
     KadasRibbonButton( QWidget *parent = 0 )
-      : QToolButton( parent ) {}
+      : QToolButton( parent )
+    {}
 
   signals:
     void contextMenuRequested( QPoint pos );

@@ -53,8 +53,7 @@ std::once_flag onceFlagMapItemRegistry;
 
 KadasMapItem::KadasMapItem( const QgsCoordinateReferenceSystem &crs )
   : mCrs( crs )
-{
-}
+{}
 
 KadasMapItem::~KadasMapItem()
 {

@@ -89,7 +89,9 @@ class KadasBullseyeLayerType : public KadasPluginLayerType
 
   public:
     KadasBullseyeLayerType( QAction *actionBullseyeTool )
-      : KadasPluginLayerType( KadasBullseyeLayer::layerType() ), mActionBullseyeTool( actionBullseyeTool ) {}
+      : KadasPluginLayerType( KadasBullseyeLayer::layerType() )
+      , mActionBullseyeTool( actionBullseyeTool )
+    {}
     void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const override;
     QgsPluginLayer *createLayer() override { return new KadasBullseyeLayer( "" ); }
     QgsPluginLayer *createLayer( const QString &uri ) override SIP_FACTORY { return new KadasBullseyeLayer( "" ); }

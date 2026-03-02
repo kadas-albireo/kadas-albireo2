@@ -385,7 +385,14 @@ void KadasCircularSectorItem::recomputeDerived()
     else
     {
       QgsCircularString *arc = new QgsCircularString();
-      arc->setPoints( QgsPointSequence() << QgsPoint( center.x(), center.y() + radius ) << QgsPoint( center.x() + radius, center.y() ) << QgsPoint( center.x(), center.y() - radius ) << QgsPoint( center.x() - radius, center.y() ) << QgsPoint( center.x(), center.y() + radius ) );
+      arc->setPoints(
+        QgsPointSequence()
+        << QgsPoint( center.x(), center.y() + radius )
+        << QgsPoint( center.x() + radius, center.y() )
+        << QgsPoint( center.x(), center.y() - radius )
+        << QgsPoint( center.x() - radius, center.y() )
+        << QgsPoint( center.x(), center.y() + radius )
+      );
       exterior->addCurve( arc );
     }
     QgsPolygon *poly = new QgsPolygon;

@@ -82,7 +82,9 @@ void KadasGpxIntegration::toggleCreateItem( bool active, std::unique_ptr<KadasMa
   {
     KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, std::move( interface ), getOrCreateLayer() );
     tool->setAction( action );
-    KadasLayerSelectionWidget::LayerFilter filter = []( QgsMapLayer *layer ) { return dynamic_cast<KadasItemLayer *>( layer ) && static_cast<KadasItemLayer *>( layer )->layerTypeKey() == QString( "KadasItemLayer" ); };
+    KadasLayerSelectionWidget::LayerFilter filter = []( QgsMapLayer *layer ) {
+      return dynamic_cast<KadasItemLayer *>( layer ) && static_cast<KadasItemLayer *>( layer )->layerTypeKey() == QString( "KadasItemLayer" );
+    };
     KadasLayerSelectionWidget::LayerCreator creator = []( const QString &name ) {
       return QgsProject::instance()->addMapLayer( new KadasItemLayer( name, QgsCoordinateReferenceSystem( "EPSG:3857" ) ) );
     };

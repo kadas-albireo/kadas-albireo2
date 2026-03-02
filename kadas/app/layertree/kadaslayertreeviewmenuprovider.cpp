@@ -36,8 +36,7 @@
 
 KadasLayerTreeViewMenuProvider::KadasLayerTreeViewMenuProvider( QgsLayerTreeView *view )
   : mView( view )
-{
-}
+{}
 
 QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
 {

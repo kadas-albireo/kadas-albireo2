@@ -83,7 +83,8 @@ class KADAS_GUI_EXPORT KadasMilxLayerType : public KadasPluginLayerType
 
   public:
     KadasMilxLayerType()
-      : KadasPluginLayerType( KadasMilxLayer::layerType() ) {}
+      : KadasPluginLayerType( KadasMilxLayer::layerType() )
+    {}
     QgsPluginLayer *createLayer() override SIP_FACTORY { return new KadasMilxLayer(); }
     QgsPluginLayer *createLayer( const QString &uri ) override SIP_FACTORY { return new KadasMilxLayer(); }
     void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const override;

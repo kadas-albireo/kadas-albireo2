@@ -168,7 +168,10 @@ void KadasMesh3DSymbolWidget::setLayer( QgsMeshLayer *meshLayer, bool updateSymb
   reloadColorRampShaderMinMax(); //As the symbol is new, the Color ramp shader needs to be initialized with min max value
 }
 
-QgsMeshLayer *KadasMesh3DSymbolWidget::meshLayer() const { return mLayer; }
+QgsMeshLayer *KadasMesh3DSymbolWidget::meshLayer() const
+{
+  return mLayer;
+}
 
 double KadasMesh3DSymbolWidget::lineEditValue( const QLineEdit *lineEdit ) const
 {

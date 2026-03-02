@@ -75,10 +75,7 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
 
   toolBar->addAction( QgsApplication::getThemeIcon( QStringLiteral( "mActionZoomFullExtent.svg" ) ), tr( "Zoom Full" ), this, &Kadas3DMapCanvasWidget::resetView );
 
-  QAction *toggleOnScreenNavigation = toolBar->addAction(
-    QgsApplication::getThemeIcon( QStringLiteral( "mAction3DNavigation.svg" ) ),
-    tr( "Toggle On-Screen Navigation" )
-  );
+  QAction *toggleOnScreenNavigation = toolBar->addAction( QgsApplication::getThemeIcon( QStringLiteral( "mAction3DNavigation.svg" ) ), tr( "Toggle On-Screen Navigation" ) );
 
   toggleOnScreenNavigation->setCheckable( true );
   toggleOnScreenNavigation->setChecked( sSettingNavigationVisible->value() );
@@ -127,10 +124,7 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
 
   toolBar->addSeparator();
 
-  QAction *toggleLayerTree = toolBar->addAction(
-    QgsApplication::getThemeIcon( QStringLiteral( "/mActionShowAllLayers.svg" ) ),
-    tr( "Toggle Layer Tree" )
-  );
+  QAction *toggleLayerTree = toolBar->addAction( QgsApplication::getThemeIcon( QStringLiteral( "/mActionShowAllLayers.svg" ) ), tr( "Toggle Layer Tree" ) );
   toggleLayerTree->setCheckable( true );
   toggleLayerTree->setChecked( sSettingLayerTreeVisible->value() );
   connect( toggleLayerTree, &QAction::toggled, this, &Kadas3DMapCanvasWidget::toggleLayerTreeWidget );
@@ -169,9 +163,7 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
 
   mShowFrustumPolyogon = new QAction( tr( "Show Visible Camera Area in 2D Map View" ), this );
   mShowFrustumPolyogon->setCheckable( true );
-  connect( mShowFrustumPolyogon, &QAction::triggered, this, [=]( bool enabled ) {
-    mCanvas->mapSettings()->setViewFrustumVisualizationEnabled( enabled );
-  } );
+  connect( mShowFrustumPolyogon, &QAction::triggered, this, [=]( bool enabled ) { mCanvas->mapSettings()->setViewFrustumVisualizationEnabled( enabled ); } );
   mCameraMenu->addAction( mShowFrustumPolyogon );
 #if 0
   mActionSetSceneExtent = mCameraMenu->addAction( QgsApplication::getThemeIcon( QStringLiteral( "extents.svg" ) ),
@@ -204,9 +196,7 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
 
   mActionEnableEyeDome = new QAction( tr( "Show Eye Dome Lighting" ), this );
   mActionEnableEyeDome->setCheckable( true );
-  connect( mActionEnableEyeDome, &QAction::triggered, this, [=]( bool enabled ) {
-    mCanvas->mapSettings()->setEyeDomeLightingEnabled( enabled );
-  } );
+  connect( mActionEnableEyeDome, &QAction::triggered, this, [=]( bool enabled ) { mCanvas->mapSettings()->setEyeDomeLightingEnabled( enabled ); } );
   mEffectsMenu->addAction( mActionEnableEyeDome );
 
   mActionEnableAmbientOcclusion = new QAction( tr( "Show Ambient Occlusion" ), this );
@@ -302,9 +292,7 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
   hLayout->addWidget( mNavigationWidget );
   hLayout->setStretch( 1, 4 );
 
-  toggleNavigationWidget(
-    setting.value( QStringLiteral( "/3D/navigationWidget/visibility" ), false, QgsSettings::Gui ).toBool()
-  );
+  toggleNavigationWidget( setting.value( QStringLiteral( "/3D/navigationWidget/visibility" ), false, QgsSettings::Gui ).toBool() );
 
   layout->addLayout( hLayout );
   // layout->addWidget( mAnimationWidget );
@@ -498,11 +486,7 @@ void Kadas3DMapCanvasWidget::configure()
     // update map
     w->apply();
 
-    const QgsVector3D p = Qgs3DUtils::transformWorldCoordinates(
-      oldLookingAt,
-      oldOrigin, oldCrs,
-      map->origin(), map->crs(), QgsProject::instance()->transformContext()
-    );
+    const QgsVector3D p = Qgs3DUtils::transformWorldCoordinates( oldLookingAt, oldOrigin, oldCrs, map->origin(), map->crs(), QgsProject::instance()->transformContext() );
 
     if ( p != oldLookingAt )
     {
@@ -667,10 +651,14 @@ void Kadas3DMapCanvasWidget::onGpuMemoryLimitReached()
 
   const QgsSettings settings;
   double memLimit = settings.value( QStringLiteral( "map3d/gpuMemoryLimit" ), 500.0, QgsSettings::App ).toDouble();
-  mMessageBar->pushMessage( tr( "A map layer has used all graphics memory allowed (%1 MB). "
-                                "You may want to lower the amount of detail in the scene, or increase the limit in the options." )
-                              .arg( memLimit ),
-                            Qgis::MessageLevel::Warning );
+  mMessageBar->pushMessage(
+    tr(
+      "A map layer has used all graphics memory allowed (%1 MB). "
+      "You may want to lower the amount of detail in the scene, or increase the limit in the options."
+    )
+      .arg( memLimit ),
+    Qgis::MessageLevel::Warning
+  );
   mGpuMemoryLimitReachedReported = true;
 }
 

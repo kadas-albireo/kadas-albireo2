@@ -31,8 +31,7 @@
 KadasAlternateGotoLocatorFilter::KadasAlternateGotoLocatorFilter( QgsMapCanvas *mapCanvas, QObject *parent )
   : QgsLocatorFilter( parent )
   , mCanvas( mapCanvas )
-{
-}
+{}
 
 KadasAlternateGotoLocatorFilter *KadasAlternateGotoLocatorFilter::clone() const
 {
@@ -79,15 +78,8 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   // Coordinates such as 106.8468,-6.3804
   // Accept decimal numbers, possibly with degree symbol (°) after each number and optional altitude
   thread_local QRegularExpression separatorRx1(
-    QStringLiteral(
-      R"(^([0-9\-\%1\%2]*)(?:\s*%4)?[\s%3]*([0-9\-\%1\%2]*)[\s%4]*(:?\d+(\.\d+)?)?$)"
-    )
-      .arg(
-        locale.decimalPoint(),
-        locale.groupSeparator(),
-        locale.decimalPoint() != ',' && locale.groupSeparator() != ',' ? QStringLiteral( "\\," ) : QString(),
-        degreeSymbol
-      )
+    QStringLiteral( R"(^([0-9\-\%1\%2]*)(?:\s*%4)?[\s%3]*([0-9\-\%1\%2]*)[\s%4]*(:?\d+(\.\d+)?)?$)" )
+      .arg( locale.decimalPoint(), locale.groupSeparator(), locale.decimalPoint() != ',' && locale.groupSeparator() != ',' ? QStringLiteral( "\\," ) : QString(), degreeSymbol )
   );
   QRegularExpressionMatch match = separatorRx1.match( string.trimmed() );
   if ( match.hasMatch() )
@@ -111,8 +103,9 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   if ( !match.hasMatch() )
   {
     // Check if the string is a pair of decimal degrees with [N,S,E,W] suffixes with optional degree symbol and optional altitude
-    thread_local QRegularExpression separatorRx3( QStringLiteral( R"(^\s*([-]?\d{1,3}(?:[\.\%1]\d+)?)(?:\s*%2)?\s*([NSEWnsew])[\s\,]*([-]?\d{1,3}(?:[\.\%1]\d+)?)(?:\s*%2)?\s*([NSEWnsew])(:?\s+\d+(\.\d+)?)?\s*$)" )
-                                                    .arg( locale.decimalPoint(), degreeSymbol ) );
+    thread_local QRegularExpression separatorRx3(
+      QStringLiteral( R"(^\s*([-]?\d{1,3}(?:[\.\%1]\d+)?)(?:\s*%2)?\s*([NSEWnsew])[\s\,]*([-]?\d{1,3}(?:[\.\%1]\d+)?)(?:\s*%2)?\s*([NSEWnsew])(:?\s+\d+(\.\d+)?)?\s*$)" ).arg( locale.decimalPoint(), degreeSymbol )
+    );
     match = separatorRx3.match( string.trimmed() );
     QString dir1, dir2;
     if ( match.hasMatch() )
@@ -124,8 +117,9 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
     }
     else
     {
-      thread_local QRegularExpression separatorRx3v2( QStringLiteral( R"(^\s*([NSEWnsew])\s*([-]?\d{1,3}(?:[\.\%1]\d+)?(?:\s*%2)?)[\s\,]*([NSEWnsew])\s*([-]?\d{1,3}(?:[\.\%1]\d+)?(?:\s*%2)?)(:?\s+\d+(\.\d+)?)?\s*$)" )
-                                                        .arg( locale.decimalPoint(), degreeSymbol ) );
+      thread_local QRegularExpression separatorRx3v2(
+        QStringLiteral( R"(^\s*([NSEWnsew])\s*([-]?\d{1,3}(?:[\.\%1]\d+)?(?:\s*%2)?)[\s\,]*([NSEWnsew])\s*([-]?\d{1,3}(?:[\.\%1]\d+)?(?:\s*%2)?)(:?\s+\d+(\.\d+)?)?\s*$)" ).arg( locale.decimalPoint(), degreeSymbol )
+      );
       match = separatorRx3v2.match( string.trimmed() );
       if ( match.hasMatch() )
       {
@@ -213,9 +207,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
       else
       {
         // 40.4462 N 79.9489 W
-        thread_local QRegularExpression separatorRx4v3(
-          R"(^\s*([0-9]{1,3}([,.][0-9]+)?)\s+([NSEWnsew])[\s;]+([0-9]{1,3}([,.][0-9]+)?)\s+([NSEWnsew])[\s;]*(:?\d+(\.\d+)?)?$)"
-        );
+        thread_local QRegularExpression separatorRx4v3( R"(^\s*([0-9]{1,3}([,.][0-9]+)?)\s+([NSEWnsew])[\s;]+([0-9]{1,3}([,.][0-9]+)?)\s+([NSEWnsew])[\s;]*(:?\d+(\.\d+)?)?$)" );
         match = separatorRx4v3.match( string.trimmed() );
         if ( match.hasMatch() )
         {
@@ -618,12 +610,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
     QgsPointXY point = KadasLatLonToUTM::UTM2LL( utm, ok );
     if ( ok )
     {
-      result.displayString = tr( "Go to %1, %2 (%3 %4%5)" )
-                               .arg( utm.easting )
-                               .arg( utm.northing )
-                               .arg( tr( "zone" ) )
-                               .arg( utm.zoneNumber )
-                               .arg( utm.zoneLetter );
+      result.displayString = tr( "Go to %1, %2 (%3 %4%5)" ).arg( utm.easting ).arg( utm.northing ).arg( tr( "zone" ) ).arg( utm.zoneNumber ).arg( utm.zoneLetter );
       if ( currentCrs != epsg4326 )
       {
         const QgsCoordinateTransform ct( epsg4326, currentCrs, QgsProject::instance()->transformContext() );
@@ -653,12 +640,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
     QgsPointXY point = KadasLatLonToUTM::UTM2LL( utm, ok );
     if ( ok )
     {
-      result.displayString = tr( "Go to %1, %2 (%3 %4%5)" )
-                               .arg( utm.easting )
-                               .arg( utm.northing )
-                               .arg( tr( "zone" ) )
-                               .arg( utm.zoneNumber )
-                               .arg( utm.zoneLetter );
+      result.displayString = tr( "Go to %1, %2 (%3 %4%5)" ).arg( utm.easting ).arg( utm.northing ).arg( tr( "zone" ) ).arg( utm.zoneNumber ).arg( utm.zoneLetter );
       if ( currentCrs != epsg4326 )
       {
         const QgsCoordinateTransform ct( epsg4326, currentCrs, QgsProject::instance()->transformContext() );
@@ -692,12 +674,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
       QgsPointXY point = KadasLatLonToUTM::UTM2LL( utm, ok );
       if ( ok )
       {
-        result.displayString = tr( "Go to %1%2%3 %4 %5" )
-                                 .arg( mgrs.zoneNumber )
-                                 .arg( mgrs.zoneLetter )
-                                 .arg( mgrs.letter100kID )
-                                 .arg( mgrs.easting )
-                                 .arg( mgrs.northing );
+        result.displayString = tr( "Go to %1%2%3 %4 %5" ).arg( mgrs.zoneNumber ).arg( mgrs.zoneLetter ).arg( mgrs.letter100kID ).arg( mgrs.easting ).arg( mgrs.northing );
         if ( currentCrs != epsg4326 )
         {
           const QgsCoordinateTransform ct( epsg4326, currentCrs, QgsProject::instance()->transformContext() );

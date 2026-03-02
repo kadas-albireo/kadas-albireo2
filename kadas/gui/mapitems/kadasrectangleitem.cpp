@@ -203,8 +203,7 @@ KadasMapItem::EditContext KadasRectangleItem::getEditContext( const KadasMapPos 
 void KadasRectangleItem::edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings )
 {
   KadasItemPos newItemPos = toItemPos( newPoint, mapSettings );
-  if ( context.vidx.part >= 0 && context.vidx.part < state()->p1.size()
-       && context.vidx.vertex >= 0 && context.vidx.vertex < 4 )
+  if ( context.vidx.part >= 0 && context.vidx.part < state()->p1.size() && context.vidx.vertex >= 0 && context.vidx.vertex < 4 )
   {
     if ( context.vidx.vertex == 0 )
     {

@@ -63,7 +63,10 @@ QgsPointXY KadasLatLonToUTM::UTM2LL( const UTMCoo &utm, bool &ok )
   double M = y / k0;
   double mu = M / ( a * ( 1 - eccSquared / 4 - 3 * eccSquared * eccSquared / 64 - 5 * eccSquared * eccSquared * eccSquared / 256 ) );
 
-  double phi1Rad = mu + ( 3 * e1 / 2 - 27 * e1 * e1 * e1 / 32 ) * std::sin( 2 * mu ) + ( 21 * e1 * e1 / 16 - 55 * e1 * e1 * e1 * e1 / 32 ) * std::sin( 4 * mu ) + ( 151 * e1 * e1 * e1 / 96 ) * std::sin( 6 * mu );
+  double phi1Rad = mu
+                   + ( 3 * e1 / 2 - 27 * e1 * e1 * e1 / 32 ) * std::sin( 2 * mu )
+                   + ( 21 * e1 * e1 / 16 - 55 * e1 * e1 * e1 * e1 / 32 ) * std::sin( 4 * mu )
+                   + ( 151 * e1 * e1 * e1 / 96 ) * std::sin( 6 * mu );
   // double phi1 = ProjMath.radToDeg(phi1Rad);
 
   double N1 = a / std::sqrt( 1 - eccSquared * std::sin( phi1Rad ) * std::sin( phi1Rad ) );
@@ -72,7 +75,10 @@ QgsPointXY KadasLatLonToUTM::UTM2LL( const UTMCoo &utm, bool &ok )
   double R1 = a * ( 1 - eccSquared ) / std::pow( 1 - eccSquared * std::sin( phi1Rad ) * std::sin( phi1Rad ), 1.5 );
   double D = x / ( N1 * k0 );
 
-  double lat = phi1Rad - ( N1 * std::tan( phi1Rad ) / R1 ) * ( D * D / 2 - ( 5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * eccPrimeSquared ) * D * D * D * D / 24 + ( 61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * eccPrimeSquared - 3 * C1 * C1 ) * D * D * D * D * D * D / 720 );
+  double lat
+    = phi1Rad
+      - ( N1 * std::tan( phi1Rad ) / R1 )
+          * ( D * D / 2 - ( 5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * eccPrimeSquared ) * D * D * D * D / 24 + ( 61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * eccPrimeSquared - 3 * C1 * C1 ) * D * D * D * D * D * D / 720 );
   lat = lat / M_PI * 180.;
 
   double lon = ( D - ( 1 + 2 * T1 + C1 ) * D * D * D / 6 + ( 5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * eccPrimeSquared + 24 * T1 * T1 ) * D * D * D * D * D / 120 ) / std::cos( phi1Rad );
@@ -103,13 +109,16 @@ KadasLatLonToUTM::UTMCoo KadasLatLonToUTM::LL2UTM( const QgsPointXY &pLatLong )
   double T = std::tan( LatRad ) * std::tan( LatRad );
   double C = eccPrimeSquared * std::cos( LatRad ) * std::cos( LatRad );
   double A = std::cos( LatRad ) * ( LongRad - LongOriginRad );
-  double M = a * ( ( 1 - eccSqr / 4 - 3 * eccSqr * eccSqr / 64 - 5 * eccSqr * eccSqr * eccSqr / 256 ) * LatRad - ( 3 * eccSqr / 8 + 3 * eccSqr * eccSqr / 32 + 45 * eccSqr * eccSqr * eccSqr / 1024 ) * std::sin( 2 * LatRad ) + ( 15 * eccSqr * eccSqr / 256 + 45 * eccSqr * eccSqr * eccSqr / 1024 ) * std::sin( 4 * LatRad ) - ( 35 * eccSqr * eccSqr * eccSqr / 3072 ) * std::sin( 6 * LatRad ) );
+  double M
+    = a
+      * ( ( 1 - eccSqr / 4 - 3 * eccSqr * eccSqr / 64 - 5 * eccSqr * eccSqr * eccSqr / 256 ) * LatRad - ( 3 * eccSqr / 8 + 3 * eccSqr * eccSqr / 32 + 45 * eccSqr * eccSqr * eccSqr / 1024 ) * std::sin( 2 * LatRad ) + ( 15 * eccSqr * eccSqr / 256 + 45 * eccSqr * eccSqr * eccSqr / 1024 ) * std::sin( 4 * LatRad ) - ( 35 * eccSqr * eccSqr * eccSqr / 3072 ) * std::sin( 6 * LatRad ) );
 
   UTMCoo coo;
 
   coo.easting = ( k0 * N * ( A + ( 1 - T + C ) * A * A * A / 6.0 + ( 5 - 18 * T + T * T + 72 * C - 58 * eccPrimeSquared ) * A * A * A * A * A / 120.0 ) + 500000.0 );
 
-  coo.northing = ( k0 * ( M + N * std::tan( LatRad ) * ( A * A / 2 + ( 5 - T + 9 * C + 4 * C * C ) * A * A * A * A / 24.0 + ( 61 - 58 * T + T * T + 600 * C - 330 * eccPrimeSquared ) * A * A * A * A * A * A / 720.0 ) ) );
+  coo.northing
+    = ( k0 * ( M + N * std::tan( LatRad ) * ( A * A / 2 + ( 5 - T + 9 * C + 4 * C * C ) * A * A * A * A / 24.0 + ( 61 - 58 * T + T * T + 600 * C - 330 * eccPrimeSquared ) * A * A * A * A * A * A / 720.0 ) ) );
   if ( Lat < 0.0 )
   {
     coo.northing += 10000000.0; //10000000 meter offset for southern hemisphere
@@ -767,10 +776,11 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
       double yMax = std::min( y2, bbox.yMaximum() );
 
       // Split box perimeter into pieces and compute lines
-      grid.lines << LineLevel( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineX( xMin, yMin, yMax, 1. ) )
-                 << LineLevel( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineX( xMax, yMin, yMax, 1. ) )
-                 << LineLevel( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineY( xMin, xMax, 1., yMin ) )
-                 << LineLevel( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineY( xMin, xMax, 1., yMax ) );
+      grid.lines
+        << LineLevel( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineX( xMin, yMin, yMax, 1. ) )
+        << LineLevel( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineX( xMax, yMin, yMax, 1. ) )
+        << LineLevel( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineY( xMin, xMax, 1., yMin ) )
+        << LineLevel( mapScale > 2000000 ? Level::Major : Level::Minor, polyGridLineY( xMin, xMax, 1., yMax ) );
 
       if ( gridMode != GridMode::GridMGRS || mapScale > 2000000 )
       {
@@ -863,7 +873,9 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
   return grid;
 }
 
-KadasLatLonToUTM::Grid KadasLatLonToUTM::computeSubGrid( int cellSize, Level level, double xMin, double xMax, double yMin, double yMax, zoneLabelCallback_t *zoneLabelCallback, gridLabelCallback_t *lineLabelCallback )
+KadasLatLonToUTM::Grid KadasLatLonToUTM::computeSubGrid(
+  int cellSize, Level level, double xMin, double xMax, double yMin, double yMax, zoneLabelCallback_t *zoneLabelCallback, gridLabelCallback_t *lineLabelCallback
+)
 {
   KadasLatLonToUTM::Grid subGrid;
   QgsPointXY p, q, r;
