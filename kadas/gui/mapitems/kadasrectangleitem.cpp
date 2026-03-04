@@ -90,7 +90,7 @@ KadasItemPos KadasRectangleItem::position() const
     x += point.x();
     y += point.y();
   }
-  int n = std::max( 1, constState()->p1.size() + constState()->p2.size() );
+  int n = std::max( qsizetype( 1 ), constState()->p1.size() + constState()->p2.size() );
   return KadasItemPos( x / n, y / n );
 }
 

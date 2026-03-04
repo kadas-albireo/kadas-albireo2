@@ -197,7 +197,7 @@ KadasItemPos KadasMilxItem::position() const
     x += point.x();
     y += point.y();
   }
-  int n = std::max( 1, constState()->points.size() );
+  int n = std::max( qsizetype( 1 ), constState()->points.size() );
   return KadasItemPos( x / n, y / n );
 }
 
