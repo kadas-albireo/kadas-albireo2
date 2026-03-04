@@ -726,7 +726,7 @@ void KadasAlternateGotoLocatorFilter::triggerResult( const QgsLocatorResult &res
 
 double KadasAlternateGotoLocatorFilter::parseNumber( const QString &string ) const
 {
-  QChar sep = QLocale().decimalPoint();
+  QString sep = QLocale().decimalPoint();
   QTextStream( stdout ) << string << " : " << sep << " ::" << QLocale().toDouble( QString( string ).replace( '.', sep ).replace( ',', sep ) ) << Qt::endl;
   return QLocale().toDouble( QString( string ).replace( '.', sep ).replace( ',', sep ) );
   return QString( string ).replace( '.', sep ).replace( ',', sep ).toDouble();
