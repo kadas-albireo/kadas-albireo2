@@ -105,33 +105,16 @@ jobs:
                 fdupes -r -1 build/vcpkg_installed/arm64-osx-dynamic/lib | grep libQt | while read line; do master=""; for file in ${line[*]}; do if  [[ "x${master}" == "x" ]]; then master=$file; else rm "${file}"; ln -s $(basename "${master}") "${file}"; fi; done; done
                 
       - name: 📑 Upload vcpkg build logs
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v
         if: failure()
         with:
           name: build-logs-${{ matrix.triplet }}
           path: |
             build/_deps/vcpkg-src/buildtrees/**/*.log
 
-      - name: � tmate session
-        uses: mxschmitt/action-tmate@v3
-
-      - name: �📦 Create SDK
+      - name: ��� Create SDK
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
         run: |
-          # Copy SIP bindings from buildtrees into vcpkg_installed (they are generated but not installed by the port)
-          BINDINGS_SRC="build/_deps/vcpkg-src/buildtrees/qgis/${{ matrix.triplet }}-rel/python"
-          BINDINGS_DST="$(find build/vcpkg_installed/${{ matrix.triplet }}/lib -path '*/site-packages/qgis' -type d)/bindings"
-          if [ -d "$BINDINGS_SRC" ]; then
-            mkdir -p "$BINDINGS_DST"
-            for module in core gui analysis 3d; do
-              if [ -d "$BINDINGS_SRC/$module" ]; then
-                cp -r "$BINDINGS_SRC/$module" "$BINDINGS_DST/"
-              fi
-            done
-            echo "Copied SIP bindings to $BINDINGS_DST"
-          else
-            echo "WARNING: SIP bindings source not found at $BINDINGS_SRC"
-          fi
           ./build/_deps/vcpkg-src/vcpkg export --zip --output-dir=./sdk --x-install-root=./build/vcpkg_installed  --x-manifest-root=vcpkg
           cd sdk && for f in vcpkg-export-*.zip; do mv "$f" "${f/vcpkg-export/vcpkg-export-${{ matrix.triplet }}}"; done
 

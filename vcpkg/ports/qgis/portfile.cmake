@@ -223,6 +223,19 @@ vcpkg_restore_env_variables(VARS PATH)
 
 vcpkg_install_cmake()
 
+# Copy SIP source files from the build tree into the package. The QGIS install
+# step places them based on SIP_DEFAULT_SIP_DIR which may not resolve correctly
+# inside vcpkg. Copy them explicitly into site-packages.
+if("bindings" IN_LIST FEATURES)
+  set(_sip_build_dir "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel/python")
+  set(_sip_dest_dir "${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/qgis/bindings")
+  foreach(_module core gui analysis 3d)
+    if(EXISTS "${_sip_build_dir}/${_module}")
+      file(COPY "${_sip_build_dir}/${_module}" DESTINATION "${_sip_dest_dir}")
+    endif()
+  endforeach()
+endif()
+
 # if(VCPKG_TARGET_IS_WINDOWS) function(copy_path basepath targetdir) file(GLOB
 # ${basepath}_PATH ${CURRENT_PACKAGES_DIR}/${basepath}/*) if( ${basepath}_PATH )
 # file(MAKE_DIRECTORY ${CURRENT_PACKAGES_DIR}/${targetdir}/qgis/${basepath})
