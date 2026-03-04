@@ -19,6 +19,7 @@
 #include <QImageReader>
 #include <QMenu>
 #include <QMessageBox>
+#include <QRegularExpression>
 #include <QShortcut>
 #include <QUrlQuery>
 
@@ -1203,7 +1204,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     testCrs.createFromOgcWmsCrs( c );
     if ( testCrs == mMapCanvas->mapSettings().destinationCrs() )
     {
-      adjustedUri.replace( QRegExp( "crs=[^&]+" ), "crs=" + c );
+      adjustedUri.replace( QRegularExpression( "crs=[^&]+" ), "crs=" + c );
       QgsDebugMsgLevel( QString( "Changing layer crs to %1, new uri: %2" ).arg( c, adjustedUri ), 2 );
       break;
     }
@@ -1215,7 +1216,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
   {
     if ( fmt == lastImageEncoding )
     {
-      adjustedUri.replace( QRegExp( "format=[^&]+" ), "format=" + fmt );
+      adjustedUri.replace( QRegularExpression( "format=[^&]+" ), "format=" + fmt );
       QgsDebugMsgLevel( QString( "Changing layer format to %1, new uri: %2" ).arg( fmt, adjustedUri ), 2 );
       break;
     }
@@ -1248,7 +1249,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     }
     else if ( uri.providerKey == "wms" )
     {
-      adjustedUri.replace( QRegExp( "layers=[^&]*" ), "layers=" + sublayer["id"].toString() );
+      adjustedUri.replace( QRegularExpression( "layers=[^&]*" ), "layers=" + sublayer["id"].toString() );
       layer = kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey, false, 0, false );
     }
 
@@ -1334,7 +1335,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
         }
         else if ( uri.providerKey == "wms" )
         {
-          adjustedUri.replace( QRegExp( "layers=[^&]*" ), "layers=" + QString::number( entry->id ) );
+          adjustedUri.replace( QRegularExpression( "layers=[^&]*" ), "layers=" + QString::number( entry->id ) );
           layer = kApp->addRasterLayer( adjustedUri, entry->name, uri.providerKey, false, 0, false );
         }
 

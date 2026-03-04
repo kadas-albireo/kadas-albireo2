@@ -19,6 +19,7 @@
 #include <QImageReader>
 #include <QJsonArray>
 #include <QMenu>
+#include <QRegularExpression>
 
 #include <array>
 #include <exiv2/exiv2.hpp>
@@ -412,7 +413,7 @@ bool KadasPictureItem::readGeoPos( const QString &filePath, const QgsCoordinateR
 
 double KadasPictureItem::parseExifRational( const QString &entry )
 {
-  QStringList parts = entry.split( QRegExp( "\\s+" ) );
+  QStringList parts = entry.split( QRegularExpression( "\\s+" ) );
 
   double value = 0;
   double div = 1;

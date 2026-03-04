@@ -18,6 +18,7 @@
 #include <QDomDocument>
 #include <QFileInfo>
 #include <QImageReader>
+#include <QRegularExpression>
 #include <QUuid>
 
 #include <quazip/quazipfile.h>
@@ -57,7 +58,16 @@ bool KadasKMLImport::importFile( const QString &filename, QString &errMsg )
     }
     // Search for kml file to open
     QStringList kmzFileList = quaZip.getFileNameList();
-    int mainKmlIndex = kmzFileList.indexOf( QRegExp( "[^/]+.kml", Qt::CaseInsensitive ) );
+    int mainKmlIndex = -1;
+    QRegularExpression kmzRe( "[^/]+.kml", QRegularExpression::CaseInsensitiveOption );
+    for ( int i = 0; i < kmzFileList.size(); ++i )
+    {
+      if ( kmzRe.match( kmzFileList[i] ).hasMatch() )
+      {
+        mainKmlIndex = i;
+        break;
+      }
+    }
     if ( mainKmlIndex == -1 || !quaZip.setCurrentFile( kmzFileList[mainKmlIndex] ) )
     {
       errMsg = tr( "Corrupt KMZ file." );
@@ -332,7 +342,7 @@ void KadasKMLImport::buildVSIVRT( const QString &name, OverlayData &overlayData,
 
   // Prepare vsi output
   QString safename = name;
-  safename.replace( QRegExp( "[<>:\"/\\\\|?*]" ), "_" ); // Replace invalid path chars
+  safename.replace( QRegularExpression( "[<>:\"/\\\\|?*]" ), "_" ); // Replace invalid path chars
   QString vsifilename = QgsProject::instance()->createAttachedFile( QString( "%1.zip" ).arg( safename ) );
   QuaZip vsiZip( vsifilename );
   if ( !vsiZip.open( QuaZip::mdCreate ) )
@@ -484,7 +494,7 @@ void KadasKMLImport::buildVSIVRT( const QString &name, OverlayData &overlayData,
 
 QVector<QgsPoint> KadasKMLImport::parseCoordinates( const QDomElement &geomEl ) const
 {
-  QStringList coordinates = geomEl.firstChildElement( "coordinates" ).text().split( QRegExp( "\\s+" ), Qt::SkipEmptyParts );
+  QStringList coordinates = geomEl.firstChildElement( "coordinates" ).text().split( QRegularExpression( "\\s+" ), Qt::SkipEmptyParts );
   QVector<QgsPoint> points;
   for ( int i = 0, n = coordinates.size(); i < n; ++i )
   {

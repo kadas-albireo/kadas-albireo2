@@ -20,6 +20,7 @@
 #include <QDesktopServices>
 #include <QMenu>
 #include <QMimeData>
+#include <QRegularExpression>
 
 #include "kadas/gui/kadastextbrowser.h"
 
@@ -91,13 +92,13 @@ void KadasTextBrowser::keyReleaseEvent( QKeyEvent *e )
     cursor.movePosition( QTextCursor::PreviousCharacter, QTextCursor::KeepAnchor );
     cursor.setCharFormat( QTextCharFormat() );
     cursor.setPosition( cursor.position() ); // Move anchor
-    QTextCursor c2 = document()->find( QRegExp( "^|\\s" ), cursor.position(), QTextDocument::FindBackward );
+    QTextCursor c2 = document()->find( QRegularExpression( "^|\\s" ), cursor.position(), QTextDocument::FindBackward );
     if ( c2.isNull() )
     {
       c2.setPosition( 0 );
     }
     cursor.movePosition( QTextCursor::PreviousCharacter, QTextCursor::KeepAnchor, cursor.position() - c2.position() );
-    if ( urlRegEx().indexIn( cursor.selectedText() ) != -1 )
+    if ( urlRegEx().match( cursor.selectedText() ).hasMatch() )
     {
       cursor.insertHtml( QString( "<a href=\"%1\" title=\"%2\">%1</a>" ).arg( cursor.selectedText() ).arg( tr( "Ctrl+Click to open hyperlink" ) ) );
       cursor.movePosition( QTextCursor::NextCharacter );
@@ -113,8 +114,9 @@ void KadasTextBrowser::insertFromMimeData( const QMimeData *source )
   insertHtml( text );
 }
 
-const QRegExp &KadasTextBrowser::urlRegEx() const
+const QRegularExpression &KadasTextBrowser::urlRegEx() const
 {
-  static QRegExp re( "((http:\\/\\/www\\.|https:\\/\\/www\\.|http:\\/\\/|https:\\/\\/)?[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?)" );
+  static QRegularExpression
+    re( "((http:\\/\\/www\\.|https:\\/\\/www\\.|http:\\/\\/|https:\\/\\/)?[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?)", QRegularExpression::CaseInsensitiveOption );
   return re;
 }

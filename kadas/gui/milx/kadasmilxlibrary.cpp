@@ -18,6 +18,7 @@
 #include <QDir>
 #include <QDomDocument>
 #include <QPainter>
+#include <QRegularExpression>
 #include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 #include <QTreeView>
@@ -223,7 +224,7 @@ QStandardItemModel *KadasMilxLibrary::loadLibrary( const QSize &viewIconSize )
       QFile galleryFile( galleryFilePath );
       if ( !galleryFilePath.endsWith( "_international.xml", Qt::CaseInsensitive ) && galleryFile.open( QIODevice::ReadOnly ) )
       {
-        QImage galleryIcon( QString( galleryFilePath ).replace( QRegExp( ".xml$" ), ".png" ) );
+        QImage galleryIcon( QString( galleryFilePath ).replace( QRegularExpression( ".xml$" ), ".png" ) );
         QDomDocument doc;
         doc.setContent( &galleryFile );
         QDomElement mssGalleryEl = doc.firstChildElement( "MssGallery" );

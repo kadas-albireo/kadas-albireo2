@@ -198,7 +198,7 @@ void KadasLocationSearchFilter::handleNetworkReply()
     QgsLocatorResult result;
     result.group = mCategoryMap.contains( origin ) ? mCategoryMap[origin].first : origin;
     result.groupScore = mCategoryMap.contains( origin ) ? mCategoryMap[origin].second : 0;
-    result.displayString = itemAttrsMap["label"].toString().replace( QRegExp( "<[^>]+>" ), "" ); // Remove HTML tags
+    result.displayString = itemAttrsMap["label"].toString().replace( QRegularExpression( "<[^>]+>" ), "" ); // Remove HTML tags
 
     QVariantMap resultData;
     const thread_local QRegularExpression bboxRe( R"(BOX\s*\(\s*(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)\s+(-?\d+\.?\d*)\s*)", QRegularExpression::CaseInsensitiveOption );

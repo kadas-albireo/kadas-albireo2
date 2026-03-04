@@ -25,6 +25,7 @@
 #include <QMessageBox>
 #include <QSplashScreen>
 #include <QStatusBar>
+#include <QRegularExpression>
 #include <QUrlQuery>
 #include <quazip/quazipfile.h>
 
@@ -1101,7 +1102,7 @@ void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
   else if ( layer->providerType() == "arcgisfeatureserver" )
   {
     layerUrl = QgsDataSourceUri( layer->source() ).param( "url" );
-    int lastIndex = layerUrl.lastIndexOf( QRegExp( "\\/\\d+\\/{0,1}$" ) ); // Chop the layer index ../MapServer/4
+    int lastIndex = layerUrl.lastIndexOf( QRegularExpression( "\\/\\d+\\/{0,1}$" ) ); // Chop the layer index ../MapServer/4
     if ( lastIndex >= 0 )
     {
       layerUrl = layerUrl.left( lastIndex );
@@ -1687,10 +1688,11 @@ void KadasApplication::injectAuthToken( QNetworkRequest *request )
     QByteArray data = QUrl::fromPercentEncoding( cookie.toRawForm() ).toLocal8Bit();
     if ( data.startsWith( "agstoken=" ) )
     {
-      QRegExp tokenRe( "\"token\":\\s*\"([A-Za-z0-9-_\\.]+)\"" );
-      if ( tokenRe.indexIn( QString( data ) ) != -1 )
+      QRegularExpression tokenRe( "\"token\":\\s*\"([A-Za-z0-9-_\\.]+)\"" );
+      QRegularExpressionMatch tokenMatch = tokenRe.match( QString( data ) );
+      if ( tokenMatch.hasMatch() )
       {
-        query.addQueryItem( "token", tokenRe.cap( 1 ) );
+        query.addQueryItem( "token", tokenMatch.captured( 1 ) );
         url.setQuery( query );
         request->setUrl( url );
         QgsDebugMsgLevel( QString( "injectAuthToken: url altered to %1" ).arg( url.toString() ), 2 );

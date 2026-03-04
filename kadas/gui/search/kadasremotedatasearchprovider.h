@@ -19,7 +19,6 @@
 #define KADASREMOTEDATASEARCHPROVIDER_H
 
 #include <QMap>
-#include <QRegExp>
 #include <QTimer>
 
 #include <qgis/qgslocatorfilter.h>
