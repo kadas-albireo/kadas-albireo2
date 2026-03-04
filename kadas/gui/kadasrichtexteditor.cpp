@@ -19,6 +19,7 @@
 
 #include <QAbstractTextDocumentLayout>
 #include <QAction>
+#include <QActionGroup>
 #include <QColorDialog>
 #include <QComboBox>
 #include <QDesktopServices>
