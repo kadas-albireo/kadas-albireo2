@@ -23,8 +23,6 @@
 #include <QDir>
 #include <QEventLoop>
 #include <QHostAddress>
-#include <QNetworkConfigurationManager>
-#include <QNetworkSession>
 #include <QImage>
 #include <QProcess>
 #include <QTcpSocket>
@@ -119,41 +117,6 @@ bool KadasMilxClientWorker::initialize()
   int port = atoi( qgetenv( portEnv ) );
   QHostAddress addr = QHostAddress( QString( qgetenv( "MILIX_SERVER_ADDR" ) ) );
 #endif
-
-  // Initialize network
-  QNetworkConfigurationManager manager;
-  if ( manager.capabilities() & QNetworkConfigurationManager::NetworkSessionRequired )
-  {
-    // Get saved network configuration
-    QgsSettings settings( QSettings::UserScope, QLatin1String( "QtProject" ) );
-    settings.beginGroup( QLatin1String( "QtNetwork" ) );
-    QString id = settings.value( QLatin1String( "DefaultNetworkConfiguration" ) ).toString();
-    settings.endGroup();
-
-    // If the saved network configuration is not currently discovered use the system default
-    QNetworkConfiguration config = manager.configurationFromIdentifier( id );
-    if ( ( config.state() & QNetworkConfiguration::Discovered ) != QNetworkConfiguration::Discovered )
-    {
-      config = manager.defaultConfiguration();
-    }
-
-    mNetworkSession = new QNetworkSession( config, this );
-    QEventLoop evLoop;
-    connect( mNetworkSession, &QNetworkSession::opened, &evLoop, &QEventLoop::quit );
-    mNetworkSession->open();
-    evLoop.exec();
-
-    // Save the used configuration
-    config = mNetworkSession->configuration();
-    if ( config.type() == QNetworkConfiguration::UserChoice )
-      id = mNetworkSession->sessionProperty( QLatin1String( "UserChoiceConfiguration" ) ).toString();
-    else
-      id = config.identifier();
-
-    settings.beginGroup( QLatin1String( "QtNetwork" ) );
-    settings.setValue( QLatin1String( "DefaultNetworkConfiguration" ), id );
-    settings.endGroup();
-  }
 
   // Connect to server
   mTcpSocket = new QTcpSocket( this );

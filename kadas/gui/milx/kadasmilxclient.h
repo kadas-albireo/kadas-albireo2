@@ -28,7 +28,6 @@
 
 #include "kadas/gui/kadas_gui.h"
 
-class QNetworkSession;
 class QRect;
 class QProcess;
 class QTcpSocket;
@@ -101,7 +100,6 @@ class KADAS_GUI_EXPORT KadasMilxClientWorker : public QObject
   private:
     bool mSync;
     QProcess *mProcess = nullptr;
-    QNetworkSession *mNetworkSession = nullptr;
     QTcpSocket *mTcpSocket = nullptr;
     QString mLastError;
     QString mLibraryVersionTag;
