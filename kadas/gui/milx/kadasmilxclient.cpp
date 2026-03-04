@@ -61,8 +61,6 @@ void KadasMilxClientWorker::cleanup()
     mProcess->deleteLater();
     mProcess = nullptr;
   }
-  delete mNetworkSession;
-  mNetworkSession = nullptr;
 }
 
 bool KadasMilxClientWorker::initialize()
