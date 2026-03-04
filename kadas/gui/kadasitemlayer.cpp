@@ -119,7 +119,7 @@ void KadasItemLayer::raiseItem( const ItemId &itemId )
 {
   int pos = mItemOrder.indexOf( itemId );
   mItemOrder.removeAt( pos );
-  mItemOrder.insert( std::min( mItemOrder.length(), pos + 1 ), itemId );
+  mItemOrder.insert( std::min( static_cast<int>( mItemOrder.length() ), pos + 1 ), itemId );
   emit repaintRequested();
 }
 
