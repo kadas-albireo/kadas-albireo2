@@ -30,6 +30,19 @@ if(TARGET Qwt::Qwt)
 endif()
 find_package(unofficial-qwt CONFIG)
 if(TARGET unofficial::qwt::qwt) # vcpkg version
+  # vcpkg sets include dir to .../include but headers are in .../include/qwt
+  get_target_property(
+    _qwt_inc unofficial::qwt::qwt INTERFACE_INCLUDE_DIRECTORIES
+  )
+  foreach(_dir ${_qwt_inc})
+    if(IS_DIRECTORY "${_dir}/qwt")
+      set_property(
+        TARGET unofficial::qwt::qwt
+        APPEND
+        PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${_dir}/qwt"
+      )
+    endif()
+  endforeach()
   add_library(Qwt::Qwt ALIAS unofficial::qwt::qwt)
   set(Qwt_FOUND TRUE)
 else() # pkgconfig
