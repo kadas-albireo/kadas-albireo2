@@ -352,7 +352,9 @@ void KadasApplication::init()
     mMessageLogViewer->show();
   }
 
-  connect( QgsApplication::authManager(), &QgsAuthManager::messageLog, mMessageLogViewer, &KadasMessageLogViewer::logMessage );
+  connect( QgsApplication::authManager(), &QgsAuthManager::messageLog, mMessageLogViewer, [this]( const QString &message, const QString &tag, Qgis::MessageLevel level ) {
+    mMessageLogViewer->logMessage( message, tag, level );
+  } );
 
   QgsProject::instance()->setBadLayerHandler( new KadasHandleBadLayersHandler );
   QgsPathResolver::setPathPreprocessor( [this]( const QString &path ) { return migrateDatasource( path ); } );
