@@ -28,7 +28,7 @@ KadasMilxEditor::KadasMilxEditor( KadasMapItem *item, EditorType type, KadasMilx
 {
   setLayout( new QHBoxLayout() );
   layout()->setSpacing( 2 );
-  layout()->setMargin( 0 );
+  layout()->setContentsMargins( 0, 0, 0, 0 );
   if ( type == KadasMapItemEditor::EditorType::CreateItemEditor )
   {
     layout()->addWidget( new QLabel( tr( "Symbol:" ) ) );

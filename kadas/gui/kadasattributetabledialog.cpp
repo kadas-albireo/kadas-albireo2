@@ -60,7 +60,7 @@ KadasAttributeTableDialog::KadasAttributeTableDialog( QgsVectorLayer *layer, Qgs
   QWidget *widget = new QWidget( this );
   widget->setObjectName( "dockContentsWidget" );
   widget->setLayout( new QVBoxLayout );
-  widget->layout()->setMargin( 2 );
+  widget->layout()->setContentsMargins( 2, 2, 2, 2 );
   widget->layout()->setSpacing( 2 );
 
   QToolBar *toolbar = new QToolBar( this );

@@ -89,7 +89,7 @@ KadasMilxLibrary::KadasMilxLibrary( WId winId, QWidget *parent )
   setLineWidth( 1 );
 
   QVBoxLayout *layout = new QVBoxLayout( this );
-  layout->setMargin( 2 );
+  layout->setContentsMargins( 2, 2, 2, 2 );
   layout->setSpacing( 2 );
   setLayout( layout );
 
