@@ -51,6 +51,7 @@
       "name": "qgis",
       "features": [
         "3d",
+        "bindings",
         "gui"
       ]
     },
