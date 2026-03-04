@@ -116,14 +116,14 @@ jobs:
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
         run: |
           ./build/_deps/vcpkg-src/vcpkg export --zip --output-dir=./sdk --x-install-root=./build/vcpkg_installed  --x-manifest-root=vcpkg
+          cd sdk && for f in vcpkg-export-*.zip; do mv "$f" "${f/vcpkg-export/vcpkg-export-${{ matrix.triplet }}}"; done
 
       - name: 📤 Upload sdk
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
-          name: kadas-albireo2-sdk-${{ matrix.triplet }}
-          path: |
-            sdk/vcpkg-export-*.zip
+          archive: false
+          path: sdk/vcpkg-export-${{ matrix.triplet }}-*.zip
 
       - name: build
         run: cmake -D VCPKG_INSTALL_OPTIONS="" build
