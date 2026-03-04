@@ -174,7 +174,7 @@ void KadasRibbonButton::paintEvent( QPaintEvent * /*e*/ )
   }
 }
 
-void KadasRibbonButton::enterEvent( QEvent *event )
+void KadasRibbonButton::enterEvent( QEnterEvent *event )
 {
   update();
   QToolButton::enterEvent( event );
