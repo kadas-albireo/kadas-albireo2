@@ -56,7 +56,7 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
         return true;
       }
       int dpi = renderContext()->painter()->device()->logicalDpiX();
-      double dpiScale = double( dpi ) / double( QApplication::desktop()->logicalDpiX() );
+      double dpiScale = double( dpi ) / double( qApp->primaryScreen()->logicalDotsPerInchX() );
       QList<KadasMilxClient::NPointSymbolGraphic> result;
 #ifndef Q_OS_WIN
       // FIXME: Why only on non-windows?
