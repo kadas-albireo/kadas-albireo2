@@ -112,7 +112,10 @@ jobs:
           path: |
             build/_deps/vcpkg-src/buildtrees/**/*.log
 
-      - name: 📦 Create SDK
+      - name: � tmate session
+        uses: mxschmitt/action-tmate@v3
+
+      - name: �📦 Create SDK
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
         run: |
           # Copy SIP bindings from buildtrees into vcpkg_installed (they are generated but not installed by the port)
