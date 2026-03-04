@@ -79,7 +79,7 @@ void KadasAlternateGotoLocatorFilter::fetchResults( const QString &string, const
   // Accept decimal numbers, possibly with degree symbol (°) after each number and optional altitude
   thread_local QRegularExpression separatorRx1(
     QStringLiteral( R"(^([0-9\-\%1\%2]*)(?:\s*%4)?[\s%3]*([0-9\-\%1\%2]*)[\s%4]*(:?\d+(\.\d+)?)?$)" )
-      .arg( locale.decimalPoint(), locale.groupSeparator(), locale.decimalPoint() != ',' && locale.groupSeparator() != ',' ? QStringLiteral( "\\," ) : QString(), degreeSymbol )
+      .arg( locale.decimalPoint(), locale.groupSeparator(), locale.decimalPoint() != QStringLiteral( "," ) && locale.groupSeparator() != QStringLiteral( "," ) ? QStringLiteral( "\\," ) : QString(), degreeSymbol )
   );
   QRegularExpressionMatch match = separatorRx1.match( string.trimmed() );
   if ( match.hasMatch() )
