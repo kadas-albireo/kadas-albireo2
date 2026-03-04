@@ -35,7 +35,7 @@ class KADAS_GUI_EXPORT KadasRibbonButton : public QToolButton
 
   protected:
     virtual void paintEvent( QPaintEvent *e ) override;
-    virtual void enterEvent( QEvent *event ) override;
+    virtual void enterEvent( QEnterEvent *event ) override;
     virtual void leaveEvent( QEvent *event ) override;
     virtual void focusInEvent( QFocusEvent *event ) override;
     virtual void focusOutEvent( QFocusEvent *event ) override;

@@ -109,7 +109,7 @@ QVariant KadasMapItemTooltip::loadResource( int type, const QUrl &url )
   return QTextEdit::loadResource( type, url );
 }
 
-void KadasMapItemTooltip::enterEvent( QEvent * )
+void KadasMapItemTooltip::enterEvent( QEnterEvent * )
 {
   mHideTimer.stop();
   mShowTimer.stop();
