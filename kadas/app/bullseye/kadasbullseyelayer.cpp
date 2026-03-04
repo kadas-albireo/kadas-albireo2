@@ -16,7 +16,7 @@
 
 #include <QAction>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QMenu>
 
 #include <GeographicLib/Geodesic.hpp>
@@ -56,7 +56,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
       }
 
       const QgsMapToPixel &mapToPixel = renderContext()->mapToPixel();
-      double dpiScale = double( renderContext()->painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
+      double dpiScale = double( renderContext()->painter()->device()->logicalDpiX() ) / qApp->primaryScreen()->logicalDotsPerInchX();
 
       renderContext()->painter()->save();
       renderContext()->painter()->setOpacity( mRenderOpacity );

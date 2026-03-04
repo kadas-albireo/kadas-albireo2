@@ -15,7 +15,7 @@
  ***************************************************************************/
 
 #include <QComboBox>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QLabel>
@@ -1414,8 +1414,8 @@ void KadasLayoutDesignerDialog::restoreWindowState()
   {
     QgsDebugMsgLevel( QStringLiteral( "restore of layout UI geometry failed" ), 2 );
     // default to 80% of screen size, at 10% from top left corner
-    resize( QDesktopWidget().availableGeometry( this ).size() * 0.8 );
-    QSize pos = QDesktopWidget().availableGeometry( this ).size() * 0.1;
+    resize( screen()->availableGeometry().size() * 0.8 );
+    QSize pos = screen()->availableGeometry().size() * 0.1;
     move( pos.width(), pos.height() );
   }
 }

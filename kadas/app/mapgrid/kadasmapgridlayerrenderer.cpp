@@ -15,7 +15,7 @@
  ***************************************************************************/
 
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QPainter>
 #include <qgsrendercontext.h>
 #include <qgsgeometryutils.h>
@@ -201,7 +201,7 @@ void KadasMapGridLayerRenderer::drawCrsGrid( const QString &crs, double segmentL
 
   if ( drawLabels && mRenderGridConfig.labelingMode == KadasMapGridLayer::LabelingEnabled )
   {
-    double dpiScale = double( renderContext()->painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
+    double dpiScale = double( renderContext()->painter()->device()->logicalDpiX() ) / qApp->primaryScreen()->logicalDotsPerInchX();
     QFont font = renderContext()->painter()->font();
     font.setBold( true );
     font.setPointSizeF( mRenderGridConfig.fontSize * dpiScale );

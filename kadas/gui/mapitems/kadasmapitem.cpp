@@ -17,7 +17,7 @@
 #include <thread>
 
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
 
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgslogger.h>
@@ -302,7 +302,7 @@ void KadasMapItem::anchorNodeRenderer( QPainter *painter, const QPointF &screenP
 
 double KadasMapItem::outputDpiScale( const QgsRenderContext &context )
 {
-  return double( context.painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
+  return double( context.painter()->device()->logicalDpiX() ) / qApp->primaryScreen()->logicalDotsPerInchX();
 }
 
 double KadasMapItem::getTextRenderScale( const QgsRenderContext &context )

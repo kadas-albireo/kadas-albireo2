@@ -15,7 +15,7 @@
  ***************************************************************************/
 
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QMenu>
 
 #include <qgis/qgsapplication.h>
@@ -75,7 +75,7 @@ class KadasGuideGridLayer::Renderer : public QgsMapLayerRenderer
       bool adaptLabelsToScreen = !( flags["globe"].toBool() || flags["kml"].toBool() );
 
       QColor bufferColor = ( 0.2126 * mRenderGridConfig.color.red() + 0.7152 * mRenderGridConfig.color.green() + 0.0722 * mRenderGridConfig.color.blue() ) > 128 ? Qt::black : Qt::white;
-      double dpiScale = double( renderContext()->painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
+      double dpiScale = double( renderContext()->painter()->device()->logicalDpiX() ) / qApp->primaryScreen()->logicalDotsPerInchX();
 
       QFont smallFont;
       smallFont.setPixelSize( 0.5 * mRenderGridConfig.fontSize * dpiScale );

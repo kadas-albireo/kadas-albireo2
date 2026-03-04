@@ -15,7 +15,6 @@
  ***************************************************************************/
 
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QDir>
 #include <QDomDocument>
 #include <QFile>
@@ -467,7 +466,7 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
       continue;
     }
     KadasMilxLayer layer( mapLayerEl.firstChildElement( "layername" ).text() );
-    int dpi = qApp->desktop()->logicalDpiX();
+    int dpi = qApp->primaryScreen()->logicalDotsPerInchX();
     QString err;
     layer.importFromMilxly( mapLayerEl.firstChildElement( "MilXLayer" ), dpi, err );
 
