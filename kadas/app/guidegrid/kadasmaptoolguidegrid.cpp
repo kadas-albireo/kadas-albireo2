@@ -16,6 +16,7 @@
 
 #include <QAction>
 #include <QPushButton>
+#include <QRegularExpression>
 
 #include <qgis/qgsapplication.h>
 #include <qgis/qgslayertreeview.h>
@@ -98,7 +99,7 @@ void KadasMapToolGuideGrid::keyReleaseEvent( QKeyEvent *e )
 }
 
 
-static QRegExp g_cooRegExp( "^\\s*(\\d+\\.?\\d*)[,\\s]?\\s*(\\d+\\.?\\d*)\\s*$" );
+static const QRegularExpression g_cooRegExp( "^\\s*(\\d+\\.?\\d*)[,\\s]?\\s*(\\d+\\.?\\d*)\\s*$" );
 
 KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QgsMapLayer *layer )
   : KadasBottomBar( canvas )
@@ -268,10 +269,11 @@ void KadasGuideGridWidget::pointPicked( KadasMapToolGuideGrid::PickMode pickMode
 void KadasGuideGridWidget::topLeftEdited()
 {
   QString text = ui.lineEditTopLeft->text();
-  if ( g_cooRegExp.indexIn( text ) != -1 )
+  QRegularExpressionMatch match = g_cooRegExp.match( text );
+  if ( match.hasMatch() )
   {
-    mCurRect.setXMinimum( g_cooRegExp.cap( 1 ).toDouble() );
-    mCurRect.setYMaximum( g_cooRegExp.cap( 2 ).toDouble() );
+    mCurRect.setXMinimum( match.captured( 1 ).toDouble() );
+    mCurRect.setYMaximum( match.captured( 2 ).toDouble() );
     if ( ui.toolButtonLockWidth->isChecked() )
     {
       mCurRect.setXMaximum( mCurRect.xMinimum() + ui.spinBoxCols->value() * ui.spinBoxWidth->value() );
@@ -304,10 +306,11 @@ void KadasGuideGridWidget::topLeftEdited()
 void KadasGuideGridWidget::bottomRightEdited()
 {
   QString text = ui.lineEditBottomRight->text();
-  if ( g_cooRegExp.indexIn( text ) != -1 )
+  QRegularExpressionMatch match = g_cooRegExp.match( text );
+  if ( match.hasMatch() )
   {
-    mCurRect.setXMaximum( g_cooRegExp.cap( 1 ).toDouble() );
-    mCurRect.setYMinimum( g_cooRegExp.cap( 2 ).toDouble() );
+    mCurRect.setXMaximum( match.captured( 1 ).toDouble() );
+    mCurRect.setYMinimum( match.captured( 2 ).toDouble() );
     if ( ui.toolButtonLockWidth->isChecked() )
     {
       mCurRect.setXMinimum( mCurRect.xMaximum() - ui.spinBoxCols->value() * ui.spinBoxWidth->value() );

@@ -18,6 +18,7 @@
 #include <QJsonObject>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QRegularExpression>
 #include <QUrlQuery>
 
 #include <qgis/qgsannotationlayer.h>
@@ -145,7 +146,7 @@ void KadasRemoteDataSearchProvider::fetchResults( const QString &string, const Q
       if ( reply->error() == QNetworkReply::NoError )
       {
         QString layerName = reply->property( "layerName" ).toString();
-        layerName.replace( QRegExp( "<[^>]+>" ), "" ); // Remove HTML tags
+        layerName.replace( QRegularExpression( "<[^>]+>" ), "" ); // Remove HTML tags
 
         QByteArray replyText = reply->readAll();
         QJsonParseError err;

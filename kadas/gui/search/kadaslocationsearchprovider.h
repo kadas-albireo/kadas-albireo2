@@ -20,7 +20,6 @@
 
 #include <QPointer>
 #include <QMap>
-#include <QRegExp>
 
 #include <qgis/qgslocatorfilter.h>
 

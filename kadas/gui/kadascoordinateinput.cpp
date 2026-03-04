@@ -17,7 +17,7 @@
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QLineEdit>
-#include <QRegExp>
+
 
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsproject.h>

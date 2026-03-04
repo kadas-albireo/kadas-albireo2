@@ -25,6 +25,7 @@
 #endif
 #include <QDialog>
 #include <QNetworkRequest>
+#include <QRegularExpression>
 #include <QStackedLayout>
 #include <QToolButton>
 #include <QUrlQuery>
@@ -78,7 +79,7 @@ class WebWidget : public QAxWidget
     QStringList cookies()
     {
       QAxObject *document = querySubObject( "Document()" );
-      return document->property( "cookie" ).toString().split( QRegExp( "\\s*;\\s*" ) );
+      return document->property( "cookie" ).toString().split( QRegularExpression( "\\s*;\\s*" ) );
     }
 
   protected:
