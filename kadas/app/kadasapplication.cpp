@@ -594,7 +594,7 @@ KadasItemLayer *KadasApplication::selectPasteTargetItemLayer( const QList<KadasM
   QDialog dialog;
   dialog.setWindowTitle( tr( "Select layer" ) );
   dialog.setLayout( new QVBoxLayout() );
-  dialog.layout()->setMargin( 2 );
+  dialog.layout()->setContentsMargins( 2, 2, 2, 2 );
   dialog.layout()->addWidget( new QLabel( tr( "Select layer to paste items to:" ) ) );
   KadasLayerSelectionWidget *layerSelectionWidget = new KadasLayerSelectionWidget( mMainWindow->mapCanvas(), mMainWindow->layerTreeView(), [&]( QgsMapLayer *layer ) {
     if ( !dynamic_cast<KadasItemLayer *>( layer ) )
