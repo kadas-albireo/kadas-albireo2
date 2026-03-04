@@ -867,7 +867,7 @@ void KadasLayoutDesignerDialog::updateStatusZoom()
   }
   else
   {
-    double dpi = QgsApplication::desktop()->logicalDpiX();
+    double dpi = qApp->primaryScreen()->logicalDotsPerInchX();
     //monitor dpi is not always correct - so make sure the value is sane
     if ( ( dpi < 60 ) || ( dpi > 1200 ) )
       dpi = 72;
