@@ -99,7 +99,7 @@ void KadasGpxWaypointItem::render( QgsRenderContext &context ) const
     QFont font = mLabelFont;
     font.setPointSizeF( font.pointSizeF() * outputDpiScale( context ) );
     QFontMetrics metrics( font );
-    pos += QPointF( metrics.width( mName ) / 2.0, 0.0 );
+    pos += QPointF( metrics.horizontalAdvance( mName ) / 2.0, 0.0 );
 
     double scale = getTextRenderScale( context );
 
