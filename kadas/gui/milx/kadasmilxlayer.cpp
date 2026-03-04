@@ -15,7 +15,7 @@
  ***************************************************************************/
 
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QMenu>
 
 #include <qgis/qgslayertreeview.h>
