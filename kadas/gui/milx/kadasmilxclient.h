@@ -31,7 +31,6 @@
 class QNetworkSession;
 class QRect;
 class QProcess;
-class QStringList;
 class QTcpSocket;
 
 struct KADAS_GUI_EXPORT KadasMilxSymbolDesc
