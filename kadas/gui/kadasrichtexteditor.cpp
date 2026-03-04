@@ -421,15 +421,15 @@ KadasRichTextEditorToolBar::KadasRichTextEditorToolBar( KadasRichTextEditor *edi
   // Bold, italic and underline buttons
 
   m_bold_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textbold" ), tr( "Bold" ), editor, SLOT( setFontBold( bool ) ), editor, this );
-  m_bold_action->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_B ) );
+  m_bold_action->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_B ) );
   addAction( m_bold_action );
 
   m_italic_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textitalic" ), tr( "Italic" ), editor, SLOT( setFontItalic( bool ) ), editor, this );
-  m_italic_action->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_I ) );
+  m_italic_action->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_I ) );
   addAction( m_italic_action );
 
   m_underline_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textunder" ), tr( "Underline" ), editor, SLOT( setFontUnderline( bool ) ), editor, this );
-  m_underline_action->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_U ) );
+  m_underline_action->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_U ) );
   addAction( m_underline_action );
 
   addSeparator();

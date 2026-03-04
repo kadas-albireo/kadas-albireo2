@@ -38,12 +38,12 @@ KadasKmlIntegration::KadasKmlIntegration( QToolButton *kmlButton, QObject *paren
 
   QAction *actionExportKml = new QAction( tr( "KML Export" ), kmlMenu );
   connect( actionExportKml, &QAction::triggered, this, &KadasKmlIntegration::exportToKml );
-  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_E, Qt::CTRL + Qt::Key_K ), kApp->mainWindow() ), &QShortcut::activated, actionExportKml, &QAction::trigger );
+  connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_E, Qt::CTRL | Qt::Key_K ), kApp->mainWindow() ), &QShortcut::activated, actionExportKml, &QAction::trigger );
   kmlMenu->addAction( actionExportKml );
 
   QAction *actionImportKml = new QAction( tr( "KML Import" ), kmlMenu );
   connect( actionImportKml, &QAction::triggered, this, &KadasKmlIntegration::importFromKml );
-  connect( new QShortcut( QKeySequence( Qt::CTRL + Qt::Key_I, Qt::CTRL + Qt::Key_K ), kApp->mainWindow() ), &QShortcut::activated, actionImportKml, &QAction::trigger );
+  connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_I, Qt::CTRL | Qt::Key_K ), kApp->mainWindow() ), &QShortcut::activated, actionImportKml, &QAction::trigger );
   kmlMenu->addAction( actionImportKml );
 
   mKMLButton->setIcon( QIcon( ":/kadas/icons/kml" ) );
