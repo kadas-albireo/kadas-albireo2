@@ -16,6 +16,7 @@
 
 #include <QComboBox>
 #include <QScreen>
+#include <QActionGroup>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QLabel>
