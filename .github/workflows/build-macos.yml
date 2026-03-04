@@ -102,8 +102,10 @@ jobs:
                 -D NUGET_USERNAME=kadas-albireo \
                 -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }} || true
                 
-                fdupes -r -1 build/vcpkg_installed/arm64-osx-dynamic/lib | grep libQt | while read line; do master=""; for file in ${line[*]}; do if  [[ "x${master}" == "x" ]]; then master=$file; else rm "${file}"; ln -s $(basename "${master}") "${file}"; fi; done; done
-                
+          fdupes -r -1 build/vcpkg_installed/arm64-osx-dynamic/lib | grep libQt | while read line; do master=""; for file in ${line[*]}; do if  [[ "x${master}" == "x" ]]; then master=$file; else rm "${file}"; ln -s $(basename "${master}") "${file}"; fi; done; done
+
+          cmake -D VCPKG_INSTALL_OPTIONS="" build
+
       - name: 📑 Upload vcpkg build logs
         uses: actions/upload-artifact@v7
         if: failure()
@@ -124,9 +126,6 @@ jobs:
         with:
           archive: false
           path: sdk/vcpkg-export-${{ matrix.triplet }}-*.zip
-
-      - name: 🛠️ Build
-        run: cmake -D VCPKG_INSTALL_OPTIONS="" build
 
       - name: 📝 Compile plugins translation
         run: |
