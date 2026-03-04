@@ -306,7 +306,7 @@ bool KadasPythonIntegration::runString( const QString &command, QString msgOnErr
   qDebug() << str;
   QgsMessageOutput *msg = QgsMessageOutput::createMessageOutput();
   msg->setTitle( QObject::tr( "Python error" ) );
-  msg->setMessage( str, QgsMessageOutput::MessageHtml );
+  msg->setMessage( str, Qgis::StringFormat::Html );
   msg->showMessage();
 
   return res;
