@@ -24,7 +24,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasribbonbutton.h"
+#include "kadas/gui/kadasribbonbutton.h"
 %End
   public:
     KadasRibbonButton( QWidget *parent = 0 );
@@ -34,7 +34,7 @@ your option) any later version. *
 
   protected:
     virtual void paintEvent( QPaintEvent *e );
-    virtual void enterEvent( QEvent *event );
+    virtual void enterEvent( QEnterEvent *event );
     virtual void leaveEvent( QEvent *event );
     virtual void focusInEvent( QFocusEvent *event );
     virtual void focusOutEvent( QFocusEvent *event );

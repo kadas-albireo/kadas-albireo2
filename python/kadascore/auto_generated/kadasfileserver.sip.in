@@ -23,7 +23,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasfileserver.h"
+#include "kadas/core/kadasfileserver.h"
 %End
   public:
     KadasFileServer( const QString &topdir, const QString &host = "", int port = 0 );

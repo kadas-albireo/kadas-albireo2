@@ -26,7 +26,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasclipboard.h"
+#include "kadas/gui/kadasclipboard.h"
 %End
   public:
     virtual ~KadasPasteHandler();
@@ -37,7 +37,7 @@ your option) any later version. *
 class KadasClipboard : QObject
 {
 %TypeHeaderCode
-#include "kadasclipboard.h"
+#include "kadas/gui/kadasclipboard.h"
 %End
   public:
     static KadasClipboard *instance();

@@ -25,7 +25,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasplugininterface.h"
+#include "kadas/gui/kadasplugininterface.h"
 %End
   public:
     static KadasPluginInterface *cast( QgisInterface *iface );

@@ -23,7 +23,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadascoordinatecrossitem.h"
+#include "kadas/gui/mapitems/kadascoordinatecrossitem.h"
 %End
   public:
     KadasCoordinateCrossItem( const QgsCoordinateReferenceSystem &crs );

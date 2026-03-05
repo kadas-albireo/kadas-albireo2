@@ -29,7 +29,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasheightprofiledialog.h"
+#include "kadas/gui/kadasheightprofiledialog.h"
 %End
   public:
     KadasHeightProfileDialog( KadasMapToolHeightProfile *tool, QWidget *parent = 0, Qt::WindowFlags f = Qt::WindowFlags() );

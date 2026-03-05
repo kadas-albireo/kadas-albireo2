@@ -28,7 +28,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasattributetabledialog.h"
+#include "kadas/gui/kadasattributetabledialog.h"
 %End
   public:
 

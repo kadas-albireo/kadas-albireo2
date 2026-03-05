@@ -23,7 +23,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasredliningtexteditor.h"
+#include "kadas/gui/mapitemeditors/kadasredliningtexteditor.h"
 %End
   public:
     KadasRedliningTextEditor( KadasMapItem *item );

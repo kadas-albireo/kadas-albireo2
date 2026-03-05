@@ -28,7 +28,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadaslocationsearchprovider.h"
+#include "kadas/gui/search/kadaslocationsearchprovider.h"
 %End
   public:
     static QgsFillSymbol *createPolygonSymbol();

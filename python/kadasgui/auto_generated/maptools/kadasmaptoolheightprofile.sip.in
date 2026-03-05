@@ -26,7 +26,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasmaptoolheightprofile.h"
+#include "kadas/gui/maptools/kadasmaptoolheightprofile.h"
 %End
   public:
     KadasMapToolHeightProfileItemInterface( QgsMapCanvas *mapCanvas );
@@ -38,7 +38,7 @@ your option) any later version. *
 class KadasMapToolHeightProfile : KadasMapToolCreateItem
 {
 %TypeHeaderCode
-#include "kadasmaptoolheightprofile.h"
+#include "kadas/gui/maptools/kadasmaptoolheightprofile.h"
 %End
   public:
     KadasMapToolHeightProfile( QgsMapCanvas *canvas );

@@ -15,7 +15,7 @@
 struct KadasMilxSymbolDesc
 {
 %TypeHeaderCode
-#include "kadasmilxclient.h"
+#include "kadas/gui/milx/kadasmilxclient.h"
 %End
     QString symbolXml;
     QString name;
@@ -29,7 +29,7 @@ struct KadasMilxSymbolDesc
 class KadasMilxSymbolSettings
 {
 %TypeHeaderCode
-#include "kadasmilxclient.h"
+#include "kadas/gui/milx/kadasmilxclient.h"
 %End
   public:
     static const QMetaObject staticMetaObject;

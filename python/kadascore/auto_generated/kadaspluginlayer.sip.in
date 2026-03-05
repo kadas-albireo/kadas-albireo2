@@ -27,7 +27,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadaspluginlayer.h"
+#include "kadas/core/kadaspluginlayer.h"
 %End
   public:
     KadasPluginLayer( const QString &layerType, const QString &layerName = QString() );
@@ -60,7 +60,7 @@ your option) any later version. *
 class KadasPluginLayerType : QObject, QgsPluginLayerType
 {
 %TypeHeaderCode
-#include "kadaspluginlayer.h"
+#include "kadas/core/kadaspluginlayer.h"
 %End
   public:
     KadasPluginLayerType( const QString &name );

@@ -25,7 +25,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadaslatlontoutm.h"
+#include "kadas/core/kadaslatlontoutm.h"
 %End
   public:
     struct UTMCoo

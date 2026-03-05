@@ -26,7 +26,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasninecellfilter.h"
+#include "kadas/analysis/kadasninecellfilter.h"
 %End
   public:
     KadasNineCellFilter(

@@ -27,7 +27,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadascoordinateinput.h"
+#include "kadas/gui/kadascoordinateinput.h"
 %End
   public:
     KadasCoordinateInput( QWidget *parent );

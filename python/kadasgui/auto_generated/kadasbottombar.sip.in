@@ -25,7 +25,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasbottombar.h"
+#include "kadas/gui/kadasbottombar.h"
 %End
   public:
     KadasBottomBar( QgsMapCanvas *canvas, const QString &color = "orange" );

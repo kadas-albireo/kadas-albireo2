@@ -27,7 +27,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasmapitemeditor.h"
+#include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
 %End
   public:
     static const QString GPX_ROUTE;

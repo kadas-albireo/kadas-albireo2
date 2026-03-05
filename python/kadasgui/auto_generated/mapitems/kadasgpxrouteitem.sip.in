@@ -23,7 +23,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasgpxrouteitem.h"
+#include "kadas/gui/mapitems/kadasgpxrouteitem.h"
 %End
   public:
     KadasGpxRouteItem( QObject *parent = 0 );

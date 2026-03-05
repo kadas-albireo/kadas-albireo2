@@ -26,7 +26,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasmilxlayerpropertiespage.h"
+#include "kadas/gui/milx/kadasmilxlayerpropertiespage.h"
 %End
   public:
     explicit KadasMilxLayerPropertiesPage( KadasMilxLayer *layer, QgsMapCanvas *canvas, QWidget *parent = 0 );
@@ -41,7 +41,7 @@ your option) any later version. *
 class KadasMilxLayerPropertiesPageFactory : QObject, QgsMapLayerConfigWidgetFactory
 {
 %TypeHeaderCode
-#include "kadasmilxlayerpropertiespage.h"
+#include "kadas/gui/milx/kadasmilxlayerpropertiespage.h"
 %End
   public:
     explicit KadasMilxLayerPropertiesPageFactory( QObject *parent = 0 );

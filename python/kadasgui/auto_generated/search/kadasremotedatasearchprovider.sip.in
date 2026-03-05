@@ -28,7 +28,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasremotedatasearchprovider.h"
+#include "kadas/gui/search/kadasremotedatasearchprovider.h"
 %End
   public:
     KadasRemoteDataSearchProvider( QgsMapCanvas *mapCanvas );

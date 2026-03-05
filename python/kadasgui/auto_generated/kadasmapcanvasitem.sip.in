@@ -27,7 +27,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasmapcanvasitem.h"
+#include "kadas/gui/kadasmapcanvasitem.h"
 %End
   public:
     KadasMapCanvasItem( const KadasMapItem *item, QgsMapCanvas *canvas );
