@@ -32,7 +32,7 @@ vcpkg_from_github(
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
   mac_install_images.patch
   # Allow overriding SIP_DEFAULT_SIP_DIR from the command line
-  sip-default-dir.patch
+  sip-default-dir.patch # https://github.com/qgis/QGIS/pull/65205
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
