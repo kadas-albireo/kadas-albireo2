@@ -106,23 +106,6 @@ bool KadasPythonIntegration::checkSystemImports()
     return false;
   }
 
-  // set PyQt api versions
-  QStringList apiV2classes;
-  apiV2classes
-    << QStringLiteral( "QDate" )
-    << QStringLiteral( "QDateTime" )
-    << QStringLiteral( "QString" )
-    << QStringLiteral( "QTextStream" )
-    << QStringLiteral( "QTime" )
-    << QStringLiteral( "QUrl" )
-    << QStringLiteral( "QVariant" );
-  for ( const QString &clsName : std::as_const( apiV2classes ) )
-  {
-    if ( !runString( QStringLiteral( "sip.setapi('%1', 2)" ).arg( clsName ), QObject::tr( "Couldn't set SIP API versions." ) + '\n' + QObject::tr( "Python support will be disabled." ) ) )
-    {
-      return false;
-    }
-  }
   // import Qt bindings
   if ( !runString( QStringLiteral( "from PyQt6 import QtCore, QtGui" ), QObject::tr( "Couldn't load PyQt." ) + '\n' + QObject::tr( "Python support will be disabled." ) ) )
   {
