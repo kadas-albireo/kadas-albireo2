@@ -26,7 +26,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadaslayerselectionwidget.h"
+#include "kadas/gui/kadaslayerselectionwidget.h"
 %End
   public:
     KadasLayerSelectionWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, SIP_PYCALLABLE filter, SIP_PYCALLABLE creator, QWidget *parent = 0 )[( QgsMapCanvas *, QgsLayerTreeView *, LayerFilter, LayerCreator, QWidget * )];

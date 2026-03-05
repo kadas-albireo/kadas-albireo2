@@ -16,7 +16,7 @@ An interface for map items creation
 %End
 
 %TypeHeaderCode
-#include "kadasmapiteminterface.h"
+#include "kadas/gui/kadasmapiteminterface.h"
 %End
   public:
     KadasMapItemInterface();

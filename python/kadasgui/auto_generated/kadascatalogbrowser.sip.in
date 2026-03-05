@@ -28,7 +28,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadascatalogbrowser.h"
+#include "kadas/gui/kadascatalogbrowser.h"
 %End
   public:
 

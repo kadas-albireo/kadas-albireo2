@@ -26,7 +26,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadaspinsearchprovider.h"
+#include "kadas/gui/search/kadaspinsearchprovider.h"
 %End
   public:
     KadasPinSearchProvider( QgsMapCanvas *mapCanvas );

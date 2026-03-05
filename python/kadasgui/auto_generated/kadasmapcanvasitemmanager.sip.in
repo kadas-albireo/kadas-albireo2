@@ -28,7 +28,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasmapcanvasitemmanager.h"
+#include "kadas/gui/kadasmapcanvasitemmanager.h"
 %End
   public:
     KadasMapCanvasItemManager();

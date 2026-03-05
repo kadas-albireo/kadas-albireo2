@@ -27,7 +27,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasalternategotolocatorfilter.h"
+#include "kadas/gui/search/kadasalternategotolocatorfilter.h"
 %End
   public:
     KadasAlternateGotoLocatorFilter( QgsMapCanvas *mapCanvas, QObject *parent = 0 );

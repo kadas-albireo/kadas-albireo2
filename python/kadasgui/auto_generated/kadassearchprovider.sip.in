@@ -27,7 +27,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadassearchprovider.h"
+#include "kadas/gui/kadassearchprovider.h"
 %End
   public:
     struct SearchResult

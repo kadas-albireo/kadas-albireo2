@@ -2484,7 +2484,7 @@ def process_class_decl():
             CONTEXT.current_line += "\n%TypeHeaderCode"
         if write_include:
             CONTEXT.current_line += (
-                f'\n#include "{os.path.basename(CONTEXT.header_file)}"'
+                f'\n#include "{CONTEXT.header_file}"'
             )
 
         # for template based inheritance, add a typedef to define the base type,

@@ -23,7 +23,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasgpxwaypointitem.h"
+#include "kadas/gui/mapitems/kadasgpxwaypointitem.h"
 %End
   public:
     KadasGpxWaypointItem();

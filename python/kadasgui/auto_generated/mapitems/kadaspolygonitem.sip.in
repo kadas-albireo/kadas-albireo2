@@ -24,7 +24,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadaspolygonitem.h"
+#include "kadas/gui/mapitems/kadaspolygonitem.h"
 %End
   public:
     KadasPolygonItem( const QgsCoordinateReferenceSystem &crs, bool geodesic = false );

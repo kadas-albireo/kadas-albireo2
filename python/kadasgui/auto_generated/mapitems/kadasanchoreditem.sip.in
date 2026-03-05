@@ -24,7 +24,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasanchoreditem.h"
+#include "kadas/gui/mapitems/kadasanchoreditem.h"
 %End
   public:
     KadasAnchoredItem( const QgsCoordinateReferenceSystem &crs );

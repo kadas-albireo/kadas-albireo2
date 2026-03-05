@@ -24,7 +24,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadaslineofsight.h"
+#include "kadas/analysis/kadaslineofsight.h"
 %End
   public:
     static bool computeTargetVisibility(

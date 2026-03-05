@@ -24,7 +24,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasmilxlayer.h"
+#include "kadas/gui/milx/kadasmilxlayer.h"
 %End
   public:
     static QString layerType();
@@ -79,7 +79,7 @@ your option) any later version. *
 class KadasMilxLayerType : KadasPluginLayerType
 {
 %TypeHeaderCode
-#include "kadasmilxlayer.h"
+#include "kadas/gui/milx/kadasmilxlayer.h"
 %End
   public:
     KadasMilxLayerType();

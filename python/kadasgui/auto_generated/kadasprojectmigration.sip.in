@@ -24,7 +24,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasprojectmigration.h"
+#include "kadas/gui/kadasprojectmigration.h"
 %End
   public:
     static QString migrateProject( const QString &fileName, QStringList &filesToAttach );

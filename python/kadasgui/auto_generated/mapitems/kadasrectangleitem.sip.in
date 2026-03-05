@@ -24,7 +24,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasrectangleitem.h"
+#include "kadas/gui/mapitems/kadasrectangleitem.h"
 %End
   public:
     KadasRectangleItem( const QgsCoordinateReferenceSystem &crs );

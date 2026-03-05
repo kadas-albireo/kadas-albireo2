@@ -24,7 +24,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasarcgisportalcatalogprovider.h"
+#include "kadas/gui/catalog/kadasarcgisportalcatalogprovider.h"
 %End
   public:
     KadasArcGisPortalCatalogProvider( const QString &baseUrl, KadasCatalogBrowser *browser, const QMap<QString, QString> &params, const QString &authId = QString() );

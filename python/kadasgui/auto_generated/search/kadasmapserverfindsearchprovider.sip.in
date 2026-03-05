@@ -27,7 +27,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasmapserverfindsearchprovider.h"
+#include "kadas/gui/search/kadasmapserverfindsearchprovider.h"
 %End
   public:
     KadasMapServerFindSearchProvider( QgsMapCanvas *mapCanvas );

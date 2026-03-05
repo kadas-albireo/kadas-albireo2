@@ -24,7 +24,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadassymbolitem.h"
+#include "kadas/gui/mapitems/kadassymbolitem.h"
 %End
   public:
     KadasSymbolItem( const QgsCoordinateReferenceSystem &crs );
@@ -60,7 +60,7 @@ your option) any later version. *
 class KadasPinItem : KadasSymbolItem
 {
 %TypeHeaderCode
-#include "kadassymbolitem.h"
+#include "kadas/gui/mapitems/kadassymbolitem.h"
 %End
   public:
     KadasPinItem( const QgsCoordinateReferenceSystem &crs );

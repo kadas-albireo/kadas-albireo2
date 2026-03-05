@@ -24,7 +24,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadascircularsectoritem.h"
+#include "kadas/gui/mapitems/kadascircularsectoritem.h"
 %End
   public:
     KadasCircularSectorItem( const QgsCoordinateReferenceSystem &crs );

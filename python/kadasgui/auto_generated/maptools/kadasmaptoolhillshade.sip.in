@@ -23,7 +23,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasmaptoolhillshade.h"
+#include "kadas/gui/maptools/kadasmaptoolhillshade.h"
 %End
   public:
     KadasMapToolHillshadeItemInterface( QgsMapCanvas *mapCanvas );
@@ -35,7 +35,7 @@ your option) any later version. *
 class KadasMapToolHillshade : KadasMapToolCreateItem
 {
 %TypeHeaderCode
-#include "kadasmaptoolhillshade.h"
+#include "kadas/gui/maptools/kadasmaptoolhillshade.h"
 %End
   public:
     KadasMapToolHillshade( QgsMapCanvas *mapCanvas );

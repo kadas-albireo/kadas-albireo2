@@ -23,7 +23,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasmaptoolslope.h"
+#include "kadas/gui/maptools/kadasmaptoolslope.h"
 %End
   public:
     KadasMapToolSlopeItemInterface( QgsMapCanvas *mapCanvas );
@@ -35,7 +35,7 @@ your option) any later version. *
 class KadasMapToolSlope : KadasMapToolCreateItem
 {
 %TypeHeaderCode
-#include "kadasmaptoolslope.h"
+#include "kadas/gui/maptools/kadasmaptoolslope.h"
 %End
   public:
     KadasMapToolSlope( QgsMapCanvas *mapCanvas );

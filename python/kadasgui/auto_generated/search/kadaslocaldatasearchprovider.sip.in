@@ -27,7 +27,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadaslocaldatasearchprovider.h"
+#include "kadas/gui/search/kadaslocaldatasearchprovider.h"
 %End
   public:
     KadasLocalDataSearchFilter( QgsMapCanvas *mapCanvas );

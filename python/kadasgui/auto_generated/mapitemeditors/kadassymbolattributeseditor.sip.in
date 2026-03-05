@@ -25,7 +25,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadassymbolattributeseditor.h"
+#include "kadas/gui/mapitemeditors/kadassymbolattributeseditor.h"
 %End
   public:
     KadasSymbolAttributesEditor( KadasMapItem *item );

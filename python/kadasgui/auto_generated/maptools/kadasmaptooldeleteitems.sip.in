@@ -23,7 +23,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasmaptooldeleteitems.h"
+#include "kadas/gui/maptools/kadasmaptooldeleteitems.h"
 %End
   public:
     KadasMapToolDeleteItemsInterface( QgsMapCanvas *mapCanvas );
@@ -36,7 +36,7 @@ your option) any later version. *
 class KadasMapToolDeleteItems : KadasMapToolCreateItem
 {
 %TypeHeaderCode
-#include "kadasmaptooldeleteitems.h"
+#include "kadas/gui/maptools/kadasmaptooldeleteitems.h"
 %End
   public:
     KadasMapToolDeleteItems( QgsMapCanvas *mapCanvas );

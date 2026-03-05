@@ -28,7 +28,7 @@ your option) any later version. *
 %End
 
 %TypeHeaderCode
-#include "kadasviewshedfilter.h"
+#include "kadas/analysis/kadasviewshedfilter.h"
 %End
   public:
     static bool computeViewshed(
