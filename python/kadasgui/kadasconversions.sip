@@ -58,7 +58,7 @@
 
     while (PyDict_Next(sipPy, &i, &kobj, &tobj))
     {
-        int k = SIPLong_AsLong(kobj);
+        int k = PyLong_AsLong(kobj);
         double t = PyFloat_AsDouble(tobj);
 
         if (*sipIsErr)
