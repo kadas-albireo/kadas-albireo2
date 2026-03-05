@@ -49,24 +49,27 @@ class KadasGpkgExportDialog(QDialog, WidgetUi):
     def selectedLayers(self):
         return self.listWidgetLayers.getSelectedLayers()
 
+    def unselectedProjectLayers(self):
+        return self.listWidgetLayers.getUnselectedProjectLayers()
+
     def buildPyramids(self):
         return self.checkBoxPyramids.isChecked()
 
     def rasterExportScale(self):
         return self.spinBoxExportScale.value() if self.checkBoxExportScale.isChecked() else None
-    
+
     def filterExtent(self):
         if not self.mGroupBoxExtent.isChecked():
             return None
-        
+
         return self.mRectTool.rect()
-        
+
     def filterExtentCrs(self):
         if not self.mGroupBoxExtent.isChecked():
             return None
-        
+
         return self.iface.mapCanvas().mapSettings().destinationCrs()
-        
+
     def clear(self):
         self.iface.mapCanvas().unsetMapTool(self.mRectTool)
         self.mRectTool = None
@@ -110,5 +113,3 @@ class KadasGpkgExportDialog(QDialog, WidgetUi):
             self.mLineEditYMin.setText(f"{extent.yMinimum(): {decs}f}")
             self.mLineEditXMax.setText(f"{extent.xMaximum(): {decs}f}")
             self.mLineEditYMax.setText(f"{extent.yMaximum(): {decs}f}")
-
-            

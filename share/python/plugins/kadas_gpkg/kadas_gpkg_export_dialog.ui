@@ -55,7 +55,7 @@
    <item row="2" column="0" colspan="2">
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>The project, including embedded layers (redlining, symbols, pictures, ...), will be written to the GeoPackage.</string>
+      <string>The project will be written to the GeoPackage.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

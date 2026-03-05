@@ -137,6 +137,9 @@ class KadasGpkgExport(KadasGpkgExportBase):
                 elif layer.type() == QgsMapLayer.RasterLayer:
                     projectlayerEl.find("provider").text = "gdal"
 
+        # Remove redlining layers not selected for export
+        self.__removeUnselectedRedlining(doc)
+
         # Remove redlining items outside export extent from project file
         if self.kadasGpkgExportDialog.filterExtent() is not None:
             self.__removeFlaggedRedlining(doc)
@@ -222,7 +225,7 @@ class KadasGpkgExport(KadasGpkgExportBase):
                 additional_resources[path] = str(uuid.uuid1()) + os.path.splitext(path)[1]
 
             return "@qgis_resources@/%s" % additional_resources[path]
-        
+
         for added_layer_source in added_layers_by_source.keys():
             if path in added_layer_source:
                 # Datasource newly added to GPKG: rewrite as GPKG path
@@ -260,7 +263,7 @@ class KadasGpkgExport(KadasGpkgExportBase):
 
     def __removeRedliningItemsFlag(self):
         """ Remove redlining items flag """
-        
+
         for layer in KadasItemLayerRegistry.getItemLayers():
             for item in layer.items().values():
                 if self.PROPERTY_ITEM_TO_BE_REMOVED in item.dynamicPropertyNames():
@@ -269,9 +272,9 @@ class KadasGpkgExport(KadasGpkgExportBase):
 
     def __removeFlaggedRedlining(self, doc):
         """ Remove redlining items outside export extent """
-        
+
         for mapItemEl in doc.iterfind("projectlayers/maplayer/MapItem"):
-            
+
             nameAttribute = mapItemEl.attrib.get("name", str())
             if not nameAttribute.startswith("Kadas"):
                 return
@@ -287,4 +290,18 @@ class KadasGpkgExport(KadasGpkgExportBase):
                 # Remove redlining item
                 mapItemEl.getparent().remove(mapItemEl)
                 continue
-            
+
+    def __removeUnselectedRedlining(self, doc):
+        """ Remove redlining layers not selected for export """
+        unselected_layer_ids = self.kadasGpkgExportDialog.unselectedProjectLayers().keys()
+        print(f"unselected_layer_ids: {unselected_layer_ids}")
+        for mapLayerIdEl in doc.iterfind("projectlayers/maplayer/id"):
+
+            layer_id = mapLayerIdEl.text
+            print(f"layer_id: {layer_id}")
+
+            if layer_id in unselected_layer_ids:
+                # Remove redlining layer
+                mapLayerEl = mapLayerIdEl.getparent()
+                mapLayerEl.getparent().remove(mapLayerEl)
+                continue
