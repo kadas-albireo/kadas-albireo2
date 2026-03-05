@@ -17,7 +17,7 @@
 
     while (i != sipCpp->constEnd())
     {
-        PyObject *kobj = SIPLong_FromLong(i.key());
+        PyObject *kobj = PyLong_FromLong(i.key());
         PyObject *tobj = PyFloat_FromDouble(i.value());
         if (kobj == NULL || tobj == NULL || PyDict_SetItem(d, kobj, tobj) < 0)
         {
