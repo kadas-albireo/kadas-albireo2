@@ -261,9 +261,27 @@ target_include_directories(
 )
 
 if(WITH_VCPKG)
+  if(WIN32)
+    set(PYTHON_STDLIB_DIR "${VCPKG_BASE_DIR}/tools/python3/Lib")
+    set(PYTHON_SITE_PACKAGES_DIR
+        "${VCPKG_BASE_DIR}/tools/python3/Lib/site-packages"
+    )
+    set(ENV_PATH_SEP ";")
+  else()
+    set(PYTHON_STDLIB_DIR
+        "${VCPKG_BASE_DIR}/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}"
+    )
+    set(PYTHON_SITE_PACKAGES_DIR
+        "${VCPKG_BASE_DIR}/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages"
+    )
+    set(ENV_PATH_SEP ":")
+  endif()
   configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/kadas.env.in
     ${CMAKE_CURRENT_BINARY_DIR}/kadas.env @ONLY
+  )
+  file(COPY ${CMAKE_CURRENT_BINARY_DIR}/kadas.env
+       DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
   )
 endif()
 
