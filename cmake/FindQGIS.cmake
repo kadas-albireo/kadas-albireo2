@@ -133,12 +133,16 @@ foreach(_component ${QGIS_FIND_COMPONENTS})
       )
       execute_process(
         COMMAND ${CMD}
-        OUTPUT_VARIABLE QGIS_PYTHON_MODULE_DIR COMMAND_ERROR_IS_FATAL ANY
+        OUTPUT_VARIABLE _qgis_python_module_dir COMMAND_ERROR_IS_FATAL ANY
                         ECHO_ERROR_VARIABLE
         OUTPUT_STRIP_TRAILING_WHITESPACE
       )
+      set(QGIS_PYTHON_MODULE_DIR
+          ${_qgis_python_module_dir}
+          CACHE PATH "Path to QGIS Python Modules" FORCE
+      )
     endif()
-    set(QGIS_SIP_DIR ${QGIS_PYTHON_MODULE_DIR}/bindings/qgis)
+    set(QGIS_SIP_DIR ${QGIS_PYTHON_MODULE_DIR}/bindings)
     message(STATUS "QGIS Python Module Dir: ${QGIS_PYTHON_MODULE_DIR}")
 
     # Add a cmake target: PYTHON_MODULE_DIR is not cmake native
