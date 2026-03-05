@@ -51,18 +51,35 @@ vcpkg_backup_env_variables(VARS PATH)
 if("bindings" IN_LIST FEATURES)
   # TODO ... we want this to be extracted via python command ?
   vcpkg_add_to_path(PREPEND "${CURRENT_INSTALLED_DIR}/tools/python3/Scripts")
+
+  # Determine Python site-packages relative path (e.g.
+  # lib/python3.12/site-packages)
+  find_program(
+    _VCPKG_PYTHON3
+    NAMES python3 python
+    PATHS "${CURRENT_INSTALLED_DIR}/tools/python3"
+    NO_DEFAULT_PATH
+  )
+  execute_process(
+    COMMAND
+      "${_VCPKG_PYTHON3}" -c
+      "import sysconfig,os; print(os.path.relpath(sysconfig.get_path('purelib'), sysconfig.get_config_var('base')))"
+    OUTPUT_VARIABLE _PYTHON3_SITE_REL
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+
   list(APPEND QGIS_OPTIONS -DWITH_BINDINGS:BOOL=ON)
   list(APPEND QGIS_OPTIONS -DSIP_GLOBAL_INSTALL:BOOL=ON)
   list(
     APPEND
     QGIS_OPTIONS
-    "-DSIP_DEFAULT_SIP_DIR=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/qgis/bindings"
+    "-DSIP_DEFAULT_SIP_DIR=${CURRENT_PACKAGES_DIR}/${_PYTHON3_SITE_REL}/qgis/bindings"
   )
 
   # DEFAULT_PYTHON_SUBDIR controls where Python modules (.so/.py) are installed.
   # BINDINGS_GLOBAL_INSTALL is left OFF (default) so this takes effect.
   list(APPEND QGIS_OPTIONS
-       "-DDEFAULT_PYTHON_SUBDIR=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}"
+       "-DDEFAULT_PYTHON_SUBDIR=${CURRENT_PACKAGES_DIR}/${_PYTHON3_SITE_REL}"
   )
 else()
   vcpkg_find_acquire_program(PYTHON3)
