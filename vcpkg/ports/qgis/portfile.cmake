@@ -20,7 +20,6 @@ vcpkg_from_github(
   PATCHES
   # Make qgis support python's debug library
   qgspython.patch
-  bindings-install.patch
   link-appkit.patch
   libxml2.patch
   crssync.patch
@@ -51,12 +50,15 @@ if("bindings" IN_LIST FEATURES)
   # TODO ... we want this to be extracted via python command ?
   vcpkg_add_to_path(PREPEND "${CURRENT_INSTALLED_DIR}/tools/python3/Scripts")
   list(APPEND QGIS_OPTIONS -DWITH_BINDINGS:BOOL=ON)
-  list(APPEND QGIS_OPTIONS -DSIP_GLOBAL_INSTALL:BOOL=OFF)
+  list(APPEND QGIS_OPTIONS -DSIP_GLOBAL_INSTALL:BOOL=ON)
+  list(
+    APPEND
+    QGIS_OPTIONS
+    "-DSIP_DEFAULT_SIP_DIR=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/qgis/bindings"
+  )
 
-  # We are relying on some qgis hacks in here In QGIS. If SIP_GLOBAL_INSTALL=OFF
-  # and DEFAULT_PYTHON_SUBDIR is set, this is used instead. If this breaks in
-  # the future, we should consider adding an explicit override for the sip
-  # installation dir in QGIS.
+  # DEFAULT_PYTHON_SUBDIR controls where Python modules (.so/.py) are installed.
+  # BINDINGS_GLOBAL_INSTALL is left OFF (default) so this takes effect.
   list(APPEND QGIS_OPTIONS
        "-DDEFAULT_PYTHON_SUBDIR=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}"
   )
@@ -222,19 +224,6 @@ vcpkg_configure_cmake(
 vcpkg_restore_env_variables(VARS PATH)
 
 vcpkg_install_cmake()
-
-# Copy SIP source files from the build tree into the package. The QGIS install
-# step places them based on SIP_DEFAULT_SIP_DIR which may not resolve correctly
-# inside vcpkg. Copy them explicitly into site-packages.
-if("bindings" IN_LIST FEATURES)
-  set(_sip_build_dir "${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel/python")
-  set(_sip_dest_dir "${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/qgis/bindings")
-  foreach(_module core gui analysis 3d)
-    if(EXISTS "${_sip_build_dir}/${_module}")
-      file(COPY "${_sip_build_dir}/${_module}" DESTINATION "${_sip_dest_dir}")
-    endif()
-  endforeach()
-endif()
 
 # if(VCPKG_TARGET_IS_WINDOWS) function(copy_path basepath targetdir) file(GLOB
 # ${basepath}_PATH ${CURRENT_PACKAGES_DIR}/${basepath}/*) if( ${basepath}_PATH )
