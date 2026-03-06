@@ -153,6 +153,7 @@ jobs:
       - name: 🧪 Run CTest
         env:
           QT_LOGGING_TO_CONSOLE: "1"
+          QT_QPA_PLATFORM: offscreen
         run: |
           ctest --test-dir build --output-on-failure -C Release
 

@@ -141,5 +141,7 @@ jobs:
           cmake --build build
 
       - name: 🧪 Run CTest
+        env:
+          QT_QPA_PLATFORM: offscreen
         run: |
           ctest --test-dir build --output-on-failure
