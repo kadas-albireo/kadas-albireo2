@@ -142,7 +142,7 @@ foreach(_component ${QGIS_FIND_COMPONENTS})
           CACHE PATH "Path to QGIS Python Modules" FORCE
       )
     endif()
-    set(QGIS_SIP_DIR ${QGIS_PYTHON_MODULE_DIR}/bindings)
+    set(QGIS_SIP_DIR ${QGIS_PYTHON_MODULE_DIR}/bindings/qgis)
     message(STATUS "QGIS Python Module Dir: ${QGIS_PYTHON_MODULE_DIR}")
 
     # Add a cmake target: PYTHON_MODULE_DIR is not cmake native
