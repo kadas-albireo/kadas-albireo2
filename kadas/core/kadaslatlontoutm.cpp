@@ -804,55 +804,55 @@ KadasLatLonToUTM::Grid KadasLatLonToUTM::computeGrid( const QgsRectangle &bbox, 
       {
         if ( mapScale > 1000000 )
         {
-          levels << QPair( mapScale > 2000000 ? Level::Minor : Level::Major, 100000 );
+          levels << qMakePair( mapScale > 2000000 ? Level::Minor : Level::Major, 100000 );
         }
         else if ( mapScale > 500000 )
         {
-          levels << QPair( Level::Major, 100000 );
-          levels << QPair( Level::Minor, 20000 );
+          levels << qMakePair( Level::Major, 100000 );
+          levels << qMakePair( Level::Minor, 20000 );
         }
         else if ( mapScale > 300000 )
         {
-          levels << QPair( Level::Major, 100000 );
-          levels << QPair( Level::Minor, 10000 );
+          levels << qMakePair( Level::Major, 100000 );
+          levels << qMakePair( Level::Minor, 10000 );
         }
         else if ( mapScale > 60000 )
         {
-          levels << QPair( Level::Minor, 5000 );
+          levels << qMakePair( Level::Minor, 5000 );
         }
         else if ( mapScale > 20000 )
         {
-          levels << QPair( Level::Minor, 1000 );
+          levels << qMakePair( Level::Minor, 1000 );
         }
         else if ( mapScale > 6000 )
         {
-          levels << QPair( Level::Minor, 500 );
+          levels << qMakePair( Level::Minor, 500 );
         }
         else if ( mapScale > 3000 )
         {
-          levels << QPair( Level::Minor, 100 );
+          levels << qMakePair( Level::Minor, 100 );
         }
         else if ( mapScale > 600 )
         {
-          levels << QPair( Level::Minor, 50 );
+          levels << qMakePair( Level::Minor, 50 );
         }
         else if ( mapScale > 300 )
         {
-          levels << QPair( Level::Minor, 10 );
+          levels << qMakePair( Level::Minor, 10 );
         }
         else if ( mapScale > 60 )
         {
-          levels << QPair( Level::Minor, 5 );
+          levels << qMakePair( Level::Minor, 5 );
         }
         else
         {
-          levels << QPair( Level::Minor, 1 );
+          levels << qMakePair( Level::Minor, 1 );
         }
       }
       else
       {
         if ( mapScale / cellSize <= 500 )
-          levels << QPair( Level::Minor, cellSize );
+          levels << qMakePair( Level::Minor, cellSize );
       }
 
       if ( gridMode == GridMode::GridMGRS )
