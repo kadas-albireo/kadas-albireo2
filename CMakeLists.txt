@@ -64,7 +64,7 @@ set(VCPKG_BASE_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
 include(GNUInstallDirs)
 include(GenerateExportHeader)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 set(BUILD_SHARED_LIBS
     ON
