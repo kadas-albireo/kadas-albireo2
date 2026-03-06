@@ -11,3 +11,11 @@ KadasCircularSectorItem.State.SectorStatus.__doc__ = """
 
 """
 # --
+try:
+    KadasCircularSectorItem.__overridden_methods__ = ['itemName', 'nodes', 'startPart', 'setCurrentPoint', 'setCurrentAttributes', 'continuePart', 'endPart', 'drawAttribs', 'drawAttribsFromPosition', 'positionFromDrawAttribs', 'getEditContext', 'edit', 'editAttribsFromPosition', 'positionFromEditAttribs', 'addPartFromGeometry', 'geometryType', 'position', 'setPosition', '_clone', 'createEmptyState', 'recomputeDerived', 'measureGeometry']
+except (NameError, AttributeError):
+    pass
+try:
+    KadasCircularSectorItem.State.__overridden_methods__ = ['assign', 'clone', 'serialize', 'deserialize']
+except (NameError, AttributeError):
+    pass

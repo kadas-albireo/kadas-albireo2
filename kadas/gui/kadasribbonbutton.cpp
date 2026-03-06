@@ -131,13 +131,13 @@ void KadasRibbonButton::paintEvent( QPaintEvent * /*e*/ )
     int maxWidth = buttonWidth - 10;
     for ( const QString &line : rawRextLines )
     {
-      if ( fm.width( line ) > maxWidth )
+      if ( fm.horizontalAdvance( line ) > maxWidth )
       {
         QString newline;
         // Measure widths at whitespace pos, fit as many words into a line as possible
         for ( const QString &word : line.split( " " ) )
         {
-          if ( fm.width( newline + " " + word ) > maxWidth )
+          if ( fm.horizontalAdvance( newline + " " + word ) > maxWidth )
           {
             if ( !newline.isEmpty() )
             {
@@ -161,7 +161,7 @@ void KadasRibbonButton::paintEvent( QPaintEvent * /*e*/ )
     for ( int i = 0; i < textLines.size(); ++i )
     {
       QString textLine = textLines.at( i );
-      double textWidth = fm.width( textLine );
+      double textWidth = fm.horizontalAdvance( textLine );
       double textHeight = fm.boundingRect( textLine ).height();
       int textX = ( buttonWidth - textWidth ) / 2.0;
       int textY = iconBottomY + textHeight * ( i + 1 ) /*+ i * 1*/;
@@ -174,7 +174,7 @@ void KadasRibbonButton::paintEvent( QPaintEvent * /*e*/ )
   }
 }
 
-void KadasRibbonButton::enterEvent( QEvent *event )
+void KadasRibbonButton::enterEvent( QEnterEvent *event )
 {
   update();
   QToolButton::enterEvent( event );

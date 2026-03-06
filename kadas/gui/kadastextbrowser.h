@@ -19,6 +19,7 @@
 
 #include "kadas/gui/kadas_gui.h"
 
+#include <QRegularExpression>
 #include <QTextBrowser>
 
 // TODO: sip generates wrong code, errors out with sipNameNr_XXXX was not declared.
@@ -39,7 +40,7 @@ class KADAS_GUI_EXPORT KadasTextBrowser : public QTextBrowser
     void mouseReleaseEvent( QMouseEvent *ev ) override;
 
   private:
-    const QRegExp &urlRegEx() const;
+    const QRegularExpression &urlRegEx() const;
 };
 
 #endif // SIP_RUN

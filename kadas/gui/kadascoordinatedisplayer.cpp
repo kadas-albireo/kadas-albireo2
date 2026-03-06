@@ -175,7 +175,7 @@ void KadasCoordinateDisplayer::syncProjectCrs()
 
 void KadasCoordinateDisplayer::displayFormatChanged( QAction *action )
 {
-  QgsProject::instance()->writeEntry( "crsdisplay", "format", mCRSSelectionButton->menu()->actions().indexOf( action ) );
+  QgsProject::instance()->writeEntry( u"crsdisplay"_s, u"format"_s, static_cast<int>( mCRSSelectionButton->menu()->actions().indexOf( action ) ) );
   mCRSSelectionButton->setDefaultAction( action );
   mCoordinateLineEdit->clear();
   KadasCoordinateFormat::Format format;

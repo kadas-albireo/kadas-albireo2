@@ -1,9 +1,9 @@
 string(REPLACE "." "_" TAG ${VERSION})
 
 # set(QGIS_REF final-${TAG})
-set(QGIS_REF e1a48d4f4cbfc5808c7edd0dc255337ee031420f)
+set(QGIS_REF a4666d590d5737537f737d58bc6bd333fc69dbeb)
 set(QGIS_SHA512
-    0c9068503b83bc035bc5ef2e06588b793757640c576b893e9114f2a43615e544bacbecb7935a9cab06fb2ac2b4f2baad5d4806ec8d21fea279204dfc33f13941
+    4e365e1b7b178a93248e028c2f8de148789c475c4fe8ceaae08671452680bc0140f28da7bc32f621b1fd0bd668d6420bdc84ee518ce4abc91f1034d43c1c5340
 )
 
 vcpkg_from_github(
@@ -20,7 +20,6 @@ vcpkg_from_github(
   PATCHES
   # Make qgis support python's debug library
   qgspython.patch
-  bindings-install.patch
   link-appkit.patch
   libxml2.patch
   crssync.patch
@@ -32,7 +31,8 @@ vcpkg_from_github(
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
   mac_install_images.patch
-  reduceLayerPropertiesProviderSection.patch # https://github.com/qgis/QGIS/pull/64123
+  # Allow overriding SIP_DEFAULT_SIP_DIR from the command line
+  sip-default-dir.patch # https://github.com/qgis/QGIS/pull/65205
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
@@ -52,12 +52,15 @@ if("bindings" IN_LIST FEATURES)
   # TODO ... we want this to be extracted via python command ?
   vcpkg_add_to_path(PREPEND "${CURRENT_INSTALLED_DIR}/tools/python3/Scripts")
   list(APPEND QGIS_OPTIONS -DWITH_BINDINGS:BOOL=ON)
-  list(APPEND QGIS_OPTIONS -DSIP_GLOBAL_INSTALL:BOOL=OFF)
+  list(APPEND QGIS_OPTIONS -DSIP_GLOBAL_INSTALL:BOOL=ON)
+  list(
+    APPEND
+    QGIS_OPTIONS
+    "-DSIP_DEFAULT_SIP_DIR=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}/qgis/bindings"
+  )
 
-  # We are relying on some qgis hacks in here In QGIS. If SIP_GLOBAL_INSTALL=OFF
-  # and DEFAULT_PYTHON_SUBDIR is set, this is used instead. If this breaks in
-  # the future, we should consider adding an explicit override for the sip
-  # installation dir in QGIS.
+  # DEFAULT_PYTHON_SUBDIR controls where Python modules (.so/.py) are installed.
+  # BINDINGS_GLOBAL_INSTALL is left OFF (default) so this takes effect.
   list(APPEND QGIS_OPTIONS
        "-DDEFAULT_PYTHON_SUBDIR=${CURRENT_PACKAGES_DIR}/${PYTHON3_SITE}"
   )
@@ -89,7 +92,6 @@ list(APPEND QGIS_OPTIONS "-DFLEX_EXECUTABLE=${FLEX}")
 # "include/qgis" everywhere else let's keep things clean and tidy and put them
 # at a predictable location
 list(APPEND QGIS_OPTIONS "-DQGIS_INCLUDE_SUBDIR=include/qgis")
-list(APPEND QGIS_OPTIONS "-DBUILD_WITH_QT6=OFF")
 # QGIS will also do that starting from protobuf version 4.23
 list(APPEND QGIS_OPTIONS "-DProtobuf_LITE_LIBRARY=protobuf::libprotobuf-lite")
 list(APPEND QGIS_OPTIONS "-DWITH_INTERNAL_NLOHMANN_JSON:BOOL=OFF")
@@ -113,8 +115,6 @@ else()
   endif()
   list(APPEND QGIS_OPTIONS -DWITH_GUI:BOOL=OFF)
 endif()
-
-list(APPEND QGIS_OPTIONS -DWITH_QTWEBKIT:BOOL=OFF)
 
 if("desktop" IN_LIST FEATURES)
   list(APPEND QGIS_OPTIONS -DWITH_DESKTOP:BOOL=ON)
@@ -200,15 +200,13 @@ endif()
 
 if(VCPKG_TARGET_IS_WINDOWS)
   list(
-    APPEND
-    QGIS_OPTIONS
-    -DQT_LRELEASE_EXECUTABLE=${CURRENT_INSTALLED_DIR}/tools/qt5-tools/bin/lrelease.exe
+    APPEND QGIS_OPTIONS
+    -DQT_LRELEASE_EXECUTABLE=${CURRENT_INSTALLED_DIR}/tools/Qt6/bin/lrelease.exe
   )
 else()
   list(
-    APPEND
-    QGIS_OPTIONS
-    -DQT_LRELEASE_EXECUTABLE=${CURRENT_INSTALLED_DIR}/tools/qt5-tools/bin/lrelease.exe
+    APPEND QGIS_OPTIONS
+    -DQT_LRELEASE_EXECUTABLE=${CURRENT_INSTALLED_DIR}/tools/Qt6/bin/lrelease.exe
   )
 endif()
 

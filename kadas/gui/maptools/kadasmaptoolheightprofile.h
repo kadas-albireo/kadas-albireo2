@@ -33,7 +33,9 @@ class KADAS_GUI_EXPORT KadasMapToolHeightProfileItemInterface : public KadasMapI
 {
   public:
     KadasMapToolHeightProfileItemInterface( QgsMapCanvas *mapCanvas )
-      : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
+      : KadasMapItemInterface()
+      , mCanvas( mapCanvas )
+    {}
     KadasMapItem *createItem() const override;
 
   private:

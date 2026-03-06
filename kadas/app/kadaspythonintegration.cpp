@@ -40,8 +40,7 @@ PyThreadState *_mainState = nullptr;
 
 KadasPythonIntegration::KadasPythonIntegration( QObject *parent )
   : QObject( parent )
-{
-}
+{}
 
 KadasPythonIntegration::~KadasPythonIntegration()
 {
@@ -107,18 +106,8 @@ bool KadasPythonIntegration::checkSystemImports()
     return false;
   }
 
-  // set PyQt api versions
-  QStringList apiV2classes;
-  apiV2classes << QStringLiteral( "QDate" ) << QStringLiteral( "QDateTime" ) << QStringLiteral( "QString" ) << QStringLiteral( "QTextStream" ) << QStringLiteral( "QTime" ) << QStringLiteral( "QUrl" ) << QStringLiteral( "QVariant" );
-  for ( const QString &clsName : std::as_const( apiV2classes ) )
-  {
-    if ( !runString( QStringLiteral( "sip.setapi('%1', 2)" ).arg( clsName ), QObject::tr( "Couldn't set SIP API versions." ) + '\n' + QObject::tr( "Python support will be disabled." ) ) )
-    {
-      return false;
-    }
-  }
   // import Qt bindings
-  if ( !runString( QStringLiteral( "from PyQt5 import QtCore, QtGui" ), QObject::tr( "Couldn't load PyQt." ) + '\n' + QObject::tr( "Python support will be disabled." ) ) )
+  if ( !runString( QStringLiteral( "from PyQt6 import QtCore, QtGui" ), QObject::tr( "Couldn't load PyQt." ) + '\n' + QObject::tr( "Python support will be disabled." ) ) )
   {
     return false;
   }
@@ -279,16 +268,28 @@ bool KadasPythonIntegration::runString( const QString &command, QString msgOnErr
   evalString( QStringLiteral( "str(sys.path)" ), path );
   evalString( QStringLiteral( "sys.version" ), version );
 
-  QString str = "<font color=\"red\">" + msgOnError + "</font><br><pre>\n" + traceback + "\n</pre>"
-                + QObject::tr( "Python version:" ) + "<br>" + version + "<br><br>"
-                + QObject::tr( "KADAS version:" ) + "<br>" + QStringLiteral( "%1 '%2', %3" ).arg( Kadas::KADAS_VERSION, Kadas::KADAS_RELEASE_NAME, Kadas::KADAS_DEV_VERSION ) + "<br><br>"
-                + QObject::tr( "Python path:" ) + "<br>" + path;
+  QString str = "<font color=\"red\">"
+                + msgOnError
+                + "</font><br><pre>\n"
+                + traceback
+                + "\n</pre>"
+                + QObject::tr( "Python version:" )
+                + "<br>"
+                + version
+                + "<br><br>"
+                + QObject::tr( "KADAS version:" )
+                + "<br>"
+                + QStringLiteral( "%1 '%2', %3" ).arg( Kadas::KADAS_VERSION, Kadas::KADAS_RELEASE_NAME, Kadas::KADAS_DEV_VERSION )
+                + "<br><br>"
+                + QObject::tr( "Python path:" )
+                + "<br>"
+                + path;
   str.replace( '\n', QLatin1String( "<br>" ) ).replace( QLatin1String( "  " ), QLatin1String( "&nbsp; " ) );
 
   qDebug() << str;
   QgsMessageOutput *msg = QgsMessageOutput::createMessageOutput();
   msg->setTitle( QObject::tr( "Python error" ) );
-  msg->setMessage( str, QgsMessageOutput::MessageHtml );
+  msg->setMessage( str, Qgis::StringFormat::Html );
   msg->showMessage();
 
   return res;
@@ -342,7 +343,8 @@ QString KadasPythonIntegration::getTraceback()
     TRACEBACK_FETCH_ERROR( QStringLiteral( "can't import traceback" ) );
   }
 
-  obResult = PyObject_CallMethod( modTB, reinterpret_cast<const char *>( "print_exception" ), reinterpret_cast<const char *>( "OOOOO" ), type, value ? value : Py_None, traceback ? traceback : Py_None, Py_None, obStringIO );
+  obResult
+    = PyObject_CallMethod( modTB, reinterpret_cast<const char *>( "print_exception" ), reinterpret_cast<const char *>( "OOOOO" ), type, value ? value : Py_None, traceback ? traceback : Py_None, Py_None, obStringIO );
 
   if ( !obResult )
   {
@@ -561,9 +563,7 @@ void KadasPythonIntegration::restorePlugins()
   for ( const QString &packageName : pluginList() )
   {
     // check if the plugin was active on last session
-    if (
-      settings.value( "/PythonPlugins/" + packageName ).toBool() || defaultSettings.value( "/PythonPlugins/" + packageName ).toBool()
-    )
+    if ( settings.value( "/PythonPlugins/" + packageName ).toBool() || defaultSettings.value( "/PythonPlugins/" + packageName ).toBool() )
     {
       loadPlugin( packageName );
     }

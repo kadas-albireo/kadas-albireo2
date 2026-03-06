@@ -56,7 +56,10 @@ void KadasMapCanvasItemManager::removeItemAfterRefresh( KadasMapItem *item, QgsM
   else
   {
     QObject *scope = new QObject;
-    connect( canvas, &QgsMapCanvas::mapCanvasRefreshed, scope, [item, scope] { removeItem( item ); scope->deleteLater(); } );
+    connect( canvas, &QgsMapCanvas::mapCanvasRefreshed, scope, [item, scope] {
+      removeItem( item );
+      scope->deleteLater();
+    } );
   }
 }
 

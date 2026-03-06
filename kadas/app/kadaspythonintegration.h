@@ -106,7 +106,8 @@ class KadasPythonRunner : public QgsPythonRunner
 {
   public:
     explicit KadasPythonRunner( KadasPythonIntegration *pythonIntegration )
-      : mPythonIntegration( pythonIntegration ) {}
+      : mPythonIntegration( pythonIntegration )
+    {}
 
     bool runCommand( QString command, QString messageOnError = QString() ) override
     {

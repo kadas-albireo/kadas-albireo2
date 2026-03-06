@@ -356,7 +356,8 @@ void KadasKMLExport::writeTiles( QgsMapLayer *mapLayer, const QgsRectangle &laye
         return;
       }
 
-      QgsRectangle tileExtent( renderExtent.xMinimum() + ix * resolution, renderExtent.yMinimum() + iy * resolution, renderExtent.xMinimum() + ( ix + tileSize ) * resolution, renderExtent.yMinimum() + ( iy + tileSize ) * resolution );
+      QgsRectangle
+        tileExtent( renderExtent.xMinimum() + ix * resolution, renderExtent.yMinimum() + iy * resolution, renderExtent.xMinimum() + ( ix + tileSize ) * resolution, renderExtent.yMinimum() + ( iy + tileSize ) * resolution );
       if ( renderTile( image, tileExtent, mapLayer ) )
       {
         QString filename = QString( "%1_%2.png" ).arg( mapLayer->id() ).arg( tileCounter++ );
@@ -458,9 +459,5 @@ void KadasKMLExport::addStyle( QTextStream &outStream, QgsFeature &f, QgsFeature
 
 QString KadasKMLExport::convertColor( const QColor &c )
 {
-  return QString( "%1%2%3%4" )
-    .arg( c.alpha(), 2, 16, QChar( '0' ) )
-    .arg( c.blue(), 2, 16, QChar( '0' ) )
-    .arg( c.green(), 2, 16, QChar( '0' ) )
-    .arg( c.red(), 2, 16, QChar( '0' ) );
+  return QString( "%1%2%3%4" ).arg( c.alpha(), 2, 16, QChar( '0' ) ).arg( c.blue(), 2, 16, QChar( '0' ) ).arg( c.green(), 2, 16, QChar( '0' ) ).arg( c.red(), 2, 16, QChar( '0' ) );
 }

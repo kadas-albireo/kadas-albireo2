@@ -39,7 +39,9 @@
 #include "kadas/gui/maptools/kadasmaptooledititemgroup.h"
 
 KadasMapToolEditItemGroup::KadasMapToolEditItemGroup( QgsMapCanvas *canvas, const QList<KadasMapItem *> &items, KadasItemLayer *layer )
-  : QgsMapTool( canvas ), mItems( items ), mLayer( layer )
+  : QgsMapTool( canvas )
+  , mItems( items )
+  , mLayer( layer )
 {
   connect( QgsProject::instance(), qOverload<QgsMapLayer *>( &QgsProject::layerWillBeRemoved ), this, &KadasMapToolEditItemGroup::checkRemovedLayer );
 }

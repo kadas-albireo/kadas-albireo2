@@ -230,8 +230,7 @@ KadasMapItem::EditContext KadasPolygonItem::getEditContext( const KadasMapPos &p
 
 void KadasPolygonItem::edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings )
 {
-  if ( context.vidx.part >= 0 && context.vidx.part < state()->points.size()
-       && context.vidx.vertex >= 0 && context.vidx.vertex < state()->points[context.vidx.part].size() )
+  if ( context.vidx.part >= 0 && context.vidx.part < state()->points.size() && context.vidx.vertex >= 0 && context.vidx.vertex < state()->points[context.vidx.part].size() )
   {
     state()->points[context.vidx.part][context.vidx.vertex] = toItemPos( newPoint, mapSettings );
     recomputeDerived();

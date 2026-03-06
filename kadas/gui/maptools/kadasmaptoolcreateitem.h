@@ -149,7 +149,9 @@ class KADAS_GUI_EXPORT KadasMapToolCreateItem : public QgsMapTool
     struct ToolState : KadasStateHistory::State
     {
         ToolState( State *_itemState, QSharedPointer<ItemData> _itemData )
-          : itemState( _itemState ), itemData( _itemData ) {}
+          : itemState( _itemState )
+          , itemData( _itemData )
+        {}
         ~ToolState() { delete itemState; }
         State *itemState = nullptr;
         QSharedPointer<ItemData> itemData;

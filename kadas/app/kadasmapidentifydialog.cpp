@@ -248,7 +248,9 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
       if ( ( capabilities & Qgis::RasterInterfaceCapability::Identify ) && format != Qgis::RasterIdentifyFormat::Undefined )
       {
         QgsCoordinateTransform crst( mCanvas->mapSettings().destinationCrs(), rlayer->crs(), QgsProject::instance()->transformContext() );
-        QgsRasterIdentifyResult result = rlayer->dataProvider()->identify( crst.transform( mapPos ), format, crst.transformBoundingBox( mCanvas->extent() ), 0.25 * mCanvas->width(), 0.25 * mCanvas->height(), mCanvas->mapSettings().outputDpi() );
+        QgsRasterIdentifyResult result
+          = rlayer->dataProvider()
+              ->identify( crst.transform( mapPos ), format, crst.transformBoundingBox( mCanvas->extent() ), 0.25 * mCanvas->width(), 0.25 * mCanvas->height(), mCanvas->mapSettings().outputDpi() );
         addRasterIdentifyResult( rlayer, result );
       }
 #endif
@@ -300,7 +302,10 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
     query.addQueryItem( "geometryType", "esriGeometryPoint" );
     query.addQueryItem( "geometry", QString( "%1,%2" ).arg( worldPos.x(), 0, 'f', 10 ).arg( worldPos.y(), 0, 'f', 10 ) );
     query.addQueryItem( "imageDisplay", QString( "%1,%2,%3" ).arg( mCanvas->width() ).arg( mCanvas->height() ).arg( mCanvas->mapSettings().outputDpi() ) );
-    query.addQueryItem( "mapExtent", QString( "%1,%2,%3,%4" ).arg( worldExtent.xMinimum(), 0, 'f', 10 ).arg( worldExtent.yMinimum(), 0, 'f', 10 ).arg( worldExtent.xMaximum(), 0, 'f', 10 ).arg( worldExtent.yMaximum(), 0, 'f', 10 ) );
+    query.addQueryItem(
+      "mapExtent",
+      QString( "%1,%2,%3,%4" ).arg( worldExtent.xMinimum(), 0, 'f', 10 ).arg( worldExtent.yMinimum(), 0, 'f', 10 ).arg( worldExtent.xMaximum(), 0, 'f', 10 ).arg( worldExtent.yMaximum(), 0, 'f', 10 )
+    );
     query.addQueryItem( "tolerance", "15" );
     query.addQueryItem( "layers", rlayerIds.join( "," ) );
     identifyUrl.setQuery( query );

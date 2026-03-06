@@ -48,10 +48,7 @@ class KadasNewsWebView : public QAxWidget
       setControl( QString::fromUtf8( "{8856F961-340A-11D0-A96B-00C04FD705A2}" ) );
     }
 
-    void load( const QUrl &url )
-    {
-      dynamicCall( "Navigate(const QString&)", url.toString() );
-    }
+    void load( const QUrl &url ) { dynamicCall( "Navigate(const QString&)", url.toString() ); }
 
   protected:
     virtual bool translateKeyEvent( int message, int keycode ) const
@@ -72,10 +69,7 @@ class KadasNewsWebView : public QWidget
       : QWidget( parent )
     {}
 
-    void load( const QUrl &url )
-    {
-      QDesktopServices::openUrl( url );
-    }
+    void load( const QUrl &url ) { QDesktopServices::openUrl( url ); }
 };
 
 #endif

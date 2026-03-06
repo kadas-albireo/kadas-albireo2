@@ -36,9 +36,18 @@ class KADAS_GUI_EXPORT KadasVBSCatalogProvider : public KadasCatalogProvider
     {
         ResultEntry() {}
         ResultEntry( const QString &_category, const QString &_title, const QString &_sortIndices, const QString &_metadataUrl, bool _flatten = false )
-          : category( _category ), title( _title ), sortIndices( _sortIndices ), metadataUrl( _metadataUrl ), flatten( _flatten ) {}
+          : category( _category )
+          , title( _title )
+          , sortIndices( _sortIndices )
+          , metadataUrl( _metadataUrl )
+          , flatten( _flatten )
+        {}
         ResultEntry( const ResultEntry &entry )
-          : category( entry.category ), title( entry.title ), sortIndices( entry.sortIndices ), metadataUrl( entry.metadataUrl ) {}
+          : category( entry.category )
+          , title( entry.title )
+          , sortIndices( entry.sortIndices )
+          , metadataUrl( entry.metadataUrl )
+        {}
         QString category;
         QString title;
         QString sortIndices;

@@ -119,7 +119,7 @@ void KadasItemLayer::raiseItem( const ItemId &itemId )
 {
   int pos = mItemOrder.indexOf( itemId );
   mItemOrder.removeAt( pos );
-  mItemOrder.insert( std::min( mItemOrder.length(), pos + 1 ), itemId );
+  mItemOrder.insert( std::min( static_cast<int>( mItemOrder.length() ), pos + 1 ), itemId );
   emit repaintRequested();
 }
 
@@ -309,8 +309,7 @@ void KadasItemLayer::setSymbolScale( double scale )
 
 
 KadasItemLayerRegistry::KadasItemLayerRegistry()
-{
-}
+{}
 
 void KadasItemLayerRegistry::init()
 {
@@ -373,13 +372,8 @@ KadasItemLayer *KadasItemLayerRegistry::getOrCreateItemLayer( StandardLayer laye
 
 const QMap<KadasItemLayerRegistry::StandardLayer, QString> &KadasItemLayerRegistry::standardLayerNames()
 {
-  static QMap<StandardLayer, QString> names = {
-    { StandardLayer::RedliningLayer, tr( "Redlining" ) },
-    { StandardLayer::SymbolsLayer, tr( "Symbols" ) },
-    { StandardLayer::PicturesLayer, tr( "Pictures" ) },
-    { StandardLayer::PinsLayer, tr( "Pins" ) },
-    { StandardLayer::RoutesLayer, tr( "Routes" ) }
-  };
+  static QMap<StandardLayer, QString> names
+    = { { StandardLayer::RedliningLayer, tr( "Redlining" ) }, { StandardLayer::SymbolsLayer, tr( "Symbols" ) }, { StandardLayer::PicturesLayer, tr( "Pictures" ) }, { StandardLayer::PinsLayer, tr( "Pins" ) }, { StandardLayer::RoutesLayer, tr( "Routes" ) } };
   return names;
 }
 
@@ -424,9 +418,7 @@ void KadasItemLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *l
     scaleSlider->setValue( log10( itemLayer->symbolScale() ) * 10 );
     scaleSlider->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
     scaleSlider->setTracking( false );
-    connect( scaleSlider, &QSlider::valueChanged, this, [=]( double value ) {
-      itemLayer->setSymbolScale( pow( 10., value / 10. ) );
-    } );
+    connect( scaleSlider, &QSlider::valueChanged, this, [=]( double value ) { itemLayer->setSymbolScale( pow( 10., value / 10. ) ); } );
     transpLayout->addWidget( scaleSlider );
 
     QWidgetAction *scaleAction = new QWidgetAction( menu );

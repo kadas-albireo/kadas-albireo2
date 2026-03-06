@@ -25,7 +25,9 @@ class KADAS_GUI_EXPORT KadasMapToolHillshadeItemInterface : public KadasMapItemI
 {
   public:
     KadasMapToolHillshadeItemInterface( QgsMapCanvas *mapCanvas )
-      : KadasMapItemInterface(), mCanvas( mapCanvas ) {}
+      : KadasMapItemInterface()
+      , mCanvas( mapCanvas )
+    {}
     KadasMapItem *createItem() const override;
 
   private:

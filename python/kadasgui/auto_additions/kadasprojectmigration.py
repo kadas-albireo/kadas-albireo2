@@ -2,5 +2,5 @@
 try:
     KadasProjectMigration.migrateProject = staticmethod(KadasProjectMigration.migrateProject)
     KadasProjectMigration.migrateProjectXml = staticmethod(KadasProjectMigration.migrateProjectXml)
-except AttributeError:
+except (NameError, AttributeError):
     pass

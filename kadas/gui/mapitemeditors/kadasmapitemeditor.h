@@ -47,7 +47,9 @@ class KADAS_GUI_EXPORT KadasMapItemEditor : public QWidget
     };
 
     KadasMapItemEditor( KadasMapItem *item, QWidget *parent = nullptr )
-      : QWidget( parent ), mItem( item ) {}
+      : QWidget( parent )
+      , mItem( item )
+    {}
 
     virtual void setItem( KadasMapItem *item ) { mItem = item; }
 

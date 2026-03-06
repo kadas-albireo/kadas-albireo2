@@ -21,10 +21,14 @@
 #include "kadas/gui/mapitemeditors/kadasgpxwaypointeditor.h"
 
 
-const QgsSettingsEntryInteger *KadasGpxWaypointEditor::settingsGpxWaypointSize = new QgsSettingsEntryInteger( QStringLiteral( "waypoint_size" ), KadasSettingsTree::sTreeGpx, 2, QStringLiteral( "Waypoint size." ) );
-const QgsSettingsEntryColor *KadasGpxWaypointEditor::settingsGpxWaypointColor = new QgsSettingsEntryColor( QStringLiteral( "waypoint_color" ), KadasSettingsTree::sTreeGpx, QColor( 255, 255, 0, 255 ), QStringLiteral( "Waypoint color." ) );
-const QgsSettingsEntryString *KadasGpxWaypointEditor::settingsGpxWaypointLabelFont = new QgsSettingsEntryString( QStringLiteral( "waypoint_label_font" ), KadasSettingsTree::sTreeGpx, QString(), QStringLiteral( "Waypoint label font." ) );
-const QgsSettingsEntryColor *KadasGpxWaypointEditor::settingsGpxWaypointLabelColor = new QgsSettingsEntryColor( QStringLiteral( "waypoint_label_color" ), KadasSettingsTree::sTreeGpx, QColor( 255, 255, 0, 255 ), QStringLiteral( "Waypoint label color." ) );
+const QgsSettingsEntryInteger *KadasGpxWaypointEditor::settingsGpxWaypointSize
+  = new QgsSettingsEntryInteger( QStringLiteral( "waypoint_size" ), KadasSettingsTree::sTreeGpx, 2, QStringLiteral( "Waypoint size." ) );
+const QgsSettingsEntryColor *KadasGpxWaypointEditor::settingsGpxWaypointColor
+  = new QgsSettingsEntryColor( QStringLiteral( "waypoint_color" ), KadasSettingsTree::sTreeGpx, QColor( 255, 255, 0, 255 ), QStringLiteral( "Waypoint color." ) );
+const QgsSettingsEntryString *KadasGpxWaypointEditor::settingsGpxWaypointLabelFont
+  = new QgsSettingsEntryString( QStringLiteral( "waypoint_label_font" ), KadasSettingsTree::sTreeGpx, QString(), QStringLiteral( "Waypoint label font." ) );
+const QgsSettingsEntryColor *KadasGpxWaypointEditor::settingsGpxWaypointLabelColor
+  = new QgsSettingsEntryColor( QStringLiteral( "waypoint_label_color" ), KadasSettingsTree::sTreeGpx, QColor( 255, 255, 0, 255 ), QStringLiteral( "Waypoint label color." ) );
 
 KadasGpxWaypointEditor::KadasGpxWaypointEditor( KadasMapItem *item )
   : KadasMapItemEditor( item )

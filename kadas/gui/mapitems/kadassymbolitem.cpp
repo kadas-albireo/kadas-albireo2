@@ -19,10 +19,6 @@
 
 #include <quazip/quazipfile.h>
 
-#include <svg2svgt/processorengine.h>
-#include <svg2svgt/ruleengine.h>
-#include <svg2svgt/logger.h>
-
 #include <qgis/qgsgeometryengine.h>
 #include <qgis/qgslinestring.h>
 #include <qgis/qgsmapsettings.h>
@@ -126,17 +122,11 @@ void KadasSymbolItem::render( QgsRenderContext &context ) const
   context.painter()->translate( -mAnchorX * constState()->size.width(), -mAnchorY * constState()->size.height() );
   if ( mScalable )
   {
-    svg2svgt::Logger logger;
-    svg2svgt::RuleEngine ruleEngine( logger );
-    ruleEngine.setDefaultRules();
-    svg2svgt::ProcessorEngine processor( ruleEngine, logger );
-
-    QSvgRenderer svgRenderer;
-    QFile file( mFilePath );
-    if ( file.open( QIODevice::ReadOnly ) )
-    {
-      svgRenderer.load( processor.process( file.readAll() ) );
-    }
+    // NOTE: Previously svg2svgt was used here to convert SVG to SVG-Tiny before
+    // rendering. This was dropped to reduce dependencies. Complex SVGs using
+    // features outside SVG-Tiny (filters, advanced gradients, etc.) may not
+    // render correctly with Qt's QSvgRenderer.
+    QSvgRenderer svgRenderer( mFilePath );
     QSize renderSize = constState()->size;
     svgRenderer.render( context.painter(), QRectF( 0, 0, renderSize.width(), renderSize.height() ) );
   }

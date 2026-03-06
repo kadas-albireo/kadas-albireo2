@@ -45,27 +45,20 @@
         "ossl"
       ]
     },
-    "qt5-base",
-    "qt5-location",
-    {
-      "name": "qt5-macextras",
-      "platform": "osx"
-    },
-    "qt5-multimedia",
-    "qt5-svg",
-    "qt5-tools",
-    {
-      "name": "qt5-winextras",
-      "platform": "windows"
-    },
-    "qtkeychain",
+    "qtbase",
+    "qtlocation",
+    "qtmultimedia",
+    "qt5compat",
+    "qtsvg",
+    "qttools",
+    "qtkeychain-qt6",
     "zlib"
   ],
   "features": {
     "3d": {
       "description": "Determines whether QGIS 3D library should be built",
       "dependencies": [
-        "qt5-3d"
+        "qt3d"
       ]
     },
     "bindings": {
@@ -77,12 +70,16 @@
         },
         "py-psycopg2",
         {
-          "name": "py-pyqt5",
+          "name": "py-pyqt6",
           "features": [
-            "3d"
+            "qt3d",
+            "qt5compat",
+            "qtdeclarative",
+            "qtpositioning",
+            "qtserialport"
           ]
         },
-        "py-qscintilla-qt5",
+        "py-qscintilla",
         {
           "name": "vcpkg-python-scripts",
           "host": true
@@ -98,8 +95,9 @@
     "gui": {
       "description": "Determines whether the QGIS gui should be built",
       "dependencies": [
-        "qscintilla-qt5",
-        "qwt-qt5"
+        "qscintilla",
+        "qtmultimedia",
+        "qwt"
       ]
     },
     "opencl": {
@@ -114,8 +112,8 @@
     "quick": {
       "description": "Build the QGIS quick components for mobile interfaces",
       "dependencies": [
-        "qt5-declarative",
-        "qt5-quickcontrols2"
+        "qtdeclarative",
+        "qtquickcontrols2"
       ]
     },
     "server": {

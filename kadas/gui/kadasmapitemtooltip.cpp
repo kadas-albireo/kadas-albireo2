@@ -51,7 +51,8 @@ void KadasMapItemTooltip::updateForPos( const QPoint &canvasPos )
   }
   else
   {
-    KadasFeaturePicker::PickResult result = KadasFeaturePicker::pick( mCanvas, mCanvas->getCoordinateTransform()->toMapCoordinates( canvasPos ), Qgis::GeometryType::Unknown, KadasItemLayer::PickObjective::PICK_OBJECTIVE_TOOLTIP );
+    KadasFeaturePicker::PickResult result
+      = KadasFeaturePicker::pick( mCanvas, mCanvas->getCoordinateTransform()->toMapCoordinates( canvasPos ), Qgis::GeometryType::Unknown, KadasItemLayer::PickObjective::PICK_OBJECTIVE_TOOLTIP );
     if ( result.itemId != KadasItemLayer::ITEM_ID_NULL )
     {
       item = static_cast<KadasItemLayer *>( result.layer )->items()[result.itemId];
@@ -108,7 +109,7 @@ QVariant KadasMapItemTooltip::loadResource( int type, const QUrl &url )
   return QTextEdit::loadResource( type, url );
 }
 
-void KadasMapItemTooltip::enterEvent( QEvent * )
+void KadasMapItemTooltip::enterEvent( QEnterEvent * )
 {
   mHideTimer.stop();
   mShowTimer.stop();

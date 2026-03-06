@@ -55,11 +55,11 @@ KadasMapItem.ContextMenuActions.__doc__ = """
 # --
 try:
     KadasMapPos.fromPoint = staticmethod(KadasMapPos.fromPoint)
-except AttributeError:
+except (NameError, AttributeError):
     pass
 try:
     KadasItemPos.fromPoint = staticmethod(KadasItemPos.fromPoint)
-except AttributeError:
+except (NameError, AttributeError):
     pass
 try:
     KadasMapItem.fromXml = staticmethod(KadasMapItem.fromXml)
@@ -67,13 +67,19 @@ try:
     KadasMapItem.anchorNodeRenderer = staticmethod(KadasMapItem.anchorNodeRenderer)
     KadasMapItem.outputDpiScale = staticmethod(KadasMapItem.outputDpiScale)
     KadasMapItem.getTextRenderScale = staticmethod(KadasMapItem.getTextRenderScale)
-except AttributeError:
+    KadasMapItem.__virtual_methods__ = ['exportName', 'margin', 'hitTest', 'closestPoint', 'symbolImage', 'symbolAnchor', 'setState', 'clear', 'populateContextMenu', 'onDoubleClick']
+    KadasMapItem.__abstract_methods__ = ['itemName', 'boundingBox', 'nodes', 'intersects', 'render', 'startPart', 'setCurrentPoint', 'setCurrentAttributes', 'continuePart', 'endPart', 'drawAttribs', 'drawAttribsFromPosition', 'positionFromDrawAttribs', 'getEditContext', 'edit', 'editAttribsFromPosition', 'positionFromEditAttribs', 'position', 'setPosition', 'createEmptyState']
+except (NameError, AttributeError):
+    pass
+try:
+    KadasMapItem.State.__abstract_methods__ = ['assign', 'clone', 'serialize', 'deserialize']
+except (NameError, AttributeError):
     pass
 try:
     KadasMapItem.Margin.__doc__ = """Margin in screen units */"""
-except AttributeError:
+except (NameError, AttributeError):
     pass
 try:
     KadasMapItem.Node.__doc__ = """Nodes for editing */"""
-except AttributeError:
+except (NameError, AttributeError):
     pass

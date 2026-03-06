@@ -25,7 +25,9 @@ class QgsPoint;
 class KADAS_ANALYSIS_EXPORT KadasLineOfSight
 {
   public:
-    static bool computeTargetVisibility( const QgsPoint &observerPos, const QgsPoint &targetPos, const QgsCoordinateReferenceSystem &crs, double nTarrainSamples, bool observerPosAbsolute = false, bool targetPosAbsolute = false );
+    static bool computeTargetVisibility(
+      const QgsPoint &observerPos, const QgsPoint &targetPos, const QgsCoordinateReferenceSystem &crs, double nTarrainSamples, bool observerPosAbsolute = false, bool targetPosAbsolute = false
+    );
 };
 
 #endif // KADAS_LINE_OF_SIGHT

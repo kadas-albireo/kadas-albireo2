@@ -7,5 +7,5 @@ try:
     Kadas.locale = staticmethod(Kadas.locale)
     Kadas.gdalOpenForLayer = staticmethod(Kadas.gdalOpenForLayer)
     Kadas.importSslCertificates = staticmethod(Kadas.importSslCertificates)
-except AttributeError:
+except (NameError, AttributeError):
     pass

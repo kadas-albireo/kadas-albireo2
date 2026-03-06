@@ -18,6 +18,7 @@
 #include <QDomDocument>
 #include <QFileInfo>
 #include <QImageReader>
+#include <QRegularExpression>
 #include <QUuid>
 
 #include <quazip/quazipfile.h>
@@ -57,7 +58,16 @@ bool KadasKMLImport::importFile( const QString &filename, QString &errMsg )
     }
     // Search for kml file to open
     QStringList kmzFileList = quaZip.getFileNameList();
-    int mainKmlIndex = kmzFileList.indexOf( QRegExp( "[^/]+.kml", Qt::CaseInsensitive ) );
+    int mainKmlIndex = -1;
+    QRegularExpression kmzRe( "[^/]+.kml", QRegularExpression::CaseInsensitiveOption );
+    for ( int i = 0; i < kmzFileList.size(); ++i )
+    {
+      if ( kmzRe.match( kmzFileList[i] ).hasMatch() )
+      {
+        mainKmlIndex = i;
+        break;
+      }
+    }
     if ( mainKmlIndex == -1 || !quaZip.setCurrentFile( kmzFileList[mainKmlIndex] ) )
     {
       errMsg = tr( "Corrupt KMZ file." );
@@ -332,7 +342,7 @@ void KadasKMLImport::buildVSIVRT( const QString &name, OverlayData &overlayData,
 
   // Prepare vsi output
   QString safename = name;
-  safename.replace( QRegExp( "[<>:\"/\\\\|?*]" ), "_" ); // Replace invalid path chars
+  safename.replace( QRegularExpression( "[<>:\"/\\\\|?*]" ), "_" ); // Replace invalid path chars
   QString vsifilename = QgsProject::instance()->createAttachedFile( QString( "%1.zip" ).arg( safename ) );
   QuaZip vsiZip( vsifilename );
   if ( !vsiZip.open( QuaZip::mdCreate ) )
@@ -357,10 +367,7 @@ void KadasKMLImport::buildVSIVRT( const QString &name, OverlayData &overlayData,
 
   // Get total size by assuming all tiles have same resolution
   const TileData &firstTile = overlayData.tiles.front();
-  QSize totSize(
-    qRound( firstTile.size.width() / firstTile.bbox.width() * overlayData.bbox.width() ),
-    qRound( firstTile.size.height() / firstTile.bbox.height() * overlayData.bbox.height() )
-  );
+  QSize totSize( qRound( firstTile.size.width() / firstTile.bbox.width() * overlayData.bbox.width() ), qRound( firstTile.size.height() / firstTile.bbox.height() * overlayData.bbox.height() ) );
 
   // Compute image rectangles and merge overlapping images
   QList<KadasAlgorithms::Rect> rects;
@@ -440,7 +447,8 @@ void KadasKMLImport::buildVSIVRT( const QString &name, OverlayData &overlayData,
   vrtStream << "  " << overlayData.bbox.yMaximum() << ", 0," << ( -overlayData.bbox.height() / totSize.height() ) << Qt::endl;
   vrtStream << " </GeoTransform>" << Qt::endl;
 
-  for ( const QPair<int, QString> &band : QList<QPair<int, QString>> { qMakePair( 1, QString( "Red" ) ), qMakePair( 2, QString( "Green" ) ), qMakePair( 3, QString( "Blue" ) ), qMakePair( 4, QString( "Alpha" ) ) } )
+  for ( const QPair<int, QString> &band :
+        QList<QPair<int, QString>> { qMakePair( 1, QString( "Red" ) ), qMakePair( 2, QString( "Green" ) ), qMakePair( 3, QString( "Blue" ) ), qMakePair( 4, QString( "Alpha" ) ) } )
   {
     vrtStream << " <VRTRasterBand dataType=\"Byte\" band=\"" << band.first << "\">" << Qt::endl;
     vrtStream << "  <ColorInterp>" << band.second << "</ColorInterp>" << Qt::endl;
@@ -451,7 +459,15 @@ void KadasKMLImport::buildVSIVRT( const QString &name, OverlayData &overlayData,
       vrtStream << "  <SimpleSource>" << Qt::endl;
       vrtStream << "   <SourceFilename relativeToVRT=\"1\">" << tile.iconHref << "</SourceFilename>" << Qt::endl;
       vrtStream << "   <SourceBand>" << band.first << "</SourceBand>" << Qt::endl;
-      vrtStream << "   <SourceProperties RasterXSize=\"" << tile.size.width() << "\" RasterYSize=\"" << tile.size.height() << "\" DataType=\"Byte\" BlockXSize=\"" << tile.size.width() << "\" BlockYSize=\"1\" />" << Qt::endl;
+      vrtStream
+        << "   <SourceProperties RasterXSize=\""
+        << tile.size.width()
+        << "\" RasterYSize=\""
+        << tile.size.height()
+        << "\" DataType=\"Byte\" BlockXSize=\""
+        << tile.size.width()
+        << "\" BlockYSize=\"1\" />"
+        << Qt::endl;
       vrtStream << "   <SrcRect xOff=\"0\" yOff=\"0\" xSize=\"" << tile.size.width() << "\" ySize=\"" << tile.size.height() << "\" />" << Qt::endl;
       vrtStream << "   <DstRect xOff=\"" << i << "\" yOff=\"" << j << "\" xSize=\"" << tile.size.width() << "\" ySize=\"" << tile.size.height() << "\" />" << Qt::endl;
       vrtStream << "  </SimpleSource>" << Qt::endl;
@@ -478,7 +494,7 @@ void KadasKMLImport::buildVSIVRT( const QString &name, OverlayData &overlayData,
 
 QVector<QgsPoint> KadasKMLImport::parseCoordinates( const QDomElement &geomEl ) const
 {
-  QStringList coordinates = geomEl.firstChildElement( "coordinates" ).text().split( QRegExp( "\\s+" ), Qt::SkipEmptyParts );
+  QStringList coordinates = geomEl.firstChildElement( "coordinates" ).text().split( QRegularExpression( "\\s+" ), Qt::SkipEmptyParts );
   QVector<QgsPoint> points;
   for ( int i = 0, n = coordinates.size(); i < n; ++i )
   {

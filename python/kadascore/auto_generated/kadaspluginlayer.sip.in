@@ -18,10 +18,10 @@ class KadasPluginLayer : QgsPluginLayer
 %Docstring(signature="appended")
 *************************************************************************
 
-This program is free software; you can redistribute it and/or modify  *
-it under the terms of the GNU General Public License as published by  *
-the Free Software Foundation; either version 2 of the License, or     *
-(at your option) any later version.                                   *
+This program is free software; you can redistribute it and/or modify *
+it under the terms of the GNU General Public License as published by *
+the Free Software Foundation; either version 2 of the License, or * (at
+your option) any later version. *
 
 **************************************************************************
 %End
@@ -31,6 +31,7 @@ the Free Software Foundation; either version 2 of the License, or     *
 %End
   public:
     KadasPluginLayer( const QString &layerType, const QString &layerName = QString() );
+
 
     virtual QString layerTypeKey() const = 0;
 
@@ -42,13 +43,10 @@ the Free Software Foundation; either version 2 of the License, or     *
     virtual double opacity() const;
 
     class IdentifyResult
-{
-
-%TypeHeaderCode
-#include "kadas/core/kadaspluginlayer.h"
-%End
+    {
       public:
         IdentifyResult( const QString &featureName, const QMap<QString, QVariant> &attributes, const QgsGeometry &geom );
+        const QString &featureName() const;
         const QMap<QString, QVariant> &attributes() const;
         const QgsGeometry &geometry() const;
 
@@ -61,12 +59,12 @@ the Free Software Foundation; either version 2 of the License, or     *
 
 class KadasPluginLayerType : QObject, QgsPluginLayerType
 {
-
 %TypeHeaderCode
 #include "kadas/core/kadaspluginlayer.h"
 %End
   public:
     KadasPluginLayerType( const QString &name );
+
     virtual void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const;
 };
 

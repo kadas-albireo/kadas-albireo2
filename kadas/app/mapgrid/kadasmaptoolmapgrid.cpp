@@ -188,7 +188,8 @@ void KadasMapGridWidget::updateGrid()
   {
     return;
   }
-  mCurrentLayer->setup( static_cast<KadasMapGridLayer::GridType>( ui.comboBoxGridType->currentData().toInt() ), ui.spinBoxIntervalX->value(), ui.spinBoxIntervalY->value(), ui.mCellSizeCombo->currentData().toInt() );
+  mCurrentLayer
+    ->setup( static_cast<KadasMapGridLayer::GridType>( ui.comboBoxGridType->currentData().toInt() ), ui.spinBoxIntervalX->value(), ui.spinBoxIntervalY->value(), ui.mCellSizeCombo->currentData().toInt() );
   mCurrentLayer->triggerRepaint();
 }
 

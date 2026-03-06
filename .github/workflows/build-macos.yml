@@ -102,9 +102,9 @@ jobs:
                 -D NUGET_USERNAME=kadas-albireo \
                 -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }} || true
                 
-                fdupes -r -1 build/vcpkg_installed/arm64-osx-dynamic/lib | grep libQt | while read line; do master=""; for file in ${line[*]}; do if  [[ "x${master}" == "x" ]]; then master=$file; else rm "${file}"; ln -s $(basename "${master}") "${file}"; fi; done; done
-                
-                cmake -D VCPKG_INSTALL_OPTIONS="" build
+          fdupes -r -1 build/vcpkg_installed/arm64-osx-dynamic/lib | grep libQt | while read line; do master=""; for file in ${line[*]}; do if  [[ "x${master}" == "x" ]]; then master=$file; else rm "${file}"; ln -s $(basename "${master}") "${file}"; fi; done; done
+
+          cmake -D VCPKG_INSTALL_OPTIONS="" build
 
       - name: 📑 Upload vcpkg build logs
         uses: actions/upload-artifact@v7
@@ -118,22 +118,22 @@ jobs:
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
         run: |
           ./build/_deps/vcpkg-src/vcpkg export --zip --output-dir=./sdk --x-install-root=./build/vcpkg_installed  --x-manifest-root=vcpkg
+          cd sdk && for f in vcpkg-export-*.zip; do mv "$f" "${f/vcpkg-export/vcpkg-export-${{ matrix.triplet }}}"; done
 
-      - name: 📤 Upload sdk
+      - name: 📤 Upload SDK
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
         uses: actions/upload-artifact@v7
         with:
-          name: kadas-albireo2-sdk-${{ matrix.triplet }}
-          path: |
-            sdk/vcpkg-export-*.zip
+          archive: false
+          path: sdk/vcpkg-export-${{ matrix.triplet }}-*.zip
 
-      - name: Compile plugins translation
+      - name: 📝 Compile plugins translation
         run: |
           # lrelease is run from cmake for app
           # plugins need to be handled
-          export PATH="${{ github.workspace }}/build/vcpkg_installed/${{ matrix.triplet }}/tools/qt5/bin:${PATH}"
-          for PLUGIN in about gpkg print; do
-            lrelease share/python/plugins/kadas_${PLUGIN}/kadas_${PLUGIN}_ts.pro
+          export PATH="${{ github.workspace }}/build/vcpkg_installed/${{ matrix.triplet }}/tools/Qt6/bin:${PATH}"
+          for PLUGIN in about gpkg print ephem; do
+            lrelease share/python/plugins/kadas_${PLUGIN}/i18n/*.ts
           done
 
       - name: 🌋 Build
@@ -141,5 +141,7 @@ jobs:
           cmake --build build
 
       - name: 🧪 Run CTest
+        env:
+          QT_QPA_PLATFORM: offscreen
         run: |
           ctest --test-dir build --output-on-failure

@@ -159,7 +159,7 @@ configure_file(
 set(KADAS_RCC_SRC ${CMAKE_SOURCE_DIR}/kadas/resources/resources.qrc)
 
 # Translation
-find_package(Qt5 COMPONENTS LinguistTools)
+find_package(Qt6 COMPONENTS LinguistTools)
 file(GLOB TS_FILES ${CMAKE_SOURCE_DIR}/i18n/*.ts)
 set_source_files_properties(
   ${TS_FILES} PROPERTIES OUTPUT_LOCATION ${CMAKE_BINARY_DIR}/i18n
@@ -178,10 +178,10 @@ foreach(QM_FILE ${QM_FILES})
 endforeach()
 file(APPEND ${KADAS_QM} "\n  </qresource>\n</RCC>\n")
 
-qt5_add_resources(KADAS_RCC ${KADAS_QM})
+qt_add_resources(KADAS_RCC ${KADAS_QM})
 
-qt5_add_resources(KADAS_RCC ${KADAS_RCC_SRC})
-qt5_wrap_ui(kadas_UI_HDR ${kadas_UI})
+qt_add_resources(KADAS_RCC ${KADAS_RCC_SRC})
+qt_wrap_ui(kadas_UI_HDR ${kadas_UI})
 
 if(WIN32)
   enable_language(RC)
@@ -199,8 +199,8 @@ set_property(SOURCE ${kadas_UI_HDR} PROPERTY SKIP_AUTOMOC ON)
 set_property(SOURCE ${KADAS_RCC} PROPERTY SKIP_AUTOMOC ON)
 
 if(WIN32)
-  find_package(Qt5AxContainer REQUIRED)
-  set(AXCONTAINER_LIBRARY Qt5::AxContainer)
+  find_package(Qt6AxContainer REQUIRED)
+  set(AXCONTAINER_LIBRARY Qt6::AxContainer)
 
   set(SHOW_CONSOLE
       OFF
@@ -225,12 +225,12 @@ add_executable(
 
 target_link_libraries(
   kadas
-  Qt5::Widgets
-  Qt5::Network
-  Qt5::Xml
-  Qt5::Sql
-  Qt5::OpenGL
-  Qt5::PrintSupport
+  Qt6::Widgets
+  Qt6::Network
+  Qt6::Xml
+  Qt6::Sql
+  Qt6::OpenGL
+  Qt6::PrintSupport
   QuaZip::QuaZip
   ${AXCONTAINER_LIBRARY}
   QGIS::Core
@@ -261,9 +261,27 @@ target_include_directories(
 )
 
 if(WITH_VCPKG)
+  if(WIN32)
+    set(PYTHON_STDLIB_DIR "${VCPKG_BASE_DIR}/tools/python3/Lib")
+    set(PYTHON_SITE_PACKAGES_DIR
+        "${VCPKG_BASE_DIR}/tools/python3/Lib/site-packages"
+    )
+    set(ENV_PATH_SEP ";")
+  else()
+    set(PYTHON_STDLIB_DIR
+        "${VCPKG_BASE_DIR}/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}"
+    )
+    set(PYTHON_SITE_PACKAGES_DIR
+        "${VCPKG_BASE_DIR}/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages"
+    )
+    set(ENV_PATH_SEP ":")
+  endif()
   configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/kadas.env.in
     ${CMAKE_CURRENT_BINARY_DIR}/kadas.env @ONLY
+  )
+  file(COPY ${CMAKE_CURRENT_BINARY_DIR}/kadas.env
+       DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
   )
 endif()
 

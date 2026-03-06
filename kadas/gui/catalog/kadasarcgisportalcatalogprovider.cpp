@@ -480,11 +480,5 @@ void KadasArcGisPortalCatalogProvider::addVTSlayer( const ResultEntry &entry )
   mimeData->setProperty( "authcfg", mAuthId );
 
   QStringList sortIndices = entry.sortIndices.split( "/" );
-  mBrowser->addItem(
-    getCategoryItem( entry.category.split( "/" ), sortIndices ),
-    entry.title,
-    sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(),
-    true,
-    mimeData
-  );
+  mBrowser->addItem( getCategoryItem( entry.category.split( "/" ), sortIndices ), entry.title, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );
 }

@@ -15,7 +15,7 @@
  ***************************************************************************/
 
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QJsonArray>
 #include <QMainWindow>
 #include <QMenu>
@@ -197,7 +197,7 @@ KadasItemPos KadasMilxItem::position() const
     x += point.x();
     y += point.y();
   }
-  int n = std::max( 1, constState()->points.size() );
+  int n = std::max( qsizetype( 1 ), constState()->points.size() );
   return KadasItemPos( x / n, y / n );
 }
 
@@ -1036,7 +1036,7 @@ void KadasMilxItem::finalize( KadasMilxItem *item, bool isCorridor )
   KadasMilxClient::NPointSymbol symbol( item->mMssString, QList<QPoint>() << QPoint( 0, 0 ), QList<int>(), QList<QPair<int, double>>(), true, true );
   QRect screenExtent( 0, 0, 100, 100 );
   KadasMilxClient::NPointSymbolGraphic result;
-  int dpi = qApp->desktop()->logicalDpiX();
+  int dpi = qApp->primaryScreen()->logicalDotsPerInchX();
   if ( KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, item->symbolSettings(), result, false ) )
   {
     item->updateSymbolMargin( result );
@@ -1168,7 +1168,7 @@ QImage KadasMilxItem::symbolImage() const
     KadasMilxClient::NPointSymbol symbol( mMssString, QList<QPoint>() << QPoint( 0, 0 ), QList<int>(), QList<QPair<int, double>>(), true, true );
     QRect screenExtent( 0, 0, 100, 100 );
     KadasMilxClient::NPointSymbolGraphic result;
-    int dpi = qApp->desktop()->logicalDpiX();
+    int dpi = qApp->primaryScreen()->logicalDotsPerInchX();
     if ( KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, symbolSettings(), result, false ) )
     {
       mSymbolGraphic = result.graphic;

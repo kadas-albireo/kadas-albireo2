@@ -124,25 +124,26 @@ jobs:
 
       - name: 📦 Create SDK
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
+        shell: bash
         run: |
           ./build/_deps/vcpkg-src/vcpkg.exe export --zip --output-dir=./sdk --x-install-root=build/vcpkg_installed --x-manifest-root=vcpkg
-        
+          cd sdk && for f in vcpkg-export-*.zip; do mv "$f" "${f/vcpkg-export/vcpkg-export-${{ matrix.triplet }}}"; done
+
       - name: 📤 Upload sdk
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
         uses: actions/upload-artifact@v7
         with:
-          name: kadas-albireo2-sdk-x64-windows
-          path: |
-            sdk/vcpkg-export-*.zip
+          archive: false
+          path: sdk/vcpkg-export-${{ matrix.triplet }}-*.zip
 
       - name: Compile plugins translation
         shell: bash
         run: |
           # lrelease is run from cmake for app
           # plugins need to be handled
-          export PATH="${{ github.workspace }}\build\vcpkg_installed\x64-windows\tools\qt5\bin:${PATH}"
-          for PLUGIN in about gpkg print; do
-            lrelease share/python/plugins/kadas_${PLUGIN}/kadas_${PLUGIN}_ts.pro
+          export PATH="${{ github.workspace }}\build\vcpkg_installed\x64-windows\tools\Qt6\bin:${PATH}"
+          for PLUGIN in about gpkg print ephem; do
+            lrelease share/python/plugins/kadas_${PLUGIN}/i18n/*.ts
           done
 
       - name: 🌋 Build
@@ -152,6 +153,7 @@ jobs:
       - name: 🧪 Run CTest
         env:
           QT_LOGGING_TO_CONSOLE: "1"
+          QT_QPA_PLATFORM: offscreen
         run: |
           ctest --test-dir build --output-on-failure -C Release
 

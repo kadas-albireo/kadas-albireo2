@@ -15,8 +15,7 @@
 class KadasMapToolPan : QgsMapTool
 {
 %Docstring(signature="appended")
-A map tool for panning the map.
-@see :py:class:`QgsMapTool`
+A map tool for panning the map. @see :py:class:`QgsMapTool`
 %End
 
 %TypeHeaderCode
@@ -67,7 +66,8 @@ Overridden mouse release event
 
     void pinchTriggered( QPinchGesture *gesture );
 %Docstring
-Flag to indicate whether mouseRelease is a click (i.e. no moves inbetween)
+Flag to indicate whether mouseRelease is a click (i.e. no moves
+inbetween)
 %End
 };
 

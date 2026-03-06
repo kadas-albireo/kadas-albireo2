@@ -15,7 +15,7 @@
  ***************************************************************************/
 
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QPainter>
 #include <qgsrendercontext.h>
 #include <qgsgeometryutils.h>
@@ -201,7 +201,7 @@ void KadasMapGridLayerRenderer::drawCrsGrid( const QString &crs, double segmentL
 
   if ( drawLabels && mRenderGridConfig.labelingMode == KadasMapGridLayer::LabelingEnabled )
   {
-    double dpiScale = double( renderContext()->painter()->device()->logicalDpiX() ) / qApp->desktop()->logicalDpiX();
+    double dpiScale = double( renderContext()->painter()->device()->logicalDpiX() ) / qApp->primaryScreen()->logicalDotsPerInchX();
     QFont font = renderContext()->painter()->font();
     font.setBold( true );
     font.setPointSizeF( mRenderGridConfig.fontSize * dpiScale );
@@ -318,12 +318,8 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
     area = area.buffered( area.width() );
   }
 
-  KadasLatLonToUTM::Grid grid = KadasLatLonToUTM::computeGrid(
-    area,
-    mapScale,
-    mRenderGridConfig.gridType == KadasMapGridLayer::GridMGRS ? KadasLatLonToUTM::GridMode::GridMGRS : KadasLatLonToUTM::GridMode::GridUTM,
-    mRenderGridConfig.cellSize
-  );
+  KadasLatLonToUTM::Grid grid = KadasLatLonToUTM::
+    computeGrid( area, mapScale, mRenderGridConfig.gridType == KadasMapGridLayer::GridMGRS ? KadasLatLonToUTM::GridMode::GridMGRS : KadasLatLonToUTM::GridMode::GridUTM, mRenderGridConfig.cellSize );
 
   // Draw grid lines
   for ( const auto &gridLine : std::as_const( grid.lines ) )
@@ -439,7 +435,16 @@ void KadasMapGridLayerRenderer::drawMgrsGrid()
   }
 }
 
-QRect KadasMapGridLayerRenderer::drawMgrsGridZoneLabel( const KadasLatLonToUTM::ZoneLabel &zoneLabel, bool adaptToScreen, const QgsCoordinateTransform &crst, const QRect &screenExtent, double mapScale, const QColor &bufferColor, const QFont &font, const QList<QRect> &drawnLabelsRects )
+QRect KadasMapGridLayerRenderer::drawMgrsGridZoneLabel(
+  const KadasLatLonToUTM::ZoneLabel &zoneLabel,
+  bool adaptToScreen,
+  const QgsCoordinateTransform &crst,
+  const QRect &screenExtent,
+  double mapScale,
+  const QColor &bufferColor,
+  const QFont &font,
+  const QList<QRect> &drawnLabelsRects
+)
 {
   double zoneFontSize = exponentialScale( mapScale, zoneLabel.fontSizeMaxScale, zoneLabel.fontSizeMinScale, zoneLabel.fontSizeMax, zoneLabel.fontSizeMin );
 

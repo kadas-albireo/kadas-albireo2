@@ -28,8 +28,7 @@
 KadasAppAuthRequestHandler::KadasAppAuthRequestHandler( QObject *parent )
   : QObject( parent )
   , QgsNetworkAuthenticationHandler()
-{
-}
+{}
 
 void KadasAppAuthRequestHandler::handleAuthRequestOpenBrowser( const QUrl &url )
 {

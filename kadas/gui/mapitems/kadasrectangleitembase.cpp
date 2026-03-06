@@ -104,8 +104,7 @@ KadasRectangleItemBase::KadasRectangleItemBase( const QgsCoordinateReferenceSyst
 }
 
 KadasRectangleItemBase::~KadasRectangleItemBase()
-{
-}
+{}
 
 
 void KadasRectangleItemBase::setFrameVisible( bool frame )
@@ -207,7 +206,14 @@ bool KadasRectangleItemBase::intersects( const KadasMapRect &rect, const QgsMapS
 
   QgsPolygon filterRect;
   QgsLineString *exterior = new QgsLineString();
-  exterior->setPoints( QgsPointSequence() << QgsPoint( rect.xMinimum(), rect.yMinimum() ) << QgsPoint( rect.xMaximum(), rect.yMinimum() ) << QgsPoint( rect.xMaximum(), rect.yMaximum() ) << QgsPoint( rect.xMinimum(), rect.yMaximum() ) << QgsPoint( rect.xMinimum(), rect.yMinimum() ) );
+  exterior->setPoints(
+    QgsPointSequence()
+    << QgsPoint( rect.xMinimum(), rect.yMinimum() )
+    << QgsPoint( rect.xMaximum(), rect.yMinimum() )
+    << QgsPoint( rect.xMaximum(), rect.yMaximum() )
+    << QgsPoint( rect.xMinimum(), rect.yMaximum() )
+    << QgsPoint( rect.xMinimum(), rect.yMinimum() )
+  );
   filterRect.setExteriorRing( exterior );
 
   QgsGeometryEngine *geomEngine = QgsGeometry::createGeometryEngine( &filterRect );
@@ -489,9 +495,15 @@ static QMatrix3x3 rotAngleAxis( const std::array<float, 3> &u, float angle )
   float cosa = std::cos( angle );
   return QMatrix3x3(
     std::array<float, 9> {
-      cosa + u[0] * u[0] * ( 1 - cosa ), u[0] * u[1] * ( 1 - cosa ) - u[2] * sina, u[0] * u[2] * ( 1 - cosa ) + u[1] * sina,
-      u[0] * u[1] * ( 1 - cosa ) + u[2] * sina, cosa + u[1] * u[1] * ( 1 - cosa ), u[1] * u[2] * ( 1 - cosa ) - u[0] * sina,
-      u[0] * u[2] * ( 1 - cosa ) - u[1] * sina, u[1] * u[2] * ( 1 - cosa ) + u[0] * sina, cosa + u[2] * u[2] * ( 1 - cosa )
+      cosa + u[0] * u[0] * ( 1 - cosa ),
+      u[0] * u[1] * ( 1 - cosa ) - u[2] * sina,
+      u[0] * u[2] * ( 1 - cosa ) + u[1] * sina,
+      u[0] * u[1] * ( 1 - cosa ) + u[2] * sina,
+      cosa + u[1] * u[1] * ( 1 - cosa ),
+      u[1] * u[2] * ( 1 - cosa ) - u[0] * sina,
+      u[0] * u[2] * ( 1 - cosa ) - u[1] * sina,
+      u[1] * u[2] * ( 1 - cosa ) + u[0] * sina,
+      cosa + u[2] * u[2] * ( 1 - cosa )
     }
       .data()
   );

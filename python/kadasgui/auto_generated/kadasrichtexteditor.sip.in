@@ -17,10 +17,10 @@ class KadasRichTextEditor : QTextEdit
 %Docstring(signature="appended")
 *************************************************************************
 
-This program is free software; you can redistribute it and/or modify  *
-it under the terms of the GNU General Public License as published by  *
-the Free Software Foundation; either version 2 of the License, or     *
-(at your option) any later version.                                   *
+This program is free software; you can redistribute it and/or modify *
+it under the terms of the GNU General Public License as published by *
+the Free Software Foundation; either version 2 of the License, or * (at
+your option) any later version. *
 
 **************************************************************************
 %End
@@ -52,7 +52,6 @@ the Free Software Foundation; either version 2 of the License, or     *
 
 class KadasColorAction : QAction
 {
-
 %TypeHeaderCode
 #include "kadas/gui/kadasrichtexteditor.h"
 %End
@@ -68,7 +67,6 @@ class KadasColorAction : QAction
 
 class KadasAddLinkDialog : QDialog
 {
-
 %TypeHeaderCode
 #include "kadas/gui/kadasrichtexteditor.h"
 %End
@@ -84,7 +82,6 @@ class KadasAddLinkDialog : QDialog
 
 class KadasAddImageDialog : QDialog
 {
-
 %TypeHeaderCode
 #include "kadas/gui/kadasrichtexteditor.h"
 %End
@@ -99,7 +96,6 @@ class KadasAddImageDialog : QDialog
 
 class KadasRichTextEditorToolBar : QToolBar
 {
-
 %TypeHeaderCode
 #include "kadas/gui/kadasrichtexteditor.h"
 %End

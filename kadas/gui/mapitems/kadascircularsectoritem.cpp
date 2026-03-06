@@ -134,7 +134,7 @@ KadasItemPos KadasCircularSectorItem::position() const
     x += center.x();
     y += center.y();
   }
-  int n = std::max( 1, constState()->centers.length() );
+  int n = std::max( qsizetype( 1 ), constState()->centers.length() );
   return KadasItemPos( x / n, y / n );
 }
 
@@ -385,7 +385,14 @@ void KadasCircularSectorItem::recomputeDerived()
     else
     {
       QgsCircularString *arc = new QgsCircularString();
-      arc->setPoints( QgsPointSequence() << QgsPoint( center.x(), center.y() + radius ) << QgsPoint( center.x() + radius, center.y() ) << QgsPoint( center.x(), center.y() - radius ) << QgsPoint( center.x() - radius, center.y() ) << QgsPoint( center.x(), center.y() + radius ) );
+      arc->setPoints(
+        QgsPointSequence()
+        << QgsPoint( center.x(), center.y() + radius )
+        << QgsPoint( center.x() + radius, center.y() )
+        << QgsPoint( center.x(), center.y() - radius )
+        << QgsPoint( center.x() - radius, center.y() )
+        << QgsPoint( center.x(), center.y() + radius )
+      );
       exterior->addCurve( arc );
     }
     QgsPolygon *poly = new QgsPolygon;

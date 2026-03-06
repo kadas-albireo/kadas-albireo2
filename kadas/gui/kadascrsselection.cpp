@@ -32,7 +32,8 @@
 
 
 KadasCrsSelection::KadasCrsSelection( QWidget *parent )
-  : QToolButton( parent ), mMapCanvas( 0 )
+  : QToolButton( parent )
+  , mMapCanvas( 0 )
 {
   QMenu *crsSelectionMenu = new QMenu( this );
   crsSelectionMenu->addAction( QgsCoordinateReferenceSystem( "EPSG:21781" ).description(), this, &KadasCrsSelection::setMapCrs )->setData( "EPSG:21781" );

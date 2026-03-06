@@ -27,7 +27,9 @@
 #include "kadas/core/kadas.h"
 
 
-bool KadasLineOfSight::computeTargetVisibility( const QgsPoint &observerPos, const QgsPoint &targetPos, const QgsCoordinateReferenceSystem &crs, double nTerrainSamples, bool observerPosAbsolute, bool targetPosAbsolute )
+bool KadasLineOfSight::computeTargetVisibility(
+  const QgsPoint &observerPos, const QgsPoint &targetPos, const QgsCoordinateReferenceSystem &crs, double nTerrainSamples, bool observerPosAbsolute, bool targetPosAbsolute
+)
 {
   QString layerid = QgsProject::instance()->readEntry( "Heightmap", "layer" );
   QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerid );
@@ -105,8 +107,7 @@ bool KadasLineOfSight::computeTargetVisibility( const QgsPoint &observerPos, con
       double lambdaR = row - std::floor( row );
       double lambdaC = col - std::floor( col );
 
-      double value = ( pixValues[0] * ( 1. - lambdaC ) + pixValues[1] * lambdaC ) * ( 1. - lambdaR )
-                     + ( pixValues[2] * ( 1. - lambdaC ) + pixValues[3] * lambdaC ) * ( lambdaR );
+      double value = ( pixValues[0] * ( 1. - lambdaC ) + pixValues[1] * lambdaC ) * ( 1. - lambdaR ) + ( pixValues[2] * ( 1. - lambdaC ) + pixValues[3] * lambdaC ) * ( lambdaR );
       double hCorr = 0.87 * k * k / ( 2 * earthRadius );
       samples.append( QPointF( k, value * heightConversion - hCorr ) );
     }
