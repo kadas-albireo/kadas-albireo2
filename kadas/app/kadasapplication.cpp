@@ -360,8 +360,29 @@ void KadasApplication::init()
   QgsPathResolver::setPathPreprocessor( [this]( const QString &path ) { return migrateDatasource( path ); } );
 
   QgsDockableWidgetHelper::sAddTabifiedDockWidgetFunction = []( Qt::DockWidgetArea dockArea, QDockWidget *dock, const QStringList &tabSiblings, bool raiseTab ) {
-    // If we want to add tabified dock widgets as QGIS does, we need to implement this
-    // KadasApplication::instance()->addTabifiedDockWidget(dockArea, dock, tabSiblings, raiseTab);
+    QMainWindow *mainWindow = KadasApplication::instance()->mainWindow();
+    if ( !mainWindow )
+      return;
+
+    // Try to tabify with a sibling dock widget if one exists
+    if ( !tabSiblings.isEmpty() )
+    {
+      for ( QDockWidget *existing : mainWindow->findChildren<QDockWidget *>() )
+      {
+        if ( tabSiblings.contains( existing->objectName() ) )
+        {
+          mainWindow->addDockWidget( dockArea, dock );
+          mainWindow->tabifyDockWidget( existing, dock );
+          if ( raiseTab )
+            dock->raise();
+          return;
+        }
+      }
+    }
+
+    mainWindow->addDockWidget( dockArea, dock );
+    if ( raiseTab )
+      dock->raise();
   };
   QgsDockableWidgetHelper::sAppStylesheetFunction = []() -> QString { return KadasApplication::instance()->styleSheet(); };
   QgsDockableWidgetHelper::sOwnerWindow = mMainWindow;
