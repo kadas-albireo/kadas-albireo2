@@ -1,9 +1,9 @@
 string(REPLACE "." "_" TAG ${VERSION})
 
 # set(QGIS_REF final-${TAG})
-set(QGIS_REF a4666d590d5737537f737d58bc6bd333fc69dbeb)
+set(QGIS_REF 2beb446a1dcb04e6e9c3490e1e1e138367664374)
 set(QGIS_SHA512
-    4e365e1b7b178a93248e028c2f8de148789c475c4fe8ceaae08671452680bc0140f28da7bc32f621b1fd0bd668d6420bdc84ee518ce4abc91f1034d43c1c5340
+    65a75ea119bd6739db9028ee289a2ba71cb91d05fc772d103b36325e57e8eedcc30bdb12ad3c43258cd531c5ce2f6c5a51877ae20f212ccd4c9b0ccfbdda6358
 )
 
 vcpkg_from_github(
@@ -31,8 +31,6 @@ vcpkg_from_github(
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
   mac_install_images.patch
-  # Allow overriding SIP_DEFAULT_SIP_DIR from the command line
-  sip-default-dir.patch # https://github.com/qgis/QGIS/pull/65205
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
