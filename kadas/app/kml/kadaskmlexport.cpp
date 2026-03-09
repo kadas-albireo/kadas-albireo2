@@ -72,7 +72,7 @@ bool KadasKMLExport::exportToFile( const QString &filename, const QList<QgsMapLa
       for ( int i = 0; i < layerFields.size(); ++i )
       {
         const QgsField &field = layerFields.at( i );
-        outStream << QString( "<SimpleField name=\"%1\" type=\"%2\"></SimpleField>" ).arg( field.name() ).arg( QVariant::typeToName( field.type() ) ) << "\n";
+        outStream << QString( "<SimpleField name=\"%1\" type=\"%2\"></SimpleField>" ).arg( field.name() ).arg( QMetaType( field.type() ).name() ) << "\n";
       }
       outStream << QString( "</Schema> " ) << "\n";
     }
