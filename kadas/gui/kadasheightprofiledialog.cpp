@@ -53,6 +53,9 @@
 #include "kadas/core/kadas.h"
 #include "kadas/core/kadascoordinateformat.h"
 #include "kadas/gui/kadasheightprofiledialog.h"
+#ifdef Q_OS_MAC
+#include "kadas/gui/kadasclipboardutils.h"
+#endif
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/mapitems/kadaslineitem.h"
@@ -811,17 +814,26 @@ void KadasHeightProfileDialog::updateLineOfSight()
 void KadasHeightProfileDialog::copyToClipboard()
 {
   QImage image( mPlot->size(), QImage::Format_ARGB32 );
+  image.fill( Qt::white );
   mPlotMarker->setVisible( false );
   mPlot->replot();
   mPlot->render( &image );
   mPlotMarker->setVisible( true );
   mPlot->replot();
+
+#ifdef Q_OS_MAC
+  // Use native NSPasteboard to avoid crash in ImageIO's TIFF encoder
+  // caused by libtiff symbol conflict with GDAL
+  KadasClipboardUtils::copyImageToClipboard( image );
+#else
   QApplication::clipboard()->setImage( image );
+#endif
 }
 
 void KadasHeightProfileDialog::addToCanvas()
 {
   QImage image( mPlot->size(), QImage::Format_ARGB32 );
+  image.fill( Qt::white );
   mPlotMarker->setVisible( false );
   mPlot->replot();
   mPlot->render( &image );

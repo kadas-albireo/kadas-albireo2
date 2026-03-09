@@ -4,6 +4,7 @@ set(kadas_gui_SRC
     kadascatalogbrowser.cpp
     kadascatalogprovider.cpp
     kadasclipboard.cpp
+    kadasclipboardutils.h
     kadascoordinatedisplayer.cpp
     kadascoordinateinput.cpp
     kadascrsselection.cpp
@@ -168,6 +169,11 @@ qt_wrap_ui(kadas_gui_UI_HDR ${kadas_gui_UI})
 set_property(SOURCE ${kadas_gui_UI} PROPERTY SKIP_AUTOMOC ON)
 
 add_library(kadas_gui ${kadas_gui_SRC} ${kadas_gui_HDR} ${kadas_gui_UI})
+
+if(APPLE)
+  target_sources(kadas_gui PRIVATE kadasclipboardutils.mm)
+  target_link_libraries(kadas_gui "-framework AppKit")
+endif()
 
 pkg_search_module(CAIRO IMPORTED_TARGET cairo REQUIRED)
 pkg_search_module(LIBRSVG IMPORTED_TARGET librsvg-2.0 REQUIRED)
