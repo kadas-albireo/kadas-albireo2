@@ -243,28 +243,28 @@ KadasLayoutDesignerDialog::KadasLayoutDesignerDialog( QWidget *parent, Qt::Windo
   mPanTool = new QgsLayoutViewToolPan( mView );
   mPanTool->setAction( mActionPan );
   mToolsActionGroup->addAction( mActionPan );
-  connect( mActionPan, &QAction::triggered, mPanTool, [=] { mView->setTool( mPanTool ); } );
+  connect( mActionPan, &QAction::triggered, mPanTool, [=, this] { mView->setTool( mPanTool ); } );
   mZoomTool = new QgsLayoutViewToolZoom( mView );
   mZoomTool->setAction( mActionZoomTool );
   mToolsActionGroup->addAction( mActionZoomTool );
-  connect( mActionZoomTool, &QAction::triggered, mZoomTool, [=] { mView->setTool( mZoomTool ); } );
+  connect( mActionZoomTool, &QAction::triggered, mZoomTool, [=, this] { mView->setTool( mZoomTool ); } );
   mSelectTool = new QgsLayoutViewToolSelect( mView );
   mSelectTool->setAction( mActionSelectMoveItem );
   mToolsActionGroup->addAction( mActionSelectMoveItem );
-  connect( mActionSelectMoveItem, &QAction::triggered, mSelectTool, [=] { mView->setTool( mSelectTool ); } );
+  connect( mActionSelectMoveItem, &QAction::triggered, mSelectTool, [=, this] { mView->setTool( mSelectTool ); } );
   // after creating an item with the add item tool, switch immediately to select tool
-  connect( mAddItemTool, &QgsLayoutViewToolAddItem::createdItem, this, [=] { mView->setTool( mSelectTool ); } );
-  connect( mAddNodeItemTool, &QgsLayoutViewToolAddNodeItem::createdItem, this, [=] { mView->setTool( mSelectTool ); } );
+  connect( mAddItemTool, &QgsLayoutViewToolAddItem::createdItem, this, [=, this] { mView->setTool( mSelectTool ); } );
+  connect( mAddNodeItemTool, &QgsLayoutViewToolAddNodeItem::createdItem, this, [=, this] { mView->setTool( mSelectTool ); } );
 
   mNodesTool = new QgsLayoutViewToolEditNodes( mView );
   mNodesTool->setAction( mActionEditNodesItem );
   mToolsActionGroup->addAction( mActionEditNodesItem );
-  connect( mActionEditNodesItem, &QAction::triggered, mNodesTool, [=] { mView->setTool( mNodesTool ); } );
+  connect( mActionEditNodesItem, &QAction::triggered, mNodesTool, [=, this] { mView->setTool( mNodesTool ); } );
 
   mMoveContentTool = new QgsLayoutViewToolMoveItemContent( mView );
   mMoveContentTool->setAction( mActionMoveItemContent );
   mToolsActionGroup->addAction( mActionMoveItemContent );
-  connect( mActionMoveItemContent, &QAction::triggered, mMoveContentTool, [=] { mView->setTool( mMoveContentTool ); } );
+  connect( mActionMoveItemContent, &QAction::triggered, mMoveContentTool, [=, this] { mView->setTool( mMoveContentTool ); } );
 
   //Ctrl+= should also trigger zoom in
   QShortcut *ctrlEquals = new QShortcut( QKeySequence( QStringLiteral( "Ctrl+=" ) ), this );
@@ -274,20 +274,20 @@ KadasLayoutDesignerDialog::KadasLayoutDesignerDialog( QWidget *parent, Qt::Windo
   connect( backSpace, &QShortcut::activated, mActionDeleteSelection, &QAction::trigger );
 
   mActionPreviewModeOff->setChecked( true );
-  connect( mActionPreviewModeOff, &QAction::triggered, this, [=] { mView->setPreviewModeEnabled( false ); } );
-  connect( mActionPreviewModeGrayscale, &QAction::triggered, this, [=] {
+  connect( mActionPreviewModeOff, &QAction::triggered, this, [=, this] { mView->setPreviewModeEnabled( false ); } );
+  connect( mActionPreviewModeGrayscale, &QAction::triggered, this, [=, this] {
     mView->setPreviewMode( QgsPreviewEffect::PreviewGrayscale );
     mView->setPreviewModeEnabled( true );
   } );
-  connect( mActionPreviewModeMono, &QAction::triggered, this, [=] {
+  connect( mActionPreviewModeMono, &QAction::triggered, this, [=, this] {
     mView->setPreviewMode( QgsPreviewEffect::PreviewMono );
     mView->setPreviewModeEnabled( true );
   } );
-  connect( mActionPreviewProtanope, &QAction::triggered, this, [=] {
+  connect( mActionPreviewProtanope, &QAction::triggered, this, [=, this] {
     mView->setPreviewMode( QgsPreviewEffect::PreviewProtanope );
     mView->setPreviewModeEnabled( true );
   } );
-  connect( mActionPreviewDeuteranope, &QAction::triggered, this, [=] {
+  connect( mActionPreviewDeuteranope, &QAction::triggered, this, [=, this] {
     mView->setPreviewMode( QgsPreviewEffect::PreviewDeuteranope );
     mView->setPreviewModeEnabled( true );
   } );
@@ -319,39 +319,39 @@ KadasLayoutDesignerDialog::KadasLayoutDesignerDialog( QWidget *parent, Qt::Windo
   connect( mActionLowerItems, &QAction::triggered, mView, &QgsLayoutView::lowerSelectedItems );
   connect( mActionMoveItemsToTop, &QAction::triggered, mView, &QgsLayoutView::moveSelectedItemsToTop );
   connect( mActionMoveItemsToBottom, &QAction::triggered, mView, &QgsLayoutView::moveSelectedItemsToBottom );
-  connect( mActionAlignLeft, &QAction::triggered, this, [=] { mView->alignSelectedItems( QgsLayoutAligner::AlignLeft ); } );
-  connect( mActionAlignHCenter, &QAction::triggered, this, [=] { mView->alignSelectedItems( QgsLayoutAligner::AlignHCenter ); } );
-  connect( mActionAlignRight, &QAction::triggered, this, [=] { mView->alignSelectedItems( QgsLayoutAligner::AlignRight ); } );
-  connect( mActionAlignTop, &QAction::triggered, this, [=] { mView->alignSelectedItems( QgsLayoutAligner::AlignTop ); } );
-  connect( mActionAlignVCenter, &QAction::triggered, this, [=] { mView->alignSelectedItems( QgsLayoutAligner::AlignVCenter ); } );
-  connect( mActionAlignBottom, &QAction::triggered, this, [=] { mView->alignSelectedItems( QgsLayoutAligner::AlignBottom ); } );
-  connect( mActionDistributeLeft, &QAction::triggered, this, [=] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeLeft ); } );
-  connect( mActionDistributeHCenter, &QAction::triggered, this, [=] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeHCenter ); } );
-  connect( mActionDistributeHSpace, &QAction::triggered, this, [=] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeHSpace ); } );
-  connect( mActionDistributeRight, &QAction::triggered, this, [=] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeRight ); } );
-  connect( mActionDistributeTop, &QAction::triggered, this, [=] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeTop ); } );
-  connect( mActionDistributeVCenter, &QAction::triggered, this, [=] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeVCenter ); } );
-  connect( mActionDistributeVSpace, &QAction::triggered, this, [=] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeVSpace ); } );
-  connect( mActionDistributeBottom, &QAction::triggered, this, [=] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeBottom ); } );
-  connect( mActionResizeNarrowest, &QAction::triggered, this, [=] { mView->resizeSelectedItems( QgsLayoutAligner::ResizeNarrowest ); } );
-  connect( mActionResizeWidest, &QAction::triggered, this, [=] { mView->resizeSelectedItems( QgsLayoutAligner::ResizeWidest ); } );
-  connect( mActionResizeShortest, &QAction::triggered, this, [=] { mView->resizeSelectedItems( QgsLayoutAligner::ResizeShortest ); } );
-  connect( mActionResizeTallest, &QAction::triggered, this, [=] { mView->resizeSelectedItems( QgsLayoutAligner::ResizeTallest ); } );
-  connect( mActionResizeToSquare, &QAction::triggered, this, [=] { mView->resizeSelectedItems( QgsLayoutAligner::ResizeToSquare ); } );
+  connect( mActionAlignLeft, &QAction::triggered, this, [=, this] { mView->alignSelectedItems( QgsLayoutAligner::AlignLeft ); } );
+  connect( mActionAlignHCenter, &QAction::triggered, this, [=, this] { mView->alignSelectedItems( QgsLayoutAligner::AlignHCenter ); } );
+  connect( mActionAlignRight, &QAction::triggered, this, [=, this] { mView->alignSelectedItems( QgsLayoutAligner::AlignRight ); } );
+  connect( mActionAlignTop, &QAction::triggered, this, [=, this] { mView->alignSelectedItems( QgsLayoutAligner::AlignTop ); } );
+  connect( mActionAlignVCenter, &QAction::triggered, this, [=, this] { mView->alignSelectedItems( QgsLayoutAligner::AlignVCenter ); } );
+  connect( mActionAlignBottom, &QAction::triggered, this, [=, this] { mView->alignSelectedItems( QgsLayoutAligner::AlignBottom ); } );
+  connect( mActionDistributeLeft, &QAction::triggered, this, [=, this] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeLeft ); } );
+  connect( mActionDistributeHCenter, &QAction::triggered, this, [=, this] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeHCenter ); } );
+  connect( mActionDistributeHSpace, &QAction::triggered, this, [=, this] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeHSpace ); } );
+  connect( mActionDistributeRight, &QAction::triggered, this, [=, this] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeRight ); } );
+  connect( mActionDistributeTop, &QAction::triggered, this, [=, this] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeTop ); } );
+  connect( mActionDistributeVCenter, &QAction::triggered, this, [=, this] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeVCenter ); } );
+  connect( mActionDistributeVSpace, &QAction::triggered, this, [=, this] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeVSpace ); } );
+  connect( mActionDistributeBottom, &QAction::triggered, this, [=, this] { mView->distributeSelectedItems( QgsLayoutAligner::DistributeBottom ); } );
+  connect( mActionResizeNarrowest, &QAction::triggered, this, [=, this] { mView->resizeSelectedItems( QgsLayoutAligner::ResizeNarrowest ); } );
+  connect( mActionResizeWidest, &QAction::triggered, this, [=, this] { mView->resizeSelectedItems( QgsLayoutAligner::ResizeWidest ); } );
+  connect( mActionResizeShortest, &QAction::triggered, this, [=, this] { mView->resizeSelectedItems( QgsLayoutAligner::ResizeShortest ); } );
+  connect( mActionResizeTallest, &QAction::triggered, this, [=, this] { mView->resizeSelectedItems( QgsLayoutAligner::ResizeTallest ); } );
+  connect( mActionResizeToSquare, &QAction::triggered, this, [=, this] { mView->resizeSelectedItems( QgsLayoutAligner::ResizeToSquare ); } );
 
   connect( mActionAddPages, &QAction::triggered, this, &KadasLayoutDesignerDialog::addPages );
 
   connect( mActionUnlockAll, &QAction::triggered, mView, &QgsLayoutView::unlockAllItems );
   connect( mActionLockItems, &QAction::triggered, mView, &QgsLayoutView::lockSelectedItems );
 
-  connect( mActionDeleteSelection, &QAction::triggered, this, [=] {
+  connect( mActionDeleteSelection, &QAction::triggered, this, [=, this] {
     if ( mView->tool() == mNodesTool )
       mNodesTool->deleteSelectedNode();
     else
       mView->deleteSelectedItems();
   } );
-  connect( mActionGroupItems, &QAction::triggered, this, [=] { mView->groupSelectedItems(); } );
-  connect( mActionUngroupItems, &QAction::triggered, this, [=] { mView->ungroupSelectedItems(); } );
+  connect( mActionGroupItems, &QAction::triggered, this, [=, this] { mView->groupSelectedItems(); } );
+  connect( mActionUngroupItems, &QAction::triggered, this, [=, this] { mView->ungroupSelectedItems(); } );
 
   //cut/copy/paste actions. Note these are not included in the ui file
   //as ui files have no support for QKeySequence shortcuts
@@ -359,13 +359,13 @@ KadasLayoutDesignerDialog::KadasLayoutDesignerDialog( QWidget *parent, Qt::Windo
   mActionCut->setShortcuts( QKeySequence::Cut );
   mActionCut->setStatusTip( tr( "Cut" ) );
   mActionCut->setIcon( QgsApplication::getThemeIcon( QStringLiteral( "/mActionEditCut.svg" ) ) );
-  connect( mActionCut, &QAction::triggered, this, [=] { mView->copySelectedItems( QgsLayoutView::ClipboardCut ); } );
+  connect( mActionCut, &QAction::triggered, this, [=, this] { mView->copySelectedItems( QgsLayoutView::ClipboardCut ); } );
 
   mActionCopy = new QAction( tr( "&Copy" ), this );
   mActionCopy->setShortcuts( QKeySequence::Copy );
   mActionCopy->setStatusTip( tr( "Copy" ) );
   mActionCopy->setIcon( QgsApplication::getThemeIcon( QStringLiteral( "/mActionEditCopy.svg" ) ) );
-  connect( mActionCopy, &QAction::triggered, this, [=] { mView->copySelectedItems( QgsLayoutView::ClipboardCopy ); } );
+  connect( mActionCopy, &QAction::triggered, this, [=, this] { mView->copySelectedItems( QgsLayoutView::ClipboardCopy ); } );
 
   mActionPaste = new QAction( tr( "&Paste" ), this );
   mActionPaste->setShortcuts( QKeySequence::Paste );
@@ -442,7 +442,7 @@ KadasLayoutDesignerDialog::KadasLayoutDesignerDialog( QWidget *parent, Qt::Windo
   connect( mHorizontalRuler, &QgsLayoutRuler::cursorPosChanged, this, &KadasLayoutDesignerDialog::updateStatusCursorPos );
   connect( mVerticalRuler, &QgsLayoutRuler::cursorPosChanged, this, &KadasLayoutDesignerDialog::updateStatusCursorPos );
 
-  connect( mView, &QgsLayoutView::itemFocused, this, [=]( QgsLayoutItem *item ) { showItemOptions( item, false ); } );
+  connect( mView, &QgsLayoutView::itemFocused, this, [=, this]( QgsLayoutItem *item ) { showItemOptions( item, false ); } );
 
   // Panel and toolbar submenus
   mToolbarMenu->addAction( mLayoutToolbar->toggleViewAction() );
@@ -464,7 +464,7 @@ KadasLayoutDesignerDialog::KadasLayoutDesignerDialog( QWidget *parent, Qt::Windo
   mGeneralPropertiesStack = new QgsPanelWidgetStack();
   mGeneralDock->setWidget( mGeneralPropertiesStack );
   mPanelsMenu->addAction( mGeneralDock->toggleViewAction() );
-  connect( mActionLayoutProperties, &QAction::triggered, this, [=] { mGeneralDock->setUserVisible( true ); } );
+  connect( mActionLayoutProperties, &QAction::triggered, this, [=, this] { mGeneralDock->setUserVisible( true ); } );
 
   mItemDock = new QgsDockWidget( tr( "Item Properties" ), this );
   mItemDock->setObjectName( QStringLiteral( "ItemDock" ) );
@@ -479,7 +479,7 @@ KadasLayoutDesignerDialog::KadasLayoutDesignerDialog( QWidget *parent, Qt::Windo
   mGuideStack = new QgsPanelWidgetStack();
   mGuideDock->setWidget( mGuideStack );
   mPanelsMenu->addAction( mGuideDock->toggleViewAction() );
-  connect( mActionManageGuides, &QAction::triggered, this, [=] { mGuideDock->setUserVisible( true ); } );
+  connect( mActionManageGuides, &QAction::triggered, this, [=, this] { mGuideDock->setUserVisible( true ); } );
 
   mUndoDock = new QgsDockWidget( tr( "Undo History" ), this );
   mUndoDock->setObjectName( QStringLiteral( "UndoDock" ) );
@@ -583,7 +583,7 @@ void KadasLayoutDesignerDialog::setCurrentLayout( QgsPrintLayout *layout )
     mLayoutToolbar->addAction( mRedoAction );
 
     connect( mLayout->undoStack(), &QgsLayoutUndoStack::undoRedoOccurredForItems, this, &KadasLayoutDesignerDialog::undoRedoOccurredForItems );
-    connect( mActionClearGuides, &QAction::triggered, &mLayout->guides(), [=] { mLayout->guides().clear(); } );
+    connect( mActionClearGuides, &QAction::triggered, &mLayout->guides(), [=, this] { mLayout->guides().clear(); } );
 
     mActionShowGrid->setChecked( mLayout->renderContext().gridVisible() );
     mActionSnapGrid->setChecked( mLayout->snapper().snapToGrid() );

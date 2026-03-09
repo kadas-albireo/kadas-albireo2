@@ -28,6 +28,7 @@
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsproviderutils.h>
 #include <qgis/qgszipitem.h>
+#include <qgis/qgsgdalutils.h>
 #include <qgis/qgsproviderregistry.h>
 #include <qgis/qgsprovidersublayerdetails.h>
 #include <qgis/qgslayertreenode.h>
@@ -177,7 +178,7 @@ void KadasAppLayerHandling::postProcessAddedLayer( QgsMapLayer *layer )
       QgsMeshLayer *meshLayer = qobject_cast<QgsMeshLayer *>( layer );
       QDateTime referenceTime = QgsProject::instance()->timeSettings()->temporalRange().begin();
       if ( !referenceTime.isValid() ) // If project reference time is invalid, use current date
-        referenceTime = QDateTime( QDate::currentDate(), QTime( 0, 0, 0 ), Qt::UTC );
+        referenceTime = QDateTime( QDate::currentDate(), QTime( 0, 0, 0 ), QTimeZone::UTC );
 
       if ( meshLayer->dataProvider() && !qobject_cast<QgsMeshLayerTemporalProperties *>( meshLayer->temporalProperties() )->referenceTime().isValid() )
         qobject_cast<QgsMeshLayerTemporalProperties *>( meshLayer->temporalProperties() )->setReferenceTime( referenceTime, meshLayer->dataProvider()->temporalCapabilities() );
@@ -213,6 +214,9 @@ void KadasAppLayerHandling::postProcessAddedLayer( QgsMapLayer *layer )
 
       break;
     }
+
+    case Qgis::LayerType::TiledScene:
+      break;
   }
 }
 
@@ -256,6 +260,7 @@ void KadasAppLayerHandling::postProcessAddedLayers( const QList<QgsMapLayer *> &
       case Qgis::LayerType::Annotation:
       case Qgis::LayerType::PointCloud:
       case Qgis::LayerType::Group:
+      case Qgis::LayerType::TiledScene:
         break;
     }
   }
@@ -286,7 +291,7 @@ QList<QgsMapLayer *> KadasAppLayerHandling::addOgrVectorLayers( const QStringLis
       baseName = QgsProviderUtils::suggestLayerNameFromFilePath( srcWithoutLayername );
 
       // if needed prompt for zipitem layers
-      QString vsiPrefix = QgsZipItem::vsiPrefix( uri );
+      QString vsiPrefix = QgsGdalUtils::vsiPrefixForPath( uri );
       if ( !uri.startsWith( QLatin1String( "/vsi" ), Qt::CaseInsensitive ) && ( vsiPrefix == QLatin1String( "/vsizip/" ) || vsiPrefix == QLatin1String( "/vsitar/" ) ) )
       {
         if ( askUserForZipItemLayers( uri, { Qgis::LayerType::Vector } ) )
@@ -850,7 +855,7 @@ QList<QgsMapLayer *> KadasAppLayerHandling::openLayer( const QString &fileName, 
   CPLPushErrorHandler( CPLQuietErrorHandler );
 
   // if needed prompt for zipitem layers
-  QString vsiPrefix = QgsZipItem::vsiPrefix( fileName );
+  QString vsiPrefix = QgsGdalUtils::vsiPrefixForPath( fileName );
   if ( vsiPrefix == QLatin1String( "/vsizip/" ) || vsiPrefix == QLatin1String( "/vsitar/" ) )
   {
     if ( askUserForZipItemLayers( fileName, {} ) )
@@ -1091,7 +1096,7 @@ QList<QgsMapLayer *> KadasAppLayerHandling::addGdalRasterLayers( const QStringLi
     QString errMsg;
 
     // if needed prompt for zipitem layers
-    QString vsiPrefix = QgsZipItem::vsiPrefix( uri );
+    QString vsiPrefix = QgsGdalUtils::vsiPrefixForPath( uri );
     if ( ( !uri.startsWith( QLatin1String( "/vsi" ), Qt::CaseInsensitive ) || uri.endsWith( QLatin1String( ".zip" ) ) || uri.endsWith( QLatin1String( ".tar" ) ) )
          && ( vsiPrefix == QLatin1String( "/vsizip/" ) || vsiPrefix == QLatin1String( "/vsitar/" ) ) )
     {
@@ -1199,10 +1204,10 @@ void KadasAppLayerHandling::openLayerDefinition( const QString &filename )
   else
   {
     QDomDocument doc;
-    QString message;
-    if ( !doc.setContent( &file, &message ) )
+    QDomDocument::ParseResult parseResult = doc.setContent( &file );
+    if ( !parseResult )
     {
-      errorMessage = message;
+      errorMessage = parseResult.errorMessage;
     }
     else
     {

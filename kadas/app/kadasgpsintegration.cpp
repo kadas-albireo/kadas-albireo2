@@ -76,8 +76,12 @@ void KadasGpsIntegration::connectGPS()
 
   disconnectGPS(); // cleanup
   QString port = QgsSettings().value( "/kadas/gps_port", "" ).toString();
-  QgsGpsDetector *gpsDetector = new QgsGpsDetector( port ); // deletes itself automatically
-  connect( gpsDetector, qOverload<QgsGpsConnection *>( &QgsGpsDetector::detected ), this, &KadasGpsIntegration::gpsConnected );
+  QgsGpsDetector *gpsDetector = new QgsGpsDetector( port, false ); // deletes itself automatically
+  connect( gpsDetector, &QgsGpsDetector::connectionDetected, this, [this, gpsDetector]() {
+    QgsGpsConnection *connection = gpsDetector->takeConnection();
+    if ( connection )
+      gpsConnected( connection );
+  } );
   connect( gpsDetector, &QgsGpsDetector::detectionFailed, this, &KadasGpsIntegration::gpsConnectionFailed );
   gpsDetector->advance();
 }
@@ -116,7 +120,8 @@ void KadasGpsIntegration::disconnectGPS()
 
 void KadasGpsIntegration::gpsStateChanged( const QgsGpsInformation &info )
 {
-  Qgis::GpsFixStatus fixStatus = info.fixStatus();
+  Qgis::GnssConstellation constellation;
+  Qgis::GpsFixStatus fixStatus = info.bestFixStatus( constellation );
 
   if ( fixStatus != mCurFixStatus )
   {

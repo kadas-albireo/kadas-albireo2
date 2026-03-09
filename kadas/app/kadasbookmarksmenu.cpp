@@ -79,9 +79,9 @@ void KadasBookmarksMenu::addBookmarkAction( Bookmark *bookmark )
   QWidgetAction *widgetAction = new QWidgetAction( this );
   widgetAction->setProperty( "name", bookmark->name );
   widgetAction->setDefaultWidget( widget );
-  connect( replaceButton, &QToolButton::clicked, this, [=] { replaceBookmark( bookmark ); } );
-  connect( deleteButton, &QToolButton::clicked, this, [=] { deleteBookmark( widgetAction, bookmark ); } );
-  connect( widgetAction, &QWidgetAction::triggered, this, [=] { restoreBookmark( bookmark ); } );
+  connect( replaceButton, &QToolButton::clicked, this, [=, this] { replaceBookmark( bookmark ); } );
+  connect( deleteButton, &QToolButton::clicked, this, [=, this] { deleteBookmark( widgetAction, bookmark ); } );
+  connect( widgetAction, &QWidgetAction::triggered, this, [=, this] { restoreBookmark( bookmark ); } );
 
   // insert alphabetically
   const QList<QAction *> constMenuActions = actions();

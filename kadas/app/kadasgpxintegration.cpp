@@ -56,8 +56,8 @@ KadasMapItem *KadasRouteInterface::createItem() const
 KadasGpxIntegration::KadasGpxIntegration( QAction *actionWaypoint, QAction *actionRoute, QAction *actionExportGpx, QAction *actionImportGpx, QObject *parent )
   : QObject( parent )
 {
-  connect( actionWaypoint, &QAction::triggered, this, [=]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasWayPointInterface>( KadasWayPointInterface() ) ) ); } );
-  connect( actionRoute, &QAction::triggered, this, [=]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasRouteInterface>( KadasRouteInterface() ) ) ); } );
+  connect( actionWaypoint, &QAction::triggered, this, [=, this]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasWayPointInterface>( KadasWayPointInterface() ) ) ); } );
+  connect( actionRoute, &QAction::triggered, this, [=, this]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasRouteInterface>( KadasRouteInterface() ) ) ); } );
   connect( actionExportGpx, &QAction::triggered, this, &KadasGpxIntegration::saveGpx );
   connect( actionImportGpx, &QAction::triggered, this, &KadasGpxIntegration::openGpx );
 
