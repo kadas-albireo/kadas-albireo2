@@ -283,7 +283,7 @@ void KadasLineItem::populateContextMenu( QMenu *menu, const EditContext &context
   }
   else
   {
-    menu->addAction( QIcon( ":/kadas/icons/add_node" ), tr( "Add node" ), menu, [=] {
+    menu->addAction( QIcon( ":/kadas/icons/add_node" ), tr( "Add node" ), menu, [=, this] {
       KadasItemPos newPos = toItemPos( clickPos, mapSettings );
       QgsVertexId insPoint = insertionPoint( constState()->points, newPos );
       state()->points[insPoint.part].insert( insPoint.vertex, newPos );

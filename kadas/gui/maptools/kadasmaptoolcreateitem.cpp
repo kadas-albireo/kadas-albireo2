@@ -220,7 +220,7 @@ void KadasMapToolCreateItem::canvasMoveEvent( QgsMapMouseEvent *e )
       mInputWidget->inputField( it.key() )->setValue( it.value() );
     }
 
-    mInputWidget->move( e->x(), e->y() + 20 );
+    mInputWidget->move( e->position().x(), e->position().y() + 20 );
     mInputWidget->show();
     if ( mInputWidget->focusedInputField() )
     {

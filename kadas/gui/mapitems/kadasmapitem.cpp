@@ -108,13 +108,13 @@ bool KadasMapItem::deserialize( const QJsonObject &json )
   {
     QMetaProperty prop = metaObject()->property( i );
     QJsonValue value = props[prop.name()];
-    QVariant variant( prop.type() );
+    QVariant variant( prop.metaType() );
     // TODO: use custom type
     if ( prop.name() == QString( "filePath" ) )
     {
       prop.write( this, QVariant::fromValue( QgsProject::instance()->readPath( value.toString() ) ) );
     }
-    else if ( prop.type() == QVariant::Pen )
+    else if ( prop.metaType() == QMetaType::fromType<QPen>() )
     {
       QStringList penStr = value.toString().split( ";" );
       if ( penStr.size() == 3 )
@@ -123,7 +123,7 @@ bool KadasMapItem::deserialize( const QJsonObject &json )
         prop.write( this, QVariant::fromValue( pen ) );
       }
     }
-    else if ( prop.type() == QVariant::Brush )
+    else if ( prop.metaType() == QMetaType::fromType<QBrush>() )
     {
       QStringList brushStr = value.toString().split( ";" );
       if ( brushStr.size() == 2 )
@@ -458,25 +458,25 @@ QJsonValue KadasMapItem::serializeProperty( const QString &name, const QVariant 
   else if ( value.isUndefined() )
   {
     // Manually handle conversion, i.e. variant.toJsonValue does not convert enums to int...
-    if ( variant.canConvert( QVariant::Int ) )
+    if ( variant.canConvert( QMetaType::fromType<int>() ) )
     {
       value = QJsonValue( variant.toInt() );
     }
-    else if ( variant.canConvert( QVariant::Double ) )
+    else if ( variant.canConvert( QMetaType::fromType<double>() ) )
     {
       value = QJsonValue( variant.toDouble() );
     }
-    else if ( variant.type() == QVariant::Pen )
+    else if ( variant.metaType() == QMetaType::fromType<QPen>() )
     {
       QPen pen = variant.value<QPen>();
       value = QString( "%1;%2;%3" ).arg( pen.color().name( QColor::HexArgb ) ).arg( pen.width() ).arg( pen.style() );
     }
-    else if ( variant.type() == QVariant::Brush )
+    else if ( variant.metaType() == QMetaType::fromType<QBrush>() )
     {
       QBrush brush = variant.value<QBrush>();
       value = QString( "%1;%2" ).arg( brush.color().name( QColor::HexArgb ) ).arg( brush.style() );
     }
-    else if ( variant.canConvert( QVariant::String ) )
+    else if ( variant.canConvert( QMetaType::fromType<QString>() ) )
     {
       value = QJsonValue( variant.toString() );
     }
