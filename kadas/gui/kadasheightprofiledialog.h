@@ -20,7 +20,9 @@
 #include <QDialog>
 
 #include <qgis/qgscoordinatereferencesystem.h>
+#include <qgis/qgssettingsentryimpl.h>
 
+#include "kadas/core/kadassettingstree.h"
 #include "kadas/gui/kadas_gui.h"
 
 class QCheckBox;
@@ -119,6 +121,9 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
     QProgressBar *mProgressBar = nullptr;
     QPushButton *mCancelButton = nullptr;
     QWidget *mStatisticsWidget = nullptr;
+
+    static const inline QgsSettingsEntryBool *sSettingsShowStatistics = new QgsSettingsEntryBool( QStringLiteral( "heightprofile-show-statistics" ), KadasSettingsTree::sTreeKadas, true );
+    static const inline QgsSettingsEntryBool *sSettingsNodeMarkers = new QgsSettingsEntryBool( QStringLiteral( "heightprofile-node-markers" ), KadasSettingsTree::sTreeKadas, true );
 };
 
 #endif // KADASHEIGHTPROFILEDIALOG_H

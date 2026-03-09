@@ -213,14 +213,14 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
   QHBoxLayout *checkboxLayout = new QHBoxLayout();
 
   mNodeMarkersCheckbox = new QCheckBox( tr( "Show vertex lines" ) );
-  mNodeMarkersCheckbox->setChecked( QgsSettings().value( "/kadas/heightprofile_nodemarkers", true ).toBool() );
+  mNodeMarkersCheckbox->setChecked( sSettingsNodeMarkers->value() );
   connect( mNodeMarkersCheckbox, &QCheckBox::toggled, this, &KadasHeightProfileDialog::toggleNodeMarkers );
   checkboxLayout->addWidget( mNodeMarkersCheckbox );
 
   mShowStatisticsCheckbox = new QCheckBox( tr( "Show statistics" ) );
-  mShowStatisticsCheckbox->setChecked( QgsSettings().value( "/kadas/heightprofile_showstatistics", true ).toBool() );
+  mShowStatisticsCheckbox->setChecked( sSettingsShowStatistics->value() );
   connect( mShowStatisticsCheckbox, &QCheckBox::toggled, this, [this]( bool checked ) {
-    QgsSettings().setValue( "/kadas/heightprofile_showstatistics", checked );
+    sSettingsShowStatistics->setValue( checked );
     mStatisticsWidget->setVisible( checked );
   } );
   mStatisticsWidget->setVisible( mShowStatisticsCheckbox->isChecked() );
@@ -922,7 +922,7 @@ void KadasHeightProfileDialog::keyPressEvent( QKeyEvent *ev )
 
 void KadasHeightProfileDialog::toggleNodeMarkers()
 {
-  QgsSettings().setValue( "/kadas/heightprofile_nodemarkers", mNodeMarkersCheckbox->isChecked() );
+  sSettingsNodeMarkers->setValue( mNodeMarkersCheckbox->isChecked() );
   qDeleteAll( mNodeMarkers );
   mNodeMarkers.clear();
   replot();
