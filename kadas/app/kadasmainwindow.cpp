@@ -710,8 +710,8 @@ void KadasMainWindow::configureButtons()
   setActionToButton( mActionPin, mPinButton, QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_M ), [this] { return addPinTool(); } );
 
   QMenu *addImageMenu = new QMenu( mAddImageButton );
-  addImageMenu->addAction( tr( "Choose file..." ), this, &KadasMainWindow::addLocalPicture, QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_I ) );
-  addImageMenu->addAction( tr( "Enter URL..." ), this, &KadasMainWindow::addRemotePicture, QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_U ) );
+  addImageMenu->addAction( tr( "Choose file..." ), QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_I ), this, &KadasMainWindow::addLocalPicture );
+  addImageMenu->addAction( tr( "Enter URL..." ), QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_U ), this, &KadasMainWindow::addRemotePicture );
   mAddImageButton->setMenu( addImageMenu );
   mAddImageButton->setPopupMode( QToolButton::InstantPopup );
   mAddImageButton->setIcon( QIcon( ":/kadas/icons/picture" ) );
@@ -1060,16 +1060,23 @@ void KadasMainWindow::showSourceSelectDialog( const QString &providerName )
   // TODO
   //  connect(dialog, &QgsAbstractDataSourceWidget::addDatabaseLayers, kApp, &KadasApplication::addDatabaseLayers);
   //  connect(dialog, &QgsAbstractDataSourceWidget::addMeshLayer, kApp, &KadasApplication::addMeshLayer);
-  connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayer, kApp, []( const QString &uri, const QString &baseName, const QString &providerKey ) {
-    kApp->addRasterLayer( uri, baseName, providerKey );
+  connect( dialog, &QgsAbstractDataSourceWidget::addLayer, kApp, [sourceProvider]( Qgis::LayerType type, const QString &uri, const QString &baseName, const QString &providerKey ) {
+    switch ( type )
+    {
+      case Qgis::LayerType::Raster:
+        kApp->addRasterLayer( uri, baseName, providerKey );
+        break;
+      case Qgis::LayerType::Vector:
+        kApp->addVectorLayer( uri, baseName, !providerKey.isEmpty() ? providerKey : sourceProvider );
+        break;
+      case Qgis::LayerType::VectorTile:
+        kApp->addVectorTileLayer( uri, baseName );
+        break;
+      default:
+        break;
+    }
   } );
-  connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayer, dialog, &QDialog::accept );
-  connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayer, kApp, [sourceProvider]( const QString &uri, const QString &layerName, const QString &providerKey ) {
-    kApp->addVectorLayer( uri, layerName, !providerKey.isEmpty() ? providerKey : sourceProvider );
-  } );
-  connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayer, dialog, &QDialog::accept );
-  connect( dialog, &QgsAbstractDataSourceWidget::addVectorTileLayer, kApp, []( const QString &url, const QString &baseName ) { kApp->addVectorTileLayer( url, baseName ); } );
-  connect( dialog, &QgsAbstractDataSourceWidget::addVectorTileLayer, dialog, &QDialog::accept );
+  connect( dialog, &QgsAbstractDataSourceWidget::addLayer, dialog, &QDialog::accept );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayers, kApp, []( const QStringList &layerUris, const QString &enc, const QString &dataSourceType ) {
     kApp->addVectorLayers( layerUris, enc, dataSourceType );
   } );
@@ -1108,8 +1115,9 @@ void KadasMainWindow::switchToTabForTool( QgsMapTool *tool )
 {
   if ( tool && tool->action() )
   {
-    for ( QWidget *widget : tool->action()->associatedWidgets() )
+    for ( QObject *obj : tool->action()->associatedObjects() )
     {
+      QWidget *widget = qobject_cast<QWidget *>( obj );
       if ( dynamic_cast<KadasRibbonButton *>( widget ) )
       {
         for ( int i = 0, n = mRibbonWidget->count(); i < n; ++i )
@@ -1255,7 +1263,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
 
     if ( layer )
     {
-      layer->setMetadataUrl( metadataUrl );
+      layer->serverProperties()->setMetadataUrls( { QgsServerMetadataUrlProperties::MetadataUrl( metadataUrl ) } );
     }
   }
   else if ( !sublayers.isEmpty() )
@@ -1341,7 +1349,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
 
         if ( layer )
         {
-          layer->setMetadataUrl( metadataUrl );
+          layer->serverProperties()->setMetadataUrls( { QgsServerMetadataUrlProperties::MetadataUrl( metadataUrl ) } );
         }
       }
       else
@@ -1357,7 +1365,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     QgsVectorTileLayer *layer = kApp->addVectorTileLayer( adjustedUri, uri.name, false );
     if ( layer )
     {
-      layer->setMetadataUrl( metadataUrl );
+      layer->serverProperties()->setMetadataUrls( { QgsServerMetadataUrlProperties::MetadataUrl( metadataUrl ) } );
     }
   }
   else
@@ -1365,7 +1373,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     QgsRasterLayer *layer = kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey );
     if ( layer )
     {
-      layer->setMetadataUrl( metadataUrl );
+      layer->serverProperties()->setMetadataUrls( { QgsServerMetadataUrlProperties::MetadataUrl( metadataUrl ) } );
     }
   }
   // Reset insertion point
