@@ -28,6 +28,7 @@ class QComboBox;
 class QDoubleSpinBox;
 class QGroupBox;
 class QLabel;
+class QPainter;
 class QProgressBar;
 
 class QwtPlot;
@@ -64,6 +65,8 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
     void addToCanvas();
     void setMarkerPlotPos( const QPoint &pos );
     void toggleNodeMarkers();
+
+    QImage renderPlotImage();
 
   private:
     class ScaleDraw;
@@ -113,6 +116,7 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
     QComboBox *mHeightModeCombo = nullptr;
     QProgressBar *mProgressBar = nullptr;
     QPushButton *mCancelButton = nullptr;
+    QWidget *mStatisticsWidget = nullptr;
 };
 
 #endif // KADASHEIGHTPROFILEDIALOG_H

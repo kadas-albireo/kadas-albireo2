@@ -24,6 +24,7 @@
 #include <QIcon>
 #include <QLabel>
 #include <QMessageBox>
+#include <QPainter>
 #include <QProgressBar>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -144,6 +145,7 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
   grid->attach( mPlot );
 
   QWidget *statWidget = new QWidget( this );
+  mStatisticsWidget = statWidget;
   QHBoxLayout *statLayout = new QHBoxLayout( this );
   statLayout->setSpacing( 0 );
   statWidget->setLayout( statLayout );
@@ -813,13 +815,7 @@ void KadasHeightProfileDialog::updateLineOfSight()
 
 void KadasHeightProfileDialog::copyToClipboard()
 {
-  QImage image( mPlot->size(), QImage::Format_ARGB32 );
-  image.fill( Qt::white );
-  mPlotMarker->setVisible( false );
-  mPlot->replot();
-  mPlot->render( &image );
-  mPlotMarker->setVisible( true );
-  mPlot->replot();
+  QImage image = renderPlotImage();
 
 #ifdef Q_OS_MAC
   // Use native NSPasteboard to avoid crash in ImageIO's TIFF encoder
@@ -832,13 +828,7 @@ void KadasHeightProfileDialog::copyToClipboard()
 
 void KadasHeightProfileDialog::addToCanvas()
 {
-  QImage image( mPlot->size(), QImage::Format_ARGB32 );
-  image.fill( Qt::white );
-  mPlotMarker->setVisible( false );
-  mPlot->replot();
-  mPlot->render( &image );
-  mPlotMarker->setVisible( true );
-  mPlot->replot();
+  QImage image = renderPlotImage();
 
   QString filename = QgsProject::instance()->createAttachedFile( "heightProfile.png" );
   image.save( filename );
@@ -848,6 +838,37 @@ void KadasHeightProfileDialog::addToCanvas()
   item->setPosition( KadasItemPos::fromPoint( mTool->canvas()->extent().center() ) );
   KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::SymbolsLayer )->addItem( item );
   KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::SymbolsLayer )->triggerRepaint();
+}
+
+QImage KadasHeightProfileDialog::renderPlotImage()
+{
+  mPlotMarker->setVisible( false );
+  mPlot->replot();
+
+  // Render the plot
+  QImage plotImage( mPlot->size(), QImage::Format_ARGB32 );
+  plotImage.fill( Qt::white );
+  mPlot->render( &plotImage );
+
+  mPlotMarker->setVisible( true );
+  mPlot->replot();
+
+  // Render the statistics bar
+  QPixmap statPixmap = mStatisticsWidget->grab();
+  QImage statImage = statPixmap.toImage();
+
+  // Composite: plot on top, statistics below
+  int totalWidth = qMax( plotImage.width(), statImage.width() );
+  int totalHeight = plotImage.height() + statImage.height();
+  QImage compositeImage( totalWidth, totalHeight, QImage::Format_ARGB32 );
+  compositeImage.fill( Qt::white );
+
+  QPainter painter( &compositeImage );
+  painter.drawImage( 0, 0, plotImage );
+  painter.drawImage( 0, plotImage.height(), statImage );
+  painter.end();
+
+  return compositeImage;
 }
 
 void KadasHeightProfileDialog::keyPressEvent( QKeyEvent *ev )
