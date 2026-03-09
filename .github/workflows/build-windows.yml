@@ -154,7 +154,7 @@ jobs:
         env:
           QT_LOGGING_TO_CONSOLE: "1"
         run: |
-          ctest --test-dir build --output-on-failure -C Release
+          ctest --test-dir build --output-on-failure --timeout 120 -C Release
 
       - name: 📦 Package
         run: |
