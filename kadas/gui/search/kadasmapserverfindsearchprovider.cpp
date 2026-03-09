@@ -167,7 +167,9 @@ void KadasMapServerFindSearchProvider::fetchResults( const QString &string, cons
           QString authid = QString( "EPSG:%1" ).arg( itemAttrsMap["spatialReference"].toMap()["wkid"].toString() );
           QgsCoordinateReferenceSystem crs( authid );
           QgsCoordinateReferenceSystem crsWgs84( "EPSG:4326" );
-          QgsAbstractGeometry *geom = QgsArcGisRestUtils::convertGeometry( itemMap["geometry"].toMap(), itemMap["geometryType"].toString(), false, false, &crs );
+          std::unique_ptr<QgsAbstractGeometry> geom = QgsArcGisRestUtils::convertGeometry( itemMap["geometry"].toMap(), itemMap["geometryType"].toString(), false, false, &crs );
+          if ( !geom )
+            continue;
           geom->transform( QgsCoordinateTransform( crs, crsWgs84, QgsProject::instance() ) );
 
           QgsLocatorResult result;
@@ -179,7 +181,6 @@ void KadasMapServerFindSearchProvider::fetchResults( const QString &string, cons
           // resultData[QStringLiteral( "zoomScale" )] = 1000;
           result.group = tr( "Layer %1" ).arg( itemMap["layerName"].toString() );
           result.displayString = QString( "%1: %2" ).arg( itemMap["foundFieldName"].toString(), itemMap["value"].toString() );
-          delete geom;
 
           result.setUserData( resultData );
           emit resultFetched( result );
