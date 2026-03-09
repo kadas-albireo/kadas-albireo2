@@ -2,7 +2,6 @@
 #include <QtTest/QTest>
 #include <QSignalSpy>
 
-#include <qgis/qgsapplication.h>
 #include <qgis/qgsfeedback.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgstest.h>
@@ -152,13 +151,5 @@ QList<QgsLocatorResult> TestKadasAlternateGotoLocatorFilter::gatherResults( QgsL
   return results;
 }
 
-int main( int argc, char *argv[] )
-{
-  QgsApplication app( argc, argv, true );
-  app.init();
-  app.setAttribute( Qt::AA_Use96Dpi, true );
-  TestKadasAlternateGotoLocatorFilter tc;
-  QTEST_SET_MAIN_SOURCE_PATH
-  return QTest::qExec( &tc, argc, argv );
-}
+QTEST_MAIN( TestKadasAlternateGotoLocatorFilter )
 #include "testkadasalternategotolocatorfilter.moc"
