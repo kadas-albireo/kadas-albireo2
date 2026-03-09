@@ -39,7 +39,7 @@ void KadasTextBrowser::contextMenuEvent( QContextMenuEvent *e )
     QMenu menu;
     QAction *openAction = menu.addAction( tr( "Open link..." ) );
     QAction *copyAction = menu.addAction( tr( "Copy link location" ) );
-    QAction *clickedAction = menu.exec( e->globalPosition().toPoint() );
+    QAction *clickedAction = menu.exec( e->globalPos() );
     if ( clickedAction == openAction )
     {
       QDesktopServices::openUrl( QUrl::fromUserInput( anchor ) );
