@@ -162,11 +162,11 @@ Kadas3DMapConfigWidget::Kadas3DMapConfigWidget( Qgs3DMapSettings *map, QgsMapCan
   cboCameraProjectionType->setCurrentIndex( cboCameraProjectionType->findData( mMap->projectionType() ) );
   mCameraNavigationModeCombo->setCurrentIndex( mCameraNavigationModeCombo->findData( QVariant::fromValue( mMap->cameraNavigationMode() ) ) );
   mCameraMovementSpeed->setValue( mMap->cameraMovementSpeed() );
-  spinTerrainScale->setValue( mMap->terrainVerticalScale() );
-  spinMapResolution->setValue( mMap->mapTileResolution() );
-  spinScreenError->setValue( mMap->maxTerrainScreenError() );
-  spinGroundError->setValue( mMap->maxTerrainGroundError() );
-  terrainElevationOffsetSpinBox->setValue( mMap->terrainElevationOffset() );
+  spinTerrainScale->setValue( mMap->terrainSettings()->verticalScale() );
+  spinMapResolution->setValue( mMap->terrainSettings()->mapTileResolution() );
+  spinScreenError->setValue( mMap->terrainSettings()->maximumScreenError() );
+  spinGroundError->setValue( mMap->terrainSettings()->maximumGroundError() );
+  terrainElevationOffsetSpinBox->setValue( mMap->terrainSettings()->elevationOffset() );
   chkShowLabels->setChecked( mMap->showLabels() );
   chkShowTileInfo->setChecked( mMap->showTerrainTilesInfo() );
   chkShowBoundingBoxes->setChecked( mMap->showTerrainBoundingBoxes() );
@@ -360,11 +360,6 @@ void Kadas3DMapConfigWidget::apply()
   mMap->setProjectionType( cboCameraProjectionType->currentData().value<Qt3DRender::QCameraLens::ProjectionType>() );
   mMap->setCameraNavigationMode( mCameraNavigationModeCombo->currentData().value<Qgis::NavigationMode>() );
   mMap->setCameraMovementSpeed( mCameraMovementSpeed->value() );
-  mMap->setTerrainVerticalScale( spinTerrainScale->value() );
-  mMap->setMapTileResolution( spinMapResolution->value() );
-  mMap->setMaxTerrainScreenError( spinScreenError->value() );
-  mMap->setMaxTerrainGroundError( spinGroundError->value() );
-  mMap->setTerrainElevationOffset( terrainElevationOffsetSpinBox->value() );
   mMap->setShowLabels( chkShowLabels->isChecked() );
   mMap->setShowTerrainTilesInfo( chkShowTileInfo->isChecked() );
   mMap->setShowTerrainBoundingBoxes( chkShowBoundingBoxes->isChecked() );
