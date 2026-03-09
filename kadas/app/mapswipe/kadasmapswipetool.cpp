@@ -135,7 +135,7 @@ void KadasMapSwipeMapTool::canvasPressEvent( QgsMapMouseEvent *e )
   {
     mIsActive = true;
     mIsSwiping = true;
-    mFirstPoint = QPoint( e->x(), e->y() );
+    mFirstPoint = QPoint( e->position().x(), e->position().y() );
     mDirectionDefined = false;
   }
 }
@@ -146,21 +146,21 @@ void KadasMapSwipeMapTool::canvasMoveEvent( QgsMapMouseEvent *e )
   {
     if ( !mDirectionDefined )
     {
-      double dX = abs( e->x() - mFirstPoint.x() );
-      double dY = abs( e->y() - mFirstPoint.y() );
+      double dX = abs( e->position().x() - mFirstPoint.x() );
+      double dY = abs( e->position().y() - mFirstPoint.y() );
       bool isVertical = dX > dY;
       mMapCanvasItem->setVertical( isVertical );
       canvas()->setCursor( isVertical ? mCursorH : mCursorV );
       if ( dX * dX + dY * dY > 50 )
         mDirectionDefined = true;
     }
-    mMapCanvasItem->setPixelPosition( e->x(), e->y() );
+    mMapCanvasItem->setPixelPosition( e->position().x(), e->position().y() );
   }
   else
   {
     bool vertical = mMapCanvasItem->vertical();
     int length = mMapCanvasItem->pixelLength();
-    if ( vertical && std::abs( e->x() - length ) < 10 || !vertical && std::abs( e->y() - length ) < 10 )
+    if ( vertical && std::abs( e->position().x() - length ) < 10 || !vertical && std::abs( e->position().y() - length ) < 10 )
     {
       canvas()->setCursor( vertical ? mCursorH : mCursorV );
     }
@@ -178,7 +178,7 @@ void KadasMapSwipeMapTool::canvasReleaseEvent( QgsMapMouseEvent *e )
   {
     mIsSwiping = false;
     canvas()->setCursor( QCursor( Qt::PointingHandCursor ) );
-    mMapCanvasItem->setPixelPosition( e->x(), e->y() );
+    mMapCanvasItem->setPixelPosition( e->position().x(), e->position().y() );
   }
 }
 

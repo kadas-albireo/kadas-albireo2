@@ -173,7 +173,7 @@ void KadasMapToolEditItemGroup::canvasPressEvent( QgsMapMouseEvent *e )
         menu.addAction( QgsApplication::getThemeIcon( "/mIconPointLayer.svg" ), tr( "Convert to waypoint" ), this, &KadasMapToolEditItemGroup::createWaypointsFromPins );
       }
 
-      menu.exec( e->globalPos() );
+      menu.exec( e->globalPosition().toPoint() );
     }
     else
     {
