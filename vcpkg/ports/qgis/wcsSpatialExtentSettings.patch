@@ -1,0 +1,99 @@
+diff --git a/src/gui/qgsowssourceselect.cpp b/src/gui/qgsowssourceselect.cpp
+index d18a00c5065..ed2bf7d2605 100644
+--- a/src/gui/qgsowssourceselect.cpp
++++ b/src/gui/qgsowssourceselect.cpp
+@@ -34,6 +34,7 @@
+ #include "qgsprojectionselectiondialog.h"
+ #include "qgsproviderregistry.h"
+ #include "qgssettings.h"
++#include "qgssettingsentryimpl.h"
+ #include "qgstreewidgetitem.h"
+ 
+ #include <QButtonGroup>
+@@ -57,6 +58,8 @@
+ 
+ using namespace Qt::StringLiterals;
+ 
++const QgsSettingsEntryBool *QgsOWSSourceSelect::settingsSpatialExtentBoxChecked = new QgsSettingsEntryBool( u"spatial-extent-box-checked"_s, sTreeOWSConnectionDialog, true );
++
+ QgsOWSSourceSelect::QgsOWSSourceSelect( const QString &service, QWidget *parent, Qt::WindowFlags fl, QgsProviderRegistry::WidgetMode theWidgetMode )
+   : QgsAbstractDataSourceWidget( parent, fl, theWidgetMode )
+   , mService( service )
+@@ -115,12 +118,24 @@ QgsOWSSourceSelect::QgsOWSSourceSelect( const QString &service, QWidget *parent,
+ 
+   // set up the WMS connections we already know about
+   populateConnectionList();
++
++  bool checked = settingsSpatialExtentBoxChecked->value();
++  mSpatialExtentBox->setChecked( checked );
++
++  connect( mSpatialExtentBox, &QgsExtentGroupBox::toggled, this, &QgsOWSSourceSelect::mSpatialExtentBox_toggled);
+ }
+ 
+ void QgsOWSSourceSelect::setMapCanvas( QgsMapCanvas *mapCanvas )
+ {
+   QgsAbstractDataSourceWidget::setMapCanvas( mapCanvas );
++
++  // Super hack workaround!!!
++  // Don't change spatial extent check state only because the canvas is set
++  mSpatialExtentBox->blockSignals(true);
++  bool checked = mSpatialExtentBox->isChecked() && mapCanvas != nullptr;
+   prepareExtent();
++  mSpatialExtentBox->setChecked(checked);
++  mSpatialExtentBox->blockSignals(false);
+ }
+ 
+ void QgsOWSSourceSelect::prepareExtent()
+@@ -700,6 +715,11 @@ void QgsOWSSourceSelect::mLayerDownButton_clicked()
+   selectedItem->setSelected( true );
+ }
+ 
++void QgsOWSSourceSelect::mSpatialExtentBox_toggled( bool checked )
++{
++  settingsSpatialExtentBoxChecked->setValue( checked );
++}
++
+ QList<QgsOWSSourceSelect::SupportedFormat> QgsOWSSourceSelect::providerFormats()
+ {
+   return QList<SupportedFormat>();
+diff --git a/src/gui/qgsowssourceselect.h b/src/gui/qgsowssourceselect.h
+index d16a8000ece..2216b3b6958 100644
+--- a/src/gui/qgsowssourceselect.h
++++ b/src/gui/qgsowssourceselect.h
+@@ -27,6 +27,7 @@
+ #include "qgsdatasourceuri.h"
+ #include "qgsguiutils.h"
+ #include "qgsproviderregistry.h"
++#include "qgssettingstree.h"
+ 
+ #include <QNetworkRequest>
+ #include <QPushButton>
+@@ -38,6 +39,7 @@ class QgsTreeWidgetItem;
+ class QDomDocument;
+ class QDomElement;
+ class QgsOWSSourceWidget;
++class QgsSettingsEntryBool;
+ 
+ 
+ /**
+@@ -62,6 +64,12 @@ class GUI_EXPORT QgsOWSSourceSelect : public QgsAbstractDataSourceWidget, public
+         QString label;
+     };
+ 
++#ifndef SIP_RUN
++    static inline QgsSettingsTreeNode *sTreeOWSConnectionDialog = QgsSettingsTree::sTreeConnections->createChildNode( QStringLiteral( "ows-connection-dialog" ) );
++
++    static const QgsSettingsEntryBool *settingsSpatialExtentBoxChecked;
++#endif
++
+     //! Constructor
+     QgsOWSSourceSelect(
+       const QString &service,
+@@ -243,6 +251,7 @@ class GUI_EXPORT QgsOWSSourceSelect : public QgsAbstractDataSourceWidget, public
+     void mTilesetsTableWidget_itemClicked( QTableWidgetItem *item );
+     void mLayerUpButton_clicked();
+     void mLayerDownButton_clicked();
++    void mSpatialExtentBox_toggled( bool checked );
+     virtual void updateButtons();
+ };
+ 
