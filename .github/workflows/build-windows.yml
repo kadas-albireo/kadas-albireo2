@@ -150,12 +150,10 @@ jobs:
         run: |
           cmake --build build --config Release
 
-      - name: tmate
-        uses: mxschmitt/action-tmate@v3
-        
       - name: 🧪 Run CTest
         env:
           QT_LOGGING_TO_CONSOLE: "1"
+          QT_PLUGIN_PATH: ${{ github.workspace }}/build/vcpkg_installed/x64-windows/Qt6/plugins
         run: |
           ctest --test-dir build --output-on-failure --timeout 120 -C Release
 
