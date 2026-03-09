@@ -479,19 +479,19 @@ void KadasMainWindow::mousePressEvent( QMouseEvent *event )
 {
   if ( event->buttons() == Qt::LeftButton )
   {
-    KadasRibbonButton *button = dynamic_cast<KadasRibbonButton *>( childAt( event->pos() ) );
+    KadasRibbonButton *button = dynamic_cast<KadasRibbonButton *>( childAt( event->position().toPoint() ) );
     if ( button && !button->objectName().startsWith( "mFavoriteButton" ) )
     {
-      mDragStartPos = event->pos();
+      mDragStartPos = event->position().toPoint();
     }
   }
 }
 
 void KadasMainWindow::mouseMoveEvent( QMouseEvent *event )
 {
-  if ( event->buttons() == Qt::LeftButton && !mDragStartPos.isNull() && ( mDragStartPos - event->pos() ).manhattanLength() >= QApplication::startDragDistance() )
+  if ( event->buttons() == Qt::LeftButton && !mDragStartPos.isNull() && ( mDragStartPos - event->position().toPoint() ).manhattanLength() >= QApplication::startDragDistance() )
   {
-    KadasRibbonButton *button = dynamic_cast<KadasRibbonButton *>( childAt( event->pos() ) );
+    KadasRibbonButton *button = dynamic_cast<KadasRibbonButton *>( childAt( event->position().toPoint() ) );
     if ( button && !button->objectName().startsWith( "mFavoriteButton" ) && button->defaultAction() )
     {
       QMimeData *mimeData = new QMimeData();
@@ -517,7 +517,7 @@ void KadasMainWindow::dragEnterEvent( QDragEnterEvent *event )
     }
   }
 
-  KadasRibbonButton *button = dynamic_cast<KadasRibbonButton *>( childAt( event->pos() ) );
+  KadasRibbonButton *button = dynamic_cast<KadasRibbonButton *>( childAt( event->position().toPoint() ) );
   if ( event->mimeData()->hasFormat( "application/qgis-kadas-button" ) && button && button->objectName().startsWith( "mFavoriteButton" ) )
   {
     event->acceptProposedAction();
@@ -550,7 +550,7 @@ void KadasMainWindow::dropEvent( QDropEvent *event )
     {
       action = mAddedActions.value( actionName, nullptr );
     }
-    KadasRibbonButton *button = dynamic_cast<KadasRibbonButton *>( childAt( event->pos() ) );
+    KadasRibbonButton *button = dynamic_cast<KadasRibbonButton *>( childAt( event->position().toPoint() ) );
     if ( action && button && button->objectName().startsWith( "mFavoriteButton" ) )
     {
       button->setEnabled( true );
@@ -1064,7 +1064,7 @@ void KadasMainWindow::showSourceSelectDialog( const QString &providerName )
     kApp->addRasterLayer( uri, baseName, providerKey );
   } );
   connect( dialog, &QgsAbstractDataSourceWidget::addRasterLayer, dialog, &QDialog::accept );
-  connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayer, kApp, [=]( const QString &uri, const QString &layerName, const QString &providerKey ) {
+  connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayer, kApp, [sourceProvider]( const QString &uri, const QString &layerName, const QString &providerKey ) {
     kApp->addVectorLayer( uri, layerName, !providerKey.isEmpty() ? providerKey : sourceProvider );
   } );
   connect( dialog, &QgsAbstractDataSourceWidget::addVectorLayer, dialog, &QDialog::accept );
@@ -1397,7 +1397,7 @@ void KadasMainWindow::checkLayerProjection( QgsMapLayer *layer )
     btn->setFlat( true );
     QgsMessageBarItem *item
       = new QgsMessageBarItem( tr( "Unknown layer projection" ), tr( "The projection of the layer %1 could not be recognized, its features might be misplaced." ).arg( layer->name() ), btn, Qgis::Warning, messageTimeout() );
-    connect( btn, &QPushButton::clicked, [=] {
+    connect( btn, &QPushButton::clicked, [=, this] {
       mInfoBar->popWidget( item );
       kApp->showLayerProperties( layer );
     } );

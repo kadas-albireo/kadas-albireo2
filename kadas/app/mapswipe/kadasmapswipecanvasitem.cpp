@@ -24,8 +24,8 @@
 KadasMapSwipeCanvasItem::KadasMapSwipeCanvasItem( QgsMapCanvas *mapCanvas )
   : QgsMapCanvasItem( mapCanvas )
 {
-  QObject::connect( mapCanvas, &QgsMapCanvas::extentsChanged, [=]() { refreshMap(); } );
-  QObject::connect( mapCanvas, &QgsMapCanvas::layersChanged, [=]() { refreshMap(); } );
+  QObject::connect( mapCanvas, &QgsMapCanvas::extentsChanged, [this]() { refreshMap(); } );
+  QObject::connect( mapCanvas, &QgsMapCanvas::layersChanged, [this]() { refreshMap(); } );
 }
 
 void KadasMapSwipeCanvasItem::enable()

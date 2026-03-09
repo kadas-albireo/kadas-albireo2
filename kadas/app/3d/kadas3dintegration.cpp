@@ -36,6 +36,7 @@
 #include <qgsmapviewsmanager.h>
 #include <qgsrasterlayer.h>
 #include <qgsdemterrainsettings.h>
+#include <qgsabstractterrainsettings.h>
 
 #include "kadas/app/3d/kadas3dintegration.h"
 #include "kadas/app/3d/kadas3dmapcanvaswidget.h"
@@ -210,7 +211,11 @@ Kadas3DMapCanvasWidget *Kadas3DIntegration::createNewMapCanvas3D( const QString 
   map->setOutputDpi( QGuiApplication::primaryScreen()->logicalDotsPerInch() );
   map->setRendererUsage( Qgis::RendererUsage::View );
 
-  map->setMaxTerrainScreenError( 2.0 );
+  {
+    std::unique_ptr<QgsAbstractTerrainSettings> terrainSettings( map->terrainSettings()->clone() );
+    terrainSettings->setMaximumScreenError( 2.0 );
+    map->setTerrainSettings( terrainSettings.release() );
+  }
 
   connect( QgsProject::instance(), &QgsProject::transformContextChanged, map, [map] { map->setTransformContext( QgsProject::instance()->transformContext() ); } );
 

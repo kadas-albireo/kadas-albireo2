@@ -114,7 +114,7 @@ void KadasPortalAuth::setupAuthentication()
             // If we create the cookies directly,
             // it does not work in the same event loop
             // so we need to delay it a bit
-            QTimer::singleShot( 1, this, [=]() { createCookies( token ); } );
+            QTimer::singleShot( 1, this, [this, token]() { createCookies( token ); } );
           }
           if ( settingsTokenUseEsriAuth->value() )
             createEsriAuth( token );

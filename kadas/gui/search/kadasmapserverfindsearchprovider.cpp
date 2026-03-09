@@ -167,7 +167,7 @@ void KadasMapServerFindSearchProvider::fetchResults( const QString &string, cons
           QString authid = QString( "EPSG:%1" ).arg( itemAttrsMap["spatialReference"].toMap()["wkid"].toString() );
           QgsCoordinateReferenceSystem crs( authid );
           QgsCoordinateReferenceSystem crsWgs84( "EPSG:4326" );
-          std::unique_ptr<QgsAbstractGeometry> geom = QgsArcGisRestUtils::convertGeometry( itemMap["geometry"].toMap(), itemMap["geometryType"].toString(), false, false, &crs );
+          std::unique_ptr<QgsAbstractGeometry> geom = QgsArcGisRestUtils::convertGeometry( itemMap["geometry"].toMap(), itemMap["geometryType"].toString(), false, false, true, &crs );
           if ( !geom )
             continue;
           geom->transform( QgsCoordinateTransform( crs, crsWgs84, QgsProject::instance() ) );

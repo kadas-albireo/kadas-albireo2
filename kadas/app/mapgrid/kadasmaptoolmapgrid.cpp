@@ -129,7 +129,7 @@ KadasMapGridWidget::KadasMapGridWidget( QgsMapCanvas *canvas, QgsLayerTreeView *
   connect( ui.toolButtonColor, &QgsColorButton::colorChanged, this, &KadasMapGridWidget::updateColor );
   connect( ui.spinBoxFontSize, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasMapGridWidget::updateFontSize );
   connect( ui.comboBoxLabeling, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasMapGridWidget::updateLabeling );
-  connect( ui.mLineWidthSpinBox, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, [=]( double value ) {
+  connect( ui.mLineWidthSpinBox, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, [this]( double value ) {
     if ( !mCurrentLayer )
       return;
     mCurrentLayer->setLineWidth( value );

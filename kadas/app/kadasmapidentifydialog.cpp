@@ -566,7 +566,7 @@ void KadasMapIdentifyDialog::rasterIdentifyFinished()
     }
     QTreeWidgetItem *resultItem = new QTreeWidgetItem( QStringList() << "" );
     QgsCoordinateReferenceSystem crs;
-    std::unique_ptr<QgsAbstractGeometry> geom = QgsArcGisRestUtils::convertGeometry( result["geometry"].toMap(), result["geometryType"].toString(), false, false, &crs );
+    std::unique_ptr<QgsAbstractGeometry> geom = QgsArcGisRestUtils::convertGeometry( result["geometry"].toMap(), result["geometryType"].toString(), false, false, true, &crs );
     if ( !geom )
       continue;
     mGeometries.append( geom.release() );

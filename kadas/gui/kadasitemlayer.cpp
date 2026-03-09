@@ -418,7 +418,7 @@ void KadasItemLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *l
     scaleSlider->setValue( log10( itemLayer->symbolScale() ) * 10 );
     scaleSlider->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
     scaleSlider->setTracking( false );
-    connect( scaleSlider, &QSlider::valueChanged, this, [=]( double value ) { itemLayer->setSymbolScale( pow( 10., value / 10. ) ); } );
+    connect( scaleSlider, &QSlider::valueChanged, this, [itemLayer]( double value ) { itemLayer->setSymbolScale( pow( 10., value / 10. ) ); } );
     transpLayout->addWidget( scaleSlider );
 
     QWidgetAction *scaleAction = new QWidgetAction( menu );

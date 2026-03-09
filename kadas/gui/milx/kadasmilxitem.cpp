@@ -725,7 +725,7 @@ void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context
   int dpi = mapSettings.outputDpi();
   KadasMilxClient::NPointSymbol symbol = toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() );
 
-  menu->addAction( QIcon( ":/kadas/icons/editor" ), tr( "Symbol editor..." ), [=] {
+  menu->addAction( QIcon( ":/kadas/icons/editor" ), tr( "Symbol editor..." ), [=, this] {
     KadasMilxClient::NPointSymbolGraphic result;
     WId winId = 0;
     for ( QWidget *widget : QApplication::topLevelWidgets() )
@@ -745,7 +745,7 @@ void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context
   {
     if ( context.vidx.vertex >= 0 )
     {
-      QAction *actionDeletePoint = menu->addAction( QIcon( ":/kadas/icons/delete_node" ), tr( "Delete node" ), [=] {
+      QAction *actionDeletePoint = menu->addAction( QIcon( ":/kadas/icons/delete_node" ), tr( "Delete node" ), [=, this] {
         KadasMilxClient::NPointSymbolGraphic result;
         if ( KadasMilxClient::deletePoint( screenRect, dpi, symbol, context.vidx.vertex, symbolSettings(), result ) )
           updateSymbol( mapSettings, result );
@@ -755,7 +755,7 @@ void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context
     }
     else
     {
-      menu->addAction( QIcon( ":/kadas/icons/add_node" ), tr( "Add node" ), [=] {
+      menu->addAction( QIcon( ":/kadas/icons/add_node" ), tr( "Add node" ), [=, this] {
         KadasMilxClient::NPointSymbolGraphic result;
         if ( KadasMilxClient::insertPoint( screenRect, dpi, symbol, screenPos, symbolSettings(), result ) )
           updateSymbol( mapSettings, result );
@@ -764,7 +764,7 @@ void KadasMilxItem::populateContextMenu( QMenu *menu, const EditContext &context
   }
   else
   {
-    QAction *action = menu->addAction( tr( "Reset offset" ), [=] {
+    QAction *action = menu->addAction( tr( "Reset offset" ), [=, this] {
       state()->userOffset = QPoint();
       update();
     } );

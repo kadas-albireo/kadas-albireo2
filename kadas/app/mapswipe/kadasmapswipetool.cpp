@@ -65,7 +65,7 @@ KadasMapSwipeMapTool::KadasMapSwipeMapTool( QgsMapCanvas *mapCanvas )
   : QgsMapTool( mapCanvas )
   , mMapCanvasItem( new KadasMapSwipeCanvasItem( mapCanvas ) )
 {
-  connect( QgsProject::instance(), qOverload<const QList<QgsMapLayer *> &>( &QgsProject::layersWillBeRemoved ), this, [=]( const QList<QgsMapLayer *> &layers ) {
+  connect( QgsProject::instance(), qOverload<const QList<QgsMapLayer *> &>( &QgsProject::layersWillBeRemoved ), this, [this]( const QList<QgsMapLayer *> &layers ) {
     for ( QgsMapLayer *layer : layers )
       mLayers.remove( layer );
     mMapCanvasItem->setLayers( mLayers );
