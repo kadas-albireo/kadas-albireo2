@@ -29,8 +29,8 @@ vcpkg_from_github(
   3dfrustumfix.patch
   3dchunkloaderconcurrency.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1278
   mac_install_images.patch
-  flagDegreesUseUntranslatedStringSuffix.patch
-  wcsSpatialExtentSettings.patch
+  flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
+  wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
