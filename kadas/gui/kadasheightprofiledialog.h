@@ -62,6 +62,7 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
     void replot();
     void updateLineOfSight();
     void copyToClipboard();
+    void saveToFile();
     void addToCanvas();
     void setMarkerPlotPos( const QPoint &pos );
     void toggleNodeMarkers();
@@ -110,6 +111,7 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
     QgsCoordinateReferenceSystem mPointsCrs;
     int mNSamples = 1000;
     QCheckBox *mNodeMarkersCheckbox = nullptr;
+    QCheckBox *mShowStatisticsCheckbox = nullptr;
     QGroupBox *mLineOfSightGroupBoxgroupBox = nullptr;
     QDoubleSpinBox *mObserverHeightSpinBox = nullptr;
     QDoubleSpinBox *mTargetHeightSpinBox = nullptr;
