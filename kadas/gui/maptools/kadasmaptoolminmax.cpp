@@ -82,9 +82,7 @@ KadasMapToolMinMax::KadasMapToolMinMax( QgsMapCanvas *mapCanvas, QAction *action
   mFilterTypeCombo->addItem( tr( "Polygon" ), QVariant::fromValue( KadasMapToolMinMax::FilterType::FilterPoly ) );
   mFilterTypeCombo->addItem( tr( "Circle" ), QVariant::fromValue( KadasMapToolMinMax::FilterType::FilterCircle ) );
   mFilterTypeCombo->setCurrentIndex( 0 );
-  connect( mFilterTypeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, [this]( int ) {
-    setFilterType( static_cast<FilterType>( mFilterTypeCombo->currentData().toInt() ) );
-  } );
+  connect( mFilterTypeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, [this]( int ) { setFilterType( static_cast<FilterType>( mFilterTypeCombo->currentData().toInt() ) ); } );
   filterTypeWidget->layout()->addWidget( mFilterTypeCombo );
 
   QToolButton *pickButton = new QToolButton();
@@ -204,10 +202,7 @@ void KadasMapToolMinMax::drawFinished()
 
           for ( int by = 0; by < maxy; ++by )
           {
-            QgsPointXY p( crst.transform(
-              pixelToGeoX( gtrans, x + bx, y + by ),
-              pixelToGeoY( gtrans, x + bx, y + by )
-            ) );
+            QgsPointXY p( crst.transform( pixelToGeoX( gtrans, x + bx, y + by ), pixelToGeoY( gtrans, x + bx, y + by ) ) );
             if ( mFilterType != FilterType::FilterRect && !filterGeom.containsPoint( p.toQPointF(), Qt::WindingFill ) )
             {
               continue;
@@ -306,9 +301,7 @@ void KadasMapToolMinMax::showContextMenu( KadasMapItem *item ) const
   menu.addAction( QIcon( ":/kadas/icons/copy_coordinates" ), tr( "Copy coordinates" ), [this, mapPos] {
     const QgsCoordinateReferenceSystem &mapCrs = mCanvas->mapSettings().destinationCrs();
     QString posStr = KadasCoordinateFormat::instance()->getDisplayString( mapPos, mapCrs );
-    QString text = QString( "%1\n%2" )
-                     .arg( posStr )
-                     .arg( KadasCoordinateFormat::instance()->getHeightAtPos( mapPos, mapCrs ) );
+    QString text = QString( "%1\n%2" ).arg( posStr ).arg( KadasCoordinateFormat::instance()->getHeightAtPos( mapPos, mapCrs ) );
     QApplication::clipboard()->setText( text );
   } );
   menu.addAction( QIcon( ":/kadas/icons/viewshed_color" ), tr( "Viewshed" ), [this, mapPos] {

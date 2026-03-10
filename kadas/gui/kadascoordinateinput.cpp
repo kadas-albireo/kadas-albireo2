@@ -17,7 +17,7 @@
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QLineEdit>
-#include <QRegExp>
+
 
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsproject.h>
@@ -29,7 +29,7 @@ KadasCoordinateInput::KadasCoordinateInput( QWidget *parent )
   : QWidget( parent )
 {
   setLayout( new QHBoxLayout() );
-  layout()->setMargin( 0 );
+  layout()->setContentsMargins( 0, 0, 0, 0 );
   layout()->setSpacing( 0 );
 
   mLineEdit = new QLineEdit( this );

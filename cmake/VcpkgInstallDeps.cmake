@@ -26,17 +26,32 @@ if(MSVC)
   set(QGIS_PLUGIN_INSTALL_PREFIX "plugins")
 
   # Additional Qt plugins (3D)
-  install(DIRECTORY "${VCPKG_BASE_DIR}/plugins/renderers/"
-          DESTINATION "bin/plugins/renderers/"
-  )
-  install(DIRECTORY "${VCPKG_BASE_DIR}/plugins/renderplugins/"
-          DESTINATION "bin/plugins/renderplugins/"
-  )
+  if(EXISTS "${VCPKG_BASE_DIR}/plugins/renderers/")
+    install(DIRECTORY "${VCPKG_BASE_DIR}/plugins/renderers/"
+            DESTINATION "bin/plugins/renderers/"
+    )
+  else()
+    message(
+      WARNING
+        "QGIS 3D renderers plugin directory not found: ${VCPKG_BASE_DIR}/plugins/renderers/"
+    )
+  endif()
+  if(EXISTS "${VCPKG_BASE_DIR}/plugins/renderplugins/")
+    install(DIRECTORY "${VCPKG_BASE_DIR}/plugins/renderplugins/"
+            DESTINATION "bin/plugins/renderplugins/"
+    )
+  else()
+    message(
+      WARNING
+        "QGIS 3D renderplugins directory not found: ${VCPKG_BASE_DIR}/plugins/renderplugins/"
+    )
+  endif()
 
   # At least python3.dll, qgis_analysis.dll and gsl.dll are missing Copy
   # everything
   file(GLOB ALL_LIBS "${VCPKG_BASE_DIR}/bin/*.dll")
   install(FILES ${ALL_LIBS} DESTINATION "bin")
+  install(DIRECTORY "${VCPKG_BASE_DIR}/Qt6/" DESTINATION "bin/Qt6/")
   install(DIRECTORY "${QGIS_PYTHON_DIR}/" DESTINATION "share/qgis/python/")
   install(FILES "${VCPKG_BASE_DIR}/bin/qgis.exe" DESTINATION "bin/")
   install(FILES "${VCPKG_BASE_DIR}/tools/ffmpeg/ffmpeg.exe"

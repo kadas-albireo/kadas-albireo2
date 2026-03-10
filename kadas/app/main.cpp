@@ -17,6 +17,7 @@
 #include <csignal>
 #include <fstream>
 #include <QDir>
+#include <QFileInfo>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QTextCodec>
@@ -74,6 +75,19 @@ int main( int argc, char *argv[] )
     }
   }
   qputenv( "PATH", cleanPath.join( ';' ) );
+
+  // Set Qt plugin path relative to executable if not pointing to a valid directory
+  QByteArray qtPluginPath = qgetenv( "QT_PLUGIN_PATH" );
+  if ( qtPluginPath.isEmpty() || !QDir( QString::fromLocal8Bit( qtPluginPath ) ).exists() )
+  {
+    // Resolve relative to the directory containing argv[0]
+    QString appDir = QFileInfo( QString::fromLocal8Bit( argv[0] ) ).absolutePath();
+    QString pluginDir = QDir( appDir ).absoluteFilePath( "Qt6/plugins" );
+    if ( QDir( pluginDir ).exists() )
+    {
+      qputenv( "QT_PLUGIN_PATH", pluginDir.toLocal8Bit() );
+    }
+  }
 #endif // Q_OS_WINDOWS
 
   QTextCodec::setCodecForLocale( QTextCodec::codecForName( "UTF-8" ) );
@@ -85,13 +99,6 @@ int main( int argc, char *argv[] )
 
   QSettings::setDefaultFormat( QSettings::IniFormat );
   QSettings::setPath( QSettings::IniFormat, QSettings::UserScope, Kadas::configPath() );
-
-  QApplication::setAttribute( Qt::AA_UseDesktopOpenGL );
-  QApplication::setAttribute( Qt::AA_DisableWindowContextHelpButton );
-
-  bool ignoreDpiScaling = QSettings().value( "/kadas/ignore_dpi_scale", false ).toBool();
-  if ( !ignoreDpiScaling )
-    QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
 
   // Initialize the default surface format for all
   // QWindow and QWindow derived components

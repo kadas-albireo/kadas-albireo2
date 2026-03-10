@@ -52,8 +52,7 @@ const int KadasMapServerFindSearchProvider::sResultCountLimit = 100;
 KadasMapServerFindSearchProvider::KadasMapServerFindSearchProvider( QgsMapCanvas *mapCanvas )
   : QgsLocatorFilter()
   , mMapCanvas( mapCanvas )
-{
-}
+{}
 
 QgsLocatorFilter *KadasMapServerFindSearchProvider::clone() const
 {
@@ -118,11 +117,12 @@ void KadasMapServerFindSearchProvider::fetchResults( const QString &string, cons
   {
     QgsCoordinateTransform ct( QgsCoordinateReferenceSystem( context.targetExtentCrs ), QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() );
     QgsRectangle box = ct.transformBoundingBox( context.targetExtent );
-    spatialFilter = QString( "{\"spatialRel\": \"esriSpatialRelIntersects\", \"geometryType\": \"esriGeometryEnvelope\", \"geometry\": { \"xmin\": %1, \"ymin\": %2, \"xmax\": %3, \"ymax\": %4, \"spatialReference\": {\"wkid\": 4326}}}" )
-                      .arg( box.xMinimum(), 0, 'f', 4 )
-                      .arg( box.yMinimum(), 0, 'f', 4 )
-                      .arg( box.xMaximum(), 0, 'f', 4 )
-                      .arg( box.yMaximum(), 0, 'f', 4 );
+    spatialFilter
+      = QString( "{\"spatialRel\": \"esriSpatialRelIntersects\", \"geometryType\": \"esriGeometryEnvelope\", \"geometry\": { \"xmin\": %1, \"ymin\": %2, \"xmax\": %3, \"ymax\": %4, \"spatialReference\": {\"wkid\": 4326}}}" )
+          .arg( box.xMinimum(), 0, 'f', 4 )
+          .arg( box.yMinimum(), 0, 'f', 4 )
+          .arg( box.xMaximum(), 0, 'f', 4 )
+          .arg( box.yMaximum(), 0, 'f', 4 );
   }
 
   // --- Begin event loop addition ---
@@ -167,7 +167,9 @@ void KadasMapServerFindSearchProvider::fetchResults( const QString &string, cons
           QString authid = QString( "EPSG:%1" ).arg( itemAttrsMap["spatialReference"].toMap()["wkid"].toString() );
           QgsCoordinateReferenceSystem crs( authid );
           QgsCoordinateReferenceSystem crsWgs84( "EPSG:4326" );
-          QgsAbstractGeometry *geom = QgsArcGisRestUtils::convertGeometry( itemMap["geometry"].toMap(), itemMap["geometryType"].toString(), false, false, &crs );
+          std::unique_ptr<QgsAbstractGeometry> geom = QgsArcGisRestUtils::convertGeometry( itemMap["geometry"].toMap(), itemMap["geometryType"].toString(), false, false, true, &crs );
+          if ( !geom )
+            continue;
           geom->transform( QgsCoordinateTransform( crs, crsWgs84, QgsProject::instance() ) );
 
           QgsLocatorResult result;
@@ -179,7 +181,6 @@ void KadasMapServerFindSearchProvider::fetchResults( const QString &string, cons
           // resultData[QStringLiteral( "zoomScale" )] = 1000;
           result.group = tr( "Layer %1" ).arg( itemMap["layerName"].toString() );
           result.displayString = QString( "%1: %2" ).arg( itemMap["foundFieldName"].toString(), itemMap["value"].toString() );
-          delete geom;
 
           result.setUserData( resultData );
           emit resultFetched( result );
@@ -255,11 +256,7 @@ void KadasMapServerFindSearchProvider::triggerResult( const QgsLocatorResult &re
             poly = qgsgeometry_cast<QgsCurvePolygon *>( geometry.constGet()->clone() );
           }
           item = new QgsAnnotationPolygonItem( poly );
-          QgsFillSymbolLayer *symbolLayer = new QgsSimpleFillSymbolLayer(
-            QColor( 0, 0, 200, 100 ),
-            Qt::BrushStyle::FDiagPattern,
-            QColor( 0, 0, 200, 200 )
-          );
+          QgsFillSymbolLayer *symbolLayer = new QgsSimpleFillSymbolLayer( QColor( 0, 0, 200, 100 ), Qt::BrushStyle::FDiagPattern, QColor( 0, 0, 200, 200 ) );
           dynamic_cast<QgsAnnotationPolygonItem *>( item )->setSymbol( new QgsFillSymbol( { symbolLayer } ) );
           break;
         }

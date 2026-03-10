@@ -67,7 +67,9 @@ void KadasFloatingInputWidgetField::checkInputChanged()
 ///////////////////////////////////////////////////////////////////////////////
 
 KadasFloatingInputWidget::KadasFloatingInputWidget( QgsMapCanvas *canvas )
-  : QWidget( canvas ), mCanvas( canvas ), mFocusedInput( 0 )
+  : QWidget( canvas )
+  , mCanvas( canvas )
+  , mFocusedInput( 0 )
 {
   setObjectName( "FloatingInputWidget" );
   QGridLayout *gridLayout = new QGridLayout();

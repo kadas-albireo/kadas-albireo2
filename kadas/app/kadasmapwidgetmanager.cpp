@@ -24,7 +24,9 @@
 #include "kadasmapwidgetmanager.h"
 
 KadasMapWidgetManager::KadasMapWidgetManager( QgsMapCanvas *masterCanvas, QMainWindow *parent )
-  : QObject( parent ), mMainWindow( parent ), mMasterCanvas( masterCanvas )
+  : QObject( parent )
+  , mMainWindow( parent )
+  , mMasterCanvas( masterCanvas )
 {
   connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasMapWidgetManager::readProjectSettings );
   connect( QgsProject::instance(), &QgsProject::writeProject, this, &KadasMapWidgetManager::writeProjectSettings );
@@ -210,12 +212,8 @@ void KadasMapWidgetManager::readProjectSettings( const QDomDocument &doc )
       QDomNamedNodeMap attributes = mapWidgetItemElem.attributes();
       QByteArray ba;
       QDataStream ds( &ba, QIODevice::ReadOnly );
-      KadasMapWidget *mapWidget = new KadasMapWidget(
-        attributes.namedItem( "number" ).nodeValue().toInt(),
-        attributes.namedItem( "id " ).nodeValue(),
-        attributes.namedItem( "title" ).nodeValue(),
-        mMasterCanvas
-      );
+      KadasMapWidget *mapWidget
+        = new KadasMapWidget( attributes.namedItem( "number" ).nodeValue().toInt(), attributes.namedItem( "id " ).nodeValue(), attributes.namedItem( "title" ).nodeValue(), mMasterCanvas );
       mapWidget->setAttribute( Qt::WA_DeleteOnClose );
       ba = QByteArray::fromBase64( attributes.namedItem( "layers" ).nodeValue().toLocal8Bit() );
       QStringList layersList;
@@ -226,12 +224,7 @@ void KadasMapWidgetManager::readProjectSettings( const QDomDocument &doc )
       bool islocked = attributes.namedItem( "islocked" ).nodeValue().toInt();
       mapWidget->setLocked( islocked );
       mapWidget->setFloating( attributes.namedItem( "floating" ).nodeValue().toInt() );
-      mapWidget->widget()->setFixedSize(
-        QSize(
-          attributes.namedItem( "width" ).nodeValue().toInt(),
-          attributes.namedItem( "height" ).nodeValue().toInt()
-        )
-      );
+      mapWidget->widget()->setFixedSize( QSize( attributes.namedItem( "width" ).nodeValue().toInt(), attributes.namedItem( "height" ).nodeValue().toInt() ) );
       ba = QByteArray::fromBase64( attributes.namedItem( "extent" ).nodeValue().toLocal8Bit() );
       QRectF extent;
       ds >> extent;

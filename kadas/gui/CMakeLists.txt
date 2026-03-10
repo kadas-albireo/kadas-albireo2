@@ -163,7 +163,7 @@ set(kadas_gui_HDR
 file(GLOB kadas_gui_UI ui/*.ui)
 list(SORT kadas_gui_UI)
 
-qt5_wrap_ui(kadas_gui_UI_HDR ${kadas_gui_UI})
+qt_wrap_ui(kadas_gui_UI_HDR ${kadas_gui_UI})
 
 set_property(SOURCE ${kadas_gui_UI} PROPERTY SKIP_AUTOMOC ON)
 
@@ -171,23 +171,21 @@ add_library(kadas_gui ${kadas_gui_SRC} ${kadas_gui_HDR} ${kadas_gui_UI})
 
 pkg_search_module(CAIRO IMPORTED_TARGET cairo REQUIRED)
 pkg_search_module(LIBRSVG IMPORTED_TARGET librsvg-2.0 REQUIRED)
-pkg_search_module(SVG2SVGT IMPORTED_TARGET svg2svgt REQUIRED)
 
 find_package(Qwt REQUIRED)
 find_package(GeographicLib REQUIRED)
 
 target_link_libraries(
   kadas_gui
-  Qt5::Widgets
-  Qt5::Network
-  Qt5::Svg
-  Qt5::Xml
-  Qt5::Concurrent
+  Qt6::Widgets
+  Qt6::Network
+  Qt6::Svg
+  Qt6::Xml
+  Qt6::Concurrent
   QuaZip::QuaZip
   QGIS::Gui
   ${GeographicLib_LIBRARIES}
   PkgConfig::LIBRSVG
-  PkgConfig::SVG2SVGT
   PkgConfig::CAIRO
   Exiv2::exiv2lib
   Qwt::Qwt

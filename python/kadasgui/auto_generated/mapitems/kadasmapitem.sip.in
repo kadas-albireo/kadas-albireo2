@@ -18,10 +18,10 @@ class KadasMapPos
 %Docstring(signature="appended")
 *************************************************************************
 
-This program is free software; you can redistribute it and/or modify  *
-it under the terms of the GNU General Public License as published by  *
-the Free Software Foundation; either version 2 of the License, or     *
-(at your option) any later version.                                   *
+This program is free software; you can redistribute it and/or modify *
+it under the terms of the GNU General Public License as published by *
+the Free Software Foundation; either version 2 of the License, or * (at
+your option) any later version. *
 
 **************************************************************************
 %End
@@ -33,6 +33,7 @@ the Free Software Foundation; either version 2 of the License, or     *
     static KadasMapPos fromPoint( const QgsPointXY &pos );
 
     KadasMapPos( double x = 0., double y = 0. );
+    double x() const;
     void setX( double x );
     double y() const;
     void setY( double y );
@@ -43,7 +44,6 @@ the Free Software Foundation; either version 2 of the License, or     *
 
 class KadasMapRect
 {
-
 %TypeHeaderCode
 #include "kadas/gui/mapitems/kadasmapitem.h"
 %End
@@ -70,7 +70,6 @@ class KadasMapRect
 
 class KadasItemPos
 {
-
 %TypeHeaderCode
 #include "kadas/gui/mapitems/kadasmapitem.h"
 %End
@@ -96,7 +95,6 @@ class KadasItemPos
 
 class KadasItemRect
 {
-
 %TypeHeaderCode
 #include "kadas/gui/mapitems/kadasmapitem.h"
 %End
@@ -119,7 +117,6 @@ class KadasItemRect
 };
 
 
-// clang-format off
 //
 // adapted from PyQt5 QPair<_TYPE1_, _TYPE2_> and QPair<float, float>
 //
@@ -224,11 +221,9 @@ class KadasItemRect
   return sipGetState( sipTransferObj );
 %End
 };
-// clang-format on
 
 class KadasMapItem : QObject /Abstract/
 {
-
 %TypeHeaderCode
 #include "kadas/gui/mapitems/kadasmapitem.h"
 %End
@@ -344,11 +339,7 @@ Trigger a redraw */
 %End
 
     class State : KadasStateHistory::State
-{
-
-%TypeHeaderCode
-#include "kadas/gui/mapitems/kadasmapitem.h"
-%End
+    {
       public:
         enum class DrawStatus
         {
@@ -367,11 +358,7 @@ Trigger a redraw */
     virtual void setState( const State *state );
 
     class NumericAttribute
-{
-
-%TypeHeaderCode
-#include "kadas/gui/mapitems/kadasmapitem.h"
-%End
+    {
       public:
         QString name;
         enum class Type

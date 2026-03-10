@@ -60,7 +60,7 @@ Kadas3DMapConfigWidget::Kadas3DMapConfigWidget( Qgs3DMapSettings *map, QgsMapCan
   // get rid of annoying outer focus rect on Mac
   m3DOptionsListWidget->setAttribute( Qt::WA_MacShowFocusRect, false );
   m3DOptionsListWidget->setCurrentRow( settings.value( QStringLiteral( "Windows/3DMapConfig/Tab" ), 0 ).toInt() );
-  connect( m3DOptionsListWidget, &QListWidget::currentRowChanged, this, [=]( int index ) { m3DOptionsStackedWidget->setCurrentIndex( index ); } );
+  connect( m3DOptionsListWidget, &QListWidget::currentRowChanged, this, [this]( int index ) { m3DOptionsStackedWidget->setCurrentIndex( index ); } );
   m3DOptionsStackedWidget->setCurrentIndex( m3DOptionsListWidget->currentRow() );
 
   if ( !settings.contains( QStringLiteral( "Windows/3DMapConfig/OptionsSplitState" ) ) )
@@ -77,7 +77,7 @@ Kadas3DMapConfigWidget::Kadas3DMapConfigWidget( Qgs3DMapSettings *map, QgsMapCan
 
   cboCameraProjectionType->addItem( tr( "Perspective Projection" ), Qt3DRender::QCameraLens::PerspectiveProjection );
   cboCameraProjectionType->addItem( tr( "Orthogonal Projection" ), Qt3DRender::QCameraLens::OrthographicProjection );
-  connect( cboCameraProjectionType, static_cast<void ( QComboBox::* )( int )>( &QComboBox::currentIndexChanged ), this, [=]() {
+  connect( cboCameraProjectionType, static_cast<void ( QComboBox::* )( int )>( &QComboBox::currentIndexChanged ), this, [this]() {
     spinCameraFieldOfView->setEnabled( cboCameraProjectionType->currentIndex() == cboCameraProjectionType->findData( Qt3DRender::QCameraLens::PerspectiveProjection ) );
   } );
 
@@ -162,11 +162,11 @@ Kadas3DMapConfigWidget::Kadas3DMapConfigWidget( Qgs3DMapSettings *map, QgsMapCan
   cboCameraProjectionType->setCurrentIndex( cboCameraProjectionType->findData( mMap->projectionType() ) );
   mCameraNavigationModeCombo->setCurrentIndex( mCameraNavigationModeCombo->findData( QVariant::fromValue( mMap->cameraNavigationMode() ) ) );
   mCameraMovementSpeed->setValue( mMap->cameraMovementSpeed() );
-  spinTerrainScale->setValue( mMap->terrainVerticalScale() );
-  spinMapResolution->setValue( mMap->mapTileResolution() );
-  spinScreenError->setValue( mMap->maxTerrainScreenError() );
-  spinGroundError->setValue( mMap->maxTerrainGroundError() );
-  terrainElevationOffsetSpinBox->setValue( mMap->terrainElevationOffset() );
+  spinTerrainScale->setValue( mMap->terrainSettings()->verticalScale() );
+  spinMapResolution->setValue( mMap->terrainSettings()->mapTileResolution() );
+  spinScreenError->setValue( mMap->terrainSettings()->maximumScreenError() );
+  spinGroundError->setValue( mMap->terrainSettings()->maximumGroundError() );
+  terrainElevationOffsetSpinBox->setValue( mMap->terrainSettings()->elevationOffset() );
   chkShowLabels->setChecked( mMap->showLabels() );
   chkShowTileInfo->setChecked( mMap->showTerrainTilesInfo() );
   chkShowBoundingBoxes->setChecked( mMap->showTerrainBoundingBoxes() );
@@ -360,11 +360,6 @@ void Kadas3DMapConfigWidget::apply()
   mMap->setProjectionType( cboCameraProjectionType->currentData().value<Qt3DRender::QCameraLens::ProjectionType>() );
   mMap->setCameraNavigationMode( mCameraNavigationModeCombo->currentData().value<Qgis::NavigationMode>() );
   mMap->setCameraMovementSpeed( mCameraMovementSpeed->value() );
-  mMap->setTerrainVerticalScale( spinTerrainScale->value() );
-  mMap->setMapTileResolution( spinMapResolution->value() );
-  mMap->setMaxTerrainScreenError( spinScreenError->value() );
-  mMap->setMaxTerrainGroundError( spinGroundError->value() );
-  mMap->setTerrainElevationOffset( terrainElevationOffsetSpinBox->value() );
   mMap->setShowLabels( chkShowLabels->isChecked() );
   mMap->setShowTerrainTilesInfo( chkShowTileInfo->isChecked() );
   mMap->setShowTerrainBoundingBoxes( chkShowBoundingBoxes->isChecked() );
@@ -401,7 +396,9 @@ void Kadas3DMapConfigWidget::apply()
   mMap->setDebugDepthMapSettings( mDebugDepthMapGroupBox->isChecked(), static_cast<Qt::Corner>( mDebugDepthMapCornerComboBox->currentIndex() ), mDebugDepthMapSizeSpinBox->value() );
 
   // Do not display the shadow debug map if the shadow effect is not enabled.
-  mMap->setDebugShadowMapSettings( mDebugShadowMapGroupBox->isChecked() && groupShadowRendering->isChecked(), static_cast<Qt::Corner>( mDebugShadowMapCornerComboBox->currentIndex() ), mDebugShadowMapSizeSpinBox->value() );
+  mMap->setDebugShadowMapSettings(
+    mDebugShadowMapGroupBox->isChecked() && groupShadowRendering->isChecked(), static_cast<Qt::Corner>( mDebugShadowMapCornerComboBox->currentIndex() ), mDebugShadowMapSizeSpinBox->value()
+  );
 }
 
 void Kadas3DMapConfigWidget::onTerrainTypeChanged()

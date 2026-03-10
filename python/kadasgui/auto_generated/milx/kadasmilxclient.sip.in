@@ -14,6 +14,9 @@
 
 struct KadasMilxSymbolDesc
 {
+%TypeHeaderCode
+#include "kadas/gui/milx/kadasmilxclient.h"
+%End
     QString symbolXml;
     QString name;
     QString militaryName;
@@ -25,7 +28,6 @@ struct KadasMilxSymbolDesc
 
 class KadasMilxSymbolSettings
 {
-
 %TypeHeaderCode
 #include "kadas/gui/milx/kadasmilxclient.h"
 %End

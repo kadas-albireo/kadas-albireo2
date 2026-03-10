@@ -30,13 +30,17 @@ class KadasCatalogBrowser::CatalogItem : public QStandardItem
 {
   public:
     CatalogItem()
-      : QStandardItem() {}
+      : QStandardItem()
+    {}
     CatalogItem( const QString &text )
-      : QStandardItem( text ) {}
+      : QStandardItem( text )
+    {}
     CatalogItem( const QIcon &icon, const QString &text )
-      : QStandardItem( icon, text ) {}
+      : QStandardItem( icon, text )
+    {}
     explicit CatalogItem( int rows, int columns = 1 )
-      : QStandardItem( rows, columns ) {}
+      : QStandardItem( rows, columns )
+    {}
 
     bool operator<( const QStandardItem &other ) const
     {
@@ -63,8 +67,7 @@ class KadasCatalogBrowser::CatalogModel : public QStandardItemModel
   public:
     CatalogModel( QObject *parent = 0 )
       : QStandardItemModel( parent )
-    {
-    }
+    {}
 
     QStandardItem *addItem( QStandardItem *parent, const QString &value, int sortIndex, bool isLeaf, QMimeData *mimeData )
     {
@@ -135,10 +138,7 @@ class KadasCatalogBrowser::CatalogModel : public QStandardItemModel
       return 0;
     }
 
-    QStringList mimeTypes() const override
-    {
-      return QStringList() << "text/uri-list" << "application/x-vnd.qgis.qgis.uri";
-    }
+    QStringList mimeTypes() const override { return QStringList() << "text/uri-list" << "application/x-vnd.qgis.qgis.uri"; }
 };
 
 class KadasCatalogBrowser::TreeFilterProxyModel : public QSortFilterProxyModel
@@ -146,8 +146,7 @@ class KadasCatalogBrowser::TreeFilterProxyModel : public QSortFilterProxyModel
   public:
     TreeFilterProxyModel( QObject *parent = 0 )
       : QSortFilterProxyModel( parent )
-    {
-    }
+    {}
 
     bool filterAcceptsRow( int source_row, const QModelIndex &source_parent ) const override
     {

@@ -228,8 +228,7 @@ KadasMapItem::EditContext KadasLineItem::getEditContext( const KadasMapPos &pos,
 
 void KadasLineItem::edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings )
 {
-  if ( context.vidx.part >= 0 && context.vidx.part < state()->points.size()
-       && context.vidx.vertex >= 0 && context.vidx.vertex < state()->points[context.vidx.part].size() )
+  if ( context.vidx.part >= 0 && context.vidx.part < state()->points.size() && context.vidx.vertex >= 0 && context.vidx.vertex < state()->points[context.vidx.part].size() )
   {
     state()->points[context.vidx.part][context.vidx.vertex] = toItemPos( newPoint, mapSettings );
     recomputeDerived();
@@ -259,10 +258,15 @@ void KadasLineItem::populateContextMenu( QMenu *menu, const EditContext &context
 {
   if ( context.vidx.vertex == 0 )
   {
-    menu->addAction( tr( "Continue line" ), menu, [this, context] {
+    menu
+      ->addAction(
+        tr( "Continue line" ),
+        menu,
+        [this, context] {
           std::reverse( state()->points[context.vidx.part].begin(), state()->points[context.vidx.part].end() );
           recomputeDerived();
-        } )
+        }
+      )
       ->setData( static_cast<int>( ContextMenuActions::EditSwitchToDrawingTool ) );
   }
   else if ( context.vidx.part >= 0 && context.vidx.vertex == state()->points[context.vidx.part].size() - 1 )
@@ -279,7 +283,7 @@ void KadasLineItem::populateContextMenu( QMenu *menu, const EditContext &context
   }
   else
   {
-    menu->addAction( QIcon( ":/kadas/icons/add_node" ), tr( "Add node" ), menu, [=] {
+    menu->addAction( QIcon( ":/kadas/icons/add_node" ), tr( "Add node" ), menu, [=, this] {
       KadasItemPos newPos = toItemPos( clickPos, mapSettings );
       QgsVertexId insPoint = insertionPoint( constState()->points, newPos );
       state()->points[insPoint.part].insert( insPoint.vertex, newPos );

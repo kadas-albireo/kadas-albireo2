@@ -25,6 +25,7 @@
 #include <QMessageBox>
 #include <QSplashScreen>
 #include <QStatusBar>
+#include <QRegularExpression>
 #include <QUrlQuery>
 #include <quazip/quazipfile.h>
 
@@ -122,8 +123,7 @@ static void setupVectorLayer( const QString &vectorLayerPath, const QStringList 
     subLayerNameFormatted = QgsMapLayer::formatLayerName( subLayerNameFormatted );
   }
 
-  if ( elements.size() >= 4 && layer->name().compare( rawLayerName, Qt::CaseInsensitive ) != 0
-       && layer->name().compare( subLayerNameFormatted, Qt::CaseInsensitive ) != 0 )
+  if ( elements.size() >= 4 && layer->name().compare( rawLayerName, Qt::CaseInsensitive ) != 0 && layer->name().compare( subLayerNameFormatted, Qt::CaseInsensitive ) != 0 )
   {
     layer->setName( QStringLiteral( "%1 %2" ).arg( layer->name(), rawLayerName ) );
   }
@@ -133,11 +133,16 @@ static void setupVectorLayer( const QString &vectorLayerPath, const QStringList 
   // Except for a few select extensions, known to be always single layer dataset.
   QFileInfo fi( vectorLayerPath );
   QString ext = fi.suffix().toLower();
-  if ( providerKey == QLatin1String( "ogr" ) && ext != QLatin1String( "shp" ) && ext != QLatin1String( "mif" ) && ext != QLatin1String( "tab" ) && ext != QLatin1String( "csv" ) && ext != QLatin1String( "geojson" ) && !vectorLayerPath.contains( QStringLiteral( "layerid=" ) ) && !vectorLayerPath.contains( QStringLiteral( "layername=" ) ) )
+  if ( providerKey == QLatin1String( "ogr" )
+       && ext != QLatin1String( "shp" )
+       && ext != QLatin1String( "mif" )
+       && ext != QLatin1String( "tab" )
+       && ext != QLatin1String( "csv" )
+       && ext != QLatin1String( "geojson" )
+       && !vectorLayerPath.contains( QStringLiteral( "layerid=" ) )
+       && !vectorLayerPath.contains( QStringLiteral( "layername=" ) ) )
   {
-    auto uriParts = QgsProviderRegistry::instance()->decodeUri(
-      layer->providerType(), layer->dataProvider()->dataSourceUri()
-    );
+    auto uriParts = QgsProviderRegistry::instance()->decodeUri( layer->providerType(), layer->dataProvider()->dataSourceUri() );
     QString composedURI( uriParts.value( QStringLiteral( "path" ) ).toString() );
     composedURI += "|layername=" + rawLayerName;
 
@@ -163,8 +168,7 @@ bool KadasApplication::isRunningFromBuildDir()
 
 KadasApplication::KadasApplication( int &argc, char **argv )
   : QgsApplication( argc, argv, true )
-{
-}
+{}
 
 KadasApplication::~KadasApplication()
 {
@@ -225,21 +229,31 @@ void KadasApplication::init()
 
   QgsApplication::initQgis();
 
-  QgsCoordinateTransform::setCustomMissingRequiredGridHandler( [=]( const QgsCoordinateReferenceSystem &sourceCrs, const QgsCoordinateReferenceSystem &destinationCrs, const QgsDatumTransform::GridDetails &grid ) {
-    mMainWindow->messageBar()->pushWarning( tr( "Transform unavailable" ), tr( "Transform between %1 and %2 requires missing grid %3." ).arg( sourceCrs.authid() ).arg( destinationCrs.authid() ).arg( grid.shortName ) );
-  } );
+  QgsCoordinateTransform::setCustomMissingRequiredGridHandler(
+    [=, this]( const QgsCoordinateReferenceSystem &sourceCrs, const QgsCoordinateReferenceSystem &destinationCrs, const QgsDatumTransform::GridDetails &grid ) {
+      mMainWindow->messageBar()
+        ->pushWarning( tr( "Transform unavailable" ), tr( "Transform between %1 and %2 requires missing grid %3." ).arg( sourceCrs.authid() ).arg( destinationCrs.authid() ).arg( grid.shortName ) );
+    }
+  );
 
-  QgsCoordinateTransform::setCustomMissingPreferredGridHandler( [=]( const QgsCoordinateReferenceSystem &sourceCrs, const QgsCoordinateReferenceSystem &destinationCrs, const QgsDatumTransform::TransformDetails & /*preferredOperation*/, const QgsDatumTransform::TransformDetails & /*availableOperation*/ ) {
-    mMainWindow->messageBar()->pushWarning( tr( "Preferred transform unavailable" ), tr( "Preferred transform between %1 and %2 unavailable." ).arg( sourceCrs.authid() ).arg( destinationCrs.authid() ) );
-  } );
+  QgsCoordinateTransform::setCustomMissingPreferredGridHandler(
+    [=,
+     this]( const QgsCoordinateReferenceSystem &sourceCrs, const QgsCoordinateReferenceSystem &destinationCrs, const QgsDatumTransform::TransformDetails & /*preferredOperation*/, const QgsDatumTransform::TransformDetails & /*availableOperation*/ ) {
+      mMainWindow->messageBar()->pushWarning( tr( "Preferred transform unavailable" ), tr( "Preferred transform between %1 and %2 unavailable." ).arg( sourceCrs.authid() ).arg( destinationCrs.authid() ) );
+    }
+  );
 
-  QgsCoordinateTransform::setCustomCoordinateOperationCreationErrorHandler( [=]( const QgsCoordinateReferenceSystem &sourceCrs, const QgsCoordinateReferenceSystem &destinationCrs, const QString &error ) {
-    mMainWindow->messageBar()->pushWarning( tr( "Transform unavailable" ), tr( "Transform between %1 and %2 unavailable: %3." ).arg( sourceCrs.authid() ).arg( destinationCrs.authid() ).arg( error ) );
-  } );
+  QgsCoordinateTransform::setCustomCoordinateOperationCreationErrorHandler(
+    [=, this]( const QgsCoordinateReferenceSystem &sourceCrs, const QgsCoordinateReferenceSystem &destinationCrs, const QString &error ) {
+      mMainWindow->messageBar()->pushWarning( tr( "Transform unavailable" ), tr( "Transform between %1 and %2 unavailable: %3." ).arg( sourceCrs.authid() ).arg( destinationCrs.authid() ).arg( error ) );
+    }
+  );
 
-  QgsCoordinateTransform::setCustomMissingGridUsedByContextHandler( [=]( const QgsCoordinateReferenceSystem &sourceCrs, const QgsCoordinateReferenceSystem &destinationCrs, const QgsDatumTransform::TransformDetails & /*desired*/ ) {
-    mMainWindow->messageBar()->pushWarning( tr( "Transform unavailable" ), tr( "Transform between %1 and %2 unavailable." ).arg( sourceCrs.authid() ).arg( destinationCrs.authid() ) );
-  } );
+  QgsCoordinateTransform::setCustomMissingGridUsedByContextHandler(
+    [=, this]( const QgsCoordinateReferenceSystem &sourceCrs, const QgsCoordinateReferenceSystem &destinationCrs, const QgsDatumTransform::TransformDetails & /*desired*/ ) {
+      mMainWindow->messageBar()->pushWarning( tr( "Transform unavailable" ), tr( "Transform between %1 and %2 unavailable." ).arg( sourceCrs.authid() ).arg( destinationCrs.authid() ) );
+    }
+  );
 
   // Setup application style
   setWindowIcon( QIcon( ":/kadas/logo" ) );
@@ -297,9 +311,7 @@ void KadasApplication::init()
   QgsNetworkAccessManager::setRequestPreprocessor( injectAuthToken );
 
   // Add network request logger
-  QgsNetworkAccessManager::instance()->setRequestPreprocessor( []( QNetworkRequest *req ) {
-    QgsDebugMsgLevel( QString( "Network request: %1" ).arg( req->url().toString() ), 2 );
-  } );
+  QgsNetworkAccessManager::instance()->setRequestPreprocessor( []( QNetworkRequest *req ) { QgsDebugMsgLevel( QString( "Network request: %1" ).arg( req->url().toString() ), 2 ); } );
 
   // Start the network logger early, we want all requests logged!
   mNetworkLogger = new QgsNetworkLogger( QgsNetworkAccessManager::instance(), this );
@@ -343,18 +355,39 @@ void KadasApplication::init()
     mMessageLogViewer->show();
   }
 
-  connect( QgsApplication::authManager(), &QgsAuthManager::messageLog, mMessageLogViewer, &KadasMessageLogViewer::logMessage );
+  connect( QgsApplication::authManager(), &QgsAuthManager::messageLog, mMessageLogViewer, [this]( const QString &message, const QString &tag, Qgis::MessageLevel level ) {
+    mMessageLogViewer->logMessage( message, tag, level );
+  } );
 
   QgsProject::instance()->setBadLayerHandler( new KadasHandleBadLayersHandler );
   QgsPathResolver::setPathPreprocessor( [this]( const QString &path ) { return migrateDatasource( path ); } );
 
   QgsDockableWidgetHelper::sAddTabifiedDockWidgetFunction = []( Qt::DockWidgetArea dockArea, QDockWidget *dock, const QStringList &tabSiblings, bool raiseTab ) {
-    // If we want to add tabified dock widgets as QGIS does, we need to implement this
-    // KadasApplication::instance()->addTabifiedDockWidget(dockArea, dock, tabSiblings, raiseTab);
+    QMainWindow *mainWindow = KadasApplication::instance()->mainWindow();
+    if ( !mainWindow )
+      return;
+
+    // Try to tabify with a sibling dock widget if one exists
+    if ( !tabSiblings.isEmpty() )
+    {
+      for ( QDockWidget *existing : mainWindow->findChildren<QDockWidget *>() )
+      {
+        if ( tabSiblings.contains( existing->objectName() ) )
+        {
+          mainWindow->addDockWidget( dockArea, dock );
+          mainWindow->tabifyDockWidget( existing, dock );
+          if ( raiseTab )
+            dock->raise();
+          return;
+        }
+      }
+    }
+
+    mainWindow->addDockWidget( dockArea, dock );
+    if ( raiseTab )
+      dock->raise();
   };
-  QgsDockableWidgetHelper::sAppStylesheetFunction = []() -> QString {
-    return KadasApplication::instance()->styleSheet();
-  };
+  QgsDockableWidgetHelper::sAppStylesheetFunction = []() -> QString { return KadasApplication::instance()->styleSheet(); };
   QgsDockableWidgetHelper::sOwnerWindow = mMainWindow;
 
 
@@ -587,7 +620,7 @@ KadasItemLayer *KadasApplication::selectPasteTargetItemLayer( const QList<KadasM
   QDialog dialog;
   dialog.setWindowTitle( tr( "Select layer" ) );
   dialog.setLayout( new QVBoxLayout() );
-  dialog.layout()->setMargin( 2 );
+  dialog.layout()->setContentsMargins( 2, 2, 2, 2 );
   dialog.layout()->addWidget( new QLabel( tr( "Select layer to paste items to:" ) ) );
   KadasLayerSelectionWidget *layerSelectionWidget = new KadasLayerSelectionWidget( mMainWindow->mapCanvas(), mMainWindow->layerTreeView(), [&]( QgsMapLayer *layer ) {
     if ( !dynamic_cast<KadasItemLayer *>( layer ) )
@@ -695,9 +728,7 @@ bool KadasApplication::projectOpen( const QString &projectFile )
   {
     QgsSettings settings;
     QString lastUsedDir = settings.value( "UI/lastProjectDir", QDir::homePath() ).toString();
-    fileName = QFileDialog::getOpenFileName(
-      mMainWindow, tr( "Choose a KADAS Project" ), lastUsedDir, tr( "KADAS project files" ) + " (*.qgs *.qgz)"
-    );
+    fileName = QFileDialog::getOpenFileName( mMainWindow, tr( "Choose a KADAS Project" ), lastUsedDir, tr( "KADAS project files" ) + " (*.qgs *.qgz)" );
     if ( fileName.isEmpty() )
     {
       return false;
@@ -858,10 +889,8 @@ bool KadasApplication::projectSaveDirty()
 {
   if ( QgsProject::instance()->isDirty() )
   {
-    QMessageBox::StandardButton response = QMessageBox::question(
-      mMainWindow, tr( "Save Project" ), tr( "Do you want to save the current project?" ),
-      QMessageBox::Yes | QMessageBox::Cancel | QMessageBox::No
-    );
+    QMessageBox::StandardButton response
+      = QMessageBox::question( mMainWindow, tr( "Save Project" ), tr( "Do you want to save the current project?" ), QMessageBox::Yes | QMessageBox::Cancel | QMessageBox::No );
     if ( response == QMessageBox::Yes )
     {
       return projectSave();
@@ -885,9 +914,7 @@ bool KadasApplication::projectSave( const QString &fileName, bool promptFileName
     QgsSettings settings;
     QString lastUsedDir = settings.value( QStringLiteral( "UI/lastProjectDir" ), QDir::homePath() ).toString();
 
-    QString path = QFileDialog::getSaveFileName(
-      mMainWindow, tr( "Choose a KADAS Project" ), lastUsedDir, tr( "Kadas project files" ) + " (*.qgz)"
-    );
+    QString path = QFileDialog::getSaveFileName( mMainWindow, tr( "Choose a KADAS Project" ), lastUsedDir, tr( "Kadas project files" ) + " (*.qgz)" );
     if ( path.isEmpty() )
     {
       return false;
@@ -1016,7 +1043,8 @@ void KadasApplication::showLayerAttributeTable( QgsMapLayer *layer )
   if ( vlayer )
   {
     // Deletes on close
-    KadasAttributeTableDialog *table = new KadasAttributeTableDialog( vlayer, mMainWindow->mapCanvas(), mMainWindow->messageBar(), mMainWindow, KadasAttributeTableDialog::settingsAttributeTableLocation->value() );
+    KadasAttributeTableDialog *table
+      = new KadasAttributeTableDialog( vlayer, mMainWindow->mapCanvas(), mMainWindow->messageBar(), mMainWindow, KadasAttributeTableDialog::settingsAttributeTableLocation->value() );
     table->show();
   }
 }
@@ -1100,7 +1128,7 @@ void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
   else if ( layer->providerType() == "arcgisfeatureserver" )
   {
     layerUrl = QgsDataSourceUri( layer->source() ).param( "url" );
-    int lastIndex = layerUrl.lastIndexOf( QRegExp( "\\/\\d+\\/{0,1}$" ) ); // Chop the layer index ../MapServer/4
+    int lastIndex = layerUrl.lastIndexOf( QRegularExpression( "\\/\\d+\\/{0,1}$" ) ); // Chop the layer index ../MapServer/4
     if ( lastIndex >= 0 )
     {
       layerUrl = layerUrl.left( lastIndex );
@@ -1443,10 +1471,7 @@ void KadasApplication::extentChanged()
 {
   // allow symbols in the legend update their preview if they use map units
   const QgsMapCanvas *mapCanvas = mMainWindow->mapCanvas();
-  mMainWindow->layerTreeView()->layerTreeModel()->setLegendMapViewData(
-    mapCanvas->mapUnitsPerPixel(),
-    static_cast<int>( std::round( mapCanvas->mapSettings().outputDpi() ) ), mapCanvas->scale()
-  );
+  mMainWindow->layerTreeView()->layerTreeModel()->setLegendMapViewData( mapCanvas->mapUnitsPerPixel(), static_cast<int>( std::round( mapCanvas->mapSettings().outputDpi() ) ), mapCanvas->scale() );
 }
 
 void KadasApplication::handleItemPicked( const KadasFeaturePicker::PickResult &result )
@@ -1689,10 +1714,11 @@ void KadasApplication::injectAuthToken( QNetworkRequest *request )
     QByteArray data = QUrl::fromPercentEncoding( cookie.toRawForm() ).toLocal8Bit();
     if ( data.startsWith( "agstoken=" ) )
     {
-      QRegExp tokenRe( "\"token\":\\s*\"([A-Za-z0-9-_\\.]+)\"" );
-      if ( tokenRe.indexIn( QString( data ) ) != -1 )
+      QRegularExpression tokenRe( "\"token\":\\s*\"([A-Za-z0-9-_\\.]+)\"" );
+      QRegularExpressionMatch tokenMatch = tokenRe.match( QString( data ) );
+      if ( tokenMatch.hasMatch() )
       {
-        query.addQueryItem( "token", tokenRe.cap( 1 ) );
+        query.addQueryItem( "token", tokenMatch.captured( 1 ) );
         url.setQuery( query );
         request->setUrl( url );
         QgsDebugMsgLevel( QString( "injectAuthToken: url altered to %1" ).arg( url.toString() ), 2 );
@@ -1821,7 +1847,12 @@ bool KadasApplication::checkTasksDependOnProject()
 
   if ( !activeTaskDescriptions.isEmpty() )
   {
-    QMessageBox::warning( mMainWindow, tr( "Active Tasks" ), tr( "The following tasks are currently running which depend on layers in this project:\n\n%1\n\nPlease cancel these tasks and retry." ).arg( qgis::setToList( activeTaskDescriptions ).join( QLatin1Char( '\n' ) ) ) );
+    QMessageBox::warning(
+      mMainWindow,
+      tr( "Active Tasks" ),
+      tr( "The following tasks are currently running which depend on layers in this project:\n\n%1\n\nPlease cancel these tasks and retry." )
+        .arg( qgis::setToList( activeTaskDescriptions ).join( QLatin1Char( '\n' ) ) )
+    );
     return true;
   }
   return false;

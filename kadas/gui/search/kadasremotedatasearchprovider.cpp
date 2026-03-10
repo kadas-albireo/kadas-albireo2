@@ -18,6 +18,7 @@
 #include <QJsonObject>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QRegularExpression>
 #include <QUrlQuery>
 
 #include <qgis/qgsannotationlayer.h>
@@ -145,7 +146,7 @@ void KadasRemoteDataSearchProvider::fetchResults( const QString &string, const Q
       if ( reply->error() == QNetworkReply::NoError )
       {
         QString layerName = reply->property( "layerName" ).toString();
-        layerName.replace( QRegExp( "<[^>]+>" ), "" ); // Remove HTML tags
+        layerName.replace( QRegularExpression( "<[^>]+>" ), "" ); // Remove HTML tags
 
         QByteArray replyText = reply->readAll();
         QJsonParseError err;
@@ -199,12 +200,7 @@ void KadasRemoteDataSearchProvider::triggerResult( const QgsLocatorResult &resul
   QgsPointXY pos = data.value( QStringLiteral( "pos" ) ).value<QgsPointXY>();
   QString crs = data.value( QStringLiteral( "crs" ) ).toString();
 
-  QgsPointXY itemPos = QgsCoordinateTransform(
-                         QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ),
-                         mMapCanvas->mapSettings().destinationCrs(),
-                         QgsProject::instance()
-  )
-                         .transform( pos );
+  QgsPointXY itemPos = QgsCoordinateTransform( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), mMapCanvas->mapSettings().destinationCrs(), QgsProject::instance() ).transform( pos );
 
   QgsAnnotationMarkerItem *item = new QgsAnnotationMarkerItem( QgsPoint( itemPos ) );
   QgsSvgMarkerSymbolLayer *symbolLayer = new QgsSvgMarkerSymbolLayer( QStringLiteral( ":/kadas/icons/pin_blue" ), 25 );

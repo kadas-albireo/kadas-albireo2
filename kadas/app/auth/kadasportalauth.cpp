@@ -35,25 +35,40 @@
 #include "kadas/app/auth/kadasappauthrequesthandler.h"
 
 
-const QgsSettingsEntryString *KadasPortalAuth::settingsPortalTokenUrl = new QgsSettingsEntryString( QStringLiteral( "token-url" ), KadasSettingsTree::sTreePortal, QString(), QStringLiteral( "URL to retrieve ESRI portal TOKEN from." ) );
-const QgsSettingsEntryStringList *KadasPortalAuth::settingsPortalCookieUrls = new QgsSettingsEntryStringList( QStringLiteral( "cookie-urls" ), KadasSettingsTree::sTreePortal, {}, QStringLiteral( "URLs for which the ERSI portal TOKEN will be set in a cookie." ) );
-const QgsSettingsEntryBool *KadasPortalAuth::settingsTokenCreateCookies = new QgsSettingsEntryBool( QStringLiteral( "token-create-cookies" ), KadasSettingsTree::sTreePortal, true, QStringLiteral( "Create cookies using the ESRI token." ) );
-const QgsSettingsEntryBool *KadasPortalAuth::settingsTokenUseEsriAuth = new QgsSettingsEntryBool( QStringLiteral( "token-use-esri-auth" ), KadasSettingsTree::sTreePortal, true, QStringLiteral( "Create cookies using the ESRI token." ) );
+const QgsSettingsEntryString *KadasPortalAuth::settingsPortalTokenUrl
+  = new QgsSettingsEntryString( QStringLiteral( "token-url" ), KadasSettingsTree::sTreePortal, QString(), QStringLiteral( "URL to retrieve ESRI portal TOKEN from." ) );
+const QgsSettingsEntryStringList *KadasPortalAuth::settingsPortalCookieUrls
+  = new QgsSettingsEntryStringList( QStringLiteral( "cookie-urls" ), KadasSettingsTree::sTreePortal, {}, QStringLiteral( "URLs for which the ERSI portal TOKEN will be set in a cookie." ) );
+const QgsSettingsEntryBool *KadasPortalAuth::settingsTokenCreateCookies
+  = new QgsSettingsEntryBool( QStringLiteral( "token-create-cookies" ), KadasSettingsTree::sTreePortal, true, QStringLiteral( "Create cookies using the ESRI token." ) );
+const QgsSettingsEntryBool *KadasPortalAuth::settingsTokenUseEsriAuth
+  = new QgsSettingsEntryBool( QStringLiteral( "token-use-esri-auth" ), KadasSettingsTree::sTreePortal, true, QStringLiteral( "Create cookies using the ESRI token." ) );
 
-const QgsSettingsEntryBool *KadasPortalAuth::settingsOAuth2Enabled = new QgsSettingsEntryBool( QStringLiteral( "enabled" ), KadasPortalAuth::sTreePortalOAuth2, false, QStringLiteral( "If enabled use OAuth2 authentication." ) );
-const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2RequestUrl = new QgsSettingsEntryString( QStringLiteral( "request-url" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Request URL." ) );
-const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2TokenUrl = new QgsSettingsEntryString( QStringLiteral( "token-url" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Token URL." ) );
-const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2ClientId = new QgsSettingsEntryString( QStringLiteral( "client-id" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Client ID." ) );
-const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2ClientSecret = new QgsSettingsEntryString( QStringLiteral( "client-secret" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Client Secret." ) );
+const QgsSettingsEntryBool *KadasPortalAuth::settingsOAuth2Enabled
+  = new QgsSettingsEntryBool( QStringLiteral( "enabled" ), KadasPortalAuth::sTreePortalOAuth2, false, QStringLiteral( "If enabled use OAuth2 authentication." ) );
+const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2RequestUrl
+  = new QgsSettingsEntryString( QStringLiteral( "request-url" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Request URL." ) );
+const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2TokenUrl
+  = new QgsSettingsEntryString( QStringLiteral( "token-url" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Token URL." ) );
+const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2ClientId
+  = new QgsSettingsEntryString( QStringLiteral( "client-id" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Client ID." ) );
+const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2ClientSecret
+  = new QgsSettingsEntryString( QStringLiteral( "client-secret" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Client Secret." ) );
 
 const QString KadasPortalAuth::ESRI_AUTH_CFG_ID = QStringLiteral( "kadas_esri_token" );
 
 KadasPortalAuth::KadasPortalAuth( QObject *parent )
   : QObject { parent }
-  , mRequestRunningMessageBox( QMessageBox::Icon::Information, tr( "OAuth2 Authentication" ), tr( "Your browser has been opened for authentication.\n\n"
-                                                                                                  "Please complete the authentication in your browser.\n"
-                                                                                                  "This dialog will close automatically when authentication is complete." ),
-                               QMessageBox::StandardButton::Cancel )
+  , mRequestRunningMessageBox(
+      QMessageBox::Icon::Information,
+      tr( "OAuth2 Authentication" ),
+      tr(
+        "Your browser has been opened for authentication.\n\n"
+        "Please complete the authentication in your browser.\n"
+        "This dialog will close automatically when authentication is complete."
+      ),
+      QMessageBox::StandardButton::Cancel
+    )
 {
   mRequestRunningMessageBox.setModal( true );
 
@@ -99,9 +114,7 @@ void KadasPortalAuth::setupAuthentication()
             // If we create the cookies directly,
             // it does not work in the same event loop
             // so we need to delay it a bit
-            QTimer::singleShot( 1, this, [=]() {
-              createCookies( token );
-            } );
+            QTimer::singleShot( 1, this, [this, token]() { createCookies( token ); } );
           }
           if ( settingsTokenUseEsriAuth->value() )
             createEsriAuth( token );

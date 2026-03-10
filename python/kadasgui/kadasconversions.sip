@@ -17,7 +17,7 @@
 
     while (i != sipCpp->constEnd())
     {
-        PyObject *kobj = SIPLong_FromLong(i.key());
+        PyObject *kobj = PyLong_FromLong(i.key());
         PyObject *tobj = PyFloat_FromDouble(i.value());
         if (kobj == NULL || tobj == NULL || PyDict_SetItem(d, kobj, tobj) < 0)
         {
@@ -44,7 +44,7 @@
 
 %ConvertToTypeCode
     PyObject *kobj, *tobj;
-    SIP_SSIZE_T i = 0;
+    Py_ssize_t i = 0;
 
     // Check the type if that is all that is required.
     if (sipIsErr == NULL)
@@ -58,7 +58,7 @@
 
     while (PyDict_Next(sipPy, &i, &kobj, &tobj))
     {
-        int k = SIPLong_AsLong(kobj);
+        int k = PyLong_AsLong(kobj);
         double t = PyFloat_AsDouble(tobj);
 
         if (*sipIsErr)

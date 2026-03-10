@@ -54,6 +54,12 @@ jobs:
         with:
           xcode-version: latest-stable
 
+      - name: 🔢 Determine version
+        id: version
+        uses: ./.github/actions/determine-version
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: 🌱 Install dependencies and generate project files
         env:
           GDAL_PYTHON_BINDINGS_WITHOUT_NUMPY: "Yes"
@@ -62,49 +68,19 @@ jobs:
           # Install first only with binarycaching, then deduplicate binaries and replace copies with symlinks.
           # Nuget doesn't understand the symlink concept
 
-          echo $(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags" --header "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}")
-          echo $(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags" --header "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" | jq -r '.[0].name')
-
-          if [[ -n "${{ github.event.pull_request.number }}" ]]; then
-            # Pull Request Build: Use "0.0.PR-number"
-            MAJOR="0"
-            MINOR="0"
-            PATCH="${{ github.event.pull_request.number }}"
-          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            # Release Workflow: Extract version from the tag name
-            TAG="${{ github.ref }}"  # e.g., refs/tags/v1.2.3
-            VERSION="${TAG#refs/tags/v}"  # Strip the prefix "refs/tags/v"
-            IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
-          else
-            # Regular Branch Build: Fetch latest release info and set patch to 99
-            RELEASE=$(curl -s "https://api.github.com/repos/kadas-albireo/kadas-albireo2/tags"  --header "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"  | jq -r '.[0].name')
-            
-            if [[ -n "$RELEASE" ]]; then
-              RELEASE="${RELEASE#v}"  # Strip 'v' prefix if exists
-              IFS='.' read -r MAJOR MINOR PATCH <<< "$RELEASE"
-            else
-              MAJOR="0"
-              MINOR="0"
-            fi
-            
-            PATCH="99"  # Default patch number for branch builds
-          fi
-
-          echo "KADAS Version: v${MAJOR}.${MINOR}.${PATCH}"
-
           cmake -S . \
                 -G Ninja \
                 -B build \
-                -D KADAS_VERSION=${MAJOR}.${MINOR}.${PATCH} \
+                -D KADAS_VERSION=${{ steps.version.outputs.version }} \
                 -D VCPKG_TARGET_TRIPLET="${{ matrix.triplet }}" \
                 -D VCPKG_HOST_TRIPLET="${{ matrix.triplet }}" \
                 -D VCPKG_INSTALL_OPTIONS="--only-binarycaching" \
                 -D NUGET_USERNAME=kadas-albireo \
                 -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }} || true
                 
-                fdupes -r -1 build/vcpkg_installed/arm64-osx-dynamic/lib | grep libQt | while read line; do master=""; for file in ${line[*]}; do if  [[ "x${master}" == "x" ]]; then master=$file; else rm "${file}"; ln -s $(basename "${master}") "${file}"; fi; done; done
-                
-                cmake -D VCPKG_INSTALL_OPTIONS="" build
+          fdupes -r -1 build/vcpkg_installed/arm64-osx-dynamic/lib | grep libQt | while read line; do master=""; for file in ${line[*]}; do if  [[ "x${master}" == "x" ]]; then master=$file; else rm "${file}"; ln -s $(basename "${master}") "${file}"; fi; done; done
+
+          cmake -D VCPKG_INSTALL_OPTIONS="" build
 
       - name: 📑 Upload vcpkg build logs
         uses: actions/upload-artifact@v7
@@ -118,22 +94,22 @@ jobs:
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
         run: |
           ./build/_deps/vcpkg-src/vcpkg export --zip --output-dir=./sdk --x-install-root=./build/vcpkg_installed  --x-manifest-root=vcpkg
+          cd sdk && for f in vcpkg-export-*.zip; do mv "$f" "${f/vcpkg-export/vcpkg-export-${{ matrix.triplet }}}"; done
 
-      - name: 📤 Upload sdk
+      - name: 📤 Upload SDK
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
         uses: actions/upload-artifact@v7
         with:
-          name: kadas-albireo2-sdk-${{ matrix.triplet }}
-          path: |
-            sdk/vcpkg-export-*.zip
+          archive: false
+          path: sdk/vcpkg-export-${{ matrix.triplet }}-*.zip
 
-      - name: Compile plugins translation
+      - name: 📝 Compile plugins translation
         run: |
           # lrelease is run from cmake for app
           # plugins need to be handled
-          export PATH="${{ github.workspace }}/build/vcpkg_installed/${{ matrix.triplet }}/tools/qt5/bin:${PATH}"
-          for PLUGIN in about gpkg print; do
-            lrelease share/python/plugins/kadas_${PLUGIN}/kadas_${PLUGIN}_ts.pro
+          export PATH="${{ github.workspace }}/build/vcpkg_installed/${{ matrix.triplet }}/tools/Qt6/bin:${PATH}"
+          for PLUGIN in about gpkg print ephem; do
+            lrelease share/python/plugins/kadas_${PLUGIN}/i18n/*.ts
           done
 
       - name: 🌋 Build
@@ -142,4 +118,4 @@ jobs:
 
       - name: 🧪 Run CTest
         run: |
-          ctest --test-dir build --output-on-failure
+          ctest --test-dir build --output-on-failure --timeout 120

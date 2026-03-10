@@ -38,8 +38,7 @@ const int KadasLocalDataSearchFilter::sResultCountLimit = 50;
 KadasLocalDataSearchFilter::KadasLocalDataSearchFilter( QgsMapCanvas *mapCanvas )
   : QgsLocatorFilter()
   , mMapCanvas( mapCanvas )
-{
-}
+{}
 
 QgsLocatorFilter *KadasLocalDataSearchFilter::clone() const
 {
@@ -140,11 +139,9 @@ void KadasLocalDataSearchFilter::buildResult( const QgsFeature &feature, QgsVect
 
   QgsLocatorResult result;
   result.displayString = tr( "%1 (%2)" ).arg( matchText ).arg( featureTitle );
-  result.setUserData( QVariantMap(
-    {
-      { QStringLiteral( "feature_id" ), feature.id() },
-      { QStringLiteral( "layer_id" ), layer->id() },
-    }
-  ) );
+  result.setUserData( QVariantMap( {
+    { QStringLiteral( "feature_id" ), feature.id() },
+    { QStringLiteral( "layer_id" ), layer->id() },
+  } ) );
   emit resultFetched( result );
 }

@@ -90,7 +90,7 @@ KadasItemPos KadasRectangleItem::position() const
     x += point.x();
     y += point.y();
   }
-  int n = std::max( 1, constState()->p1.size() + constState()->p2.size() );
+  int n = std::max( qsizetype( 1 ), constState()->p1.size() + constState()->p2.size() );
   return KadasItemPos( x / n, y / n );
 }
 
@@ -203,8 +203,7 @@ KadasMapItem::EditContext KadasRectangleItem::getEditContext( const KadasMapPos 
 void KadasRectangleItem::edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings )
 {
   KadasItemPos newItemPos = toItemPos( newPoint, mapSettings );
-  if ( context.vidx.part >= 0 && context.vidx.part < state()->p1.size()
-       && context.vidx.vertex >= 0 && context.vidx.vertex < 4 )
+  if ( context.vidx.part >= 0 && context.vidx.part < state()->p1.size() && context.vidx.vertex >= 0 && context.vidx.vertex < 4 )
   {
     if ( context.vidx.vertex == 0 )
     {

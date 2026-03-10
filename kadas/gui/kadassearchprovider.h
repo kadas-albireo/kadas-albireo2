@@ -66,7 +66,8 @@ class KADAS_GUI_EXPORT KadasSearchProvider : public QObject
     };
 
     KadasSearchProvider( QgsMapCanvas *mapCanvas )
-      : mMapCanvas( mapCanvas ) {}
+      : mMapCanvas( mapCanvas )
+    {}
     virtual ~KadasSearchProvider() {}
     virtual void startSearch( const QString &searchtext, const SearchRegion &searchRegion ) = 0;
     virtual void cancelSearch() {}

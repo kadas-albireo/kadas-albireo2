@@ -36,6 +36,7 @@
 #include <qgsmapviewsmanager.h>
 #include <qgsrasterlayer.h>
 #include <qgsdemterrainsettings.h>
+#include <qgsabstractterrainsettings.h>
 
 #include "kadas/app/3d/kadas3dintegration.h"
 #include "kadas/app/3d/kadas3dmapcanvaswidget.h"
@@ -68,9 +69,7 @@ void read3DMapViewSettings( Kadas3DMapCanvasWidget *widget, QDomElement &elem3DM
   map->setTransformContext( QgsProject::instance()->transformContext() );
   map->setPathResolver( QgsProject::instance()->pathResolver() );
   map->setMapThemeCollection( QgsProject::instance()->mapThemeCollection() );
-  QObject::connect( QgsProject::instance(), &QgsProject::transformContextChanged, map, [map] {
-    map->setTransformContext( QgsProject::instance()->transformContext() );
-  } );
+  QObject::connect( QgsProject::instance(), &QgsProject::transformContextChanged, map, [map] { map->setTransformContext( QgsProject::instance()->transformContext() ); } );
 
 #if 0
   // these things are not saved in project
@@ -93,7 +92,9 @@ void read3DMapViewSettings( Kadas3DMapCanvasWidget *widget, QDomElement &elem3DM
 }
 
 Kadas3DIntegration::Kadas3DIntegration( QAction *action3D, QgsMapCanvas *mapCanvas, QObject *parent )
-  : QObject( parent ), mAction3D( action3D ), mMapCanvas( mapCanvas )
+  : QObject( parent )
+  , mAction3D( action3D )
+  , mMapCanvas( mapCanvas )
 {
   Qgs3D::initialize();
 
@@ -125,9 +126,7 @@ Kadas3DIntegration::Kadas3DIntegration( QAction *action3D, QgsMapCanvas *mapCanv
       {
         connect( m3DMapCanvasWidget->mapCanvas3D()->mapSettings(), &Qgs3DMapSettings::settingsChanged, [this]() {
           QDomImplementation DomImplementation;
-          QDomDocumentType documentType = DomImplementation.createDocumentType(
-            QStringLiteral( "qgis" ), QStringLiteral( "http://mrcc.com/qgis.dtd" ), QStringLiteral( "SYSTEM" )
-          );
+          QDomDocumentType documentType = DomImplementation.createDocumentType( QStringLiteral( "qgis" ), QStringLiteral( "http://mrcc.com/qgis.dtd" ), QStringLiteral( "SYSTEM" ) );
           QDomDocument doc( documentType );
 
           QDomElement elem3DMap;
@@ -212,11 +211,13 @@ Kadas3DMapCanvasWidget *Kadas3DIntegration::createNewMapCanvas3D( const QString 
   map->setOutputDpi( QGuiApplication::primaryScreen()->logicalDotsPerInch() );
   map->setRendererUsage( Qgis::RendererUsage::View );
 
-  map->setMaxTerrainScreenError( 2.0 );
+  {
+    std::unique_ptr<QgsAbstractTerrainSettings> terrainSettings( map->terrainSettings()->clone() );
+    terrainSettings->setMaximumScreenError( 2.0 );
+    map->setTerrainSettings( terrainSettings.release() );
+  }
 
-  connect( QgsProject::instance(), &QgsProject::transformContextChanged, map, [map] {
-    map->setTransformContext( QgsProject::instance()->transformContext() );
-  } );
+  connect( QgsProject::instance(), &QgsProject::transformContextChanged, map, [map] { map->setTransformContext( QgsProject::instance()->transformContext() ); } );
 
   canvasWidget->setMapSettings( map );
 

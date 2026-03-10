@@ -75,10 +75,7 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
 
   toolBar->addAction( QgsApplication::getThemeIcon( QStringLiteral( "mActionZoomFullExtent.svg" ) ), tr( "Zoom Full" ), this, &Kadas3DMapCanvasWidget::resetView );
 
-  QAction *toggleOnScreenNavigation = toolBar->addAction(
-    QgsApplication::getThemeIcon( QStringLiteral( "mAction3DNavigation.svg" ) ),
-    tr( "Toggle On-Screen Navigation" )
-  );
+  QAction *toggleOnScreenNavigation = toolBar->addAction( QgsApplication::getThemeIcon( QStringLiteral( "mAction3DNavigation.svg" ) ), tr( "Toggle On-Screen Navigation" ) );
 
   toggleOnScreenNavigation->setCheckable( true );
   toggleOnScreenNavigation->setChecked( sSettingNavigationVisible->value() );
@@ -127,10 +124,7 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
 
   toolBar->addSeparator();
 
-  QAction *toggleLayerTree = toolBar->addAction(
-    QgsApplication::getThemeIcon( QStringLiteral( "/mActionShowAllLayers.svg" ) ),
-    tr( "Toggle Layer Tree" )
-  );
+  QAction *toggleLayerTree = toolBar->addAction( QgsApplication::getThemeIcon( QStringLiteral( "/mActionShowAllLayers.svg" ) ), tr( "Toggle Layer Tree" ) );
   toggleLayerTree->setCheckable( true );
   toggleLayerTree->setChecked( sSettingLayerTreeVisible->value() );
   connect( toggleLayerTree, &QAction::toggled, this, &Kadas3DMapCanvasWidget::toggleLayerTreeWidget );
@@ -147,7 +141,7 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
 
   mActionSync2DNavTo3D = new QAction( tr( "2D Map View Follows 3D Camera" ), this );
   mActionSync2DNavTo3D->setCheckable( true );
-  connect( mActionSync2DNavTo3D, &QAction::triggered, this, [=]( bool enabled ) {
+  connect( mActionSync2DNavTo3D, &QAction::triggered, this, [this]( bool enabled ) {
     mActionSync3DNavTo2D->setChecked( false );
     Qgis::ViewSyncModeFlags syncMode = mCanvas->mapSettings()->viewSyncMode();
     syncMode.setFlag( Qgis::ViewSyncModeFlag::Sync2DTo3D, enabled );
@@ -158,7 +152,7 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
 
   mActionSync3DNavTo2D = new QAction( tr( "3D Camera Follows 2D Map View" ), this );
   mActionSync3DNavTo2D->setCheckable( true );
-  connect( mActionSync3DNavTo2D, &QAction::triggered, this, [=]( bool enabled ) {
+  connect( mActionSync3DNavTo2D, &QAction::triggered, this, [this]( bool enabled ) {
     mActionSync2DNavTo3D->setChecked( false );
     Qgis::ViewSyncModeFlags syncMode = mCanvas->mapSettings()->viewSyncMode();
     syncMode.setFlag( Qgis::ViewSyncModeFlag::Sync3DTo2D, enabled );
@@ -169,16 +163,14 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
 
   mShowFrustumPolyogon = new QAction( tr( "Show Visible Camera Area in 2D Map View" ), this );
   mShowFrustumPolyogon->setCheckable( true );
-  connect( mShowFrustumPolyogon, &QAction::triggered, this, [=]( bool enabled ) {
-    mCanvas->mapSettings()->setViewFrustumVisualizationEnabled( enabled );
-  } );
+  connect( mShowFrustumPolyogon, &QAction::triggered, this, [this]( bool enabled ) { mCanvas->mapSettings()->setViewFrustumVisualizationEnabled( enabled ); } );
   mCameraMenu->addAction( mShowFrustumPolyogon );
 #if 0
   mActionSetSceneExtent = mCameraMenu->addAction( QgsApplication::getThemeIcon( QStringLiteral( "extents.svg" ) ),
                           tr( "Set 3D Scene Extent on 2D Map View" ), this, &Kadas3DMapCanvasWidget::setSceneExtentOn2DCanvas );
   mActionSetSceneExtent->setCheckable( true );
 #endif
-  auto createShortcuts = [=]( const QString &objectName, void ( Kadas3DMapCanvasWidget::*slot )() ) {
+  auto createShortcuts = [this]( const QString &objectName, void ( Kadas3DMapCanvasWidget::*slot )() ) {
     if ( QShortcut *sc = QgsGui::shortcutsManager()->shortcutByName( objectName ) )
       connect( sc, &QShortcut::activated, this, slot );
   };
@@ -195,7 +187,7 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
 
   mActionEnableShadows = new QAction( tr( "Show Shadows" ), this );
   mActionEnableShadows->setCheckable( true );
-  connect( mActionEnableShadows, &QAction::toggled, this, [=]( bool enabled ) {
+  connect( mActionEnableShadows, &QAction::toggled, this, [this]( bool enabled ) {
     QgsShadowSettings settings = mCanvas->mapSettings()->shadowSettings();
     settings.setRenderShadows( enabled );
     mCanvas->mapSettings()->setShadowSettings( settings );
@@ -204,14 +196,12 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
 
   mActionEnableEyeDome = new QAction( tr( "Show Eye Dome Lighting" ), this );
   mActionEnableEyeDome->setCheckable( true );
-  connect( mActionEnableEyeDome, &QAction::triggered, this, [=]( bool enabled ) {
-    mCanvas->mapSettings()->setEyeDomeLightingEnabled( enabled );
-  } );
+  connect( mActionEnableEyeDome, &QAction::triggered, this, [this]( bool enabled ) { mCanvas->mapSettings()->setEyeDomeLightingEnabled( enabled ); } );
   mEffectsMenu->addAction( mActionEnableEyeDome );
 
   mActionEnableAmbientOcclusion = new QAction( tr( "Show Ambient Occlusion" ), this );
   mActionEnableAmbientOcclusion->setCheckable( true );
-  connect( mActionEnableAmbientOcclusion, &QAction::triggered, this, [=]( bool enabled ) {
+  connect( mActionEnableAmbientOcclusion, &QAction::triggered, this, [this]( bool enabled ) {
     QgsAmbientOcclusionSettings ambientOcclusionSettings = mCanvas->mapSettings()->ambientOcclusionSettings();
     ambientOcclusionSettings.setEnabled( enabled );
     mCanvas->mapSettings()->setAmbientOcclusionSettings( ambientOcclusionSettings );
@@ -269,7 +259,7 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
 
   mLabelNavSpeedHideTimeout = new QTimer( this );
   mLabelNavSpeedHideTimeout->setInterval( 1000 );
-  connect( mLabelNavSpeedHideTimeout, &QTimer::timeout, this, [=] {
+  connect( mLabelNavSpeedHideTimeout, &QTimer::timeout, this, [this] {
     mLabelNavigationSpeed->hide();
     mLabelNavSpeedHideTimeout->stop();
   } );
@@ -302,9 +292,7 @@ Kadas3DMapCanvasWidget::Kadas3DMapCanvasWidget( const QString &name, bool isDock
   hLayout->addWidget( mNavigationWidget );
   hLayout->setStretch( 1, 4 );
 
-  toggleNavigationWidget(
-    setting.value( QStringLiteral( "/3D/navigationWidget/visibility" ), false, QgsSettings::Gui ).toBool()
-  );
+  toggleNavigationWidget( setting.value( QStringLiteral( "/3D/navigationWidget/visibility" ), false, QgsSettings::Gui ).toBool() );
 
   layout->addLayout( hLayout );
   // layout->addWidget( mAnimationWidget );
@@ -489,7 +477,7 @@ void Kadas3DMapCanvasWidget::configure()
   Kadas3DMapConfigWidget *w = new Kadas3DMapConfigWidget( map, mMainCanvas, mCanvas, mConfigureDialog );
   QDialogButtonBox *buttons = new QDialogButtonBox( QDialogButtonBox::Apply | QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Help, mConfigureDialog );
 
-  auto applyConfig = [=]() {
+  auto applyConfig = [this, map, w]() {
     const QgsVector3D oldOrigin = map->origin();
     const QgsCoordinateReferenceSystem oldCrs = map->crs();
     const QgsCameraPose oldCameraPose = mCanvas->cameraController()->cameraPose();
@@ -498,11 +486,7 @@ void Kadas3DMapCanvasWidget::configure()
     // update map
     w->apply();
 
-    const QgsVector3D p = Qgs3DUtils::transformWorldCoordinates(
-      oldLookingAt,
-      oldOrigin, oldCrs,
-      map->origin(), map->crs(), QgsProject::instance()->transformContext()
-    );
+    const QgsVector3D p = Qgs3DUtils::transformWorldCoordinates( oldLookingAt, oldOrigin, oldCrs, map->origin(), map->crs(), QgsProject::instance()->transformContext() );
 
     if ( p != oldLookingAt )
     {
@@ -517,7 +501,7 @@ void Kadas3DMapCanvasWidget::configure()
   };
 
   connect( buttons, &QDialogButtonBox::rejected, mConfigureDialog, &QDialog::reject );
-  connect( buttons, &QDialogButtonBox::clicked, mConfigureDialog, [=]( QAbstractButton *button ) {
+  connect( buttons, &QDialogButtonBox::clicked, mConfigureDialog, [this, buttons, applyConfig]( QAbstractButton *button ) {
     if ( button == buttons->button( QDialogButtonBox::Apply ) || button == buttons->button( QDialogButtonBox::Ok ) )
       applyConfig();
     if ( button == buttons->button( QDialogButtonBox::Ok ) )
@@ -525,7 +509,7 @@ void Kadas3DMapCanvasWidget::configure()
   } );
   connect( buttons, &QDialogButtonBox::helpRequested, w, []() { QgsHelp::openHelp( QStringLiteral( "map_views/3d_map_view.html#scene-configuration" ) ); } );
 
-  connect( w, &Kadas3DMapConfigWidget::isValidChanged, this, [=]( bool valid ) {
+  connect( w, &Kadas3DMapConfigWidget::isValidChanged, this, [buttons]( bool valid ) {
     buttons->button( QDialogButtonBox::Apply )->setEnabled( valid );
     buttons->button( QDialogButtonBox::Ok )->setEnabled( valid );
   } );
@@ -667,10 +651,14 @@ void Kadas3DMapCanvasWidget::onGpuMemoryLimitReached()
 
   const QgsSettings settings;
   double memLimit = settings.value( QStringLiteral( "map3d/gpuMemoryLimit" ), 500.0, QgsSettings::App ).toDouble();
-  mMessageBar->pushMessage( tr( "A map layer has used all graphics memory allowed (%1 MB). "
-                                "You may want to lower the amount of detail in the scene, or increase the limit in the options." )
-                              .arg( memLimit ),
-                            Qgis::MessageLevel::Warning );
+  mMessageBar->pushMessage(
+    tr(
+      "A map layer has used all graphics memory allowed (%1 MB). "
+      "You may want to lower the amount of detail in the scene, or increase the limit in the options."
+    )
+      .arg( memLimit ),
+    Qgis::MessageLevel::Warning
+  );
   mGpuMemoryLimitReachedReported = true;
 }
 

@@ -16,10 +16,10 @@ class KadasMeasureWidget : KadasMapItemEditor
 %Docstring(signature="appended")
 *************************************************************************
 
-This program is free software; you can redistribute it and/or modify  *
-it under the terms of the GNU General Public License as published by  *
-the Free Software Foundation; either version 2 of the License, or     *
-(at your option) any later version.                                   *
+This program is free software; you can redistribute it and/or modify *
+it under the terms of the GNU General Public License as published by *
+the Free Software Foundation; either version 2 of the License, or * (at
+your option) any later version. *
 
 **************************************************************************
 %End
@@ -54,7 +54,6 @@ the Free Software Foundation; either version 2 of the License, or     *
 
 class KadasMapToolMeasure : KadasMapToolCreateItem
 {
-
 %TypeHeaderCode
 #include "kadas/gui/maptools/kadasmaptoolmeasure.h"
 %End
@@ -82,12 +81,13 @@ class KadasMapToolMeasure : KadasMapToolCreateItem
 
 class KadasMapToolMeasureItemInterface : KadasMapItemInterface
 {
-
 %TypeHeaderCode
 #include "kadas/gui/maptools/kadasmaptoolmeasure.h"
 %End
   public:
     KadasMapToolMeasureItemInterface( QgsMapCanvas *mapCanvas, KadasMapToolMeasure::MeasureMode measureMode );
+    virtual KadasMapItem *createItem() const;
+
 
 };
 

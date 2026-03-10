@@ -38,8 +38,7 @@ KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, std::uniqu
   : QgsMapTool( canvas )
   , mInterface( std::move( interface ) )
   , mLayer( layer )
-{
-}
+{}
 
 KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapItemInterface *interface, KadasItemLayer *layer )
   : QgsMapTool( canvas )
@@ -52,8 +51,7 @@ KadasMapToolCreateItem::KadasMapToolCreateItem( QgsMapCanvas *canvas, KadasMapIt
   : QgsMapTool( canvas )
   , mItem( item )
   , mLayer( layer )
-{
-}
+{}
 
 KadasMapToolCreateItem::~KadasMapToolCreateItem()
 {
@@ -222,7 +220,7 @@ void KadasMapToolCreateItem::canvasMoveEvent( QgsMapMouseEvent *e )
       mInputWidget->inputField( it.key() )->setValue( it.value() );
     }
 
-    mInputWidget->move( e->x(), e->y() + 20 );
+    mInputWidget->move( e->position().x(), e->position().y() + 20 );
     mInputWidget->show();
     if ( mInputWidget->focusedInputField() )
     {
@@ -233,8 +231,7 @@ void KadasMapToolCreateItem::canvasMoveEvent( QgsMapMouseEvent *e )
 }
 
 void KadasMapToolCreateItem::canvasReleaseEvent( QgsMapMouseEvent *e )
-{
-}
+{}
 
 void KadasMapToolCreateItem::keyPressEvent( QKeyEvent *e )
 {

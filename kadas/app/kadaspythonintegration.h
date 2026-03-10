@@ -106,7 +106,8 @@ class KadasPythonRunner : public QgsPythonRunner
 {
   public:
     explicit KadasPythonRunner( KadasPythonIntegration *pythonIntegration )
-      : mPythonIntegration( pythonIntegration ) {}
+      : mPythonIntegration( pythonIntegration )
+    {}
 
     bool runCommand( QString command, QString messageOnError = QString() ) override
     {
@@ -126,13 +127,13 @@ class KadasPythonRunner : public QgsPythonRunner
       return false;
     }
 
-    bool runFileCommand( const QString &filename, const QString &messageOnError = QString() )
+    bool runFileCommand( const QString &filename, const QString &messageOnError = QString() ) override
     {
       QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
       return false;
     }
 
-    bool setArgvCommand( const QStringList &arguments, const QString &messageOnError = QString() )
+    bool setArgvCommand( const QStringList &arguments, const QString &messageOnError = QString() ) override
     {
       QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
       return false;

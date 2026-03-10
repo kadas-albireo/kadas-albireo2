@@ -25,7 +25,8 @@
 #include <QDesktopServices>
 #include <QUrl>
 
-const QgsSettingsEntryString *KadasFeedback::settingsPortalFeedbackUrl = new QgsSettingsEntryString( QStringLiteral( "feedback-url" ), KadasSettingsTree::sTreePortal, QString(), QStringLiteral( "URL to the feedback page." ) );
+const QgsSettingsEntryString *KadasFeedback::settingsPortalFeedbackUrl
+  = new QgsSettingsEntryString( QStringLiteral( "feedback-url" ), KadasSettingsTree::sTreePortal, QString(), QStringLiteral( "URL to the feedback page." ) );
 
 bool KadasFeedback::isConfigured()
 {

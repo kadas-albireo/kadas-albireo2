@@ -17,7 +17,6 @@ typedef void *GDALDatasetH;
 
 class Kadas
 {
-
 %TypeHeaderCode
 #include "kadas/core/kadas.h"
 %End

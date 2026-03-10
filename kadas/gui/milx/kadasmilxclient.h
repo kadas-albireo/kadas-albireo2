@@ -28,10 +28,8 @@
 
 #include "kadas/gui/kadas_gui.h"
 
-class QNetworkSession;
 class QRect;
 class QProcess;
-class QStringList;
 class QTcpSocket;
 
 struct KADAS_GUI_EXPORT KadasMilxSymbolDesc
@@ -102,7 +100,6 @@ class KADAS_GUI_EXPORT KadasMilxClientWorker : public QObject
   private:
     bool mSync;
     QProcess *mProcess = nullptr;
-    QNetworkSession *mNetworkSession = nullptr;
     QTcpSocket *mTcpSocket = nullptr;
     QString mLastError;
     QString mLibraryVersionTag;
@@ -119,7 +116,13 @@ class KADAS_GUI_EXPORT KadasMilxClient : public QThread
     struct NPointSymbol
     {
         NPointSymbol( const QString &_xml, const QList<QPoint> &_points, const QList<int> &_controlPoints, const QList<QPair<int, double>> &_attributes, bool _finalized, bool _colored )
-          : xml( _xml ), points( _points ), controlPoints( _controlPoints ), attributes( _attributes ), finalized( _finalized ), colored( _colored ) {}
+          : xml( _xml )
+          , points( _points )
+          , controlPoints( _controlPoints )
+          , attributes( _attributes )
+          , finalized( _finalized )
+          , colored( _colored )
+        {}
 
         QString xml;
         QList<QPoint> points;
@@ -154,7 +157,9 @@ class KADAS_GUI_EXPORT KadasMilxClient : public QThread
     static bool getSymbolsMetadata( const QStringList &symbolIds, QList<KadasMilxSymbolDesc> &result );
     static bool getMilitaryName( const QString &symbolXml, QString &militaryName );
     static bool getControlPointIndices( const QString &symbolXml, int nPoints, const KadasMilxSymbolSettings &settings, QList<int> &controlPoints );
-    static bool getControlPoints( const QString &symbolXml, QList<QPoint> &points, const QList<QPair<int, double>> &attributes, QList<int> &controlPoints, bool isCorridor, const KadasMilxSymbolSettings &settings );
+    static bool getControlPoints(
+      const QString &symbolXml, QList<QPoint> &points, const QList<QPair<int, double>> &attributes, QList<int> &controlPoints, bool isCorridor, const KadasMilxSymbolSettings &settings
+    );
 
     static bool appendPoint( const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, const QPoint &newPoint, const KadasMilxSymbolSettings &settings, NPointSymbolGraphic &result );
     static bool insertPoint( const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, const QPoint &newPoint, const KadasMilxSymbolSettings &settings, NPointSymbolGraphic &result );
@@ -162,7 +167,9 @@ class KADAS_GUI_EXPORT KadasMilxClient : public QThread
     static bool moveAttributePoint( const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, int attr, const QPoint &newPos, const KadasMilxSymbolSettings &settings, NPointSymbolGraphic &result );
     static bool canDeletePoint( const NPointSymbol &symbol, const KadasMilxSymbolSettings &settings, int index, bool &canDelete );
     static bool deletePoint( const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, int index, const KadasMilxSymbolSettings &settings, NPointSymbolGraphic &result );
-    static bool editSymbol( const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, QString &newSymbolXml, QString &newSymbolMilitaryName, const KadasMilxSymbolSettings &settings, NPointSymbolGraphic &result, WId parentWid );
+    static bool editSymbol(
+      const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, QString &newSymbolXml, QString &newSymbolMilitaryName, const KadasMilxSymbolSettings &settings, NPointSymbolGraphic &result, WId parentWid
+    );
     static bool createSymbol( QString &symbolId, KadasMilxSymbolDesc &result, WId parentWid );
 
     static bool updateSymbol( const QRect &visibleExtent, int dpi, const NPointSymbol &symbol, const KadasMilxSymbolSettings &settings, NPointSymbolGraphic &result, bool returnPoints );

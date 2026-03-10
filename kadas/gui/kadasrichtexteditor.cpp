@@ -19,6 +19,7 @@
 
 #include <QAbstractTextDocumentLayout>
 #include <QAction>
+#include <QActionGroup>
 #include <QColorDialog>
 #include <QComboBox>
 #include <QDesktopServices>
@@ -47,13 +48,13 @@
 #include "kadas/gui/kadasrichtexteditor.h"
 
 // Richtext simplification filter helpers: Elements to be discarded
-static inline bool filterElement( const QStringRef &name )
+static inline bool filterElement( const QStringView &name )
 {
   return name != QStringLiteral( "meta" ) && name != QStringLiteral( "style" );
 }
 
 // Richtext simplification filter helpers: Filter attributes of elements
-static inline void filterAttributes( const QStringRef &name, QXmlStreamAttributes *atts, bool *paragraphAlignmentFound )
+static inline void filterAttributes( const QStringView &name, QXmlStreamAttributes *atts, bool *paragraphAlignmentFound )
 {
   if ( atts->isEmpty() )
     return;
@@ -84,8 +85,8 @@ static inline void filterAttributes( const QStringRef &name, QXmlStreamAttribute
   }
 }
 
-// Richtext simplification filter helpers: Check for blank QStringRef.
-static inline bool isWhiteSpace( const QStringRef &in )
+// Richtext simplification filter helpers: Check for blank QStringView.
+static inline bool isWhiteSpace( const QStringView &in )
 {
   const int count = in.size();
   for ( int i = 0; i < count; i++ )
@@ -395,7 +396,12 @@ void KadasColorAction::chooseColor()
 ///////////////////////////////////////////////////////////////////////////////
 
 KadasRichTextEditorToolBar::KadasRichTextEditorToolBar( KadasRichTextEditor *editor, QWidget *parent )
-  : QToolBar( parent ), m_link_action( new QAction( this ) ), m_image_action( new QAction( this ) ), m_color_action( new KadasColorAction( this ) ), m_font_size_input( new QComboBox ), m_editor( editor )
+  : QToolBar( parent )
+  , m_link_action( new QAction( this ) )
+  , m_image_action( new QAction( this ) )
+  , m_color_action( new KadasColorAction( this ) )
+  , m_font_size_input( new QComboBox )
+  , m_editor( editor )
 {
   // Font size combo box
   m_font_size_input->setEditable( false );
@@ -415,15 +421,15 @@ KadasRichTextEditorToolBar::KadasRichTextEditorToolBar( KadasRichTextEditor *edi
   // Bold, italic and underline buttons
 
   m_bold_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textbold" ), tr( "Bold" ), editor, SLOT( setFontBold( bool ) ), editor, this );
-  m_bold_action->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_B ) );
+  m_bold_action->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_B ) );
   addAction( m_bold_action );
 
   m_italic_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textitalic" ), tr( "Italic" ), editor, SLOT( setFontItalic( bool ) ), editor, this );
-  m_italic_action->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_I ) );
+  m_italic_action->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_I ) );
   addAction( m_italic_action );
 
   m_underline_action = createCheckableAction( QIcon( ":/kadas/icons/texteditor/textunder" ), tr( "Underline" ), editor, SLOT( setFontUnderline( bool ) ), editor, this );
-  m_underline_action->setShortcut( QKeySequence( Qt::CTRL + Qt::Key_U ) );
+  m_underline_action->setShortcut( QKeySequence( Qt::CTRL | Qt::Key_U ) );
   addAction( m_underline_action );
 
   addSeparator();

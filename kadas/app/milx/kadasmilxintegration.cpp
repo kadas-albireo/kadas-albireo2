@@ -120,9 +120,7 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
 
   mMilxLibrary = new KadasMilxLibrary( kApp->mainWindow()->winId() );
 
-  KadasMapItemEditor::registry()->insert( "KadasMilxEditor", [this]( KadasMapItem *item, KadasMapItemEditor::EditorType type ) {
-    return new KadasMilxEditor( item, type, mMilxLibrary );
-  } );
+  KadasMapItemEditor::registry()->insert( "KadasMilxEditor", [this]( KadasMapItem *item, KadasMapItemEditor::EditorType type ) { return new KadasMilxEditor( item, type, mMilxLibrary ); } );
 
   kApp->mainWindow()->addCustomDropHandler( &mDropHandler );
 
@@ -165,8 +163,8 @@ void KadasMilxIntegration::createMilx( bool active )
   QgsMapCanvas *canvas = kApp->mainWindow()->mapCanvas();
   if ( active )
   {
-    KadasLayerSelectionWidget::LayerFilter layerFilter = [=]( QgsMapLayer *layer ) { return dynamic_cast<KadasMilxLayer *>( layer ); };
-    KadasLayerSelectionWidget::LayerCreator layerCreator = [=]( const QString &name ) { return new KadasMilxLayer( name ); };
+    KadasLayerSelectionWidget::LayerFilter layerFilter = []( QgsMapLayer *layer ) { return dynamic_cast<KadasMilxLayer *>( layer ); };
+    KadasLayerSelectionWidget::LayerCreator layerCreator = []( const QString &name ) { return new KadasMilxLayer( name ); };
 
     KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, std::make_unique<KadasMilxInterface>(), getOrCreateLayer() );
     tool->setAction( mUi.mActionMilx );

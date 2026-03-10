@@ -23,8 +23,7 @@
 
 KadasMapToolSelectRect::KadasMapToolSelectRect( QgsMapCanvas *mapCanvas )
   : QgsMapTool( mapCanvas )
-{
-}
+{}
 
 void KadasMapToolSelectRect::setRect( const QgsRectangle &rect )
 {
@@ -59,10 +58,10 @@ void KadasMapToolSelectRect::canvasMoveEvent( QgsMapMouseEvent *e )
   {
     // Determine cursor
     QRectF r = canvasRect( mRect );
-    bool left = qAbs( r.left() - e->x() ) < tol;
-    bool right = qAbs( r.right() - e->x() ) < tol;
-    bool top = qAbs( r.top() - e->y() ) < tol;
-    bool bottom = qAbs( r.bottom() - e->y() ) < tol;
+    bool left = qAbs( r.left() - e->position().x() ) < tol;
+    bool right = qAbs( r.right() - e->position().x() ) < tol;
+    bool top = qAbs( r.top() - e->position().y() ) < tol;
+    bool bottom = qAbs( r.bottom() - e->position().y() ) < tol;
 
     if ( mResizeAllowed )
     {
@@ -175,25 +174,25 @@ void KadasMapToolSelectRect::canvasPressEvent( QgsMapMouseEvent *e )
       mResizePoints = QList<QgsPointXY>() << QgsPointXY( mRect.xMinimum(), mRect.yMinimum() ) << QgsPointXY( mRect.xMaximum(), mRect.yMaximum() );
       mResizeMoveOffset = QgsPointXY();
 
-      if ( qAbs( p1.x() - e->x() ) < tol )
+      if ( qAbs( p1.x() - e->position().x() ) < tol )
       {
         mResizeHandlers.append( [this]( const QgsPointXY &p ) { mResizePoints[0].setX( p.x() ); } );
-        mResizeMoveOffset.setX( ( e->x() - p1.x() ) * mup );
+        mResizeMoveOffset.setX( ( e->position().x() - p1.x() ) * mup );
       }
-      else if ( qAbs( p2.x() - e->x() ) < tol )
+      else if ( qAbs( p2.x() - e->position().x() ) < tol )
       {
         mResizeHandlers.append( [this]( const QgsPointXY &p ) { mResizePoints[1].setX( p.x() ); } );
-        mResizeMoveOffset.setX( ( e->x() - p2.x() ) * mup );
+        mResizeMoveOffset.setX( ( e->position().x() - p2.x() ) * mup );
       }
-      if ( qAbs( p1.y() - e->y() ) < tol )
+      if ( qAbs( p1.y() - e->position().y() ) < tol )
       {
         mResizeHandlers.append( [this]( const QgsPointXY &p ) { mResizePoints[1].setY( p.y() ); } );
-        mResizeMoveOffset.setY( -( e->y() - p1.y() ) * mup );
+        mResizeMoveOffset.setY( -( e->position().y() - p1.y() ) * mup );
       }
-      else if ( qAbs( p2.y() - e->y() ) < tol )
+      else if ( qAbs( p2.y() - e->position().y() ) < tol )
       {
         mResizeHandlers.append( [this]( const QgsPointXY &p ) { mResizePoints[0].setY( p.y() ); } );
-        mResizeMoveOffset.setY( -( e->y() - p2.y() ) * mup );
+        mResizeMoveOffset.setY( -( e->position().y() - p2.y() ) * mup );
       }
     }
 

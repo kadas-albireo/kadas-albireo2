@@ -33,7 +33,7 @@ KadasPhongMaterialWidget::KadasPhongMaterialWidget( QWidget *parent, bool hasOpa
   connect( btnDiffuse, &QgsColorButton::colorChanged, this, &KadasPhongMaterialWidget::changed );
   connect( btnAmbient, &QgsColorButton::colorChanged, this, &KadasPhongMaterialWidget::changed );
   connect( btnSpecular, &QgsColorButton::colorChanged, this, &KadasPhongMaterialWidget::changed );
-  connect( spinShininess, static_cast<void ( QDoubleSpinBox::* )( double )>( &QDoubleSpinBox::valueChanged ), this, [=] {
+  connect( spinShininess, static_cast<void ( QDoubleSpinBox::* )( double )>( &QDoubleSpinBox::valueChanged ), this, [this] {
     updateWidgetState();
     emit changed();
   } );

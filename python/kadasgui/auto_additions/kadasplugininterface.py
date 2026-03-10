@@ -121,6 +121,8 @@ KadasPluginInterface.ActionClassicMenuLocation.__doc__ = """
 # --
 try:
     KadasPluginInterface.cast = staticmethod(KadasPluginInterface.cast)
+    KadasPluginInterface.__virtual_methods__ = ['addAction', 'addActionMenu', 'removeAction']
+    KadasPluginInterface.__abstract_methods__ = ['getClassicMenu', 'getSubMenu', 'getRibbonWidget', 'getRibbonTabWidget', 'addAction', 'addActionMenu', 'addActionMapCanvasRightClick', 'removeAction', 'removeActionMenu', 'removeActionMapCanvasRightClick', 'findAction', 'findObject', 'createNewPrintLayout', 'deletePrintLayout', 'printLayouts', 'showLayoutDesigner', 'saveProject', 'addVectorLayerQuiet', 'addRasterLayerQuiet', 'addVectorTileLayerQuiet', 'addPointCloudLayerQuiet']
     KadasPluginInterface.__signal_arguments__ = {'printLayoutAdded': ['layout: QgsPrintLayout'], 'printLayoutWillBeRemoved': ['layout: QgsPrintLayout']}
-except AttributeError:
+except (NameError, AttributeError):
     pass

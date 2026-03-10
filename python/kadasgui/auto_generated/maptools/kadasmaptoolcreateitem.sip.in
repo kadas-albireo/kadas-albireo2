@@ -16,10 +16,10 @@ class KadasMapToolCreateItem : QgsMapTool
 %Docstring(signature="appended")
 *************************************************************************
 
-This program is free software; you can redistribute it and/or modify  *
-it under the terms of the GNU General Public License as published by  *
-the Free Software Foundation; either version 2 of the License, or     *
-(at your option) any later version.                                   *
+This program is free software; you can redistribute it and/or modify *
+it under the terms of the GNU General Public License as published by *
+the Free Software Foundation; either version 2 of the License, or * (at
+your option) any later version. *
 
 **************************************************************************
 %End
@@ -61,7 +61,6 @@ the Free Software Foundation; either version 2 of the License, or     *
 
     // TODO: creator should be optional
     void showLayerSelection( bool enabled, QgsLayerTreeView *layerTreeView, SIP_PYCALLABLE filter, SIP_PYCALLABLE creator );
-    // clang-format off
 %MethodCode
 
     // Make sure the callables doesn't get garbage collected, this is needed because refcount for a1/a2 is 0
@@ -104,7 +103,6 @@ the Free Software Foundation; either version 2 of the License, or     *
     Py_END_ALLOW_THREADS
 
 %End
-    // clang-format on
     void addPartFromGeometry( const QgsAbstractGeometry &geom, const QgsCoordinateReferenceSystem &crs );
     void addPoint( const KadasMapPos &mapPos );
 

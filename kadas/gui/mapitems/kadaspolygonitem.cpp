@@ -230,8 +230,7 @@ KadasMapItem::EditContext KadasPolygonItem::getEditContext( const KadasMapPos &p
 
 void KadasPolygonItem::edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings )
 {
-  if ( context.vidx.part >= 0 && context.vidx.part < state()->points.size()
-       && context.vidx.vertex >= 0 && context.vidx.vertex < state()->points[context.vidx.part].size() )
+  if ( context.vidx.part >= 0 && context.vidx.part < state()->points.size() && context.vidx.vertex >= 0 && context.vidx.vertex < state()->points[context.vidx.part].size() )
   {
     state()->points[context.vidx.part][context.vidx.vertex] = toItemPos( newPoint, mapSettings );
     recomputeDerived();
@@ -269,7 +268,7 @@ void KadasPolygonItem::populateContextMenu( QMenu *menu, const EditContext &cont
   }
   else
   {
-    menu->addAction( QIcon( ":/kadas/icons/add_node" ), tr( "Add node" ), menu, [=] {
+    menu->addAction( QIcon( ":/kadas/icons/add_node" ), tr( "Add node" ), menu, [=, this] {
       KadasItemPos newPos = toItemPos( clickPos, mapSettings );
       QgsVertexId insPoint = insertionPoint( constState()->points, newPos );
       state()->points[insPoint.part].insert( insPoint.vertex, newPos );

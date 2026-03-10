@@ -40,8 +40,7 @@ KadasNineCellFilter::KadasNineCellFilter( const QgsRasterLayer *layer, const QSt
   , mInputNodataValue( -1.0 )
   , mOutputNodataValue( -1.0 )
   , mZFactor( -1 )
-{
-}
+{}
 
 
 int KadasNineCellFilter::processRaster( QProgressDialog *p, QString &errorMsg )
@@ -224,15 +223,18 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p, QString &errorMsg )
     {
       if ( j == 0 )
       {
-        resultLine[j] = processNineCellWindow( &mInputNodataValue, &scanLine1[j], &scanLine1[j + 1], &mInputNodataValue, &scanLine2[j], &scanLine2[j + 1], &mInputNodataValue, &scanLine3[j], &scanLine3[j + 1] );
+        resultLine[j]
+          = processNineCellWindow( &mInputNodataValue, &scanLine1[j], &scanLine1[j + 1], &mInputNodataValue, &scanLine2[j], &scanLine2[j + 1], &mInputNodataValue, &scanLine3[j], &scanLine3[j + 1] );
       }
       else if ( j == xSize - 1 )
       {
-        resultLine[j] = processNineCellWindow( &scanLine1[j - 1], &scanLine1[j], &mInputNodataValue, &scanLine2[j - 1], &scanLine2[j], &mInputNodataValue, &scanLine3[j - 1], &scanLine3[j], &mInputNodataValue );
+        resultLine[j]
+          = processNineCellWindow( &scanLine1[j - 1], &scanLine1[j], &mInputNodataValue, &scanLine2[j - 1], &scanLine2[j], &mInputNodataValue, &scanLine3[j - 1], &scanLine3[j], &mInputNodataValue );
       }
       else
       {
-        resultLine[j] = processNineCellWindow( &scanLine1[j - 1], &scanLine1[j], &scanLine1[j + 1], &scanLine2[j - 1], &scanLine2[j], &scanLine2[j + 1], &scanLine3[j - 1], &scanLine3[j], &scanLine3[j + 1] );
+        resultLine[j]
+          = processNineCellWindow( &scanLine1[j - 1], &scanLine1[j], &scanLine1[j + 1], &scanLine2[j - 1], &scanLine2[j], &scanLine2[j + 1], &scanLine3[j - 1], &scanLine3[j], &scanLine3[j + 1] );
       }
     }
 
@@ -281,7 +283,9 @@ GDALDatasetH KadasNineCellFilter::openInputFile( int &nCellsX, int &nCellsY )
   return inputDataset;
 }
 
-bool KadasNineCellFilter::computeWindow( GDALDatasetH dataset, const QgsCoordinateReferenceSystem &datasetCrs, const QgsRectangle &region, const QgsCoordinateReferenceSystem &regionCrs, int &rowStart, int &rowEnd, int &colStart, int &colEnd )
+bool KadasNineCellFilter::computeWindow(
+  GDALDatasetH dataset, const QgsCoordinateReferenceSystem &datasetCrs, const QgsRectangle &region, const QgsCoordinateReferenceSystem &regionCrs, int &rowStart, int &rowEnd, int &colStart, int &colEnd
+)
 {
   int nCellsX = GDALGetRasterXSize( dataset );
   int nCellsY = GDALGetRasterYSize( dataset );

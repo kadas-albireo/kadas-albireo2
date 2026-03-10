@@ -56,8 +56,8 @@ KadasMapItem *KadasRouteInterface::createItem() const
 KadasGpxIntegration::KadasGpxIntegration( QAction *actionWaypoint, QAction *actionRoute, QAction *actionExportGpx, QAction *actionImportGpx, QObject *parent )
   : QObject( parent )
 {
-  connect( actionWaypoint, &QAction::triggered, this, [=]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasWayPointInterface>( KadasWayPointInterface() ) ) ); } );
-  connect( actionRoute, &QAction::triggered, this, [=]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasRouteInterface>( KadasRouteInterface() ) ) ); } );
+  connect( actionWaypoint, &QAction::triggered, this, [=, this]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasWayPointInterface>( KadasWayPointInterface() ) ) ); } );
+  connect( actionRoute, &QAction::triggered, this, [=, this]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasRouteInterface>( KadasRouteInterface() ) ) ); } );
   connect( actionExportGpx, &QAction::triggered, this, &KadasGpxIntegration::saveGpx );
   connect( actionImportGpx, &QAction::triggered, this, &KadasGpxIntegration::openGpx );
 
@@ -82,7 +82,9 @@ void KadasGpxIntegration::toggleCreateItem( bool active, std::unique_ptr<KadasMa
   {
     KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, std::move( interface ), getOrCreateLayer() );
     tool->setAction( action );
-    KadasLayerSelectionWidget::LayerFilter filter = []( QgsMapLayer *layer ) { return dynamic_cast<KadasItemLayer *>( layer ) && static_cast<KadasItemLayer *>( layer )->layerTypeKey() == QString( "KadasItemLayer" ); };
+    KadasLayerSelectionWidget::LayerFilter filter = []( QgsMapLayer *layer ) {
+      return dynamic_cast<KadasItemLayer *>( layer ) && static_cast<KadasItemLayer *>( layer )->layerTypeKey() == QString( "KadasItemLayer" );
+    };
     KadasLayerSelectionWidget::LayerCreator creator = []( const QString &name ) {
       return QgsProject::instance()->addMapLayer( new KadasItemLayer( name, QgsCoordinateReferenceSystem( "EPSG:3857" ) ) );
     };

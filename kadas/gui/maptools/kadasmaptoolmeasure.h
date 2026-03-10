@@ -45,7 +45,8 @@ class KADAS_GUI_EXPORT KadasMeasureWidget : public KadasMapItemEditor
     };
     Q_ENUM( AzimuthNorth )
 
-    static const inline QgsSettingsEntryEnumFlag<AzimuthNorth> *settingsLastAzimuthNorth = new QgsSettingsEntryEnumFlag<AzimuthNorth>( QStringLiteral( "last-azimuth-north" ), KadasSettingsTree::sTreeKadas, AzimuthNorth::AzimuthGeoNorth ) SIP_SKIP;
+    static const inline QgsSettingsEntryEnumFlag<AzimuthNorth> *settingsLastAzimuthNorth
+      = new QgsSettingsEntryEnumFlag<AzimuthNorth>( QStringLiteral( "last-azimuth-north" ), KadasSettingsTree::sTreeKadas, AzimuthNorth::AzimuthGeoNorth ) SIP_SKIP;
 
 
     KadasMeasureWidget( KadasMapItem *item );
@@ -105,7 +106,10 @@ class KADAS_GUI_EXPORT KadasMapToolMeasureItemInterface : public KadasMapItemInt
 {
   public:
     KadasMapToolMeasureItemInterface( QgsMapCanvas *mapCanvas, KadasMapToolMeasure::MeasureMode measureMode )
-      : KadasMapItemInterface(), mCanvas( mapCanvas ), mMeasureMode( measureMode ) {}
+      : KadasMapItemInterface()
+      , mCanvas( mapCanvas )
+      , mMeasureMode( measureMode )
+    {}
     KadasMapItem *createItem() const override;
 
   private:

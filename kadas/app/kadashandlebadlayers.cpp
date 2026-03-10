@@ -45,7 +45,7 @@ KadasHandleBadLayers::KadasHandleBadLayers( const QList<QDomNode> &layers )
 
   mLayerList = new QTableWidget();
   layout()->addWidget( mLayerList );
-  layout()->setMargin( 2 );
+  layout()->setContentsMargins( 2, 2, 2, 2 );
   resize( 640, 240 );
 
   QDialogButtonBox *buttonBox = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel );

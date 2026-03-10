@@ -13,3 +13,8 @@ KadasMapItemEditor.EditorType.__doc__ = """
 
 """
 # --
+try:
+    KadasMapItemEditor.__virtual_methods__ = ['setItem', 'reset']
+    KadasMapItemEditor.__abstract_methods__ = ['syncItemToWidget', 'syncWidgetToItem']
+except (NameError, AttributeError):
+    pass

@@ -100,7 +100,9 @@ class KadasGuideGridLayerType : public KadasPluginLayerType
 
   public:
     KadasGuideGridLayerType( QAction *actionGuideGridTool )
-      : KadasPluginLayerType( KadasGuideGridLayer::layerType() ), mActionGuideGridTool( actionGuideGridTool ) {}
+      : KadasPluginLayerType( KadasGuideGridLayer::layerType() )
+      , mActionGuideGridTool( actionGuideGridTool )
+    {}
     void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const override;
     QgsPluginLayer *createLayer() override { return new KadasGuideGridLayer( "" ); }
     QgsPluginLayer *createLayer( const QString &uri ) override { return new KadasGuideGridLayer( "" ); }

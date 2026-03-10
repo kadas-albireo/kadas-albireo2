@@ -174,7 +174,7 @@ void KadasMapToolEditItem::canvasPressEvent( QgsMapMouseEvent *e )
       }
       KadasItemContextMenuActions actions( mCanvas, &menu, mItem, mLayer );
       connect( mItem, &QObject::destroyed, this, &KadasMapToolEditItem::itemDestroyed );
-      QAction *clickedAction = menu.exec( e->globalPos() );
+      QAction *clickedAction = menu.exec( e->globalPosition().toPoint() );
       if ( mItem )
       {
         disconnect( mItem, &QObject::destroyed, this, &KadasMapToolEditItem::itemDestroyed );
@@ -248,7 +248,7 @@ void KadasMapToolEditItem::canvasMoveEvent( QgsMapMouseEvent *e )
       mInputWidget->inputField( it.key() )->setValue( it.value() );
     }
 
-    mInputWidget->move( e->x(), e->y() + 20 );
+    mInputWidget->move( e->position().x(), e->position().y() + 20 );
     mInputWidget->show();
     if ( mInputWidget->focusedInputField() )
     {

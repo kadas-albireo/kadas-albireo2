@@ -25,7 +25,7 @@ Kadas3DLayerTreeModel::Kadas3DLayerTreeModel( Qgs3DMapCanvas *mapCanvas )
 
   setLayerTreeModel( new QgsLayerTreeModel( QgsProject::instance()->layerTreeRoot(), this ) );
 
-  connect( QgsProject::instance(), &QgsProject::readProject, this, [=] {
+  connect( QgsProject::instance(), &QgsProject::readProject, this, [=, this] {
     beginResetModel();
     mShownLayers.clear();
     visibleLayers( QgsProject::instance()->layerTreeRoot(), mShownLayers );
@@ -102,7 +102,8 @@ void Kadas3DLayerTreeModel::setFilterText( const QString &filterText )
     return;
 
   mFilterText = filterText;
-  invalidateFilter();
+  beginFilterChange();
+  endFilterChange();
 }
 
 QgsLayerTreeModel *Kadas3DLayerTreeModel::layerTreeModel() const

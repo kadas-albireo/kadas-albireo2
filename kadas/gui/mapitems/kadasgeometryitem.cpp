@@ -151,7 +151,9 @@ QString KadasGeometryItem::asKml( const QgsRenderContext &context, QuaZip *kmzZi
     return QString();
   }
 
-  auto color2hex = []( const QColor &c ) { return QString( "%1%2%3%4" ).arg( c.alpha(), 2, 16, QChar( '0' ) ).arg( c.blue(), 2, 16, QChar( '0' ) ).arg( c.green(), 2, 16, QChar( '0' ) ).arg( c.red(), 2, 16, QChar( '0' ) ); };
+  auto color2hex = []( const QColor &c ) {
+    return QString( "%1%2%3%4" ).arg( c.alpha(), 2, 16, QChar( '0' ) ).arg( c.blue(), 2, 16, QChar( '0' ) ).arg( c.green(), 2, 16, QChar( '0' ) ).arg( c.red(), 2, 16, QChar( '0' ) );
+  };
 
   QString outString;
   QTextStream outStream( &outString );
@@ -279,7 +281,14 @@ bool KadasGeometryItem::intersects( const KadasMapRect &rect, const QgsMapSettin
 
   QgsPolygon filterRect;
   QgsLineString *exterior = new QgsLineString();
-  exterior->setPoints( QgsPointSequence() << QgsPoint( r.xMinimum(), r.yMinimum() ) << QgsPoint( r.xMaximum(), r.yMinimum() ) << QgsPoint( r.xMaximum(), r.yMaximum() ) << QgsPoint( r.xMinimum(), r.yMaximum() ) << QgsPoint( r.xMinimum(), r.yMinimum() ) );
+  exterior->setPoints(
+    QgsPointSequence()
+    << QgsPoint( r.xMinimum(), r.yMinimum() )
+    << QgsPoint( r.xMaximum(), r.yMinimum() )
+    << QgsPoint( r.xMaximum(), r.yMaximum() )
+    << QgsPoint( r.xMinimum(), r.yMaximum() )
+    << QgsPoint( r.xMinimum(), r.yMinimum() )
+  );
   filterRect.setExteriorRing( exterior );
 
   QgsGeometryEngine *geomEngine = QgsGeometry::createGeometryEngine( &filterRect );
@@ -459,7 +468,7 @@ void KadasGeometryItem::addMeasurements( const QStringList &measurements, const 
   }
   if ( !measurements.isEmpty() )
   {
-    mMeasurementLabels.append( MeasurementLabel { measurements.join( "\n" ), mapPos, width, metrics.height() * measurements.size(), center } );
+    mMeasurementLabels.append( MeasurementLabel { measurements.join( "\n" ), mapPos, width, static_cast<int>( metrics.height() * measurements.size() ), center } );
   }
 }
 
@@ -468,8 +477,7 @@ static KadasItemPos projectPointOnSegment( const KadasItemPos &p, const KadasIte
   double nx = s2.y() - s1.y();
   double ny = -( s2.x() - s1.x() );
   double t = ( p.x() * ny - p.y() * nx - s1.x() * ny + s1.y() * nx ) / ( ( s2.x() - s1.x() ) * ny - ( s2.y() - s1.y() ) * nx );
-  return t < 0. ? s1 : t > 1. ? s2
-                              : KadasItemPos( s1.x() + ( s2.x() - s1.x() ) * t, s1.y() + ( s2.y() - s1.y() ) * t );
+  return t < 0. ? s1 : t > 1. ? s2 : KadasItemPos( s1.x() + ( s2.x() - s1.x() ) * t, s1.y() + ( s2.y() - s1.y() ) * t );
 }
 
 QgsVertexId KadasGeometryItem::insertionPoint( const QList<QList<KadasItemPos>> &points, const KadasItemPos &testPos ) const

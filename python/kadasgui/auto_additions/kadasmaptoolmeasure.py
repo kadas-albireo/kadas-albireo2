@@ -22,3 +22,15 @@ KadasMapToolMeasure.MeasureMode.__doc__ = """
 
 """
 # --
+try:
+    KadasMeasureWidget.__overridden_methods__ = ['syncItemToWidget', 'syncWidgetToItem', 'setItem']
+except (NameError, AttributeError):
+    pass
+try:
+    KadasMapToolMeasure.__overridden_methods__ = ['activate', 'canvasPressEvent', 'canvasMoveEvent', 'canvasReleaseEvent', 'keyReleaseEvent']
+except (NameError, AttributeError):
+    pass
+try:
+    KadasMapToolMeasureItemInterface.__overridden_methods__ = ['createItem']
+except (NameError, AttributeError):
+    pass

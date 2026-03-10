@@ -106,8 +106,7 @@ double KadasCoordinateUtils::getHeightAtPos( const QgsPointXY &p, const QgsCoord
   double lambdaR = row - std::floor( row );
   double lambdaC = col - std::floor( col );
 
-  double value = ( pixValues[0] * ( 1. - lambdaC ) + pixValues[1] * lambdaC ) * ( 1. - lambdaR )
-                 + ( pixValues[2] * ( 1. - lambdaC ) + pixValues[3] * lambdaC ) * ( lambdaR );
+  double value = ( pixValues[0] * ( 1. - lambdaC ) + pixValues[1] * lambdaC ) * ( 1. - lambdaR ) + ( pixValues[2] * ( 1. - lambdaC ) + pixValues[3] * lambdaC ) * ( lambdaR );
   if ( rasterCrs.mapUnits() != unit )
   {
     value *= QgsUnitTypes::fromUnitToUnitFactor( vertUnit, unit );

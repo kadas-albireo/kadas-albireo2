@@ -47,10 +47,22 @@ class KADAS_GUI_EXPORT KadasCatalogProvider : public QObject
 
     QList<QDomNode> childrenByTagName( const QDomElement &element, const QString &tagName ) const;
     QMap<QString, QString> parseWMTSTileMatrixSets( const QDomDocument &doc ) const;
-    void parseWMTSLayerCapabilities( const QDomNode &layerItem, const QMap<QString, QString> &tileMatrixSetMap, const QString &url, const QString &layerInfoUrl, const QString &extraParams, QString &title, QString &layerid, const QString &authCfg, QMimeData *&mimeData ) const;
+    void parseWMTSLayerCapabilities(
+      const QDomNode &layerItem,
+      const QMap<QString, QString> &tileMatrixSetMap,
+      const QString &url,
+      const QString &layerInfoUrl,
+      const QString &extraParams,
+      QString &title,
+      QString &layerid,
+      const QString &authCfg,
+      QMimeData *&mimeData
+    ) const;
     QStringList parseWMSFormats( const QDomDocument &doc ) const;
     QString parseWMSNestedLayer( const QDomNode &layerItem ) const;
-    bool parseWMSLayerCapabilities( const QDomNode &layerItem, const QString &title, const QStringList &imgFormats, const QStringList &parentCrs, const QString &url, const QString &layerInfoUrl, const QString &authCfg, QMimeData *&mimeData ) const;
+    bool parseWMSLayerCapabilities(
+      const QDomNode &layerItem, const QString &title, const QStringList &imgFormats, const QStringList &parentCrs, const QString &url, const QString &layerInfoUrl, const QString &authCfg, QMimeData *&mimeData
+    ) const;
     QStandardItem *getCategoryItem( const QStringList &titles, const QStringList &sortIndices );
 
 #ifndef SIP_RUN
@@ -63,7 +75,9 @@ class KADAS_GUI_EXPORT KadasCatalogProvider : public QObject
           , sortIndices( _sortIndices )
         {}
 
-        ResultEntry( const QString &_url, const QString &_id, const QString &_category, const QString &_title, const QString &_sortIndices, const QString &_metadataUrl, const QString &_detailUrl, bool _flatten = false )
+        ResultEntry(
+          const QString &_url, const QString &_id, const QString &_category, const QString &_title, const QString &_sortIndices, const QString &_metadataUrl, const QString &_detailUrl, bool _flatten = false
+        )
           : url( _url )
           , id( _id )
           , category( _category )
