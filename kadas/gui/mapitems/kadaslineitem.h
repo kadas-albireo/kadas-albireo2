@@ -17,6 +17,9 @@
 #ifndef KADASLINEITEM_H
 #define KADASLINEITEM_H
 
+#include "qgis/qgsannotationlineitem.h"
+
+#include "kadas/gui/mapitems/kadasmapitem.h"
 #include "kadas/gui/mapitems/kadasgeometryitem.h"
 
 class QgsMultiLineString;
@@ -26,8 +29,16 @@ class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
     Q_OBJECT
     Q_PROPERTY( bool geodesic READ geodesic WRITE setGeodesic )
 
+    Q_PROPERTY( QColor mFillColor READ color WRITE setColor )
+    Q_PROPERTY( QColor mColor READ color WRITE setColor )
+    Q_PROPERTY( double mStrokeWidth READ strokeWidth WRITE setStrokeWidth )
+    Q_PROPERTY( Qt::PenStyle mStrokeStyle READ strokeStyle WRITE setStrokeStyle )
+
   public:
     KadasLineItem( const QgsCoordinateReferenceSystem &crs, bool geodesic = false );
+
+    //virtual QgsAnnotationLineItem *annotationItem() const override { return mQgsItem; }
+    QgsAnnotationLineItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const override SIP_FACTORY { return mQgsItem; };
 
     bool geodesic() const { return mGeodesic; }
     void setGeodesic( bool geodesic );
@@ -55,8 +66,6 @@ class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
     AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
     KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
 
-    KadasItemPos position() const override;
-    void setPosition( const KadasItemPos &pos ) override;
 
     Qgis::GeometryType geometryType() const override { return Qgis::GeometryType::Line; }
 
@@ -86,11 +95,28 @@ class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
     };
     const State *constState() const { return static_cast<State *>( mState ); }
 
+    void translate( double dx, double dy ) override;
+    QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
+
+
+    void render( QgsRenderContext &context ) const override;
+
+
   protected:
     KadasMapItem *_clone() const override SIP_FACTORY;
     State *createEmptyState() const override SIP_FACTORY { return new State(); }
     void recomputeDerived() override;
     void measureGeometry() override;
+
+    void setColor( const QColor &color );
+    QColor color() const { return mColor; }
+    double strokeWidth() const { return mStrokeWidth2; }
+    void setStrokeWidth( double width );
+    void setStrokeStyle( const Qt::PenStyle &style );
+    Qt::PenStyle strokeStyle() const { return mStrokeStyle2; };
+
+    void updateQgsAnnotation();
+
 
   private:
     enum AttribIds
@@ -98,6 +124,8 @@ class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
       AttrX,
       AttrY
     };
+
+    QgsAnnotationLineItem *mQgsItem = nullptr;
 
     bool mGeodesic = false;
     MeasurementMode mMeasurementMode = MeasurementMode::MeasureLineAndSegments;
@@ -107,6 +135,12 @@ class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
     State *state() { return static_cast<State *>( mState ); }
 
     double computeSegmentAzimut( const KadasItemPos &p1, const KadasItemPos &p2, bool geoNorth ) const;
+
+    QColor mStrokeColor2 = Qt::red;
+    double mStrokeWidth2 = 1;
+    QColor mColor = Qt::white;
+    //QColor mFillColor2 = Qt::white;
+    Qt::PenStyle mStrokeStyle2 = Qt::PenStyle::SolidLine;
 };
 
 #endif // KADASLINEITEM_H
