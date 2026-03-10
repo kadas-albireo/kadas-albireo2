@@ -30,10 +30,20 @@ if(MSVC)
     install(DIRECTORY "${VCPKG_BASE_DIR}/plugins/renderers/"
             DESTINATION "bin/plugins/renderers/"
     )
+  else()
+    message(
+      WARNING
+        "QGIS 3D renderers plugin directory not found: ${VCPKG_BASE_DIR}/plugins/renderers/"
+    )
   endif()
   if(EXISTS "${VCPKG_BASE_DIR}/plugins/renderplugins/")
     install(DIRECTORY "${VCPKG_BASE_DIR}/plugins/renderplugins/"
             DESTINATION "bin/plugins/renderplugins/"
+    )
+  else()
+    message(
+      WARNING
+        "QGIS 3D renderplugins directory not found: ${VCPKG_BASE_DIR}/plugins/renderplugins/"
     )
   endif()
 
