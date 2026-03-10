@@ -165,6 +165,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: kadas-albireo2-portable
+          archive: false
           path: |
             build/kadas-*.zip
 
@@ -173,6 +174,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: kadas-albireo2-msi
+          archive: false
           path: |
             build/kadas-win64-*.msi
 
@@ -200,3 +202,15 @@ jobs:
           files: |
             build/kadas-*.zip
             build/kadas-*.msi
+
+      - name: 💬 Sticky comment on PR
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: windows-artifacts
+          message: |
+            ## 🪟 Windows Build Artifacts
+
+            📦 [Download portable ZIP](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)
+
+            <sub>Built from ${{ github.event.pull_request.head.sha }} • [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})</sub>
