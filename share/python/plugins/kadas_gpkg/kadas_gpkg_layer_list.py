@@ -13,7 +13,7 @@ class KadasGpkgLayersList(QListWidget):
     LayerSizeRole = Qt.UserRole + 3
     LayerProviderNameRole = Qt.UserRole + 4
     WARN_SIZE = 50 * 1024 * 1024
-    PROJECT_LAYER_PROVIDERS = ["bullseye", "guide_grid", "KadasItemLayer"]
+    PROJECT_LAYER_PROVIDERS = ["bullseye", "guide_grid", "KadasItemLayer", "annotation"]
 
     def __init__(self, parent):
 
@@ -51,7 +51,9 @@ class KadasGpkgLayersList(QListWidget):
             item.setData(KadasGpkgLayersList.LayerIdRole, layerid)
             item.setData(KadasGpkgLayersList.LayerTypeRole, layer.type())
             item.setData(KadasGpkgLayersList.LayerSizeRole, file_size)
-            item.setData(KadasGpkgLayersList.LayerProviderNameRole, layer.dataProvider().name())
+            item.setData(
+                KadasGpkgLayersList.LayerProviderNameRole, layer.dataProvider().name()
+            )
             if file_size is not None and file_size < KadasGpkgLayersList.WARN_SIZE:
                 item.setCheckState(Qt.Checked)
                 item.setIcon(QIcon())
