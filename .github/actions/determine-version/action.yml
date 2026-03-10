@@ -1,0 +1,65 @@
+name: Determine KADAS version
+description: >
+  Determines MAJOR.MINOR.PATCH version from the build context:
+  PR builds use 0.0.<PR number>, tag builds parse the tag,
+  branch builds use the latest tag with patch set to 99.
+
+inputs:
+  github-token:
+    description: GitHub token for API calls
+    required: true
+
+outputs:
+  version:
+    description: "Full version string (MAJOR.MINOR.PATCH)"
+    value: ${{ steps.version.outputs.version }}
+  major:
+    description: "Major version number"
+    value: ${{ steps.version.outputs.major }}
+  minor:
+    description: "Minor version number"
+    value: ${{ steps.version.outputs.minor }}
+  patch:
+    description: "Patch version number"
+    value: ${{ steps.version.outputs.patch }}
+
+runs:
+  using: composite
+  steps:
+    - id: version
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        GH_REF: ${{ github.ref }}
+      run: |
+        if [[ -n "$PR_NUMBER" ]]; then
+          # Pull Request Build: Use "0.0.PR-number"
+          MAJOR="0"
+          MINOR="0"
+          PATCH="$PR_NUMBER"
+        elif [[ "$GH_REF" == refs/tags/* ]]; then
+          # Release Workflow: Extract version from the tag name
+          VERSION="${GH_REF#refs/tags/v}"
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+        else
+          # Regular Branch Build: Fetch latest tag and set patch to 99
+          RELEASE=$(curl -s "https://api.github.com/repos/${{ github.repository }}/tags" \
+            --header "Authorization: Bearer $GH_TOKEN" | jq -r '.[0].name')
+
+          if [[ -n "$RELEASE" ]]; then
+            RELEASE="${RELEASE#v}"
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$RELEASE"
+          else
+            MAJOR="0"
+            MINOR="0"
+          fi
+
+          PATCH="99"
+        fi
+
+        echo "KADAS Version: v${MAJOR}.${MINOR}.${PATCH}"
+        echo "version=${MAJOR}.${MINOR}.${PATCH}" >> "$GITHUB_OUTPUT"
+        echo "major=${MAJOR}" >> "$GITHUB_OUTPUT"
+        echo "minor=${MINOR}" >> "$GITHUB_OUTPUT"
+        echo "patch=${PATCH}" >> "$GITHUB_OUTPUT"
