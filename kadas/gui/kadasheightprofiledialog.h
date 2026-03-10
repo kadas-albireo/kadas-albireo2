@@ -122,8 +122,10 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
     QPushButton *mCancelButton = nullptr;
     QWidget *mStatisticsWidget = nullptr;
 
-    static const inline QgsSettingsEntryBool *sSettingsShowStatistics = new QgsSettingsEntryBool( QStringLiteral( "heightprofile-show-statistics" ), KadasSettingsTree::sTreeKadas, true );
-    static const inline QgsSettingsEntryBool *sSettingsNodeMarkers = new QgsSettingsEntryBool( QStringLiteral( "heightprofile-node-markers" ), KadasSettingsTree::sTreeKadas, true );
+    static inline QgsSettingsTreeNode *sTreeProfile = KadasSettingsTree::sTreeKadas->createChildNode( QStringLiteral( "height-profile" ) );
+    static const inline QgsSettingsEntryBool *sSettingsShowStatistics = new QgsSettingsEntryBool( QStringLiteral( "show-statistics" ), sTreeProfile, true );
+    static const inline QgsSettingsEntryBool *sSettingsNodeMarkers = new QgsSettingsEntryBool( QStringLiteral( "node-markers" ), sTreeProfile, true );
+    static const inline QgsSettingsEntryString *sSettingsSaveDir = new QgsSettingsEntryString( QStringLiteral( "save-dir" ), sTreeProfile, QDir::homePath() );
 };
 
 #endif // KADASHEIGHTPROFILEDIALOG_H
