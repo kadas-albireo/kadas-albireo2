@@ -39,7 +39,6 @@ cfg = sipconfig.Configuration()
 sip_dir = cfg.default_sip_dir
 for p in (
     os.path.join(sip_dir, "PyQt6"),
-    os.path.join(sip_dir, "PyQt6-3"),
     sip_dir,
     os.path.join(cfg.default_mod_dir, "PyQt6", "bindings"),
 ):
