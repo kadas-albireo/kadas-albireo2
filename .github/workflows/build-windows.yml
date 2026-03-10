@@ -141,6 +141,7 @@ jobs:
           cmake --build build --target bundle --config Release
 
       - name: 📤 Upload portable
+        id: upload-portable
         uses: actions/upload-artifact@v7
         with:
           name: kadas-albireo2-portable
@@ -190,6 +191,6 @@ jobs:
           message: |
             ## 🪟 Windows Build Artifacts
 
-            📦 [Download portable ZIP](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)
+            📦 [Download portable ZIP](${{ steps.upload-portable.outputs.artifact-url }})
 
             <sub>Built from ${{ github.event.pull_request.head.sha }} • [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})</sub>
