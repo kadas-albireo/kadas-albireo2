@@ -861,12 +861,12 @@ void KadasHeightProfileDialog::addToCanvas()
 
 void KadasHeightProfileDialog::saveToFile()
 {
-  QString lastDir = QgsSettings().value( "/kadas/heightprofile_sketchtogis_save_dir", QDir::homePath() ).toString();
+  QString lastDir = sSettingsSaveDir->value();
   QString filename = QFileDialog::getSaveFileName( this, tr( "Save height profile" ), lastDir, tr( "PNG Image (*.png);;JPEG Image (*.jpg);;BMP Image (*.bmp)" ) );
   if ( filename.isEmpty() )
     return;
 
-  QgsSettings().setValue( "/kadas/heightprofile_sketchtogis_save_dir", QFileInfo( filename ).absolutePath() );
+  sSettingsSaveDir->setValue( QFileInfo( filename ).absolutePath() );
   QImage image = renderPlotImage();
   image.save( filename );
 }
