@@ -51,8 +51,7 @@ if(MSVC)
   # everything
   file(GLOB ALL_LIBS "${VCPKG_BASE_DIR}/bin/*.dll")
   install(FILES ${ALL_LIBS} DESTINATION "bin")
-  install(DIRECTORY "${VCPKG_BASE_DIR}/Qt6/" DESTINATION "bin/Qt6/"
-  )
+  install(DIRECTORY "${VCPKG_BASE_DIR}/Qt6/" DESTINATION "bin/Qt6/")
   install(DIRECTORY "${QGIS_PYTHON_DIR}/" DESTINATION "share/qgis/python/")
   install(FILES "${VCPKG_BASE_DIR}/bin/qgis.exe" DESTINATION "bin/")
   install(FILES "${VCPKG_BASE_DIR}/tools/ffmpeg/ffmpeg.exe"
