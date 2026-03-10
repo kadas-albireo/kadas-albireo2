@@ -23,10 +23,16 @@
 
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgslinestring.h>
+#include <qgis/qgslinesymbol.h>
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgsmultilinestring.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsmarkersymbol.h>
+#include <qgis/qgsmarkersymbollayer.h>
+#include <qgis/qgssymbollayerutils.h>
+#include <qgis/qgslinesymbollayer.h>
+#include <qgis/qgslinesymbol.h>
 
 #include "kadas/gui/mapitems/kadaslineitem.h"
 
@@ -74,6 +80,11 @@ bool KadasLineItem::State::deserialize( const QJsonObject &json )
 KadasLineItem::KadasLineItem( const QgsCoordinateReferenceSystem &crs, bool geodesic )
   : KadasGeometryItem( crs )
 {
+  mQgsItem = new QgsAnnotationLineItem( new QgsLineString() );
+  //Line below For testing purpose
+  mQgsItem->setSymbol( QgsLineSymbol::createSimple( { { QString( "color" ), QString( "#000000" ) }, { QString( "outline_width" ), 0.6 } } ).release() );
+  connect( this, &KadasMapItem::zIndexChanged, this, [=]( int index ) { mQgsItem->setZIndex( index ); } );
+
   mGeodesic = geodesic;
   clear();
 }
@@ -85,41 +96,50 @@ void KadasLineItem::setGeodesic( bool geodesic )
   emit propertyChanged();
 }
 
-KadasItemPos KadasLineItem::position() const
+void KadasLineItem::translate( double dx, double dy )
 {
-  double x = 0., y = 0.;
-  int n = 0;
-  for ( const QList<KadasItemPos> &part : constState()->points )
-  {
-    for ( const KadasItemPos &point : part )
-    {
-      x += point.x();
-      y += point.y();
-    }
-    n += part.size();
-  }
-  n = std::max( 1, n );
-  return KadasItemPos( x / n, y / n );
+  QgsCurve *geom = mQgsItem->geometry()->clone();
+
+  geom->transform( QTransform::fromTranslate( dx, dy ) );
+  mQgsItem->setGeometry( geom );
+
+  update();
 }
 
-void KadasLineItem::setPosition( const KadasItemPos &pos )
+QString KadasLineItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const
 {
-  KadasItemPos prevPos = position();
-  double dx = pos.x() - prevPos.x();
-  double dy = pos.y() - prevPos.y();
-  for ( QList<KadasItemPos> &part : state()->points )
+  if ( !mQgsItem )
   {
-    for ( KadasItemPos &point : part )
-    {
-      point.setX( point.x() + dx );
-      point.setY( point.y() + dy );
-    }
+    return QString();
   }
-  if ( mGeometry )
-  {
-    mGeometry->transformVertices( [dx, dy]( const QgsPoint &p ) { return QgsPoint( p.x() + dx, p.y() + dy ); } );
-  }
-  update();
+
+  auto color2hex = []( const QColor &c ) { return QString( "%1%2%3%4" ).arg( c.alpha(), 2, 16, QChar( '0' ) ).arg( c.blue(), 2, 16, QChar( '0' ) ).arg( c.green(), 2, 16, QChar( '0' ) ).arg( c.red(), 2, 16, QChar( '0' ) ); };
+
+  QString outString;
+  QTextStream outStream( &outString );
+  outStream << "<Placemark>\n";
+  outStream << QString( "<name>%1</name>\n" ).arg( exportName() );
+  outStream << "<Style>\n";
+  outStream << QString( "<LineStyle><width>%1</width><color>%2</color></LineStyle>\n<PolyStyle><fill>%3</fill><color>%4</color></PolyStyle>\n" )
+                 .arg( outline().width() )
+                 .arg( color2hex( outline().color() ) )
+                 .arg( fill().style() != Qt::NoBrush ? 1 : 0 )
+                 .arg( color2hex( fill().color() ) );
+  outStream << "</Style>\n";
+  outStream << "<ExtendedData>\n";
+  outStream << "<SchemaData schemaUrl=\"#KadasGeometryItem\">\n";
+  outStream << QString( "<SimpleData name=\"icon_type\">%1</SimpleData>\n" ).arg( static_cast<int>( mIconType ) );
+  outStream << QString( "<SimpleData name=\"outline_style\">%1</SimpleData>\n" ).arg( QgsSymbolLayerUtils::encodePenStyle( mPen.style() ) );
+  outStream << QString( "<SimpleData name=\"fill_style\">%1</SimpleData>\n" ).arg( QgsSymbolLayerUtils::encodeBrushStyle( mBrush.style() ) );
+  outStream << "</SchemaData>\n";
+  outStream << "</ExtendedData>\n";
+  QgsAbstractGeometry *geom = mQgsItem->geometry()->segmentize();
+  geom->transform( QgsCoordinateTransform( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() ) );
+  outStream << geom->asKml( 6 ) << "\n";
+  delete geom;
+  outStream << "</Placemark>\n";
+  outStream.flush();
+  return outString;
 }
 
 QList<KadasMapItem::Node> KadasLineItem::nodes( const QgsMapSettings &settings ) const
@@ -134,6 +154,30 @@ QList<KadasMapItem::Node> KadasLineItem::nodes( const QgsMapSettings &settings )
   }
   return nodes;
 }
+
+void KadasLineItem::render( QgsRenderContext &context ) const
+{
+  QgsFeedback fb;
+  mQgsItem->render( context, &fb );
+
+  //mQgsItem->symbol()->startRender( context );
+  //mQgsItem->symbol()->renderPolyline( mQgsItem->geometry()->asQPolygonF(), nullptr, context );
+  //mQgsItem->symbol()->stopRender( context );
+
+  //  if ( mQgsItem )
+  //  {
+  //    if ( context.painter() )
+  //    {
+  //      //if ( !fb)
+  //      //{
+  //        mQgsItem->render( context, &fb );
+  //      //}
+  //    }
+  //    //mQgsItem->render( context, &fb );
+  //  }
+  //}
+}
+
 
 bool KadasLineItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
 {
@@ -334,6 +378,7 @@ void KadasLineItem::addPartFromGeometry( const QgsAbstractGeometry &geom )
 const QgsMultiLineString *KadasLineItem::geometry() const
 {
   return static_cast<QgsMultiLineString *>( mGeometry );
+  //return static_cast<QgsMultiLineString *>( mQgsItem->geometry() );
 }
 
 QgsMultiLineString *KadasLineItem::geometry()
@@ -352,7 +397,7 @@ void KadasLineItem::setMeasurementMode( MeasurementMode measurementMode, Qgis::A
 KadasMapItem *KadasLineItem::_clone() const
 {
   KadasLineItem *item = new KadasLineItem( crs() );
-  item->mGeometry = mGeometry->clone();
+  item->mQgsItem = mQgsItem->clone();
   return item;
 }
 
@@ -499,5 +544,42 @@ void KadasLineItem::recomputeDerived()
       multiGeom->addGeometry( ring );
     }
   }
-  setInternalGeometry( multiGeom );
+  if ( mQgsItem )
+  {
+    mQgsItem->setGeometry( multiGeom->lineStringN( 1 ) );
+  }
+  //setInternalGeometry( multiGeom );
+}
+
+void KadasLineItem::setColor( const QColor &color )
+{
+  mColor = color;
+  update();
+}
+
+void KadasLineItem::setStrokeWidth( double width )
+{
+  mStrokeWidth2 = width;
+  updateQgsAnnotation();
+  update();
+}
+
+void KadasLineItem::setStrokeStyle( const Qt::PenStyle &style )
+{
+  mStrokeStyle2 = style;
+  updateQgsAnnotation();
+  update();
+}
+
+void KadasLineItem::updateQgsAnnotation()
+{
+  QgsSimpleLineSymbolLayer *symbolLayer = new QgsSimpleLineSymbolLayer();
+  symbolLayer->setWidthUnit( Qgis::RenderUnit::Points );
+  symbolLayer->setWidth( mStrokeWidth2 );
+  //symbolLayer->setStrokeColor( mStrokeColor );
+  symbolLayer->setColor( mColor );
+  symbolLayer->setPenStyle( mStrokeStyle2 );
+  mQgsItem->setSymbol( new QgsLineSymbol( { symbolLayer } ) );
+
+  update();
 }
