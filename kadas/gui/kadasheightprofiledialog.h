@@ -20,7 +20,9 @@
 #include <QDialog>
 
 #include <qgis/qgscoordinatereferencesystem.h>
+#include <qgis/qgssettingsentryimpl.h>
 
+#include "kadas/core/kadassettingstree.h"
 #include "kadas/gui/kadas_gui.h"
 
 class QCheckBox;
@@ -28,6 +30,7 @@ class QComboBox;
 class QDoubleSpinBox;
 class QGroupBox;
 class QLabel;
+class QPainter;
 class QProgressBar;
 
 class QwtPlot;
@@ -61,9 +64,12 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
     void replot();
     void updateLineOfSight();
     void copyToClipboard();
+    void saveToFile();
     void addToCanvas();
     void setMarkerPlotPos( const QPoint &pos );
     void toggleNodeMarkers();
+
+    QImage renderPlotImage();
 
   private:
     class ScaleDraw;
@@ -107,12 +113,19 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
     QgsCoordinateReferenceSystem mPointsCrs;
     int mNSamples = 1000;
     QCheckBox *mNodeMarkersCheckbox = nullptr;
+    QCheckBox *mShowStatisticsCheckbox = nullptr;
     QGroupBox *mLineOfSightGroupBoxgroupBox = nullptr;
     QDoubleSpinBox *mObserverHeightSpinBox = nullptr;
     QDoubleSpinBox *mTargetHeightSpinBox = nullptr;
     QComboBox *mHeightModeCombo = nullptr;
     QProgressBar *mProgressBar = nullptr;
     QPushButton *mCancelButton = nullptr;
+    QWidget *mStatisticsWidget = nullptr;
+
+    static inline QgsSettingsTreeNode *sTreeProfile = KadasSettingsTree::sTreeKadas->createChildNode( QStringLiteral( "height-profile" ) );
+    static const inline QgsSettingsEntryBool *sSettingsShowStatistics = new QgsSettingsEntryBool( QStringLiteral( "show-statistics" ), sTreeProfile, true );
+    static const inline QgsSettingsEntryBool *sSettingsNodeMarkers = new QgsSettingsEntryBool( QStringLiteral( "node-markers" ), sTreeProfile, true );
+    static const inline QgsSettingsEntryString *sSettingsSaveDir = new QgsSettingsEntryString( QStringLiteral( "save-dir" ), sTreeProfile, QDir::homePath() );
 };
 
 #endif // KADASHEIGHTPROFILEDIALOG_H

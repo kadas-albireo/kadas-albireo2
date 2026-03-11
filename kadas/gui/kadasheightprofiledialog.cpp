@@ -23,7 +23,9 @@
 #include <QGroupBox>
 #include <QIcon>
 #include <QLabel>
+#include <QFileDialog>
 #include <QMessageBox>
+#include <QPainter>
 #include <QProgressBar>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -53,6 +55,9 @@
 #include "kadas/core/kadas.h"
 #include "kadas/core/kadascoordinateformat.h"
 #include "kadas/gui/kadasheightprofiledialog.h"
+#ifdef Q_OS_MAC
+#include "kadas/gui/kadasclipboardutils.h"
+#endif
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/mapitems/kadaslineitem.h"
@@ -141,6 +146,7 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
   grid->attach( mPlot );
 
   QWidget *statWidget = new QWidget( this );
+  mStatisticsWidget = statWidget;
   QHBoxLayout *statLayout = new QHBoxLayout( this );
   statLayout->setSpacing( 0 );
   statWidget->setLayout( statLayout );
@@ -151,6 +157,8 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
     vline->setFrameShadow( QFrame::Sunken );
     return vline;
   };
+
+  statLayout->addSpacerItem( new QSpacerItem( 10, 0, QSizePolicy::MinimumExpanding ) );
 
   statLayout->addWidget( createVline() );
   statLayout->addSpacing( 10 );
@@ -202,10 +210,24 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
 
   mPlotPicker = new PlotMousePicker( mPlot->canvas(), [this]( const QPoint &pos ) { setMarkerPlotPos( pos ); } );
 
+  QHBoxLayout *checkboxLayout = new QHBoxLayout();
+
   mNodeMarkersCheckbox = new QCheckBox( tr( "Show vertex lines" ) );
-  mNodeMarkersCheckbox->setChecked( QgsSettings().value( "/kadas/heightprofile_nodemarkers", true ).toBool() );
+  mNodeMarkersCheckbox->setChecked( sSettingsNodeMarkers->value() );
   connect( mNodeMarkersCheckbox, &QCheckBox::toggled, this, &KadasHeightProfileDialog::toggleNodeMarkers );
-  vboxLayout->addWidget( mNodeMarkersCheckbox );
+  checkboxLayout->addWidget( mNodeMarkersCheckbox );
+
+  mShowStatisticsCheckbox = new QCheckBox( tr( "Show statistics" ) );
+  mShowStatisticsCheckbox->setChecked( sSettingsShowStatistics->value() );
+  connect( mShowStatisticsCheckbox, &QCheckBox::toggled, this, [this]( bool checked ) {
+    sSettingsShowStatistics->setValue( checked );
+    mStatisticsWidget->setVisible( checked );
+  } );
+  mStatisticsWidget->setVisible( mShowStatisticsCheckbox->isChecked() );
+  checkboxLayout->addWidget( mShowStatisticsCheckbox );
+
+  checkboxLayout->addStretch();
+  vboxLayout->addLayout( checkboxLayout );
 
   mLineOfSightGroupBoxgroupBox = new QGroupBox( this );
   mLineOfSightGroupBoxgroupBox->setTitle( tr( "Line of sight" ) );
@@ -261,6 +283,7 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
 
   QDialogButtonBox *bbox = new QDialogButtonBox( QDialogButtonBox::Close, Qt::Horizontal, this );
   QPushButton *copyButton = bbox->addButton( tr( "Copy to clipboard" ), QDialogButtonBox::ActionRole );
+  QPushButton *saveButton = bbox->addButton( tr( "Save to file" ), QDialogButtonBox::ActionRole );
   QPushButton *addButton = bbox->addButton( tr( "Add to map" ), QDialogButtonBox::ActionRole );
   hboxLayout->addWidget( bbox );
 
@@ -268,6 +291,7 @@ KadasHeightProfileDialog::KadasHeightProfileDialog( KadasMapToolHeightProfile *t
   connect( bbox, &QDialogButtonBox::accepted, this, &QDialog::accept );
   connect( bbox, &QDialogButtonBox::rejected, this, &QDialog::reject );
   connect( copyButton, &QPushButton::clicked, this, &KadasHeightProfileDialog::copyToClipboard );
+  connect( saveButton, &QPushButton::clicked, this, &KadasHeightProfileDialog::saveToFile );
   connect( addButton, &QPushButton::clicked, this, &KadasHeightProfileDialog::addToCanvas );
   connect( this, &QDialog::finished, this, &KadasHeightProfileDialog::finish );
 
@@ -810,23 +834,20 @@ void KadasHeightProfileDialog::updateLineOfSight()
 
 void KadasHeightProfileDialog::copyToClipboard()
 {
-  QImage image( mPlot->size(), QImage::Format_ARGB32 );
-  mPlotMarker->setVisible( false );
-  mPlot->replot();
-  mPlot->render( &image );
-  mPlotMarker->setVisible( true );
-  mPlot->replot();
+  QImage image = renderPlotImage();
+
+#ifdef Q_OS_MAC
+  // Use native NSPasteboard to avoid crash in ImageIO's TIFF encoder
+  // caused by libtiff symbol conflict with GDAL
+  KadasClipboardUtils::copyImageToClipboard( image );
+#else
   QApplication::clipboard()->setImage( image );
+#endif
 }
 
 void KadasHeightProfileDialog::addToCanvas()
 {
-  QImage image( mPlot->size(), QImage::Format_ARGB32 );
-  mPlotMarker->setVisible( false );
-  mPlot->replot();
-  mPlot->render( &image );
-  mPlotMarker->setVisible( true );
-  mPlot->replot();
+  QImage image = renderPlotImage();
 
   QString filename = QgsProject::instance()->createAttachedFile( "heightProfile.png" );
   image.save( filename );
@@ -836,6 +857,55 @@ void KadasHeightProfileDialog::addToCanvas()
   item->setPosition( KadasItemPos::fromPoint( mTool->canvas()->extent().center() ) );
   KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::SymbolsLayer )->addItem( item );
   KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::SymbolsLayer )->triggerRepaint();
+}
+
+void KadasHeightProfileDialog::saveToFile()
+{
+  QString lastDir = sSettingsSaveDir->value();
+  QString filename = QFileDialog::getSaveFileName( this, tr( "Save height profile" ), lastDir, tr( "PNG Image (*.png);;JPEG Image (*.jpg);;BMP Image (*.bmp)" ) );
+  if ( filename.isEmpty() )
+    return;
+
+  sSettingsSaveDir->setValue( QFileInfo( filename ).absolutePath() );
+  QImage image = renderPlotImage();
+  image.save( filename );
+}
+
+QImage KadasHeightProfileDialog::renderPlotImage()
+{
+  mPlotMarker->setVisible( false );
+  mPlot->replot();
+
+  // Render the plot
+  QImage plotImage( mPlot->size(), QImage::Format_ARGB32 );
+  plotImage.fill( Qt::white );
+  mPlot->render( &plotImage );
+
+  mPlotMarker->setVisible( true );
+  mPlot->replot();
+
+  bool includeStats = mShowStatisticsCheckbox->isChecked();
+  if ( !includeStats )
+    return plotImage;
+
+  // Render the statistics bar
+  QPixmap statPixmap = mStatisticsWidget->grab();
+  QImage statImage = statPixmap.toImage();
+
+  // Composite: plot on top, statistics centered below
+  int totalWidth = qMax( plotImage.width(), statImage.width() );
+  int totalHeight = plotImage.height() + statImage.height();
+  QImage compositeImage( totalWidth, totalHeight, QImage::Format_ARGB32 );
+  compositeImage.fill( Qt::white );
+
+  QPainter painter( &compositeImage );
+  int plotX = ( totalWidth - plotImage.width() ) / 2;
+  painter.drawImage( plotX, 0, plotImage );
+  int statX = ( totalWidth - statImage.width() ) / 2;
+  painter.drawImage( statX, plotImage.height(), statImage );
+  painter.end();
+
+  return compositeImage;
 }
 
 void KadasHeightProfileDialog::keyPressEvent( QKeyEvent *ev )
@@ -852,7 +922,7 @@ void KadasHeightProfileDialog::keyPressEvent( QKeyEvent *ev )
 
 void KadasHeightProfileDialog::toggleNodeMarkers()
 {
-  QgsSettings().setValue( "/kadas/heightprofile_nodemarkers", mNodeMarkersCheckbox->isChecked() );
+  sSettingsNodeMarkers->setValue( mNodeMarkersCheckbox->isChecked() );
   qDeleteAll( mNodeMarkers );
   mNodeMarkers.clear();
   replot();
