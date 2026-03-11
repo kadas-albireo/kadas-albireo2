@@ -57,6 +57,7 @@ jobs:
             libxkbcommon-dev \
             libxkbcommon-x11-dev \
             libegl1-mesa-dev \
+            libsm-dev \
             bison \
             flex \
             gperf \
