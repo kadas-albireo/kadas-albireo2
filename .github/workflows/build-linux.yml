@@ -66,6 +66,18 @@ jobs:
             libdbus-1-dev \
             libatspi2.0-dev \
             libx11-dev \
+            libxcb-xkb-dev\
+            libxcb-util0-dev \
+            libxcb-icccm4-dev \
+            libxcb-image0-dev \
+            libxcb-keysyms1-dev \
+            libxcb-randr0-dev \
+            libxcb-render-util0-dev \
+            libxcb-render0-dev \
+            libxcb-shape0-dev \
+            libxcb-shm0-dev \
+            libxcb-xfixes0-dev \
+            libxcb-xinerama0-dev \
             bison \
             flex \
             gperf \
