@@ -78,6 +78,8 @@ jobs:
             libxcb-shm0-dev \
             libxcb-xfixes0-dev \
             libxcb-xinerama0-dev \
+            libegl-dev \
+            libmali-dev \
             bison \
             flex \
             gperf \
