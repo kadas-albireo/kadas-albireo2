@@ -45,8 +45,10 @@ jobs:
             unzip \
             tar \
             autoconf \
+            autoconf-archive \
             automake \
             libtool \
+            libtool-bin \
             bison \
             flex \
             gperf \
