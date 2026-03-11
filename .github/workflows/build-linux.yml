@@ -63,6 +63,8 @@ jobs:
             libevdev-dev \
             libdrm-dev \
             libgbm-dev \
+            libdbus-1-dev \
+            libatspi2.0-dev \
             bison \
             flex \
             gperf \
