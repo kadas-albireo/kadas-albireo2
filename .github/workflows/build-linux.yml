@@ -47,6 +47,7 @@ jobs:
             autoconf \
             autoconf-archive \
             automake \
+            libltdl-dev \
             libtool \
             libtool-bin \
             bison \
