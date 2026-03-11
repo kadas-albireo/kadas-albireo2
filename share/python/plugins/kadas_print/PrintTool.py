@@ -42,11 +42,11 @@ class PrintTool(KadasMapToolSelectRect):
         self.dialogui = Ui_PrintDialog()
         self.dialogui.setupUi(self.dialog)
         self.exportButton = self.dialogui.buttonBox.addButton(
-            self.tr("Export"), QDialogButtonBox.ActionRole)
+            self.tr("Export"), QDialogButtonBox.ButtonRole.ActionRole)
         self.printButton = self.dialogui.buttonBox.addButton(
-            self.tr("Print"), QDialogButtonBox.ActionRole)
+            self.tr("Print"), QDialogButtonBox.ButtonRole.ActionRole)
         self.advancedButton = self.dialogui.buttonBox.addButton(
-            self.tr("Advanced"), QDialogButtonBox.HelpRole)
+            self.tr("Advanced"), QDialogButtonBox.ButtonRole.HelpRole)
 
         proxy = QSortFilterProxyModel(self.dialogui.comboBox_printlayouts)
         proxy.setSourceModel(self.dialogui.comboBox_printlayouts.model())
@@ -317,7 +317,7 @@ class PrintTool(KadasMapToolSelectRect):
         self.__updateView()
 
     def __showCartoucheDialog(self):
-        self.cartouchedialog.exec_()
+        self.cartouchedialog.exec()
         cartoucheItem = self.__layoutItem("mapcartouche", QgsLayoutItemGroup)
         for item in cartoucheItem.items():
             item.redraw()
@@ -373,7 +373,7 @@ class PrintTool(KadasMapToolSelectRect):
             layersList.insertRow(row)
             layer = qgsProject.mapLayer(layerNode.layerId())
             item = QTableWidgetItem(layer.name())
-            item.setData(Qt.UserRole, layerNode.layerId())
+            item.setData(Qt.ItemDataRole.UserRole, layerNode.layerId())
             layersList.setItem(row, 0, item)
             combo = QComboBox()
             combo.addItems([
@@ -390,7 +390,7 @@ class PrintTool(KadasMapToolSelectRect):
         if execDialog:
             legendDialog.resize(320, 240)
             bbox = QDialogButtonBox(
-                QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+                QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
             legendDialog.setWindowTitle(self.tr("Configure legend"))
             legendDialog.setLayout(QVBoxLayout())
             legendDialog.layout().addWidget(QLabel(
@@ -399,14 +399,14 @@ class PrintTool(KadasMapToolSelectRect):
             legendDialog.layout().addWidget(bbox)
             bbox.accepted.connect(legendDialog.accept)
             bbox.rejected.connect(legendDialog.reject)
-        if not execDialog or legendDialog.exec_() == QDialog.Accepted:
+        if not execDialog or legendDialog.exec() == QDialog.DialogCode.Accepted:
             # Reset model
             legendItem.setAutoUpdateModel(True)
             legendItem.setAutoUpdateModel(False)
             removeLayers = []
             removeLegends = []
             for i in range(0, layersList.rowCount()):
-                layerId = layersList.item(i, 0).data(Qt.UserRole)
+                layerId = layersList.item(i, 0).data(Qt.ItemDataRole.UserRole)
                 comboIdx = layersList.cellWidget(i, 1).currentIndex()
                 if comboIdx == 0:
                     removeLayers.append(layerId)
@@ -472,7 +472,7 @@ class PrintTool(KadasMapToolSelectRect):
         for path in QgsProject.instance().attachedFiles():
             if path.endswith(".qpt"):
                 file = QFile(path)
-                if file.open(QIODevice.ReadOnly):
+                if file.open(QIODevice.OpenModeFlag.ReadOnly):
                     reader = QXmlStreamReader(file)
                     reader.readNextStartElement()
                     name = reader.attributes().value("name")
@@ -495,7 +495,7 @@ class PrintTool(KadasMapToolSelectRect):
 
     def __loadPrintLayout(self, filename):
         file = QFile(filename)
-        if not file.open(QIODevice.ReadOnly):
+        if not file.open(QIODevice.OpenModeFlag.ReadOnly):
 
             self.__setUiEnabled(False)
             return
@@ -559,7 +559,7 @@ class PrintTool(KadasMapToolSelectRect):
         self.__initPrintLayout()
 
     def __manageLayouts(self):
-        PrintLayoutManager(self.iface, self.dialog).exec_()
+        PrintLayoutManager(self.iface, self.dialog).exec()
         self.__reloadPrintLayouts()
 
     def __getCustomExtent(self):
@@ -644,7 +644,7 @@ class PrintTool(KadasMapToolSelectRect):
             return
 
         self.printing = True
-        QApplication.setOverrideCursor( Qt.WaitCursor )
+        QApplication.setOverrideCursor( Qt.CursorShape.WaitCursor )
         self.dialogui.previewGraphic.setUpdatesEnabled(False)
         self.dialog.setEnabled(False)
 
@@ -694,11 +694,11 @@ class PrintTool(KadasMapToolSelectRect):
                 self.printer.setPageLayout(self.printLayout.pageCollection().page(0).pageLayout())
             printdialog = QPrintDialog(self.printer)
 
-            if printdialog.exec_() != QDialog.Accepted:
+            if printdialog.exec() != QDialog.DialogCode.Accepted:
                 return
 
             self.printing = True
-            QApplication.setOverrideCursor( Qt.WaitCursor )
+            QApplication.setOverrideCursor( Qt.CursorShape.WaitCursor )
             self.dialogui.previewGraphic.setUpdatesEnabled(False)
             self.dialog.setEnabled(False)
 

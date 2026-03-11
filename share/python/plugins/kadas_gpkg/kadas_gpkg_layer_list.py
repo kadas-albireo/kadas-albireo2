@@ -8,9 +8,9 @@ import re
 
 class KadasGpkgLayersList(QListWidget):
 
-    LayerIdRole = Qt.UserRole + 1
-    LayerTypeRole = Qt.UserRole + 2
-    LayerSizeRole = Qt.UserRole + 3
+    LayerIdRole = Qt.ItemDataRole.UserRole + 1
+    LayerTypeRole = Qt.ItemDataRole.UserRole + 2
+    LayerSizeRole = Qt.ItemDataRole.UserRole + 3
     WARN_SIZE = 50 * 1024 * 1024
 
     def __init__(self, parent):
@@ -63,10 +63,10 @@ class KadasGpkgLayersList(QListWidget):
             item.setData(KadasGpkgLayersList.LayerTypeRole, self.layers[layerid])
             item.setData(KadasGpkgLayersList.LayerSizeRole, filesize)
             if filesize is not None and filesize < KadasGpkgLayersList.WARN_SIZE:
-                item.setCheckState(Qt.Checked)
+                item.setCheckState(Qt.CheckState.Checked)
                 item.setIcon(QIcon())
             else:
-                item.setCheckState(Qt.Unchecked)
+                item.setCheckState(Qt.CheckState.Unchecked)
                 item.setIcon(QIcon(":/images/themes/default/mIconWarning.svg"))
 
             self.addItem(item)
@@ -80,11 +80,11 @@ class KadasGpkgLayersList(QListWidget):
             # Disable layers already in GPKG
             gpkgLayer = existingOutputGpkg and (layer.source().startswith(existingOutputGpkg) or layer.source().startswith("GPKG:" + existingOutputGpkg))
             if gpkgLayer:
-                item.setFlags(item.flags() & ~(Qt.ItemIsSelectable | Qt.ItemIsEnabled))
+                item.setFlags(item.flags() & ~(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled))
                 item.setIcon(QIcon(":/images/themes/default/mIconSuccess.svg"))
             else:
                 size = item.data(KadasGpkgLayersList.LayerSizeRole)
-                item.setFlags(item.flags() | Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                item.setFlags(item.flags() | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
                 if size is not None and int(size) < KadasGpkgLayersList.WARN_SIZE:
                     item.setIcon(QIcon())
                 else:
@@ -94,7 +94,7 @@ class KadasGpkgLayersList(QListWidget):
         layers = {}
         for i in range(0, self.count()):
             item = self.item(i)
-            if item.flags() & Qt.ItemIsEnabled and item.checkState() == Qt.Checked:
+            if item.flags() & Qt.ItemFlag.ItemIsEnabled and item.checkState() == Qt.CheckState.Checked:
                 layerid = item.data(KadasGpkgLayersList.LayerIdRole)
                 layers[layerid] = item.data(KadasGpkgLayersList.LayerTypeRole)
         return layers

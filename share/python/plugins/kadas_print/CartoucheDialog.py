@@ -56,8 +56,8 @@ class CartoucheDialog(QDialog, Ui_CartoucheDialog):
         self.mapcartoucheView.setScene(self.scene)
         self.mapcartoucheView.resizeEvent = self.__resizeEvent
 
-        exportButton = self.buttonBox.addButton(self.tr("Export"), QDialogButtonBox.ActionRole)
-        importButton = self.buttonBox.addButton(self.tr("Import"), QDialogButtonBox.ActionRole)
+        exportButton = self.buttonBox.addButton(self.tr("Export"), QDialogButtonBox.ButtonRole.ActionRole)
+        importButton = self.buttonBox.addButton(self.tr("Import"), QDialogButtonBox.ButtonRole.ActionRole)
         exportButton.clicked.connect(self.__exportCartouche)
         importButton.clicked.connect(self.__importCartouche)
 
@@ -70,7 +70,7 @@ class CartoucheDialog(QDialog, Ui_CartoucheDialog):
     def __resizeEvent(self, ev):
         cartouche = self.scene.itemById("mapcartouche")
         if cartouche:
-            self.mapcartoucheView.fitInView(cartouche, Qt.KeepAspectRatio)
+            self.mapcartoucheView.fitInView(cartouche, Qt.AspectRatioMode.KeepAspectRatio)
 
     def storeInProject(self):
         QgsProject.instance().writeEntry("VBS-Print", "cartouche", self.__serializeCartouche())
@@ -217,7 +217,7 @@ class CartoucheDialog(QDialog, Ui_CartoucheDialog):
         QSettings().setValue("/UI/lastImportExportDir", fileinfo.absolutePath())
 
         file = QFile(filename)
-        if not file.open(QIODevice.WriteOnly):
+        if not file.open(QIODevice.OpenModeFlag.WriteOnly):
             QMessageBox.critical(self, self.tr("Export failed"), self.tr("Unable to write to file."))
 
         file.write(self.__serializeCartouche().encode('utf-8'))
@@ -233,7 +233,7 @@ class CartoucheDialog(QDialog, Ui_CartoucheDialog):
         QSettings().setValue("/UI/lastImportExportDir", fileinfo.absolutePath())
 
         file = QFile(filename)
-        if not file.open(QIODevice.ReadOnly):
+        if not file.open(QIODevice.OpenModeFlag.ReadOnly):
             QMessageBox.critical(self, self.tr("Import failed"), self.tr("Unable to read file."))
 
         xmlstr = file.readAll()

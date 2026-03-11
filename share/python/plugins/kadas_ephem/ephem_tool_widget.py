@@ -31,7 +31,7 @@ class EphemToolWidget(KadasBottomBar):
         self.ui = Ui_EphemToolWidget()
         self.ui.setupUi(self)
 
-        self.ui.closeButton.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.ui.closeButton.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         self.ui.closeButton.setIcon(QIcon(":/kadas/icons/close"))
         self.ui.closeButton.setToolTip(self.tr("Close"))
         self.ui.closeButton.clicked.connect(self.close)
@@ -48,9 +48,9 @@ class EphemToolWidget(KadasBottomBar):
 
         self.busyOverlay = QLabel(self.tr("Calculating..."))
         self.busyOverlay.setStyleSheet("QLabel { background-color: white;}")
-        self.busyOverlay.setAlignment(Qt.AlignHCenter|Qt.AlignVCenter)
+        self.busyOverlay.setAlignment(Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
         self.busyOverlay.setVisible(False)
-        self.busyOverlay.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.busyOverlay.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.ui.verticalLayout.addWidget(self.busyOverlay)
 
         self.wgsPos = None
@@ -92,12 +92,12 @@ class EphemToolWidget(KadasBottomBar):
         if not self.wgsPos:
             return
 
-        QApplication.setOverrideCursor(Qt.BusyCursor)
+        QApplication.setOverrideCursor(Qt.CursorShape.BusyCursor)
 
         if self.ui.checkBoxRelief.isChecked():
             self.busyOverlay.setVisible(True)
             self.ui.tabWidgetOutput.setEnabled(False)
-            QApplication.instance().processEvents(QEventLoop.ExcludeUserInputEvents)
+            QApplication.instance().processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
 
         self.ui.tabWidgetOutput.setEnabled(True)
         font = self.ui.labelPositionValue.font()

@@ -30,11 +30,11 @@ class KadasGpkgImportDialog(QDialog):
         self.ui.setupUi(self)
         self.ui.labelDataWarning.setVisible(False)
         self.ui.widgetProjectImport.setVisible(False)
-        self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+        self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
         self.ui.buttonSelectFile.clicked.connect(self.__selectInputFile)
         self.ui.radioButtonImportLayers.toggled.connect(self.ui.listWidgetLayers.setEnabled)
 
-        self.layerIdRole = Qt.UserRole + 1
+        self.layerIdRole = Qt.ItemDataRole.UserRole + 1
         self.xml = None
 
         if filename is not None:
@@ -64,7 +64,7 @@ class KadasGpkgImportDialog(QDialog):
             self.ui.widgetProjectImport.setVisible(True)
 
         self.ui.lineEditInputFile.setText(filename)
-        self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
+        self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
 
     def __read_gpkg_project(self, gpkg_filename):
         self.ui.listWidgetLayers.clear()
@@ -99,7 +99,7 @@ class KadasGpkgImportDialog(QDialog):
                 # Need at least layerid and layername
                 continue
             item = QListWidgetItem(layername)
-            item.setCheckState(Qt.Unchecked)
+            item.setCheckState(Qt.CheckState.Unchecked)
             item.setData(self.layerIdRole, layerid)
             self.ui.listWidgetLayers.addItem(item)
 
@@ -120,7 +120,7 @@ class KadasGpkgImportDialog(QDialog):
         layerIds = []
         for i in range(0, self.ui.listWidgetLayers.count()):
             item = self.ui.listWidgetLayers.item(i)
-            if item.checkState() == Qt.Checked:
+            if item.checkState() == Qt.CheckState.Checked:
                 layerIds.append(item.data(self.layerIdRole))
         return layerIds
 
@@ -133,7 +133,7 @@ class KadasGpkgImport(QObject):
     def run(self, gpkg_filename=None):
 
         importDialog = KadasGpkgImportDialog(self.iface.mainWindow(), self.iface, gpkg_filename)
-        if importDialog.exec_() != QDialog.Accepted:
+        if importDialog.exec() != QDialog.DialogCode.Accepted:
             return
 
         gpkg_filename = importDialog.gpkgFilename()
@@ -205,10 +205,10 @@ class KadasGpkgImport(QObject):
 
         else:
             if QgsProject.instance().isDirty():
-                ret = QMessageBox.question(self.iface.mainWindow(), self.tr("Save project?"), self.tr("The project has unsaved changes. Do you want to save them before proceeding?"), QMessageBox.Yes|QMessageBox.No|QMessageBox.Cancel, QMessageBox.Cancel)
-                if ret == QMessageBox.Cancel:
+                ret = QMessageBox.question(self.iface.mainWindow(), self.tr("Save project?"), self.tr("The project has unsaved changes. Do you want to save them before proceeding?"), QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No|QMessageBox.StandardButton.Cancel, QMessageBox.StandardButton.Cancel)
+                if ret == QMessageBox.StandardButton.Cancel:
                     return
-                elif ret == QMessageBox.Yes and not self.iface.saveProject():
+                elif ret == QMessageBox.StandardButton.Yes and not self.iface.saveProject():
                     return
 
             try:

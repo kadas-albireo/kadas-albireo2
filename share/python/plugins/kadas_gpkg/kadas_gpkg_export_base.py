@@ -58,7 +58,7 @@ class KadasGpkgExportBase(QObject):
     def write_layers(self, selected_layers, gpkg_writefile, pdialog, added_layer_ids, added_layers_by_source, messages, pyramids, filterExtent=None, filterExtentCrs=None, rasterExportScale=None):
         canceled = False
         for layerid in selected_layers:
-            QApplication.processEvents(QEventLoop.ExcludeUserInputEvents)
+            QApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
             if pdialog.wasCanceled():
                 canceled = True
                 break
