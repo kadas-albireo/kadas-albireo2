@@ -75,7 +75,8 @@ jobs:
                 -D CMAKE_BUILD_TYPE=Release \
                 -D KADAS_VERSION=${{ steps.version.outputs.version }} \
                 -D VCPKG_TARGET_TRIPLET="${{ matrix.triplet }}" \
-                -D VCPKG_INSTALL_OPTIONS="--x-abi-tools-use-exact-versions" \
+                -D VCPKG_HOST_TRIPLET=x64-linux-dynamic \
+                -D VCPKG_INSTALL_OPTIONS="--x-abi-tools-use-exact-versions;--allow-unsupported" \
                 -D NUGET_USERNAME=kadas-albireo \
                 -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
