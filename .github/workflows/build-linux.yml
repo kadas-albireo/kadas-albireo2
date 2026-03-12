@@ -83,6 +83,7 @@ jobs:
             libxcb-glx0-dev \
             libxext-dev \
             libxrandr-dev \
+            libxcb-sync-dev \
             bison \
             flex \
             gperf \
