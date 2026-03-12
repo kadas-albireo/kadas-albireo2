@@ -81,7 +81,6 @@ jobs:
             libegl-dev \
             libxcb-util-dev \
             libxcb-glx0-dev \
-            libxcb-xkb1-dev \
             libxext-dev \
             libxrandr-dev \
             bison \
