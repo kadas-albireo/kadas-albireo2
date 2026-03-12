@@ -20,9 +20,8 @@ import math
 
 from .CartoucheDialog import CartoucheDialog
 from .PrintLayoutManager import PrintLayoutManager
-from .ui.ui_printdialog import Ui_PrintDialog
 
-
+Ui_PrintDialog, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "ui", "printdialog.ui"))
 class PrintTool(KadasMapToolSelectRect):
 
     def __init__(self, iface):

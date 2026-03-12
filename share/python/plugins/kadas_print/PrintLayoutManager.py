@@ -7,8 +7,9 @@
 #
 #    copyright            : (C) 2015 by Sourcepole AG
 
-from .ui.ui_printlayoutmanager import Ui_PrintLayoutManager
+import os
 
+from qgis.PyQt import uic
 from qgis.PyQt.QtCore import *
 from qgis.PyQt.QtGui import *
 from qgis.PyQt.QtWidgets import *
@@ -16,6 +17,7 @@ from qgis.PyQt.QtXml import *
 
 from qgis.core import *
 
+Ui_PrintLayoutManager, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "ui", "printlayoutmanager.ui"))
 
 class PrintLayoutManager(QDialog, Ui_PrintLayoutManager):
 

@@ -6,7 +6,9 @@
 #    (at your option) any later version.
 #
 #    copyright            : (C) 2015 by Sourcepole AG
+import os 
 
+from qgis.PyQt import uic
 from qgis.PyQt.QtCore import *
 from qgis.PyQt.QtGui import *
 from qgis.PyQt.QtWidgets import *
@@ -16,6 +18,7 @@ from qgis.gui import *
 
 from .ui.ui_cartouchedialog import Ui_CartoucheDialog
 
+Ui_CartoucheDialog, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "ui", "cartouchedialog.ui"))
 
 class CartoucheDialog(QDialog, Ui_CartoucheDialog):
     def __init__(self, scene, parent=None):

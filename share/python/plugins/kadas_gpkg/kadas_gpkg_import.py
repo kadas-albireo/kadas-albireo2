@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from qgis.PyQt import uic
 from qgis.PyQt.QtCore import *
 from qgis.PyQt.QtGui import *
 from qgis.PyQt.QtWidgets import *
@@ -18,11 +19,12 @@ import sqlite3
 import shutil
 import tempfile
 
-from .ui_kadas_gpkg_import_dialog import Ui_KadasGpkgImportDialog
 
+PLUGIN_DIR = os.path.dirname(__file__)
+
+Ui_KadasGpkgImportDialog, _ = uic.loadUiType(os.path.join(PLUGIN_DIR, "kadas_gpkg_import_dialog.ui"))
 
 class KadasGpkgImportDialog(QDialog):
-
     def __init__(self, parent, iface, filename=None):
         QDialog.__init__(self, parent)
         self.iface = iface
