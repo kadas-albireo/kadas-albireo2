@@ -59,16 +59,13 @@ jobs:
             libxkbcommon-x11-dev \
             libegl1-mesa-dev \
             libsm-dev \
-
             libevdev-dev \
             libdrm-dev \
             libgbm-dev \
             libdbus-1-dev \
             libatspi2.0-dev \
             libx11-dev \
-
             libegl-dev \
-
             libxext-dev \
             libxrandr-dev \
             libgl1-mesa-dev \
