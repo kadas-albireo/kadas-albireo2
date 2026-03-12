@@ -50,6 +50,7 @@ jobs:
             libltdl-dev \
             libtool \
             libtool-bin \
+            '^libxcb.*-dev' \
             libx11-xcb-dev \
             libglu1-mesa-dev \
             libxrender-dev \
@@ -58,32 +59,18 @@ jobs:
             libxkbcommon-x11-dev \
             libegl1-mesa-dev \
             libsm-dev \
-            libxcb1-dev \
-            libxcb-xinput-dev \
+
             libevdev-dev \
             libdrm-dev \
             libgbm-dev \
             libdbus-1-dev \
             libatspi2.0-dev \
             libx11-dev \
-            libxcb-xkb-dev\
-            libxcb-util0-dev \
-            libxcb-icccm4-dev \
-            libxcb-image0-dev \
-            libxcb-keysyms1-dev \
-            libxcb-randr0-dev \
-            libxcb-render-util0-dev \
-            libxcb-render0-dev \
-            libxcb-shape0-dev \
-            libxcb-shm0-dev \
-            libxcb-xfixes0-dev \
-            libxcb-xinerama0-dev \
+
             libegl-dev \
-            libxcb-util-dev \
-            libxcb-glx0-dev \
+
             libxext-dev \
             libxrandr-dev \
-            libxcb-sync-dev \
             libgl1-mesa-dev \
             libfontconfig1-dev \
             bison \
@@ -158,7 +145,7 @@ jobs:
         env:
           QT_LOGGING_TO_CONSOLE: "1"
         run: |
-          ctest --test-dir build --output-on-failure --timeout 120 -C Release
+          xvfb-run --server-args="-screen 0 640x480x24" ctest --test-dir build --output-on-failure --timeout 120 -C Release
 
       - name: 📦 Package
         run: |
