@@ -7,6 +7,7 @@
 #
 #    copyright            : (C) 2015 by Sourcepole AG
 
+from qgis.PyQt import uic
 from qgis.PyQt.QtCore import *
 from qgis.PyQt.QtGui import *
 from qgis.PyQt.QtWidgets import *

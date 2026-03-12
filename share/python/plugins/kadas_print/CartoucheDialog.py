@@ -16,8 +16,6 @@ from qgis.PyQt.QtXml import *
 from qgis.core import *
 from qgis.gui import *
 
-from .ui.ui_cartouchedialog import Ui_CartoucheDialog
-
 Ui_CartoucheDialog, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "ui", "cartouchedialog.ui"))
 
 class CartoucheDialog(QDialog, Ui_CartoucheDialog):
