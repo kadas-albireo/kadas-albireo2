@@ -6,7 +6,6 @@ from qgis.PyQt.QtWidgets import *
 import os
 import sys
 
-from . import resources
 from .kadas_gpkg_export import KadasGpkgExport
 from .kadas_gpkg_import import KadasGpkgImport
 from qgis.gui import *
@@ -71,9 +70,9 @@ class KadasGpkg(QObject):
         self.importAction = QAction(self.tr("GPKG Import"))
         self.importAction.triggered.connect(self.__importGpkg)
         self.menu.addAction(self.importAction)
-
+        icon_path = os.path.join(os.path.dirname(__file__), 'icons/gpkg.png')
         self.iface.addActionMenu(self.tr("GPKG"),
-                                 QIcon(":/plugins/KADASGpkg/icons/gpkg.png"),
+                                 QIcon( icon_path ),
                                  self.menu,
                                  self.iface.PLUGIN_MENU,
                                  self.iface.MAPS_TAB)
