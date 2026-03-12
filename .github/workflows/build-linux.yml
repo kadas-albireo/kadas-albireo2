@@ -84,6 +84,8 @@ jobs:
             libxext-dev \
             libxrandr-dev \
             libxcb-sync-dev \
+            libgl1-mesa-dev \
+            libfontconfig1-dev \
             bison \
             flex \
             gperf \
