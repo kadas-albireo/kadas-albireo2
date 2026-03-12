@@ -17,8 +17,6 @@ from kadas.kadasgui import *
 import os
 
 from .PrintTool import PrintTool
-from . import resources_rc
-
 
 class PrintPlugin(QObject):
     def __init__(self, iface):

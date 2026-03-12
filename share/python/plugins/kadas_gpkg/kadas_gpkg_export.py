@@ -39,7 +39,7 @@ class KadasGpkgExport(KadasGpkgExportBase):
         self.kadasGpkgExportDialog.show()
 
     def __dialogFinished(self, result):
-        if result == QDialog.Accepted:
+        if result == QDialog.DialogCode.Accepted:
             self.__export()
 
         self.kadasGpkgExportDialog.finished.disconnect()
@@ -66,7 +66,7 @@ class KadasGpkgExport(KadasGpkgExportBase):
         pdialog = QProgressDialog(
             self.tr("Writing %s...") % os.path.basename(gpkg_filename),
             self.tr("Cancel"), 0, 0,  self.iface.mainWindow())
-        pdialog.setWindowModality(Qt.WindowModal)
+        pdialog.setWindowModality(Qt.WindowModality.WindowModal)
         pdialog.setWindowTitle(self.tr("GPKG Export"))
         pdialog.show()
 
@@ -75,7 +75,7 @@ class KadasGpkgExport(KadasGpkgExportBase):
         self.init_gpkg_qgis(cursor)
         conn.commit()
         conn.close()
-        QApplication.processEvents(QEventLoop.ExcludeUserInputEvents)
+        QApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
 
         # Collect layer sources
         layer_sources = set()
