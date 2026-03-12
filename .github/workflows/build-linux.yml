@@ -79,6 +79,11 @@ jobs:
             libxcb-xfixes0-dev \
             libxcb-xinerama0-dev \
             libegl-dev \
+            libxcb-util-dev \
+            libxcb-glx0-dev \
+            libxcb-xkb1-dev \
+            libxext-dev \
+            libxrandr-dev \
             bison \
             flex \
             gperf \
