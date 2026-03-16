@@ -175,6 +175,20 @@ jobs:
           EOF
           )
 
+      - name: 🧪 Install pytest for plugin tests
+        shell: bash
+        run: |
+          ./build/vcpkg_installed/x64-windows/tools/python3/python.exe -m pip install pytest
+
+      - name: 🧪 Run plugin tests
+        shell: bash
+        env:
+          PYTHONPATH: "${{ github.workspace }}/build/output/python;${{ github.workspace }}/share/python/plugins"
+          KADAS_BIN_DIR: "${{ github.workspace }}/build/output/bin"
+        run: |
+          ./build/vcpkg_installed/x64-windows/tools/python3/python.exe \
+            -m pytest share/python/plugins/kadas_gpkg/tests/ -v
+
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
         if: ${{ github.event_name == 'release' }}
