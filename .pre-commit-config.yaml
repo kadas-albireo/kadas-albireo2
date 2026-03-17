@@ -46,7 +46,11 @@ repos:
   hooks:
   - id: flake8
     files: ^share/python/plugins/
-    args: [--max-line-length, "99"]
+    args: [
+      "--max-line-length=115",
+      # ignore long comments (E501), as long lines are formatted by black
+      "--ignore=E501",
+    ]
 
 ci:
   autofix_prs: true
