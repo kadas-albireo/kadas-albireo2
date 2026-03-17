@@ -5,9 +5,8 @@ from abc import abstractmethod
 
 from qgis.core import *
 from qgis.gui import *
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtCore import QEventLoop, QObject
+from qgis.PyQt.QtWidgets import QApplication
 
 
 class KadasGpkgExportBase(QObject):

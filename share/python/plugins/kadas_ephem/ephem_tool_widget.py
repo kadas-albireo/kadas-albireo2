@@ -6,9 +6,9 @@ from kadas.kadascore import *
 from kadas.kadasgui import *
 from qgis.core import *
 from qgis.gui import *
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtCore import QDateTime, QEventLoop, Qt, pyqtSignal
+from qgis.PyQt.QtGui import QIcon, QPixmap
+from qgis.PyQt.QtWidgets import QApplication, QLabel, QSizePolicy
 from qgis.PyQt.uic import loadUiType
 
 from .ephem_recompute_task import EphemComputeTask

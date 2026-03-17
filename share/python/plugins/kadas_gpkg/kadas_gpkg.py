@@ -4,9 +4,9 @@ import os
 
 from kadas.kadasgui import *
 from qgis.gui import *
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtCore import QCoreApplication, QObject, QSettings, Qt, QTranslator
+from qgis.PyQt.QtGui import QIcon, QKeySequence
+from qgis.PyQt.QtWidgets import QAction, QMenu, QShortcut
 
 from .kadas_gpkg_export import KadasGpkgExport
 from .kadas_gpkg_import import KadasGpkgImport

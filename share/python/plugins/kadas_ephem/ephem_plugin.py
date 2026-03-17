@@ -14,7 +14,8 @@ import os
 
 from kadas.kadasgui import KadasPluginInterface
 from qgis.PyQt.QtCore import QCoreApplication, QSettings, QTranslator
-from qgis.PyQt.QtGui import QAction, QIcon
+from qgis.PyQt.QtGui import QIcon
+from qgis.PyQt.QtWidgets import QAction
 
 from .ephem_tool import EphemTool
 

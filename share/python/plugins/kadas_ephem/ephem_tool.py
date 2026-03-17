@@ -3,9 +3,7 @@ from kadas.kadascore import *
 from kadas.kadasgui import *
 from qgis.core import *
 from qgis.gui import *
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtCore import Qt
 
 from .ephem_tool_widget import EphemToolWidget
 

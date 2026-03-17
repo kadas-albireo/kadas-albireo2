@@ -13,11 +13,31 @@ from kadas.kadasgui import *
 from qgis.core import *
 from qgis.gui import *
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtPrintSupport import *
-from qgis.PyQt.QtWidgets import *
-from qgis.PyQt.QtXml import *
+from qgis.PyQt.QtCore import (
+    QDir,
+    QDomDocument,
+    QFile,
+    QIODevice,
+    QRectF,
+    QSettings,
+    Qt,
+    QXmlStreamReader,
+)
+from qgis.PyQt.QtGui import QDoubleValidator
+from qgis.PyQt.QtPrintSupport import QPrintDialog, QPrinter, QPrinterInfo
+from qgis.PyQt.QtWidgets import (
+    QApplication,
+    QComboBox,
+    QDialog,
+    QDialogButtonBox,
+    QFileDialog,
+    QLabel,
+    QMessageBox,
+    QSortFilterProxyModel,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+)
 
 from .CartoucheDialog import CartoucheDialog
 from .PrintLayoutManager import PrintLayoutManager

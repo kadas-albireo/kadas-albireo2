@@ -13,9 +13,7 @@
 import os
 
 from kadas.kadasgui import *
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtCore import QCoreApplication, QSettings, QTranslator
 
 from .about_dialog import AboutDialog
 

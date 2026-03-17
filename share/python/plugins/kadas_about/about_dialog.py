@@ -14,9 +14,9 @@ import os
 
 from kadas.kadascore import *
 from qgis.core import Qgis
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtGui import QPixmap
+from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QFrame, QGridLayout, QLabel, QSizePolicy
 
 
 class AboutDialog(QDialog):

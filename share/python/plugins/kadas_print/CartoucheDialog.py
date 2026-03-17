@@ -11,10 +11,9 @@ import os
 from qgis.core import *
 from qgis.gui import *
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
-from qgis.PyQt.QtXml import *
+from qgis.PyQt.QtCore import QDate, QFile, QFileInfo, QIODevice, QSettings, Qt
+from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QFileDialog, QMessageBox
+from qgis.PyQt.QtXml import QDomDocument
 
 Ui_CartoucheDialog, _ = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "ui", "cartouchedialog.ui")
