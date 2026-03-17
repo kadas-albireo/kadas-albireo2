@@ -12,7 +12,6 @@ import os
 from qgis.core import QgsPrintLayout, QgsProject, QgsReadWriteContext
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import (
-    QDomDocument,
     QFile,
     QFileInfo,
     QIODevice,
@@ -21,6 +20,7 @@ from qgis.PyQt.QtCore import (
     QXmlStreamReader,
 )
 from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QListWidgetItem, QMessageBox
+from qgis.PyQt.QtXml import QDomDocument
 
 Ui_PrintLayoutManager, _ = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "ui", "printlayoutmanager.ui")

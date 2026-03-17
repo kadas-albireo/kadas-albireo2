@@ -30,9 +30,9 @@ from qgis.gui import QgsScaleComboBox
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import (
     QDir,
-    QDomDocument,
     QFile,
     QIODevice,
+    QSortFilterProxyModel,
     QRectF,
     QSettings,
     Qt,
@@ -48,11 +48,11 @@ from qgis.PyQt.QtWidgets import (
     QFileDialog,
     QLabel,
     QMessageBox,
-    QSortFilterProxyModel,
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
 )
+from qgis.PyQt.QtXml import QDomDocument
 
 from .CartoucheDialog import CartoucheDialog
 from .PrintLayoutManager import PrintLayoutManager
