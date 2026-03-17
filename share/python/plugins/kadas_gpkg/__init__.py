@@ -3,4 +3,5 @@
 
 def classFactory(iface):
     from .kadas_gpkg import KadasGpkg
+
     return KadasGpkg(iface)

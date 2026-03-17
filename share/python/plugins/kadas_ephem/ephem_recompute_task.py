@@ -1,15 +1,13 @@
+import math
+from datetime import datetime, timezone
+from enum import Enum
 
 import ephem
-from enum import Enum
-from datetime import datetime, timezone
-import math
-
-from qgis.PyQt.QtCore import QThread, QDateTime, QTimeZone
-
-from qgis.core import QgsCoordinateReferenceSystem, QgsPoint
-
-from kadas.kadascore import KadasCoordinateUtils
 from kadas.kadasanalysis import KadasLineOfSight
+from kadas.kadascore import KadasCoordinateUtils
+from qgis.core import QgsCoordinateReferenceSystem, QgsPoint
+from qgis.PyQt.QtCore import QDateTime, QThread, QTimeZone
+
 
 class EphemComputeResult(object):
     def __init__(self):
@@ -26,6 +24,7 @@ class EphemComputeResult(object):
 
 class EphemComputeTaskCanceled(Exception):
     pass
+
 
 class EphemComputeTask(QThread):
 
@@ -57,7 +56,7 @@ class EphemComputeTask(QThread):
         self.considerRelief = considerRelief
         self.dateTime = dateTime
         self.timezoneType = timezoneType
-        
+
         if self.isRunning():
             self.cancel()
             self.wait()
@@ -67,14 +66,14 @@ class EphemComputeTask(QThread):
 
     def getResult(self):
         return self.result
-    
+
     def cancel(self):
         self.canceled = True
 
     def run(self):
         try:
             ts = self.getTimestamp(self.dateTime)
-    
+
             self.result.position = self.wgsPos
             self.result.celestialBody = self.celestialBody
 
@@ -82,34 +81,41 @@ class EphemComputeTask(QThread):
             home.lat = str(self.wgsPos.y())
             home.lon = str(self.wgsPos.x())
             home.date = ephem.Date(datetime.fromtimestamp(ts, timezone.utc))
-    
+
             if self.celestialBody == self.CelestialBody.SUN:
                 ## Sun ##
-    
+
                 sun = ephem.Sun()
                 sun.compute(home)
                 self.__check_canceled()
-    
-                self.result.azimuthElevationValueText = "%s %s" % (self.formatDMS(sun.az), self.formatDMS(sun.alt, True))
+
+                self.result.azimuthElevationValueText = "%s %s" % (
+                    self.formatDMS(sun.az),
+                    self.formatDMS(sun.alt, True),
+                )
                 self.result.angle = -self.azDec(sun.az)
-    
+
                 # Compute sunrise and sunset taking relief into account
                 try:
                     sunset = ephem.to_timezone(home.next_setting(sun), ephem.UTC).timestamp()
                 except:
                     sunset = None
-    
+
                 sun.compute(home)
                 suntransit = ephem.to_timezone(home.next_transit(sun), ephem.UTC).timestamp()
                 if sunset and suntransit > sunset:
-                    suntransit = ephem.to_timezone(home.previous_transit(sun), ephem.UTC).timestamp()
-    
+                    suntransit = ephem.to_timezone(
+                        home.previous_transit(sun), ephem.UTC
+                    ).timestamp()
+
                 sun.compute(home)
                 self.__check_canceled()
 
                 if sun.alt >= 0:
                     try:
-                        sunrise = ephem.to_timezone(home.previous_rising(sun), ephem.UTC).timestamp()
+                        sunrise = ephem.to_timezone(
+                            home.previous_rising(sun), ephem.UTC
+                        ).timestamp()
                     except:
                         sunrise = None
                 else:
@@ -118,54 +124,75 @@ class EphemComputeTask(QThread):
                     except:
                         sunrise = None
                 if self.considerRelief:
-                    tvisible = self.search_body_visible(ephem.Sun(), sunrise, sunset) if sunrise and sunset else None
+                    tvisible = (
+                        self.search_body_visible(ephem.Sun(), sunrise, sunset)
+                        if sunrise and sunset
+                        else None
+                    )
                     if tvisible:
-                        sunset = self.search_body_relief_crossing(ephem.Sun(), sunset, tvisible) if sunset else None
-                        sunrise = self.search_body_relief_crossing(ephem.Sun(), sunrise, tvisible) if sunrise else None
+                        sunset = (
+                            self.search_body_relief_crossing(ephem.Sun(), sunset, tvisible)
+                            if sunset
+                            else None
+                        )
+                        sunrise = (
+                            self.search_body_relief_crossing(ephem.Sun(), sunrise, tvisible)
+                            if sunrise
+                            else None
+                        )
                     else:
                         sunset = None
                         sunrise = None
-    
+
                 if sunrise and (not sunset or sunrise < sunset):
                     self.result.riseValueText = "%s" % self.timestampToHourString(sunrise)
                 else:
                     self.result.riseValueText = "-"
-    
+
                 if sunset and (not sunrise or sunset > sunrise):
                     self.result.setValueText = "%s" % self.timestampToHourString(sunset)
                 else:
                     self.result.setValueText = "-"
-    
+
                 self.result.zenithValueText = self.timestampToHourString(suntransit)
-                self.result.azimuthVisible = sunrise is not None and sunset is not None and ts >= sunrise and ts <= sunset
-    
+                self.result.azimuthVisible = (
+                    sunrise is not None and sunset is not None and ts >= sunrise and ts <= sunset
+                )
+
             else:
                 ## Moon ##
-    
+
                 moon = ephem.Moon()
                 moon.compute(home)
-                self.result.azimuthElevationValueText = "%s %s" % (self.formatDMS(moon.az), self.formatDMS(moon.alt, True))
+                self.result.azimuthElevationValueText = "%s %s" % (
+                    self.formatDMS(moon.az),
+                    self.formatDMS(moon.alt, True),
+                )
                 self.result.angle = -self.azDec(moon.az)
-    
+
                 # Compute moonrise and moonset taking relief into account
                 try:
                     moonset = ephem.to_timezone(home.next_setting(moon), ephem.UTC).timestamp()
                 except:
                     moonset = None
-    
+
                 moon.compute(home)
                 self.__check_canceled()
-                
+
                 moontransit = ephem.to_timezone(home.next_transit(moon), ephem.UTC).timestamp()
                 if moonset and moontransit > moonset:
-                    moontransit = ephem.to_timezone(home.previous_transit(moon), ephem.UTC).timestamp()
-    
+                    moontransit = ephem.to_timezone(
+                        home.previous_transit(moon), ephem.UTC
+                    ).timestamp()
+
                 moon.compute(home)
                 self.__check_canceled()
 
                 if moon.alt >= 0:
                     try:
-                        moonrise = ephem.to_timezone(home.previous_rising(moon), ephem.UTC).timestamp()
+                        moonrise = ephem.to_timezone(
+                            home.previous_rising(moon), ephem.UTC
+                        ).timestamp()
                     except:
                         moonrise = None
                 else:
@@ -174,29 +201,46 @@ class EphemComputeTask(QThread):
                     except:
                         moonrise = None
                 if self.considerRelief:
-                    tvisible = self.search_body_visible(ephem.Moon(), moonrise, moonset) if moonrise and moonset else None
+                    tvisible = (
+                        self.search_body_visible(ephem.Moon(), moonrise, moonset)
+                        if moonrise and moonset
+                        else None
+                    )
                     if tvisible:
-                        moonset = self.search_body_relief_crossing(ephem.Moon(), moonset, tvisible) if moonset else None
-                        moonrise = self.search_body_relief_crossing(ephem.Moon(), moonrise, tvisible) if moonrise else None
+                        moonset = (
+                            self.search_body_relief_crossing(ephem.Moon(), moonset, tvisible)
+                            if moonset
+                            else None
+                        )
+                        moonrise = (
+                            self.search_body_relief_crossing(ephem.Moon(), moonrise, tvisible)
+                            if moonrise
+                            else None
+                        )
                     else:
                         moonset = None
                         moonrise = None
-    
+
                 if moonrise and (not moonset or moonrise < moonset):
-                    self.result.riseValueText = "%s" % self.timestampToHourString(moonrise)                
+                    self.result.riseValueText = "%s" % self.timestampToHourString(moonrise)
                 else:
                     self.result.riseValueText = "-"
-    
+
                 if moonset and (not moonrise or moonset > moonrise):
                     self.result.setValueText = "%s" % self.timestampToHourString(moonset)
                 else:
                     self.result.setValueText = "-"
-    
+
                 # Moon phase
                 self.result.moonPhase = moon.phase
-    
-                self.result.azimuthVisible = moonrise is not None and moonset is not None and ts >= moonrise and ts <= moonset
-        
+
+                self.result.azimuthVisible = (
+                    moonrise is not None
+                    and moonset is not None
+                    and ts >= moonrise
+                    and ts <= moonset
+                )
+
         except EphemComputeTaskCanceled:
             return
         except Exception as exception:
@@ -204,9 +248,15 @@ class EphemComputeTask(QThread):
 
     def timestampToHourString(self, timestamp):
         if self.timezoneType == self.TimezoneType.TIMEZONE_UTC:
-            return QDateTime.fromSecsSinceEpoch(round(timestamp), QTimeZone.utc()).toString("hh:mm")
+            return QDateTime.fromSecsSinceEpoch(round(timestamp), QTimeZone.utc()).toString(
+                "hh:mm"
+            )
         elif self.timezoneType == self.TimezoneType.TIMEZONE_LOCAL:
-            tz = QTimeZone(KadasCoordinateUtils.getTimezoneAtPos(self.wgsPos, QgsCoordinateReferenceSystem("EPSG:4326")))
+            tz = QTimeZone(
+                KadasCoordinateUtils.getTimezoneAtPos(
+                    self.wgsPos, QgsCoordinateReferenceSystem("EPSG:4326")
+                )
+            )
             return QDateTime.fromSecsSinceEpoch(round(timestamp), tz).toString("hh:mm")
         else:
             return QDateTime.fromSecsSinceEpoch(round(timestamp)).toString("hh:mm")
@@ -215,7 +265,11 @@ class EphemComputeTask(QThread):
         if self.timezoneType == EphemComputeTask.TimezoneType.TIMEZONE_UTC:
             datetime = QDateTime(datetime.date(), datetime.time(), QTimeZone.utc())
         elif self.timezoneType == EphemComputeTask.TimezoneType.TIMEZONE_LOCAL:
-            tz = QTimeZone(KadasCoordinateUtils.getTimezoneAtPos(self.wgsPos, QgsCoordinateReferenceSystem("EPSG:4326")))
+            tz = QTimeZone(
+                KadasCoordinateUtils.getTimezoneAtPos(
+                    self.wgsPos, QgsCoordinateReferenceSystem("EPSG:4326")
+                )
+            )
             datetime = QDateTime(datetime.date(), datetime.time(), QTimeZone(tz))
         return datetime.toSecsSinceEpoch()
 
@@ -225,10 +279,10 @@ class EphemComputeTask(QThread):
             strval = "+" + strval
         parts = strval.split(":")
         if len(parts) == 3:
-            return parts[0] + "°" + parts[1] + "'" + parts[2] + "\""
+            return parts[0] + "°" + parts[1] + "'" + parts[2] + '"'
         else:
             return strval
-        
+
     def azDec(self, val):
         strval = str(val)
         parts = strval.split(":")
@@ -287,11 +341,18 @@ class EphemComputeTask(QThread):
 
     def body_is_visible(self, body_pos):
         # 100m resolution
-        bodyVisibility = KadasLineOfSight.computeTargetVisibility(QgsPoint(self.mrcPos.x(), self.mrcPos.y(), 0), body_pos, QgsCoordinateReferenceSystem("EPSG:3857"), 10000, False, True)
+        bodyVisibility = KadasLineOfSight.computeTargetVisibility(
+            QgsPoint(self.mrcPos.x(), self.mrcPos.y(), 0),
+            body_pos,
+            QgsCoordinateReferenceSystem("EPSG:3857"),
+            10000,
+            False,
+            True,
+        )
         self.__check_canceled()
 
         return bodyVisibility
-    
+
     def __check_canceled(self):
         if self.canceled:
             raise EphemComputeTaskCanceled()

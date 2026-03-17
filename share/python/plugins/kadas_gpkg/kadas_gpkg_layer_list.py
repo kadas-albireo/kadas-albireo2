@@ -1,10 +1,11 @@
+import os
+import re
+
+from qgis.core import QgsMapLayer, QgsProject
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QListWidget, QListWidgetItem
-from qgis.core import QgsProject, QgsMapLayer
 
-import os
-import re
 
 class KadasGpkgLayersList(QListWidget):
 
@@ -18,7 +19,19 @@ class KadasGpkgLayersList(QListWidget):
         QListWidget.__init__(self, parent)
 
         self.layers = {}
-        local_providers = ["delimitedtext", "gdal", "gpx", "mssql", "ogr", "postgres", "spatialite", "wcs", "wms", "WFS", "arcgisfeatureserver"]
+        local_providers = [
+            "delimitedtext",
+            "gdal",
+            "gpx",
+            "mssql",
+            "ogr",
+            "postgres",
+            "spatialite",
+            "wcs",
+            "wms",
+            "WFS",
+            "arcgisfeatureserver",
+        ]
 
         for layer in QgsProject.instance().mapLayers().values():
             provider = "unknown"
@@ -41,7 +54,7 @@ class KadasGpkgLayersList(QListWidget):
                 filename = filename[:pos]
             # Resolve file url
             if filename.startswith("file://"):
-                filename = filename[7:filename.find("?")]
+                filename = filename[7 : filename.find("?")]
             # Remove vsi prefix
             if filename.startswith("/vsi"):
                 filename = re.sub(r"/vsi\w+/", "", filename)
@@ -78,13 +91,20 @@ class KadasGpkgLayersList(QListWidget):
             layerid = item.data(KadasGpkgLayersList.LayerIdRole)
             layer = QgsProject.instance().mapLayer(layerid)
             # Disable layers already in GPKG
-            gpkgLayer = existingOutputGpkg and (layer.source().startswith(existingOutputGpkg) or layer.source().startswith("GPKG:" + existingOutputGpkg))
+            gpkgLayer = existingOutputGpkg and (
+                layer.source().startswith(existingOutputGpkg)
+                or layer.source().startswith("GPKG:" + existingOutputGpkg)
+            )
             if gpkgLayer:
-                item.setFlags(item.flags() & ~(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled))
+                item.setFlags(
+                    item.flags() & ~(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
+                )
                 item.setIcon(QIcon(":/images/themes/default/mIconSuccess.svg"))
             else:
                 size = item.data(KadasGpkgLayersList.LayerSizeRole)
-                item.setFlags(item.flags() | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
+                item.setFlags(
+                    item.flags() | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled
+                )
                 if size is not None and int(size) < KadasGpkgLayersList.WARN_SIZE:
                     item.setIcon(QIcon())
                 else:
@@ -94,7 +114,10 @@ class KadasGpkgLayersList(QListWidget):
         layers = {}
         for i in range(0, self.count()):
             item = self.item(i)
-            if item.flags() & Qt.ItemFlag.ItemIsEnabled and item.checkState() == Qt.CheckState.Checked:
+            if (
+                item.flags() & Qt.ItemFlag.ItemIsEnabled
+                and item.checkState() == Qt.CheckState.Checked
+            ):
                 layerid = item.data(KadasGpkgLayersList.LayerIdRole)
                 layers[layerid] = item.data(KadasGpkgLayersList.LayerTypeRole)
         return layers

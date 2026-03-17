@@ -1,23 +1,21 @@
 # -*- coding: utf-8 -*-
 
-from qgis.PyQt.QtCore import Qt, QTemporaryDir, QEventLoop
-from qgis.PyQt.QtWidgets import QDialog, QProgressDialog, QMessageBox, QApplication
-
-from qgis.core import QgsProject, QgsPathResolver, QgsMapLayer, Qgis, QgsCoordinateTransform, QgsPluginLayer
-from qgis.gui import *
-
-from kadas.kadasgui import KadasMapRect, KadasItemLayer, KadasItemLayerRegistry
-
-import os
 import json
 import mimetypes
-import sqlite3
+import os
 import shutil
+import sqlite3
 import uuid
-from lxml import etree as ET
 
-from .kadas_gpkg_export_dialog import KadasGpkgExportDialog
+from kadas.kadasgui import KadasItemLayerRegistry, KadasMapRect
+from lxml import etree as ET
+from qgis.core import Qgis, QgsMapLayer, QgsPathResolver, QgsProject
+from qgis.PyQt.QtCore import QEventLoop, Qt, QTemporaryDir
+from qgis.PyQt.QtWidgets import QApplication, QDialog, QMessageBox, QProgressDialog
+
 from .kadas_gpkg_export_base import KadasGpkgExportBase
+from .kadas_gpkg_export_dialog import KadasGpkgExportDialog
+
 
 class KadasGpkgExport(KadasGpkgExportBase):
 
@@ -60,12 +58,20 @@ class KadasGpkgExport(KadasGpkgExportBase):
         try:
             conn = sqlite3.connect(gpkg_writefile)
         except:
-            QMessageBox.warning(self.iface.mainWindow(), self.tr("Error"), self.tr("Unable to create or open output file"))
+            QMessageBox.warning(
+                self.iface.mainWindow(),
+                self.tr("Error"),
+                self.tr("Unable to create or open output file"),
+            )
             return
 
         pdialog = QProgressDialog(
             self.tr("Writing %s...") % os.path.basename(gpkg_filename),
-            self.tr("Cancel"), 0, 0,  self.iface.mainWindow())
+            self.tr("Cancel"),
+            0,
+            0,
+            self.iface.mainWindow(),
+        )
         pdialog.setWindowModality(Qt.WindowModality.WindowModal)
         pdialog.setWindowTitle(self.tr("GPKG Export"))
         pdialog.show()
@@ -90,9 +96,24 @@ class KadasGpkgExport(KadasGpkgExportBase):
         added_layer_ids = []
         added_layers_by_source = {}
         messages = []
-        if not self.write_layers(self.kadasGpkgExportDialog.selectedLayers(), gpkg_writefile, pdialog, added_layer_ids, added_layers_by_source, messages, self.kadasGpkgExportDialog.buildPyramids(), self.kadasGpkgExportDialog.filterExtent(), self.kadasGpkgExportDialog.filterExtentCrs(), self.kadasGpkgExportDialog.rasterExportScale()):
+        if not self.write_layers(
+            self.kadasGpkgExportDialog.selectedLayers(),
+            gpkg_writefile,
+            pdialog,
+            added_layer_ids,
+            added_layers_by_source,
+            messages,
+            self.kadasGpkgExportDialog.buildPyramids(),
+            self.kadasGpkgExportDialog.filterExtent(),
+            self.kadasGpkgExportDialog.filterExtentCrs(),
+            self.kadasGpkgExportDialog.rasterExportScale(),
+        ):
             pdialog.hide()
-            QMessageBox.warning(self.iface.mainWindow(), self.tr("GPKG Export"), self.tr("The operation was canceled."))
+            QMessageBox.warning(
+                self.iface.mainWindow(),
+                self.tr("GPKG Export"),
+                self.tr("The operation was canceled."),
+            )
             return
 
         project = QgsProject.instance()
@@ -103,10 +124,17 @@ class KadasGpkgExport(KadasGpkgExportBase):
 
         # Flag redlining items outside export extent
         if self.kadasGpkgExportDialog.filterExtent() is not None:
-            self.__flagRedliningItemsOutsideExtent(self.kadasGpkgExportDialog.filterExtent(), self.kadasGpkgExportDialog.filterExtentCrs())
+            self.__flagRedliningItemsOutsideExtent(
+                self.kadasGpkgExportDialog.filterExtent(),
+                self.kadasGpkgExportDialog.filterExtentCrs(),
+            )
 
         additional_resources = {}
-        preprocessorId = QgsPathResolver.setPathWriter(lambda path: self.rewriteProjectPaths(path, gpkg_filename, added_layers_by_source, layer_sources, additional_resources))
+        preprocessorId = QgsPathResolver.setPathWriter(
+            lambda path: self.rewriteProjectPaths(
+                path, gpkg_filename, added_layers_by_source, layer_sources, additional_resources
+            )
+        )
         project.write()
         QgsPathResolver.removePathWriter(preprocessorId)
 
@@ -123,11 +151,12 @@ class KadasGpkgExport(KadasGpkgExportBase):
         parser = ET.XMLParser(strip_cdata=False)
         doc = ET.parse(tmpfile, parser=parser)
         if not doc:
-            QMessageBox.warning(self.iface.mainWindow(), self.tr("Error"), self.tr("Invalid project"))
+            QMessageBox.warning(
+                self.iface.mainWindow(), self.tr("Error"), self.tr("Invalid project")
+            )
             return
 
         # Replace layer provider types in project file
-        sources = []
         for projectlayerEl in doc.find("projectlayers"):
             layerId = projectlayerEl.find("id").text
             if layerId in added_layer_ids:
@@ -162,47 +191,66 @@ class KadasGpkgExport(KadasGpkgExportBase):
             try:
                 shutil.move(gpkg_writefile, gpkg_filename)
             except:
-                QMessageBox.warning(self.iface.mainWindow(), self.tr("Error"), self.tr("Unable to create output file"))
+                QMessageBox.warning(
+                    self.iface.mainWindow(),
+                    self.tr("Error"),
+                    self.tr("Unable to create output file"),
+                )
                 return
 
         pdialog.hide()
-        self.iface.messageBar().pushMessage(
-            self.tr("GPKG export completed"), "", Qgis.Info, 5)
+        self.iface.messageBar().pushMessage(self.tr("GPKG export completed"), "", Qgis.Info, 5)
 
         if messages:
             QMessageBox.warning(
                 self.iface.mainWindow(),
                 self.tr("GPKG Export"),
-                self.tr("The following layers were not exported to the GeoPackage:\n- %s") % "\n- ".join(messages))
+                self.tr("The following layers were not exported to the GeoPackage:\n- %s")
+                % "\n- ".join(messages),
+            )
 
     def init_gpkg_qgis(self, cursor):
         # Create extension
         cursor.execute(
-            'CREATE TABLE IF NOT EXISTS gpkg_extensions (table_name TEXT,column_name TEXT,extension_name TEXT NOT NULL,definition TEXT NOT NULL,scope TEXT NOT NULL,CONSTRAINT ge_tce UNIQUE (table_name, column_name, extension_name))')
-        extension_record = (None, None, 'qgis',
-                            'http://github.com/pka/qgpkg/blob/master/'
-                            'qgis_geopackage_extension.md',
-                            'read-write')
-        cursor.execute('SELECT count(1) FROM gpkg_extensions WHERE extension_name=?', (extension_record[2],))
+            "CREATE TABLE IF NOT EXISTS gpkg_extensions (table_name TEXT,column_name TEXT,extension_name TEXT NOT NULL,definition TEXT NOT NULL,scope TEXT NOT NULL,CONSTRAINT ge_tce UNIQUE (table_name, column_name, extension_name))"
+        )
+        extension_record = (
+            None,
+            None,
+            "qgis",
+            "http://github.com/pka/qgpkg/blob/master/" "qgis_geopackage_extension.md",
+            "read-write",
+        )
+        cursor.execute(
+            "SELECT count(1) FROM gpkg_extensions WHERE extension_name=?", (extension_record[2],)
+        )
         if cursor.fetchone()[0] == 0:
-            cursor.execute('INSERT INTO gpkg_extensions VALUES (?,?,?,?,?)', extension_record)
+            cursor.execute("INSERT INTO gpkg_extensions VALUES (?,?,?,?,?)", extension_record)
 
         # Create qgis_projects table
-        cursor.execute('CREATE TABLE IF NOT EXISTS qgis_projects (name TEXT PRIMARY KEY, xml TEXT NOT NULL)')
+        cursor.execute(
+            "CREATE TABLE IF NOT EXISTS qgis_projects (name TEXT PRIMARY KEY, xml TEXT NOT NULL)"
+        )
 
         # Create qgis_resources table
-        cursor.execute('CREATE TABLE IF NOT EXISTS qgis_resources (name TEXT PRIMARY KEY, mime_type TEXT NOT NULL, content BLOB NOT NULL)')
+        cursor.execute(
+            "CREATE TABLE IF NOT EXISTS qgis_resources (name TEXT PRIMARY KEY, mime_type TEXT NOT NULL, content BLOB NOT NULL)"
+        )
 
     def write_project(self, cursor, project_xml):
-        """ Write or update qgis project """
+        """Write or update qgis project"""
         project_name = "qgpkg"
-        cursor.execute('SELECT count(1) FROM qgis_projects WHERE name=?', (project_name,))
+        cursor.execute("SELECT count(1) FROM qgis_projects WHERE name=?", (project_name,))
         if cursor.fetchone()[0] == 0:
-            cursor.execute('INSERT INTO qgis_projects VALUES (?,?)', (project_name, project_xml))
+            cursor.execute("INSERT INTO qgis_projects VALUES (?,?)", (project_name, project_xml))
         else:
-            cursor.execute('UPDATE qgis_projects SET xml=? WHERE name=?', (project_xml, project_name))
+            cursor.execute(
+                "UPDATE qgis_projects SET xml=? WHERE name=?", (project_xml, project_name)
+            )
 
-    def rewriteProjectPaths(self, path, gpkg_filename, added_layers_by_source, layer_sources, additional_resources):
+    def rewriteProjectPaths(
+        self, path, gpkg_filename, added_layers_by_source, layer_sources, additional_resources
+    ):
         if not path:
             return path
 
@@ -222,7 +270,7 @@ class KadasGpkgExport(KadasGpkgExportBase):
                 additional_resources[path] = str(uuid.uuid1()) + os.path.splitext(path)[1]
 
             return "@qgis_resources@/%s" % additional_resources[path]
-        
+
         for added_layer_source in added_layers_by_source.keys():
             if path in added_layer_source:
                 # Datasource newly added to GPKG: rewrite as GPKG path
@@ -236,20 +284,28 @@ class KadasGpkgExport(KadasGpkgExportBase):
         return path
 
     def add_resource(self, cursor, path, resource_id):
-        """ Add a resource file to qgis_resources """
-        with open(path, 'rb') as fh:
+        """Add a resource file to qgis_resources"""
+        with open(path, "rb") as fh:
             blob = fh.read()
             mime_type = mimetypes.MimeTypes().guess_type(path)[0]
-            cursor.execute('SELECT count(1) FROM qgis_resources WHERE name=?', (resource_id,))
+            cursor.execute("SELECT count(1) FROM qgis_resources WHERE name=?", (resource_id,))
             if cursor.fetchone()[0] == 0:
-                cursor.execute('INSERT INTO qgis_resources VALUES(?, ?, ?)', (resource_id, mime_type, sqlite3.Binary(blob)))
+                cursor.execute(
+                    "INSERT INTO qgis_resources VALUES(?, ?, ?)",
+                    (resource_id, mime_type, sqlite3.Binary(blob)),
+                )
             else:
-                cursor.execute('UPDATE qgis_resources SET mime_type=?, content=? WHERE name=?', (mime_type, sqlite3.Binary(blob), resource_id))
+                cursor.execute(
+                    "UPDATE qgis_resources SET mime_type=?, content=? WHERE name=?",
+                    (mime_type, sqlite3.Binary(blob), resource_id),
+                )
 
     def __flagRedliningItemsOutsideExtent(self, extent, crs):
-        """ Flag redlining items outside export extent """
+        """Flag redlining items outside export extent"""
 
-        rectExportExtent = KadasMapRect(extent.xMinimum(), extent.yMinimum(), extent.xMaximum(), extent.yMaximum())
+        rectExportExtent = KadasMapRect(
+            extent.xMinimum(), extent.yMinimum(), extent.xMaximum(), extent.yMaximum()
+        )
         mapSettings = self.iface.mapCanvas().mapSettings()
 
         for layer in KadasItemLayerRegistry.getItemLayers():
@@ -259,8 +315,8 @@ class KadasGpkgExport(KadasGpkgExportBase):
                     item.setProperty(self.PROPERTY_ITEM_TO_BE_REMOVED, True)
 
     def __removeRedliningItemsFlag(self):
-        """ Remove redlining items flag """
-        
+        """Remove redlining items flag"""
+
         for layer in KadasItemLayerRegistry.getItemLayers():
             for item in layer.items().values():
                 if self.PROPERTY_ITEM_TO_BE_REMOVED in item.dynamicPropertyNames():
@@ -268,10 +324,10 @@ class KadasGpkgExport(KadasGpkgExportBase):
                     item.setProperty(self.PROPERTY_ITEM_TO_BE_REMOVED, None)
 
     def __removeFlaggedRedlining(self, doc):
-        """ Remove redlining items outside export extent """
-        
+        """Remove redlining items outside export extent"""
+
         for mapItemEl in doc.iterfind("projectlayers/maplayer/MapItem"):
-            
+
             nameAttribute = mapItemEl.attrib.get("name", str())
             if not nameAttribute.startswith("Kadas"):
                 return
@@ -287,4 +343,3 @@ class KadasGpkgExport(KadasGpkgExportBase):
                 # Remove redlining item
                 mapItemEl.getparent().remove(mapItemEl)
                 continue
-            

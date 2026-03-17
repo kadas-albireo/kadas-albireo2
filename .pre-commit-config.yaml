@@ -2,12 +2,12 @@
 # See https://pre-commit.com/hooks.html for more hooks
 exclude: |
   (?x)^(
-    share/ |
+    share/(?!python/plugins/) |
     .clang-format$
   )
 repos:
 - repo: https://github.com/pre-commit/mirrors-clang-format
-  rev: v21.1.8
+  rev: v22.1.1
   hooks:
   - id: clang-format
     types_or: [c++, c, c#]
@@ -19,6 +19,34 @@ repos:
     args: [--in-place]
     additional_dependencies: [pyyaml>=5.1]
   #- id: cmake-lint
+
+- repo: https://github.com/PyCQA/autoflake
+  rev: v2.3.3
+  hooks:
+  - id: autoflake
+    files: ^share/python/plugins/
+    args: [--in-place, --remove-all-unused-imports, --remove-unused-variables]
+
+- repo: https://github.com/PyCQA/isort
+  rev: 8.0.1
+  hooks:
+  - id: isort
+    files: ^share/python/plugins/
+    args: [--profile, black, --line-length, "99"]
+
+- repo: https://github.com/psf/black
+  rev: 26.3.1
+  hooks:
+  - id: black
+    files: ^share/python/plugins/
+    args: [--line-length, "99"]
+
+- repo: https://github.com/PyCQA/flake8
+  rev: 7.3.0
+  hooks:
+  - id: flake8
+    files: ^share/python/plugins/
+    args: [--max-line-length, "99"]
 
 ci:
   autofix_prs: true

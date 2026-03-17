@@ -11,10 +11,12 @@
 """
 
 import os
+
+from kadas.kadasgui import *
 from qgis.PyQt.QtCore import *
 from qgis.PyQt.QtGui import *
 from qgis.PyQt.QtWidgets import *
-from kadas.kadasgui import *
+
 from .about_dialog import AboutDialog
 
 
@@ -25,11 +27,10 @@ class AboutPlugin:
         self.plugin_dir = os.path.dirname(__file__)
 
         # initialize locale
-        self.locale = QSettings().value('locale/userLocale', 'en')[0:2]
+        self.locale = QSettings().value("locale/userLocale", "en")[0:2]
         locale_path = os.path.join(
-            self.plugin_dir,
-            'i18n',
-            'kadas_about_{}.qm'.format(self.locale))
+            self.plugin_dir, "i18n", "kadas_about_{}.qm".format(self.locale)
+        )
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -49,8 +50,8 @@ class AboutPlugin:
 
     def showAbout(self):
         locale = self.locale
-        if not locale in ['en', 'de', 'it', 'fr']:
-            locale = 'en'
+        if not locale in ["en", "de", "it", "fr"]:
+            locale = "en"
         if self.aboutWidget is None:
             self.aboutWidget = AboutDialog(locale, self.iface.mainWindow())
         self.aboutWidget.show()

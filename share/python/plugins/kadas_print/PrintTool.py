@@ -7,22 +7,24 @@
 #
 #    copyright            : (C) 2015 by Sourcepole AG
 
+import os
+
+from kadas.kadasgui import *
+from qgis.core import *
+from qgis.gui import *
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import *
 from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
 from qgis.PyQt.QtPrintSupport import *
+from qgis.PyQt.QtWidgets import *
 from qgis.PyQt.QtXml import *
-from qgis.core import *
-from qgis.gui import *
-from kadas.kadasgui import *
-import os
-import math
 
 from .CartoucheDialog import CartoucheDialog
 from .PrintLayoutManager import PrintLayoutManager
 
 Ui_PrintDialog, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "ui", "printdialog.ui"))
+
+
 class PrintTool(KadasMapToolSelectRect):
 
     def __init__(self, iface):
@@ -42,27 +44,27 @@ class PrintTool(KadasMapToolSelectRect):
         self.dialogui = Ui_PrintDialog()
         self.dialogui.setupUi(self.dialog)
         self.exportButton = self.dialogui.buttonBox.addButton(
-            self.tr("Export"), QDialogButtonBox.ButtonRole.ActionRole)
+            self.tr("Export"), QDialogButtonBox.ButtonRole.ActionRole
+        )
         self.printButton = self.dialogui.buttonBox.addButton(
-            self.tr("Print"), QDialogButtonBox.ButtonRole.ActionRole)
+            self.tr("Print"), QDialogButtonBox.ButtonRole.ActionRole
+        )
         self.advancedButton = self.dialogui.buttonBox.addButton(
-            self.tr("Advanced"), QDialogButtonBox.ButtonRole.HelpRole)
+            self.tr("Advanced"), QDialogButtonBox.ButtonRole.HelpRole
+        )
 
         proxy = QSortFilterProxyModel(self.dialogui.comboBox_printlayouts)
         proxy.setSourceModel(self.dialogui.comboBox_printlayouts.model())
         self.dialogui.comboBox_printlayouts.model().setParent(proxy)
         self.dialogui.comboBox_printlayouts.setModel(proxy)
 
+        self.dialogui.comboBox_fileformat.addItem("PDF", self.tr("PDF Document (*.pdf);;"))
         self.dialogui.comboBox_fileformat.addItem(
-            "PDF", self.tr("PDF Document (*.pdf);;"))
-        self.dialogui.comboBox_fileformat.addItem(
-            "GeoPDF", self.tr("GeoPDF Document (*.geopdf);;"))
-        self.dialogui.comboBox_fileformat.addItem(
-            "JPG", self.tr("JPG Image (*.jpg);;"))
-        self.dialogui.comboBox_fileformat.addItem(
-            "BMP", self.tr("BMP Image (*.bmp);;"))
-        self.dialogui.comboBox_fileformat.addItem(
-            "PNG", self.tr("PNG Image (*.png);;"))
+            "GeoPDF", self.tr("GeoPDF Document (*.geopdf);;")
+        )
+        self.dialogui.comboBox_fileformat.addItem("JPG", self.tr("JPG Image (*.jpg);;"))
+        self.dialogui.comboBox_fileformat.addItem("BMP", self.tr("BMP Image (*.bmp);;"))
+        self.dialogui.comboBox_fileformat.addItem("PNG", self.tr("PNG Image (*.png);;"))
 
         self.dialogui.comboBox_crs.addItem("LV95", "EPSG:2056,0")
         self.dialogui.comboBox_crs.addItem("LV03", "EPSG:21781,0")
@@ -80,43 +82,27 @@ class PrintTool(KadasMapToolSelectRect):
         self.dialogui.previewGraphic.resizeEvent = self.__resizePreview
 
         QgsProject.instance().layoutManager().layoutAdded.connect(
-            lambda view: self.__reloadPrintLayouts())
-        QgsProject.instance().layoutManager().layoutRemoved.connect(
-            self.__reloadPrintLayouts)
-        self.dialogui.comboBox_printlayouts.currentIndexChanged.connect(
-            self.__selectPrintLayout)
-        self.dialogui.toolButton_layoutManager.clicked.connect(
-            self.__manageLayouts)
-        self.dialogui.lineEdit_title.textChanged.connect(
-            self.__titleChanged)
-        self.dialogui.comboBox_scale.scaleChanged.connect(
-            self.__changeScale)
-        self.dialogui.spinBox_border.valueChanged.connect(
-            self.__generatePrintLayout)
-        self.dialogui.lineedit_xmin.editingFinished.connect(
-            self.__generatePrintLayout)
-        self.dialogui.lineedit_xmax.editingFinished.connect(
-            self.__generatePrintLayout)
-        self.dialogui.lineedit_ymin.editingFinished.connect(
-            self.__generatePrintLayout)
-        self.dialogui.lineedit_ymax.editingFinished.connect(
-            self.__generatePrintLayout)
-        self.dialogui.button_mapCartouche.clicked.connect(
-            self.__showCartoucheDialog)
-        self.dialogui.comboBox_crs.currentIndexChanged.connect(
-            self.__setupGrid)
-        self.dialogui.checkBox_gridAnnotations.toggled.connect(
-            self.__toggleGridAnnotations)
+            lambda view: self.__reloadPrintLayouts()
+        )
+        QgsProject.instance().layoutManager().layoutRemoved.connect(self.__reloadPrintLayouts)
+        self.dialogui.comboBox_printlayouts.currentIndexChanged.connect(self.__selectPrintLayout)
+        self.dialogui.toolButton_layoutManager.clicked.connect(self.__manageLayouts)
+        self.dialogui.lineEdit_title.textChanged.connect(self.__titleChanged)
+        self.dialogui.comboBox_scale.scaleChanged.connect(self.__changeScale)
+        self.dialogui.spinBox_border.valueChanged.connect(self.__generatePrintLayout)
+        self.dialogui.lineedit_xmin.editingFinished.connect(self.__generatePrintLayout)
+        self.dialogui.lineedit_xmax.editingFinished.connect(self.__generatePrintLayout)
+        self.dialogui.lineedit_ymin.editingFinished.connect(self.__generatePrintLayout)
+        self.dialogui.lineedit_ymax.editingFinished.connect(self.__generatePrintLayout)
+        self.dialogui.button_mapCartouche.clicked.connect(self.__showCartoucheDialog)
+        self.dialogui.comboBox_crs.currentIndexChanged.connect(self.__setupGrid)
+        self.dialogui.checkBox_gridAnnotations.toggled.connect(self.__toggleGridAnnotations)
         self.dialogui.checkBox_legend.toggled.connect(self.__toggleLegend)
-        self.dialogui.button_configureLegend.clicked.connect(
-            lambda: self.__configureLegend())
+        self.dialogui.button_configureLegend.clicked.connect(lambda: self.__configureLegend())
         self.dialogui.checkBox_scalebar.toggled.connect(self.__toggleScalebar)
-        self.dialogui.checkBox_mapCartouche.toggled.connect(
-            self.__toggleMapCartouche)
-        self.dialogui.spinBox_intervalx.valueChanged.connect(
-            self.__intervalXChanged)
-        self.dialogui.spinBox_intervaly.valueChanged.connect(
-            self.__intervalYChanged)
+        self.dialogui.checkBox_mapCartouche.toggled.connect(self.__toggleMapCartouche)
+        self.dialogui.spinBox_intervalx.valueChanged.connect(self.__intervalXChanged)
+        self.dialogui.spinBox_intervaly.valueChanged.connect(self.__intervalYChanged)
         self.dialogui.groupBox_grid.setChecked(False)
         self.exportButton.clicked.connect(self.__export)
         self.printButton.clicked.connect(self.__print)
@@ -124,8 +110,7 @@ class PrintTool(KadasMapToolSelectRect):
         self.dialog.finished.connect(self.close)
         self.dialogui.groupBox_grid.toggled.connect(self.__setupGrid)
         self.iface.mapCanvas().mapCanvasRefreshed.connect(self.__updateMap)
-        self.iface.mapCanvas().destinationCrsChanged.connect(
-            self.__mapUnitsChanged)
+        self.iface.mapCanvas().destinationCrsChanged.connect(self.__mapUnitsChanged)
         self.rectChanged.connect(self.__updateRectCoords)
         self.rectChangeComplete.connect(self.__rectChangeComplete)
 
@@ -140,9 +125,10 @@ class PrintTool(KadasMapToolSelectRect):
             self.mapitem.update()
 
     def __mapUnitsChanged(self):
-        if not self.fixedSizeMode and \
-                self.iface.mapCanvas().mapSettings().mapUnits() \
-                != QgsUnitTypes.DistanceMeters:
+        if (
+            not self.fixedSizeMode
+            and self.iface.mapCanvas().mapSettings().mapUnits() != QgsUnitTypes.DistanceMeters
+        ):
             self.__setUiEnabled(False)
             self.dialogui.label_unitWarning.setVisible(True)
         elif self.dialogui.label_unitWarning.isVisible():
@@ -169,32 +155,36 @@ class PrintTool(KadasMapToolSelectRect):
             # Only update extent if it does not intersect
             # with full extent of map
             extent = self.__getCustomExtent()
-            if not extent or not self.iface.mapCanvas().fullExtent().contains(
-                    extent):
+            if not extent or not self.iface.mapCanvas().fullExtent().contains(extent):
                 extent = self.iface.mapCanvas().extent()
                 self.dialogui.lineedit_xmin.setText(
-                    str(round(extent.xMinimum() + 0.125 * extent.width())))
+                    str(round(extent.xMinimum() + 0.125 * extent.width()))
+                )
                 self.dialogui.lineedit_xmax.setText(
-                    str(round(extent.xMaximum() - 0.125 * extent.width())))
+                    str(round(extent.xMaximum() - 0.125 * extent.width()))
+                )
                 self.dialogui.lineedit_ymin.setText(
-                    str(round(extent.yMinimum() + 0.125 * extent.height())))
+                    str(round(extent.yMinimum() + 0.125 * extent.height()))
+                )
                 self.dialogui.lineedit_ymax.setText(
-                    str(round(extent.yMaximum() - 0.125 * extent.height())))
+                    str(round(extent.yMaximum() - 0.125 * extent.height()))
+                )
             self.__generatePrintLayout()
         else:
             extent = self.iface.mapCanvas().extent()
-            extentheight = self.mapitem.extent().height() / self.mapitem.extent().width() * extent.width()
+            extentheight = (
+                self.mapitem.extent().height() / self.mapitem.extent().width() * extent.width()
+            )
             center = extent.center().y()
-            extent.setYMinimum(center - extentheight / 2.)
-            extent.setYMaximum(center + extentheight / 2.)
+            extent.setYMinimum(center - extentheight / 2.0)
+            extent.setYMaximum(center + extentheight / 2.0)
             self.mapitem.setExtent(extent)
         wmtsScales = []
         refRes = 0.0254 / self.printLayout.renderContext().dpi()
         resolutions = self.iface.mapCanvas().zoomResolutions()
-        minDist = -1
         bestScale = self.mapitem.scale()
         if resolutions:
-            minDist = abs(self.mapitem.scale() - refRes / resolutions[0])
+            abs(self.mapitem.scale() - refRes / resolutions[0])
         for resolution in resolutions:
             scale = resolution / refRes
             if self.mapitem.scale() > scale:
@@ -232,15 +222,12 @@ class PrintTool(KadasMapToolSelectRect):
             self.dialogui.groupBox_grid.setEnabled(False)
         else:
             self.__setupGrid()
-        cartoucheItem = self.__layoutItem(
-            "mapcartouche", QgsLayoutItemGroup)
+        cartoucheItem = self.__layoutItem("mapcartouche", QgsLayoutItemGroup)
         if not cartoucheItem:
             self.dialogui.checkBox_mapCartouche.setEnabled(False)
         else:
-            self.dialogui.checkBox_mapCartouche.setChecked(
-                cartoucheItem.isVisible())
-        self.dialogui.groupBox_grid.setChecked(
-            self.mapitem.grid().enabled())
+            self.dialogui.checkBox_mapCartouche.setChecked(cartoucheItem.isVisible())
+        self.dialogui.groupBox_grid.setChecked(self.mapitem.grid().enabled())
 
     def close(self):
         self.iface.mapCanvas().unsetMapTool(self)
@@ -273,28 +260,32 @@ class PrintTool(KadasMapToolSelectRect):
             self.mapitem.grid().setEnabled(False)
         else:
             crs, format = self.dialogui.comboBox_crs.itemData(
-                self.dialogui.comboBox_crs.currentIndex()).split(",")
+                self.dialogui.comboBox_crs.currentIndex()
+            ).split(",")
             self.mapitem.grid().setEnabled(True)
             self.grid.setCrs(QgsCoordinateReferenceSystem(crs))
-            if format == '0':
+            if format == "0":
                 self.grid.setAnnotationPrecision(5)
                 self.grid.setAnnotationFormat(QgsLayoutItemMapGrid.Decimal)
-            elif format == 'second':
+            elif format == "second":
                 self.grid.setAnnotationPrecision(1)
                 self.grid.setAnnotationFormat(QgsLayoutItemMapGrid.DegreeMinuteSecond)
-            elif format == 'minute':
+            elif format == "minute":
                 self.grid.setAnnotationPrecision(3)
                 self.grid.setAnnotationFormat(QgsLayoutItemMapGrid.DegreeMinute)
 
             self.grid.setAnnotationDisplay(
-                QgsLayoutItemMapGrid.LongitudeOnly, QgsLayoutItemMapGrid.Top)
+                QgsLayoutItemMapGrid.LongitudeOnly, QgsLayoutItemMapGrid.Top
+            )
             self.grid.setAnnotationDisplay(
-                QgsLayoutItemMapGrid.LatitudeOnly, QgsLayoutItemMapGrid.Right)
+                QgsLayoutItemMapGrid.LatitudeOnly, QgsLayoutItemMapGrid.Right
+            )
             self.grid.setAnnotationDisplay(
-                QgsLayoutItemMapGrid.LongitudeOnly,
-                QgsLayoutItemMapGrid.Bottom)
+                QgsLayoutItemMapGrid.LongitudeOnly, QgsLayoutItemMapGrid.Bottom
+            )
             self.grid.setAnnotationDisplay(
-                QgsLayoutItemMapGrid.LatitudeOnly, QgsLayoutItemMapGrid.Left)
+                QgsLayoutItemMapGrid.LatitudeOnly, QgsLayoutItemMapGrid.Left
+            )
             if crs != "EPSG:4326":
                 # self.grid.setAnnotationDisplay(QgsComposerMapGrid.HideAll, QgsComposerMapGrid.Top)
                 # self.grid.setAnnotationDisplay(QgsComposerMapGrid.HideAll, QgsComposerMapGrid.Right)
@@ -306,12 +297,10 @@ class PrintTool(KadasMapToolSelectRect):
             self.dialogui.label_intervaly.setEnabled(True)
             # Get interval from composer
             self.dialogui.spinBox_intervalx.blockSignals(True)
-            self.dialogui.spinBox_intervalx.setValue(
-                self.mapitem.grid().intervalX())
+            self.dialogui.spinBox_intervalx.setValue(self.mapitem.grid().intervalX())
             self.dialogui.spinBox_intervalx.blockSignals(False)
             self.dialogui.spinBox_intervaly.blockSignals(True)
-            self.dialogui.spinBox_intervaly.setValue(
-                self.mapitem.grid().intervalY())
+            self.dialogui.spinBox_intervaly.setValue(self.mapitem.grid().intervalY())
             self.dialogui.spinBox_intervaly.blockSignals(False)
 
         self.__updateView()
@@ -376,13 +365,15 @@ class PrintTool(KadasMapToolSelectRect):
             item.setData(Qt.ItemDataRole.UserRole, layerNode.layerId())
             layersList.setItem(row, 0, item)
             combo = QComboBox()
-            combo.addItems([
-                self.tr("Hidden"),
-                self.tr("Visible without layer legend"),
-                self.tr("Visible with layer legend")])
+            combo.addItems(
+                [
+                    self.tr("Hidden"),
+                    self.tr("Visible without layer legend"),
+                    self.tr("Visible with layer legend"),
+                ]
+            )
             if layerNode.layerId() in prevLayers:
-                combo.setCurrentIndex(
-                    2 if prevLayers[layerNode.layerId()] is True else 1)
+                combo.setCurrentIndex(2 if prevLayers[layerNode.layerId()] is True else 1)
             else:
                 combo.setCurrentIndex(0)
             layersList.setCellWidget(row, 1, combo)
@@ -390,11 +381,11 @@ class PrintTool(KadasMapToolSelectRect):
         if execDialog:
             legendDialog.resize(320, 240)
             bbox = QDialogButtonBox(
-                QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+                QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
+            )
             legendDialog.setWindowTitle(self.tr("Configure legend"))
             legendDialog.setLayout(QVBoxLayout())
-            legendDialog.layout().addWidget(QLabel(
-                self.tr("Select layers to display in legend:")))
+            legendDialog.layout().addWidget(QLabel(self.tr("Select layers to display in legend:")))
             legendDialog.layout().addWidget(layersList)
             legendDialog.layout().addWidget(bbox)
             bbox.accepted.connect(legendDialog.accept)
@@ -419,8 +410,7 @@ class PrintTool(KadasMapToolSelectRect):
                 elif layerNode.layerId() in removeLegends:
                     index = model.node2index(layerNode)
                     if model.rowCount(index) > 0:
-                        layerNode.setCustomProperty(
-                            "legend/node-order", "empty")
+                        layerNode.setCustomProperty("legend/node-order", "empty")
                         model.refreshLayerLegend(layerNode)
             legendItem.adjustBoxSize()
             legendItem.updateLegend()
@@ -508,7 +498,7 @@ class PrintTool(KadasMapToolSelectRect):
             self.__setUiEnabled(False)
 
         layoutEl = layoutEls.at(0).toElement()
-        layout = QgsPrintLayout( QgsProject.instance() )
+        layout = QgsPrintLayout(QgsProject.instance())
         layout.setName(layoutEl.attribute("name"))
 
         if not layout.loadFromTemplate(doc, QgsReadWriteContext()):
@@ -532,11 +522,14 @@ class PrintTool(KadasMapToolSelectRect):
             layout.__class__ = QgsPrintLayout
             self.fixedSizeMode = layout.name() != "Custom"
             self.setAllowResize(not self.fixedSizeMode)
-        except Exception as e:
+        except Exception:
             self.__setUiEnabled(False)
             return
 
-        if not self.fixedSizeMode and self.iface.mapCanvas().mapSettings().mapUnits() != QgsUnitTypes.DistanceMeters:
+        if (
+            not self.fixedSizeMode
+            and self.iface.mapCanvas().mapSettings().mapUnits() != QgsUnitTypes.DistanceMeters
+        ):
             self.__setUiEnabled(False)
             self.dialogui.label_unitWarning.setVisible(True)
             return
@@ -547,7 +540,8 @@ class PrintTool(KadasMapToolSelectRect):
             QMessageBox.warning(
                 self.iface.mainWindow(),
                 self.tr("Invalid layout"),
-                self.tr("The layout must have exactly one map item."))
+                self.tr("The layout must have exactly one map item."),
+            )
             self.__setUiEnabled(False)
             return
 
@@ -590,10 +584,10 @@ class PrintTool(KadasMapToolSelectRect):
         if not extent:
             return
         border = self.dialogui.spinBox_border.value()
-        borderdelta = border - self.mapitem.x()
+        border - self.mapitem.x()
 
-        mapwidth = ((extent.xMaximum() - extent.xMinimum()) / scale * 1000.0)
-        mapheight = ((extent.yMaximum() - extent.yMinimum()) / scale * 1000.0)
+        mapwidth = (extent.xMaximum() - extent.xMinimum()) / scale * 1000.0
+        mapheight = (extent.yMaximum() - extent.yMinimum()) / scale * 1000.0
 
         self.mapitem.attemptSetSceneRect(QRectF(border, border, mapwidth, mapheight))
         self.mapitem.attemptMove(QgsLayoutPoint(border, border), False, False, 0)
@@ -613,8 +607,8 @@ class PrintTool(KadasMapToolSelectRect):
         pageCollection.endPageSizeChange()
 
         self.dialogui.label_paperSize.setText(
-            self.tr("Paper size: %.2f cm x %.2f cm") % (
-                newwidth / 10., newheight / 10.))
+            self.tr("Paper size: %.2f cm x %.2f cm") % (newwidth / 10.0, newheight / 10.0)
+        )
 
         self.setRect(extent)
         self.__resizePreview()
@@ -623,20 +617,23 @@ class PrintTool(KadasMapToolSelectRect):
     def __export(self):
         settings = QSettings()
         format = self.dialogui.comboBox_fileformat.itemData(
-            self.dialogui.comboBox_fileformat.currentIndex())
+            self.dialogui.comboBox_fileformat.currentIndex()
+        )
 
         # Ensure output filename has correct extension
         filename = settings.value("/print/lastfile", "")
         if filename:
-            filename = os.path.splitext(filename)[0] + "." + self.dialogui.comboBox_fileformat.currentText().lower()
+            filename = (
+                os.path.splitext(filename)[0]
+                + "."
+                + self.dialogui.comboBox_fileformat.currentText().lower()
+            )
         else:
             filename = QDir.homePath()
 
         filename = QFileDialog.getSaveFileName(
-            self.iface.mainWindow(),
-            self.tr("Print Layout"),
-            filename,
-            format)
+            self.iface.mainWindow(), self.tr("Print Layout"), filename, format
+        )
 
         if type(filename) == tuple:
             filename = filename[0]
@@ -644,36 +641,37 @@ class PrintTool(KadasMapToolSelectRect):
             return
 
         self.printing = True
-        QApplication.setOverrideCursor( Qt.CursorShape.WaitCursor )
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
         self.dialogui.previewGraphic.setUpdatesEnabled(False)
         self.dialog.setEnabled(False)
 
         # Ensure output filename has correct extension
-        filename = os.path.splitext(filename)[
-            0] + "." + self.dialogui.comboBox_fileformat.currentText().lower()
+        filename = (
+            os.path.splitext(filename)[0]
+            + "."
+            + self.dialogui.comboBox_fileformat.currentText().lower()
+        )
 
         settings.setValue("/print/lastfile", filename)
 
         success = False
         exporter = QgsLayoutExporter(self.printLayout)
-        if filename[-4:].lower() == u".pdf":
-            success = exporter.exportToPdf(
-                filename, QgsLayoutExporter.PdfExportSettings())
-        elif filename[-7:].lower() == u".geopdf":
+        if filename[-4:].lower() == ".pdf":
+            success = exporter.exportToPdf(filename, QgsLayoutExporter.PdfExportSettings())
+        elif filename[-7:].lower() == ".geopdf":
             pdfExportSettings = QgsLayoutExporter.PdfExportSettings()
             pdfExportSettings.writeGeoPdf = True
 
-            success = exporter.exportToPdf(
-                filename, pdfExportSettings)
+            success = exporter.exportToPdf(filename, pdfExportSettings)
         else:
-            success = exporter.exportToImage(
-                filename, QgsLayoutExporter.ImageExportSettings())
+            success = exporter.exportToImage(filename, QgsLayoutExporter.ImageExportSettings())
         if success != QgsLayoutExporter.Success:
             self.iface.messageBar().clearWidgets()
             QMessageBox.warning(
                 self.iface.mainWindow(),
                 self.tr("Print Failed"),
-                self.tr("Failed to print the layout."))
+                self.tr("Failed to print the layout."),
+            )
 
         self.dialog.setEnabled(True)
         self.dialogui.previewGraphic.setUpdatesEnabled(True)
@@ -683,9 +681,8 @@ class PrintTool(KadasMapToolSelectRect):
     def __print(self):
         if not QPrinterInfo.availablePrinterNames():
             QMessageBox.warning(
-                self.dialog,
-                self.tr("No Printers"),
-                self.tr("No printers were found."))
+                self.dialog, self.tr("No Printers"), self.tr("No printers were found.")
+            )
         else:
             if not self.printer:
                 self.printer = QPrinter()
@@ -698,12 +695,11 @@ class PrintTool(KadasMapToolSelectRect):
                 return
 
             self.printing = True
-            QApplication.setOverrideCursor( Qt.CursorShape.WaitCursor )
+            QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
             self.dialogui.previewGraphic.setUpdatesEnabled(False)
             self.dialog.setEnabled(False)
 
-            success = exporter.print(
-                self.printer, QgsLayoutExporter.PrintExportSettings())
+            success = exporter.print(self.printer, QgsLayoutExporter.PrintExportSettings())
 
             self.dialog.setEnabled(True)
             self.dialogui.previewGraphic.setUpdatesEnabled(True)
@@ -714,13 +710,15 @@ class PrintTool(KadasMapToolSelectRect):
                 QMessageBox.warning(
                     self.iface.mainWindow(),
                     self.tr("Print Failed"),
-                    self.tr("Failed to print the layout."))
+                    self.tr("Failed to print the layout."),
+                )
 
     def __setUiEnabled(self, enabled):
         self.dialogui.lineEdit_title.setEnabled(enabled)
         self.dialogui.comboBox_scale.setEnabled(enabled)
         self.dialogui.button_mapCartouche.setEnabled(
-            self.dialogui.checkBox_mapCartouche.isChecked())
+            self.dialogui.checkBox_mapCartouche.isChecked()
+        )
         self.dialogui.checkBox_legend.setEnabled(enabled)
         self.dialogui.checkBox_scalebar.setEnabled(enabled)
         self.dialogui.groupBox_grid.setEnabled(enabled)

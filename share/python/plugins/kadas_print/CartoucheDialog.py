@@ -6,17 +6,20 @@
 #    (at your option) any later version.
 #
 #    copyright            : (C) 2015 by Sourcepole AG
-import os 
+import os
 
+from qgis.core import *
+from qgis.gui import *
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import *
 from qgis.PyQt.QtGui import *
 from qgis.PyQt.QtWidgets import *
 from qgis.PyQt.QtXml import *
-from qgis.core import *
-from qgis.gui import *
 
-Ui_CartoucheDialog, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "ui", "cartouchedialog.ui"))
+Ui_CartoucheDialog, _ = uic.loadUiType(
+    os.path.join(os.path.dirname(__file__), "ui", "cartouchedialog.ui")
+)
+
 
 class CartoucheDialog(QDialog, Ui_CartoucheDialog):
     def __init__(self, scene, parent=None):
@@ -57,8 +60,12 @@ class CartoucheDialog(QDialog, Ui_CartoucheDialog):
         self.mapcartoucheView.setScene(self.scene)
         self.mapcartoucheView.resizeEvent = self.__resizeEvent
 
-        exportButton = self.buttonBox.addButton(self.tr("Export"), QDialogButtonBox.ButtonRole.ActionRole)
-        importButton = self.buttonBox.addButton(self.tr("Import"), QDialogButtonBox.ButtonRole.ActionRole)
+        exportButton = self.buttonBox.addButton(
+            self.tr("Export"), QDialogButtonBox.ButtonRole.ActionRole
+        )
+        importButton = self.buttonBox.addButton(
+            self.tr("Import"), QDialogButtonBox.ButtonRole.ActionRole
+        )
         exportButton.clicked.connect(self.__exportCartouche)
         importButton.clicked.connect(self.__importCartouche)
 
@@ -80,28 +87,40 @@ class CartoucheDialog(QDialog, Ui_CartoucheDialog):
         self.codenameLE.setText(unicode(self.__getPrintLayoutItemText("codename")))
         self.troopstitleLE.setText(unicode(self.__getPrintLayoutItemText("troopstitle")))
         self.supplementtitleLE.setText(unicode(self.__getPrintLayoutItemText("supplementtitle")))
-        self.cartouchecircumscriptionLE.setText(unicode(self.__getPrintLayoutItemText("cartouchecircumscription")))
+        self.cartouchecircumscriptionLE.setText(
+            unicode(self.__getPrintLayoutItemText("cartouchecircumscription"))
+        )
         self.scaletitleLE.setText(unicode(self.__getPrintLayoutItemText("scaletitle")))
         self.placedateLE.setText(unicode(self.__getPrintLayoutItemText("placedate")))
-        self.exerciseorganisationLE.setText(unicode(self.__getPrintLayoutItemText("exerciseorganisation")))
+        self.exerciseorganisationLE.setText(
+            unicode(self.__getPrintLayoutItemText("exerciseorganisation"))
+        )
         self.coursetitleLE.setText(unicode(self.__getPrintLayoutItemText("coursetitle")))
         self.exercisetitleLE.setText(unicode(self.__getPrintLayoutItemText("exercisetitle")))
         self.documenttitleLE.setText(unicode(self.__getPrintLayoutItemText("documenttitle")))
         self.exercisedateLE.setDate(QDate.currentDate())
 
     def updatePrintLayout(self, x=None):
-        self.__setPrintLayoutItemText("classification1", unicode(self.classification2.currentText()))
+        self.__setPrintLayoutItemText(
+            "classification1", unicode(self.classification2.currentText())
+        )
         self.__setPrintLayoutItemText("troopstitle", unicode(self.troopstitleLE.text()))
         self.__setPrintLayoutItemText("codename", unicode(self.codenameLE.text()))
-        self.__setPrintLayoutItemText("cartouchecircumscription", unicode(self.cartouchecircumscriptionLE.text()))
+        self.__setPrintLayoutItemText(
+            "cartouchecircumscription", unicode(self.cartouchecircumscriptionLE.text())
+        )
         self.__setPrintLayoutItemText("supplementtitle", unicode(self.supplementtitleLE.text()))
         self.__setPrintLayoutItemText("scaletitle", unicode(self.scaletitleLE.text()))
         self.__setPrintLayoutItemText("placedate", unicode(self.placedateLE.text()))
 
         if self.exerciseGroupBox.isChecked():
             self.__setPrintLayoutItemText("exercisedate", unicode(self.exercisedateLE.text()))
-            self.__setPrintLayoutItemText("classification2", unicode(self.classification1.currentText()))
-            self.__setPrintLayoutItemText("exerciseorganisation", unicode(self.exerciseorganisationLE.text()))
+            self.__setPrintLayoutItemText(
+                "classification2", unicode(self.classification1.currentText())
+            )
+            self.__setPrintLayoutItemText(
+                "exerciseorganisation", unicode(self.exerciseorganisationLE.text())
+            )
             self.__setPrintLayoutItemText("coursetitle", unicode(self.coursetitleLE.text()))
             self.__setPrintLayoutItemText("exercisetitle", unicode(self.exercisetitleLE.text()))
             self.__setPrintLayoutItemText("documenttitle", unicode(self.documenttitleLE.text()))
@@ -136,18 +155,34 @@ class CartoucheDialog(QDialog, Ui_CartoucheDialog):
     def __getElementText(self, parent, element, default=""):
         try:
             return parent.elementsByTagName(element).at(0).toElement().text()
-        except Exception as e:
+        except Exception:
             return default
 
     def __serializeCartouche(self):
         doc = QDomDocument()
         legend = doc.createElement("Legend")
         doc.appendChild(legend)
-        classification1 = self.classification1.itemData(self.classification1.findText(self.classification1.lineEdit().text())) or self.classification1.lineEdit().text() or "None"
-        classification2 = self.classification2.itemData(self.classification2.findText(self.classification2.lineEdit().text())) or self.classification2.lineEdit().text() or "None"
+        classification1 = (
+            self.classification1.itemData(
+                self.classification1.findText(self.classification1.lineEdit().text())
+            )
+            or self.classification1.lineEdit().text()
+            or "None"
+        )
+        classification2 = (
+            self.classification2.itemData(
+                self.classification2.findText(self.classification2.lineEdit().text())
+            )
+            or self.classification2.lineEdit().text()
+            or "None"
+        )
 
-        self.__addTextElement(legend, "ExerciseInfoVisible", ("1" if self.exerciseGroupBox.isChecked() else "0"))
-        self.__addTextElement(legend, "ExerciseDate", self.exercisedateLE.date().toString("yyyy-MM-ddT00:00:00"))
+        self.__addTextElement(
+            legend, "ExerciseInfoVisible", ("1" if self.exerciseGroupBox.isChecked() else "0")
+        )
+        self.__addTextElement(
+            legend, "ExerciseDate", self.exercisedateLE.date().toString("yyyy-MM-ddT00:00:00")
+        )
         self.__addTextElement(legend, "ExerciseCommandUnit", self.exerciseorganisationLE.text())
         self.__addTextElement(legend, "ExerciseServiceContext", self.coursetitleLE.text())
         self.__addTextElement(legend, "ExerciseClassification", classification1)
@@ -173,7 +208,9 @@ class CartoucheDialog(QDialog, Ui_CartoucheDialog):
             return False
 
         try:
-            self.exerciseGroupBox.setChecked(int(self.__getElementText(legend, "ExerciseInfoVisible", "0")))
+            self.exerciseGroupBox.setChecked(
+                int(self.__getElementText(legend, "ExerciseInfoVisible", "0"))
+            )
         except:
             self.exerciseGroupBox.setChecked(False)
 
@@ -186,7 +223,9 @@ class CartoucheDialog(QDialog, Ui_CartoucheDialog):
         classification1idx = self.classification1.findData(classification1)
         classification2idx = self.classification2.findData(classification2)
 
-        self.exercisedateLE.setDate(QDate.fromString(self.__getElementText(legend, "ExerciseDate"), "yyyy-MM-ddT00:00:00"))
+        self.exercisedateLE.setDate(
+            QDate.fromString(self.__getElementText(legend, "ExerciseDate"), "yyyy-MM-ddT00:00:00")
+        )
         self.exerciseorganisationLE.setText(self.__getElementText(legend, "ExerciseCommandUnit"))
         self.coursetitleLE.setText(self.__getElementText(legend, "ExerciseServiceContext"))
         if classification1idx >= 0:
@@ -210,8 +249,11 @@ class CartoucheDialog(QDialog, Ui_CartoucheDialog):
 
     def __exportCartouche(self):
         lastDir = QSettings().value("/UI/lastImportExportDir", ".")
-        filename = QFileDialog.getSaveFileName(self, self.tr("Export cartouche"), lastDir, self.tr("XML Files (*.xml);;"))
-        if type(filename) == tuple: filename = filename[0]
+        filename = QFileDialog.getSaveFileName(
+            self, self.tr("Export cartouche"), lastDir, self.tr("XML Files (*.xml);;")
+        )
+        if type(filename) == tuple:
+            filename = filename[0]
         if not filename:
             return
         fileinfo = QFileInfo(filename)
@@ -219,14 +261,19 @@ class CartoucheDialog(QDialog, Ui_CartoucheDialog):
 
         file = QFile(filename)
         if not file.open(QIODevice.OpenModeFlag.WriteOnly):
-            QMessageBox.critical(self, self.tr("Export failed"), self.tr("Unable to write to file."))
+            QMessageBox.critical(
+                self, self.tr("Export failed"), self.tr("Unable to write to file.")
+            )
 
-        file.write(self.__serializeCartouche().encode('utf-8'))
+        file.write(self.__serializeCartouche().encode("utf-8"))
 
     def __importCartouche(self):
         lastDir = QSettings().value("/UI/lastImportExportDir", ".")
-        filename = QFileDialog.getOpenFileName(self, self.tr("Import cartouche"), lastDir, self.tr("XML Files (*.xml);;"))
-        if type(filename) == tuple: filename = filename[0]
+        filename = QFileDialog.getOpenFileName(
+            self, self.tr("Import cartouche"), lastDir, self.tr("XML Files (*.xml);;")
+        )
+        if type(filename) == tuple:
+            filename = filename[0]
         fileinfo = QFileInfo(filename)
         if not fileinfo.exists():
             return
@@ -239,6 +286,10 @@ class CartoucheDialog(QDialog, Ui_CartoucheDialog):
 
         xmlstr = file.readAll()
         if not self.__deserializeCartouche(xmlstr):
-            QMessageBox.critical(self, self.tr("Import failed"), self.tr("The file does not appear to contain valid cartouche data."))
+            QMessageBox.critical(
+                self,
+                self.tr("Import failed"),
+                self.tr("The file does not appear to contain valid cartouche data."),
+            )
         else:
             self.updatePrintLayout()

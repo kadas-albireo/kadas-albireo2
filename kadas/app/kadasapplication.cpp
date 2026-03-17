@@ -133,14 +133,16 @@ static void setupVectorLayer( const QString &vectorLayerPath, const QStringList 
   // Except for a few select extensions, known to be always single layer dataset.
   QFileInfo fi( vectorLayerPath );
   QString ext = fi.suffix().toLower();
-  if ( providerKey == QLatin1String( "ogr" )
-       && ext != QLatin1String( "shp" )
-       && ext != QLatin1String( "mif" )
-       && ext != QLatin1String( "tab" )
-       && ext != QLatin1String( "csv" )
-       && ext != QLatin1String( "geojson" )
-       && !vectorLayerPath.contains( QStringLiteral( "layerid=" ) )
-       && !vectorLayerPath.contains( QStringLiteral( "layername=" ) ) )
+  if (
+    providerKey == QLatin1String( "ogr" )
+    && ext != QLatin1String( "shp" )
+    && ext != QLatin1String( "mif" )
+    && ext != QLatin1String( "tab" )
+    && ext != QLatin1String( "csv" )
+    && ext != QLatin1String( "geojson" )
+    && !vectorLayerPath.contains( QStringLiteral( "layerid=" ) )
+    && !vectorLayerPath.contains( QStringLiteral( "layername=" ) )
+  )
   {
     auto uriParts = QgsProviderRegistry::instance()->decodeUri( layer->providerType(), layer->dataProvider()->dataSourceUri() );
     QString composedURI( uriParts.value( QStringLiteral( "path" ) ).toString() );

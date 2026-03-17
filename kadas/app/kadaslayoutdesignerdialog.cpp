@@ -1093,8 +1093,7 @@ void KadasLayoutDesignerDialog::renameLayout()
 
 void KadasLayoutDesignerDialog::deleteLayout()
 {
-  if ( QMessageBox::question( this, tr( "Delete Layout" ), tr( "Are you sure you want to delete the layout “%1”?" ).arg( currentLayout()->name() ), QMessageBox::Yes | QMessageBox::No, QMessageBox::No )
-       != QMessageBox::Yes )
+  if ( QMessageBox::question( this, tr( "Delete Layout" ), tr( "Are you sure you want to delete the layout “%1”?" ).arg( currentLayout()->name() ), QMessageBox::Yes | QMessageBox::No, QMessageBox::No ) != QMessageBox::Yes )
     return;
 
   kApp->deletePrintLayout( currentLayout() );

@@ -13,4 +13,5 @@
 
 def classFactory(iface):
     from .about_plugin import AboutPlugin
+
     return AboutPlugin(iface)
