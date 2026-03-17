@@ -69,7 +69,7 @@ class KadasGpkgLayersList(QListWidget):
 
             try:
                 filesize = os.path.getsize(filename)
-            except:
+            except Exception:
                 filesize = None
             item = QListWidgetItem(layer.name())
             item.setData(KadasGpkgLayersList.LayerIdRole, layerid)

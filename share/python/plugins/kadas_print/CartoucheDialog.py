@@ -211,7 +211,7 @@ class CartoucheDialog(QDialog, Ui_CartoucheDialog):
             self.exerciseGroupBox.setChecked(
                 int(self.__getElementText(legend, "ExerciseInfoVisible", "0"))
             )
-        except:
+        except Exception:
             self.exerciseGroupBox.setChecked(False)
 
         classification1 = self.__getElementText(legend, "ExerciseClassification")

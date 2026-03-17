@@ -57,7 +57,7 @@ class KadasGpkgExport(KadasGpkgExportBase):
         # Open database
         try:
             conn = sqlite3.connect(gpkg_writefile)
-        except:
+        except Exception:
             QMessageBox.warning(
                 self.iface.mainWindow(),
                 self.tr("Error"),
@@ -186,15 +186,15 @@ class KadasGpkgExport(KadasGpkgExportBase):
         if self.kadasGpkgExportDialog.clearOutputFile():
             try:
                 os.remove(gpkg_filename)
-            except:
+            except Exception:
                 pass
             try:
                 shutil.move(gpkg_writefile, gpkg_filename)
-            except:
+            except Exception as exception:
                 QMessageBox.warning(
                     self.iface.mainWindow(),
                     self.tr("Error"),
-                    self.tr("Unable to create output file"),
+                    self.tr(f"Unable to create output file: {exception}"),
                 )
                 return
 

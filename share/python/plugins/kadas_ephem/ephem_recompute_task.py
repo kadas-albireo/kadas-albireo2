@@ -98,7 +98,7 @@ class EphemComputeTask(QThread):
                 # Compute sunrise and sunset taking relief into account
                 try:
                     sunset = ephem.to_timezone(home.next_setting(sun), ephem.UTC).timestamp()
-                except:
+                except Exception:
                     sunset = None
 
                 sun.compute(home)
@@ -116,12 +116,12 @@ class EphemComputeTask(QThread):
                         sunrise = ephem.to_timezone(
                             home.previous_rising(sun), ephem.UTC
                         ).timestamp()
-                    except:
+                    except Exception:
                         sunrise = None
                 else:
                     try:
                         sunrise = ephem.to_timezone(home.next_rising(sun), ephem.UTC).timestamp()
-                    except:
+                    except Exception:
                         sunrise = None
                 if self.considerRelief:
                     tvisible = (
@@ -173,7 +173,7 @@ class EphemComputeTask(QThread):
                 # Compute moonrise and moonset taking relief into account
                 try:
                     moonset = ephem.to_timezone(home.next_setting(moon), ephem.UTC).timestamp()
-                except:
+                except Exception:
                     moonset = None
 
                 moon.compute(home)
@@ -193,12 +193,12 @@ class EphemComputeTask(QThread):
                         moonrise = ephem.to_timezone(
                             home.previous_rising(moon), ephem.UTC
                         ).timestamp()
-                    except:
+                    except Exception:
                         moonrise = None
                 else:
                     try:
                         moonrise = ephem.to_timezone(home.next_rising(moon), ephem.UTC).timestamp()
-                    except:
+                    except Exception:
                         moonrise = None
                 if self.considerRelief:
                     tvisible = (

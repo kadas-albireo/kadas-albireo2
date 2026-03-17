@@ -144,7 +144,7 @@ class PrintTool(KadasMapToolSelectRect):
                 # gets the attributes...
                 dir(item)
             return item
-        except:
+        except Exception:
             return None
 
     def __initPrintLayout(self):
@@ -562,7 +562,7 @@ class PrintTool(KadasMapToolSelectRect):
             ymin = float(self.dialogui.lineedit_ymin.text())
             xmax = float(self.dialogui.lineedit_xmax.text())
             ymax = float(self.dialogui.lineedit_ymax.text())
-        except:
+        except Exception:
             # One or more extent inputs empty
             return None
 

@@ -43,7 +43,7 @@ class PrintPlugin(QObject):
     def initGui(self):
         try:
             self.printAction = self.iface.findAction("mActionPrint")
-        except:
+        except Exception:
             self.printAction = None
         if self.printAction:
             self.printAction.setCheckable(True)

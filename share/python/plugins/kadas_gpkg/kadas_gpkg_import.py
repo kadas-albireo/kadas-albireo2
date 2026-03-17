@@ -72,7 +72,7 @@ class KadasGpkgImportDialog(QDialog):
 
         try:
             conn = sqlite3.connect(gpkg_filename)
-        except:
+        except Exception:
             return None
 
         """ Read qgis project """
@@ -96,7 +96,7 @@ class KadasGpkgImportDialog(QDialog):
             try:
                 layerid = maplayer.firstChildElement("id").text()
                 layername = maplayer.firstChildElement("layername").text()
-            except:
+            except Exception:
                 # Need at least layerid and layername
                 continue
             item = QListWidgetItem(layername)
@@ -151,7 +151,7 @@ class KadasGpkgImport(QObject):
 
             try:
                 conn = sqlite3.connect(importDialog.gpkgFilename())
-            except:
+            except Exception:
                 return
             cursor = conn.cursor()
 
@@ -194,7 +194,7 @@ class KadasGpkgImport(QObject):
                 try:
                     layerid = maplayer.firstChildElement("id").text()
                     layername = maplayer.firstChildElement("layername").text()
-                except:
+                except Exception:
                     # Don't process layers without id
                     continue
                 if layerid not in layerIds:
@@ -242,7 +242,7 @@ class KadasGpkgImport(QObject):
 
             try:
                 conn = sqlite3.connect(importDialog.gpkgFilename())
-            except:
+            except Exception:
                 return
             cursor = conn.cursor()
 
@@ -282,7 +282,7 @@ class KadasGpkgImport(QObject):
         project_name = "qgpkg"
         try:
             cursor.execute("SELECT xml FROM qgis_projects WHERE name=?", (project_name,))
-        except:
+        except Exception:
             return None
         qgis_projects = cursor.fetchone()
         if qgis_projects is None:
@@ -323,7 +323,7 @@ class KadasGpkgImport(QObject):
         """Extract a resource file from qgis_resources"""
         try:
             cursor.execute("SELECT content FROM qgis_resources WHERE name=?", (resource_id,))
-        except:
+        except Exception:
             return None
         with open(output, "wb") as fh:
             fh.write(cursor.fetchone()[0])
