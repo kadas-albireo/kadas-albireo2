@@ -5,7 +5,7 @@
 
 ## Progetti
 
-Le mappe possono essere caricate e salvate come progetti. Viene utilizzato il formato dei pro­getti QGIS, con estensione **\*.qgz**. I progetti vengono creati sulla base di modelli. All'avvio dell'appli­cazione, viene automaticamente creato un progetto sulla base di un modello online od offline, a seconda che il computer sia collegato alla rete o meno.
+Le mappe possono essere caricate e salvate come progetti. Viene utilizzato il formato dei pro­getti QGIS, con estensione _\*.qgz_. I progetti vengono creati sulla base di modelli. All'avvio dell'appli­cazione, viene automaticamente creato un progetto sulla base di un modello online od offline, a seconda che il computer sia collegato alla rete o meno.
 
 ## Creazione e salvataggio di mappe
 
@@ -21,7 +21,7 @@ La mappa attuale può essere inviata alla stampante tramite la funzione **Stampa
 
 La stampa si basa su dei modelli. Come impostazione standard, vengono forniti i modelli A0-A6, in formato sia orizzontale che verticale, e un modello Custom.
 
-Una volta scelto il modello, nella finestra della mappa principale viene visualizzato un rettangolo blu semitrasparente che corrisponde all'riquadro da stampare. Nel caso di modelli con formato di pagina fisso, il rettangolo presente nella mappa principale può essere spostato per adattare l'area di stampa. La dimensione del riquadro viene calcolato dal formato della pagina e dalla scala scelta nel dialogo di stampa. Nel caso del modello **Custom**, il riquadro viene definito numericamente nel dialogo di stampa, e il formato della pagina risultante in base a queste indicazioni.
+Una volta scelto il modello, nella finestra della mappa principale viene visualizzato un rettangolo blu semitrasparente che corrisponde all'riquadro da stampare. Nel caso di modelli con formato di pagina fisso, il rettangolo presente nella mappa principale può essere spostato per adattare l'area di stampa. La dimensione del riquadro viene calcolato dal formato della pagina e dalla scala scelta nel dialogo di stampa. Nel caso del modello _Custom_, il riquadro viene definito numericamente nel dialogo di stampa, e il formato della pagina risultante in base a queste indicazioni.
 
 Durante la stampa, è possibile inserire o rimuovere secondo preferenza degli elementi aggiuntivi come la griglia delle coordinate, il cartiglio della mappa, legenda e il righello della scala. La posi­zione di questi elementi è definita nel modello.
 
@@ -40,12 +40,12 @@ Durante la stampa, è possibile inserire o rimuovere secondo preferenza degli el
 - **Cartiglio**: attivazione/disattivazione della cartuccia
 - **Modifica Cartiglio**: configurazione della cartuccia
 - **Barra della scala**: attivazione/disattivazione della visualizzazione della scala
-- **Legenda**: attivazione/disattivazione della legenda, tramite il pulsante **Configura** è inoltre possibile scegliere separatamente quali layer appaiono nella legenda
+- **Legenda**: attivazione/disattivazione della legenda, tramite il pulsante _Configura_ è inoltre possibile scegliere separatamente quali layer appaiono nella legenda
 - **Formato**: scelta del formato per la funzione di esportazione del file
 
 ### Modelli di stampa
 
-I modelli contenuti nel progetto possono venir gestiti tramite il **Gestore modelli**, attivabile con il pulsante situato a destra del campo di selezione del modello. Nel gestore i modelli possono venir importati, esportati e rimossi dal progetto.
+I modelli contenuti nel progetto possono venir gestiti tramite il _Gestore modelli_, attivabile con il pulsante situato a destra del campo di selezione del modello. Nel gestore i modelli possono venir importati, esportati e rimossi dal progetto.
 
 ![](../media/image12.1.png)
 
@@ -74,7 +74,7 @@ Il contenuto della mappa può essere esportato come KML o KMZ. Immagini, layer r
 
 I file KML/KMZ possono anche essere importati in KADAS.
 
-**Nota**: KMZ e KML sono formati di esportazione che possono comportare delle per­dite e, pertanto, non sono adatti allo scambio tra utenti di KADAS. A questo scopo è necessario utiliz­zare il formato nativo **\*.qgs**.
+_Nota_: KMZ e KML sono formati di esportazione che possono comportare delle per­dite e, pertanto, non sono adatti allo scambio tra utenti di KADAS. A questo scopo è necessario utiliz­zare il formato nativo _\*.qgs_.
 
 ## GPKG Esportazione e importazione
 

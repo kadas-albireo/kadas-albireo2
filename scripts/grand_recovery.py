@@ -64,12 +64,28 @@ SECTION_TITLES: dict[str, str] = {
     "gps":                          "Navigation",
     "mss":                          "MSS",
     "settings":                     "Settings",
-    "working_with_vector":          "Advanced / Vector Layers",
-    "working_with_raster":          "Advanced / Raster Layers",
-    "working_with_projections":     "Advanced / Working with Projections",
-    "print_composer":               "Advanced / Print Composer",
-    "gpsgate":                      "Advanced / GPS Gate",
-    "appendices":                   "Appendix",
+    "working_with_vector/supported_data":   "Supported Formats",
+    "working_with_vector/vector_properties":"Properties Dialog",
+    "working_with_vector/expression":       "Expressions",
+    "working_with_vector/field_calculator": "Field Calculator",
+    "working_with_raster/supported_data":   "Supported Formats",
+    "working_with_raster/raster_properties":"Properties Dialog",
+    "working_with_projections/working_with_projections": "Working with Projections",
+    "print_composer/print_composer":        "Print Composer",
+    "gpsgate/gpsgate":                      "GPS Gate",
+    "appendices/shortcuts":                 "Keyboard Shortcuts",
+    "appendices/license":                   "License",
+}
+
+# Sections that are grouped under a nav parent heading.
+# key = section key prefix, value = nav group label
+SECTION_GROUPS: dict[str, str] = {
+    "working_with_vector":      "Advanced / Vector Layers",
+    "working_with_raster":      "Advanced / Raster Layers",
+    "working_with_projections": "Advanced / Projections",
+    "print_composer":           "Advanced / Print Composer",
+    "gpsgate":                  "Advanced / GPS Gate",
+    "appendices":               "Appendix",
 }
 
 
@@ -82,11 +98,25 @@ class KadasConverter(MarkdownConverter):
 
     - Drops <a name="secN"> anchor tags (legacy HTML anchors — MkDocs
       generates its own heading anchors from the heading text).
-    - Converts <strong><em>…</em></strong> (UI element names in the source)
-      to plain **…** bold, stripping the redundant italic wrapper.
+    - Uses _ for <em> (italic) and ** for <strong> (bold) so that
+      <strong><em>…</em></strong> renders as ***bold+italic*** and plain
+      <em>…</em> renders as _italic_ rather than **bold**.
     - Normalises whitespace in the output so we never get more than one
       blank line between blocks.
     """
+
+    # Override em to use _ so it stays visually distinct from ** bold.
+    # Without this, markdownify uses strong_em_symbol ("**") for both
+    # <em> and <strong>, making <em>text</em> render as **text** (bold).
+    def convert_em(self, el, text, parent_tags):
+        from markdownify import chomp
+        if "_noformat" in parent_tags:
+            return text
+        prefix, suffix, text = chomp(text)
+        if not text:
+            return ""
+        return f"{prefix}_{text}_{suffix}"
+
 
     def convert_a(self, el, text, parent_tags):
         # Drop legacy <a name="secN"> anchors — keep nothing, not even the text
@@ -107,15 +137,14 @@ def html_to_markdown(html_fragment: str) -> str:
     md = KadasConverter(
         heading_style="ATX",      # Use # style headings
         bullets="-",              # Use - for unordered lists
-        strong_em_symbol="**",
+        strong_em_symbol="*",     # convert_b multiplies this by 2 → **, em is overridden to _
         newline_style="backslash",
     ).convert(html_fragment)
 
-    # Collapse ****** (strong+em double-wrap) into plain ** bold.
-    # markdownify renders <strong><em>text</em></strong> as ******text******
-    # but in KADAS docs this pattern is purely used for UI element names,
-    # so plain bold is the right semantic and much cleaner to read/edit.
-    md = re.sub(r"\*{3,}(.+?)\*{3,}", r"**\1**", md)
+    # <strong><em>…</em></strong> now renders as **_text_** — collapse to plain
+    # **text** since in KADAS docs this pattern marks UI element names where
+    # bold alone is the right semantic and cleaner to read/edit.
+    md = re.sub(r"\*\*_(.+?)_\*\*", r"**\1**", md)
 
     # Fix nested list indentation: markdownify emits 2-space indented nested
     # list items, but Python-Markdown (used by MkDocs) requires 4 spaces to
@@ -215,12 +244,17 @@ def recover_page(html_path: Path, lang: str, section: str) -> str:
 # ---------------------------------------------------------------------------
 def discover_sections(lang: str) -> list[tuple[str, Path]]:
     """
-    Walk the {lang}/{lang}/ subtree and return a list of (section_name, html_path)
+    Walk the {lang}/{lang}/ subtree and return a list of (section_key, html_path)
     tuples, sorted so that the top-level index comes first.
 
-    A "section" is either:
-      - The lang dir itself (docs/{lang}/{lang}/index.html  →  "index")
-      - Any subfolder containing an index.html
+    Section keys:
+      - "index"                                for {lang}/index.html
+      - "analysis"                             for {lang}/analysis/index.html
+      - "working_with_vector/expression"       for {lang}/working_with_vector/expression/index.html
+
+    Depth-1 folders that contain a direct index.html are flat sections.
+    Depth-1 folders that contain only sub-folders (no direct index.html) are
+    group containers — we recurse one level deeper for their pages.
     """
     lang_dir = HTML_ROOT / lang / lang
     if not lang_dir.is_dir():
@@ -234,12 +268,23 @@ def discover_sections(lang: str) -> list[tuple[str, Path]]:
     if top_index.exists():
         sections.append(("index", top_index))
 
-    # Sub-section index.html files
+    # Iterate depth-1 subdirectories in sorted order
     for sub in sorted(lang_dir.iterdir()):
-        if sub.is_dir():
-            sub_index = sub / "index.html"
-            if sub_index.exists():
-                sections.append((sub.name, sub_index))
+        if not sub.is_dir():
+            continue
+        direct_index = sub / "index.html"
+        if direct_index.exists():
+            # Flat section (e.g. analysis/, draw/)
+            sections.append((sub.name, direct_index))
+        else:
+            # Group container (e.g. working_with_vector/, appendices/)
+            # recurse one level deeper
+            for subsub in sorted(sub.iterdir()):
+                if subsub.is_dir():
+                    deep_index = subsub / "index.html"
+                    if deep_index.exists():
+                        section_key = f"{sub.name}/{subsub.name}"
+                        sections.append((section_key, deep_index))
 
     return sections
 
@@ -271,7 +316,10 @@ def generate_nav_skeleton(recovered: dict[str, list[str]]) -> str:
     """
     Build a YAML nav block from the recovered sections.
 
-    recovered = { "en": ["index", "kadas_gui", ...], "de": [...], ... }
+    Flat sections become top-level nav entries.
+    Sections whose key contains a "/" are grouped under their parent heading.
+
+    recovered = { "en": ["index", "kadas_gui", "working_with_vector/expression", ...], ... }
     """
     lines = ["# Paste this nav block into your mkdocs.yml", "nav:"]
 
@@ -279,10 +327,19 @@ def generate_nav_skeleton(recovered: dict[str, list[str]]) -> str:
         if lang not in recovered:
             continue
         lines.append(f"  # --- {lang.upper()} ---")
+        emitted_groups: set[str] = set()
         for section in recovered[lang]:
             title = SECTION_TITLES.get(section, section.replace("_", " ").title())
             md_path = f"{lang}/{section}.md"
-            lines.append(f"  - '{title}': '{md_path}'")
+            if "/" in section:
+                group_key = section.split("/")[0]
+                group_label = SECTION_GROUPS.get(group_key, group_key.replace("_", " ").title())
+                if group_key not in emitted_groups:
+                    lines.append(f"  - '{group_label}':")
+                    emitted_groups.add(group_key)
+                lines.append(f"    - '{title}': '{md_path}'")
+            else:
+                lines.append(f"  - '{title}': '{md_path}'")
 
     return "\n".join(lines) + "\n"
 
@@ -318,7 +375,7 @@ def run_single_file(html_path: Path) -> None:
 
 
 def run_language(lang: str, dry_run: bool = False) -> list[str]:
-    """Recover all sections for a single language. Returns list of section names."""
+    """Recover all sections for a single language. Returns list of section keys."""
     print(f"\n[{lang}] Starting recovery...")
     sections = discover_sections(lang)
     if not sections:
@@ -330,8 +387,12 @@ def run_language(lang: str, dry_run: bool = False) -> list[str]:
 
     recovered_sections = []
     for section, html_path in sections:
+        # Section key may contain a slash for deep pages (e.g. "appendices/shortcuts")
+        # — create the intermediate directory if needed.
         out_file = lang_out / f"{section}.md"
         print(f"  [{lang}/{section}] {html_path.relative_to(REPO_ROOT)} → {out_file.relative_to(REPO_ROOT)}")
+        if not dry_run:
+            out_file.parent.mkdir(parents=True, exist_ok=True)
 
         md = recover_page(html_path, lang, section)
 

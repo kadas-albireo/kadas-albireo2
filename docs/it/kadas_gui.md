@@ -48,7 +48,7 @@ I risultati vengono elencati nelle categorie corrispondenti. L'elenco dei risult
 
 ![](../media/image2.png)
 
-Alla destra del campo di ricerca è possibile definire un filtro per la ricerca locale e remota del set di dati. Questo filtro **non** viene applicato alla ricerca di coordinate, località o spilli.
+Alla destra del campo di ricerca è possibile definire un filtro per la ricerca locale e remota del set di dati. Questo filtro _non_ viene applicato alla ricerca di coordinate, località o spilli.
 
 ## Visualizzazione mappa
 
@@ -89,7 +89,7 @@ Tramite click destro su un elemento è possibile eseguire varie operazioni, a di
 
 Ulteriori layer di carta possono essere aggiunti alla carta dal catalogo dei geodati. Se l'elenco è vuoto, non è stato possibile connettersi al servizio di catalogo.
 
-All'avvio del programma vengono visualizzati solo i dati pubblici. A seconda dell'utente, dopo aver effettuato correttamente l'autenticazione, posso­no essere disponibili ulteriori dati, vedi **Autenticazione SAML** sotto.
+All'avvio del programma vengono visualizzati solo i dati pubblici. A seconda dell'utente, dopo aver effettuato correttamente l'autenticazione, posso­no essere disponibili ulteriori dati, vedi _Autenticazione SAML_ sotto.
 
 Inserendo i termini di ricerca nel campo di testo, i layer disponibili sono limitati di conseguenza. È possibile aggiungere un layer alla mappa utilizzando il menu contestuale (tasto destro del mouse sulla voce del layer) o tramite "Drag and Drop".
 
@@ -104,7 +104,7 @@ Le seguenti funzioni sono disponibili sopra l'elenco del catalogo:
 
 Nella barra di stato sono disposti i seguenti indicatori e le seguenti funzioni:
 
-- **GPS**: L'uso del pulsante GPS è descritto nel [capitolo **Navigazione**](/gps).
+- **GPS**: L'uso del pulsante GPS è descritto nel [capitolo _Navigazione_](/gps).
 - \_**Posizione del mouse\_**: La posizione corrente del mouse sulla mappa può essere visualizzata rispetto a molteplici sistemi di riferimento . Il sistema desiderato può essere selezionato dal menu a sinistra campo di visualizzazione. L'unità di misura dell'altezza può essere modificata nella scheda Impostazioni.
 - **Scala**: La scala corrente della visualizzazione della mappa è mostrata accanto al campo delle coordinate. Il selettore di scala consente di scegliere tra scale predefinite tra 1:500 e 1:100000000. L'icona del lucchetto consente di bloccare la scala corrente della mappa; lo zoom influirà quindi solo sul fattore di ingrandimento.
 - **Sistema di coordinate**: Il pulsante di selezione del sistema di coordinate permette di scegliere quale proiezione utilizzare per la mappa. Se la proiezione selezionata differisce dalla proiezione nativa di un dataset, quest'ultimo viene riproiettato, il che può comportare una riduzione delle prestazioni a seconda della quantità di dati.

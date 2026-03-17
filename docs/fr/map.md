@@ -5,7 +5,7 @@
 
 ## Projets
 
-Les cartes peuvent être chargées et enregistrées comme projets. On utilise le format de projet QGIS, qui se termine par **\*.qgz**. Les projets sont créés comme propositions. Au lancement de l’application, un projet est automatiquement créé comme proposition en ligne ou hors ligne, indépendamment du fait que l’ordinateur soit relié à Internet.
+Les cartes peuvent être chargées et enregistrées comme projets. On utilise le format de projet QGIS, qui se termine par _\*.qgz_. Les projets sont créés comme propositions. Au lancement de l’application, un projet est automatiquement créé comme proposition en ligne ou hors ligne, indépendamment du fait que l’ordinateur soit relié à Internet.
 
 ## Créer et sauvegarder des cartes
 
@@ -21,7 +21,7 @@ La carte actuelle peut être imprimée avec la fonction **Imprimer** ou sauvegar
 
 L’impression se base sur des modèles. Par défaut, des modèles sont proposés en format A0-A6, aussi bien en portrait qu’en paysage, ainsi qu’un modèle Custom.
 
-Une fois le modèle choisi, un rectangle bleu semi-transparent apparaît dans la fenêtre principale de la carte, qui correspond à l’extrait à imprimer. Pour les modèles avec un format de papier fixe, ce rectangle peut être déplacé sur la carte principale afin d’adapter la zone à imprimer. La taille de l’extrait dépend du format du papier ainsi que des mesures indiquées dans la boîte de dialogue d’impression. Avec le modèle **Custom**, l’extrait est défini numériquement avec l’échelle dans la boîte de dialogue d’impression, et le format de papier en résultant est calculé de manière dynamique selon ces indications.
+Une fois le modèle choisi, un rectangle bleu semi-transparent apparaît dans la fenêtre principale de la carte, qui correspond à l’extrait à imprimer. Pour les modèles avec un format de papier fixe, ce rectangle peut être déplacé sur la carte principale afin d’adapter la zone à imprimer. La taille de l’extrait dépend du format du papier ainsi que des mesures indiquées dans la boîte de dialogue d’impression. Avec le modèle _Custom_, l’extrait est défini numériquement avec l’échelle dans la boîte de dialogue d’impression, et le format de papier en résultant est calculé de manière dynamique selon ces indications.
 
 Lors de l'impression d'éléments supplémentaires, la grille de coordonnées, la cartouche de cartes, la légende et la barre d'échelle peuvent être affichées ou masquées comme vous le souhaitez. La position de ces éléments est définie dans le modèle.
 
@@ -40,7 +40,7 @@ Lors de l'impression d'éléments supplémentaires, la grille de coordonnées, l
 - **Cartouche** : activation/désactivation du cartouche
 - **Éditer cartouche** : configuration du cartouche
 - **Barre d'échelle** : activation/désactivation de l’indication de l’échelle
-- **Légende** : Activer/désactiver la légende, via **Configurer** on peut sélectionner séparément les couches qui apparaissent dans la légende
+- **Légende** : Activer/désactiver la légende, via _Configurer_ on peut sélectionner séparément les couches qui apparaissent dans la légende
 - **Format de fichier** : choix du format pour la fonction d’exportation du fichier
 
 ### Modèles d'impression
@@ -74,7 +74,7 @@ Le contenu de la carte peut être exporté comme KML ou KMZ. Les images, les cou
 
 Les fichiers KML/KMZ peuvent également être importés dans KADAS.
 
-**Remarque**: KMZ et KML sont des formats d’exportation qui génèrent souvent des pertes de données et qui ne conviennent donc pas pour les échanges entre utilisateurs de KADAS. Pour de tels échanges, il faut utiliser le format de projet natif **\*.qgs**.
+_Remarque_: KMZ et KML sont des formats d’exportation qui génèrent souvent des pertes de données et qui ne conviennent donc pas pour les échanges entre utilisateurs de KADAS. Pour de tels échanges, il faut utiliser le format de projet natif _\*.qgs_.
 
 ## Exportation et importation GPKG
 

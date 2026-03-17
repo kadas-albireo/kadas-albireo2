@@ -49,7 +49,7 @@ Les punaises, photos et symboles MSS ponctuels sont indiqués comme billboards.
 
 ### Navigation dans la vue 3D
 
-- \***Angle de vue** : La commande de navigation supérieure permet à l'utilisateur de modifier les angles de vue horizontal et vertical de la caméra.
+- \*_Angle de vue_ : La commande de navigation supérieure permet à l'utilisateur de modifier les angles de vue horizontal et vertical de la caméra.
 - **Position de la caméra**: La commande de navigation inférieure permet de changer la position de la caméra autour du globe. La même chose peut être accomplie avec les touches fléchées du clavier.
 - **+**: Réduit la hauteur de la caméra.
 - **-**: Augmente la hauteur de la caméra.

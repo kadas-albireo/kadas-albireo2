@@ -48,7 +48,7 @@ Les résultats sont listés dans des catégories indiquées en conséquence. La 
 
 ![](../media/image2.png)
 
-À droite du champ de recherche, il est possible de définir un filtre pour la recherche de données locales ou à distance. Ce filtre ne s’applique **pas** aux recherches de coordonnées, de localités ou de punaises.
+À droite du champ de recherche, il est possible de définir un filtre pour la recherche de données locales ou à distance. Ce filtre ne s’applique _pas_ aux recherches de coordonnées, de localités ou de punaises.
 
 ## Affichage de la carte
 
@@ -91,7 +91,7 @@ Il est possible de sélectionner plus d’une couche ou d’un groupe à la fois
 
 D’autres niveaux de cartes peuvent être ajoutés à la carte dans le catalogue de géodonnées. Si la liste est vide, il n’y a pas de raccordement par réseau avec le service de catalogue.
 
-Au lancement du programme, seules les données publiques sont affichées. En fonction de l’utilisateur, d’autres données pourront être mises à disposition après authentification, voir **Authentification SAML** ci-dessous.
+Au lancement du programme, seules les données publiques sont affichées. En fonction de l’utilisateur, d’autres données pourront être mises à disposition après authentification, voir _Authentification SAML_ ci-dessous.
 
 La saisie de termes de recherche dans le champ de texte limite en conséquence les niveaux disponibles. Un niveau peut être ajouté au moyen du menu contextuel (clic droit sur l’indication du niveau) ou par “glisser-déposer” sur la carte.
 
@@ -106,7 +106,7 @@ Les fonctions suivantes sont à disposition en haut de la liste de catalogue :
 
 Les indications et les éléments de commande suivants sont énumérés dans la barre d’état :
 
-- **GPS**: La fonction de la touche GPS est décrite dans le [chapitre **Navigation**.](/gps)
-- **Position de la souris**: La **position actuelle de la souris** peut être affichée dans différents systèmes de coordonnées. Le système d’affichage souhaité peut être choisi par la touche à droite de l’indication de la position.
-- **Échelle**: À droite de ces coordonnées se trouve **l’échelle de la carte\_**. Si vous zoomez ou dé-zoomez, l’échelle se met à jour automatiquement. Une liste déroulante vous permet de choisir une échelle prédéterminée allant du 1:500ème au 1:1000000ème. L'icône de verrouillage permet de verrouiller l'échelle actuelle de la carte, le zoom n'affectant alors que le facteur d'agrandissement.
-- **Système de coordonnées**: Le système de référence où la carte actuelle doit être représentée peut être choisi dans le champ de sélection du **système de coordonnées**. Le système de référence affiché peut différer du système de référence dans lequel les données existent. Dans ce cas, les données sont converties pour la représentation.
+- **GPS**: La fonction de la touche GPS est décrite dans le [chapitre _Navigation_.](/gps)
+- **Position de la souris**: La _position actuelle de la souris_ peut être affichée dans différents systèmes de coordonnées. Le système d’affichage souhaité peut être choisi par la touche à droite de l’indication de la position.
+- **Échelle**: À droite de ces coordonnées se trouve _l’échelle de la carte\__. Si vous zoomez ou dé-zoomez, l’échelle se met à jour automatiquement. Une liste déroulante vous permet de choisir une échelle prédéterminée allant du 1:500ème au 1:1000000ème. L'icône de verrouillage permet de verrouiller l'échelle actuelle de la carte, le zoom n'affectant alors que le facteur d'agrandissement.
+- **Système de coordonnées**: Le système de référence où la carte actuelle doit être représentée peut être choisi dans le champ de sélection du _système de coordonnées_. Le système de référence affiché peut différer du système de référence dans lequel les données existent. Dans ce cas, les données sont converties pour la représentation.

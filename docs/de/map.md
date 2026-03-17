@@ -5,7 +5,7 @@
 
 ## Projekte
 
-Karten können als Projekte geladen und gespeichert werden. Es wird das QGIS Projektformat verwendet, mit Endung **\*.qgz**. Projekte werden aus Vorlagen erstellt. Beim Starten der Applikation wird automatisch ein Projekt aus einer Online- oder Offline-Vorlage erstellt, abhängig davon, ob der Rechner am Netz angeschlossen ist.
+Karten können als Projekte geladen und gespeichert werden. Es wird das QGIS Projektformat verwendet, mit Endung _\*.qgz_. Projekte werden aus Vorlagen erstellt. Beim Starten der Applikation wird automatisch ein Projekt aus einer Online- oder Offline-Vorlage erstellt, abhängig davon, ob der Rechner am Netz angeschlossen ist.
 
 ## Neue Projekte anlegen und Speichern
 
@@ -21,7 +21,7 @@ Die aktuelle Karte kann über die Funktion **Drucken** auf den Drucker ausgegebe
 
 Das Drucken basiert auf Vorlagen. Standardmässig werden Vorlagen für A0 bis A6 sowohl Quer- als Hochformat angeboten, sowie eine Custom Vorlage.
 
-Bei ausgewählter Vorlage wird im Hauptkartenfenster ein blaues halb-transparentes Rechteck angezeigt, welches dem zu druckenden Ausschnitt entspricht. Bei den Vorlagen mit fixem Papierformat kann dieses Rechteck in der Hauptkarte verschoben werden, um den Druckbereich anzupassen. Die Grösse des Ausschnitts wird vom Papierformat und dem im Druckdialog angegebenen Massstab abgeleitet. Bei der **Custom** Vorlage wird der Ausschnitt zusammen mit dem Massstab im Druckdialog numerisch definiert, und das resultierende Papierformat wird diesen Angaben entsprechend dynamisch berechnet.
+Bei ausgewählter Vorlage wird im Hauptkartenfenster ein blaues halb-transparentes Rechteck angezeigt, welches dem zu druckenden Ausschnitt entspricht. Bei den Vorlagen mit fixem Papierformat kann dieses Rechteck in der Hauptkarte verschoben werden, um den Druckbereich anzupassen. Die Grösse des Ausschnitts wird vom Papierformat und dem im Druckdialog angegebenen Massstab abgeleitet. Bei der _Custom_ Vorlage wird der Ausschnitt zusammen mit dem Massstab im Druckdialog numerisch definiert, und das resultierende Papierformat wird diesen Angaben entsprechend dynamisch berechnet.
 
 Beim Drucken können zusätzliche Elemente, Koordinatengitter, Kartenkartusche, Legende, und Massstabbalken je nach Wunsch ein- oder ausgeblendet werden. Die Position dieser Elemente ist in der Vorlage definiert.
 
@@ -40,7 +40,7 @@ Beim Drucken können zusätzliche Elemente, Koordinatengitter, Kartenkartusche, 
 - **Kartenkartusche**: Ein-/Ausschalten der Kartusche
 - **Kartenkartusche anpassen**: Konfiguration der Kartusche
 - **Massstabsbalken**: Ein-/Ausschalten der Masstabsanzeige
-- **Legende**: Ein-/Ausschalten der Legende, über **Anpassen** kann separat gewählt werden, welche Ebenen in der Legende erscheinen
+- **Legende**: Ein-/Ausschalten der Legende, über _Anpassen_ kann separat gewählt werden, welche Ebenen in der Legende erscheinen
 - **Dateiformat**: Auswahl des Formats für die Datei-Export Funktion
 
 ### Druckvorlagen
@@ -74,7 +74,7 @@ Der Karteninhalt kann als KML oder KMZ exportiert werden. Bilder, Rasterebenen s
 
 KML/KMZ Dateien können in KADAS auch importiert werden.
 
-**Hinweis**: KMZ und KML sind verlustbehaftete Export-Formate sind, und daher nicht geeignet für den Austausch zwischen KADAS Anwender ist. Dazu sollte das native **\*.qgs** Projektformat verwendet werden.
+_Hinweis_: KMZ und KML sind verlustbehaftete Export-Formate sind, und daher nicht geeignet für den Austausch zwischen KADAS Anwender ist. Dazu sollte das native _\*.qgs_ Projektformat verwendet werden.
 
 ## GPKG Export und Import
 

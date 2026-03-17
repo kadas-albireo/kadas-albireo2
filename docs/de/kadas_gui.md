@@ -48,7 +48,7 @@ Die Resultate werden in entsprechend bezeichnete Kategorien aufgelistet. Die Res
 
 ![](../media/image2.png)
 
-Rechts vom Suchfeld gibt es die Möglichkeit, einen Filter für die lokale und remote Datensatz-Suche zu definieren. Dieser Filter greift **nicht** für Koordinaten, Ortschaft oder Stecknadelsuchen.
+Rechts vom Suchfeld gibt es die Möglichkeit, einen Filter für die lokale und remote Datensatz-Suche zu definieren. Dieser Filter greift _nicht_ für Koordinaten, Ortschaft oder Stecknadelsuchen.
 
 ## Kartenfenster
 
@@ -89,7 +89,7 @@ Es ist möglich mehr als einen Layer oder Gruppe zur gleichen Zeit auszuwählen 
 
 Im Geodatenkatalog können weitere Kartenebenen zur Karte hinzugefügt werden. Ist die Liste leer, besteht keine Netzwerkverbindung zum Katalogdienst.
 
-Beim Programmstart werden nur öffentliche Daten angezeigt. Abhängig vom Benutzer können nach erfolgter Authentifizierung weitere Daten zur Verfügung stehen, siehe **SAML Authentifizierung** unten.
+Beim Programmstart werden nur öffentliche Daten angezeigt. Abhängig vom Benutzer können nach erfolgter Authentifizierung weitere Daten zur Verfügung stehen, siehe _SAML Authentifizierung_ unten.
 
 Durch Eingabe von Suchbegriffen im Textfeld werden die verfügbaren Ebenen entsprechend eingeschränkt. Eine Ebene kann mittels Kontextmenü (rechte Maustaste auf dem Ebeneneintrag) oder via “Drag and Drop” der Karte hinzugefügt werden.
 
@@ -104,7 +104,7 @@ Oberhalb der Katalogliste stehen folgende Funktionen zur Verfügung:
 
 In der Statuszeile sind folgende Anzeigen und Bedienelemente angeordnet:
 
-- **GPS**: Die Verwendung der GPS Schaltfläche ist im Kapitel [Kapitel **Navigation**](/gps) beschrieben.
+- **GPS**: Die Verwendung der GPS Schaltfläche ist im Kapitel [Kapitel _Navigation_](/gps) beschrieben.
 - Mausposition\_\*\*: Die aktuelle Mausposition auf der Karte kann in Bezug auf mehrere Referenzsysteme angezeigt werden. Das gewünschte System kann im Menü links neben der Positionsanzeige ausgewählt werden. Die Einheit für die Höhe kann in der Einstellungen-Registerkarte geändert werden.
 - **Massstab**: Der aktuelle Massstab der Kartenansicht wird neben dem Koordinatenfeld angezeigt. Der Menü ermöglicht die Auswahl zwischen vordefinierten Skalen zwischen 1:500 und 1:100000000. Mit dem Schloss-Symbol kann der aktuelle Kartenmassstab fixiert werden, das Zoomen wirkt sich dann nur noch auf den Vergrößerungsfaktor aus.
 - Koordinatenbezugssystem\_\*\*: In dieser Auswahlschaltfläche ausgewählt werden, welche Projektion für die Karte verwendet werden soll. Weicht die gewählte Projektion von der nativen Projektion eines Datensatzes ab, wird dieser neu projiziert, was je nach Datenmenge zu Leistungseinbussen führen kann.
