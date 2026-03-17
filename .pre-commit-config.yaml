@@ -49,7 +49,7 @@ repos:
     args: [
       "--max-line-length=115",
       # ignore long comments (E501), as long lines are formatted by black
-      "--ignore=E501,E203",
+      "--ignore=E501,E203,W503",
     ]
 
 ci:
