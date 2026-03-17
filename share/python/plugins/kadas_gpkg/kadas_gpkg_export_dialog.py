@@ -23,7 +23,7 @@ class KadasGpkgExportDialog(QDialog, WidgetUi):
 
         self.iface = iface
 
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(False)
 
         self.spinBoxExportScale.setValue(int(iface.mapCanvas().mapSettings().scale()))
 
@@ -73,7 +73,7 @@ class KadasGpkgExportDialog(QDialog, WidgetUi):
 
     def __selectOutputFile(self):
         lastDir = QSettings().value("/UI/lastImportExportDir", ".")
-        filename = QFileDialog.getSaveFileName(self, self.tr("Select GPKG File..."), lastDir, self.tr("GPKG Database (*.gpkg)"), "", QFileDialog.DontConfirmOverwrite)[0]
+        filename = QFileDialog.getSaveFileName(self, self.tr("Select GPKG File..."), lastDir, self.tr("GPKG Database (*.gpkg)"), "", QFileDialog.Option.DontConfirmOverwrite)[0]
 
         if not filename:
             return
@@ -84,7 +84,7 @@ class KadasGpkgExportDialog(QDialog, WidgetUi):
         QSettings().setValue("/UI/lastImportExportDir", os.path.dirname(filename))
         self.lineEditOutputFile.setText(filename)
 
-        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(filename is not None)
+        self.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(filename is not None)
         self.__updateLocalLayerList()
 
     def __updateLocalLayerList(self):

@@ -7,8 +7,9 @@
 #
 #    copyright            : (C) 2015 by Sourcepole AG
 
-from .ui.ui_printlayoutmanager import Ui_PrintLayoutManager
+import os
 
+from qgis.PyQt import uic
 from qgis.PyQt.QtCore import *
 from qgis.PyQt.QtGui import *
 from qgis.PyQt.QtWidgets import *
@@ -16,6 +17,7 @@ from qgis.PyQt.QtXml import *
 
 from qgis.core import *
 
+Ui_PrintLayoutManager, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "ui", "printlayoutmanager.ui"))
 
 class PrintLayoutManager(QDialog, Ui_PrintLayoutManager):
 
@@ -44,18 +46,18 @@ class PrintLayoutManager(QDialog, Ui_PrintLayoutManager):
             if layout != removedLayout:
                 name = layout.name()
                 item = QListWidgetItem(name)
-                item.setData(Qt.UserRole, layout)
+                item.setData(Qt.ItemDataRole.UserRole, layout)
                 self.listWidgetLayouts.addItem(item)
         # Attached, unloaded layouts
         for path in QgsProject.instance().attachedFiles():
             if path.endswith(".qpt"):
                 file = QFile(path)
-                if file.open(QIODevice.ReadOnly):
+                if file.open(QIODevice.OpenModeFlag.ReadOnly):
                     reader = QXmlStreamReader(file)
                     reader.readNextStartElement()
                     name = reader.attributes().value("name")
                     item = QListWidgetItem(name)
-                    item.setData(Qt.UserRole, path)
+                    item.setData(Qt.ItemDataRole.UserRole, path)
                     self.listWidgetLayouts.addItem(item)
 
         self.listWidgetLayouts.sortItems()
@@ -80,11 +82,11 @@ class PrintLayoutManager(QDialog, Ui_PrintLayoutManager):
         QSettings().setValue(
             "/UI/lastImportExportDir", QFileInfo(filename).absolutePath())
         file = QFile(filename)
-        if not file.open(QIODevice.ReadOnly):
+        if not file.open(QIODevice.OpenModeFlag.ReadOnly):
             QMessageBox.critical(
                 self, self.tr("Import Failed"),
                 self.tr("Failed to open the input file for reading."),
-                QMessageBox.Ok)
+                QMessageBox.StandardButton.Ok)
         else:
             doc = QDomDocument()
             doc.setContent(file)
@@ -92,7 +94,7 @@ class PrintLayoutManager(QDialog, Ui_PrintLayoutManager):
             if len(layoutEls) == 0:
                 QMessageBox.critical(
                     self, self.tr("Import Failed"),
-                    self.tr("The file does not appear to be a valid print layout."), QMessageBox.Ok)
+                    self.tr("The file does not appear to be a valid print layout."), QMessageBox.StandardButton.Ok)
                 return
             layoutEl = layoutEls.at(0).toElement()
 
@@ -102,7 +104,7 @@ class PrintLayoutManager(QDialog, Ui_PrintLayoutManager):
             if not layout.loadFromTemplate(doc, QgsReadWriteContext()):
                 QMessageBox.critical(self, self.tr("Import Failed"), self.tr(
                     "The file does not appear to be a valid print layout."),
-                    QMessageBox.Ok)
+                    QMessageBox.StandardButton.Ok)
                 return
 
             self.layoutManager.addLayout(layout)
@@ -120,7 +122,7 @@ class PrintLayoutManager(QDialog, Ui_PrintLayoutManager):
             "/UI/lastImportExportDir", QFileInfo(filename).absolutePath())
 
         item = self.listWidgetLayouts.selectedItems()[0]
-        layout = item.data(Qt.UserRole)
+        layout = item.data(Qt.ItemDataRole.UserRole)
         if isinstance(layout, str):
             success = QFile(QgsProject.instance().attachedFile(layout)).copy(filename)
         else:
@@ -132,11 +134,11 @@ class PrintLayoutManager(QDialog, Ui_PrintLayoutManager):
             QMessageBox.critical(
                 self, self.tr("Export Failed"),
                 self.tr("Failed to open the output file for writing."),
-                QMessageBox.Ok)
+                QMessageBox.StandardButton.Ok)
 
     def __remove(self):
         item = self.listWidgetLayouts.selectedItems()[0]
-        layout = item.data(Qt.UserRole)
+        layout = item.data(Qt.ItemDataRole.UserRole)
         if isinstance(layout, str):
             QgsProject.instance().removeAttachedFile(layout)
             self.__reloadPrintLayouts()

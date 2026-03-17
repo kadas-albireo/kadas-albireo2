@@ -1,7 +1,7 @@
 [general]
 name=KADAS Print
 qgisMinimumVersion=3.00
-qgisMaximumVersion=3.99
+qgisMaximumVersion=4.99
 description=Instantly print map excerpts
 about=The instant print plugin allows to quickly print map excerpts to a file, utilizing an existing composer as page layout.
 version=2.3

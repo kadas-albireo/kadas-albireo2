@@ -1,7 +1,7 @@
 [general]
 name=KADAS Ephem
 qgisMinimumVersion=3.0
-qgisMaximumVersion=3.99
+qgisMaximumVersion=4.99
 description=KADAS ephem plugin
 about=KADAS ephem plugin.
 version=1.3

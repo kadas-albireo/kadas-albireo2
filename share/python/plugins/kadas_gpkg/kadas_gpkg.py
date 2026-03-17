@@ -6,7 +6,6 @@ from qgis.PyQt.QtWidgets import *
 import os
 import sys
 
-from . import resources
 from .kadas_gpkg_export import KadasGpkgExport
 from .kadas_gpkg_import import KadasGpkgImport
 from qgis.gui import *
@@ -60,20 +59,20 @@ class KadasGpkg(QObject):
 
         self.menu = QMenu()
 
-        self.exportShortcut = QShortcut(QKeySequence(Qt.CTRL + Qt.Key_E, Qt.CTRL + Qt.Key_G), self.iface.mainWindow())
+        self.exportShortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_E, Qt.Modifier.CTRL | Qt.Key.Key_G), self.iface.mainWindow())
         self.exportShortcut.activated.connect(self.__exportGpkg)
         self.exportAction = QAction(self.tr("GPKG Export"))
         self.exportAction.triggered.connect(self.__exportGpkg)
         self.menu.addAction(self.exportAction)
 
-        self.importShortcut = QShortcut(QKeySequence(Qt.CTRL + Qt.Key_I, Qt.CTRL + Qt.Key_G), self.iface.mainWindow())
+        self.importShortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_I, Qt.Modifier.CTRL | Qt.Key.Key_G), self.iface.mainWindow())
         self.importShortcut.activated.connect(self.__importGpkg)
         self.importAction = QAction(self.tr("GPKG Import"))
         self.importAction.triggered.connect(self.__importGpkg)
         self.menu.addAction(self.importAction)
-
+        icon_path = os.path.join(os.path.dirname(__file__), 'icons/gpkg.png')
         self.iface.addActionMenu(self.tr("GPKG"),
-                                 QIcon(":/plugins/KADASGpkg/icons/gpkg.png"),
+                                 QIcon( icon_path ),
                                  self.menu,
                                  self.iface.PLUGIN_MENU,
                                  self.iface.MAPS_TAB)

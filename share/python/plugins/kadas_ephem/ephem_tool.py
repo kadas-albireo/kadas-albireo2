@@ -15,7 +15,7 @@ class EphemTool(QgsMapTool):
         QgsMapTool.__init__(self, iface.mapCanvas())
 
         self.iface = iface
-        self.setCursor(Qt.ArrowCursor)
+        self.setCursor(Qt.CursorShape.ArrowCursor)
         self.widget = None
 
     def clean(self):
@@ -44,13 +44,13 @@ class EphemTool(QgsMapTool):
         self.iface.mapCanvas().unsetMapTool(self)
 
     def canvasReleaseEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             self.positionPicked(self.toMapCoordinates(event.pos()))
-        elif event.button() == Qt.RightButton:
+        elif event.button() == Qt.MouseButton.RightButton:
             self.iface.mapCanvas().unsetMapTool(self)
 
     def keyReleaseEvent(self, event):
-        if event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key.Key_Escape:
             self.iface.mapCanvas().unsetMapTool( self )
 
     def positionPicked(self, pos):

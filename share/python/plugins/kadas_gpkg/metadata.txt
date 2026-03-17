@@ -1,7 +1,7 @@
 [general]
 name=KADAS GPKG
 qgisMinimumVersion=3.0
-qgisMaximumVersion=3.99
+qgisMaximumVersion=4.99
 description=KADAS GPKG plugin
 about=KADAS GPKG plugin.
 version=2.4
