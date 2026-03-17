@@ -21,7 +21,7 @@ Die Nutzungsbedingungen für die Daten sind in der Anwendung unter Hilfe → Üb
 
 Mit dem Release von KADAS 2.3 im Q3 2025 sind zahlreiche Neuerungen, Verbesserungen und Fehlerbehebungen umgesetzt worden.
 
-- **Neue Funktionalitäten und Geodaten**
+- _Neue Funktionalitäten und Geodaten_
     - Geodienste und Geodaten mit einer Zeitkomponente können als chronologische Animation abgespielt werden.
     - Themenvergleiche (SWIPE-Tool) bei dem zwei Kartenansichten interaktiv mithilfe eines Schiebereglers ein- und ausgeblendet werden können.
     - Geöffnete Attributtabellen werden im Projekt gespeichert und beim Öffnen des Projektes angezeigt.
@@ -31,7 +31,7 @@ Mit dem Release von KADAS 2.3 im Q3 2025 sind zahlreiche Neuerungen, Verbesserun
     - Vector Tiles Geodienste der MGDI werden im Geokatalog gelistet und können geladen werden.
     - Neu bestehen die Offline-Daten aus der World Briefing Map.
     - Der MSS Export ist neu als KML möglich (nach dem KML-Export nicht weiter bearbeitbar).
-- **Verbesserungen**
+- _Verbesserungen_
     - Plugin Manager: Bei Start von KADAS wird geprüft, ob aktuellere Versionen der installierten Plugins im Repository vorhanden sind. Falls dem so ist, wird automatisch die neueste Version des Plugins installiert und der Benutzer mit einer Meldung informiert.
     - Beim Abfragen via Klicken ist die Darstellung der Resultate, insbesondere wenn mehrere Resultate zurückgegeben werden, verbessert worden.
     - Die Funktion Bookmarks speichert nun auch Layer in Gruppen und Untergruppen.
@@ -44,13 +44,13 @@ Mit dem Release von KADAS 2.3 im Q3 2025 sind zahlreiche Neuerungen, Verbesserun
     - Die Druckvorlagen wurden aktualisiert und enthalten neu defaultmässig das Erstelldatum und das Projektionssystem.
     - Analysen lassen sich direkt über einen Rechtsklick mit der Maus starten.
     - Die Ausdehnung des GPKG-Exports von Vektordaten kann definiert werden.
-- **Fehlerbehebungen**
+- _Fehlerbehebungen_
     - Crash beim Export von GeoPDF wurde behoben.
     - Beim Export von GeoPDF werden alle Layer berücksichtigt und lagekorrekt dargestellt.
     - Crash bei der Verwendung des Ephemeris-Werkzeuges wurde behoben.
     - Crash beim Export von Geopackages wurde behoben.
     - Fehlende Übersetzungen in den Sprachen (DE, FR, IT) behoben.
-- **Technische Anpassungen**
+- _Technische Anpassungen_
     - KADAS 2.3 basiert auf der QGIS-Version 3.44.0-Solothurn.
     - Die beiden Höhenmodelle Schweiz und weltweit (dtm\_analysis.tif + general\_dtm\_globe.tif) sind im COG-Format (Cloud Optimized GeoTIFF) vorhanden. Das erlaubt eine schnellere Prozessierung und Visualisierung.
     - Der 3D Viewer (Globe) musste ausgetauscht werden, da die verwendete Technologie End-of-life ist. Neu wird der 3D Viewer von der QGIS-Applikation verwendet.
@@ -61,7 +61,7 @@ Mit dem Release von KADAS 2.3 im Q3 2025 sind zahlreiche Neuerungen, Verbesserun
 
 ### Version 2.2.0 (Juni 2023)
 
-- **Allgemein**:
+- _Allgemein_:
     - Unterstützung für das Laden von Esri VectorTile-Ebenen hinzugefügt
     - Unterstützung für das Laden von Esri MapService-Ebenen hinzugefügt
     - Layerbaum: Unterstützung der Konfiguration des Aktualisierungsintervalls der Datenquelle für die automatische Aktualisierung der Ebenen
@@ -69,45 +69,45 @@ Mit dem Release von KADAS 2.3 im Q3 2025 sind zahlreiche Neuerungen, Verbesserun
     - Sperren des Kartenmassstabs
     - Konfigurierbarer News-Popup-Dialog
     - Verbesserter Import von 3D-Geometrien aus KML-Dateien
-- **Ansicht**:
+- _Ansicht_:
     - Aufnahme von Schnappschüssen der 3D-Ansicht
     - Verbesserte MGRS-Gitterbeschriftung
-- **Analyse**:
+- _Analyse_:
     - Neues Min/Max-Tool zur Abfrage des niedrigsten/höchsten Punktes im ausgewählten Bereich
     - Auswahl der Zeitzone im Ephemeriden-Werkzeug
     - Korrekte Behandlung von NODATA-Werten im Höhenprofil
-- **Zeichnen**:
+- _Zeichnen_:
     - Rückgängig/Wiederherstellen für die gesamte Zeichensitzung zulassen
     - Ändern der Z-Reihenfolge von Zeichnungen
     - Hinzufügen von Bildern aus einer URL
-- **MSS**:
+- _MSS_:
     - Rückgängig machen/Wiederholen während der gesamten Zeichnungssitzung erlauben
     - Gestaltung von Führungslinien (Breite, Farbe)
     - Aktualisierung auf MSS-2024
-- **Hilfe**:
+- _Hilfe_:
     - Suche in der Hilfe
 
 ### Version 2.1.0 (Dezember 2021)
 
-- **Allgemeines**:
+- _Allgemeines_:
     - Drucken: Korrekte Skalierung von Symbolen (MSS, Pins, Bilder, ...) entsprechend der Druck-DPI
     - GPKG: Möglichkeit, Projektebenen zu importieren
     - Ebenenbaum: Möglichkeit zum Zoomen und Entfernen aller ausgewählten Ebenen
     - Skalenbasierte Sichtbarkeit auch für Redlining/MSS-Ebenen
     - Attributtabelle: Verschiedene neue Auswahl- und Zoom-Werkzeuge
-- **Ansicht**:
+- _Ansicht_:
     - Neue Lesezeichen-Funktion
-- **Analyse**:
+- _Analyse_:
     - Viewshed: Möglichkeit, den vertikalen Winkelbereich des Beobachters zu begrenzen
     - Höhenprofil / Sichtlinie: Anzeige der Markierung in der Grafik, wenn man mit der Maus über die Linie auf der Karte fährt
     - Neues Ephemeriden-Werkzeug
-- **Zeichnen**:
+- _Zeichnen_:
     - Pins: neuer Rich-Text-Editor
     - Stecknadeln: Möglichkeit, mit der Mouse mit dem Tooltipinhalt zu interagieren
     - Führungsraster: Beschriftung nur eines Quadranten zulassen
     - Bullseye: Beschriftung von Quandranten
     - Neues Element zum Zeichnen von Passkreuzen
-- **MSS**:
+- _MSS_:
     - Symbol-Einstellungen pro Ebene
     - Aktualisierung auf MSS-2022
 
@@ -128,7 +128,7 @@ Mit dem Release von KADAS 2.3 im Q3 2025 sind zahlreiche Neuerungen, Verbesserun
 
 ### Version 1.2 (Dezember 2018)
 
-- **Allgemein**:
+- _Allgemein_:
     - Verbesserte KML/KMZ Export Funktionalität
     - Neue KML/KMZ Import Funktionalität
     - Neue GeoPackage Export und Import Funktionalität
@@ -136,32 +136,32 @@ Mit dem Release von KADAS 2.3 im Q3 2025 sind zahlreiche Neuerungen, Verbesserun
     - Erlaube das Hinzufügen von Aktionen zum Ribbon GUI via Python Schnittstelle
     - Setzte Tastenkürzel für zahlreiche Aktionen des Ribbon GUIs
     - Verbessertes "Fuzzy-Matching" bei der Koordinatensuche
-- **Analyse**:
+- _Analyse_:
     - Darstellung von Knotenpunkte der Messlinie im Höhenprofil
-- **Zeichnen**:
+- _Zeichnen_:
     - Unterstützung für numerische Eingabe beim Zeichnen von Redlining Objekte
     - Erlaube das Setzen von Skalierungsfaktoren für Annotationenebenen
     - Erlaube das aktivieren/deaktivieren des Rahmen der Bild-Annotationen
     - Erlaube des Manipulieren von Gruppen von Annotationen
     - Neue Funktionalität: Führungsraster
     - Neue Funktionalität: Bullseye
-- **GPS**:
+- _GPS_:
     - Erlaube das Konvertieren zwischen Waypoints und Stecknadeln
     - Erlaube das Ändern der Farbe von Waypoints un Routen
-- **MSS**:
+- _MSS_:
     - Upgrade auf MSS-2019
 
 ### Version 1.1 (November 2017)
 
-- **Allgemein**:
+- _Allgemein_:
     - Frei setzbaren Cursor im Suchfeld
     - Höhenanzeige in der Statusleiste
     - Geschwindigkeitsverbesserungen bei der Kartendarstellung
     - Attributtabelle für Vektorebenen
-- **Analyse**:
+- _Analyse_:
     - Geodätische Distanz- und Flächenmessung
     - Azimut wählbar relativ zum Kartennorden oder geographischen Norden
-- **Zeichnen**:
+- _Zeichnen_:
     - Einschaltbares Snapping beim Zeichnen
     - Undo/Redo beim Zeichnen
     - Zeichnung können verschoben, kopiert, ausgschnitten und eingefügt werden, einzeln oder als Gruppe
@@ -169,14 +169,14 @@ Mit dem Release von KADAS 2.3 im Q3 2025 sind zahlreiche Neuerungen, Verbesserun
     - Laden von SVG Graphiken (u.a. SymTaZ Graphiken)
     - Laden von nicht georeferenzierte Bilder
     - Bilder und Stecknadeln werden nun in entsprechende Ebenen abgelegt
-- **MSS**:
+- _MSS_:
     - Upgrade auf MSS-2018
     - Korrektes Grössenverhältnis von MSS Symbole beim Drucken
     - Kartuscheinhalt kann von und nach MilX oder XML Dateien importiert bzw. exportiert werden
     - Numerische Eingabe von numerischen Attributen beim Zeichnen von MSS Symbole
-- **3D**:
+- _3D_:
     - Unterstützung für 3D Geometrien in der 3D-Ansicht
-- **Drucken**:
+- _Drucken_:
     - Im Projekt enthaltene Druckvorlagen können verwaltet werden
 
 ### Version 1.0 (September 2016)

@@ -48,7 +48,7 @@ The results are listed in correspondingly designated categories. The result list
 
 ![](../media/image2.png)
 
-To the right of the search field, it is possible to define a filter geometry for local and remote data set search. This filter is **NOT** applied to coordinate, location or pin searches.
+To the right of the search field, it is possible to define a filter geometry for local and remote data set search. This filter is _NOT_ applied to coordinate, location or pin searches.
 
 ## Map View
 
@@ -89,7 +89,7 @@ It is possible to select more than one layer or group at the same time by holdin
 
 The geodata catalog allows adding additional layers to the map. The catalog is empty if no network connection to the catalog service could be established
 
-When starting the program, only public data is displayed. Depending on the user, further data may be available after authentication, see **SAML authentication** below.
+When starting the program, only public data is displayed. Depending on the user, further data may be available after authentication, see _SAML authentication_ below.
 
 The contents of the catalog can by filtered by entering an appropriate text in the input field above the catalog. A layer in the catalog can be added to the map by drag and drop or double click.
 
@@ -104,7 +104,7 @@ The toolbar above the catalog contains the following functionalities:
 
 The status bar contains following labels and control widgets:
 
-- **GPS**: Usage of the GPS button is described in the [**Navigation** chapter](/gps).
+- **GPS**: Usage of the GPS button is described in the [_Navigation_ chapter](/gps).
 - **Mouse position**: The current mouse position on the map can be displayed with respect to multiple reference systems. The desired format can be selected from the menu left of the display label. The unit for the height can be changed in the Settings tab.
 - **Scale**: The current scale of the map view is displayed next to the coordinate field. The scale selector allows to choose between predefined scales ranging from 1:500 to 1:1000000. The lock icon allows locking the current map scale, zooming will then only affect the magnification factor.
 - **Coordinate reference system**: The coordinate reference system selection button allows to choose which projection to use for the map. If the selected projection differs from the native projection of a dataset, the latter will be reprojected, which may result in reduced performance depending on the amount of data.

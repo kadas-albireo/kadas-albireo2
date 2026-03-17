@@ -46,7 +46,7 @@ Per poter utilizzare queste funzioni di analisi del terreno, deve essere definit
 
 Entrambe queste analisi vengono calcolate in un riquadro rettangolare della mappa. La tonalità del rilievo richiede inoltre l’immissione dell’angolo orizzontale e verticale della sorgente luminosa.
 
-I risultati delle analisi di pendenza e rilievo vengono inseriti come layer raster alla mappa e compaiono, di conseguenza, nella legenda. Salvando il progetto, questi layer vengono allegati al progetto nel file **.qgz**.
+I risultati delle analisi di pendenza e rilievo vengono inseriti come layer raster alla mappa e compaiono, di conseguenza, nella legenda. Salvando il progetto, questi layer vengono allegati al progetto nel file _.qgz_.
 
 ![](../media/image5.png)
 
@@ -58,7 +58,7 @@ Per poter utilizzare queste funzioni di analisi del terreno, deve essere definit
 
 L’analisi della visibilità viene calcolata all’interno di un settore circolare o di un cerchio completo. Al primo clic del mouse sulla mappa viene definito il luogo d’osservazione; il secondo clic definisce il raggio; il terzo clic definisce l’apertura angolare del settore. Questi parametri possono essere immessi anche numericamente se l’immissione numerica è attiva. Dopo il rilevamento della superficie di analisi, possono essere adeguati i parametri di calcolo – ovvero l’altezza d’osservazione, l’altezza di arrivo, se queste altezze debbano essere interpretate relativamente al terreno o al livello del mare e se debba essere visualizzata l’area visibile o quella non visibile.
 
-Il risultato viene aggiunto come layer raster alla mappa. Al salvataggio del progetto, esso viene allegato al progetto nel file **.qgz**.
+Il risultato viene aggiunto come layer raster alla mappa. Al salvataggio del progetto, esso viene allegato al progetto nel file _.qgz_.
 
 ## Min/Max
 

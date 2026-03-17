@@ -21,7 +21,7 @@ Le condizioni d'uso dei dati sono riportate nell'applicazione alla voce Aiuto �
 
 Con il rilascio di KADAS 2.3 nel terzo trimestre del 2025 sono state implementate numerose novità, miglioramenti e correzioni di bug.
 
-- **Nuove funzionalità e geodati**
+- _Nuove funzionalità e geodati_
     - I geoservizi e i dati geografici con una componente temporale possono essere riprodotti come animazioni cronologiche.
     - Confronto tematico (strumento SWIPE) in cui è possibile visualizzare e nascondere in modo interattivo due mappe utilizzando un cursore.
     - Le tabelle degli attributi aperte vengono salvate nel progetto e visualizzate all'apertura del progetto.
@@ -31,7 +31,7 @@ Con il rilascio di KADAS 2.3 nel terzo trimestre del 2025 sono state implementat
     - Vector Tiles Geodienste der MGDI werden im Geokatalog gelistet und können geladen werden.
     - I dati offline sono ora costituiti dalla World Briefing Map.
     - L'esportazione MSS è ora possibile come KML (non modificabile dopo l'esportazione KML).
-- **Miglioramenti**
+- _Miglioramenti_
     - Plugin Manager: all'avvio di KADAS viene verificato se nel repository sono disponibili versioni più recenti dei plugin installati. In tal caso, viene installata automaticamente la versione più recente del plugin e l'utente viene informato con un messaggio.
     - Durante la ricerca tramite clic, è stata migliorata la visualizzazione dei risultati, in particolare quando vengono restituiti più risultati.
     - La funzione Segnalibri ora salva anche i livelli in gruppi e sottogruppi.
@@ -44,13 +44,13 @@ Con il rilascio di KADAS 2.3 nel terzo trimestre del 2025 sono state implementat
     - I modelli di stampa sono stati aggiornati e ora contengono di default la data di creazione e il sistema di proiezione.
     - Le analisi possono essere avviate direttamente con un clic destro del mouse.
     - È possibile definire l'estensione dell'esportazione GPKG dei dati vettoriali.
-- **Correzione di errori**
+- _Correzione di errori_
     - Risolto il crash durante l'esportazione di GeoPDF
     - Durante l'esportazione di GeoPDF vengono considerati tutti i livelli e visualizzati correttamente.
     - Risolto il crash durante l'utilizzo dello strumento Ephemeris.
     - Risolto il crash durante l'esportazione di Geopackage.
     - Risolto: traduzioni mancanti nelle lingue (DE, FR, IT)
-- **Modifiche tecniche**
+- _Modifiche tecniche_
     - KADAS 2.3 si basa sulla versione QGIS 3.44.0-Solothurn
     - I due modelli altimetrici della Svizzera e del mondo (dtm\_analysis.tif + general\_dtm\_globe.tif) sono disponibili in formato COG (Cloud Optimized GeoTIFF). Ciò consente un'elaborazione e una visualizzazione più rapide.
     - Il visualizzatore 3D (Globe) ha dovuto essere sostituito perché la tecnologia utilizzata è giunta al termine del suo ciclo di vita. Ora il visualizzatore 3D viene utilizzato dall'applicazione QGIS.
@@ -61,7 +61,7 @@ Con il rilascio di KADAS 2.3 nel terzo trimestre del 2025 sono state implementat
 
 ### Versione 2.2.0 (giugno 2023)
 
-- **Generale**:
+- _Generale_:
     - Permette il caricamento di livelli Esri VectorTile
     - Permette il caricamento di livelli Esri MapService
     - Albero dei livelli: permette la configurazione dell'intervallo di aggiornamento dell'origine dati per l'aggiornamento automatico dei livelli
@@ -69,45 +69,45 @@ Con il rilascio di KADAS 2.3 nel terzo trimestre del 2025 sono state implementat
     - Possibilità di bloccare la scala della mappa
     - Finestra di dialogo "novità" configurabile
     - Miglioramento dell'importazione di geometrie 3D da file KML
-- **Vista**:
+- _Vista_:
     - Possibilità di scattare foto istantanee della vista 3D
     - Miglioramento dell'etichettatura della griglia MGRS
-- **Analisi**:
+- _Analisi_:
     - Nuovo strumento min/max per determinare il punto più basso/più alto nell'area selezionata
     - Selezione del fuso orario nello strumento effemeridi
     - Gestione corretta dei valori NODATA nel profilo altimetrico
-- **Disegno**:
+- _Disegno_:
     - Consentire l'annullamento/ripristino durante l'intera sessione di disegno.
     - Possibilità di modificare l'ordine z dei disegni
     - Possibilità di aggiungere immagini da URL
-- **MSS**:
+- _MSS_:
     - Consente l'annullamento/ripristino durante l'intera sessione di disegno.
     - Possibilità di stilizzare le linee guida (larghezza, colore)
     - Aggiornamento a MSS-2024
-- **Aiuto**:
+- _Aiuto_:
     - Consente la ricerca nella guida
 
 ### Versione 2.1.0 (dicembre 2021)
 
-- **Generale**:
+- _Generale_:
     - Stampa: Scalare correttamente i simboli (MSS, pin, immagini, ...) in base ai DPI di stampa
     - GPKG: Permettere l'importazione dei livelli di progetti
     - Indice: Possibilità di zoomare e rimuovere tutti i layer selezionati
     - Visibilità basata sulla scala anche per i layer redlining/MSS
     - Tabella attributi: vari nuovi strumenti di selezione e zoom per
-- **Vista**:
+- _Vista_:
     - Nuova funzione segnalibri
-- **Analisi**:
+- _Analisi_:
     - Viewshed: Possibilità di limitare gli angoli verticali dell'osservatore
     - Profilo altimetrico / linea di vista: mostrare l'indicatore nel grafico quando si passa sopra la linea sulla mappa
     - Nuovo strumento effemeridi
-- **Disegno**:
+- _Disegno_:
     - Spilli: Nuovo editor richt-text
     - Spilli: Permettere di interagire con il contenuto del tooltip con il mouse
     - Griglia di guida: Consentire l'etichettatura di un solo quadrante
     - Bullseye: Etichettatura dei quandranti
     - Nuovo elemento di disegno a croce di coordinate
-- **MSS**:
+- _MSS_:
     - Impostazioni dei simboli per livello
     - Aggiornamento a MSS-2022
 
@@ -128,7 +128,7 @@ Con il rilascio di KADAS 2.3 nel terzo trimestre del 2025 sono state implementat
 
 ### Versione 1.2 (Dicembre 2018)
 
-- **Generale**:
+- _Generale_:
     - Funzionalità di esportazione KML/KMZ migliorata
     - Nuova funtionalità di importazione KML/KMZ
     - Nuova funzionalità di esportazione e importazione GeoPackage
@@ -136,32 +136,32 @@ Con il rilascio di KADAS 2.3 nel terzo trimestre del 2025 sono state implementat
     - Possibilità di aggiungere funzionalità all'interfaccia ribbon dall'API Python
     - Aggiungi tasti di scelta rapida per varie funzionalità dell'interfaccia ribbon
     - Migliora il "fuzzy-matching" nella ricerca di coordinate
-- **Analisi**:
+- _Analisi_:
     - Disegna i vertici della linea di misura nel profilo di elevazione
-- **Disegnare**:
+- _Disegnare_:
     - Supporta l'input numerico nel disegno di oggetti redlining
     - Possibilità di scalare il contanuto di interi layer di annotazioni
     - Possibilità di attivare e disattivare le cornici di immagini
     - Possibilità di manipulare gruppi di annotazioni
     - Nuova funtionalità: griglia di guida
     - Nuova funtionalità: Bullseye
-- **GPS**:
+- _GPS_:
     - Possibilità di convertire tra waypoints e spilli
     - Possibilità di modificare il colore di waypoints e rotte
-- **MSS**:
+- _MSS_:
     - Aggiornamento a MSS-2019
 
 ### Versione 1.1 (Novembre 2017)
 
-- **Generale**:
+- _Generale_:
     - Cursore liberamente posizionabile nel campo di ricerca
     - Indicazione della quota nella barra dello stato
     - Miglioramenti di prestazione della mappa
     - Tabella degli attributi per layer vettoriali
-- **Analisi**:
+- _Analisi_:
     - Misurazioni geodetiche di distanze e aree
     - Azimut relativo al Nord della mappa o al Nord geografico
-- **Disegnare**:
+- _Disegnare_:
     - Possibilità di attivare lo snapping durante la modalità di disegno
     - Possibilità di annullare/ripetere nella modalità di disegno
     - Possibilità di spostare, copiare, tagliare ed incollare disegni, singolarmente o in gruppo
@@ -169,14 +169,14 @@ Con il rilascio di KADAS 2.3 nel terzo trimestre del 2025 sono state implementat
     - Possibilità di caricare grafiche SVG (tra cui simboli SymTaZ)
     - Possibilità di caricare immagini non georeferenziate
     - Spilli e immagini sono vengono ora raggruppate in layer
-- **MSS**:
+- _MSS_:
     - Aggiornamento a MSS-2018
     - Rapporto dimensionale corretto dei simboli MSS nella stampa
     - Il cartiglio può venir importato e esportato da risp. a file MilX o XML
     - Input numerico per gli attributi nella modalità di disegno di simboli MSS
-- **3D**:
+- _3D_:
     - Possibilità di visualizzare geometrie come modelli 3D
-- **Stampa**:
+- _Stampa_:
     - Possibilità di gestire i modelli di stampa contenuti nel proggetto
 
 ### Versione 1.0 (Settembre 2016)

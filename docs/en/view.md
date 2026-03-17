@@ -40,9 +40,9 @@ The following functions are available in the title bar of the 3D window:
 
 All 2D map layers are by default drawn as a draped textures on the globe. Vector layers (including redlining) can alternatively be drawn either as extruded 2.5D models or as 3D models, with the style of the 2D view adopted as far as possible in the 3D view. For representation as 3D models, the geometries of the layer must be provided with elevation information (Z coordinates), and these must be either expressed with respect to the terrain or the sea level. The display options for vector levels can be set in the corresponding layer properties.
 
-**Note**: The tooltips of the input fields in the globe settings of the layer describe the various options in detail.
+_Note_: The tooltips of the input fields in the globe settings of the layer describe the various options in detail.
 
-**Note**: The shading of 3D models depends on the position of the sun. The position of the sun can be controlled by specifying time and date in the globe settings.
+_Note_: The shading of 3D models depends on the position of the sun. The position of the sun can be controlled by specifying time and date in the globe settings.
 
 ![](../media/image15.png)
 

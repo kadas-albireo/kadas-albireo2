@@ -5,7 +5,7 @@
 
 ## Projects
 
-Maps can be loaded and saved as projects. The QGIS project format is used, ending with **\*.qgz**. Projects are created from templates. When starting the application, a project is automatically created from an online or offline template, depending on whether the computer is connected to the network.
+Maps can be loaded and saved as projects. The QGIS project format is used, ending with _\*.qgz_. Projects are created from templates. When starting the application, a project is automatically created from an online or offline template, depending on whether the computer is connected to the network.
 
 ## Creating and saving maps
 
@@ -21,7 +21,7 @@ The **Print** functionality allows printing the current map or exporting it to a
 
 Printing is based on layouts. By default, layouts for A0 through A6 are available in both landscape and portrait modes, as well as a Custom layout.
 
-When the layout is selected, the main map window displays a blue semi-transparent rectangle that corresponds to the section to be printed. For fixed-size layouts, this rectangle can be moved in the main map to adjust the print area. The size of the rectangle is derived from the paper size and the scale specified in the print dialog. In the case of the **Custom** layout, the section is numerically defined along with the scale in the print dialog, and the resulting paper size is dynamically calculated according to this information.
+When the layout is selected, the main map window displays a blue semi-transparent rectangle that corresponds to the section to be printed. For fixed-size layouts, this rectangle can be moved in the main map to adjust the print area. The size of the rectangle is derived from the paper size and the scale specified in the print dialog. In the case of the _Custom_ layout, the section is numerically defined along with the scale in the print dialog, and the resulting paper size is dynamically calculated according to this information.
 
 When printing additional elements, coordinate grid, card cartridge, legend, and scale bar can be shown or hidden as desired. The position of these elements is defined in the layout.
 
@@ -40,12 +40,12 @@ When printing additional elements, coordinate grid, card cartridge, legend, and 
 - **Map cartouche**: Toggling of the map cartouche
 - **Edit map cartouche**: Setup of the map cartouche
 - **Scalebar**: Toggling of the scale bar
-- **Legend**: Enable or disable the map legend, via the **Configure** button it is furthermore possible to separately choose which layers are shown in the legend
+- **Legend**: Enable or disable the map legend, via the _Configure_ button it is furthermore possible to separately choose which layers are shown in the legend
 - **File format**: Choice of the file format when exporting to a file
 
 ### Print Layouts
 
-The print layouts contained in the project can be managed in the **Print Layout Manager** dialog, which can be opened by pressing the button to the right of the print layout selection. There, individual layouts can be imported, exported and removed from the project.
+The print layouts contained in the project can be managed in the _Print Layout Manager_ dialog, which can be opened by pressing the button to the right of the print layout selection. There, individual layouts can be imported, exported and removed from the project.
 
 ![](../media/image12.1.png)
 
@@ -74,7 +74,7 @@ The map content can be exported as KML or KMZ. Images, raster layers as well as 
 
 KMZ/KML files can also be imported into KADAS.
 
-**Note**: KMZ and KML are lossy export formats, and therefore not suitable for exchange between KADAS users. The native **\*.qgs** project format should be used for this.
+_Note_: KMZ and KML are lossy export formats, and therefore not suitable for exchange between KADAS users. The native _\*.qgs_ project format should be used for this.
 
 ## GPKG Export and Import
 

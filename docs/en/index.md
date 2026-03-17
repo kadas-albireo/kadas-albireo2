@@ -21,7 +21,7 @@ The terms of use for the data are listed in the application under Help → About
 
 With the release of KADAS 2.3 in Q3 2025, numerous new features, improvements, and bug fixes have been implemented.
 
-- **New functionalities and geodata**
+- _New functionalities and geodata_
     - Geoservices and geodata with a time component can be played back as a chronological animation.
     - Theme comparisons (SWIPE tool) where two map views can be interactively shown and hidden using a slider.
     - Open attribute tables are saved in the project and displayed when the project is opened.
@@ -31,7 +31,7 @@ With the release of KADAS 2.3 in Q3 2025, numerous new features, improvements, a
     - Vector tiles geodata services from the MGDI are listed in the geocatalog and can be loaded.
     - Offline data now consists of the World Briefing Map.
     - MSS export is now possible as KML (cannot be further edited after KML export).
-- **Improvements**
+- _Improvements_
     - Plugin Manager: When KADAS is started, it checks whether more recent versions of the installed plugins are available in the repository. If so, the latest version of the plugin is automatically installed, and the user is informed with a message.
     - When querying by clicking, the display of results has been improved, especially when multiple results are returned.
     - The Bookmarks function now also saves layers in groups and subgroups.
@@ -44,13 +44,13 @@ With the release of KADAS 2.3 in Q3 2025, numerous new features, improvements, a
     - The print templates have been updated and now include the creation date and projection system by default.
     - Analyses can be started directly by right-clicking with the mouse.
     - The extent of the GPKG export of vector data can be defined.
-- **Bug fixes**
+- _Bug fixes_
     - Crash when exporting GeoPDF has been fixed.
     - When exporting GeoPDF, all layers are considered and displayed in the correct position.
     - Crash when using the ephemeris tool has been fixed.
     - Crash when exporting geopackages has been fixed.
     - Missing translations in the languages (DE, FR, IT) have been fixed.
-- **Technical adjustments**
+- _Technical adjustments_
     - KADAS 2.3 is based on QGIS version 3.44.0-Solothurn.
     - The two elevation models for Switzerland and worldwide (dtm\_analysis.tif + general\_dtm\_globe.tif) are available in COG format (Cloud Optimized GeoTIFF). This allows for faster processing and visualization.
     - The 3D viewer (Globe) had to be replaced because the technology used is end-of-life. The 3D viewer is now used by the QGIS application.
@@ -61,7 +61,7 @@ With the release of KADAS 2.3 in Q3 2025, numerous new features, improvements, a
 
 ### Version 2.2.0 (June 2023)
 
-- **General**:
+- _General_:
     - Add support for loading Esri VectorTile layers
     - Add support for loading Esri MapService layers
     - Layertree: support configuring data source refresh interval for auto-refreshing layers
@@ -69,45 +69,45 @@ With the release of KADAS 2.3 in Q3 2025, numerous new features, improvements, a
     - Allow locking map scale
     - Configurable News Popup dialog
     - Improved import of 3D geometries from KML files
-- **View**:
+- _View_:
     - Allow taking snapshot pictures of 3D view
     - Improved MGRS grid labeling
-- **Analysis**:
+- _Analysis_:
     - New min/max tool for querying lowest/highest point in selected area
     - Timezone selection in ephemeris tool
     - Correctly handle NODATA values in height profile
-- **Draw**:
+- _Draw_:
     - Allow undo/redo for entire drawing session
     - Allow modifying z-order of drawings
     - Allow adding pictures from URL
-- **MSS**:
+- _MSS_:
     - Allow undo/redo for entire drawing session
     - Allow styling leader lines (width, color)
     - Update to MSS-2024
-- **Help**:
+- _Help_:
     - Allow searching through help
 
 ### Version 2.1.0 (December 2021)
 
-- **General**:
+- _General_:
     - Print: Properly scale symbols (MSS, pins, pictures, ...) according to print DPI
     - GPKG: Allow importing project layers
     - Layer tree: Possibility to zoom to and remove all selected layers
     - Scale based visibility also for redlining/MSS layers
     - Attribute table: various new selection and zoom tools to
-- **View**:
+- _View_:
     - New bookmarks function
-- **Analysis**:
+- _Analysis_:
     - Viewshed: Possibility to limit observer vertical angle range
     - Height profile / Line of sight: show marker in plot when hovering over line on the map
     - New ephemeris tool
-- **Draw**:
+- _Draw_:
     - Pins: Add rich text editor
     - Pins: Allow interacting with tooltip content with mouse
     - Guide grid: Allow labeling only one quadrant
     - Bullseye: Quandrant labeling
     - New coordinate cross drawing item
-- **MSS**:
+- _MSS_:
     - Per layer symbol settings
     - Update to MSS-2022
 
@@ -128,7 +128,7 @@ With the release of KADAS 2.3 in Q3 2025, numerous new features, improvements, a
 
 ### Version 1.2 (December 2018)
 
-- **General**:
+- _General_:
     - Improved KML/KMZ export functionality
     - New KML/KMZ import functionality
     - New GeoPackage export and import functionality
@@ -136,32 +136,32 @@ With the release of KADAS 2.3 in Q3 2025, numerous new features, improvements, a
     - Allow adding actions to ribbon GUI via Python API
     - Add keyboard shortcuts for many actions in ribbon GUI
     - Improved fuzzy matching when searching coordinates
-- **Analysis**:
+- _Analysis_:
     - Show node markers in height profile
-- **Draw**:
+- _Draw_:
     - Support numeric input when drawing redlining objects
     - Allow setting scaling factor for annotation layers
     - Allow toggling frames of image annotations
     - Allow manipulating groups of annotation items
     - New Guide Grid functionality
     - New Bullseye functionality
-- **GPS**:
+- _GPS_:
     - Allow conversion between waypoints and pins
     - Allow changing color of waypoints and routes
-- **MSS**:
+- _MSS_:
     - Update to MSS-2019
 
 ### Version 1.1 (November 2017)
 
-- **General**:
+- _General_:
     - Freely positionable cursor in the search field
     - Height display in the status bar
     - Speed ​​improvements in map display
     - Attribute table for vector layers
-- **Analysis**:
+- _Analysis_:
     - Geodetic distance and area measurement
     - Option to measure azimuth relative to the map north or geographical north
-- **Draw**:
+- _Draw_:
     - Optional snapping when drawing
     - Undo/redo when drawing
     - Drawings can be moved, copied, cut and pasted, individually or as a group
@@ -169,14 +169,14 @@ With the release of KADAS 2.3 in Q3 2025, numerous new features, improvements, a
     - Loading of SVG graphics (including SymTaZ graphics)
     - Loading non-georeferenced images
     - Pictures and pins are now stored in corresponding layers
-- **MSS**:
+- _MSS_:
     - Upgrade to MSS-2018
     - Correct size ratio of MSS symbols when printing
     - Cartouche content can be imported or exported to and from MilX or XML files
     - Numeric input of attributes when drawing MSS symbols
-- **3D**:
+- _3D_:
     - Support for 3D geometries in the 3D view
-- **Printing**:
+- _Printing_:
     - Print templates contained in the project can be managed
 
 ### Version 1.0 (September 2016)

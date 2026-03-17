@@ -46,7 +46,7 @@ Pour utiliser ces fonctions d’analyse du terrain, il faut définir un modèle 
 
 Ces deux analyses sont effectuées dans une portion rectangulaire de la carte. L’estompage nécessite également de saisir l’angle horizontal et vertical de la source de lumière.
 
-Les résultats des analyses de pente et d’ombrage sont ajoutés à la carte comme niveaux de raster et apparaissent ainsi dans le répertoire de la carte. Lors de l’enregistrement du projet, ces données sont attachées au projet dans le fichier **.qgz**.
+Les résultats des analyses de pente et d’ombrage sont ajoutés à la carte comme niveaux de raster et apparaissent ainsi dans le répertoire de la carte. Lors de l’enregistrement du projet, ces données sont attachées au projet dans le fichier _.qgz_.
 
 ![](../media/image5.png)
 
@@ -58,7 +58,7 @@ Pour utiliser ces fonctions d’analyse du terrain, il faut définir un modèle 
 
 L’analyse de visibilité est calculée au sein d’une portion de cercle ou d’un cercle complet. Le premier clic sur la carte permet de définir la position de l’observateur, le deuxième clic le rayon et le troisième l’angle d’ouverture du secteur. Si la saisie numérique est activée, ces paramètres peuvent également être saisis numériquement. Une fois que la surface à analyser a été saisie, les paramètres de calcul peuvent être modifiés, autrement dit l’altitude de l’observateur, la hauteur du signal, l’interprétation (ou non) de l’altitude en fonction du terrain ou du niveau de la mer et l’affichage (ou non) des portions de terrain visibles ou invisibles.
 
-Après calcul, le résultat est ajouté à la carte sous forme de couche raster. Si vous sauvegardez le projet, cette couche sera attachée au projet dans le fichier **.qgz**.
+Après calcul, le résultat est ajouté à la carte sous forme de couche raster. Si vous sauvegardez le projet, cette couche sera attachée au projet dans le fichier _.qgz_.
 
 ## Min/Max
 

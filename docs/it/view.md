@@ -40,9 +40,9 @@ Le seguenti funzioni sono disponibili dalla barra titolo della finestra 3D:
 
 Per impostazione predefinita, i layer della vista 2D sono disegnati come immagini drappeggiate sul terreno del globo. Layer vettoriali (tra cui redlining) possono alternativamente venir visualizzati come modelli estrusi 2.5D oppure come modelli 3D. Lo stile del layer viene applicato ai modelli nel limite del possibile. Per la rappresentazione come modelli 3D, le geometrie devono contenere informazioni di quota (coordinate Z), e queste devono essere espresse relative al layer del suolo oppure al layer del mare. Le impostazioni di visualizzazione si possono modificare nel dialogo delle proprietà del rispettivo layer.
 
-**Nota**: I tooltip dei campi delle impostazioni del Globo del layer descrivono le varie impostazioni in dettaglio.
+_Nota_: I tooltip dei campi delle impostazioni del Globo del layer descrivono le varie impostazioni in dettaglio.
 
-**Nota**: L'ombreggiatura dei modelli 3D dipende dalla posizione del sole. Questa può venir controllata inserendo la data e ora desiderata nelle impostazioni del globo.
+_Nota_: L'ombreggiatura dei modelli 3D dipende dalla posizione del sole. Questa può venir controllata inserendo la data e ora desiderata nelle impostazioni del globo.
 
 ![](../media/image15.png)
 
