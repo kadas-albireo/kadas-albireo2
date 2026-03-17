@@ -82,46 +82,40 @@ class CartoucheDialog(QDialog, Ui_CartoucheDialog):
         QgsProject.instance().writeEntry("VBS-Print", "cartouche", self.__serializeCartouche())
 
     def updateUi(self):
-        self.codenameLE.setText(unicode(self.__getPrintLayoutItemText("codename")))
-        self.troopstitleLE.setText(unicode(self.__getPrintLayoutItemText("troopstitle")))
-        self.supplementtitleLE.setText(unicode(self.__getPrintLayoutItemText("supplementtitle")))
+        self.codenameLE.setText(self.__getPrintLayoutItemText("codename"))
+        self.troopstitleLE.setText(self.__getPrintLayoutItemText("troopstitle"))
+        self.supplementtitleLE.setText(self.__getPrintLayoutItemText("supplementtitle"))
         self.cartouchecircumscriptionLE.setText(
-            unicode(self.__getPrintLayoutItemText("cartouchecircumscription"))
+            self.__getPrintLayoutItemText("cartouchecircumscription")
         )
-        self.scaletitleLE.setText(unicode(self.__getPrintLayoutItemText("scaletitle")))
-        self.placedateLE.setText(unicode(self.__getPrintLayoutItemText("placedate")))
-        self.exerciseorganisationLE.setText(
-            unicode(self.__getPrintLayoutItemText("exerciseorganisation"))
-        )
-        self.coursetitleLE.setText(unicode(self.__getPrintLayoutItemText("coursetitle")))
-        self.exercisetitleLE.setText(unicode(self.__getPrintLayoutItemText("exercisetitle")))
-        self.documenttitleLE.setText(unicode(self.__getPrintLayoutItemText("documenttitle")))
+        self.scaletitleLE.setText(self.__getPrintLayoutItemText("scaletitle"))
+        self.placedateLE.setText(self.__getPrintLayoutItemText("placedate"))
+        self.exerciseorganisationLE.setText(self.__getPrintLayoutItemText("exerciseorganisation"))
+        self.coursetitleLE.setText(self.__getPrintLayoutItemText("coursetitle"))
+        self.exercisetitleLE.setText(self.__getPrintLayoutItemText("exercisetitle"))
+        self.documenttitleLE.setText(self.__getPrintLayoutItemText("documenttitle"))
         self.exercisedateLE.setDate(QDate.currentDate())
 
     def updatePrintLayout(self, x=None):
+        self.__setPrintLayoutItemText("classification1", self.classification2.currentText())
+        self.__setPrintLayoutItemText("troopstitle", self.troopstitleLE.text())
+        self.__setPrintLayoutItemText("codename", self.codenameLE.text())
         self.__setPrintLayoutItemText(
-            "classification1", unicode(self.classification2.currentText())
+            "cartouchecircumscription", self.cartouchecircumscriptionLE.text()
         )
-        self.__setPrintLayoutItemText("troopstitle", unicode(self.troopstitleLE.text()))
-        self.__setPrintLayoutItemText("codename", unicode(self.codenameLE.text()))
-        self.__setPrintLayoutItemText(
-            "cartouchecircumscription", unicode(self.cartouchecircumscriptionLE.text())
-        )
-        self.__setPrintLayoutItemText("supplementtitle", unicode(self.supplementtitleLE.text()))
-        self.__setPrintLayoutItemText("scaletitle", unicode(self.scaletitleLE.text()))
-        self.__setPrintLayoutItemText("placedate", unicode(self.placedateLE.text()))
+        self.__setPrintLayoutItemText("supplementtitle", self.supplementtitleLE.text())
+        self.__setPrintLayoutItemText("scaletitle", self.scaletitleLE.text())
+        self.__setPrintLayoutItemText("placedate", self.placedateLE.text())
 
         if self.exerciseGroupBox.isChecked():
-            self.__setPrintLayoutItemText("exercisedate", unicode(self.exercisedateLE.text()))
+            self.__setPrintLayoutItemText("exercisedate", self.exercisedateLE.text())
+            self.__setPrintLayoutItemText("classification2", self.classification1.currentText())
             self.__setPrintLayoutItemText(
-                "classification2", unicode(self.classification1.currentText())
+                "exerciseorganisation", self.exerciseorganisationLE.text()
             )
-            self.__setPrintLayoutItemText(
-                "exerciseorganisation", unicode(self.exerciseorganisationLE.text())
-            )
-            self.__setPrintLayoutItemText("coursetitle", unicode(self.coursetitleLE.text()))
-            self.__setPrintLayoutItemText("exercisetitle", unicode(self.exercisetitleLE.text()))
-            self.__setPrintLayoutItemText("documenttitle", unicode(self.documenttitleLE.text()))
+            self.__setPrintLayoutItemText("coursetitle", self.coursetitleLE.text())
+            self.__setPrintLayoutItemText("exercisetitle", self.exercisetitleLE.text())
+            self.__setPrintLayoutItemText("documenttitle", self.documenttitleLE.text())
         else:
             self.__setPrintLayoutItemText("exercisedate", "")
             self.__setPrintLayoutItemText("classification2", "")
