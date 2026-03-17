@@ -4,8 +4,7 @@ import os
 import sqlite3
 import tempfile
 
-from kadas.kadascore import *
-from kadas.kadasgui import *
+from kadas.kadasgui import KadasMapCanvasItemManager, KadasMapItem, KadasProjectMigration
 from qgis.core import *
 from qgis.gui import *
 from qgis.PyQt import uic

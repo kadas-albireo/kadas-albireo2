@@ -12,7 +12,7 @@
 
 import os
 
-from kadas.kadascore import *
+from kadas.kadascore import Kadas
 from qgis.core import Qgis
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QPixmap

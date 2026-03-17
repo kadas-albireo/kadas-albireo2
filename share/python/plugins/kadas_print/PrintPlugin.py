@@ -10,9 +10,7 @@
 
 import os
 
-from kadas.kadasgui import *
-from qgis.core import *
-from qgis.gui import *
+from kadas.kadasgui import KadasPluginInterface
 from qgis.PyQt.QtCore import QCoreApplication, QObject, QSettings, QTranslator
 
 from .PrintTool import PrintTool

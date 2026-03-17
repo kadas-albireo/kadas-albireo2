@@ -9,7 +9,7 @@
 
 import os
 
-from kadas.kadasgui import *
+from kadas.kadasgui import KadasMapToolSelectRect
 from qgis.core import *
 from qgis.gui import *
 from qgis.PyQt import uic

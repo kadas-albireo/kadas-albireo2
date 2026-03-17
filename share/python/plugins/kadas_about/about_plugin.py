@@ -12,7 +12,7 @@
 
 import os
 
-from kadas.kadasgui import *
+from kadas.kadasgui import KadasPluginInterface
 from qgis.PyQt.QtCore import QCoreApplication, QSettings, QTranslator
 
 from .about_dialog import AboutDialog

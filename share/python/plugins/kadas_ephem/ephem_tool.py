@@ -1,6 +1,4 @@
-from kadas.kadasanalysis import *
-from kadas.kadascore import *
-from kadas.kadasgui import *
+from kadas.kadasgui import KadasItemPos, KadasMapCanvasItemManager, KadasSymbolItem
 from qgis.core import *
 from qgis.gui import *
 from qgis.PyQt.QtCore import Qt
