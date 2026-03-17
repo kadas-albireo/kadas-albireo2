@@ -11,3 +11,5 @@ kadas/resources/resources.qrc
 .vscode
 __pycache__
 out
+site/
+scripts/.venv/

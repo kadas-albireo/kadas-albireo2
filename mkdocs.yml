@@ -1,0 +1,47 @@
+site_name: KADAS Albireo
+site_description: KADAS Albireo Documentation
+docs_dir: docs
+theme:
+  name: readthedocs
+
+nav:
+  - EN:
+    - General: en/index.md
+    - The Interface: en/kadas_gui.md
+    - Map: en/map.md
+    - View: en/view.md
+    - Analysis: en/analysis.md
+    - Draw: en/draw.md
+    - Navigation: en/gps.md
+    - MSS: en/mss.md
+    - Settings: en/settings.md
+  - DE:
+    - Allgemeines: de/index.md
+    - KADAS Benutzeroberfläche: de/kadas_gui.md
+    - Karte: de/map.md
+    - Ansicht: de/view.md
+    - Analyse: de/analysis.md
+    - Zeichnen: de/draw.md
+    - Navigation: de/gps.md
+    - MSS: de/mss.md
+    - Einstellungen: de/settings.md
+  - FR:
+    - Généralités: fr/index.md
+    - Interface de KADAS: fr/kadas_gui.md
+    - Carte: fr/map.md
+    - Vue: fr/view.md
+    - Analyse: fr/analysis.md
+    - Dessiner: fr/draw.md
+    - Navigation: fr/gps.md
+    - MSS: fr/mss.md
+    - Préférences: fr/settings.md
+  - IT:
+    - Generalità: it/index.md
+    - Interfaccia KADAS: it/kadas_gui.md
+    - Mappa: it/map.md
+    - Vista: it/view.md
+    - Analisi: it/analysis.md
+    - Disegnare: it/draw.md
+    - Navigazione: it/gps.md
+    - MSS: it/mss.md
+    - Impostazioni: it/settings.md
