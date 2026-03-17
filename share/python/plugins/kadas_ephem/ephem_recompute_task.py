@@ -83,7 +83,7 @@ class EphemComputeTask(QThread):
             home.date = ephem.Date(datetime.fromtimestamp(ts, timezone.utc))
 
             if self.celestialBody == self.CelestialBody.SUN:
-                ## Sun ##
+                # Sun
 
                 sun = ephem.Sun()
                 sun.compute(home)
@@ -160,7 +160,7 @@ class EphemComputeTask(QThread):
                 )
 
             else:
-                ## Moon ##
+                # Moon
 
                 moon = ephem.Moon()
                 moon.compute(home)

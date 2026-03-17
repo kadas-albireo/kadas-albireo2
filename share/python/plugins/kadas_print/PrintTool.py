@@ -635,7 +635,7 @@ class PrintTool(KadasMapToolSelectRect):
             self.iface.mainWindow(), self.tr("Print Layout"), filename, format
         )
 
-        if type(filename) == tuple:
+        if isinstance(filename, tuple):
             filename = filename[0]
         if not filename:
             return

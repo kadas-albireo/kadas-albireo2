@@ -264,9 +264,9 @@ class KadasGpkgExport(KadasGpkgExportBase):
         elif path and (path.startswith(gpkg_filename) or path.startswith("GPKG:" + gpkg_filename)):
             # Previous GPKG sources: replace GPKG path with placeholder
             return path.replace(gpkg_filename, "@gpkg_file@")
-        elif os.path.isfile(path) and not path in layer_sources:
+        elif os.path.isfile(path) and path not in layer_sources:
             # Other resource: Add it to resources,
-            if not path in additional_resources:
+            if path not in additional_resources:
                 additional_resources[path] = str(uuid.uuid1()) + os.path.splitext(path)[1]
 
             return "@qgis_resources@/%s" % additional_resources[path]

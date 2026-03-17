@@ -78,7 +78,7 @@ class PrintLayoutManager(QDialog, Ui_PrintLayoutManager):
         filename = QFileDialog.getOpenFileName(
             self, self.tr("Import Layout"), lastDir, self.tr("QPT Files (*.qpt);;")
         )
-        if type(filename) == tuple:
+        if isinstance(filename, tuple):
             filename = filename[0]
         if not filename:
             return
@@ -124,7 +124,7 @@ class PrintLayoutManager(QDialog, Ui_PrintLayoutManager):
         filename = QFileDialog.getSaveFileName(
             self, self.tr("Export Layout"), lastDir, self.tr("QPT Files (*.qpt);;")
         )
-        if type(filename) == tuple:
+        if isinstance(filename, tuple):
             filename = filename[0]
         if not filename:
             return

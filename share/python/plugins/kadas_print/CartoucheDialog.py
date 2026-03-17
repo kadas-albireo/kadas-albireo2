@@ -252,7 +252,7 @@ class CartoucheDialog(QDialog, Ui_CartoucheDialog):
         filename = QFileDialog.getSaveFileName(
             self, self.tr("Export cartouche"), lastDir, self.tr("XML Files (*.xml);;")
         )
-        if type(filename) == tuple:
+        if isinstance(filename, tuple):
             filename = filename[0]
         if not filename:
             return
@@ -272,7 +272,7 @@ class CartoucheDialog(QDialog, Ui_CartoucheDialog):
         filename = QFileDialog.getOpenFileName(
             self, self.tr("Import cartouche"), lastDir, self.tr("XML Files (*.xml);;")
         )
-        if type(filename) == tuple:
+        if isinstance(filename, tuple):
             filename = filename[0]
         fileinfo = QFileInfo(filename)
         if not fileinfo.exists():

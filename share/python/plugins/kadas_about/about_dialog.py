@@ -25,13 +25,13 @@ class AboutDialog(QDialog):
         self.setModal(True)
 
         self.setWindowTitle(self.tr("About %s") % (Kadas.KADAS_FULL_RELEASE_NAME))
-        l = QGridLayout()
-        l.setVerticalSpacing(5)
-        self.setLayout(l)
+        layout = QGridLayout()
+        layout.setVerticalSpacing(5)
+        self.setLayout(layout)
 
         splashLabel = QLabel()
         splashLabel.setPixmap(QPixmap(":/kadas/splash"))
-        l.addWidget(splashLabel, l.rowCount(), 0, 1, 2)
+        layout.addWidget(splashLabel, layout.rowCount(), 0, 1, 2)
 
         versionLabel = QLabel(
             self.tr("<b>Version</b>: %s (%s) - Based on QGIS %s")
@@ -42,7 +42,7 @@ class AboutDialog(QDialog):
             )
         )
         versionLabel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        l.addWidget(versionLabel, l.rowCount(), 0, 1, 1)
+        layout.addWidget(versionLabel, layout.rowCount(), 0, 1, 1)
 
         licenseLabel = QLabel(
             self.tr(
@@ -52,26 +52,26 @@ class AboutDialog(QDialog):
         licenseLabel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         licenseLabel.setOpenExternalLinks(True)
         licenseLabel.setWordWrap(True)
-        l.addWidget(licenseLabel, l.rowCount(), 0, 1, 1)
+        layout.addWidget(licenseLabel, layout.rowCount(), 0, 1, 1)
         mssLabel = QLabel(self.tr("The MSS/MilX components are property of gs-soft AG"))
         mssLabel.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         mssLabel.setWordWrap(True)
-        l.addWidget(mssLabel, l.rowCount(), 0, 1, 1)
+        layout.addWidget(mssLabel, layout.rowCount(), 0, 1, 1)
 
         adminLogo = QLabel()
         adminLogo.setPixmap(QPixmap(os.path.join(os.path.dirname(__file__), "adminch.png")))
         adminLogo.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
-        l.addWidget(adminLogo, 2, 1, 3, 1)
+        layout.addWidget(adminLogo, 2, 1, 3, 1)
 
         hline = QFrame()
         hline.setFrameShape(QFrame.Shape.HLine)
         hline.setFrameShadow(QFrame.Shadow.Sunken)
-        l.addWidget(hline, l.rowCount(), 0, 1, 1)
+        layout.addWidget(hline, layout.rowCount(), 0, 1, 1)
 
         hline2 = QFrame()
         hline2.setFrameShape(QFrame.Shape.HLine)
         hline2.setFrameShadow(QFrame.Shadow.Sunken)
-        l.addWidget(hline2, l.rowCount() - 1, 1, 1, 1)
+        layout.addWidget(hline2, layout.rowCount() - 1, 1, 1, 1)
 
         pdfpath = os.path.join(
             os.path.dirname(__file__),
@@ -91,7 +91,7 @@ class AboutDialog(QDialog):
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
         )
         swisstopoDataTermsLink.setOpenExternalLinks(True)
-        l.addWidget(swisstopoDataTermsLink, l.rowCount(), 0, 1, 1)
+        layout.addWidget(swisstopoDataTermsLink, layout.rowCount(), 0, 1, 1)
 
         gdiTermsLinkMap = {
             "en": "https://www.geo.admin.ch/en/about-swiss-geoportal/responsabilities-and-contacts.html",
@@ -105,7 +105,7 @@ class AboutDialog(QDialog):
         )
         swissGDIdataTermsLink.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         swissGDIdataTermsLink.setOpenExternalLinks(True)
-        l.addWidget(swissGDIdataTermsLink, l.rowCount(), 0, 1, 1)
+        layout.addWidget(swissGDIdataTermsLink, layout.rowCount(), 0, 1, 1)
 
         dtmLinkMap = {
             "en": "https://www.swisstopo.admin.ch/en/height-model-swissaltiregio",
@@ -118,7 +118,7 @@ class AboutDialog(QDialog):
         )
         dtmLink.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         dtmLink.setOpenExternalLinks(True)
-        l.addWidget(dtmLink, l.rowCount(), 0, 1, 1)
+        layout.addWidget(dtmLink, layout.rowCount(), 0, 1, 1)
 
         dataContactLink = QLabel(
             '<a href="mailto:webgis@swisstopo.ch">%s<a>'
@@ -126,7 +126,7 @@ class AboutDialog(QDialog):
         )
         dataContactLink.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         dataContactLink.setOpenExternalLinks(True)
-        l.addWidget(dataContactLink, l.rowCount(), 0, 1, 1)
+        layout.addWidget(dataContactLink, layout.rowCount(), 0, 1, 1)
 
         disclaimerLinkMap = {
             "en": "https://www.admin.ch/gov/en/start/terms-and-conditions.html",
@@ -140,11 +140,11 @@ class AboutDialog(QDialog):
         )
         disclaimerLink.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         disclaimerLink.setOpenExternalLinks(True)
-        l.addWidget(disclaimerLink, l.rowCount(), 0, 1, 1)
+        layout.addWidget(disclaimerLink, layout.rowCount(), 0, 1, 1)
 
         bbox = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
         bbox.accepted.connect(self.accept)
         bbox.rejected.connect(self.reject)
-        l.addWidget(bbox, l.rowCount(), 0, 1, 2)
+        layout.addWidget(bbox, layout.rowCount(), 0, 1, 2)
 
         self.setFixedSize(self.sizeHint())

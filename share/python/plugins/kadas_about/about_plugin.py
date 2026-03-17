@@ -50,7 +50,7 @@ class AboutPlugin:
 
     def showAbout(self):
         locale = self.locale
-        if not locale in ["en", "de", "it", "fr"]:
+        if locale not in ["en", "de", "it", "fr"]:
             locale = "en"
         if self.aboutWidget is None:
             self.aboutWidget = AboutDialog(locale, self.iface.mainWindow())
