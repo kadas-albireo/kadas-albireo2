@@ -8,8 +8,7 @@
 #    copyright            : (C) 2015 by Sourcepole AG
 import os
 
-from qgis.core import *
-from qgis.gui import *
+from qgis.core import QgsProject
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QDate, QFile, QFileInfo, QIODevice, QSettings, Qt
 from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QFileDialog, QMessageBox

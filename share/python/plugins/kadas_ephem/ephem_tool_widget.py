@@ -3,8 +3,7 @@ import os
 
 from kadas.kadascore import KadasCoordinateUtils
 from kadas.kadasgui import KadasBottomBar, KadasItemPos, KadasMapCanvasItemManager, KadasSymbolItem
-from qgis.core import *
-from qgis.gui import *
+from qgis.core import QgsCoordinateFormatter, QgsCoordinateReferenceSystem
 from qgis.PyQt.QtCore import QDateTime, QEventLoop, Qt, pyqtSignal
 from qgis.PyQt.QtGui import QIcon, QPixmap
 from qgis.PyQt.QtWidgets import QApplication, QLabel, QSizePolicy

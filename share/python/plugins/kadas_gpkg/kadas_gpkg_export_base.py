@@ -3,8 +3,18 @@
 import re
 from abc import abstractmethod
 
-from qgis.core import *
-from qgis.gui import *
+from qgis.core import (
+    QgsCoordinateTransform,
+    QgsFeedback,
+    QgsMapLayer,
+    QgsProject,
+    QgsRaster,
+    QgsRasterBlockFeedback,
+    QgsRasterFileWriter,
+    QgsRasterPipe,
+    QgsRasterProjector,
+    QgsVectorFileWriter,
+)
 from qgis.PyQt.QtCore import QEventLoop, QObject
 from qgis.PyQt.QtWidgets import QApplication
 

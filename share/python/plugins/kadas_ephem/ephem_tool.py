@@ -1,6 +1,6 @@
 from kadas.kadasgui import KadasItemPos, KadasMapCanvasItemManager, KadasSymbolItem
-from qgis.core import *
-from qgis.gui import *
+from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
+from qgis.gui import QgsMapTool
 from qgis.PyQt.QtCore import Qt
 
 from .ephem_tool_widget import EphemToolWidget

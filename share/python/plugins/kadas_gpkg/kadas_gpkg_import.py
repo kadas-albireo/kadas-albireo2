@@ -5,8 +5,20 @@ import sqlite3
 import tempfile
 
 from kadas.kadasgui import KadasMapCanvasItemManager, KadasMapItem, KadasProjectMigration
-from qgis.core import *
-from qgis.gui import *
+from qgis.core import (
+    Qgis,
+    QgsApplication,
+    QgsMapLayer,
+    QgsMapLayerFactory,
+    QgsMapLayerType,
+    QgsMeshLayer,
+    QgsPathResolver,
+    QgsProject,
+    QgsRasterLayer,
+    QgsReadWriteContext,
+    QgsVectorLayer,
+    QgsVectorTileLayer,
+)
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QFileInfo, QObject, QSettings, Qt
 from qgis.PyQt.QtWidgets import (

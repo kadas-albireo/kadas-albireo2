@@ -3,7 +3,7 @@
 import os
 
 from kadas.kadasgui import KadasPluginInterface
-from qgis.gui import *
+from qgis.gui import QgsCustomDropHandler
 from qgis.PyQt.QtCore import QCoreApplication, QObject, QSettings, Qt, QTranslator
 from qgis.PyQt.QtGui import QIcon, QKeySequence
 from qgis.PyQt.QtWidgets import QAction, QMenu, QShortcut

@@ -9,7 +9,7 @@
 
 import os
 
-from qgis.core import *
+from qgis.core import QgsPrintLayout, QgsProject, QgsReadWriteContext
 from qgis.PyQt import uic
 from qgis.PyQt.QtCore import (
     QDomDocument,
