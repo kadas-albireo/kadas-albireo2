@@ -32,9 +32,9 @@ from qgis.PyQt.QtCore import (
     QDir,
     QFile,
     QIODevice,
-    QSortFilterProxyModel,
     QRectF,
     QSettings,
+    QSortFilterProxyModel,
     Qt,
     QXmlStreamReader,
 )
