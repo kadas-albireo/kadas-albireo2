@@ -17,7 +17,7 @@ repos:
   hooks:
   - id: cmake-format
     args: [--in-place]
-    additional_dependencies: [pyyaml>=5.1]
+    additional_dependencies: [pyyaml>=6.0.3]
   #- id: cmake-lint
 
 - repo: https://github.com/PyCQA/autoflake
