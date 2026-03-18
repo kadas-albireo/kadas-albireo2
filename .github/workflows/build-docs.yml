@@ -29,7 +29,7 @@ jobs:
 
       - name: 📦 Install MkDocs
         run: |
-          pip install mkdocs mkdocs-readthedocs
+          pip install mkdocs
 
       - name: 🔨 Build docs
         run: |
