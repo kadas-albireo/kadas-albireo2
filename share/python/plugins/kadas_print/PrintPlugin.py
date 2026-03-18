@@ -8,15 +8,13 @@
 #    copyright            : (C) 2014-2015 by Sandro Mani / Sourcepole AG
 #    email                : smani@sourcepole.ch
 
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
-from qgis.core import *
-from qgis.gui import *
-from kadas.kadasgui import *
 import os
 
+from kadas.kadasgui import KadasPluginInterface
+from qgis.PyQt.QtCore import QCoreApplication, QObject, QSettings, QTranslator
+
 from .PrintTool import PrintTool
+
 
 class PrintPlugin(QObject):
     def __init__(self, iface):
@@ -29,8 +27,7 @@ class PrintPlugin(QObject):
         # Localize
         if QSettings().value("locale/userLocale"):
             locale = QSettings().value("locale/userLocale")[0:2]
-            localePath = os.path.join(
-                self.pluginDir, 'i18n', 'kadas_print_{}.qm'.format(locale))
+            localePath = os.path.join(self.pluginDir, "i18n", "kadas_print_{}.qm".format(locale))
 
             if os.path.exists(localePath):
                 self.translator = QTranslator()
@@ -42,7 +39,7 @@ class PrintPlugin(QObject):
     def initGui(self):
         try:
             self.printAction = self.iface.findAction("mActionPrint")
-        except:
+        except Exception:
             self.printAction = None
         if self.printAction:
             self.printAction.setCheckable(True)

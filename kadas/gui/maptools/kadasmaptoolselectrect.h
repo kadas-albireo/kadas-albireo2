@@ -59,8 +59,7 @@ class KADAS_GUI_EXPORT KadasMapToolSelectRect : public QgsMapTool
       InteractionNone,
       InteractionMoving,
       InteractionResizing
-    } mInteraction
-      = InteractionNone;
+    } mInteraction = InteractionNone;
 
     QList<QgsPointXY> mResizePoints;
     QList<std::function<void( const QgsPointXY )>> mResizeHandlers;

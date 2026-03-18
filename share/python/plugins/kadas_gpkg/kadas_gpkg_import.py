@@ -1,28 +1,41 @@
 # -*- coding: utf-8 -*-
 
-from qgis.PyQt import uic
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
-from qgis.PyQt.QtXml import *
-
-from qgis.core import *
-from qgis.gui import *
-from kadas.kadascore import *
-from kadas.kadasgui import *
-
-import logging
-import glob
 import os
-import mimetypes
 import sqlite3
-import shutil
 import tempfile
 
+from kadas.kadasgui import KadasMapCanvasItemManager, KadasMapItem, KadasProjectMigration
+from qgis.core import (
+    Qgis,
+    QgsApplication,
+    QgsMapLayer,
+    QgsMapLayerFactory,
+    QgsMapLayerType,
+    QgsMeshLayer,
+    QgsPathResolver,
+    QgsProject,
+    QgsRasterLayer,
+    QgsReadWriteContext,
+    QgsVectorLayer,
+    QgsVectorTileLayer,
+)
+from qgis.PyQt import uic
+from qgis.PyQt.QtCore import QFileInfo, QObject, QSettings, Qt
+from qgis.PyQt.QtWidgets import (
+    QDialog,
+    QDialogButtonBox,
+    QFileDialog,
+    QListWidgetItem,
+    QMessageBox,
+)
+from qgis.PyQt.QtXml import QDomDocument, QDomNodeList
 
 PLUGIN_DIR = os.path.dirname(__file__)
 
-Ui_KadasGpkgImportDialog, _ = uic.loadUiType(os.path.join(PLUGIN_DIR, "kadas_gpkg_import_dialog.ui"))
+Ui_KadasGpkgImportDialog, _ = uic.loadUiType(
+    os.path.join(PLUGIN_DIR, "kadas_gpkg_import_dialog.ui")
+)
+
 
 class KadasGpkgImportDialog(QDialog):
     def __init__(self, parent, iface, filename=None):
@@ -45,7 +58,9 @@ class KadasGpkgImportDialog(QDialog):
     def __selectInputFile(self, filename):
         if not filename:
             lastDir = QSettings().value("/UI/lastImportExportDir", ".")
-            filename = QFileDialog.getOpenFileName(self, self.tr("Select GPKG File..."), lastDir, self.tr("GPKG Database (*.gpkg)"))[0]
+            filename = QFileDialog.getOpenFileName(
+                self, self.tr("Select GPKG File..."), lastDir, self.tr("GPKG Database (*.gpkg)")
+            )[0]
 
             if not filename:
                 return
@@ -73,15 +88,15 @@ class KadasGpkgImportDialog(QDialog):
 
         try:
             conn = sqlite3.connect(gpkg_filename)
-        except:
+        except Exception:
             return None
 
         """ Read qgis project """
         project_name = "qgpkg"
         cursor = conn.cursor()
         try:
-            cursor.execute('SELECT xml FROM qgis_projects WHERE name=?', (project_name,))
-        except Exception as e:
+            cursor.execute("SELECT xml FROM qgis_projects WHERE name=?", (project_name,))
+        except Exception:
             return None
         qgis_projects = cursor.fetchone()
         if qgis_projects is None:
@@ -97,7 +112,7 @@ class KadasGpkgImportDialog(QDialog):
             try:
                 layerid = maplayer.firstChildElement("id").text()
                 layername = maplayer.firstChildElement("layername").text()
-            except:
+            except Exception:
                 # Need at least layerid and layername
                 continue
             item = QListWidgetItem(layername)
@@ -107,7 +122,6 @@ class KadasGpkgImportDialog(QDialog):
 
         conn.close()
         return xml
-
 
     def gpkgFilename(self):
         return self.ui.lineEditInputFile.text()
@@ -126,6 +140,7 @@ class KadasGpkgImportDialog(QDialog):
                 layerIds.append(item.data(self.layerIdRole))
         return layerIds
 
+
 class KadasGpkgImport(QObject):
 
     def __init__(self, iface):
@@ -141,14 +156,18 @@ class KadasGpkgImport(QObject):
         gpkg_filename = importDialog.gpkgFilename()
         xml = importDialog.projectXml()
         if not xml:
-            self.iface.addVectorLayerQuiet(gpkg_filename, QFileInfo(gpkg_filename).baseName(), "ogr")
-            self.iface.addRasterLayerQuiet(gpkg_filename, QFileInfo(gpkg_filename).baseName(), "gdal")
+            self.iface.addVectorLayerQuiet(
+                gpkg_filename, QFileInfo(gpkg_filename).baseName(), "ogr"
+            )
+            self.iface.addRasterLayerQuiet(
+                gpkg_filename, QFileInfo(gpkg_filename).baseName(), "gdal"
+            )
 
         elif importDialog.selectedLayersOnly():
 
             try:
                 conn = sqlite3.connect(importDialog.gpkgFilename())
-            except:
+            except Exception:
                 return
             cursor = conn.cursor()
 
@@ -163,12 +182,21 @@ class KadasGpkgImport(QObject):
             maplayers = doc.elementsByTagName("maplayer")
             mapcanvasitems = None
             try:
-                mapcanvasitems = doc.elementsByTagName("MapCanvasItems").at(0).toElement().elementsByTagName("MapItem")
-            except Exception as e:
+                mapcanvasitems = (
+                    doc.elementsByTagName("MapCanvasItems")
+                    .at(0)
+                    .toElement()
+                    .elementsByTagName("MapItem")
+                )
+            except Exception:
                 mapcanvasitems = QDomNodeList()
 
             extracted_resources = {}
-            preprocessorId = QgsPathResolver.setPathPreprocessor(lambda path: self.gpkgResourceToAttachment(path, cursor, gpkg_filename, extracted_resources))
+            preprocessorId = QgsPathResolver.setPathPreprocessor(
+                lambda path: self.gpkgResourceToAttachment(
+                    path, cursor, gpkg_filename, extracted_resources
+                )
+            )
 
             context = QgsReadWriteContext()
             context.setPathResolver(QgsProject.instance().pathResolver())
@@ -182,7 +210,7 @@ class KadasGpkgImport(QObject):
                 try:
                     layerid = maplayer.firstChildElement("id").text()
                     layername = maplayer.firstChildElement("layername").text()
-                except:
+                except Exception:
                     # Don't process layers without id
                     continue
                 if layerid not in layerIds:
@@ -203,11 +231,26 @@ class KadasGpkgImport(QObject):
             conn.close()
 
             if failed:
-                QMessageBox.warning(self.iface.mainWindow(), self.tr("Import Errors"), self.tr("The following layers could not be imported:%s") % ("\n - " + "\n - ".join(failed)))
+                QMessageBox.warning(
+                    self.iface.mainWindow(),
+                    self.tr("Import Errors"),
+                    self.tr("The following layers could not be imported:%s")
+                    % ("\n - " + "\n - ".join(failed)),
+                )
 
         else:
             if QgsProject.instance().isDirty():
-                ret = QMessageBox.question(self.iface.mainWindow(), self.tr("Save project?"), self.tr("The project has unsaved changes. Do you want to save them before proceeding?"), QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No|QMessageBox.StandardButton.Cancel, QMessageBox.StandardButton.Cancel)
+                ret = QMessageBox.question(
+                    self.iface.mainWindow(),
+                    self.tr("Save project?"),
+                    self.tr(
+                        "The project has unsaved changes. Do you want to save them before proceeding?"
+                    ),
+                    QMessageBox.StandardButton.Yes
+                    | QMessageBox.StandardButton.No
+                    | QMessageBox.StandardButton.Cancel,
+                    QMessageBox.StandardButton.Cancel,
+                )
                 if ret == QMessageBox.StandardButton.Cancel:
                     return
                 elif ret == QMessageBox.StandardButton.Yes and not self.iface.saveProject():
@@ -215,7 +258,7 @@ class KadasGpkgImport(QObject):
 
             try:
                 conn = sqlite3.connect(importDialog.gpkgFilename())
-            except:
+            except Exception:
                 return
             cursor = conn.cursor()
 
@@ -228,13 +271,17 @@ class KadasGpkgImport(QObject):
             output = os.path.join(tmpdir, "gpkg_project.qgs")
             with open(output, "wb") as fh:
                 if isinstance(xml, str):
-                    fh.write(xml.encode('utf-8'))
+                    fh.write(xml.encode("utf-8"))
                 else:
                     fh.write(xml)
 
             # Read project, adjust paths and extract resources as necessary
             extracted_resources = {}
-            preprocessorId = QgsPathResolver.setPathPreprocessor(lambda path: self.readProjectPaths(path, cursor, gpkg_filename, tmpdir, extracted_resources))
+            preprocessorId = QgsPathResolver.setPathPreprocessor(
+                lambda path: self.readProjectPaths(
+                    path, cursor, gpkg_filename, tmpdir, extracted_resources
+                )
+            )
 
             self.iface.addProject(output)
 
@@ -244,15 +291,14 @@ class KadasGpkgImport(QObject):
             QgsPathResolver.removePathPreprocessor(preprocessorId)
             conn.close()
 
-        self.iface.messageBar().pushMessage(
-            self.tr("GPKG import completed"), "", Qgis.Info, 5)
+        self.iface.messageBar().pushMessage(self.tr("GPKG import completed"), "", Qgis.Info, 5)
 
     def read_project(self, cursor):
-        """ Read qgis project """
+        """Read qgis project"""
         project_name = "qgpkg"
         try:
-            cursor.execute('SELECT xml FROM qgis_projects WHERE name=?', (project_name,))
-        except:
+            cursor.execute("SELECT xml FROM qgis_projects WHERE name=?", (project_name,))
+        except Exception:
             return None
         qgis_projects = cursor.fetchone()
         if qgis_projects is None:
@@ -269,7 +315,9 @@ class KadasGpkgImport(QObject):
             if resource_id in extracted_resources:
                 path = extracted_resources[resource_id]
             else:
-                path = self.extract_resource(cursor, os.path.join(tmpdir, resource_id), resource_id)
+                path = self.extract_resource(
+                    cursor, os.path.join(tmpdir, resource_id), resource_id
+                )
                 extracted_resources[resource_id] = path
         return path
 
@@ -288,17 +336,17 @@ class KadasGpkgImport(QObject):
         return path
 
     def extract_resource(self, cursor, output, resource_id):
-        """ Extract a resource file from qgis_resources """
+        """Extract a resource file from qgis_resources"""
         try:
-            cursor.execute('SELECT content FROM qgis_resources WHERE name=?', (resource_id,))
-        except:
+            cursor.execute("SELECT content FROM qgis_resources WHERE name=?", (resource_id,))
+        except Exception:
             return None
-        with open(output, 'wb') as fh:
+        with open(output, "wb") as fh:
             fh.write(cursor.fetchone()[0])
         return output
 
     def addProjectLayer(self, maplayerEl, context):
-        layerType, ok = QgsMapLayerFactory.typeFromString( maplayerEl.attribute("type") )
+        layerType, ok = QgsMapLayerFactory.typeFromString(maplayerEl.attribute("type"))
         if not ok:
             # Invalid layer type
             return False
@@ -314,7 +362,7 @@ class KadasGpkgImport(QObject):
             mapLayer = QgsVectorTileLayer()
         elif layerType == QgsMapLayerType.PluginLayer:
             typeName = maplayerEl.attribute("name")
-            mapLayer = QgsApplication.pluginLayerRegistry().createLayer( typeName )
+            mapLayer = QgsApplication.pluginLayerRegistry().createLayer(typeName)
 
         if mapLayer is None:
             return False

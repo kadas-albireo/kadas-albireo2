@@ -1,13 +1,10 @@
+from kadas.kadasgui import KadasItemPos, KadasMapCanvasItemManager, KadasSymbolItem
+from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
+from qgis.gui import QgsMapTool
+from qgis.PyQt.QtCore import Qt
 
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
-from qgis.core import *
-from qgis.gui import *
-from kadas.kadascore import *
-from kadas.kadasgui import *
-from kadas.kadasanalysis import *
 from .ephem_tool_widget import EphemToolWidget
+
 
 class EphemTool(QgsMapTool):
 
@@ -26,7 +23,7 @@ class EphemTool(QgsMapTool):
         self.widget.close.connect(self.close)
         self.widget.setVisible(True)
         self.pin = KadasSymbolItem(self.iface.mapCanvas().mapSettings().destinationCrs())
-        self.pin.setup( ":/kadas/icons/pin_blue", 0.5, 1.0 );
+        self.pin.setup(":/kadas/icons/pin_blue", 0.5, 1.0)
         self.pin.setVisible(False)
         KadasMapCanvasItemManager.addItem(self.pin)
 
@@ -51,7 +48,7 @@ class EphemTool(QgsMapTool):
 
     def keyReleaseEvent(self, event):
         if event.key() == Qt.Key.Key_Escape:
-            self.iface.mapCanvas().unsetMapTool( self )
+            self.iface.mapCanvas().unsetMapTool(self)
 
     def positionPicked(self, pos):
         self.pin.setPosition(KadasItemPos.fromPoint(pos))

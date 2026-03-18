@@ -9,15 +9,23 @@
 
 import os
 
+from qgis.core import QgsPrintLayout, QgsProject, QgsReadWriteContext
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
-from qgis.PyQt.QtXml import *
+from qgis.PyQt.QtCore import (
+    QFile,
+    QFileInfo,
+    QIODevice,
+    QSettings,
+    Qt,
+    QXmlStreamReader,
+)
+from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QListWidgetItem, QMessageBox
+from qgis.PyQt.QtXml import QDomDocument
 
-from qgis.core import *
+Ui_PrintLayoutManager, _ = uic.loadUiType(
+    os.path.join(os.path.dirname(__file__), "ui", "printlayoutmanager.ui")
+)
 
-Ui_PrintLayoutManager, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "ui", "printlayoutmanager.ui"))
 
 class PrintLayoutManager(QDialog, Ui_PrintLayoutManager):
 
@@ -30,11 +38,12 @@ class PrintLayoutManager(QDialog, Ui_PrintLayoutManager):
         self.__reloadPrintLayouts()
 
         QgsProject.instance().layoutManager().layoutAdded.connect(
-            lambda view: self.__reloadPrintLayouts())
-        QgsProject.instance().layoutManager().layoutRemoved.connect(
-            self.__reloadPrintLayouts)
+            lambda view: self.__reloadPrintLayouts()
+        )
+        QgsProject.instance().layoutManager().layoutRemoved.connect(self.__reloadPrintLayouts)
         self.listWidgetLayouts.selectionModel().selectionChanged.connect(
-            self.__listSelectionChanged)
+            self.__listSelectionChanged
+        )
         self.pushButtonImport.clicked.connect(self.__import)
         self.pushButtonExport.clicked.connect(self.__export)
         self.pushButtonRemove.clicked.connect(self.__remove)
@@ -73,28 +82,32 @@ class PrintLayoutManager(QDialog, Ui_PrintLayoutManager):
     def __import(self):
         lastDir = QSettings().value("/UI/lastImportExportDir", ".")
         filename = QFileDialog.getOpenFileName(
-            self, self.tr("Import Layout"), lastDir,
-            self.tr("QPT Files (*.qpt);;"))
-        if type(filename) == tuple:
+            self, self.tr("Import Layout"), lastDir, self.tr("QPT Files (*.qpt);;")
+        )
+        if isinstance(filename, tuple):
             filename = filename[0]
         if not filename:
             return
-        QSettings().setValue(
-            "/UI/lastImportExportDir", QFileInfo(filename).absolutePath())
+        QSettings().setValue("/UI/lastImportExportDir", QFileInfo(filename).absolutePath())
         file = QFile(filename)
         if not file.open(QIODevice.OpenModeFlag.ReadOnly):
             QMessageBox.critical(
-                self, self.tr("Import Failed"),
+                self,
+                self.tr("Import Failed"),
                 self.tr("Failed to open the input file for reading."),
-                QMessageBox.StandardButton.Ok)
+                QMessageBox.StandardButton.Ok,
+            )
         else:
             doc = QDomDocument()
             doc.setContent(file)
             layoutEls = doc.elementsByTagName("Layout")
             if len(layoutEls) == 0:
                 QMessageBox.critical(
-                    self, self.tr("Import Failed"),
-                    self.tr("The file does not appear to be a valid print layout."), QMessageBox.StandardButton.Ok)
+                    self,
+                    self.tr("Import Failed"),
+                    self.tr("The file does not appear to be a valid print layout."),
+                    QMessageBox.StandardButton.Ok,
+                )
                 return
             layoutEl = layoutEls.at(0).toElement()
 
@@ -102,9 +115,12 @@ class PrintLayoutManager(QDialog, Ui_PrintLayoutManager):
             layout.setName(layoutEl.attribute("name"))
 
             if not layout.loadFromTemplate(doc, QgsReadWriteContext()):
-                QMessageBox.critical(self, self.tr("Import Failed"), self.tr(
-                    "The file does not appear to be a valid print layout."),
-                    QMessageBox.StandardButton.Ok)
+                QMessageBox.critical(
+                    self,
+                    self.tr("Import Failed"),
+                    self.tr("The file does not appear to be a valid print layout."),
+                    QMessageBox.StandardButton.Ok,
+                )
                 return
 
             self.layoutManager.addLayout(layout)
@@ -112,14 +128,13 @@ class PrintLayoutManager(QDialog, Ui_PrintLayoutManager):
     def __export(self):
         lastDir = QSettings().value("/UI/lastImportExportDir", ".")
         filename = QFileDialog.getSaveFileName(
-            self, self.tr("Export Layout"),
-            lastDir, self.tr("QPT Files (*.qpt);;"))
-        if type(filename) == tuple:
+            self, self.tr("Export Layout"), lastDir, self.tr("QPT Files (*.qpt);;")
+        )
+        if isinstance(filename, tuple):
             filename = filename[0]
         if not filename:
             return
-        QSettings().setValue(
-            "/UI/lastImportExportDir", QFileInfo(filename).absolutePath())
+        QSettings().setValue("/UI/lastImportExportDir", QFileInfo(filename).absolutePath())
 
         item = self.listWidgetLayouts.selectedItems()[0]
         layout = item.data(Qt.ItemDataRole.UserRole)
@@ -132,9 +147,11 @@ class PrintLayoutManager(QDialog, Ui_PrintLayoutManager):
             success = layout.saveAsTemplate(filename, ctx)
         if not success:
             QMessageBox.critical(
-                self, self.tr("Export Failed"),
+                self,
+                self.tr("Export Failed"),
                 self.tr("Failed to open the output file for writing."),
-                QMessageBox.StandardButton.Ok)
+                QMessageBox.StandardButton.Ok,
+            )
 
     def __remove(self):
         item = self.listWidgetLayouts.selectedItems()[0]

@@ -13,4 +13,5 @@
 
 def classFactory(iface):
     from .ephem_plugin import EphemPlugin
+
     return EphemPlugin(iface)

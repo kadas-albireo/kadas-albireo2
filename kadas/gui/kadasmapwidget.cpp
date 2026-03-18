@@ -315,9 +315,11 @@ bool KadasMapWidget::eventFilter( QObject *obj, QEvent *ev )
     mTitleStackedWidget->setCurrentWidget( mTitleLabel );
     return true;
   }
-  else if ( obj == mTitleLineEdit
-            && ev->type() == QEvent::KeyPress
-            && ( static_cast<QKeyEvent *>( ev )->key() == Qt::Key_Enter || static_cast<QKeyEvent *>( ev )->key() == Qt::Key_Return || static_cast<QKeyEvent *>( ev )->key() == Qt::Key_Escape ) )
+  else if (
+    obj == mTitleLineEdit
+    && ev->type() == QEvent::KeyPress
+    && ( static_cast<QKeyEvent *>( ev )->key() == Qt::Key_Enter || static_cast<QKeyEvent *>( ev )->key() == Qt::Key_Return || static_cast<QKeyEvent *>( ev )->key() == Qt::Key_Escape )
+  )
   {
     setWindowTitle( mTitleLineEdit->text() );
     mTitleLabel->setText( mTitleLineEdit->text() );

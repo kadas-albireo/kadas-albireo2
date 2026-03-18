@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from qgis.PyQt.QtCore import *
-from qgis.PyQt.QtGui import *
-from qgis.PyQt.QtWidgets import *
 import os
-import sys
+
+from kadas.kadasgui import KadasPluginInterface
+from qgis.gui import QgsCustomDropHandler
+from qgis.PyQt.QtCore import QCoreApplication, QObject, QSettings, Qt, QTranslator
+from qgis.PyQt.QtGui import QIcon, QKeySequence
+from qgis.PyQt.QtWidgets import QAction, QMenu, QShortcut
 
 from .kadas_gpkg_export import KadasGpkgExport
 from .kadas_gpkg_import import KadasGpkgImport
-from qgis.gui import *
-from kadas.kadasgui import *
 
 
 class KadasGpkgDropHandler(QgsCustomDropHandler):
@@ -23,7 +23,7 @@ class KadasGpkgDropHandler(QgsCustomDropHandler):
                 return True
         return False
 
-    def handleMimeDataV2( self, mimedata):
+    def handleMimeDataV2(self, mimedata):
         if len(mimedata.urls()) > 0:
             path = mimedata.urls()[0].toLocalFile()
             if path.lower().endswith(".gpkg"):
@@ -41,12 +41,11 @@ class KadasGpkg(QObject):
         self.dropHandler = KadasGpkgDropHandler(self.iface)
 
         # initialize locale
-        if QSettings().value('locale/userLocale'):
-            self.locale = QSettings().value('locale/userLocale')[0:2]
+        if QSettings().value("locale/userLocale"):
+            self.locale = QSettings().value("locale/userLocale")[0:2]
             locale_path = os.path.join(
-                os.path.dirname(__file__),
-                'i18n',
-                'kadas_gpkg_{}.qm'.format(self.locale))
+                os.path.dirname(__file__), "i18n", "kadas_gpkg_{}.qm".format(self.locale)
+            )
 
             if os.path.exists(locale_path):
                 self.translator = QTranslator()
@@ -59,23 +58,31 @@ class KadasGpkg(QObject):
 
         self.menu = QMenu()
 
-        self.exportShortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_E, Qt.Modifier.CTRL | Qt.Key.Key_G), self.iface.mainWindow())
+        self.exportShortcut = QShortcut(
+            QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_E, Qt.Modifier.CTRL | Qt.Key.Key_G),
+            self.iface.mainWindow(),
+        )
         self.exportShortcut.activated.connect(self.__exportGpkg)
         self.exportAction = QAction(self.tr("GPKG Export"))
         self.exportAction.triggered.connect(self.__exportGpkg)
         self.menu.addAction(self.exportAction)
 
-        self.importShortcut = QShortcut(QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_I, Qt.Modifier.CTRL | Qt.Key.Key_G), self.iface.mainWindow())
+        self.importShortcut = QShortcut(
+            QKeySequence(Qt.Modifier.CTRL | Qt.Key.Key_I, Qt.Modifier.CTRL | Qt.Key.Key_G),
+            self.iface.mainWindow(),
+        )
         self.importShortcut.activated.connect(self.__importGpkg)
         self.importAction = QAction(self.tr("GPKG Import"))
         self.importAction.triggered.connect(self.__importGpkg)
         self.menu.addAction(self.importAction)
-        icon_path = os.path.join(os.path.dirname(__file__), 'icons/gpkg.png')
-        self.iface.addActionMenu(self.tr("GPKG"),
-                                 QIcon( icon_path ),
-                                 self.menu,
-                                 self.iface.PLUGIN_MENU,
-                                 self.iface.MAPS_TAB)
+        icon_path = os.path.join(os.path.dirname(__file__), "icons/gpkg.png")
+        self.iface.addActionMenu(
+            self.tr("GPKG"),
+            QIcon(icon_path),
+            self.menu,
+            self.iface.PLUGIN_MENU,
+            self.iface.MAPS_TAB,
+        )
         self.iface.registerCustomDropHandler(self.dropHandler)
 
     def unload(self):

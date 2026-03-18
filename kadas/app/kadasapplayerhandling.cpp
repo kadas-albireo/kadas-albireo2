@@ -401,9 +401,11 @@ QList<QgsMapLayer *> KadasAppLayerHandling::addOgrVectorLayers( const QStringLis
     {
       QString msg = QObject::tr( "%1 is not a valid or recognized data source." ).arg( uri );
       // If the failed layer was a vsicurl type, give the user a chance to try the normal download.
-      if ( isVsiCurl
-           && QMessageBox::question( kApp->mainWindow(), QObject::tr( "Invalid Data Source" ), QObject::tr( "Download with \"Protocol\" source type has failed, do you want to try the \"File\" source type?" ) )
-                == QMessageBox::Yes )
+      if (
+        isVsiCurl
+        && QMessageBox::question( kApp->mainWindow(), QObject::tr( "Invalid Data Source" ), QObject::tr( "Download with \"Protocol\" source type has failed, do you want to try the \"File\" source type?" ) )
+             == QMessageBox::Yes
+      )
       {
         QString fileUri = uri;
         fileUri.replace( QLatin1String( "/vsicurl/" ), " " );
@@ -1097,8 +1099,10 @@ QList<QgsMapLayer *> KadasAppLayerHandling::addGdalRasterLayers( const QStringLi
 
     // if needed prompt for zipitem layers
     QString vsiPrefix = QgsGdalUtils::vsiPrefixForPath( uri );
-    if ( ( !uri.startsWith( QLatin1String( "/vsi" ), Qt::CaseInsensitive ) || uri.endsWith( QLatin1String( ".zip" ) ) || uri.endsWith( QLatin1String( ".tar" ) ) )
-         && ( vsiPrefix == QLatin1String( "/vsizip/" ) || vsiPrefix == QLatin1String( "/vsitar/" ) ) )
+    if (
+      ( !uri.startsWith( QLatin1String( "/vsi" ), Qt::CaseInsensitive ) || uri.endsWith( QLatin1String( ".zip" ) ) || uri.endsWith( QLatin1String( ".tar" ) ) )
+      && ( vsiPrefix == QLatin1String( "/vsizip/" ) || vsiPrefix == QLatin1String( "/vsitar/" ) )
+    )
     {
       if ( askUserForZipItemLayers( uri, { Qgis::LayerType::Raster } ) )
         continue;
