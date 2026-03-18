@@ -1,6 +1,7 @@
 site_name: KADAS Albireo
 site_description: KADAS Albireo Documentation
 docs_dir: docs
+site_dir: share/docs/html
 theme:
   name: readthedocs
 

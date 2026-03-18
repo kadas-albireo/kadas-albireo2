@@ -15,13 +15,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  build-docs:
+    uses: ./.github/workflows/build-docs.yml
+
   build:
     name: build (windows)
     runs-on: windows-2022
+    needs: build-docs
 
     steps:
       - name: 🐣 Checkout
         uses: actions/checkout@v6
+
+      - name: 📥 Download docs artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: kadas-docs-html
+          path: share/docs/html
 
       - name: 🐩 Install CMake and Ninja
         uses: lukka/get-cmake@latest
