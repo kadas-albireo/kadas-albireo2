@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/fr/fr/analysis/index.html -->
+<!-- Recovered from: docs_old/html/fr/fr/analysis/index.html -->
 <!-- Language: fr | Section: analysis -->
 
 # Analyse

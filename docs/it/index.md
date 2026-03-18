@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/it/it/index.html -->
+<!-- Recovered from: docs_old/html/it/it/index.html -->
 <!-- Language: it | Section: index -->
 
 # Generalità

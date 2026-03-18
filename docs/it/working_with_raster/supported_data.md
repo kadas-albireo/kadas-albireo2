@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/it/it/working_with_raster/supported_data/index.html -->
+<!-- Recovered from: docs_old/html/it/it/working_with_raster/supported_data/index.html -->
 <!-- Language: it | Section: working_with_raster/supported_data -->
 
 # Lavorare con i dati raster

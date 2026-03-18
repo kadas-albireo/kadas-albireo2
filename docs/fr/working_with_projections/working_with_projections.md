@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/fr/fr/working_with_projections/working_with_projections/index.html -->
+<!-- Recovered from: docs_old/html/fr/fr/working_with_projections/working_with_projections/index.html -->
 <!-- Language: fr | Section: working_with_projections/working_with_projections -->
 
 # Utiliser les projections
@@ -24,4 +24,4 @@ L'onglet _SCR_ contient les éléments importants suivants:
 
 La projection à la volée dépend de la capacité à transformer les données dans un _SCR par défaut_ et KADAS utilise ici le WGS84. Pour certains SCR, plusieurs méthodes de transformation sont disponibles. KADAS vous permet de choisir laquelle utiliser, sinon une transformation par défaut sera utilisée.
 
-KADAS demande quelle transformation utiliser en ouvrant une fenêtre qui affiche au format texte PROJ.4 les transformations de la source et de la cible. De plus amples informations s'affichent au passage de la souris sur une transformation. Les transformations à utiliser par défaut sont sauvegardées en cochant ![radiobuttonon](/images/radiobuttonon.png) _Se souvenir de la sélection_.
+KADAS demande quelle transformation utiliser en ouvrant une fenêtre qui affiche au format texte PROJ.4 les transformations de la source et de la cible. De plus amples informations s'affichent au passage de la souris sur une transformation. Les transformations à utiliser par défaut sont sauvegardées en cochant ![radiobuttonon](../../images/radiobuttonon.png) _Se souvenir de la sélection_.

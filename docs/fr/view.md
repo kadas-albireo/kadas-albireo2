@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/fr/fr/view/index.html -->
+<!-- Recovered from: docs_old/html/fr/fr/view/index.html -->
 <!-- Language: fr | Section: view -->
 
 # Vue

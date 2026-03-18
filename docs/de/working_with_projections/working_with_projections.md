@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/de/de/working_with_projections/working_with_projections/index.html -->
+<!-- Recovered from: docs_old/html/de/de/working_with_projections/working_with_projections/index.html -->
 <!-- Language: de | Section: working_with_projections/working_with_projections -->
 
 # Arbeiten mit Projektionen
@@ -24,4 +24,4 @@ The _CRS_ tab contains the following important components:
 
 Eine Spontan-Reprojektion hängt davon ab ob Daten in ein ‘Standard-KBS’ transformiert werden können, KADAS benutzt hierbei WGS84. Für einige KBS sind eine Reihe von Transformationen verfügbar. Sie können unter KADAS die benutzte Transformation definieren sonst benutzt es eine Standard-Transformation.
 
-KADAS fragt welche Transformation benutzt werden soll indem es eine Dialogbox, die den PROJ.4 Text der wiederum die Quell- und Ziel-Datumstransformation beschreibt, öffnet. Weitere Informationen sind zu finden indem man mit der Maus über eine Transformation geht. Benutzereinstellungen können gespeichert werden indem Sie ![radiobuttonon](/images/radiobuttonon.png) _Speichere Auswahl_ auswählen.
+KADAS fragt welche Transformation benutzt werden soll indem es eine Dialogbox, die den PROJ.4 Text der wiederum die Quell- und Ziel-Datumstransformation beschreibt, öffnet. Weitere Informationen sind zu finden indem man mit der Maus über eine Transformation geht. Benutzereinstellungen können gespeichert werden indem Sie ![radiobuttonon](../../images/radiobuttonon.png) _Speichere Auswahl_ auswählen.

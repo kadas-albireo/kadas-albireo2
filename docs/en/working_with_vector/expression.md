@@ -1,9 +1,9 @@
-<!-- Recovered from: share/docs/html/en/en/working_with_vector/expression/index.html -->
+<!-- Recovered from: docs_old/html/en/en/working_with_vector/expression/index.html -->
 <!-- Language: en | Section: working_with_vector/expression -->
 
 # Expressions
 
-The **Expressions** feature are available through the field calculator or the add a new column button in the attribut table or the Field tab in the Layer properties ; through the graduaded, categorized and rule-based rendering in the Style tab of the Layer properties ; through the expression-based labeling ![](../../../../images/browsebutton.png) in the ![](../../../../images/mActionLabeling.png) _Labeling_ core application ; through the feature selection and through the diagram tab of the Layer properties as well as the _Main properties_ of the label item and the _Atlas generation_ tab in the Print Composer.
+The **Expressions** feature are available through the field calculator or the add a new column button in the attribut table or the Field tab in the Layer properties ; through the graduaded, categorized and rule-based rendering in the Style tab of the Layer properties ; through the expression-based labeling ![](../../images/browsebutton.png) in the ![](../../images/mActionLabeling.png) _Labeling_ core application ; through the feature selection and through the diagram tab of the Layer properties as well as the _Main properties_ of the label item and the _Atlas generation_ tab in the Print Composer.
 
 They are a powerful way to manipulate attribute value in order to dynamically change the final value in order to change the geometry style, the content of the label, the value for diagram, select some feature or create virtual column.
 

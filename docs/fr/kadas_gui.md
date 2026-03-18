@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/fr/fr/kadas_gui/index.html -->
+<!-- Recovered from: docs_old/html/fr/fr/kadas_gui/index.html -->
 <!-- Language: fr | Section: kadas_gui -->
 
 # Interface de KADAS
@@ -17,13 +17,13 @@ L’interface de KADAS est divisée en cinq zones distinctes :
 
 On peut alterner entre diverses barres d’outils dans le menu de fonction grâce à la liste de menu. Les barres d’outils contiennent des touches pour les diverses fonctions. Les fonctions sont documentées dans un chapitre séparé :
 
-- [Carte](/map)
-- [Vue](/view)
-- [Analyse](/analysis)
-- [Dessiner](/draw)
-- [Navigation](/gps)
-- [MSS](/mss)
-- [Paramètres](/settings)
+- [Carte](../map/)
+- [Vue](../view/)
+- [Analyse](../analysis/)
+- [Dessiner](../draw/)
+- [Navigation](../gps/)
+- [MSS](../mss/)
+- [Paramètres](../settings/)
 
 ## Favoris et recherche
 
@@ -106,7 +106,7 @@ Les fonctions suivantes sont à disposition en haut de la liste de catalogue :
 
 Les indications et les éléments de commande suivants sont énumérés dans la barre d’état :
 
-- **GPS**: La fonction de la touche GPS est décrite dans le [chapitre _Navigation_.](/gps)
+- **GPS**: La fonction de la touche GPS est décrite dans le [chapitre _Navigation_.](../gps/)
 - **Position de la souris**: La _position actuelle de la souris_ peut être affichée dans différents systèmes de coordonnées. Le système d’affichage souhaité peut être choisi par la touche à droite de l’indication de la position.
 - **Échelle**: À droite de ces coordonnées se trouve _l’échelle de la carte\__. Si vous zoomez ou dé-zoomez, l’échelle se met à jour automatiquement. Une liste déroulante vous permet de choisir une échelle prédéterminée allant du 1:500ème au 1:1000000ème. L'icône de verrouillage permet de verrouiller l'échelle actuelle de la carte, le zoom n'affectant alors que le facteur d'agrandissement.
 - **Système de coordonnées**: Le système de référence où la carte actuelle doit être représentée peut être choisi dans le champ de sélection du _système de coordonnées_. Le système de référence affiché peut différer du système de référence dans lequel les données existent. Dans ce cas, les données sont converties pour la représentation.

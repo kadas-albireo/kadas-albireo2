@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/fr/fr/settings/index.html -->
+<!-- Recovered from: docs_old/html/fr/fr/settings/index.html -->
 <!-- Language: fr | Section: settings -->
 
 # Préférences

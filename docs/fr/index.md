@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/fr/fr/index.html -->
+<!-- Recovered from: docs_old/html/fr/fr/index.html -->
 <!-- Language: fr | Section: index -->
 
 # Généralités

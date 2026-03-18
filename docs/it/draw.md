@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/it/it/draw/index.html -->
+<!-- Recovered from: docs_old/html/it/it/draw/index.html -->
 <!-- Language: it | Section: draw -->
 
 # Disegnare

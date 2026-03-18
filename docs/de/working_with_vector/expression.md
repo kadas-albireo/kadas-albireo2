@@ -1,9 +1,9 @@
-<!-- Recovered from: share/docs/html/de/de/working_with_vector/expression/index.html -->
+<!-- Recovered from: docs_old/html/de/de/working_with_vector/expression/index.html -->
 <!-- Language: de | Section: working_with_vector/expression -->
 
 # Ausdrücke
 
-Die Funktion **Expressions** steht über den Feldrechner oder das Hinzufügen einer neuen Spaltenschaltfläche in der Attributtabelle oder der Registerkarte Feld in den Layereigenschaften zur Verfügung; über das abgestufte, kategorisierte und regelbasierte Rendering in der Registerkarte Style der Layereigenschaften; über die expressionsbasierte Beschriftung ![](../../../../images/browsebutton.png) in der ![](../../../../images/mActionLabeling.png) _Labeling_ Kernanwendung; durch die Featureauswahl und durch den Diagrammreiter der Layereigenschaften sowie die _Haupteigenschaften_ des Labelelements und die Registerkarte _Atlasgenerierung_ im Print Composer.
+Die Funktion **Expressions** steht über den Feldrechner oder das Hinzufügen einer neuen Spaltenschaltfläche in der Attributtabelle oder der Registerkarte Feld in den Layereigenschaften zur Verfügung; über das abgestufte, kategorisierte und regelbasierte Rendering in der Registerkarte Style der Layereigenschaften; über die expressionsbasierte Beschriftung ![](../../images/browsebutton.png) in der ![](../../images/mActionLabeling.png) _Labeling_ Kernanwendung; durch die Featureauswahl und durch den Diagrammreiter der Layereigenschaften sowie die _Haupteigenschaften_ des Labelelements und die Registerkarte _Atlasgenerierung_ im Print Composer.
 
 Sie sind eine leistungsfähige Möglichkeit, den Attributwert zu manipulieren, um den Endwert dynamisch zu ändern, um den Geometrie-Stil, den Inhalt des Labels, den Wert für das Diagramm, die Auswahl eines Features oder die Erstellung einer virtuellen Spalte zu ändern.
 

@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/en/en/map/index.html -->
+<!-- Recovered from: docs_old/html/en/en/map/index.html -->
 <!-- Language: en | Section: map -->
 
 # Map

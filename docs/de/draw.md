@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/de/de/draw/index.html -->
+<!-- Recovered from: docs_old/html/de/de/draw/index.html -->
 <!-- Language: de | Section: draw -->
 
 # Zeichnen

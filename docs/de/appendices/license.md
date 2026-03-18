@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/de/de/appendices/license/index.html -->
+<!-- Recovered from: docs_old/html/de/de/appendices/license/index.html -->
 <!-- Language: de | Section: appendices/license -->
 
 # GNU General Public License

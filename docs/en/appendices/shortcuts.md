@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/en/en/appendices/shortcuts/index.html -->
+<!-- Recovered from: docs_old/html/en/en/appendices/shortcuts/index.html -->
 <!-- Language: en | Section: appendices/shortcuts -->
 
 # Keyboard shortcuts

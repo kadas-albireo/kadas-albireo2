@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/it/it/working_with_vector/supported_data/index.html -->
+<!-- Recovered from: docs_old/html/it/it/working_with_vector/supported_data/index.html -->
 <!-- Language: it | Section: working_with_vector/supported_data -->
 
 # Formati supportati
@@ -21,13 +21,13 @@ Uno shapefile può anche includere un file con suffisso `.prj` che contiene le i
 
 Quando si carica un livello vettoriale, si apre la seguente finestra di dialogo:
 
-![](../../../../images/addvectorlayerdialog.png)
+![](../../images/addvectorlayerdialog.png)
 
-Nella finestra di dialogo seleziona ![radiobuttonon](../../../../images/radiobuttonon.png) _File_ e clicca su **[Sfoglia]**. Si aprirà cosi una finestra di dialogo standard che ti consentirà di cercare nel computer lo shapefile o qualunque altro dato vettoriale che vuoi caricare. La casella di controllo _Tipo file_ ![](../../../../images/selectstring.png) consente di selezionare in anticipo specifici formati supportati da OGR.
+Nella finestra di dialogo seleziona ![radiobuttonon](../../images/radiobuttonon.png) _File_ e clicca su **[Sfoglia]**. Si aprirà cosi una finestra di dialogo standard che ti consentirà di cercare nel computer lo shapefile o qualunque altro dato vettoriale che vuoi caricare. La casella di controllo _Tipo file_ ![](../../images/selectstring.png) consente di selezionare in anticipo specifici formati supportati da OGR.
 
 Se vuoi, puoi selezionare il tipo di codifica per lo shapefile.
 
-![](../../../../images/shapefileopendialog.png)
+![](../../images/shapefileopendialog.png)
 
 Selezionando un shapefile dalla lista e cliccando **[Apri]** lo carica in KADAS.
 
@@ -35,7 +35,7 @@ Selezionando un shapefile dalla lista e cliccando **[Apri]** lo carica in KADAS.
 
 Quando aggiungi un vettore alla mappa, gli viene assegnato un colore casuale. Se aggiungi più vettori in una sola volta, ciascuno avrà un colore diverso.
 
-Una volta caricato lo shapefile, puoi interagire con la mappa usando gli strumenti di navigazione. Per cambiare lo stile di un vettore, apri la finestra di dialogo _Proprietà layer_ facendo doppio click sul nome del vettore oppure cliccando con il tasto destro sul nome del vettore e scegliendo _Proprietà_. Vedi la sezione [_Menu Stile_](vector_properties.html#vector-style-menu) per ulteriori informazioni su come impostare la simbologia dei vettori.
+Una volta caricato lo shapefile, puoi interagire con la mappa usando gli strumenti di navigazione. Per cambiare lo stile di un vettore, apri la finestra di dialogo _Proprietà layer_ facendo doppio click sul nome del vettore oppure cliccando con il tasto destro sul nome del vettore e scegliendo _Proprietà_. Vedi la sezione [_Menu Stile_](vector_properties.md#vector-style-menu) per ulteriori informazioni su come impostare la simbologia dei vettori.
 
 ### Ottimizzare le prestazioni per gli shapefile
 
@@ -43,7 +43,7 @@ Per migliorare le prestazioni di visualizzazione di uno shapefile, puoi creare u
 
 Segui questi passi per creare un indice spaziale:
 
-- Carica uno shapefile cliccando sul pulsante ![](../../../../images/mActionAddOgrLayer.png) _Aggiungi vettore_ oppure premi `Ctrl+Shift+V`.
+- Carica uno shapefile cliccando sul pulsante ![](../../images/mActionAddOgrLayer.png) _Aggiungi vettore_ oppure premi `Ctrl+Shift+V`.
 - Apri la finestra di dialogo _Proprietà layer_ facendo doppio click sul nome dello shapefile nella legenda o cliccandoci con il tasto destro e scegliendo _Proprietà_ dal menu contestuale.
 - Nella scheda _Generale_ clicca sul pulsante **[Crea indice spaziale]**.
 

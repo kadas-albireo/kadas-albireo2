@@ -1,0 +1,12 @@
+/* Make breadcrumb items look and behave like links */
+.wy-breadcrumbs li a,
+.wy-breadcrumbs li span {
+    color: #2980b9;
+    cursor: pointer;
+}
+
+.wy-breadcrumbs li a:hover,
+.wy-breadcrumbs li span:hover {
+    color: #3091d1;
+    text-decoration: underline;
+}

@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/de/de/settings/index.html -->
+<!-- Recovered from: docs_old/html/de/de/settings/index.html -->
 <!-- Language: de | Section: settings -->
 
 # Einstellungen

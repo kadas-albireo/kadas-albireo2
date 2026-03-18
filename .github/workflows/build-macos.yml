@@ -14,9 +14,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-docs:
-    uses: ./.github/workflows/build-docs.yml
-
   build:
     strategy:
       matrix:
@@ -29,17 +26,20 @@ jobs:
             deployment-target: "11.0"
     name: build (macos)
     runs-on: ${{ matrix.os }}
-    needs: build-docs
 
     steps:
       - name: 🐣 Checkout
         uses: actions/checkout@v6
 
-      - name: 📥 Download docs artifact
-        uses: actions/download-artifact@v4
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v6
         with:
-          name: kadas-docs-html
-          path: share/docs/html
+          python-version: '3.12'
+
+      - name: 📚 Build docs
+        run: |
+          pip install mkdocs
+          mkdocs build --strict
 
       - name: 🐩 Install CMake and Ninja
         uses: lukka/get-cmake@latest

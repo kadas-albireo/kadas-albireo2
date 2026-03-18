@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/it/it/appendices/license/index.html -->
+<!-- Recovered from: docs_old/html/it/it/appendices/license/index.html -->
 <!-- Language: it | Section: appendices/license -->
 
 # Licenza Pubblica Generica (GPL) del progretto GNU

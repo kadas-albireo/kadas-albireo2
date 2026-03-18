@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/it/it/working_with_projections/working_with_projections/index.html -->
+<!-- Recovered from: docs_old/html/it/it/working_with_projections/working_with_projections/index.html -->
 <!-- Language: it | Section: working_with_projections/working_with_projections -->
 
 # Lavorare con le proiezioni
@@ -24,4 +24,4 @@ The _CRS_ tab contains the following important components:
 
 La riproiezione al volo dipende dalla capacità di trasformare i dati in un ‘SR predefinito’ che in KADAS è WGS84. Per alcuni SR sono disponibili molti tipi di trasformazione. KADAS ti permette di definire la trasformazione da usare, altrimenti verrà usata la trasformazione predefinita.
 
-In una finestra di dialogo, KADAS chiede quale trasformazione deve usare visualizzando il informazioni di PROJ.4 che descrivono la trasformazione di partenza e quella di destinazione. Puoi ottenere altre informazioni fermando il cursore del mouse sopra una trasformazione. Puoi salvare le impostazioni selezionando il pulsante ![radiobuttonon](/images/radiobuttonon.png) _Ricorda la selezione_.
+In una finestra di dialogo, KADAS chiede quale trasformazione deve usare visualizzando il informazioni di PROJ.4 che descrivono la trasformazione di partenza e quella di destinazione. Puoi ottenere altre informazioni fermando il cursore del mouse sopra una trasformazione. Puoi salvare le impostazioni selezionando il pulsante ![radiobuttonon](../../images/radiobuttonon.png) _Ricorda la selezione_.

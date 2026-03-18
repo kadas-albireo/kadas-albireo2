@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/en/en/working_with_projections/working_with_projections/index.html -->
+<!-- Recovered from: docs_old/html/en/en/working_with_projections/working_with_projections/index.html -->
 <!-- Language: en | Section: working_with_projections/working_with_projections -->
 
 # Working with Projections
@@ -24,4 +24,4 @@ The _CRS_ tab contains the following important components:
 
 OTF depends on being able to transform data into a ‘default CRS’, and KADAS uses WGS84. For some CRS there are a number of transforms available. KADAS allows you to define the transformation used otherwise KADAS uses a default transformation.
 
-KADAS asks which transformation to use by opening a dialogue box displaying PROJ.4 text describing the source and destination transforms. Further information may be found by hovering over a transform. User defaults can be saved by selecting ![radiobuttonon](/images/radiobuttonon.png) _Remember selection_.
+KADAS asks which transformation to use by opening a dialogue box displaying PROJ.4 text describing the source and destination transforms. Further information may be found by hovering over a transform. User defaults can be saved by selecting ![radiobuttonon](../../images/radiobuttonon.png) _Remember selection_.

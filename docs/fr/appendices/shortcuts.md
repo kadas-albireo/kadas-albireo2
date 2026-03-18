@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/fr/fr/appendices/shortcuts/index.html -->
+<!-- Recovered from: docs_old/html/fr/fr/appendices/shortcuts/index.html -->
 <!-- Language: fr | Section: appendices/shortcuts -->
 
 # Raccourcis

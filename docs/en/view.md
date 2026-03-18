@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/en/en/view/index.html -->
+<!-- Recovered from: docs_old/html/en/en/view/index.html -->
 <!-- Language: en | Section: view -->
 
 # View
