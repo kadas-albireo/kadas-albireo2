@@ -21,13 +21,13 @@ Shapefiles also can include a file with a `.prj` suffix, which contains the proj
 
 When loading a vector layer, the following dialog opens:
 
-![](../../../../images/addvectorlayerdialog.png)
+![](../../images/addvectorlayerdialog.png)
 
-From the available options check ![radiobuttonon](../../../../images/radiobuttonon.png) _File_. Click on **[Browse]**. That will bring up a standard open file dialog, which allows you to navigate the file system and load a shapefile or other supported data source. The selection box _Filter_ ![](../../../../images/selectstring.png) allows you to preselect some OGR-supported file formats.
+From the available options check ![radiobuttonon](../../images/radiobuttonon.png) _File_. Click on **[Browse]**. That will bring up a standard open file dialog, which allows you to navigate the file system and load a shapefile or other supported data source. The selection box _Filter_ ![](../../images/selectstring.png) allows you to preselect some OGR-supported file formats.
 
 You can also select the encoding for the shapefile if desired.
 
-![](../../../../images/shapefileopendialog.png)
+![](../../images/shapefileopendialog.png)
 
 Selecting a shapefile from the list and clicking **[Open]** loads it into KADAS.
 
@@ -35,7 +35,7 @@ Selecting a shapefile from the list and clicking **[Open]** loads it into KADAS.
 
 When you add a layer to the map, it is assigned a random color. When adding more than one layer at a time, different colors are assigned to each layer.
 
-Once a shapefile is loaded, you can zoom around it using the map navigation tools. To change the style of a layer, open the _Layer Properties_ dialog by double clicking on the layer name or by right-clicking on the name in the legend and choosing _Properties_ from the context menu. See section [_Style Menu_](vector_properties.html#vector-style-menu) for more information on setting symbology of vector layers.
+Once a shapefile is loaded, you can zoom around it using the map navigation tools. To change the style of a layer, open the _Layer Properties_ dialog by double clicking on the layer name or by right-clicking on the name in the legend and choosing _Properties_ from the context menu. See section [_Style Menu_](vector_properties.md#vector-style-menu) for more information on setting symbology of vector layers.
 
 ### Improving Performance for Shapefiles
 

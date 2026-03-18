@@ -21,13 +21,13 @@ Un shapefile inclus également un fichier ayant l'extension `.prj` qui contient 
 
 When loading a vector layer, the following dialog opens:
 
-![](../../../../images/addvectorlayerdialog.png)
+![](../../images/addvectorlayerdialog.png)
 
-Cliquez sur ![radiobuttonon](../../../../images/radiobuttonon.png) _Fichier_ puis sur le bouton **[Parcourir]**. L'outil ouvre alors une fenêtre de dialogue standard qui vous permet de naviguer dans les répertoires et les fichiers, et charger le shapefile ou tout autre format géré. La boîte de sélection _Fichiers de type_ ![](../../../../images/selectstring.png) vous permet de présélectionner un format de fichier géré par OGR.
+Cliquez sur ![radiobuttonon](../../images/radiobuttonon.png) _Fichier_ puis sur le bouton **[Parcourir]**. L'outil ouvre alors une fenêtre de dialogue standard qui vous permet de naviguer dans les répertoires et les fichiers, et charger le shapefile ou tout autre format géré. La boîte de sélection _Fichiers de type_ ![](../../images/selectstring.png) vous permet de présélectionner un format de fichier géré par OGR.
 
 Si vous le souhaitez, vous pouvez également sélectionner le type de codage du shapefile.
 
-![](../../../../images/shapefileopendialog.png)
+![](../../images/shapefileopendialog.png)
 
 Selecting a shapefile from the list and clicking **[Open]** loads it into KADAS.
 
@@ -43,7 +43,7 @@ Pour améliorer les performances de dessin d'un shapefile, vous pouvez créer un
 
 Voici les étapes de création d'un index spatial:
 
-- Chargez un shapefile en cliquant sur le bouton ![](../../../../images/mActionAddOgrLayer.png) _Ajouter une couche vecteur_ de la barre d'outils ou en pressant les touches `Ctrl+Shift+V`.
+- Chargez un shapefile en cliquant sur le bouton ![](../../images/mActionAddOgrLayer.png) _Ajouter une couche vecteur_ de la barre d'outils ou en pressant les touches `Ctrl+Shift+V`.
 - Ouvrez la fenêtre _Propriétés de la Couche_ en double-cliquant sur le nom de la couche dans la légende ou en faisant un clic droit et en choisissant _Propriétés_ dans le menu qui apparait.
 - Dans l'onglet _Général_, cliquez sur le bouton **[Créer un index spatial]**.
 

@@ -3,7 +3,7 @@
 
 # Feldrechner
 
-Mit ![](../../../../images/mActionCalculateField.png) _Feldrechner_ Knopf in der Attributtabelle können Sie Berechnungen auf Basis von bestehenden Attributwerten oder definierten Funktionen durchführen, z.B. um die Länge oder die Fläche von Geometrieobjekten zu berechnen. Die Ergebnisse können in eine neue Attributspalte geschrieben werden, in ein virtuelles Feld oder Sie können verwendet werden um Werte in einer vorhandenen Spalte zu updaten.
+Mit ![](../../images/mActionCalculateField.png) _Feldrechner_ Knopf in der Attributtabelle können Sie Berechnungen auf Basis von bestehenden Attributwerten oder definierten Funktionen durchführen, z.B. um die Länge oder die Fläche von Geometrieobjekten zu berechnen. Die Ergebnisse können in eine neue Attributspalte geschrieben werden, in ein virtuelles Feld oder Sie können verwendet werden um Werte in einer vorhandenen Spalte zu updaten.
 
 **Virtuelle Felder**
 
@@ -20,15 +20,15 @@ In der schnellen Feldberechnungsleiste wählen Sie erst einen bestehenden Feldna
 
 Im Feldberechnungsdialog müssen Sie erst auswählen ob sie nur ausgewählte Objekte updaten wollen, eine neues Feld anlegen, in das die Ergebnisse der Berechnung eingefügt werden oder ob Sie ein vorhandenes Feld erneuern wollen.
 
-![](../../../../images/fieldcalculator.png)
+![](../../images/fieldcalculator.png)
 
 Wenn Sie sich entschließen ein neues Feld hinzuzufügen, müssen Sie einen Feldnamen, einen Feldtyp (Ganzzahl, Dezimalzahl, Text oder Datum), die Ausgabefeldbreite und die Genauigkeit eingeben. Zum Beispiel wenn Sie ein Ausgabefeldbreite von 10 und eine Genauigkeit von 3 wählen, heißt das, dass 6 Einträge vor dem Komma stehen, dann das Komma und dann weitere 3 Einträge für die Genauigkeit.
 
 A short example illustrates how field calculator works when using the _Expression_ tab. We want to calculate the length in km of the `railroads` layer from the KADAS sample dataset:
 
-1. Laden Sie das Shape `railroads.shp` in KADAS und öffnen Sie die den Dialog ![](../../../../images/mActionOpenTable.png) _Attributtabelle öffnen_.
-2. Klicken Sie auf ![](../../../../images/mActionToggleEditing.png) _Bearbeitungsmodus umschalten_ und öffnen Sie den ![](../../../../images/mActionCalculateField.png) _Feldrechner_ Dialog.
-3. Wählen Sie das ![](../../../../images/checkbox.png) _Neues Feld anlegen_ Kontrollkästchen um die Berechnungen in ein neues Feld zu speichern.
+1. Laden Sie das Shape `railroads.shp` in KADAS und öffnen Sie die den Dialog ![](../../images/mActionOpenTable.png) _Attributtabelle öffnen_.
+2. Klicken Sie auf ![](../../images/mActionToggleEditing.png) _Bearbeitungsmodus umschalten_ und öffnen Sie den ![](../../images/mActionCalculateField.png) _Feldrechner_ Dialog.
+3. Wählen Sie das ![](../../images/checkbox.png) _Neues Feld anlegen_ Kontrollkästchen um die Berechnungen in ein neues Feld zu speichern.
 4. Setzen Sie `laenge` als Ausgabefeldname, `real` als Ausgabefeldtyp und definieren Sie die Ausgabefeldbreite mit 10 und die Ausgabefeldgenauigkeit mit 3.
 5. Machen Sie jetzt einen Doppelklick auf die Funktion `$length` in der _Geometrie_ Gruppe und fügen Sie sie in die Ausdruck Box des Feldrechners ein.
 6. Vervollständigen Sie den Ausdruck indem Sie “/1000” im Feldrechnerausdruckfenster und klicken Sie **[OK]**.

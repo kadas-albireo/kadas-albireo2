@@ -3,7 +3,7 @@
 
 # Calculatrice de champ
 
-Le bouton ![](../../../../images/mActionCalculateField.png) _Ouvrir la calculatrice de champs_ de la table d'attributs permet d'opérer des calculs sur la base des valeurs attributaires ou d'utiliser des fonctions, par exemple pour calculer la longueur ou la surface des entités. Les résultats peuvent être écrits dans une nouvelle colonne attributaire, un champ virtuel ou mettre à jour une colonne existante.
+Le bouton ![](../../images/mActionCalculateField.png) _Ouvrir la calculatrice de champs_ de la table d'attributs permet d'opérer des calculs sur la base des valeurs attributaires ou d'utiliser des fonctions, par exemple pour calculer la longueur ou la surface des entités. Les résultats peuvent être écrits dans une nouvelle colonne attributaire, un champ virtuel ou mettre à jour une colonne existante.
 
 **Champ Virtuels**
 
@@ -20,15 +20,15 @@ Dans la barre de calcul de champ, vous sélectionnez d'abord le champ à éditer
 
 Dans la Calculatrice de champ, vous devez d'abord spécifier si vous souhaitez mettre à jour uniquement les entités sélectionnées, créer un nouveau champ où les résultats du calcul seront stockés ou mettre à jour un champ existant.
 
-![](../../../../images/fieldcalculator.png)
+![](../../images/fieldcalculator.png)
 
 Si vous choisissez d'ajouter un nouveau champ, vous devez lui donner un nom, un type (nombre entier, nombre décimal ou chaîne de caractère), une longueur et sa précision. Par exemple, si vous créez un champ d'une longueur de 10 et doté d'une précision de 3, vous aurez 6 chiffres avant la virgule, la virgule et 3 chiffres après.
 
 L'exemple suivant montre comment la calculatrice de champs fonctionne. Il s'agit de calculer la longueur en km de la couche `railroads` issue de l'échantillon de données KADAS.
 
-1. Chargez le fichier shapefile `railroads.shp` dans QGIS et ouvrez sa ![](../../../../images/mActionOpenTable.png) _Table d'Attributs_.
-2. Cliquez sur ![](../../../../images/mActionToggleEditing.png) _Basculer en mode édition_ et ouvrez la ![](../../../../images/mActionCalculateField.png) _Calculatrice de champs_.
-3. Cochez la case ![](../../../../images/checkbox.png) _Créer un nouveau champ_ pour enregistrer le résultat des calculs dans un nouveau champ.
+1. Chargez le fichier shapefile `railroads.shp` dans QGIS et ouvrez sa ![](../../images/mActionOpenTable.png) _Table d'Attributs_.
+2. Cliquez sur ![](../../images/mActionToggleEditing.png) _Basculer en mode édition_ et ouvrez la ![](../../images/mActionCalculateField.png) _Calculatrice de champs_.
+3. Cochez la case ![](../../images/checkbox.png) _Créer un nouveau champ_ pour enregistrer le résultat des calculs dans un nouveau champ.
 4. Ajoutez `longueur` dans le nom de ce champ, `réel` en tant que type et définissez une longueur de 10 et une précision de 3.
 5. Double-cliquez maintenant sur la fonction `$length` de la catégorie _Géometrie_ pour l'ajouter à la zone d'Expression.
 6. Terminez en rentrant 1000 à la fin de l'expression et en cliquant sur le bouton **[Ok]**.

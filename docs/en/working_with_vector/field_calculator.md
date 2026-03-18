@@ -3,7 +3,7 @@
 
 # Field Calculator
 
-The ![](../../../../images/mActionCalculateField.png) _Field Calculator_ button in the attribute table allows you to perform calculations on the basis of existing attribute values or defined functions, for instance, to calculate length or area of geometry features. The results can be written to a new attribute field, a virtual field, or they can be used to update values in an existing field.
+The ![](../../images/mActionCalculateField.png) _Field Calculator_ button in the attribute table allows you to perform calculations on the basis of existing attribute values or defined functions, for instance, to calculate length or area of geometry features. The results can be written to a new attribute field, a virtual field, or they can be used to update values in an existing field.
 
 **Virtual Fields**
 
@@ -20,15 +20,15 @@ In quick field calculation bar, you first select the existing field name then op
 
 In the field calculator dialog, you first must select whether you want to only update selected features, create a new attribute field where the results of the calculation will be added or update an existing field.
 
-![](../../../../images/fieldcalculator.png)
+![](../../images/fieldcalculator.png)
 
 If you choose to add a new field, you need to enter a field name, a field type (integer, real or string), the total field width, and the field precision. For example, if you choose a field width of 10 and a field precision of 3, it means you have 6 digits before the dot, then the dot and another 3 digits for the precision.
 
 A short example illustrates how field calculator works when using the _Expression_ tab. We want to calculate the length in km of the `railroads` layer from the KADAS sample dataset:
 
-1. Load the shapefile `railroads.shp` in KADAS and press ![](../../../../images/mActionOpenTable.png) _Open Attribute Table_.
-2. Click on ![](../../../../images/mActionToggleEditing.png) _Toggle editing mode_ and open the ![](../../../../images/mActionCalculateField.png) _Field Calculator_ dialog.
-3. Select the ![](../../../../images/checkbox.png) _Create a new field_ checkbox to save the calculations into a new field.
+1. Load the shapefile `railroads.shp` in KADAS and press ![](../../images/mActionOpenTable.png) _Open Attribute Table_.
+2. Click on ![](../../images/mActionToggleEditing.png) _Toggle editing mode_ and open the ![](../../images/mActionCalculateField.png) _Field Calculator_ dialog.
+3. Select the ![](../../images/checkbox.png) _Create a new field_ checkbox to save the calculations into a new field.
 4. Add `length` as Output field name and `real` as Output field type, and define Output field width to be 10 and Precision, 3.
 5. Now double click on function `$length` in the _Geometry_ group to add it into the Field calculator expression box.
 6. Complete the expression by typing ‘’/ 1000’’ in the Field calculator expression box and click **[Ok]**.

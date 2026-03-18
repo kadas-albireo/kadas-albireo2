@@ -3,7 +3,7 @@
 
 # Espressioni
 
-La funzione **Espressioni** è disponibile tramite il calcolatore di campo o il pulsante per aggiungere una nuova colonna nella tabella degli attributi o nella scheda Campo nelle proprietà del livello; tramite il rendering graduato, categorizzato e basato su regole nella scheda Stile delle proprietà del livello; tramite l'etichettatura basata sulle espressioni ![](../../../../images/browsebutton.png) nell'applicazione principale _Etichettatura_ ![](../../../../images/mActionLabeling.png); tramite la selezione delle funzioni e tramite la scheda diagramma delle proprietà del livello, nonché le proprietà principali dell'elemento etichetta e la scheda generazione di _Atlante_ nel Compositore di stampa.
+La funzione **Espressioni** è disponibile tramite il calcolatore di campo o il pulsante per aggiungere una nuova colonna nella tabella degli attributi o nella scheda Campo nelle proprietà del livello; tramite il rendering graduato, categorizzato e basato su regole nella scheda Stile delle proprietà del livello; tramite l'etichettatura basata sulle espressioni ![](../../images/browsebutton.png) nell'applicazione principale _Etichettatura_ ![](../../images/mActionLabeling.png); tramite la selezione delle funzioni e tramite la scheda diagramma delle proprietà del livello, nonché le proprietà principali dell'elemento etichetta e la scheda generazione di _Atlante_ nel Compositore di stampa.
 
 Sono un modo potente per manipolare il valore degli attributi al fine di modificare dinamicamente il valore finale per cambiare lo stile della geometria, il contenuto dell'etichetta, il valore per il diagramma, selezionare qualche caratteristica o creare colonne virtuali.
 

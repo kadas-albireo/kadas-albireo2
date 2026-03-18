@@ -5,7 +5,7 @@
 
 The _Layer Properties_ dialog for a vector layer provides information about the layer, symbology settings and labeling options. If your vector layer has been loaded from a PostgreSQL/PostGIS datastore, you can also alter the underlying SQL for the layer by invoking the _Query Builder_ dialog on the _General_ tab. To access the _Layer Properties_ dialog, double-click on a layer in the legend or right-click on the layer and select _Properties_ from the pop-up menu.
 
-![](../../../../images/vector_general_menu.png)
+![](../../images/vector_general_menu.png)
 
 ## Style Menu
 
@@ -15,13 +15,13 @@ The Style menu provides you with a comprehensive tool for rendering and symboliz
 
 The renderer is responsible for drawing a feature together with the correct symbol. There are four types of renderers: single symbol, categorized, graduated and rule-based. There is no continuous color renderer, because it is in fact only a special case of the graduated renderer. The categorized and graduated renderers can be created by specifying a symbol and a color ramp - they will set the colors for symbols appropriately. For point layers, there is a point displacement renderer available. For each data type (points, lines and polygons), vector symbol layer types are available. Depending on the chosen renderer, the _Style_ menu provides different additional sections. On the bottom right of the symbology dialog, there is a **[Symbol]** button, which gives access to the Style Manager (see _vector\_style\_manager_). The Style Manager allows you to edit and remove existing symbols and add new ones.
 
-After having made any needed changes, the symbol can be added to the list of current style symbols (using **[Symbol]** ![](../../../../images/selectstring.png) _Save in symbol library_), and then it can easily be used in the future. Furthermore, you can use the **[Save Style]** ![](../../../../images/selectstring.png) button to save the symbol as a KADAS layer style file (.qml) or SLD file (.sld). SLDs can be exported from any type of renderer – single symbol, categorized, graduated or rule-based – but when importing an SLD, either a single symbol or rule-based renderer is created. That means that categorized or graduated styles are converted to rule-based. If you want to preserve those renderers, you have to stick to the QML format. On the other hand, it can be very handy sometimes to have this easy way of converting styles to rule-based.
+After having made any needed changes, the symbol can be added to the list of current style symbols (using **[Symbol]** ![](../../images/selectstring.png) _Save in symbol library_), and then it can easily be used in the future. Furthermore, you can use the **[Save Style]** ![](../../images/selectstring.png) button to save the symbol as a KADAS layer style file (.qml) or SLD file (.sld). SLDs can be exported from any type of renderer – single symbol, categorized, graduated or rule-based – but when importing an SLD, either a single symbol or rule-based renderer is created. That means that categorized or graduated styles are converted to rule-based. If you want to preserve those renderers, you have to stick to the QML format. On the other hand, it can be very handy sometimes to have this easy way of converting styles to rule-based.
 
 If you change the renderer type when setting the style of a vector layer the settings you made for the symbol will be maintained. Be aware that this procedure only works for one change. If you repeat changing the renderer type the settings for the symbol will get lost.
 
 If the datasource of the layer is a database (PostGIS or Spatialite for example), you can save your layer style inside a table of the database. Just click on _Save Style_ comboxbox and choose **Save in database** item then fill in the dialog to define a style name, add a description, an ui file and if the style is a default style. When loading a layer from the database, if a style already exists for this layer, KADAS will load the layer and its style. You can add several style in the database. Only one will be the default style anyway.
 
-![](../../../../images/save_style_database.png)
+![](../../images/save_style_database.png)
 
 **Select and change multiple symbols**
 
@@ -33,11 +33,11 @@ The Single Symbol Renderer is used to render all features of the layer using a s
 
 If you click on the first level in the _Symbol layers_ dialog on the left side, it's possible to define basic parameters like _Size_, _Transparency_, _color_ and _Rotation_. Here, the layers are joined together.
 
-![](../../../../images/singlesymbol_ng_line.png)
+![](../../images/singlesymbol_ng_line.png)
 
 In any spinbox in this dialog you can enter expressions. E.g. you can calculate simple math like multiplying the existing size of a point by 3 without resorting to a calculator.
 
-![](../../../../images/expression_symbol_size_spinbox.png)
+![](../../images/expression_symbol_size_spinbox.png)
 
 If you click on the second level in the _Symbol layers_ dialog a _Data-defined override_ for nearly all settings is possible. When using a data-defined color one may want to link the color to a field _budged_. Here a comment functionality is inserted.
 
@@ -58,7 +58,7 @@ END
 
 The Categorized Renderer is used to render all features from a layer, using a single user-defined symbol whose color reflects the value of a selected feature's attribute. The _Style_ menu allows you to select:
 
-- The attribute (using the Column listbox or the ![](../../../../images/mIconExpressionEditorOpen.png) _Set column expression_ function, see [_Expressions_](expression.html#vector-expressions))
+- The attribute (using the Column listbox or the ![](../../images/mIconExpressionEditorOpen.png) _Set column expression_ function, see [_Expressions_](expression.md#vector-expressions))
 - The symbol (using the Symbol dialog)
 - The colors (using the color Ramp listbox)
 
@@ -70,19 +70,19 @@ Right-click shows a contextual menu to **Copy/Paste**, **Change color**, **Chang
 
 The **[Advanced]** button in the lower-right corner of the dialog allows you to set the fields containing rotation and size scale information. For convenience, the center of the menu lists the values of all currently selected attributes together, including the symbols that will be rendered.
 
-![](../../../../images/categorysymbol_ng_line.png)
+![](../../images/categorysymbol_ng_line.png)
 
 **Graduated Renderer**
 
 The Graduated Renderer is used to render all the features from a layer, using a single user-defined symbol whose color reflects the assignment of a selected feature's attribute to a class.
 
-![](../../../../images/graduatesymbol_ng_line.png)
+![](../../images/graduatesymbol_ng_line.png)
 
 Like the Categorized Renderer, the Graduated Renderer allows you to define rotation and size scale from specified columns.
 
 Also, analogous to the Categorized Renderer, the _Style_ tab allows you to select:
 
-- The attribute (using the Column listbox or the ![](../../../../images/mIconExpressionEditorOpen.png) _Set column expression_ function, see [_Expressions_](expression.html#vector-expressions) chapter)
+- The attribute (using the Column listbox or the ![](../../images/mIconExpressionEditorOpen.png) _Set column expression_ function, see [_Expressions_](expression.md#vector-expressions) chapter)
 - The symbol (using the Symbol Properties button)
 - The colors (using the color Ramp list)
 
@@ -104,21 +104,21 @@ Right-click shows a contextual menu to **Copy/Paste**, **Change color**, **Chang
 
 **Thematic maps using an expression**
 
-Categorized and graduated thematic maps can now be created using the result of an expression. In the properties dialog for vector layers, the attribute chooser has been augmented with a ![](../../../../images/mIconExpressionEditorOpen.png) _Set column expression_ function. So now you no longer need to write the classification attribute to a new column in your attribute table if you want the classification attribute to be a composite of multiple fields, or a formula of some sort.
+Categorized and graduated thematic maps can now be created using the result of an expression. In the properties dialog for vector layers, the attribute chooser has been augmented with a ![](../../images/mIconExpressionEditorOpen.png) _Set column expression_ function. So now you no longer need to write the classification attribute to a new column in your attribute table if you want the classification attribute to be a composite of multiple fields, or a formula of some sort.
 
 **Rule-based rendering**
 
 The Rule-based Renderer is used to render all the features from a layer, using rule based symbols whose color reflects the assignment of a selected feature's attribute to a class. The rules are based on SQL statements. The dialog allows rule grouping by filter or scale, and you can decide if you want to enable symbol levels or use only the first-matched rule.
 
-To create a rule, activate an existing row by double-clicking on it, or click on _+_ and click on the new rule. In the _Rule properties_ dialog, you can define a label for the rule. Press the ![](../../../../images/browsebutton.png) button to open the expression string builder. In the **Function List**, click on _Fields and Values_ to view all attributes of the attribute table to be searched. To add an attribute to the field calculator **Expression** field, double click its name in the _Fields and Values_ list. Generally, you can use the various fields, values and functions to construct the calculation expression, or you can just type it into the box. You can create a new rule by copying and pasting an existing rule with the right mouse button. You can also use the _ELSE_ rule that will be run if none of the other rules on that level match. The rules appear in a tree hierarchy in the map legend. Just double-klick the rules in the map legend and the Style menu of the layer properties appears showing the rule that is the background for the symbol in the tree.
+To create a rule, activate an existing row by double-clicking on it, or click on _+_ and click on the new rule. In the _Rule properties_ dialog, you can define a label for the rule. Press the ![](../../images/browsebutton.png) button to open the expression string builder. In the **Function List**, click on _Fields and Values_ to view all attributes of the attribute table to be searched. To add an attribute to the field calculator **Expression** field, double click its name in the _Fields and Values_ list. Generally, you can use the various fields, values and functions to construct the calculation expression, or you can just type it into the box. You can create a new rule by copying and pasting an existing rule with the right mouse button. You can also use the _ELSE_ rule that will be run if none of the other rules on that level match. The rules appear in a tree hierarchy in the map legend. Just double-klick the rules in the map legend and the Style menu of the layer properties appears showing the rule that is the background for the symbol in the tree.
 
-![](../../../../images/rulesymbol_ng_line.png)
+![](../../images/rulesymbol_ng_line.png)
 
 **Point displacement**
 
 The Point Displacement Renderer works to visualize all features of a point layer, even if they have the same location. To do this, the symbols of the points are placed on a displacement circle around a center symbol.
 
-![](../../../../images/poi_displacement.png)
+![](../../images/poi_displacement.png)
 
 **Export vector symbology**
 
@@ -128,7 +128,7 @@ You have the option to export vector symbology from KADAS into Google \*.kml, \*
 
 Inverted polygon renderer allows user to define a symbol to fill in outside of the layer's polygons. As before you can select subrenderers. These subrenderers are the same as for the main renderers.
 
-![](../../../../images/inverted_polygon_symbol.png)
+![](../../images/inverted_polygon_symbol.png)
 
 **Switch quickly between styles**
 
@@ -140,17 +140,17 @@ With the Heatmap renderer you can create live dynamic heatmaps for (multi)point 
 
 ### Color Picker
 
-Regardless the type of style to be used, the _select color_ dialog will show when you click to choose a color - either border or fill color. This dialog has four different tabs which allow you to select colors by ![](../../../../images/mIconColorBox.png) _color ramp_, ![](../../../../images/mIconColorWheel.png) _color wheel_, ![](../../../../images/mIconColorSwatches.png) _color swatches_ or ![](../../../../images/mIconColorPicker.png) _color picker_.
+Regardless the type of style to be used, the _select color_ dialog will show when you click to choose a color - either border or fill color. This dialog has four different tabs which allow you to select colors by ![](../../images/mIconColorBox.png) _color ramp_, ![](../../images/mIconColorWheel.png) _color wheel_, ![](../../images/mIconColorSwatches.png) _color swatches_ or ![](../../images/mIconColorPicker.png) _color picker_.
 
 Whatever method you use, the selected color is always described through color sliders for HSV (Hue, Saturation, Value) and RGB (Red, Green, Blue) values. There is also an _opacity_ slider to set transparency level. On the lower left part of the dialog you can see a comparison between the _current_ and the _new_ color you are presently selecting and on the lower right part you have the option to add the color you just tweaked into a color slot button.
 
-![](../../../../images/color_picker_ramp.png)
+![](../../images/color_picker_ramp.png)
 
-With ![](../../../../images/mIconColorBox.png) _color ramp_ or with ![](../../../../images/mIconColorWheel.png) _color wheel_, you can browse to all possible color combinations. There are other possibilities though. By using color swatches ![](../../../../images/mIconColorSwatches.png) you can choose from a preselected list. This selected list is populated with one of three methods: _Recent colors_, _Standard colors_ or _Project colors_
+With ![](../../images/mIconColorBox.png) _color ramp_ or with ![](../../images/mIconColorWheel.png) _color wheel_, you can browse to all possible color combinations. There are other possibilities though. By using color swatches ![](../../images/mIconColorSwatches.png) you can choose from a preselected list. This selected list is populated with one of three methods: _Recent colors_, _Standard colors_ or _Project colors_
 
-![](../../../../images/color_picker_recent_colors.png)
+![](../../images/color_picker_recent_colors.png)
 
-Another option is to use the ![](../../../../images/mIconColorPicker.png) _color picker_ which allows you to sample a color from under your mouse pointer at any part of QGIS or even from another application by pressing the space bar. Please note that the color picker is OS dependent and is currently not supported by OSX.
+Another option is to use the ![](../../images/mIconColorPicker.png) _color picker_ which allows you to sample a color from under your mouse pointer at any part of QGIS or even from another application by pressing the space bar. Please note that the color picker is OS dependent and is currently not supported by OSX.
 
 Tip
 
@@ -158,11 +158,11 @@ Tip
 
 You can quickly choose from _Recent colors_, from _Standard colors_ or simply _copy_ or _paste_ a color by clicking the drop-down arrow that follows a current color box.
 
-![](../../../../images/quick_color_picker.png)
+![](../../images/quick_color_picker.png)
 
 ### Layer rendering
 
-- _Layer transparency_ ![slider](../../../../images/slider.png): You can make the underlying layer in the map canvas visible with this tool. Use the slider to adapt the visibility of your vector layer to your needs. You can also make a precise definition of the percentage of visibility in the the menu beside the slider.
+- _Layer transparency_ ![slider](../../images/slider.png): You can make the underlying layer in the map canvas visible with this tool. Use the slider to adapt the visibility of your vector layer to your needs. You can also make a precise definition of the percentage of visibility in the the menu beside the slider.
 
 - _Layer blending mode_ and _Feature blending mode_: You can achieve special rendering effects with these tools that you may previously only know from graphics programs. The pixels of your overlaying and underlaying layers are mixed through the settings described below.
     - Normal: This is the standard blend mode, which uses the alpha channel of the top pixel to blend with the pixel beneath it. The colors aren't mixed.
@@ -181,7 +181,7 @@ You can quickly choose from _Recent colors_, from _Standard colors_ or simply _c
 
 ## Labels Menu
 
-The ![](../../../../images/mActionLabeling.png) _Labels_ core application provides smart labeling for vector point, line and polygon layers, and it only requires a few parameters. This new application also supports on-the-fly transformed layers. The core functions of the application have been redesigned. In KADAS, there are a number of other features that improve the labeling. The following menus have been created for labeling the vector layers:
+The ![](../../images/mActionLabeling.png) _Labels_ core application provides smart labeling for vector point, line and polygon layers, and it only requires a few parameters. This new application also supports on-the-fly transformed layers. The core functions of the application have been redesigned. In KADAS, there are a number of other features that improve the labeling. The following menus have been created for labeling the vector layers:
 
 - Text
 - Formatting
@@ -195,33 +195,33 @@ Let us see how the new menus can be used for various vector layers.
 
 **Labeling point layers**
 
-Start KADAS and load a vector point layer. Activate the layer in the legend and click on the ![](../../../../images/mActionLabeling.png) _Layer Labeling Options_ icon in the KADAS toolbar menu.
+Start KADAS and load a vector point layer. Activate the layer in the legend and click on the ![](../../images/mActionLabeling.png) _Layer Labeling Options_ icon in the KADAS toolbar menu.
 
-The first step is to activate the ![](../../../../images/checkbox.png) _Label this layer with_ checkbox and select an attribute column to use for labeling. Click ![](../../../../images/mIconExpressionEditorOpen.png) if you want to define labels based on expressions.
+The first step is to activate the ![](../../images/checkbox.png) _Label this layer with_ checkbox and select an attribute column to use for labeling. Click ![](../../images/mIconExpressionEditorOpen.png) if you want to define labels based on expressions.
 
 The following steps describe a simple labeling without using the _Data defined override_ functions, which are situated next to the drop-down menus.
 
 You can define the text style in the _Text_ menu. Use the _Type case_ option to influence the text rendering. You have the possibility to render the text _All uppercase_, _All lowercase_ or _Capitalize first letter_. Use the blend modes to create effects known from graphics programs.
 
-In the _Formatting_ menu, you can define a character for a line break in the labels with the _Wrap on character_ function. Use the ![](../../../../images/checkbox.png) _Formatted numbers_ option to format the numbers in an attribute table. Here, decimal places may be inserted. If you enable this option, three decimal places are initially set by default.
+In the _Formatting_ menu, you can define a character for a line break in the labels with the _Wrap on character_ function. Use the ![](../../images/checkbox.png) _Formatted numbers_ option to format the numbers in an attribute table. Here, decimal places may be inserted. If you enable this option, three decimal places are initially set by default.
 
-To create a buffer, just activate the ![](../../../../images/checkbox.png) _Draw text buffer_ checkbox in the _Buffer_ menu. The buffer color is variable. Here, you can also use blend modes.
+To create a buffer, just activate the ![](../../images/checkbox.png) _Draw text buffer_ checkbox in the _Buffer_ menu. The buffer color is variable. Here, you can also use blend modes.
 
-If the ![](../../../../images/checkbox.png) _color buffer's fill_ checkbox is activated, it will interact with partially transparent text and give mixed color transparency results. Turning off the buffer fill fixes that issue (except where the interior aspect of the buffer's stroke intersects with the text's fill) and also allows you to make outlined text.
+If the ![](../../images/checkbox.png) _color buffer's fill_ checkbox is activated, it will interact with partially transparent text and give mixed color transparency results. Turning off the buffer fill fixes that issue (except where the interior aspect of the buffer's stroke intersects with the text's fill) and also allows you to make outlined text.
 
 In the _Background_ menu, you can define with _Size X_ and _Size Y_ the shape of your background. Use _Size type_ to insert an additional _Buffer_ into your background. The buffer size is set by default here. The background then consists of the buffer plus the background in _Size X_ and _Size Y_. You can set a _Rotation_ where you can choose between _Sync with label_, _Offset of label_ and _Fixed_. Using _Offset of label_ and _Fixed_, you can rotate the background. Define an _Offset X,Y_ with X and Y values, and the background will be shifted. When applying _Radius X,Y_, the background gets rounded corners. Again, it is possible to mix the background with the underlying layers in the map canvas using the _Blend mode_.
 
-Use the _Shadow_ menu for a user-defined _Drop shadow_. The drawing of the background is very variable. Choose between _Lowest label component_, _Text_, _Buffer_ and _Background_. The _Offset_ angle depends on the orientation of the label. If you choose the ![](../../../../images/checkbox.png) _Use global shadow_ checkbox, then the zero point of the angle is always oriented to the north and doesn't depend on the orientation of the label. You can influence the appearance of the shadow with the _Blur radius_. The higher the number, the softer the shadows. The appearance of the drop shadow can also be altered by choosing a blend mode.
+Use the _Shadow_ menu for a user-defined _Drop shadow_. The drawing of the background is very variable. Choose between _Lowest label component_, _Text_, _Buffer_ and _Background_. The _Offset_ angle depends on the orientation of the label. If you choose the ![](../../images/checkbox.png) _Use global shadow_ checkbox, then the zero point of the angle is always oriented to the north and doesn't depend on the orientation of the label. You can influence the appearance of the shadow with the _Blur radius_. The higher the number, the softer the shadows. The appearance of the drop shadow can also be altered by choosing a blend mode.
 
-Choose the _Placement_ menu for the label placement and the labeling priority. Using the ![radiobuttonon](../../../../images/radiobuttonon.png) _Offset from point_ setting, you now have the option to use _Quadrants_ to place your label. Additionally, you can alter the angle of the label placement with the _Rotation_ setting. Thus, a placement in a certain quadrant with a certain rotation is possible. In the _priority_ section you can define with which priority the labels are rendered. It interacts with labels of the other vector layers in the map canvas. If there are labels from different layers in the same location then the label with the higher priority will be displayed and the other will be left out.
+Choose the _Placement_ menu for the label placement and the labeling priority. Using the ![radiobuttonon](../../images/radiobuttonon.png) _Offset from point_ setting, you now have the option to use _Quadrants_ to place your label. Additionally, you can alter the angle of the label placement with the _Rotation_ setting. Thus, a placement in a certain quadrant with a certain rotation is possible. In the _priority_ section you can define with which priority the labels are rendered. It interacts with labels of the other vector layers in the map canvas. If there are labels from different layers in the same location then the label with the higher priority will be displayed and the other will be left out.
 
-In the _Rendering_ menu, you can define label and feature options. Under _Label options_, you find the scale-based visibility setting now. You can prevent KADAS from rendering only selected labels with the ![](../../../../images/checkbox.png) _Show all labels for this layer (including colliding labels)_ checkbox. Under _Feature options_, you can define whether every part of a multipart feature is to be labeled. It's possible to define whether the number of features to be labeled is limited and to ![](../../../../images/checkbox.png) _Discourage labels from covering features_.
+In the _Rendering_ menu, you can define label and feature options. Under _Label options_, you find the scale-based visibility setting now. You can prevent KADAS from rendering only selected labels with the ![](../../images/checkbox.png) _Show all labels for this layer (including colliding labels)_ checkbox. Under _Feature options_, you can define whether every part of a multipart feature is to be labeled. It's possible to define whether the number of features to be labeled is limited and to ![](../../images/checkbox.png) _Discourage labels from covering features_.
 
-![](../../../../images/label_points.png)
+![](../../images/label_points.png)
 
 **Labeling line layers**
 
-The first step is to activate the ![](../../../../images/checkbox.png) _Label this layer_ checkbox in the _Label settings_ tab and select an attribute column to use for labeling. Click ![](../../../../images/mIconExpressionEditorOpen.png) if you want to define labels based on expressions.
+The first step is to activate the ![](../../images/checkbox.png) _Label this layer_ checkbox in the _Label settings_ tab and select an attribute column to use for labeling. Click ![](../../images/mIconExpressionEditorOpen.png) if you want to define labels based on expressions.
 
 After that, you can define the text style in the _Text_ menu. Here, you can use the same settings as for point layers.
 
@@ -233,7 +233,7 @@ The _Background_ menu has the same entries as described in section [labeling poi
 
 Also, the _Shadow_ menu has the same entries as described in section [labeling point layers](#labeling-point-layers).
 
-In the _Placement_ menu, you find special settings for line layers. The label can be placed ![radiobuttonon](../../../../images/radiobuttonon.png) _Parallel_, ![radiobuttonoff](../../../../images/radiobuttonoff.png) _Curved_ or ![radiobuttonoff](../../../../images/radiobuttonoff.png) _Horizontal_. With the ![radiobuttonon](../../../../images/radiobuttonon.png) _Parallel_ and ![radiobuttonoff](../../../../images/radiobuttonoff.png) _Curved_ option, you can define the position ![](../../../../images/checkbox.png) _Above line_, ![](../../../../images/checkbox.png) _On line_ and ![](../../../../images/checkbox.png) _Below line_. It's possible to select several options at once. In that case, KADAS will look for the optimal position of the label. Remember that here you can also use the line orientation for the position of the label. Additionally, you can define a _Maximum angle between curved characters_ when selecting the ![radiobuttonoff](../../../../images/radiobuttonoff.png) _Curved_ option.
+In the _Placement_ menu, you find special settings for line layers. The label can be placed ![radiobuttonon](../../images/radiobuttonon.png) _Parallel_, ![radiobuttonoff](../../images/radiobuttonoff.png) _Curved_ or ![radiobuttonoff](../../images/radiobuttonoff.png) _Horizontal_. With the ![radiobuttonon](../../images/radiobuttonon.png) _Parallel_ and ![radiobuttonoff](../../images/radiobuttonoff.png) _Curved_ option, you can define the position ![](../../images/checkbox.png) _Above line_, ![](../../images/checkbox.png) _On line_ and ![](../../images/checkbox.png) _Below line_. It's possible to select several options at once. In that case, KADAS will look for the optimal position of the label. Remember that here you can also use the line orientation for the position of the label. Additionally, you can define a _Maximum angle between curved characters_ when selecting the ![radiobuttonoff](../../images/radiobuttonoff.png) _Curved_ option.
 
 You can set up a minimum distance for repeating labels. Distance can be in mm or in map units.
 
@@ -241,11 +241,11 @@ Some Placement setup will display more options, for example, _Curved_ and _Paral
 
 The _Rendering_ menu has nearly the same entries as for point layers. In the _Feature options_, you can now _Suppress labeling of features smaller than_.
 
-![](../../../../images/label_line.png)
+![](../../images/label_line.png)
 
 **Labeling polygon layers**
 
-The first step is to activate the ![](../../../../images/checkbox.png) _Label this layer_ checkbox and select an attribute column to use for labeling. Click ![](../../../../images/mIconExpressionEditorOpen.png) if you want to define labels based on expressions.
+The first step is to activate the ![](../../images/checkbox.png) _Label this layer_ checkbox and select an attribute column to use for labeling. Click ![](../../images/mIconExpressionEditorOpen.png) if you want to define labels based on expressions.
 
 In the _Text_ menu, define the text style. The entries are the same as for point and line layers.
 
@@ -257,9 +257,9 @@ Use the _Background_ menu to create a complex user-defined background for the po
 
 The entries in the _Shadow_ menu are the same as for point and line layers.
 
-In the _Placement_ menu, you find special settings for polygon layers. ![radiobuttonon](../../../../images/radiobuttonon.png) _Offset from centroid_, ![radiobuttonoff](../../../../images/radiobuttonoff.png) _Horizontal (slow)_, ![radiobuttonoff](../../../../images/radiobuttonoff.png) _Around centroid_, ![radiobuttonoff](../../../../images/radiobuttonoff.png) _Free_ and ![radiobuttonoff](../../../../images/radiobuttonoff.png) _Using perimeter_ are possible.
+In the _Placement_ menu, you find special settings for polygon layers. ![radiobuttonon](../../images/radiobuttonon.png) _Offset from centroid_, ![radiobuttonoff](../../images/radiobuttonoff.png) _Horizontal (slow)_, ![radiobuttonoff](../../images/radiobuttonoff.png) _Around centroid_, ![radiobuttonoff](../../images/radiobuttonoff.png) _Free_ and ![radiobuttonoff](../../images/radiobuttonoff.png) _Using perimeter_ are possible.
 
-In the ![radiobuttonon](../../../../images/radiobuttonon.png) _Offset from centroid_ settings, you can specify if the centroid is of the ![radiobuttonon](../../../../images/radiobuttonon.png) _visible polygon_ or ![radiobuttonoff](../../../../images/radiobuttonoff.png) _whole polygon_. That means that either the centroid is used for the polygon you can see on the map or the centroid is determined for the whole polygon, no matter if you can see the whole feature on the map. You can place your label with the quadrants here, and define offset and rotation. The ![radiobuttonoff](../../../../images/radiobuttonoff.png) _Around centroid_ setting makes it possible to place the label around the centroid with a certain distance. Again, you can define ![radiobuttonon](../../../../images/radiobuttonon.png) _visible polygon_ or ![radiobuttonoff](../../../../images/radiobuttonoff.png) _whole polygon_ for the centroid. With the ![radiobuttonoff](../../../../images/radiobuttonoff.png) _Using perimeter_ settings, you can define a position and a distance for the label. For the position, ![](../../../../images/checkbox.png) _Above line_, ![](../../../../images/checkbox.png) _On line_, ![](../../../../images/checkbox.png) _Below line_ and ![](../../../../images/checkbox.png) _Line orientation dependent position_ are possible.
+In the ![radiobuttonon](../../images/radiobuttonon.png) _Offset from centroid_ settings, you can specify if the centroid is of the ![radiobuttonon](../../images/radiobuttonon.png) _visible polygon_ or ![radiobuttonoff](../../images/radiobuttonoff.png) _whole polygon_. That means that either the centroid is used for the polygon you can see on the map or the centroid is determined for the whole polygon, no matter if you can see the whole feature on the map. You can place your label with the quadrants here, and define offset and rotation. The ![radiobuttonoff](../../images/radiobuttonoff.png) _Around centroid_ setting makes it possible to place the label around the centroid with a certain distance. Again, you can define ![radiobuttonon](../../images/radiobuttonon.png) _visible polygon_ or ![radiobuttonoff](../../images/radiobuttonoff.png) _whole polygon_ for the centroid. With the ![radiobuttonoff](../../images/radiobuttonoff.png) _Using perimeter_ settings, you can define a position and a distance for the label. For the position, ![](../../images/checkbox.png) _Above line_, ![](../../images/checkbox.png) _On line_, ![](../../images/checkbox.png) _Below line_ and ![](../../images/checkbox.png) _Line orientation dependent position_ are possible.
 
 Related to the choice of Label Placement, several options will appear. As for Point Placement you can choose the distance for the polygon outline, repeat the label around the polygon perimeter.
 
@@ -267,13 +267,13 @@ As for point and line vector layers you have the possibility to define a _Priori
 
 The entries in the _Rendering_ menu are the same as for line layers. You can also use _Suppress labeling of features smaller than_ in the _Feature options_.
 
-![](../../../../images/label_area.png)
+![](../../images/label_area.png)
 
 **Define labels based on expressions**
 
-QGIS allows to use expressions to label features. Just click the ![](../../../../images/mIconExpressionEditorOpen.png) icon in the ![](../../../../images/mActionLabeling.png) _Labels_ menu of the properties dialog.
+QGIS allows to use expressions to label features. Just click the ![](../../images/mIconExpressionEditorOpen.png) icon in the ![](../../images/mActionLabeling.png) _Labels_ menu of the properties dialog.
 
-![](../../../../images/label_expression.png)
+![](../../images/label_expression.png)
 
 Expression based labeling is easy to work with. All you have to take care of is, that you need to combine all elements (strings, fields and functions) with a string concatenation sign `||` and that fields a written in “double quotes” and strings in ‘single quotes'. Let's have a look at some examples:
 
@@ -308,29 +308,29 @@ Expression based labeling is easy to work with. All you have to take care of is,
 -> This place is a town
 ```
 
-As you can see in the expression builder, you have hundreds of functions available to create simple and very complex expressions to label your data in QGIS. See [_Expressions_](expression.html#vector-expressions) chapter for more information and examples on expressions.
+As you can see in the expression builder, you have hundreds of functions available to create simple and very complex expressions to label your data in QGIS. See [_Expressions_](expression.md#vector-expressions) chapter for more information and examples on expressions.
 
 **Using data-defined override for labeling**
 
-With the data-defined override functions, the settings for the labeling are overridden by entries in the attribute table. You can activate and deactivate the function with the right-mouse button. Hover over the symbol and you see the information about the data-defined override, including the current definition field. We now describe an example using the data-defined override function for the ![](../../../../images/mActionMoveLabel.png)_Move label_ function.
+With the data-defined override functions, the settings for the labeling are overridden by entries in the attribute table. You can activate and deactivate the function with the right-mouse button. Hover over the symbol and you see the information about the data-defined override, including the current definition field. We now describe an example using the data-defined override function for the ![](../../images/mActionMoveLabel.png)_Move label_ function.
 
 1. Import `lakes.shp` from the KADAS sample dataset.
-2. Double-click the layer to open the Layer Properties. Click on _Labels_ and _Placement_. Select ![radiobuttonon](../../../../images/radiobuttonon.png) _Offset from centroid_.
-3. Look for the _Data defined_ entries. Click the ![](../../../../images/mIconDataDefine.png) icon to define the field type for the _Coordinate_. Choose _xlabel_ for X and _ylabel_ for Y. The icons are now highlighted in yellow.
+2. Double-click the layer to open the Layer Properties. Click on _Labels_ and _Placement_. Select ![radiobuttonon](../../images/radiobuttonon.png) _Offset from centroid_.
+3. Look for the _Data defined_ entries. Click the ![](../../images/mIconDataDefine.png) icon to define the field type for the _Coordinate_. Choose _xlabel_ for X and _ylabel_ for Y. The icons are now highlighted in yellow.
 4. Zoom into a lake.
-5. Go to the Label toolbar and click the ![](../../../../images/mActionMoveLabel.png) icon. Now you can shift the label manually to another position. The new position of the label is saved in the _xlabel_ and _ylabel_ columns of the attribute table.
+5. Go to the Label toolbar and click the ![](../../images/mActionMoveLabel.png) icon. Now you can shift the label manually to another position. The new position of the label is saved in the _xlabel_ and _ylabel_ columns of the attribute table.
 
-![](../../../../images/label_data_defined.png)
+![](../../images/label_data_defined.png)
 
-![](../../../../images/move_label.png)
+![](../../images/move_label.png)
 
 ## Fields Menu
 
-![](../../../../images/attributes.png) Within the _Fields_ menu, the field attributes of the selected dataset can be manipulated. The buttons ![](../../../../images/mActionNewAttribute.png) _New Column_ and ![](../../../../images/mActionDeleteAttribute.png) _Delete Column_ can be used when the dataset is in ![](../../../../images/mActionToggleEditing.png) _Editing mode_.
+![](../../images/attributes.png) Within the _Fields_ menu, the field attributes of the selected dataset can be manipulated. The buttons ![](../../images/mActionNewAttribute.png) _New Column_ and ![](../../images/mActionDeleteAttribute.png) _Delete Column_ can be used when the dataset is in ![](../../images/mActionToggleEditing.png) _Editing mode_.
 
 **Edit Widget**
 
-![](../../../../images/editwidgetsdialog.png)
+![](../../images/editwidgetsdialog.png)
 
 Within the _Fields_ menu, you also find an **edit widget** column. This column can be used to define values or a range of values that are allowed to be added to the specific attribute table column. If you click on the **[edit widget]** button, a dialog opens, where you can define different widgets. These widgets are:
 
@@ -357,7 +357,7 @@ KADAS has an advanced _hidden_ option to define your own field widget using pyth
 
 With the **Attribute editor layout**, you can now define built-in forms. This is usefull for data entry jobs or to identify objects using the option auto open form when you have objects with many attributes. You can create an editor with several tabs and named groups to present the attribute fields.
 
-Choose _Drag and drop designer_ and an attribute column. Use the ![](../../../../images/mActionSignPlus.png) icon to create a category to insert a tab or a named group. When creating a new category, KADAS will insert a new tab or named group for the category in the built-in form. The next step will be to assign the relevant fields to a selected category with the ![](../../../../images/mActionArrowRight.png) icon. You can create more categories and use the same fields again.
+Choose _Drag and drop designer_ and an attribute column. Use the ![](../../images/mActionSignPlus.png) icon to create a category to insert a tab or a named group. When creating a new category, KADAS will insert a new tab or named group for the category in the built-in form. The next step will be to assign the relevant fields to a selected category with the ![](../../images/mActionArrowRight.png) icon. You can create more categories and use the same fields again.
 
 Other options in the dialog are _Autogenerate_ and _Provide ui-file_.
 
@@ -376,13 +376,13 @@ Reference in Python Init Function like so: MyForms.open
 
 MyForms.py must live on PYTHONPATH, in .qgis2/python, or inside the project folder.
 
-![](../../../../images/attribute_editor_layout.png)
+![](../../images/attribute_editor_layout.png)
 
-![](../../../../images/resulting_feature_form.png)
+![](../../images/resulting_feature_form.png)
 
 ## General Menu
 
-![](../../../../images/general.png) Use this menu to make general settings for the vector layer. There are several options available:
+![](../../images/general.png) Use this menu to make general settings for the vector layer. There are several options available:
 
 Layer Info
 
@@ -397,7 +397,7 @@ Coordinate Reference System
 - _Update Extents_ information for a layer
 - View or change the projection of the specific vector layer, clicking on _Specify ..._
 
-![](../../../../images/checkbox.png) _Scale dependent visibility_
+![](../../images/checkbox.png) _Scale dependent visibility_
 
 - You can set the _Maximum (inclusive)_ and _Minimum (exclusive)_ scale. The scale can also be set by the **[Current]** buttons.
 
@@ -405,25 +405,25 @@ Feature subset
 
 - With the **[Query Builder]** button, you can create a subset of the features in the layer that will be visualized (also refer to section _vector\_query\_builder_).
 
-![](../../../../images/vector_general_menu.png)
+![](../../images/vector_general_menu.png)
 
 ## Rendering Menu
 
-KADAS supports for on-the-fly feature generalisation. This can improve rendering times when drawing many complex features at small scales. This feature can be enabled or disabled in the layer settings using the ![](../../../../images/checkbox.png) _Simplify geometry_ option. There is also a new global setting that enables generalisation by default for newly added layers (see section [_Options_](../introduction/qgis_configuration.html#gui-options)). **Note**: Feature generalisation may introduce artefacts into your rendered output in some cases. These may include slivers between polygons and inaccurate rendering when using offset-based symbol layers.
+KADAS supports for on-the-fly feature generalisation. This can improve rendering times when drawing many complex features at small scales. This feature can be enabled or disabled in the layer settings using the ![](../../images/checkbox.png) _Simplify geometry_ option. There is also a new global setting that enables generalisation by default for newly added layers (see section _Options_). **Note**: Feature generalisation may introduce artefacts into your rendered output in some cases. These may include slivers between polygons and inaccurate rendering when using offset-based symbol layers.
 
 ## Display Menu
 
-![](../../../../images/mActionMapTips.png) This menu is specifically created for Map Tips. It includes a new feature: Map Tip display text in HTML. While you can still choose a ![radiobuttonoff](../../../../images/radiobuttonoff.png) _Field_ to be displayed when hovering over a feature on the map, it is now possible to insert HTML code that creates a complex display when hovering over a feature. To activate Map Tips, select the menu option _View ‣ MapTips_. Figure Display 1 shows an example of HTML code.
+![](../../images/mActionMapTips.png) This menu is specifically created for Map Tips. It includes a new feature: Map Tip display text in HTML. While you can still choose a ![radiobuttonoff](../../images/radiobuttonoff.png) _Field_ to be displayed when hovering over a feature on the map, it is now possible to insert HTML code that creates a complex display when hovering over a feature. To activate Map Tips, select the menu option _View ‣ MapTips_. Figure Display 1 shows an example of HTML code.
 
-![](../../../../images/display_html.png)
+![](../../images/display_html.png)
 
-![](../../../../images/map_tip.png)
+![](../../images/map_tip.png)
 
 ## Actions Menu
 
-![](../../../../images/action.png) KADAS provides the ability to perform an action based on the attributes of a feature. This can be used to perform any number of actions, for example, running a program with arguments built from the attributes of a feature or passing parameters to a web reporting tool.
+![](../../images/action.png) KADAS provides the ability to perform an action based on the attributes of a feature. This can be used to perform any number of actions, for example, running a program with arguments built from the attributes of a feature or passing parameters to a web reporting tool.
 
-![](../../../../images/action_dialog.png)
+![](../../images/action_dialog.png)
 
 Actions are useful when you frequently want to run an external application or view a web page based on one or more values in your vector layer. They are divided into six types and can be used like this:
 
@@ -453,11 +453,11 @@ The second example uses the %% notation, which does not rely on a particular fie
 
 **Using Actions**
 
-Actions can be invoked from either the _Identify Results_ dialog, an _Attribute Table_ dialog or from _Run Feature Action_ (recall that these dialogs can be opened by clicking ![](../../../../images/mActionIdentify.png) _Identify Features_ or ![](../../../../images/mActionOpenTable.png) _Open Attribute Table_ or ![](../../../../images/mAction.png) _Run Feature Action_). To invoke an action, right click on the record and choose the action from the pop-up menu. Actions are listed in the popup menu by the name you assigned when defining the action. Click on the action you wish to invoke.
+Actions can be invoked from either the _Identify Results_ dialog, an _Attribute Table_ dialog or from _Run Feature Action_ (recall that these dialogs can be opened by clicking ![](../../images/mActionIdentify.png) _Identify Features_ or ![](../../images/mActionOpenTable.png) _Open Attribute Table_ or ![](../../images/mAction.png) _Run Feature Action_). To invoke an action, right click on the record and choose the action from the pop-up menu. Actions are listed in the popup menu by the name you assigned when defining the action. Click on the action you wish to invoke.
 
 If you are invoking an action that uses the `%%` notation, right-click on the field value in the _Identify Results_ dialog or the _Attribute Table_ dialog that you wish to pass to the application or script.
 
-Here is another example that pulls data out of a vector layer and inserts it into a file using bash and the `echo` command (so it will only work on or perhaps ![](../../../../images/osx.png)). The layer in question has fields for a species name `taxon_name`, latitude `lat` and longitude `long`. We would like to be able to make a spatial selection of localities and export these field values to a text file for the selected record (shown in yellow in the KADAS map area). Here is the action to achieve this:
+Here is another example that pulls data out of a vector layer and inserts it into a file using bash and the `echo` command (so it will only work on or perhaps ![](../../images/osx.png)). The layer in question has fields for a species name `taxon_name`, latitude `lat` and longitude `long`. We would like to be able to make a spatial selection of localities and export these field values to a text file for the selected record (shown in yellow in the KADAS map area). Here is the action to achieve this:
 
 ```
 bash -c "echo \"%taxon_name %lat %long\" >> /tmp/species_localities.txt"
@@ -496,7 +496,7 @@ firefox http://google.com/search?q=%NAMES
 
 We can now use the action. Close the _Layer Properties_ dialog and zoom in to an area of interest. Make sure the `lakes` layer is active and identify a lake. In the result box you'll now see that our action is visible:
 
-![](../../../../images/action_identifyaction.png)
+![](../../images/action_identifyaction.png)
 
 When we click on the action, it brings up Firefox and navigates to the URL <http://www.google.com/search?q=Tustumena>. It is also possible to add further attribute fields to the action. Therefore, you can add a `+` to the end of the action text, select another field and click on **[Insert Field]**. In this example, there is just no other field available that would make sense to search for.
 
@@ -528,7 +528,7 @@ But what about if the relative path needs to be relative to the (saved) project 
 
 ```
 command="firefox";
-imagerelpath="images/test_image.jpg";
+imagerelpath="../../images/test_image.jpg";
 projectpath=qgis.core.QgsProject.instance().fileName();
 import os.path; path=os.path.dirname(str(projectpath)) if projectpath != '' else None;
 image=os.path.join(path, imagerelpath);
@@ -552,22 +552,22 @@ qgis.utils.iface.addRasterLayer('/yourpath/[% "filename" %].tif','[% "layername"
 
 ## Joins Menu
 
-![](../../../../images/join.png) The _Joins_ menu allows you to join a loaded attribute table to a loaded vector layer. After clicking ![](../../../../images/mActionSignPlus.png), the _Add vector join_ dialog appears. As key columns, you have to define a join layer you want to connect with the target vector layer. Then, you have to specify the join field that is common to both the join layer and the target layer. Now you can also specify a subset of fields from the joined layer based on the checkbox ![](../../../../images/checkbox.png) _Choose which fields are joined_. As a result of the join, all information from the join layer and the target layer are displayed in the attribute table of the target layer as joined information. If you specified a subset of fields only these fields are displayed in the attribute table of the target layer.
+![](../../images/join.png) The _Joins_ menu allows you to join a loaded attribute table to a loaded vector layer. After clicking ![](../../images/mActionSignPlus.png), the _Add vector join_ dialog appears. As key columns, you have to define a join layer you want to connect with the target vector layer. Then, you have to specify the join field that is common to both the join layer and the target layer. Now you can also specify a subset of fields from the joined layer based on the checkbox ![](../../images/checkbox.png) _Choose which fields are joined_. As a result of the join, all information from the join layer and the target layer are displayed in the attribute table of the target layer as joined information. If you specified a subset of fields only these fields are displayed in the attribute table of the target layer.
 
 KADAS currently has support for joining non-spatial table formats supported by OGR (e.g., CSV, DBF and Excel), delimited text and the PostgreSQL provider.
 
-![](../../../../images/join_attributes.png)
+![](../../images/join_attributes.png)
 
 Additionally, the add vector join dialog allows you to:
 
-- ![](../../../../images/checkbox.png) _Cache join layer in virtual memory_
-- ![](../../../../images/checkbox.png) _Create attribute index on the join field_
-- ![](../../../../images/checkbox.png) _Choose which fields are joined_
-- Create a ![](../../../../images/checkbox.png) _Custom field name prefix_
+- ![](../../images/checkbox.png) _Cache join layer in virtual memory_
+- ![](../../images/checkbox.png) _Create attribute index on the join field_
+- ![](../../images/checkbox.png) _Choose which fields are joined_
+- Create a ![](../../images/checkbox.png) _Custom field name prefix_
 
 ## Diagrams Menu
 
-![](../../../../images/diagram.png) The _Diagrams_ menu allows you to add a graphic overlay to a vector layer.
+![](../../images/diagram.png) The _Diagrams_ menu allows you to add a graphic overlay to a vector layer.
 
 The current core implementation of diagrams provides support for pie charts, text diagrams and histograms.
 
@@ -575,33 +575,33 @@ The menu is divided into four tabs: _Appearance_, _Size_, _Postion_ and _Options
 
 In the cases of the text diagram and pie chart, text values of different data columns are displayed one below the other with a circle or a box and dividers. In the _Size_ tab, diagram size is based on a fixed size or on linear scaling according to a classification attribute. The placement of the diagrams, which is done in the _Position_ tab, interacts with the new labeling, so position conflicts between diagrams and labels are detected and solved. In addition, chart positions can be fixed manually.
 
-![](../../../../images/diagram_tab.png)
+![](../../images/diagram_tab.png)
 
-We will demonstrate an example and overlay on the Alaska boundary layer a text diagram showing temperature data from a climate vector layer. Both vector layers are part of the KADAS sample dataset (see section [_Sample Data_](../introduction/getting_started.html#label-sampledata)).
+We will demonstrate an example and overlay on the Alaska boundary layer a text diagram showing temperature data from a climate vector layer. Both vector layers are part of the KADAS sample dataset (see section _Sample Data_).
 
-1. First, click on the ![](../../../../images/mActionAddOgrLayer.png) _Load Vector_ icon, browse to the KADAS sample dataset folder, and load the two vector shape layers `alaska.shp` and `climate.shp`.
+1. First, click on the ![](../../images/mActionAddOgrLayer.png) _Load Vector_ icon, browse to the KADAS sample dataset folder, and load the two vector shape layers `alaska.shp` and `climate.shp`.
 2. Double click the `climate` layer in the map legend to open the _Layer Properties_ dialog.
-3. Click on the _Diagrams_ menu, activate ![](../../../../images/checkbox.png)_Display diagrams_, and from the _Diagram type_ ![](../../../../images/selectstring.png) combo box, select _Text diagram_.
+3. Click on the _Diagrams_ menu, activate ![](../../images/checkbox.png)_Display diagrams_, and from the _Diagram type_ ![](../../images/selectstring.png) combo box, select _Text diagram_.
 4. In the _Appearance_ tab, we choose a light blue as background color, and in the _Size_ tab, we set a fixed size to 18 mm.
 5. In the _Position_ tab, placement could be set to _Around Point_.
-6. In the diagram, we want to display the values of the three columns `T_F_JAN`, `T_F_JUL` and `T_F_MEAN`. First select `T_F_JAN` as _Attributes_ and click the ![](../../../../images/mActionSignPlus.png) button, then `T_F_JUL`, and finally `T_F_MEAN`.
+6. In the diagram, we want to display the values of the three columns `T_F_JAN`, `T_F_JUL` and `T_F_MEAN`. First select `T_F_JAN` as _Attributes_ and click the ![](../../images/mActionSignPlus.png) button, then `T_F_JUL`, and finally `T_F_MEAN`.
 7. Now click **[Apply]** to display the diagram in the KADAS main window.
-8. You can adapt the chart size in the _Size_ tab. Deactivate the ![](../../../../images/checkbox.png) _Fixed size_ and set the size of the diagrams on the basis of an attribute with the **[Find maximum value]** button and the _Size_ menu. If the diagrams appear too small on the screen, you can activate the ![](../../../../images/checkbox.png) _Increase size of small diagrams_ checkbox and define the minimum size of the diagrams.
+8. You can adapt the chart size in the _Size_ tab. Deactivate the ![](../../images/checkbox.png) _Fixed size_ and set the size of the diagrams on the basis of an attribute with the **[Find maximum value]** button and the _Size_ menu. If the diagrams appear too small on the screen, you can activate the ![](../../images/checkbox.png) _Increase size of small diagrams_ checkbox and define the minimum size of the diagrams.
 9. Change the attribute colors by double clicking on the color values in the _Assigned attributes_ field.
 10. Finally, click **[Ok]**.
 
-![](../../../../images/climate_diagram.png)
+![](../../images/climate_diagram.png)
 
-Remember that in the _Position_ tab, a ![](../../../../images/checkbox.png) _Data defined position_ of the diagrams is possible. Here, you can use attributes to define the position of the diagram. You can also set a scale-dependent visibility in the _Appearance_ tab.
+Remember that in the _Position_ tab, a ![](../../images/checkbox.png) _Data defined position_ of the diagrams is possible. Here, you can use attributes to define the position of the diagram. You can also set a scale-dependent visibility in the _Appearance_ tab.
 
-The size and the attributes can also be an expression. Use the ![](../../../../images/mIconExpressionEditorOpen.png) button to add an expression. See [_Expressions_](expression.html#vector-expressions) chapter for more information and example.
+The size and the attributes can also be an expression. Use the ![](../../images/mIconExpressionEditorOpen.png) button to add an expression. See [_Expressions_](expression.md#vector-expressions) chapter for more information and example.
 
 ## Metadata Menu
 
-![](../../../../images/metadata.png) The _Metadata_ menu consists of _Description_, _Attribution_, _MetadataURL_ and _Properties_ sections.
+![](../../images/metadata.png) The _Metadata_ menu consists of _Description_, _Attribution_, _MetadataURL_ and _Properties_ sections.
 
 In the _Properties_ section, you get general information about the layer, including specifics about the type and location, number of features, feature type, and editing capabilities. The _Extents_ table provides you with layer extent information and the _Layer Spatial Reference System_, which is information about the CRS of the layer. This is a quick way to get information about the layer.
 
 Additionally, you can add or edit a title and abstract for the layer in the _Description_ section. It's also possible to define a _Keyword list_ here. These keyword lists can be used in a metadata catalogue. If you want to use a title from an XML metadata file, you have to fill in a link in the _DataUrl_ field. Use _Attribution_ to get attribute data from an XML metadata catalogue. In _MetadataUrl_, you can define the general path to the XML metadata catalogue. This information will be saved in the KADAS project file for subsequent sessions and will be used for KADAS server.
 
-![](../../../../images/vector_metadata_tab.png)
+![](../../images/vector_metadata_tab.png)

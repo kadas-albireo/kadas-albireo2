@@ -3,7 +3,7 @@
 
 # Expressions
 
-Les **Expressions** sont disponibles dans la Calculatrice de champ ou via le bouton Ajout d'une nouvelle colonne dans la table attributaire ou via l'onglet Champ dans les Propriétés de la couche; via les rendus Gradué, Catégorisé et Basé sur un ensemble de règles dans l'onglet Style des Propriétés de la couche; via le bouton ![](../../../../images/browsebutton.png) d'étiquetage basé sur une formule dans l’_Étiquetage_ ![](../../../../images/mActionLabeling.png); via la sélection d'entité et via l'onglet diagramme des Propriétés de la couche ainsi que dans le Composeur d'impression pour les _Propriétés principales_ d'un objet étiquette et dans l'onglet _Génération d'Atlas_ .
+Les **Expressions** sont disponibles dans la Calculatrice de champ ou via le bouton Ajout d'une nouvelle colonne dans la table attributaire ou via l'onglet Champ dans les Propriétés de la couche; via les rendus Gradué, Catégorisé et Basé sur un ensemble de règles dans l'onglet Style des Propriétés de la couche; via le bouton ![](../../images/browsebutton.png) d'étiquetage basé sur une formule dans l’_Étiquetage_ ![](../../images/mActionLabeling.png); via la sélection d'entité et via l'onglet diagramme des Propriétés de la couche ainsi que dans le Composeur d'impression pour les _Propriétés principales_ d'un objet étiquette et dans l'onglet _Génération d'Atlas_ .
 
 Ils constituent un moyen efficace de manipuler la valeur d'attribut pour changer dynamiquement la valeur finale afin de changer le style de géométrie, le contenu d'une étiquette, la valeur d'un diagramme, sélectionner des entités ou créer une colonne virtuelle.
 
