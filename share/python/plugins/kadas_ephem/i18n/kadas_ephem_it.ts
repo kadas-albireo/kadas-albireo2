@@ -2,7 +2,7 @@
 <context>
     <name>EphemPlugin</name>
     <message>
-        <location filename="../ephem_plugin.py" line="45"/>
+        <location filename="../ephem_plugin.py" line="44"/>
         <source>Ephemeris</source>
         <translation>Effemeridi</translation>
     </message>
@@ -65,22 +65,22 @@
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Nota: nelle località con rilievi ripidi e/o grandi differenze di altezza su una breve distanza, sono possibili più albe e più tramonti, ma verrà visualizzato un solo risultato.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../EphemToolWidget.ui" line="354"/>
+        <location filename="../EphemToolWidget.ui" line="353"/>
         <source>Position:</source>
         <translation>Posizione:</translation>
     </message>
     <message>
-        <location filename="../EphemToolWidget.ui" line="372"/>
+        <location filename="../EphemToolWidget.ui" line="371"/>
         <source>Click on the map to select a position</source>
         <translation>Seleziona una posizione sulla mappa</translation>
     </message>
     <message>
-        <location filename="../EphemToolWidget.ui" line="379"/>
+        <location filename="../EphemToolWidget.ui" line="378"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Timezone:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Fuso orario:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../EphemToolWidget.ui" line="392"/>
+        <location filename="../EphemToolWidget.ui" line="391"/>
         <source>-</source>
         <translation>-</translation>
     </message>

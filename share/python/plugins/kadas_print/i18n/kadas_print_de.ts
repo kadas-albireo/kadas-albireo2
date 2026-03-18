@@ -1,81 +1,73 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="de">
+<?xml version="1.0" ?><!DOCTYPE TS><TS version="2.1" language="de">
 <context>
     <name>CartoucheDialog</name>
     <message>
-        <location filename="../CartoucheDialog.py" line="30"/>
-        <location filename="../CartoucheDialog.py" line="35"/>
+        <location filename="../CartoucheDialog.py" line="33"/>
         <source>RESTRICTED</source>
         <translation>INTERN</translation>
     </message>
     <message>
-        <location filename="../CartoucheDialog.py" line="31"/>
-        <location filename="../CartoucheDialog.py" line="36"/>
+        <location filename="../CartoucheDialog.py" line="34"/>
         <source>CONFIDENTIAL</source>
         <translation>VERTRAULICH</translation>
     </message>
     <message>
-        <location filename="../CartoucheDialog.py" line="32"/>
-        <location filename="../CartoucheDialog.py" line="37"/>
+        <location filename="../CartoucheDialog.py" line="35"/>
         <source>SECRET</source>
         <translation>GEHEIM</translation>
     </message>
     <message>
         <location filename="../CartoucheDialog.py" line="42"/>
-        <location filename="../CartoucheDialog.py" line="44"/>
         <source>CLASSIFICATION</source>
         <translation>KLASSIFIZIERUNG</translation>
     </message>
     <message>
-        <location filename="../CartoucheDialog.py" line="62"/>
+        <location filename="../CartoucheDialog.py" line="60"/>
         <source>Export</source>
         <translation>Exportieren</translation>
     </message>
     <message>
-        <location filename="../CartoucheDialog.py" line="63"/>
+        <location filename="../CartoucheDialog.py" line="61"/>
         <source>Import</source>
         <translation>Importieren</translation>
     </message>
     <message>
-        <location filename="../CartoucheDialog.py" line="215"/>
+        <location filename="../CartoucheDialog.py" line="213"/>
         <source>Export cartouche</source>
         <translation>Kartousche exportieren</translation>
     </message>
     <message>
-        <location filename="../CartoucheDialog.py" line="215"/>
-        <location filename="../CartoucheDialog.py" line="230"/>
+        <location filename="../CartoucheDialog.py" line="228"/>
         <source>XML Files (*.xml);;</source>
         <translation>XML Dateien (*.xml);;</translation>
     </message>
     <message>
-        <location filename="../CartoucheDialog.py" line="224"/>
+        <location filename="../CartoucheDialog.py" line="222"/>
         <source>Export failed</source>
         <translation>Export gescheitert</translation>
     </message>
     <message>
-        <location filename="../CartoucheDialog.py" line="224"/>
+        <location filename="../CartoucheDialog.py" line="222"/>
         <source>Unable to write to file.</source>
         <translation>Die Datei konnte nicht geschrieben werden.</translation>
     </message>
     <message>
-        <location filename="../CartoucheDialog.py" line="230"/>
+        <location filename="../CartoucheDialog.py" line="228"/>
         <source>Import cartouche</source>
         <translation>Kartousche importieren</translation>
     </message>
     <message>
-        <location filename="../CartoucheDialog.py" line="240"/>
-        <location filename="../CartoucheDialog.py" line="244"/>
+        <location filename="../CartoucheDialog.py" line="242"/>
         <source>Import failed</source>
         <translation>Import gescheitert</translation>
     </message>
     <message>
-        <location filename="../CartoucheDialog.py" line="240"/>
+        <location filename="../CartoucheDialog.py" line="238"/>
         <source>Unable to read file.</source>
         <translation>Die Datei konnte nicht gelesen werden.</translation>
     </message>
     <message>
-        <location filename="../CartoucheDialog.py" line="244"/>
+        <location filename="../CartoucheDialog.py" line="242"/>
         <source>The file does not appear to contain valid cartouche data.</source>
         <translation>Die Datei scheint keine gültige Kartousche zu enthalten.</translation>
     </message>
@@ -334,17 +326,17 @@
         <translation>Unsichtbar</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="380"/>
+        <location filename="../PrintTool.py" line="379"/>
         <source>Visible without layer legend</source>
         <translation>Sichtbar, ohne Ebenenlegende</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="381"/>
+        <location filename="../PrintTool.py" line="379"/>
         <source>Visible with layer legend</source>
         <translation>Sichtbar, mit Ebenenlegende</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="393"/>
+        <location filename="../PrintTool.py" line="394"/>
         <source>Configure legend</source>
         <translation>Legende anpassen</translation>
     </message>
@@ -354,12 +346,12 @@
         <translation>Ebenen auswählen, die in der Legende erscheinen sollen:</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="548"/>
+        <location filename="../PrintTool.py" line="547"/>
         <source>Invalid layout</source>
         <translation>Ungültige Druckzusammenstellung</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="549"/>
+        <location filename="../PrintTool.py" line="547"/>
         <source>The layout must have exactly one map item.</source>
         <translation>Die Zusammenstellung muss genau ein Kartenelement haben.</translation>
     </message>
@@ -369,29 +361,27 @@
         <translation>Papierformat: %.2f cm x %.2f cm</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="636"/>
+        <location filename="../PrintTool.py" line="635"/>
         <source>Print Layout</source>
         <translation>Vorlage</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="674"/>
-        <location filename="../PrintTool.py" line="715"/>
+        <location filename="../PrintTool.py" line="714"/>
         <source>Print Failed</source>
         <translation>Druck gescheitert</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="675"/>
-        <location filename="../PrintTool.py" line="716"/>
+        <location filename="../PrintTool.py" line="714"/>
         <source>Failed to print the layout.</source>
         <translation>Die Zusammenstellung konnte nicht gedruckt werden.</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="686"/>
+        <location filename="../PrintTool.py" line="685"/>
         <source>No Printers</source>
         <translation>Keine Drucker</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="687"/>
+        <location filename="../PrintTool.py" line="685"/>
         <source>No printers were found.</source>
         <translation>Keine Drucker wurden gefunden.</translation>
     </message>
