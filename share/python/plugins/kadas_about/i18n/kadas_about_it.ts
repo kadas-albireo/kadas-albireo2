@@ -2,47 +2,47 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../about_dialog.py" line="26"/>
+        <location filename="../about_dialog.py" line="27"/>
         <source>About %s</source>
         <translation>Info su %s</translation>
     </message>
     <message>
-        <location filename="../about_dialog.py" line="35"/>
+        <location filename="../about_dialog.py" line="36"/>
         <source>&lt;b&gt;Version&lt;/b&gt;: %s (%s) - Based on QGIS %s</source>
         <translation>&lt;b&gt;Versione&lt;/b&gt;: %s (%s) - Basato su QGIS %s</translation>
     </message>
     <message>
-        <location filename="../about_dialog.py" line="39"/>
+        <location filename="../about_dialog.py" line="47"/>
         <source>This software is released under the &lt;a href=&quot;http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html&quot;&gt;GNU Public License (GPL) Version 2&lt;/a&gt;</source>
         <translation>Questo software è rilasciato sotto &lt;a href=&quot;http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html&quot;&gt;GNU Public License (GPL) Version 2&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../about_dialog.py" line="92"/>
+        <location filename="../about_dialog.py" line="116"/>
         <source>swissALTIRegio usage disclaimer</source>
         <translation>Condizioni d&apos;utilizzo per swissALTIRegio</translation>
     </message>
     <message>
-        <location filename="../about_dialog.py" line="44"/>
+        <location filename="../about_dialog.py" line="56"/>
         <source>The MSS/MilX components are property of gs-soft AG</source>
         <translation>Le componenti MSS/MilX sono proprietà della gs-soft SA</translation>
     </message>
     <message>
-        <location filename="../about_dialog.py" line="72"/>
+        <location filename="../about_dialog.py" line="86"/>
         <source>Terms of use for swisstopo geodata</source>
         <translation>Condizioni d&apos;utilizzo per geodati swisstopo</translation>
     </message>
     <message>
-        <location filename="../about_dialog.py" line="83"/>
+        <location filename="../about_dialog.py" line="102"/>
         <source>Terms of use for Swiss GDI geodata</source>
         <translation>Condizioni d&apos;utilizzo per swiss GDI</translation>
     </message>
     <message>
-        <location filename="../about_dialog.py" line="97"/>
+        <location filename="../about_dialog.py" line="123"/>
         <source>Data management and controller contact</source>
         <translation>Contatto responsabile dati</translation>
     </message>
     <message>
-        <location filename="../about_dialog.py" line="106"/>
+        <location filename="../about_dialog.py" line="137"/>
         <source>Data usage liability disclaimer</source>
         <translation>Esonero di responsabilità per l&apos;uso di dati</translation>
     </message>

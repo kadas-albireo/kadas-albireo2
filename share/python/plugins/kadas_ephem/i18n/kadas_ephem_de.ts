@@ -2,7 +2,7 @@
 <context>
     <name>EphemPlugin</name>
     <message>
-        <location filename="../ephem_plugin.py" line="44"/>
+        <location filename="../ephem_plugin.py" line="46"/>
         <source>Ephemeris</source>
         <translation>Ephemeriden</translation>
     </message>

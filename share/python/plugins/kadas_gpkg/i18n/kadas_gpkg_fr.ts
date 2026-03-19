@@ -2,17 +2,17 @@
 <context>
     <name>KadasGpkg</name>
     <message>
-        <location filename="../kadas_gpkg.py" line="64"/>
+        <location filename="../kadas_gpkg.py" line="66"/>
         <source>GPKG Export</source>
         <translation>Exportation GPKG</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg.py" line="70"/>
+        <location filename="../kadas_gpkg.py" line="75"/>
         <source>GPKG Import</source>
         <translation>Importation GPKG</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg.py" line="74"/>
+        <location filename="../kadas_gpkg.py" line="79"/>
         <source>GPKG</source>
         <translation>GPKG</translation>
     </message>
@@ -20,77 +20,77 @@
 <context>
     <name>KadasGpkgExport</name>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="165"/>
+        <location filename="../kadas_gpkg_export.py" line="194"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="63"/>
+        <location filename="../kadas_gpkg_export.py" line="61"/>
         <source>Unable to create or open output file</source>
         <translation>Impossible de créer ou d&apos;ouvrir le fichier de sortie</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="66"/>
+        <location filename="../kadas_gpkg_export.py" line="68"/>
         <source>Writing %s...</source>
         <translation>%s en cours d&apos;écriture...</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="66"/>
+        <location filename="../kadas_gpkg_export.py" line="68"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="173"/>
+        <location filename="../kadas_gpkg_export.py" line="205"/>
         <source>GPKG Export</source>
         <translation>Exportation GPKG</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="95"/>
+        <location filename="../kadas_gpkg_export.py" line="112"/>
         <source>The operation was canceled.</source>
         <translation>L&apos;opération a été annulée.</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="126"/>
+        <location filename="../kadas_gpkg_export.py" line="154"/>
         <source>Invalid project</source>
         <translation>Projet invalide</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="165"/>
-        <source>Unable to create output file</source>
-        <translation>Impossible de créer le fichier de sortie</translation>
-    </message>
-    <message>
-        <location filename="../kadas_gpkg_export.py" line="169"/>
+        <location filename="../kadas_gpkg_export.py" line="202"/>
         <source>GPKG export completed</source>
         <translation>Exportation GPKG complétée</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="173"/>
+        <location filename="../kadas_gpkg_export.py" line="205"/>
         <source>The following layers were not exported to the GeoPackage:
 - %s</source>
         <translation>Les couches suivantes n&apos;ont pas été écrites dans le GeoPackage:
 - %s</translation>
     </message>
+    <message>
+        <location filename="../kadas_gpkg_export.py" line="194"/>
+        <source>Unable to create output file: {exception}</source>
+        <translation type="unfinished"/>
+    </message>
 </context>
 <context>
     <name>KadasGpkgExportBase</name>
     <message>
-        <location filename="../kadas_gpkg_export_base.py" line="105"/>
+        <location filename="../kadas_gpkg_export_base.py" line="125"/>
         <source>Writing %s</source>
         <translation>%s en cours d&apos;écriture...</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_base.py" line="100"/>
+        <location filename="../kadas_gpkg_export_base.py" line="118"/>
         <source>Write failed: error %d (%s)</source>
         <translation>Échec d&apos;écriture %d (%s)</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_base.py" line="144"/>
+        <location filename="../kadas_gpkg_export_base.py" line="170"/>
         <source>Write failed: error %d</source>
         <translation>Échec d&apos;écriture %d</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_base.py" line="155"/>
+        <location filename="../kadas_gpkg_export_base.py" line="182"/>
         <source>Computing pyramids, please wait...</source>
         <translation>Les pyramides sont en cours de calcul, veuillez patienter...</translation>
     </message>
@@ -176,27 +176,27 @@
 <context>
     <name>KadasGpkgImport</name>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="206"/>
+        <location filename="../kadas_gpkg_import.py" line="234"/>
         <source>Import Errors</source>
         <translation>Erreurs d&apos;importation</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="206"/>
+        <location filename="../kadas_gpkg_import.py" line="234"/>
         <source>The following layers could not be imported:%s</source>
         <translation>Les couches suivantes n&apos;ont pas pu être importées:%s</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="210"/>
+        <location filename="../kadas_gpkg_import.py" line="243"/>
         <source>Save project?</source>
         <translation>Enregistrer le projet?</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="210"/>
+        <location filename="../kadas_gpkg_import.py" line="243"/>
         <source>The project has unsaved changes. Do you want to save them before proceeding?</source>
         <translation>Le projet a des modifications non enregistrées. Enregistrer-les avant de continuer?</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="247"/>
+        <location filename="../kadas_gpkg_import.py" line="294"/>
         <source>GPKG import completed</source>
         <translation>Importation GPKG complétée</translation>
     </message>
@@ -204,12 +204,12 @@
 <context>
     <name>KadasGpkgImportDialog</name>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="48"/>
+        <location filename="../kadas_gpkg_import.py" line="61"/>
         <source>Select GPKG File...</source>
         <translation>Choisir le fichier GPKG ...</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="48"/>
+        <location filename="../kadas_gpkg_import.py" line="61"/>
         <source>GPKG Database (*.gpkg)</source>
         <translation>Base des données GPKG (*.gpkg)</translation>
     </message>
