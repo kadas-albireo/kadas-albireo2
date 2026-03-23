@@ -6,6 +6,9 @@ theme:
   name: readthedocs
 extra_css:
   - assets/extra.css
+plugins:
+  - search
+  - open-in-new-tab
 
 nav:
   - EN:
