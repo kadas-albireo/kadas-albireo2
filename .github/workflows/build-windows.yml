@@ -167,7 +167,7 @@ jobs:
         run: |
           set -e
           $(./build/vcpkg_installed/x64-windows/tools/python3/python.exe <<EOF
-          import os   
+          import os
           os.add_dll_directory(os.getcwd() + '/build/output/bin')
           from kadas.kadasgui import *
           from kadas.kadascore import *
@@ -182,9 +182,11 @@ jobs:
 
       - name: 🧪 Run plugin tests
         shell: bash
+        timeout-minutes: 10
         env:
           PYTHONPATH: "${{ github.workspace }}/build/output/python;${{ github.workspace }}/share/python/plugins"
           KADAS_BIN_DIR: "${{ github.workspace }}/build/output/bin"
+          QT_QPA_PLATFORM: "offscreen"
         run: |
           ./build/vcpkg_installed/x64-windows/tools/python3/python.exe \
             -m pytest share/python/plugins/kadas_gpkg/tests/ -v
