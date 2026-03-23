@@ -4,8 +4,7 @@ docs_dir: docs
 site_dir: share/docs/html
 theme:
   name: readthedocs
-extra_css:
-  - assets/extra.css
+
 extra_javascript:
   - assets/extra.js
 plugins:

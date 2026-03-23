@@ -2,8 +2,8 @@
  *
  * The readthedocs theme renders home links with relative hrefs (e.g. "../..")
  * rather than absolute "/", so we can't select them by href value.
- * Instead we select by the classes the theme always puts on home anchors:
- *   - .icon.icon-home  (sidebar logo and breadcrumb home icon)
+ * Instead we select by the class the theme always puts on home anchors:
+ *   - .icon-home  (sidebar logo and breadcrumb home icon)
  *
  * Supported languages: en, de, fr, it
  */
@@ -23,9 +23,8 @@
     if (!lang) {
       return;
     }
-    var homeUrl = "/" + lang + "/";
     document.querySelectorAll("a.icon-home").forEach(function (a) {
-      a.href = homeUrl;
+      a.href = "/" + lang + "/";
     });
   });
 })();
