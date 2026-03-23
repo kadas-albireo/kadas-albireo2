@@ -122,7 +122,7 @@ class KadasGpkgLayersList(QListWidget):
 
     def __get_layer_size(self, layer):
 
-        # Size 0 for redlining layers
+        # Treat project/plugin layers (providers in PROJECT_LAYER_PROVIDERS, e.g. redlining/guide grid/bullseye/annotation) as size 0
         if layer.dataProvider().name() in self.PROJECT_LAYER_PROVIDERS:
             return 0
 
