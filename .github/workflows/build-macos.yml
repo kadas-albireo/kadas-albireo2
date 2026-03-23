@@ -9,13 +9,13 @@ on:
     types: ['published']
   workflow_dispatch:
 
-jobs:
-  build-docs:
-    uses: ./.github/workflows/build-docs.yml
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+
+jobs:
+  build-docs:
+    uses: ./.github/workflows/build-docs.yml
 
   build:
     strategy:
