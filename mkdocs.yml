@@ -6,11 +6,14 @@ theme:
   name: readthedocs
 extra_css:
   - assets/extra.css
+extra_javascript:
+  - assets/extra.js
 plugins:
   - search
   - open-in-new-tab
 
 nav:
+  - Home: index.md
   - EN:
     - General: en/index.md
     - The Interface: en/kadas_gui.md
