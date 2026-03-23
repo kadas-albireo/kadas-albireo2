@@ -3,11 +3,11 @@
 
 # Formats de données gérés
 
-KADAS utilise la bibliothèque OGR pour lire et écrire des données vectorielles incluant les formats ESRI shapefiles, MapInfo et MicroStation; les bases de données AutoCAD DXF, PostGIS, SpatiaLite, Oracle Spatial et MS SQL Spatial et de nombreux autres formats. Les données vectorielles GRASS et PostgreSQL sont gérées par des extensions natives de KADAS. Les données vectorielles peuvent également être lues depuis des archives zip ou gzip. A ce jour, 69 formats de données vectorielles sont gérés par la bibliothèque OGR. La liste complète est disponible sur <http://www.gdal.org/ogr/ogr_formats.html>.
+KADAS utilise la bibliothèque OGR pour lire et écrire des données vectorielles incluant les formats ESRI shapefiles, MapInfo et MicroStation; les bases de données AutoCAD DXF, PostGIS, SpatiaLite, Oracle Spatial et MS SQL Spatial et de nombreux autres formats. Les données vectorielles GRASS et PostgreSQL sont gérées par des extensions natives de KADAS. Les données vectorielles peuvent également être lues depuis des archives zip ou gzip. A ce jour, 69 formats de données vectorielles sont gérés par la bibliothèque OGR. La liste complète est disponible sur [http://www.gdal.org/ogr/ogr_formats.html](https://gdal.org/en/stable/drivers/vector/index.html).
 
 ## Shapefiles ESRI
 
-Le format de fichier vecteur standard utilisé par QGIS est le shapefile ESRI. Il est géré à travers la bibliothèque OGR Simple Feature Library (<http://www.gdal.org/ogr/>).
+Le format de fichier vecteur standard utilisé par QGIS est le shapefile ESRI. Il est géré à travers la bibliothèque OGR Simple Feature Library (<http://www.gdal.org/>).
 
 Un shapefile est en réalité composé de plusieurs fichiers. Les trois suivants sont requis:
 
