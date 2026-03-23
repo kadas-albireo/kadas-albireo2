@@ -1,11 +1,6 @@
 ---
 name: 📚 Build - Docs
 on:
-  push:
-    branches:
-      - main
-      - release-*
-  pull_request:
   workflow_dispatch:
   workflow_call:
 
