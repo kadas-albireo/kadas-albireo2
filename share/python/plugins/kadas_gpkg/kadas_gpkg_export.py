@@ -18,7 +18,6 @@ from .kadas_gpkg_export_dialog import KadasGpkgExportDialog
 
 
 class KadasGpkgExport(KadasGpkgExportBase):
-
     PROPERTY_ITEM_TO_BE_REMOVED = "flagToBeRemoved"
 
     def __init__(self, iface):
@@ -165,6 +164,9 @@ class KadasGpkgExport(KadasGpkgExportBase):
                     projectlayerEl.find("provider").text = "ogr"
                 elif layer.type() == QgsMapLayer.RasterLayer:
                     projectlayerEl.find("provider").text = "gdal"
+
+        # Remove redlining layers not selected for export
+        self.__removeUnselectedProjectLayers(doc)
 
         # Remove redlining items outside export extent from project file
         if self.kadasGpkgExportDialog.filterExtent() is not None:
@@ -343,3 +345,35 @@ class KadasGpkgExport(KadasGpkgExportBase):
                 # Remove redlining item
                 mapItemEl.getparent().remove(mapItemEl)
                 continue
+
+    def __removeUnselectedProjectLayers(self, doc):
+        """Remove redlining/annotation layers not selected for export"""
+        unselected_layer_ids = self.kadasGpkgExportDialog.unselectedProjectLayers().keys()
+
+        for mapLayerIdEl in doc.iterfind("projectlayers/maplayer/id"):
+            layer_id = mapLayerIdEl.text
+
+            if layer_id in unselected_layer_ids:
+                mapLayerEl = mapLayerIdEl.getparent()
+                mapLayerEl.getparent().remove(mapLayerEl)
+                continue
+
+        for legendGroupEl in doc.iterfind("layer-tree-group"):
+            self.__removeUnselectedProjectLayersGroups(legendGroupEl, unselected_layer_ids)
+
+    def __removeUnselectedProjectLayersGroups(self, legendGroupEl, unselected_layer_ids):
+        for legendLayerEl in legendGroupEl.iterfind("layer-tree-layer"):
+            layer_id = legendLayerEl.attrib.get("id")
+
+            if layer_id in unselected_layer_ids:
+                legendGroupEl.remove(legendLayerEl)
+                continue
+
+        for nestedLegendGroupEl in legendGroupEl.iterfind("layer-tree-group"):
+            self.__removeUnselectedProjectLayersGroups(nestedLegendGroupEl, unselected_layer_ids)
+
+            # Remove group if empty
+            if not nestedLegendGroupEl.findall(
+                "layer-tree-group"
+            ) and not nestedLegendGroupEl.findall("layer-tree-layer"):
+                legendGroupEl.remove(nestedLegendGroupEl)

@@ -45,6 +45,9 @@ class KadasGpkgExportDialog(QDialog, WidgetUi):
     def selectedLayers(self):
         return self.listWidgetLayers.getSelectedLayers()
 
+    def unselectedProjectLayers(self):
+        return self.listWidgetLayers.getUnselectedProjectLayers()
+
     def buildPyramids(self):
         return self.checkBoxPyramids.isChecked()
 
