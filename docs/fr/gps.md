@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/fr/fr/gps/index.html -->
+<!-- Recovered from: docs_old/html/fr/fr/gps/index.html -->
 <!-- Language: fr | Section: gps -->
 
 # Navigation

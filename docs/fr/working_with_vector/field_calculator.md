@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/fr/fr/working_with_vector/field_calculator/index.html -->
+<!-- Recovered from: docs_old/html/fr/fr/working_with_vector/field_calculator/index.html -->
 <!-- Language: fr | Section: working_with_vector/field_calculator -->
 
 # Calculatrice de champ

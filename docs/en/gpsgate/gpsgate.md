@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/en/en/gpsgate/gpsgate/index.html -->
+<!-- Recovered from: docs_old/html/en/en/gpsgate/gpsgate/index.html -->
 <!-- Language: en | Section: gpsgate/gpsgate -->
 
 # GpsGate

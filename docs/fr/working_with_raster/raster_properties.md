@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/fr/fr/working_with_raster/raster_properties/index.html -->
+<!-- Recovered from: docs_old/html/fr/fr/working_with_raster/raster_properties/index.html -->
 <!-- Language: fr | Section: working_with_raster/raster_properties -->
 
 # Fenêtre Propriétés de la couche raster

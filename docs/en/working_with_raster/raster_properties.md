@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/en/en/working_with_raster/raster_properties/index.html -->
+<!-- Recovered from: docs_old/html/en/en/working_with_raster/raster_properties/index.html -->
 <!-- Language: en | Section: working_with_raster/raster_properties -->
 
 # Raster Properties Dialog

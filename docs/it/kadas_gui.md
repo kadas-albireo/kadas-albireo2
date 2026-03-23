@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/it/it/kadas_gui/index.html -->
+<!-- Recovered from: docs_old/html/it/it/kadas_gui/index.html -->
 <!-- Language: it | Section: kadas_gui -->
 
 # Interfaccia KADAS
@@ -17,13 +17,13 @@ L’interfaccia grafica KADAS è divisa in cinque aree:
 
 Le funzionalità sono raggruppate in schede, le quali possono essere attivate dalla barra del menu. Le schede contengono pulsanti per le varie funzionalità. Queste sono documentate nei rispettivi capitoli:
 
-- [Mappa](/map)
-- [Vista](/view)
-- [Analisi](/analysis)
-- [Disegnare](/draw)
-- [Navigazione](/gps)
-- [MSS](/mss)
-- [Impostazioni](/settings)
+- [Mappa](../map/)
+- [Vista](../view/)
+- [Analisi](../analysis/)
+- [Disegnare](../draw/)
+- [Navigazione](../gps/)
+- [MSS](../mss/)
+- [Impostazioni](../settings/)
 
 ## Preferiti e ricerca
 
@@ -104,7 +104,7 @@ Le seguenti funzioni sono disponibili sopra l'elenco del catalogo:
 
 Nella barra di stato sono disposti i seguenti indicatori e le seguenti funzioni:
 
-- **GPS**: L'uso del pulsante GPS è descritto nel [capitolo _Navigazione_](/gps).
+- **GPS**: L'uso del pulsante GPS è descritto nel [capitolo _Navigazione_](../gps/).
 - \_**Posizione del mouse\_**: La posizione corrente del mouse sulla mappa può essere visualizzata rispetto a molteplici sistemi di riferimento . Il sistema desiderato può essere selezionato dal menu a sinistra campo di visualizzazione. L'unità di misura dell'altezza può essere modificata nella scheda Impostazioni.
 - **Scala**: La scala corrente della visualizzazione della mappa è mostrata accanto al campo delle coordinate. Il selettore di scala consente di scegliere tra scale predefinite tra 1:500 e 1:100000000. L'icona del lucchetto consente di bloccare la scala corrente della mappa; lo zoom influirà quindi solo sul fattore di ingrandimento.
 - **Sistema di coordinate**: Il pulsante di selezione del sistema di coordinate permette di scegliere quale proiezione utilizzare per la mappa. Se la proiezione selezionata differisce dalla proiezione nativa di un dataset, quest'ultimo viene riproiettato, il che può comportare una riduzione delle prestazioni a seconda della quantità di dati.

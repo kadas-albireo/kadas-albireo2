@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/it/it/working_with_vector/vector_properties/index.html -->
+<!-- Recovered from: docs_old/html/it/it/working_with_vector/vector_properties/index.html -->
 <!-- Language: it | Section: working_with_vector/vector_properties -->
 
 # Proprietà dei vettori
@@ -525,7 +525,7 @@ E se il percorso relativo deve essere relativo al file di progetto (salvato)? Il
 
 ```
 command="firefox";
-imagerelpath="../../images/test_image.jpg";
+imagerelpath="images/test_image.jpg";
 projectpath=qgis.core.QgsProject.instance().fileName();
 import os.path; path=os.path.dirname(str(projectpath)) if projectpath != '' else None;
 image=os.path.join(path, imagerelpath);

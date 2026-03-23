@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/it/it/view/index.html -->
+<!-- Recovered from: docs_old/html/it/it/view/index.html -->
 <!-- Language: it | Section: view -->
 
 # Vista

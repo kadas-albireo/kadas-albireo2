@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/fr/fr/working_with_projections/working_with_projections/index.html -->
+<!-- Recovered from: docs_old/html/fr/fr/working_with_projections/working_with_projections/index.html -->
 <!-- Language: fr | Section: working_with_projections/working_with_projections -->
 
 # Utiliser les projections

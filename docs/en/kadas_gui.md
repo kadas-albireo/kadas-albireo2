@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/en/en/kadas_gui/index.html -->
+<!-- Recovered from: docs_old/html/en/en/kadas_gui/index.html -->
 <!-- Language: en | Section: kadas_gui -->
 
 # KADAS Interface
@@ -17,13 +17,13 @@ The KADAS GUI is divided into five areas:
 
 Functionalities are grouped by topic in tabs, which can be activated from the menu bar. The tabs contain buttons for the various functionalities. The functionalities of each tab are documented in the respective chapters:
 
-- [Map](/map)
-- [View](/view)
-- [Analysis](/analysis)
-- [Draw](/draw)
-- [Navigation](/gps)
-- [MSS](/mss)
-- [Settings](/settings)
+- [Map](../map/)
+- [View](../view/)
+- [Analysis](../analysis/)
+- [Draw](../draw/)
+- [Navigation](../gps/)
+- [MSS](../mss/)
+- [Settings](../settings/)
 
 ## Favorites and search
 
@@ -104,7 +104,7 @@ The toolbar above the catalog contains the following functionalities:
 
 The status bar contains following labels and control widgets:
 
-- **GPS**: Usage of the GPS button is described in the [_Navigation_ chapter](/gps).
+- **GPS**: Usage of the GPS button is described in the [_Navigation_ chapter](../gps/).
 - **Mouse position**: The current mouse position on the map can be displayed with respect to multiple reference systems. The desired format can be selected from the menu left of the display label. The unit for the height can be changed in the Settings tab.
 - **Scale**: The current scale of the map view is displayed next to the coordinate field. The scale selector allows to choose between predefined scales ranging from 1:500 to 1:1000000. The lock icon allows locking the current map scale, zooming will then only affect the magnification factor.
 - **Coordinate reference system**: The coordinate reference system selection button allows to choose which projection to use for the map. If the selected projection differs from the native projection of a dataset, the latter will be reprojected, which may result in reduced performance depending on the amount of data.

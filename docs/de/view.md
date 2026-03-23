@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/de/de/view/index.html -->
+<!-- Recovered from: docs_old/html/de/de/view/index.html -->
 <!-- Language: de | Section: view -->
 
 # Ansicht

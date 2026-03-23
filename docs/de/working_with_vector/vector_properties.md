@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/de/de/working_with_vector/vector_properties/index.html -->
+<!-- Recovered from: docs_old/html/de/de/working_with_vector/vector_properties/index.html -->
 <!-- Language: de | Section: working_with_vector/vector_properties -->
 
 # Vektorlayereigenschaften
@@ -529,7 +529,7 @@ Was aber wenn der relative Pfad relativ zur (gespeicherten) Projektdatei sein mu
 
 ```
 command="firefox";
-imagerelpath="../../images/test_image.jpg";
+imagerelpath="images/test_image.jpg";
 projectpath=qgis.core.QgsProject.instance().fileName();
 import os.path; path=os.path.dirname(str(projectpath)) if projectpath != '' else None;
 image=os.path.join(path, imagerelpath);

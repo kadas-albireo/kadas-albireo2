@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/en/en/settings/index.html -->
+<!-- Recovered from: docs_old/html/en/en/settings/index.html -->
 <!-- Language: en | Section: settings -->
 
 # Settings

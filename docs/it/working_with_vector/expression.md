@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/it/it/working_with_vector/expression/index.html -->
+<!-- Recovered from: docs_old/html/it/it/working_with_vector/expression/index.html -->
 <!-- Language: it | Section: working_with_vector/expression -->
 
 # Espressioni

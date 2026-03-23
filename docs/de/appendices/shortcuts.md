@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/de/de/appendices/shortcuts/index.html -->
+<!-- Recovered from: docs_old/html/de/de/appendices/shortcuts/index.html -->
 <!-- Language: de | Section: appendices/shortcuts -->
 
 # Tastaturkürzel

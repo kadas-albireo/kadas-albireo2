@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/fr/fr/print_composer/print_composer/index.html -->
+<!-- Recovered from: docs_old/html/fr/fr/print_composer/print_composer/index.html -->
 <!-- Language: fr | Section: print_composer/print_composer -->
 
 # Composeur d'Impression

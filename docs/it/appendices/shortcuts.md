@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/it/it/appendices/shortcuts/index.html -->
+<!-- Recovered from: docs_old/html/it/it/appendices/shortcuts/index.html -->
 <!-- Language: it | Section: appendices/shortcuts -->
 
 # Tasti di scelta rapida

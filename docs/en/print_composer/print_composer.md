@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/en/en/print_composer/print_composer/index.html -->
+<!-- Recovered from: docs_old/html/en/en/print_composer/print_composer/index.html -->
 <!-- Language: en | Section: print_composer/print_composer -->
 
 # Print Composer

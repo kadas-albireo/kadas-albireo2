@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/fr/fr/mss/index.html -->
+<!-- Recovered from: docs_old/html/fr/fr/mss/index.html -->
 <!-- Language: fr | Section: mss -->
 
 # MSS

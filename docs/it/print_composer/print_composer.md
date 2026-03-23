@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/it/it/print_composer/print_composer/index.html -->
+<!-- Recovered from: docs_old/html/it/it/print_composer/print_composer/index.html -->
 <!-- Language: it | Section: print_composer/print_composer -->
 
 # Compositore di stampa
@@ -486,6 +486,7 @@ Le immagini SVG vengono ruotate automaticamente con la linea. Il colore dell'imm
 
 La scheda _Proprietà elemento_ della tabella degli attributi fornisce le seguenti funzionalità:
 
+![](../../images/print_composer_attributo1.png)
 
 ### Proprietà principali
 

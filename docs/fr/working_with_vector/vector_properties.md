@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/fr/fr/working_with_vector/vector_properties/index.html -->
+<!-- Recovered from: docs_old/html/fr/fr/working_with_vector/vector_properties/index.html -->
 <!-- Language: fr | Section: working_with_vector/vector_properties -->
 
 # Fenêtre Propriétés d'une couche vecteur
@@ -523,7 +523,7 @@ Et si le chemin relatif doit dépendre du fichier de projet (sauvegardé) ? Le c
 
 ```
 command="firefox";
-imagerelpath="../../images/test_image.jpg";
+imagerelpath="images/test_image.jpg";
 projectpath=qgis.core.QgsProject.instance().fileName();
 import os.path; path=os.path.dirname(str(projectpath)) if projectpath != '' else None;
 image=os.path.join(path, imagerelpath);

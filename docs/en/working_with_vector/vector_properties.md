@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/en/en/working_with_vector/vector_properties/index.html -->
+<!-- Recovered from: docs_old/html/en/en/working_with_vector/vector_properties/index.html -->
 <!-- Language: en | Section: working_with_vector/vector_properties -->
 
 # The Vector Properties Dialog
@@ -528,7 +528,7 @@ But what about if the relative path needs to be relative to the (saved) project 
 
 ```
 command="firefox";
-imagerelpath="../../images/test_image.jpg";
+imagerelpath="images/test_image.jpg";
 projectpath=qgis.core.QgsProject.instance().fileName();
 import os.path; path=os.path.dirname(str(projectpath)) if projectpath != '' else None;
 image=os.path.join(path, imagerelpath);

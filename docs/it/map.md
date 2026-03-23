@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/it/it/map/index.html -->
+<!-- Recovered from: docs_old/html/it/it/map/index.html -->
 <!-- Language: it | Section: map -->
 
 # Mappa

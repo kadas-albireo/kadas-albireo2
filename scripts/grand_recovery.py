@@ -27,7 +27,8 @@ Output:
     ├── de/
     ├── fr/
     ├── it/
-    └── media/       ← shared images copied here
+    ├── media/       ← KADAS screenshots copied here
+    └── images/      ← QGIS upstream icons/images copied here
     mkdocs.nav.yml   ← nav skeleton to paste into mkdocs.yml
 """
 
@@ -45,10 +46,12 @@ from markdownify import MarkdownConverter
 # ---------------------------------------------------------------------------
 SCRIPT_DIR   = Path(__file__).resolve().parent
 REPO_ROOT    = SCRIPT_DIR.parent
-HTML_ROOT    = REPO_ROOT / "share" / "docs" / "html"
+HTML_ROOT    = REPO_ROOT / "docs_old" / "html"
 MEDIA_SRC    = HTML_ROOT / "media"
+IMAGES_SRC   = HTML_ROOT / "images"
 OUTPUT_ROOT  = REPO_ROOT / "docs"
 MEDIA_DST    = OUTPUT_ROOT / "media"
+IMAGES_DST   = OUTPUT_ROOT / "images"
 
 LANGUAGES    = ["en", "de", "fr", "it"]
 
@@ -183,21 +186,103 @@ def html_to_markdown(html_fragment: str) -> str:
 # ---------------------------------------------------------------------------
 def rewrite_image_paths(md: str, section: str, lang: str) -> str:
     """
-    In the source HTML, images are referenced as ../../../media/imageN.png
-    relative to docs/{lang}/{lang}/{section}/index.html.
+    Rewrites all image paths to be correct relative to the output .md file.
 
-    In the new structure they will live at docs/{lang}/{section}.md and
-    the shared media folder will be at docs/media/.  MkDocs resolves paths
-    relative to the .md file, so the correct relative path is:
-        ../media/imageN.png
+    Two image pools exist:
+      - media/   KADAS screenshots  (../../../media/imageN.png in source HTML)
+      - images/  QGIS upstream icons (../../../../images/foo.png or /images/foo.png)
 
-    We also handle the top-level index (section == "index") whose file will
-    be at docs/{lang}/index.md — same depth, same relative path.
+    Output files sit at one of two depths inside docs/:
+      - depth 1: docs/{lang}/{section}.md          (flat sections)
+      - depth 2: docs/{lang}/{group}/{page}.md     (deep sections)
+
+    Correct relative prefixes:
+                    depth-1     depth-2
+      media/        ../media/   ../../media/
+      images/       ../images/  ../../images/
     """
-    # Match both ../../../media/... and ../../media/... (defensive)
-    pattern = re.compile(r"\.\./(?:\.\./)*media/([\w.\-]+)")
-    replacement = r"../media/\1"
-    return pattern.sub(replacement, md)
+    depth = section.count("/")  # 0 → depth-1 file, 1 → depth-2 file
+    up = "../" * (depth + 1)
+
+    # media/ references (KADAS screenshots)
+    md = re.sub(r"\.\./(?:\.\./)*media/([\w.\-]+)", f"{up}media/\\1", md)
+
+    # images/ references (QGIS icons) — relative (one or more ../) and
+    # absolute-style (/images/filename).
+    # We require at least one ../ for the relative case to avoid matching
+    # an already-rewritten path (which would cause double-substitution).
+    md = re.sub(r"(?:\.\./)+(images/[\w.\-]+)", f"{up}\\1", md)
+    md = re.sub(r"\(/images/([\w.\-]+)", f"({up}images/\\1", md)
+
+    return md
+
+
+# Pages that exist in our MkDocs site as deep pages (stem only, no extension).
+# Used to decide whether an .html cross-link should be kept (converted to .md)
+# or stripped to plain text (target doesn't exist in this repo).
+_KNOWN_DEEP_PAGES = {
+    "expression",
+    "vector_properties",
+    "field_calculator",
+    "supported_data",
+    "raster_properties",
+    "working_with_projections",
+    "print_composer",
+    "gpsgate",
+}
+
+
+def rewrite_html_links(md: str) -> str:
+    """
+    Convert relative .html cross-links to .md, or strip to plain text when
+    the target page doesn't exist in this repo.
+
+    Examples:
+      [Expressions](expression.html#anchor)  →  [Expressions](expression.md#anchor)
+      [Intro](../introduction/intro.html)    →  Intro
+    """
+    def _replace(m: re.Match) -> str:
+        label = m.group(1)
+        href  = m.group(2)
+        stem  = Path(href.split("#")[0]).stem
+        if stem in _KNOWN_DEEP_PAGES:
+            return f"[{label}]({re.sub(r'.html', '.md', href)})"
+        else:
+            return label  # strip broken link, keep readable text
+
+    return re.sub(r'\[([^\]]+)\]\(([^)]*?\.html(?:#[^)]*)?)\)', _replace, md)
+
+
+def rewrite_internal_links(md: str, section: str) -> str:
+    """
+    The source HTML used root-relative links like /map, /view, /analysis, etc.
+    because the old site served each language at its own root (e.g. /en/).
+
+    In the new MkDocs structure, pages live at docs/{lang}/{section}.md.
+    From a flat section (e.g. en/kadas_gui.md) the correct relative path to
+    another flat section is ../map/ (one level up, then into the sibling).
+    From a deep section (e.g. en/working_with_vector/expression.md) it would
+    be ../../map/, but internal cross-links in deep pages are rare/absent.
+
+    We rewrite:
+        /section       →  ../section/
+        /section/      →  ../section/
+    Only for the known flat section names to avoid touching real external URLs.
+    """
+    flat_sections = {
+        "index", "kadas_gui", "map", "view", "analysis",
+        "draw", "gps", "mss", "settings",
+    }
+    depth = section.count("/")  # 0 for flat, 1 for deep (e.g. appendices/license)
+    prefix = "../../" if depth >= 1 else "../"
+
+    def replace_link(m: re.Match) -> str:
+        name = m.group(1).rstrip("/")
+        if name in flat_sections:
+            return f"]({prefix}{name}/)"
+        return m.group(0)  # leave unknown root-relative links untouched
+
+    return re.sub(r"\]\(/([\w/]+)/?\)", replace_link, md)
 
 
 # ---------------------------------------------------------------------------
@@ -230,6 +315,8 @@ def recover_page(html_path: Path, lang: str, section: str) -> str:
 
     raw_md = html_to_markdown(str(content_div))
     fixed_md = rewrite_image_paths(raw_md, section, lang)
+    fixed_md = rewrite_html_links(fixed_md)
+    fixed_md = rewrite_internal_links(fixed_md, section)
 
     # Add a metadata comment header so we can trace provenance
     header = (
@@ -292,21 +379,26 @@ def discover_sections(lang: str) -> list[tuple[str, Path]]:
 # ---------------------------------------------------------------------------
 # Media copy
 # ---------------------------------------------------------------------------
-def copy_media() -> None:
-    """Copy the shared media/ folder to docs/media/ (skip if already up to date)."""
-    if not MEDIA_SRC.is_dir():
-        print(f"  [WARN] Media source not found: {MEDIA_SRC}", file=sys.stderr)
+def _copy_folder(src: Path, dst: Path, label: str) -> None:
+    """Copy all files from src into dst, skipping unchanged files."""
+    if not src.is_dir():
+        print(f"  [WARN] Source not found, skipping: {src}", file=sys.stderr)
         return
-
-    MEDIA_DST.mkdir(parents=True, exist_ok=True)
+    dst.mkdir(parents=True, exist_ok=True)
     copied = 0
-    for src_file in MEDIA_SRC.iterdir():
-        dst_file = MEDIA_DST / src_file.name
-        if not dst_file.exists() or src_file.stat().st_mtime > dst_file.stat().st_mtime:
-            shutil.copy2(src_file, dst_file)
-            copied += 1
+    for src_file in src.iterdir():
+        if src_file.is_file():
+            dst_file = dst / src_file.name
+            if not dst_file.exists() or src_file.stat().st_mtime > dst_file.stat().st_mtime:
+                shutil.copy2(src_file, dst_file)
+                copied += 1
+    print(f"  [{label}] {copied} file(s) copied/updated → {dst.relative_to(REPO_ROOT)}")
 
-    print(f"  [media] {copied} file(s) copied/updated → {MEDIA_DST.relative_to(REPO_ROOT)}")
+
+def copy_media() -> None:
+    """Copy media/ (KADAS screenshots) and images/ (QGIS icons) to docs/."""
+    _copy_folder(MEDIA_SRC,  MEDIA_DST,  "media")
+    _copy_folder(IMAGES_SRC, IMAGES_DST, "images")
 
 
 # ---------------------------------------------------------------------------

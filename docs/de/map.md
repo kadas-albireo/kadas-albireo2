@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/de/de/map/index.html -->
+<!-- Recovered from: docs_old/html/de/de/map/index.html -->
 <!-- Language: de | Section: map -->
 
 # Karte

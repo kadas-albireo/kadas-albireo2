@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/de/de/print_composer/print_composer/index.html -->
+<!-- Recovered from: docs_old/html/de/de/print_composer/print_composer/index.html -->
 <!-- Language: de | Section: print_composer/print_composer -->
 
 # Druckzusammenstellung

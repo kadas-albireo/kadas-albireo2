@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/fr/fr/working_with_vector/supported_data/index.html -->
+<!-- Recovered from: docs_old/html/fr/fr/working_with_vector/supported_data/index.html -->
 <!-- Language: fr | Section: working_with_vector/supported_data -->
 
 # Formats de données gérés

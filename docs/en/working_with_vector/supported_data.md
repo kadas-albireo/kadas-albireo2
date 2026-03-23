@@ -1,4 +1,4 @@
-<!-- Recovered from: share/docs/html/en/en/working_with_vector/supported_data/index.html -->
+<!-- Recovered from: docs_old/html/en/en/working_with_vector/supported_data/index.html -->
 <!-- Language: en | Section: working_with_vector/supported_data -->
 
 # Supported Data Formats
