@@ -486,7 +486,7 @@ Le immagini SVG vengono ruotate automaticamente con la linea. Il colore dell'imm
 
 La scheda _Proprietà elemento_ della tabella degli attributi fornisce le seguenti funzionalità:
 
-![](../../images/print_composer_attributo1.png)
+![](../../images/print_composer_attribute1.png)
 
 ### Proprietà principali
 

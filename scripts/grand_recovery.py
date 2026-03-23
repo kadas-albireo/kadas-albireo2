@@ -182,6 +182,27 @@ def html_to_markdown(html_fragment: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Source HTML typo corrections
+# ---------------------------------------------------------------------------
+# These are known filename typos in the original HTML source that were
+# faithfully reproduced by the converter. We fix them here so the build
+# doesn't warn about missing files.
+_IMAGE_TYPO_CORRECTIONS: dict[str, str] = {
+    # FR gpsgate: "device" duplicated in filename
+    "wizard_device_device_found_200.gif": "wizard_device_found_200.gif",
+    # IT print_composer: Italian-localized name that was never created
+    "print_composer_attributo1.png": "print_composer_attribute1.png",
+}
+
+
+def fix_image_typos(md: str) -> str:
+    """Replace known misspelled image filenames inherited from the source HTML."""
+    for wrong, correct in _IMAGE_TYPO_CORRECTIONS.items():
+        md = md.replace(wrong, correct)
+    return md
+
+
+# ---------------------------------------------------------------------------
 # Image path rewriting
 # ---------------------------------------------------------------------------
 def rewrite_image_paths(md: str, section: str, lang: str) -> str:
@@ -314,7 +335,8 @@ def recover_page(html_path: Path, lang: str, section: str) -> str:
         return f"<!-- Recovery failed for {html_path} -->\n"
 
     raw_md = html_to_markdown(str(content_div))
-    fixed_md = rewrite_image_paths(raw_md, section, lang)
+    fixed_md = fix_image_typos(raw_md)
+    fixed_md = rewrite_image_paths(fixed_md, section, lang)
     fixed_md = rewrite_html_links(fixed_md)
     fixed_md = rewrite_internal_links(fixed_md, section)
 

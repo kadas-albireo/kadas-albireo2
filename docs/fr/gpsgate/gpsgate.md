@@ -23,7 +23,7 @@ Cliquez sur Suivant. L'Assistant va maintenant commencer à rechercher un GPS. C
 
 Lorsque l'Assistant trouve un GPS, une boîte de dialogue de message s'affiche. Cliquez sur "Oui" pour accepter le GPS trouvé comme entrée. Si plusieurs récepteurs GPS sont connectés, cliquez sur "Non" jusqu'à ce que GpsGate trouve le récepteur que vous souhaitez utiliser.
 
-![](../../images/wizard_device_device_found_200.gif)
+![](../../images/wizard_device_found_200.gif)
 
 Si GpsGate ne trouve pas votre GPS, vous devez utiliser "Advanced Setup..."
 
