@@ -11,8 +11,11 @@ if sys.platform == "win32":
     kadas_bin = os.environ.get("KADAS_BIN_DIR", "")
     if kadas_bin:
         os.add_dll_directory(kadas_bin)
+        # Qt platform plugins (qwindows, qoffscreen, …) live under Qt6/plugins.
+        # This must be set before the first Qt import so QPA can find them.
+        qt_plugin_path = os.path.join(kadas_bin, "Qt6", "plugins")
+        os.environ.setdefault("QT_QPA_PLATFORM_PLUGIN_PATH", qt_plugin_path)
 
-from kadas.kadasgui import KadasPluginInterface  # noqa: E402
 from qgis.gui import QgsMapCanvas  # noqa: E402
 from qgis.PyQt.QtCore import QSize  # noqa: E402
 from qgis.PyQt.QtWidgets import QMainWindow  # noqa: E402
@@ -35,6 +38,10 @@ def iface():
     Follows the same pattern as qgis.testing.mocked.get_iface() but uses
     KadasPluginInterface as the spec so Kadas-specific methods are available.
     """
+    # Imported here (not at module level) so that loading the kadas C extension
+    # does not interfere with QgsApplication initialisation in qgs_app.
+    from kadas.kadasgui import KadasPluginInterface  # noqa: PLC0415
+
     my_iface = mock.Mock(spec=KadasPluginInterface)
 
     main_window = QMainWindow()
