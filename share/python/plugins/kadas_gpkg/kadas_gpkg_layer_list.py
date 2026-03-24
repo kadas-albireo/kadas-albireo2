@@ -18,7 +18,6 @@ from qgis.PyQt.QtWidgets import (
 _LAYER_ID_ROLE = Qt.ItemDataRole.UserRole + 1
 
 
-
 class KadasGpkgLayersList(QWidget):
     """Layer selection widget mirroring the project layer tree structure.
 
@@ -53,7 +52,7 @@ class KadasGpkgLayersList(QWidget):
         QWidget.__init__(self, parent)
 
         self._icon_warn = QIcon(":/images/themes/default/mIconWarning.svg")
-        self._icon_ok   = QIcon(":/images/themes/default/mIconSuccess.svg")
+        self._icon_ok = QIcon(":/images/themes/default/mIconSuccess.svg")
         self._icon_none = QIcon()
 
         # layer-ids already stored in the target gpkg
@@ -78,7 +77,7 @@ class KadasGpkgLayersList(QWidget):
         self._tree.itemChanged.connect(self._on_item_changed)
 
         # Buttons
-        btn_all  = QPushButton(self.tr("Select All"))
+        btn_all = QPushButton(self.tr("Select All"))
         btn_none = QPushButton(self.tr("Deselect All"))
         btn_all.clicked.connect(self._select_all)
         btn_none.clicked.connect(self._deselect_all)
@@ -159,19 +158,19 @@ class KadasGpkgLayersList(QWidget):
                 item.setText(0, layer.name())
                 item.setData(0, _LAYER_ID_ROLE, layer.id())
                 item.setIcon(0, QgsIconUtils.iconForLayer(layer))
-                item.setFlags(
-                    Qt.ItemFlag.ItemIsEnabled
-                    | Qt.ItemFlag.ItemIsUserCheckable
-                )
+                item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsUserCheckable)
                 item.setCheckState(
                     0,
                     Qt.CheckState.Unchecked if is_large else Qt.CheckState.Checked,
                 )
                 if is_large:
                     item.setIcon(1, self._icon_warn)
-                    item.setToolTip(1, self.tr(
-                        "Layer size is unknown or larger than 50 MB – deselected by default"
-                    ))
+                    item.setToolTip(
+                        1,
+                        self.tr(
+                            "Layer size is unknown or larger than 50 MB – deselected by default"
+                        ),
+                    )
 
     # ------------------------------------------------------------------
     # Status refresh (called after target GPKG file is chosen)
@@ -207,9 +206,12 @@ class KadasGpkgLayersList(QWidget):
                 is_large = size is None or size >= self.WARN_SIZE
                 if is_large:
                     item.setIcon(1, self._icon_warn)
-                    item.setToolTip(1, self.tr(
-                        "Layer size is unknown or larger than 50 MB – deselected by default"
-                    ))
+                    item.setToolTip(
+                        1,
+                        self.tr(
+                            "Layer size is unknown or larger than 50 MB – deselected by default"
+                        ),
+                    )
                 else:
                     item.setIcon(1, self._icon_none)
                     item.setToolTip(1, "")
@@ -254,18 +256,14 @@ class KadasGpkgLayersList(QWidget):
     def _select_all(self):
         self._tree.blockSignals(True)
         try:
-            self._set_subtree_check_state(
-                self._tree.invisibleRootItem(), Qt.CheckState.Checked
-            )
+            self._set_subtree_check_state(self._tree.invisibleRootItem(), Qt.CheckState.Checked)
         finally:
             self._tree.blockSignals(False)
 
     def _deselect_all(self):
         self._tree.blockSignals(True)
         try:
-            self._set_subtree_check_state(
-                self._tree.invisibleRootItem(), Qt.CheckState.Unchecked
-            )
+            self._set_subtree_check_state(self._tree.invisibleRootItem(), Qt.CheckState.Unchecked)
         finally:
             self._tree.blockSignals(False)
 

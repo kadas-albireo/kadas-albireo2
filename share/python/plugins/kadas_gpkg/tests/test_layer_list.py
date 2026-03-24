@@ -15,11 +15,8 @@ Structure used in most tests:
         └── layer_b2   (ogr, small → Checked by default)
 """
 
-import pathlib
-import tempfile
-
 import pytest
-
+from kadas_gpkg.kadas_gpkg_layer_list import _LAYER_ID_ROLE, KadasGpkgLayersList
 from qgis.core import (
     QgsCoordinateTransformContext,
     QgsProject,
@@ -28,12 +25,10 @@ from qgis.core import (
 )
 from qgis.PyQt.QtCore import Qt
 
-from kadas_gpkg.kadas_gpkg_layer_list import KadasGpkgLayersList, _LAYER_ID_ROLE
-
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_ogr_layer(name: str, gpkg_path: str) -> QgsVectorLayer:
     """Write a tiny point GeoPackage and return an OGR-backed QgsVectorLayer."""
@@ -86,6 +81,7 @@ def _find_group_in(parent, group_name: str):
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture(autouse=True)
 def clean_project():
     """Ensure each test starts with an empty QgsProject."""
@@ -132,6 +128,7 @@ def four_layer_project(tmp_path):
 # Basic construction
 # ---------------------------------------------------------------------------
 
+
 class TestConstruction:
     def test_widget_created(self, four_layer_project):
         widget, *_ = four_layer_project
@@ -140,9 +137,9 @@ class TestConstruction:
     def test_all_layers_present(self, four_layer_project):
         widget, la1, la2, lb1, lb2 = four_layer_project
         for layer in (la1, la2, lb1, lb2):
-            assert _find_item(widget, layer.id()) is not None, (
-                f"Layer '{layer.name()}' not found in widget"
-            )
+            assert (
+                _find_item(widget, layer.id()) is not None
+            ), f"Layer '{layer.name()}' not found in widget"
 
     def test_groups_present(self, four_layer_project):
         widget, *_ = four_layer_project
@@ -154,22 +151,23 @@ class TestConstruction:
         widget, la1, la2, lb1, lb2 = four_layer_project
         for layer in (la1, la2, lb1, lb2):
             item = _find_item(widget, layer.id())
-            assert item.checkState(0) == Qt.CheckState.Checked, (
-                f"Layer '{layer.name()}' should be Checked by default"
-            )
+            assert (
+                item.checkState(0) == Qt.CheckState.Checked
+            ), f"Layer '{layer.name()}' should be Checked by default"
 
     def test_groups_checked_by_default(self, four_layer_project):
         widget, *_ = four_layer_project
         for name in ("GroupA", "GroupB"):
             grp = _find_group_item(widget, name)
-            assert grp.checkState(0) == Qt.CheckState.Checked, (
-                f"Group '{name}' should be Checked when all children are Checked"
-            )
+            assert (
+                grp.checkState(0) == Qt.CheckState.Checked
+            ), f"Group '{name}' should be Checked when all children are Checked"
 
 
 # ---------------------------------------------------------------------------
 # getSelectedLayers
 # ---------------------------------------------------------------------------
+
 
 class TestGetSelectedLayers:
     def test_all_selected_initially(self, four_layer_project):
@@ -208,6 +206,7 @@ class TestGetSelectedLayers:
 # Group tristate – upward sync (child → parent, handled by ItemIsAutoTristate)
 # ---------------------------------------------------------------------------
 
+
 class TestGroupTristateUpward:
     def test_uncheck_one_child_makes_group_partial(self, four_layer_project):
         widget, la1, la2, *_ = four_layer_project
@@ -242,6 +241,7 @@ class TestGroupTristateUpward:
 # ---------------------------------------------------------------------------
 # Group tristate – downward propagation (parent → children)
 # ---------------------------------------------------------------------------
+
 
 class TestGroupTristateDownward:
     def test_uncheck_group_unchecks_all_children(self, four_layer_project):
@@ -289,6 +289,7 @@ class TestGroupTristateDownward:
 # updateLayerList – in-GPKG layers become disabled
 # ---------------------------------------------------------------------------
 
+
 class TestUpdateLayerList:
     def test_in_gpkg_layer_becomes_disabled(self, four_layer_project):
         """A layer whose source path starts with the target gpkg path is disabled."""
@@ -297,9 +298,9 @@ class TestUpdateLayerList:
         target_gpkg = la1.source().split("|")[0]
         widget.updateLayerList(target_gpkg)
         item = _find_item(widget, la1.id())
-        assert not (item.flags() & Qt.ItemFlag.ItemIsEnabled), (
-            "Layer whose source is in the target gpkg must be disabled"
-        )
+        assert not (
+            item.flags() & Qt.ItemFlag.ItemIsEnabled
+        ), "Layer whose source is in the target gpkg must be disabled"
 
     def test_in_gpkg_layer_excluded_from_selected(self, four_layer_project):
         widget, la1, la2, lb1, lb2 = four_layer_project
@@ -320,6 +321,7 @@ class TestUpdateLayerList:
 # Unsupported provider layers are hidden
 # ---------------------------------------------------------------------------
 
+
 class TestUnsupportedProviders:
     def test_unsupported_provider_layer_not_shown(self, qgs_app):
         """A layer whose provider is not in SUPPORTED_PROVIDERS must be omitted."""
@@ -335,9 +337,9 @@ class TestUnsupportedProviders:
         root.addLayer(layer)
 
         widget = KadasGpkgLayersList()
-        assert _find_item(widget, layer.id()) is None, (
-            "A 'memory' provider layer should be filtered out of the widget"
-        )
+        assert (
+            _find_item(widget, layer.id()) is None
+        ), "A 'memory' provider layer should be filtered out of the widget"
 
     def test_ogr_layer_is_shown(self, qgs_app, tmp_path):
         """A small real OGR layer must appear in the widget."""
@@ -348,6 +350,6 @@ class TestUnsupportedProviders:
         project.layerTreeRoot().addLayer(layer)
 
         widget = KadasGpkgLayersList()
-        assert _find_item(widget, layer.id()) is not None, (
-            "An OGR layer should appear in the widget"
-        )
+        assert (
+            _find_item(widget, layer.id()) is not None
+        ), "An OGR layer should appear in the widget"
