@@ -20,54 +20,54 @@
 <context>
     <name>KadasGpkgExport</name>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="194"/>
+        <location filename="../kadas_gpkg_export.py" line="196"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="61"/>
+        <location filename="../kadas_gpkg_export.py" line="60"/>
         <source>Unable to create or open output file</source>
         <translation>Impossible de créer ou d&apos;ouvrir le fichier de sortie</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="68"/>
+        <location filename="../kadas_gpkg_export.py" line="67"/>
         <source>Writing %s...</source>
         <translation>%s en cours d&apos;écriture...</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="68"/>
+        <location filename="../kadas_gpkg_export.py" line="67"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="205"/>
+        <location filename="../kadas_gpkg_export.py" line="207"/>
         <source>GPKG Export</source>
         <translation>Exportation GPKG</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="112"/>
+        <location filename="../kadas_gpkg_export.py" line="111"/>
         <source>The operation was canceled.</source>
         <translation>L&apos;opération a été annulée.</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="154"/>
+        <location filename="../kadas_gpkg_export.py" line="153"/>
         <source>Invalid project</source>
         <translation>Projet invalide</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="202"/>
+        <location filename="../kadas_gpkg_export.py" line="204"/>
         <source>GPKG export completed</source>
         <translation>Exportation GPKG complétée</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="205"/>
+        <location filename="../kadas_gpkg_export.py" line="207"/>
         <source>The following layers were not exported to the GeoPackage:
 - %s</source>
         <translation>Les couches suivantes n&apos;ont pas été écrites dans le GeoPackage:
 - %s</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export.py" line="194"/>
+        <location filename="../kadas_gpkg_export.py" line="196"/>
         <source>Unable to create output file: {exception}</source>
         <translation type="unfinished"/>
     </message>
@@ -118,11 +118,6 @@
         <translation>Effacer le GeoPackage existant avant d&apos;exporter</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_dialog.ui" line="58"/>
-        <source>The project, including embedded layers (redlining, symbols, pictures, ...), will be written to the GeoPackage.</source>
-        <translation>Le projet, incluant les couches intégrées (redlining, symboles, images, ...), sera écrit dans le GeoPackage.</translation>
-    </message>
-    <message>
         <location filename="../kadas_gpkg_export_dialog.ui" line="68"/>
         <source>Additionally, the following layers will be added to the GeoPackage:</source>
         <translation>De plus, les couches suivantes seront ajoutées au GeoPackage:</translation>
@@ -171,6 +166,11 @@
         <location filename="../kadas_gpkg_export_dialog.ui" line="219"/>
         <source>X Max.:</source>
         <translation>X Max.:</translation>
+    </message>
+    <message>
+        <location filename="../kadas_gpkg_export_dialog.ui" line="58"/>
+        <source>The project will be written to the GeoPackage.</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
