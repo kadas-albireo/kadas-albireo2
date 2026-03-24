@@ -6,7 +6,7 @@ vcpkg_from_github(
   REF
   v${VERSION}
   SHA512
-  39b5dc1dd1423309375f9407010470f6cfd8f052d81c8393fe0beef90d911b00170c3953d910c7c70abd37395dd7623d1e4c49ebd231416aaf58057af4d3df0c
+  afb0d27c5503d074bcc66e95ecd110596ce7a0f4a81259bd90781b776d0d4a9670abd0249d4d426e4fa33c7299ef21a809fc9da62929139a76a1eb99e3474586
   HEAD_REF
   main
 )
@@ -25,6 +25,8 @@ z_vcpkg_setup_pkgconfig_path(CONFIG "RELEASE")
 list(APPEND meson_opts "--python.platlibdir" "${CURRENT_INSTALLED_DIR}/lib")
 list(JOIN meson_opts "\",\"" meson_opts)
 
+# Override z_vcpkg_python_func_python to ensure the installed Python is used
+# instead of vcpkg's internal tool Python (which may not have gpep517).
 if(VCPKG_TARGET_IS_WINDOWS)
   set(z_vcpkg_python_func_python
       ${CURRENT_HOST_INSTALLED_DIR}/tools/python3/python${VCPKG_HOST_EXECUTABLE_SUFFIX}
@@ -34,13 +36,13 @@ else()
       ${CURRENT_HOST_INSTALLED_DIR}/tools/python3/python${PYTHON3_VERSION_MAJOR}.${PYTHON3_VERSION_MINOR}${VCPKG_HOST_EXECUTABLE_SUFFIX}
   )
 endif()
+
 vcpkg_python_build_and_install_wheel(
   SOURCE_PATH
   "${SOURCE_PATH}"
   OPTIONS
   --config-json
   "{\"setup-args\" : [\"-Dsystem-freetype=true\", \"-Dsystem-qhull=true\", \"${meson_opts}\" ] }"
-  # -Csetup-args=-Dsystem-freetype=true -Csetup-args=-Dsystem-qhull=true
 )
 
 file(GLOB licenses "${SOURCE_PATH}/LICENSE/*")
