@@ -3,7 +3,7 @@
 
 # Supported Data Formats
 
-KADAS uses the OGR library to read and write vector data formats, including ESRI shapefiles, MapInfo and MicroStation file formats, AutoCAD DXF, PostGIS, SpatiaLite, Oracle Spatial and MSSQL Spatial databases, and many more. GRASS vector and PostgreSQL support is supplied by native KADAS data provider plugins. Vector data can also be loaded in read mode from zip and gzip archives into KADAS. As of the date of this document, 69 vector formats are supported by the OGR library. The complete list is available at <[http://www.gdal.org/ogr/ogr_formats.html](https://gdal.org/en/stable/drivers/vector/index.html)>.
+KADAS uses the OGR library to read and write vector data formats, including ESRI shapefiles, MapInfo and MicroStation file formats, AutoCAD DXF, PostGIS, SpatiaLite, Oracle Spatial and MSSQL Spatial databases, and many more. GRASS vector and PostgreSQL support is supplied by native KADAS data provider plugins. Vector data can also be loaded in read mode from zip and gzip archives into KADAS. As of the date of this document, 69 vector formats are supported by the OGR library. The complete list is available at [http://www.gdal.org/ogr/ogr_formats.html](https://gdal.org/en/stable/drivers/vector/index.html).
 
 ## ESRI Shapefiles
 
