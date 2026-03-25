@@ -74,12 +74,6 @@
    </item>
    <item row="4" column="0" colspan="2">
     <widget class="KadasGpkgLayersList" name="listWidgetLayers">
-     <property name="iconSize">
-      <size>
-       <width>16</width>
-       <height>16</height>
-      </size>
-     </property>
     </widget>
    </item>
    <item row="5" column="0">
@@ -244,7 +238,7 @@
  <customwidgets>
   <customwidget>
    <class>KadasGpkgLayersList</class>
-   <extends>QListWidget</extends>
+   <extends>QWidget</extends>
    <header>kadas_gpkg.kadas_gpkg_layer_list</header>
   </customwidget>
  </customwidgets>
