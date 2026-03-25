@@ -1924,126 +1924,146 @@ Veuillez annuler ces tâches et réessayer.</translation>
 <context>
     <name>KadasHeightProfileDialog</name>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="118"/>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="568"/>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="589"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="123"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="592"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="613"/>
         <source>Height profile</source>
         <translation>Profil d&apos;altitude</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="122"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="127"/>
         <source>Measure along existing line</source>
         <translation>Mesurer ligne existante</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="133"/>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="396"/>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="453"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="138"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="420"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="477"/>
         <source>Height [ft AMSL]</source>
         <translation>Altitude [ft AMSL]</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="133"/>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="396"/>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="453"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="138"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="420"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="477"/>
         <source>Height [m AMSL]</source>
         <translation>Altitude [m AMSL]</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="134"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="139"/>
         <source>Distance [m]</source>
         <translation>Distance [m]</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="160"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="168"/>
         <source>Difference of altitude start-end</source>
         <translation>Dénivellation départ-fin</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="161"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="169"/>
         <source>Ascent</source>
         <translation>Montée</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="162"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="170"/>
         <source>Descent</source>
         <translation>Descente</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="163"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="171"/>
         <source>Highest Point</source>
         <translation>Point culminant</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="164"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="172"/>
         <source>Lowest Point</source>
         <translation>Point le plus bas</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="165"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="173"/>
         <source>Linear distance</source>
         <translation>Distance à vol d&apos;oiseau</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="166"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="174"/>
         <source>Path distance</source>
         <translation>Longuer chemin</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="205"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="215"/>
         <source>Show vertex lines</source>
         <translation>Marquer les sommets</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="211"/>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="769"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="220"/>
+        <source>Show statistics</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="233"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="793"/>
         <source>Line of sight</source>
         <translation>Ligne de mire</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="218"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="240"/>
         <source>Observer height:</source>
         <translation>Altitude de l&apos;observateur:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="229"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="251"/>
         <source>Target height:</source>
         <translation>Altitude de l&apos;objectif:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="240"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="262"/>
         <source>Heights relative to:</source>
         <translation>Altitude relative au:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="243"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="265"/>
         <source>Ground</source>
         <translation>Terrain</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="244"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="266"/>
         <source>Sea level</source>
         <translation>Niveau de la mer</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="263"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="285"/>
         <source>Copy to clipboard</source>
         <translation>Copier vers le presse-papier</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="264"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="286"/>
+        <source>Save to file</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="287"/>
         <source>Add to map</source>
         <translation>Ajouter à la carte</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="412"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="436"/>
         <source>No heightmap is defined in the project. Right-click a raster layer in the layer tree and select it to be used as heightmap.</source>
         <translation>Aucun modèle d&apos;élévation est défini dans le projet. Choisissez une couche raster à utiliser comme modèle d&apos;élévation dans le menu contextuel dans la table du contenu de la carte.</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="420"/>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="444"/>
         <source>Error: Unable to open heightmap.</source>
         <translation>Erreur: impossible d&apos;ouvrire le modèle d&apos;elevation.</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="865"/>
+        <source>Save height profile</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/gui/kadasheightprofiledialog.cpp" line="865"/>
+        <source>PNG Image (*.png);;JPEG Image (*.jpg);;BMP Image (*.bmp)</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 <context>
