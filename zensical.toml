@@ -1,0 +1,160 @@
+# KADAS Albireo Documentation — Zensical configuration
+# This is the TOML equivalent of mkdocs.yml.
+# Zensical can also read mkdocs.yml directly, but zensical.toml is the
+# recommended format for new/migrated projects.
+
+[project]
+site_name        = "KADAS Albireo"
+site_description = "KADAS Albireo Documentation"
+docs_dir         = "docs"
+site_dir         = "share/docs/html"
+
+extra_javascript = ["assets/extra.js"]
+
+nav = [
+  {"Home" = "index.md"},
+
+  # ── English ──────────────────────────────────────────────────────────────────
+  {"EN" = [
+    {"General"       = "en/index.md"},
+    {"The Interface" = "en/kadas_gui.md"},
+    {"Map"           = "en/map.md"},
+    {"View"          = "en/view.md"},
+    {"Analysis"      = "en/analysis.md"},
+    {"Draw"          = "en/draw.md"},
+    {"Navigation"    = "en/gps.md"},
+    {"MSS"           = "en/mss.md"},
+    {"Settings"      = "en/settings.md"},
+    {"Advanced functionalities" = [
+      {"Vector Layers" = [
+        {"Supported Formats" = "en/working_with_vector/supported_data.md"},
+        {"Properties Dialog" = "en/working_with_vector/vector_properties.md"},
+        {"Expressions"       = "en/working_with_vector/expression.md"},
+        {"Field Calculator"  = "en/working_with_vector/field_calculator.md"},
+      ]},
+      {"Raster Layers" = [
+        {"Supported Formats" = "en/working_with_raster/supported_data.md"},
+        {"Properties Dialog" = "en/working_with_raster/raster_properties.md"},
+      ]},
+      {"Working with Projections" = "en/working_with_projections/working_with_projections.md"},
+      {"Print Composer"           = "en/print_composer/print_composer.md"},
+      {"GPS Gate"                 = "en/gpsgate/gpsgate.md"},
+    ]},
+    {"Appendix" = [
+      {"Keyboard Shortcuts" = "en/appendices/shortcuts.md"},
+      {"License"            = "en/appendices/license.md"},
+    ]},
+  ]},
+
+  # ── Deutsch ──────────────────────────────────────────────────────────────────
+  {"DE" = [
+    {"Allgemeines"              = "de/index.md"},
+    {"KADAS Benutzeroberfläche" = "de/kadas_gui.md"},
+    {"Karte"                    = "de/map.md"},
+    {"Ansicht"                  = "de/view.md"},
+    {"Analyse"                  = "de/analysis.md"},
+    {"Zeichnen"                 = "de/draw.md"},
+    {"Navigation"               = "de/gps.md"},
+    {"MSS"                      = "de/mss.md"},
+    {"Einstellungen"            = "de/settings.md"},
+    {"Erweiterte Funktionen" = [
+      {"Vektorlayer" = [
+        {"Unterstützte Formate" = "de/working_with_vector/supported_data.md"},
+        {"Eigenschaften"        = "de/working_with_vector/vector_properties.md"},
+        {"Ausdrücke"            = "de/working_with_vector/expression.md"},
+        {"Feldrechner"          = "de/working_with_vector/field_calculator.md"},
+      ]},
+      {"Rasterlayer" = [
+        {"Unterstützte Formate" = "de/working_with_raster/supported_data.md"},
+        {"Eigenschaften"        = "de/working_with_raster/raster_properties.md"},
+      ]},
+      {"Arbeiten mit Projektionen" = "de/working_with_projections/working_with_projections.md"},
+      {"Druckzusammenstellung"     = "de/print_composer/print_composer.md"},
+      {"GPS Gate"                  = "de/gpsgate/gpsgate.md"},
+    ]},
+    {"Anhang" = [
+      {"Tastaturkürzel" = "de/appendices/shortcuts.md"},
+      {"Lizenz"         = "de/appendices/license.md"},
+    ]},
+  ]},
+
+  # ── Français ─────────────────────────────────────────────────────────────────
+  {"FR" = [
+    {"Généralités"        = "fr/index.md"},
+    {"Interface de KADAS" = "fr/kadas_gui.md"},
+    {"Carte"              = "fr/map.md"},
+    {"Vue"                = "fr/view.md"},
+    {"Analyse"            = "fr/analysis.md"},
+    {"Dessiner"           = "fr/draw.md"},
+    {"Navigation"         = "fr/gps.md"},
+    {"MSS"                = "fr/mss.md"},
+    {"Préférences"        = "fr/settings.md"},
+    {"Fonctionnalités avancées" = [
+      {"Couches vectorielles" = [
+        {"Formats supportés"     = "fr/working_with_vector/supported_data.md"},
+        {"Propriétés"            = "fr/working_with_vector/vector_properties.md"},
+        {"Expressions"           = "fr/working_with_vector/expression.md"},
+        {"Calculatrice de champ" = "fr/working_with_vector/field_calculator.md"},
+      ]},
+      {"Couches raster" = [
+        {"Formats supportés" = "fr/working_with_raster/supported_data.md"},
+        {"Propriétés"        = "fr/working_with_raster/raster_properties.md"},
+      ]},
+      {"Travailler avec les projections" = "fr/working_with_projections/working_with_projections.md"},
+      {"Composeur d'impression"          = "fr/print_composer/print_composer.md"},
+      {"GPS Gate"                        = "fr/gpsgate/gpsgate.md"},
+    ]},
+    {"Annexe" = [
+      {"Raccourcis clavier" = "fr/appendices/shortcuts.md"},
+      {"Licence"            = "fr/appendices/license.md"},
+    ]},
+  ]},
+
+  # ── Italiano ─────────────────────────────────────────────────────────────────
+  {"IT" = [
+    {"Generalità"        = "it/index.md"},
+    {"Interfaccia KADAS" = "it/kadas_gui.md"},
+    {"Mappa"             = "it/map.md"},
+    {"Vista"             = "it/view.md"},
+    {"Analisi"           = "it/analysis.md"},
+    {"Disegnare"         = "it/draw.md"},
+    {"Navigazione"       = "it/gps.md"},
+    {"MSS"               = "it/mss.md"},
+    {"Impostazioni"      = "it/settings.md"},
+    {"Funzionalità avanzate" = [
+      {"Layer vettoriali" = [
+        {"Formati supportati"   = "it/working_with_vector/supported_data.md"},
+        {"Proprietà"            = "it/working_with_vector/vector_properties.md"},
+        {"Espressioni"          = "it/working_with_vector/expression.md"},
+        {"Calcolatore di campi" = "it/working_with_vector/field_calculator.md"},
+      ]},
+      {"Layer raster" = [
+        {"Formati supportati" = "it/working_with_raster/supported_data.md"},
+        {"Proprietà"          = "it/working_with_raster/raster_properties.md"},
+      ]},
+      {"Lavorare con le proiezioni" = "it/working_with_projections/working_with_projections.md"},
+      {"Compositore di stampa"      = "it/print_composer/print_composer.md"},
+      {"GPS Gate"                   = "it/gpsgate/gpsgate.md"},
+    ]},
+    {"Appendice" = [
+      {"Scorciatoie da tastiera" = "it/appendices/shortcuts.md"},
+      {"Licenza"                 = "it/appendices/license.md"},
+    ]},
+  ]},
+]
+
+# ── Theme ──────────────────────────────────────────────────────────────────────
+# "classic" matches the Material for MkDocs look-and-feel.
+# Switch to "modern" when you're ready to adopt the new Zensical design.
+[project.theme]
+variant = "classic"
+
+# ── Language selector ──────────────────────────────────────────────────────────
+# Renders a language-switcher in the header.
+[project.extra]
+alternate = [
+  { name = "English",  link = "/en/", lang = "en" },
+  { name = "Deutsch",  link = "/de/", lang = "de" },
+  { name = "Français", link = "/fr/", lang = "fr" },
+  { name = "Italiano", link = "/it/", lang = "it" },
+]
