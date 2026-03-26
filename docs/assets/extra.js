@@ -1,9 +1,8 @@
 /* Rewrite the home icon link to the current language root.
  *
- * The readthedocs theme renders home links with relative hrefs (e.g. "../..")
- * rather than absolute "/", so we can't select them by href value.
- * Instead we select by the class the theme always puts on home anchors:
- *   - .icon-home  (sidebar logo and breadcrumb home icon)
+ * Zensical (Material for MkDocs) renders the home logo as an anchor with
+ * class "md-header__button md-logo" and a matching sidebar element.
+ * We rewrite their href so the home button always goes to /{lang}/.
  *
  * Supported languages: en, de, fr, it
  */
@@ -23,7 +22,10 @@
     if (!lang) {
       return;
     }
-    document.querySelectorAll("a.icon-home").forEach(function (a) {
+    // Material for MkDocs / Zensical: home anchors carry the "md-logo" class
+    // (both the header logo and the sidebar logo link).
+    // The readthedocs theme used "icon-home" – keep that for backwards compat.
+    document.querySelectorAll("a.md-logo, a.icon-home").forEach(function (a) {
       a.href = "/" + lang + "/";
     });
   });

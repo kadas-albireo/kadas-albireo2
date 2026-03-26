@@ -18,13 +18,13 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: 📦 Install MkDocs
+      - name: 📦 Install Zensical
         run: |
-          pip install mkdocs mkdocs-open-in-new-tab
+          pip install zensical
 
       - name: 🔨 Build docs
         run: |
-          mkdocs build --strict
+          zensical build
 
       - name: 📤 Upload docs artifact
         uses: actions/upload-artifact@v7
