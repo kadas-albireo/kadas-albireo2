@@ -1,8 +1,4 @@
-/* Rewrite the home icon link to the current language root.
- *
- * Zensical (Material for MkDocs) renders the home logo as an anchor with
- * class "md-header__button md-logo" and a matching sidebar element.
- * We rewrite their href so the home button always goes to /{lang}/.
+/* Language-aware home link + open external links in new tab
  *
  * Supported languages: en, de, fr, it
  */
@@ -18,15 +14,29 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
+    // ── Home icon ────────────────────────────────────────────────────────────
+    // Zensical (Material theme): home anchors carry the "md-logo" class,
+    // both in the header and in the sidebar.
     var lang = detectLang();
-    if (!lang) {
-      return;
+    if (lang) {
+      document.querySelectorAll("a.md-logo").forEach(function (a) {
+        a.href = "/" + lang + "/";
+      });
     }
-    // Material for MkDocs / Zensical: home anchors carry the "md-logo" class
-    // (both the header logo and the sidebar logo link).
-    // The readthedocs theme used "icon-home" – keep that for backwards compat.
-    document.querySelectorAll("a.md-logo, a.icon-home").forEach(function (a) {
-      a.href = "/" + lang + "/";
+
+    // ── External links → new tab ─────────────────────────────────────────────
+    // Any anchor whose href points to a different origin gets
+    // target="_blank" + rel="noopener noreferrer".
+    document.querySelectorAll("a[href]").forEach(function (a) {
+      try {
+        var url = new URL(a.href, window.location.href);
+        if (url.origin !== window.location.origin) {
+          a.setAttribute("target", "_blank");
+          a.setAttribute("rel", "noopener noreferrer");
+        }
+      } catch (e) {
+        // ignore unparseable hrefs
+      }
     });
   });
 })();
