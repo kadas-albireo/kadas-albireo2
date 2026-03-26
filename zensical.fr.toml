@@ -1,0 +1,48 @@
+# KADAS Albireo — French documentation
+# docs_dir is docs/fr so only French pages and their search index are built.
+# media/ and images/ live in docs/ (parent) and are copied once to
+# share/docs/html/ by the build script; the relative paths in the built HTML
+# (../../media/ and ../../../images/) resolve correctly from there.
+
+[project]
+site_name        = "KADAS Albireo"
+site_description = "Documentation KADAS Albireo"
+docs_dir         = "docs/fr"
+site_dir         = "share/docs/html/fr"
+
+extra_javascript = ["../assets/extra.js"]
+
+nav = [
+  {"Généralités"        = "index.md"},
+  {"Interface de KADAS" = "kadas_gui.md"},
+  {"Carte"              = "map.md"},
+  {"Vue"                = "view.md"},
+  {"Analyse"            = "analysis.md"},
+  {"Dessiner"           = "draw.md"},
+  {"Navigation"         = "gps.md"},
+  {"MSS"                = "mss.md"},
+  {"Préférences"        = "settings.md"},
+  {"Fonctionnalités avancées" = [
+    {"Couches vectorielles" = [
+      {"Formats supportés"     = "working_with_vector/supported_data.md"},
+      {"Propriétés"            = "working_with_vector/vector_properties.md"},
+      {"Expressions"           = "working_with_vector/expression.md"},
+      {"Calculatrice de champ" = "working_with_vector/field_calculator.md"},
+    ]},
+    {"Couches raster" = [
+      {"Formats supportés" = "working_with_raster/supported_data.md"},
+      {"Propriétés"        = "working_with_raster/raster_properties.md"},
+    ]},
+    {"Travailler avec les projections" = "working_with_projections/working_with_projections.md"},
+    {"Composeur d'impression"          = "print_composer/print_composer.md"},
+    {"GPS Gate"                        = "gpsgate/gpsgate.md"},
+  ]},
+  {"Annexe" = [
+    {"Raccourcis clavier" = "appendices/shortcuts.md"},
+    {"Licence"            = "appendices/license.md"},
+  ]},
+]
+
+[project.theme]
+variant  = "classic"
+language = "fr"

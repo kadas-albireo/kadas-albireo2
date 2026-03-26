@@ -1,0 +1,48 @@
+# KADAS Albireo Documentation — Italian build
+# docs_dir points at the Italian subtree only → isolated nav, search, and UI.
+# media/ and images/ live in docs/ (outside docs_dir) and are resolved via
+# relative paths in the built HTML to share/docs/html/media/ and
+# share/docs/html/images/, which are populated by the build script.
+
+[project]
+site_name        = "KADAS Albireo"
+site_description = "KADAS Albireo Documentation"
+docs_dir         = "docs/it"
+site_dir         = "share/docs/html/it"
+
+extra_javascript = ["../assets/extra.js"]
+
+nav = [
+  {"Generalità"        = "index.md"},
+  {"Interfaccia KADAS" = "kadas_gui.md"},
+  {"Mappa"             = "map.md"},
+  {"Vista"             = "view.md"},
+  {"Analisi"           = "analysis.md"},
+  {"Disegnare"         = "draw.md"},
+  {"Navigazione"       = "gps.md"},
+  {"MSS"               = "mss.md"},
+  {"Impostazioni"      = "settings.md"},
+  {"Funzionalità avanzate" = [
+    {"Layer vettoriali" = [
+      {"Formati supportati"   = "working_with_vector/supported_data.md"},
+      {"Proprietà"            = "working_with_vector/vector_properties.md"},
+      {"Espressioni"          = "working_with_vector/expression.md"},
+      {"Calcolatore di campi" = "working_with_vector/field_calculator.md"},
+    ]},
+    {"Layer raster" = [
+      {"Formati supportati" = "working_with_raster/supported_data.md"},
+      {"Proprietà"          = "working_with_raster/raster_properties.md"},
+    ]},
+    {"Lavorare con le proiezioni" = "working_with_projections/working_with_projections.md"},
+    {"Compositore di stampa"      = "print_composer/print_composer.md"},
+    {"GPS Gate"                   = "gpsgate/gpsgate.md"},
+  ]},
+  {"Appendice" = [
+    {"Scorciatoie da tastiera" = "appendices/shortcuts.md"},
+    {"Licenza"                 = "appendices/license.md"},
+  ]},
+]
+
+[project.theme]
+variant  = "classic"
+language = "it"
