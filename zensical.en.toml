@@ -1,0 +1,45 @@
+# KADAS Albireo — English documentation
+# Build:  zensical build --config-file zensical.en.toml
+
+[project]
+site_name        = "KADAS Albireo"
+site_description = "KADAS Albireo Documentation"
+docs_dir         = "docs/en"
+site_dir         = "share/docs/html/en"
+
+extra_javascript = ["../assets/extra.js"]
+
+nav = [
+  {"General"       = "index.md"},
+  {"The Interface" = "kadas_gui.md"},
+  {"Map"           = "map.md"},
+  {"View"          = "view.md"},
+  {"Analysis"      = "analysis.md"},
+  {"Draw"          = "draw.md"},
+  {"Navigation"    = "gps.md"},
+  {"MSS"           = "mss.md"},
+  {"Settings"      = "settings.md"},
+  {"Advanced functionalities" = [
+    {"Vector Layers" = [
+      {"Supported Formats" = "working_with_vector/supported_data.md"},
+      {"Properties Dialog" = "working_with_vector/vector_properties.md"},
+      {"Expressions"       = "working_with_vector/expression.md"},
+      {"Field Calculator"  = "working_with_vector/field_calculator.md"},
+    ]},
+    {"Raster Layers" = [
+      {"Supported Formats" = "working_with_raster/supported_data.md"},
+      {"Properties Dialog" = "working_with_raster/raster_properties.md"},
+    ]},
+    {"Working with Projections" = "working_with_projections/working_with_projections.md"},
+    {"Print Composer"           = "print_composer/print_composer.md"},
+    {"GPS Gate"                 = "gpsgate/gpsgate.md"},
+  ]},
+  {"Appendix" = [
+    {"Keyboard Shortcuts" = "appendices/shortcuts.md"},
+    {"License"            = "appendices/license.md"},
+  ]},
+]
+
+[project.theme]
+variant  = "classic"
+language = "en"

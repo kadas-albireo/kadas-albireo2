@@ -19,12 +19,10 @@ jobs:
           python-version: '3.12'
 
       - name: 📦 Install Zensical
-        run: |
-          pip install zensical
+        run: pip install zensical
 
       - name: 🔨 Build docs
-        run: |
-          zensical build
+        run: python3 scripts/build_docs.py
 
       - name: 📤 Upload docs artifact
         uses: actions/upload-artifact@v7
