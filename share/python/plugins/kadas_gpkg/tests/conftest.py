@@ -11,10 +11,12 @@ if sys.platform == "win32":
     kadas_bin = os.environ.get("KADAS_BIN_DIR", "")
     if kadas_bin:
         os.add_dll_directory(kadas_bin)
-        # Qt platform plugins (qwindows, qoffscreen, …) live under Qt6/plugins.
-        # This must be set before the first Qt import so QPA can find them.
-        qt_plugin_path = os.path.join(kadas_bin, "Qt6", "plugins")
-        os.environ.setdefault("QT_QPA_PLATFORM_PLUGIN_PATH", qt_plugin_path)
+    # qgis._gui has a static link dependency on qgis_3d.dll (Qgs3DMapCanvas is
+    # used in the QgisInterface base class).  On Windows the DLL loader must
+    # resolve qgis_3d.dll before qgis._gui is loaded; importing qgis._3d first
+    # ensures this and avoids "DLL load failed: The specified procedure could
+    # not be found" when importing qgis.gui.
+    import qgis._3d  # noqa: F401
 
 from qgis.gui import QgsMapCanvas  # noqa: E402
 from qgis.PyQt.QtCore import QSize  # noqa: E402
