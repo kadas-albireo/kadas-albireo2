@@ -35,7 +35,7 @@ class KadasPhongMaterialWidget : public QgsMaterialSettingsWidget, private Ui::P
 
     static QgsMaterialSettingsWidget *create();
 
-    void setTechnique( QgsMaterialSettingsRenderingTechnique technique ) final;
+    void setTechnique( Qgis::MaterialRenderingTechnique technique ) final;
     void setSettings( const QgsAbstractMaterialSettings *settings, QgsVectorLayer *layer ) final;
     QgsAbstractMaterialSettings *settings() override;
 

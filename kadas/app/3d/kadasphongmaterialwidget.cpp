@@ -60,14 +60,14 @@ QgsMaterialSettingsWidget *KadasPhongMaterialWidget::create()
   return new KadasPhongMaterialWidget();
 }
 
-void KadasPhongMaterialWidget::setTechnique( QgsMaterialSettingsRenderingTechnique technique )
+void KadasPhongMaterialWidget::setTechnique( Qgis::MaterialRenderingTechnique technique )
 {
   switch ( technique )
   {
-    case QgsMaterialSettingsRenderingTechnique::Triangles:
-    case QgsMaterialSettingsRenderingTechnique::TrianglesFromModel:
-    case QgsMaterialSettingsRenderingTechnique::InstancedPoints:
-    case QgsMaterialSettingsRenderingTechnique::Points:
+    case Qgis::MaterialRenderingTechnique::Triangles:
+    case Qgis::MaterialRenderingTechnique::TrianglesFromModel:
+    case Qgis::MaterialRenderingTechnique::InstancedPoints:
+    case Qgis::MaterialRenderingTechnique::Points:
     {
       lblDiffuse->setVisible( true );
       btnDiffuse->setVisible( true );
@@ -78,7 +78,7 @@ void KadasPhongMaterialWidget::setTechnique( QgsMaterialSettingsRenderingTechniq
       break;
     }
 
-    case QgsMaterialSettingsRenderingTechnique::TrianglesWithFixedTexture:
+    case Qgis::MaterialRenderingTechnique::TrianglesWithFixedTexture:
     {
       lblDiffuse->setVisible( false );
       btnDiffuse->setVisible( false );
@@ -89,7 +89,7 @@ void KadasPhongMaterialWidget::setTechnique( QgsMaterialSettingsRenderingTechniq
       break;
     }
 
-    case QgsMaterialSettingsRenderingTechnique::TrianglesDataDefined:
+    case Qgis::MaterialRenderingTechnique::TrianglesDataDefined:
     {
       lblDiffuse->setVisible( true );
       btnDiffuse->setVisible( true );
@@ -100,7 +100,7 @@ void KadasPhongMaterialWidget::setTechnique( QgsMaterialSettingsRenderingTechniq
       break;
     }
 
-    case QgsMaterialSettingsRenderingTechnique::Lines:
+    case Qgis::MaterialRenderingTechnique::Lines:
       // not supported
       break;
   }
