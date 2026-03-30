@@ -8,15 +8,20 @@ import pytest
 # QGIS imports.  Set the KADAS_BIN_DIR environment variable to the kadas bin
 # directory (e.g. build/output/bin) when running tests.
 if sys.platform == "win32":
+    import ctypes
+
     kadas_bin = os.environ.get("KADAS_BIN_DIR", "")
     if kadas_bin:
         os.add_dll_directory(kadas_bin)
-    # qgis._gui has a static link dependency on qgis_3d.dll (Qgs3DMapCanvas is
-    # used in the QgisInterface base class).  On Windows the DLL loader must
-    # resolve qgis_3d.dll before qgis._gui is loaded; importing qgis._3d first
-    # ensures this and avoids "DLL load failed: The specified procedure could
-    # not be found" when importing qgis.gui.
-    import qgis._3d  # noqa: F401
+    # qgis_gui.dll has a load-time dependency on qgis_3d.dll (Qgs3DMapCanvas
+    # is referenced in the QgisInterface base class).  Without pre-loading the
+    # native DLL, Windows fails to initialise _gui_p.pyd with "The specified
+    # procedure could not be found" (ERROR_PROC_NOT_FOUND).  We load it via
+    # ctypes — which only invokes LoadLibraryEx on the native DLL, never the
+    # Python binding init code in _3d_p.pyd — to stay robust against version
+    # mismatches in the Python binding layer while still satisfying the
+    # load-time linker requirement.
+    ctypes.CDLL("qgis_3d.dll")
 
 from qgis.gui import QgsMapCanvas  # noqa: E402
 from qgis.PyQt.QtCore import QSize  # noqa: E402
