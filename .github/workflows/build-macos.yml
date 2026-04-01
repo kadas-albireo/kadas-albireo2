@@ -50,7 +50,7 @@ jobs:
           python-version: '3.11'
 
       - name: 🍭 Setup XCode
-        uses: maxim-lobanov/setup-xcode@v1.6.0
+        uses: maxim-lobanov/setup-xcode@v1.7.0
         with:
           xcode-version: latest-stable
 
