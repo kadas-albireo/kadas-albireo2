@@ -109,6 +109,7 @@ your option) any later version. *
 
   protected:
     virtual KadasMapItem *_clone() const /Factory/;
+
     virtual State *createEmptyState() const /Factory/;
     virtual void recomputeDerived();
 
