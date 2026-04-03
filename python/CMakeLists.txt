@@ -195,3 +195,12 @@ foreach(module ${PY_MODULES})
   endforeach(pyfile)
   py_compile(py${module} "${KADAS_PYTHON_OUTPUT_DIRECTORY}/${module}")
 endforeach(module)
+
+# Install kadas/utils.py (top-level kadas package utility module)
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/utils.py
+  ${KADAS_PYTHON_OUTPUT_DIRECTORY}/utils.py COPYONLY
+)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/utils.py
+        DESTINATION "${KADAS_PYTHON_INSTALL_DIRECTORY}"
+)
