@@ -1,18 +1,12 @@
 ---
 name: 🪟 Build - Windows
 on:
-  push:
-    branches:
-      - main
-      - release-*
-  pull_request:
-  release:
-    types: ['published']
+  workflow_call:
+    inputs:
+      docs-artifact-name:
+        required: true
+        type: string
   workflow_dispatch:
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
 
 jobs:
   build:
@@ -22,6 +16,12 @@ jobs:
     steps:
       - name: 🐣 Checkout
         uses: actions/checkout@v6
+
+      - name: 📥 Download docs artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.docs-artifact-name }}
+          path: share/docs/html/
 
       - name: 🐩 Install CMake and Ninja
         uses: lukka/get-cmake@latest

@@ -1,0 +1,33 @@
+---
+name: 🏗️ Build
+on:
+  push:
+    branches:
+      - main
+      - release-*
+  pull_request:
+  release:
+    types: ['published']
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs:
+    uses: ./.github/workflows/build-docs.yml
+
+  macos:
+    uses: ./.github/workflows/build-macos.yml
+    needs: docs
+    with:
+      docs-artifact-name: kadas-docs-html
+    secrets: inherit
+
+  windows:
+    uses: ./.github/workflows/build-windows.yml
+    needs: docs
+    with:
+      docs-artifact-name: kadas-docs-html
+    secrets: inherit
