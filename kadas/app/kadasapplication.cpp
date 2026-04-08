@@ -165,7 +165,11 @@ KadasApplication *KadasApplication::instance()
 
 bool KadasApplication::isRunningFromBuildDir()
 {
-  return QFile::exists( QDir( applicationDirPath() ).absoluteFilePath( ".kadasbuilddir" ) );
+  QDir appDir( applicationDirPath() );
+#if MULTI_CONFIG_LAYOUT
+  appDir.cdUp();
+#endif
+  return QFile::exists( appDir.absoluteFilePath( ".kadasbuilddir" ) );
 }
 
 KadasApplication::KadasApplication( int &argc, char **argv )
