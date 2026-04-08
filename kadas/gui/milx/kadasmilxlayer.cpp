@@ -102,6 +102,26 @@ KadasMilxLayer::KadasMilxLayer( const QString &name )
   : KadasItemLayer( name, QgsCoordinateReferenceSystem( "EPSG:4326" ), layerType() )
 {}
 
+KadasItemLayer *KadasMilxLayer::clone() const
+{
+  KadasMilxLayer *layer = new KadasMilxLayer( name() );
+  layer->mTransformContext = mTransformContext;
+  layer->mOpacity = mOpacity;
+  for ( auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it )
+  {
+    layer->mItems.insert( it.key(), it.value()->clone() );
+  }
+  layer->mItemOrder = mItemOrder;
+  layer->mItemBounds = mItemBounds;
+  layer->mIdCounter = mIdCounter;
+  layer->mFreeIds = mFreeIds;
+  layer->mSymbolScale = mSymbolScale;
+  layer->mIsApproved = mIsApproved;
+  layer->mOverrideMilxSymbolSettings = mOverrideMilxSymbolSettings;
+  layer->mMilxSymbolSettings = mMilxSymbolSettings;
+  return layer;
+}
+
 bool KadasMilxLayer::acceptsItem( const KadasMapItem *item ) const
 {
   return dynamic_cast<const KadasMilxItem *>( item );

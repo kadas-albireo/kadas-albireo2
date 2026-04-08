@@ -147,6 +147,11 @@ KadasItemLayer *KadasItemLayer::clone() const
   {
     layer->mItems.insert( it.key(), it.value()->clone() );
   }
+  layer->mItemOrder = mItemOrder;
+  layer->mItemBounds = mItemBounds;
+  layer->mIdCounter = mIdCounter;
+  layer->mFreeIds = mFreeIds;
+  layer->mSymbolScale = mSymbolScale;
   return layer;
 }
 
