@@ -119,3 +119,15 @@ jobs:
       - name: 🧪 Run CTest
         run: |
           ctest --test-dir build --output-on-failure --timeout 120
+
+      - name: 🧪 Install pytest for plugin tests
+        run: |
+          ./build/vcpkg_installed/${{ matrix.triplet }}/tools/python3/python3 -m pip install pytest
+
+      - name: 🧪 Run plugin tests
+        env:
+          PYTHONPATH: "${{ github.workspace }}/build/output/python:${{ github.workspace }}/share/python/plugins"
+          DYLD_LIBRARY_PATH: "${{ github.workspace }}/build/vcpkg_installed/${{ matrix.triplet }}/lib"
+        run: |
+          ./build/vcpkg_installed/${{ matrix.triplet }}/tools/python3/python3 \
+            -m pytest share/python/plugins/kadas_gpkg/tests/ -v

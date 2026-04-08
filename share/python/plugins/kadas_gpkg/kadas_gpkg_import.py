@@ -54,6 +54,8 @@ class KadasGpkgImportDialog(QDialog):
 
         if filename is not None:
             self.__selectInputFile(filename)
+        else:
+            self.ui.buttonSelectFile.click()
 
     def __selectInputFile(self, filename):
         if not filename:
