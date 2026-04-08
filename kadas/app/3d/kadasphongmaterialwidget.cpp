@@ -101,6 +101,7 @@ void KadasPhongMaterialWidget::setTechnique( Qgis::MaterialRenderingTechnique te
     }
 
     case Qgis::MaterialRenderingTechnique::Lines:
+    case Qgis::MaterialRenderingTechnique::Billboards:
       // not supported
       break;
   }
