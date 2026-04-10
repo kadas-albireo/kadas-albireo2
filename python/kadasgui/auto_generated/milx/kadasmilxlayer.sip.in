@@ -34,6 +34,9 @@ your option) any later version. *
     virtual bool acceptsItem( const KadasMapItem *item ) const;
 
 
+    virtual KadasItemLayer *clone() const /Factory/;
+
+
     virtual bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context );
 
     virtual bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const;

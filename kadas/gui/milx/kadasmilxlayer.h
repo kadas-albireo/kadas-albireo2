@@ -33,6 +33,8 @@ class KADAS_GUI_EXPORT KadasMilxLayer : public KadasItemLayer
     QString layerTypeKey() const override { return layerType(); }
     bool acceptsItem( const KadasMapItem *item ) const override;
 
+    KadasItemLayer *clone() const override SIP_FACTORY;
+
     bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
     bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const override;
 
