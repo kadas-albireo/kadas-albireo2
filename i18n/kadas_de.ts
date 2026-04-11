@@ -5292,7 +5292,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <translation>Legt die Stärke des Anteils der Spiegelungsfarbe fest.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadasphongmaterialwidget.cpp" line="188"/>
+        <location filename="../kadas/app/3d/kadasphongmaterialwidget.cpp" line="189"/>
         <source>Specular color is disabled because material has no shininess</source>
         <translation>Die Spiegelungsfarbe ist deaktiviert, da das Material keinen Glanz aufweist.</translation>
     </message>

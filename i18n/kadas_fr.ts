@@ -5293,7 +5293,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation>Définir l&apos;intensité de la couleur spéculaire</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadasphongmaterialwidget.cpp" line="188"/>
+        <location filename="../kadas/app/3d/kadasphongmaterialwidget.cpp" line="189"/>
         <source>Specular color is disabled because material has no shininess</source>
         <translation>La couleur spéculaire est désactivée car le matériau n&apos;est pas brillant.</translation>
     </message>

@@ -5290,7 +5290,7 @@ Prova una risoluzione minore o una minor dimensione di pagina.</translation>
         <translation>Imposta l’intensità del contributo del colore speculare</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadasphongmaterialwidget.cpp" line="188"/>
+        <location filename="../kadas/app/3d/kadasphongmaterialwidget.cpp" line="189"/>
         <source>Specular color is disabled because material has no shininess</source>
         <translation>Il colore speculare è disattivato perché il materiale non ha brillantezza</translation>
     </message>
