@@ -285,6 +285,12 @@ if(WITH_VCPKG)
   )
 endif()
 
+if(CMAKE_CONFIGURATION_TYPES)
+  target_compile_definitions(kadas PRIVATE MULTI_CONFIG_LAYOUT=1)
+else()
+  target_compile_definitions(kadas PRIVATE MULTI_CONFIG_LAYOUT=0)
+endif()
+
 if(WITH_CRASHREPORT)
   target_link_libraries(kadas ${CRASHRPT_LIBRARY})
   target_compile_definitions(kadas PRIVATE WITH_CRASHREPORT)
