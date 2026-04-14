@@ -140,7 +140,7 @@ KadasMapItem *KadasItemLayer::takeItem( const ItemId &itemId )
 
 KadasItemLayer *KadasItemLayer::clone() const
 {
-  KadasItemLayer *layer = new KadasItemLayer( name(), crs() );
+  auto layer = std::make_unique<KadasItemLayer>( name(), crs() );
   layer->mTransformContext = mTransformContext;
   layer->mOpacity = mOpacity;
   for ( auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it )
@@ -152,7 +152,7 @@ KadasItemLayer *KadasItemLayer::clone() const
   layer->mIdCounter = mIdCounter;
   layer->mFreeIds = mFreeIds;
   layer->mSymbolScale = mSymbolScale;
-  return layer;
+  return layer.release();
 }
 
 QgsMapLayerRenderer *KadasItemLayer::createMapRenderer( QgsRenderContext &rendererContext )

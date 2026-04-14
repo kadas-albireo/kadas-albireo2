@@ -104,7 +104,7 @@ KadasMilxLayer::KadasMilxLayer( const QString &name )
 
 KadasItemLayer *KadasMilxLayer::clone() const
 {
-  KadasMilxLayer *layer = new KadasMilxLayer( name() );
+  auto layer = std::make_unique<KadasMilxLayer>( name() );
   layer->mTransformContext = mTransformContext;
   layer->mOpacity = mOpacity;
   for ( auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it )
@@ -119,7 +119,7 @@ KadasItemLayer *KadasMilxLayer::clone() const
   layer->mIsApproved = mIsApproved;
   layer->mOverrideMilxSymbolSettings = mOverrideMilxSymbolSettings;
   layer->mMilxSymbolSettings = mMilxSymbolSettings;
-  return layer;
+  return layer.release();
 }
 
 bool KadasMilxLayer::acceptsItem( const KadasMapItem *item ) const
