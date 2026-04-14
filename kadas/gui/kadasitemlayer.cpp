@@ -140,14 +140,19 @@ KadasMapItem *KadasItemLayer::takeItem( const ItemId &itemId )
 
 KadasItemLayer *KadasItemLayer::clone() const
 {
-  KadasItemLayer *layer = new KadasItemLayer( name(), crs() );
+  auto layer = std::make_unique<KadasItemLayer>( name(), crs() );
   layer->mTransformContext = mTransformContext;
   layer->mOpacity = mOpacity;
   for ( auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it )
   {
     layer->mItems.insert( it.key(), it.value()->clone() );
   }
-  return layer;
+  layer->mItemOrder = mItemOrder;
+  layer->mItemBounds = mItemBounds;
+  layer->mIdCounter = mIdCounter;
+  layer->mFreeIds = mFreeIds;
+  layer->mSymbolScale = mSymbolScale;
+  return layer.release();
 }
 
 QgsMapLayerRenderer *KadasItemLayer::createMapRenderer( QgsRenderContext &rendererContext )

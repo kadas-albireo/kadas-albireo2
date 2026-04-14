@@ -19,6 +19,8 @@
 
 #include <QImage>
 
+#define SIP_NO_FILE
+
 /**
  * Utility to copy a QImage to the system clipboard, using native macOS
  * NSPasteboard API on Apple platforms to avoid a crash in ImageIO's TIFF
