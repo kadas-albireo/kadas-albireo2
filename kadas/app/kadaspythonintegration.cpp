@@ -529,7 +529,13 @@ QString KadasPythonIntegration::kadasPythonPath() const
 {
   if ( KadasApplication::isRunningFromBuildDir() )
   {
-    return KadasApplication::applicationDirPath() + QStringLiteral( "/../python" );
+    QDir appDir( KadasApplication::applicationDirPath() );
+#if MULTI_CONFIG_LAYOUT
+    appDir.cdUp();
+#endif
+    appDir.cdUp();
+    appDir.cd( QStringLiteral( "python" ) );
+    return appDir.absolutePath();
   }
   else
   {
