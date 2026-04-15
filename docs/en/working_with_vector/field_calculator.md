@@ -34,7 +34,7 @@ A short example illustrates how field calculator works when using the _Expressio
 6. Complete the expression by typing ‘’/ 1000’’ in the Field calculator expression box and click **[Ok]**.
 7. You can now find a new field `length` in the attribute table.
 
-The available functions are listed in [Expressions](../expression/) chapter.
+The available functions are listed in [Expressions](expression/) chapter.
 
 ## Function Editor tab
 

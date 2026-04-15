@@ -34,7 +34,7 @@ A short example illustrates how field calculator works when using the _Expressio
 6. Vervollständigen Sie den Ausdruck indem Sie “/1000” im Feldrechnerausdruckfenster und klicken Sie **[OK]**.
 7. Sie können jetzt eine neue Spalte `laenge` in der Attributtabelle finden.
 
-Die erhältlichen Funktionen sind im Kapitel [Ausdrücke](../expression/) aufgeführt.
+Die erhältlichen Funktionen sind im Kapitel [Ausdrücke](expression/) aufgeführt.
 
 ## Funktionseditor
 

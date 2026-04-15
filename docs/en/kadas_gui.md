@@ -3,7 +3,7 @@
 
 # KADAS Interface
 
-![](../media/image1.png)
+![](media/image1.png)
 
 The KADAS GUI is divided into five areas:
 
@@ -17,13 +17,13 @@ The KADAS GUI is divided into five areas:
 
 Functionalities are grouped by topic in tabs, which can be activated from the menu bar. The tabs contain buttons for the various functionalities. The functionalities of each tab are documented in the respective chapters:
 
-- [Map](../map/)
-- [View](../view/)
-- [Analysis](../analysis/)
-- [Draw](../draw/)
-- [Navigation](../gps/)
-- [MSS](../mss/)
-- [Settings](../settings/)
+- [Map](map/)
+- [View](view/)
+- [Analysis](analysis/)
+- [Draw](draw/)
+- [Navigation](gps/)
+- [MSS](mss/)
+- [Settings](settings/)
 
 ## Favorites and search
 
@@ -46,7 +46,7 @@ As soon as at least three characters are typed, the search starts and results ar
 
 The results are listed in correspondingly designated categories. The result list can be searched with mouse or keyboard arrows. When selecting a result with the arrows, a blue pin is placed in the appropriate location. When activating a result with the mouse, the map extent is centered on the corresponding location.
 
-![](../media/image2.png)
+![](media/image2.png)
 
 To the right of the search field, it is possible to define a filter geometry for local and remote data set search. This filter is _NOT_ applied to coordinate, location or pin searches.
 
@@ -104,7 +104,7 @@ The toolbar above the catalog contains the following functionalities:
 
 The status bar contains following labels and control widgets:
 
-- **GPS**: Usage of the GPS button is described in the [_Navigation_ chapter](../gps/).
+- **GPS**: Usage of the GPS button is described in the [_Navigation_ chapter](gps/).
 - **Mouse position**: The current mouse position on the map can be displayed with respect to multiple reference systems. The desired format can be selected from the menu left of the display label. The unit for the height can be changed in the Settings tab.
 - **Scale**: The current scale of the map view is displayed next to the coordinate field. The scale selector allows to choose between predefined scales ranging from 1:500 to 1:1000000. The lock icon allows locking the current map scale, zooming will then only affect the magnification factor.
 - **Coordinate reference system**: The coordinate reference system selection button allows to choose which projection to use for the map. If the selected projection differs from the native projection of a dataset, the latter will be reprojected, which may result in reduced performance depending on the amount of data.

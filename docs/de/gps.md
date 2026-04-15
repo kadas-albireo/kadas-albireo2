@@ -7,7 +7,7 @@ Im Navigation-Tab befinden sich Funktionalitäten zur Interaktion mit einem ange
 
 ## Geolokalisierung Aktivieren
 
-Um unter Windows ein GPS mit KADAS verwenden zu können, muss auf dem System die Applikation GpsGate Splitter installiert sein, siehe [GPSGate Konfiguration](../gpsgate/gpsgate/)
+Um unter Windows ein GPS mit KADAS verwenden zu können, muss auf dem System die Applikation GpsGate Splitter installiert sein, siehe [GPSGate Konfiguration](gpsgate/gpsgate/)
 
 Der Status der GPS-Verbindung wird in der Statuszeile im unteren Programmbereich angezeigt. Dieser GPS Statusbutton kann aktiviert bzw. deaktiviert werden, um die Verbidung zu erstellen oder trennen. Die Füllfarbe des Statusbuttons ändert sich gemäss dem aktuellen Verbindungszustand:
 

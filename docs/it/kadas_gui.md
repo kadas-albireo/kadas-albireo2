@@ -3,7 +3,7 @@
 
 # Interfaccia KADAS
 
-![](../media/image1.png)
+![](media/image1.png)
 
 L’interfaccia grafica KADAS è divisa in cinque aree:
 
@@ -17,13 +17,13 @@ L’interfaccia grafica KADAS è divisa in cinque aree:
 
 Le funzionalità sono raggruppate in schede, le quali possono essere attivate dalla barra del menu. Le schede contengono pulsanti per le varie funzionalità. Queste sono documentate nei rispettivi capitoli:
 
-- [Mappa](../map/)
-- [Vista](../view/)
-- [Analisi](../analysis/)
-- [Disegnare](../draw/)
-- [Navigazione](../gps/)
-- [MSS](../mss/)
-- [Impostazioni](../settings/)
+- [Mappa](map/)
+- [Vista](view/)
+- [Analisi](analysis/)
+- [Disegnare](draw/)
+- [Navigazione](gps/)
+- [MSS](mss/)
+- [Impostazioni](settings/)
 
 ## Preferiti e ricerca
 
@@ -46,7 +46,7 @@ La ricerca viene avviata appena sono stati digitati tre o più caratteri nel cam
 
 I risultati vengono elencati nelle categorie corrispondenti. L'elenco dei risultati può essere esaminato con il mouse oppure con le frecce della tastiera. Se si seleziona un risultato con i tasti freccia, nel punto corrispondente viene inserita una spillo blu. Attivando un risultato con il mouse, il riquadro della mappa viene centrato nella località corrispondente.
 
-![](../media/image2.png)
+![](media/image2.png)
 
 Alla destra del campo di ricerca è possibile definire un filtro per la ricerca locale e remota del set di dati. Questo filtro _non_ viene applicato alla ricerca di coordinate, località o spilli.
 
@@ -104,7 +104,7 @@ Le seguenti funzioni sono disponibili sopra l'elenco del catalogo:
 
 Nella barra di stato sono disposti i seguenti indicatori e le seguenti funzioni:
 
-- **GPS**: L'uso del pulsante GPS è descritto nel [capitolo _Navigazione_](../gps/).
+- **GPS**: L'uso del pulsante GPS è descritto nel [capitolo _Navigazione_](gps/).
 - \_**Posizione del mouse\_**: La posizione corrente del mouse sulla mappa può essere visualizzata rispetto a molteplici sistemi di riferimento . Il sistema desiderato può essere selezionato dal menu a sinistra campo di visualizzazione. L'unità di misura dell'altezza può essere modificata nella scheda Impostazioni.
 - **Scala**: La scala corrente della visualizzazione della mappa è mostrata accanto al campo delle coordinate. Il selettore di scala consente di scegliere tra scale predefinite tra 1:500 e 1:100000000. L'icona del lucchetto consente di bloccare la scala corrente della mappa; lo zoom influirà quindi solo sul fattore di ingrandimento.
 - **Sistema di coordinate**: Il pulsante di selezione del sistema di coordinate permette di scegliere quale proiezione utilizzare per la mappa. Se la proiezione selezionata differisce dalla proiezione nativa di un dataset, quest'ultimo viene riproiettato, il che può comportare una riduzione delle prestazioni a seconda della quantità di dati.

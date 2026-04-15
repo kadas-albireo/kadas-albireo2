@@ -34,7 +34,7 @@ L'exemple suivant montre comment la calculatrice de champs fonctionne. Il s'agit
 6. Terminez en rentrant 1000 à la fin de l'expression et en cliquant sur le bouton **[Ok]**.
 7. Vous pouvez maintenant voir la nouvelle colonne `longueur` dans la table d'attributs.
 
-Les fonctions disponibles sont listées dans [Expressions](../expression/).
+Les fonctions disponibles sont listées dans [Expressions](expression/).
 
 ## Onglet Editeur de fonction
 

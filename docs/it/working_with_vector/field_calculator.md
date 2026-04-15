@@ -34,7 +34,7 @@ Un breve esempio illustra come funziona il calcolatore di campo quando si utiliz
 6. Completa l’espressione digitando ‘’/ 1000’’ nel campo Espressione e clicca **[OK]**.
 7. You can now find a new field `length` in the attribute table.
 
-Le funzioni disponibili sono elencate nel capitolo [Espressioni](../expression/).
+Le funzioni disponibili sono elencate nel capitolo [Espressioni](expression/).
 
 ## Scheda Editor funzioni
 
