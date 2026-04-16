@@ -19,15 +19,15 @@ jobs:
     uses: ./.github/workflows/build-docs.yml
 
   macos:
-    uses: ./.github/workflows/build-macos.yml
     needs: docs
+    uses: ./.github/workflows/build-macos.yml
     with:
       docs-artifact-name: kadas-docs-html
     secrets: inherit
 
   windows:
-    uses: ./.github/workflows/build-windows.yml
     needs: docs
+    uses: ./.github/workflows/build-windows.yml
     with:
       docs-artifact-name: kadas-docs-html
     secrets: inherit
