@@ -145,6 +145,7 @@ KadasMilxItem::KadasMilxItem()
 
 void KadasMilxItem::setSymbol( const KadasMilxSymbolDesc &symbolDesc )
 {
+  qDebug() << "[MILX-DEBUG] KadasMilxItem::setSymbol xml.len=" << symbolDesc.symbolXml.length() << "militaryName=" << symbolDesc.militaryName << "this=" << this;
   mMssString = symbolDesc.symbolXml;
   mMilitaryName = symbolDesc.militaryName;
   mHasVariablePoints = symbolDesc.hasVariablePoints;
@@ -349,6 +350,11 @@ QPair<KadasMapPos, double> KadasMilxItem::closestPoint( const KadasMapPos &pos, 
 
 void KadasMilxItem::render( QgsRenderContext &context ) const
 {
+  if ( mMssString.isEmpty() )
+  {
+    qDebug() << "[MILX-DEBUG] KadasMilxItem::render SKIP — empty mMssString (this=" << this << "drawStatus=" << int( constState()->drawStatus ) << "nPoints=" << constState()->points.size() << ")";
+    return;
+  }
   double dpiScale = outputDpiScale( context );
   KadasMilxClient::NPointSymbol symbol = toSymbol( context.mapToPixel(), context.coordinateTransform().destinationCrs(), true );
   KadasMilxClient::NPointSymbolGraphic result;

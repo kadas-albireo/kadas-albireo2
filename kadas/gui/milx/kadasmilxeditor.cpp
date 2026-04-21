@@ -86,6 +86,19 @@ void KadasMilxEditor::toggleLibrary( bool enabled )
 
 void KadasMilxEditor::symbolSelected( const KadasMilxSymbolDesc &symbolTemplate )
 {
+  const int ds = mItem ? int( mItem->constState()->drawStatus ) : -1;
+  qDebug()
+    << "[MILX-DEBUG] KadasMilxEditor::symbolSelected xml.len="
+    << symbolTemplate.symbolXml.length()
+    << "mItem="
+    << mItem
+    << "isMilxItem="
+    << ( dynamic_cast<KadasMilxItem *>( mItem ) != nullptr )
+    << "drawStatus="
+    << ds
+    << "(Empty="
+    << int( KadasMapItem::State::DrawStatus::Empty )
+    << ")";
   if ( !symbolTemplate.symbolXml.isEmpty() )
   {
     mSymbolButton->setIcon( QIcon( QPixmap::fromImage( symbolTemplate.icon ) ) );
@@ -99,6 +112,11 @@ void KadasMilxEditor::symbolSelected( const KadasMilxSymbolDesc &symbolTemplate 
   mSelectedSymbol = symbolTemplate;
   if ( dynamic_cast<KadasMilxItem *>( mItem ) && mItem->constState()->drawStatus == KadasMapItem::State::DrawStatus::Empty )
   {
+    qDebug() << "[MILX-DEBUG] KadasMilxEditor::symbolSelected -> calling setSymbol on item";
     static_cast<KadasMilxItem *>( mItem )->setSymbol( symbolTemplate );
+  }
+  else
+  {
+    qDebug() << "[MILX-DEBUG] KadasMilxEditor::symbolSelected -> NOT calling setSymbol (wrong type or drawStatus != Empty)";
   }
 }

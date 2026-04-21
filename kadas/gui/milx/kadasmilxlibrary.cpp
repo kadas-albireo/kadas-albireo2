@@ -176,8 +176,10 @@ void KadasMilxLibrary::itemClicked( const QModelIndex &index )
 
     KadasMilxSymbolDesc symbolDesc;
     symbolDesc.symbolXml = item->data( SymbolXmlRole ).toString();
+    qDebug() << "[MILX-DEBUG] KadasMilxLibrary::itemClicked symbolXml.len=" << symbolDesc.symbolXml.length() << "head=" << symbolDesc.symbolXml.left( 80 );
     if ( symbolDesc.symbolXml.isEmpty() )
     {
+      qDebug() << "[MILX-DEBUG] KadasMilxLibrary::itemClicked -> early return (empty xml)";
       return;
     }
     hide();
@@ -196,6 +198,7 @@ void KadasMilxLibrary::itemClicked( const QModelIndex &index )
       symbolDesc.symbolType = item->data( SymbolTypeRole ).toString();
       symbolDesc.icon = item->icon().pixmap( item->icon().actualSize( QSize( 32, 32 ) ) ).toImage();
     }
+    qDebug() << "[MILX-DEBUG] KadasMilxLibrary emitting symbolSelected xml.len=" << symbolDesc.symbolXml.length() << "militaryName=" << symbolDesc.militaryName << "type=" << symbolDesc.symbolType;
     emit symbolSelected( symbolDesc );
   }
 }
