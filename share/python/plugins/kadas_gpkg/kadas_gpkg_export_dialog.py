@@ -1,6 +1,5 @@
 import os
 
-# from .kadas_gpkg_layer_list import KadasGpkgLayersList
 from kadas.kadasgui import KadasMapToolSelectRect
 from qgis.core import Qgis
 from qgis.PyQt.QtCore import QSettings
