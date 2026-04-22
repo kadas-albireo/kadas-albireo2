@@ -22,6 +22,7 @@
 #include <QDataStream>
 #include <QDir>
 #include <QEventLoop>
+#include <QFile>
 #include <QHostAddress>
 #include <QImage>
 #include <QProcess>
@@ -87,14 +88,49 @@ bool KadasMilxClientWorker::initialize()
   {
     mProcess = new QProcess( this );
     connect( mProcess, qOverload<int, QProcess::ExitStatus>( &QProcess::finished ), this, &KadasMilxClientWorker::cleanup );
-    connect( mProcess, &QProcess::errorOccurred, this, []( QProcess::ProcessError error ) { qWarning() << QStringLiteral( "Could not start milxserver: Error %1" ).arg( error ); } );
+    connect( mProcess, qOverload<int, QProcess::ExitStatus>( &QProcess::finished ), this, []( int exitCode, QProcess::ExitStatus exitStatus ) {
+      qWarning() << "[MILX-DEBUG] milxserver finished exitCode=" << exitCode << " exitStatus=" << exitStatus;
+    } );
+    connect( mProcess, &QProcess::errorOccurred, this, [this]( QProcess::ProcessError error ) {
+      qWarning() << QStringLiteral( "Could not start milxserver: Error %1" ).arg( error );
+      if ( mProcess )
+      {
+        const QByteArray eout = mProcess->readAllStandardError();
+        const QByteArray oout = mProcess->readAllStandardOutput();
+        qWarning() << "[MILX-DEBUG] milxserver errorString=" << mProcess->errorString();
+        qWarning() << "[MILX-DEBUG] milxserver stderr=" << QString::fromLocal8Bit( eout );
+        qWarning() << "[MILX-DEBUG] milxserver stdout=" << QString::fromLocal8Bit( oout );
+      }
+    } );
 
     const QString serverPath = QCoreApplication::applicationDirPath() + QStringLiteral( "/milxserver.exe" );
+    qWarning() << "[MILX-DEBUG] launching milxserver:" << serverPath << "exists=" << QFile::exists( serverPath );
+    mProcess->setProcessChannelMode( QProcess::SeparateChannels );
     mProcess->setProgram( serverPath );
     mProcess->start();
 
-    mProcess->waitForReadyRead( 10000 );
+    const bool started = mProcess->waitForStarted( 10000 );
+    qWarning() << "[MILX-DEBUG] waitForStarted=" << started << "state=" << mProcess->state() << "pid=" << mProcess->processId();
+    const bool gotStdout = mProcess->waitForReadyRead( 10000 );
     QByteArray out = mProcess->readAllStandardOutput();
+    QByteArray errOut = mProcess->readAllStandardError();
+    qWarning()
+      << "[MILX-DEBUG] milxserver gotStdout="
+      << gotStdout
+      << "stdout.len="
+      << out.size()
+      << "stderr.len="
+      << errOut.size()
+      << "state="
+      << mProcess->state()
+      << "exitCode="
+      << mProcess->exitCode()
+      << "errorString="
+      << mProcess->errorString();
+    if ( !errOut.isEmpty() )
+      qWarning() << "[MILX-DEBUG] milxserver stderr:" << QString::fromLocal8Bit( errOut );
+    if ( !out.isEmpty() )
+      qWarning() << "[MILX-DEBUG] milxserver stdout:" << QString::fromLocal8Bit( out );
     if ( !mProcess->isOpen() )
     {
       cleanup();
@@ -110,6 +146,7 @@ bool KadasMilxClientWorker::initialize()
       return false;
     }
     port = QString( out ).toInt();
+    qWarning() << "[MILX-DEBUG] milxserver port=" << port;
   }
 #else
   int port = atoi( qgetenv( portEnv ) );
