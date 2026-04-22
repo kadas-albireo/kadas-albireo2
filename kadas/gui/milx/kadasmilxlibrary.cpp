@@ -229,7 +229,16 @@ QStandardItemModel *KadasMilxLibrary::loadLibrary( const QSize &viewIconSize )
       {
         QImage galleryIcon( QString( galleryFilePath ).replace( QRegularExpression( ".xml$" ), ".png" ) );
         QDomDocument doc;
-        doc.setContent( &galleryFile );
+        const auto parseResult = doc.setContent( &galleryFile );
+        qDebug()
+          << "[MILX-DEBUG] loadLibrary file="
+          << galleryFileName
+          << " parseOk="
+          << bool( parseResult )
+          << " docRootTag="
+          << doc.documentElement().tagName()
+          << " mssGalleryChildCount="
+          << doc.firstChildElement( "MssGallery" ).childNodes().count();
         QDomElement mssGalleryEl = doc.firstChildElement( "MssGallery" );
         QDomElement galleryNameEl = mssGalleryEl.firstChildElement( QString( "Name_%1" ).arg( lang ) );
         if ( galleryNameEl.isNull() )
@@ -268,6 +277,23 @@ QStandardItemModel *KadasMilxLibrary::loadLibrary( const QSize &viewIconSize )
             }
             QList<KadasMilxSymbolDesc> symbolDescs;
             KadasMilxClient::getSymbolsMetadata( symbolXmls, symbolDescs );
+            qDebug()
+              << "[MILX-DEBUG] loadLibrary section='"
+              << sectionNameEl.text()
+              << "' subSection='"
+              << subSectionNameEl.text()
+              << "' membersIn="
+              << symbolXmls.size()
+              << " firstXmlInLen="
+              << ( symbolXmls.isEmpty() ? -1 : symbolXmls.first().length() )
+              << " firstXmlInHead="
+              << ( symbolXmls.isEmpty() ? QString() : symbolXmls.first().left( 80 ) )
+              << " descsOut="
+              << symbolDescs.size()
+              << " firstDescXmlLen="
+              << ( symbolDescs.isEmpty() ? -1 : symbolDescs.first().symbolXml.length() )
+              << " firstDescName="
+              << ( symbolDescs.isEmpty() ? QString() : symbolDescs.first().name );
             for ( const KadasMilxSymbolDesc &symbolDesc : symbolDescs )
             {
               if ( mLoaderAborted )
