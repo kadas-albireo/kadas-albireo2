@@ -269,11 +269,13 @@ bool KadasMilxClientWorker::processRequest( const QByteArray &request, QByteArra
   if ( replycmd == MILX_REPLY_ERROR )
   {
     ostream >> mLastError;
+    qWarning() << "[MILX-DEBUG] processRequest server replied ERROR:" << mLastError << " expectedReply=" << expectedReply;
     return false;
   }
   else if ( replycmd != expectedReply )
   {
     mLastError = tr( "Unexpected reply" );
+    qWarning() << "[MILX-DEBUG] processRequest unexpected reply code=" << replycmd << " expectedReply=" << expectedReply << " responseBytes=" << response.size();
     return false;
   }
   return true;
@@ -412,6 +414,7 @@ bool KadasMilxClient::getSymbolsMetadata( const QStringList &symbolIds, QList<Ka
   QByteArray response;
   if ( !instance()->processRequest( request, response, MILX_REPLY_GET_SYMBOLS_METADATA ) )
   {
+    qWarning() << "[MILX-DEBUG] getSymbolsMetadata processRequest FAILED symbolIds.size=" << symbolIds.size();
     return false;
   }
 
@@ -422,6 +425,7 @@ bool KadasMilxClient::getSymbolsMetadata( const QStringList &symbolIds, QList<Ka
   ostream >> nResults;
   if ( nResults != symbolIds.size() )
   {
+    qWarning() << "[MILX-DEBUG] getSymbolsMetadata nResults mismatch nResults=" << nResults << " expected=" << symbolIds.size() << " replycmd=" << replycmd << " responseBytes=" << response.size();
     return false;
   }
   for ( int i = 0; i < nResults; ++i )
