@@ -353,3 +353,67 @@ class TestUnsupportedProviders:
         assert (
             _find_item(widget, layer.id()) is not None
         ), "An OGR layer should appear in the widget"
+
+
+# ---------------------------------------------------------------------------
+# Regression: _select_all() must check group items on the very first call
+# ---------------------------------------------------------------------------
+
+
+class TestSelectAllGroupsRegression:
+    def test_group_datachanged_fires_after_children_are_checked(self, four_layer_project):
+        """The group's model dataChanged must fire only after all its children are
+        already in the target state.
+
+        Root cause: _set_subtree_check_state sets the GROUP item first and then
+        recurses into its children. When the group's setCheckState triggers a
+        model dataChanged notification, the view schedules a repaint. On Qt
+        versions where ItemIsAutoTristate only propagates upward (not downward),
+        the repaint happens while children are still in the old (mixed) state, so
+        the group checkbox is rendered with the wrong (PartiallyChecked) indicator.
+        On the second Select All press the children are already Checked, so the
+        notification fires in a consistent state and the group renders correctly.
+
+        Fix: recurse into children first so that when the group's own
+        setCheckState is called — and the model notification fires — all children
+        are already in the target state. The view then repaints the group with the
+        correct indicator on the very first press.
+        """
+        widget, la1, la2, lb1, lb2 = four_layer_project
+
+        # Put GroupA into a PartiallyChecked state
+        _find_item(widget, la2.id()).setCheckState(0, Qt.CheckState.Unchecked)
+        grp_a = _find_group_item(widget, "GroupA")
+        assert grp_a.checkState(0) == Qt.CheckState.PartiallyChecked, \
+            "Precondition: GroupA must be PartiallyChecked"
+
+        # Capture the state of la2 AT THE MOMENT the group's dataChanged fires.
+        # With the buggy order (group set before children), dataChanged for the
+        # group fires while la2 is still Unchecked — the view would render the
+        # group as PartiallyChecked.
+        # With the fix (children set first), dataChanged fires after la2 is
+        # already Checked — the view renders Checked correctly.
+        la2_states_when_group_fires = []
+
+        def on_data_changed(tl, br, roles):
+            item = widget._tree.itemFromIndex(tl)
+            if item is grp_a:
+                la2_item = _find_item(widget, la2.id())
+                la2_states_when_group_fires.append(la2_item.checkState(0))
+
+        widget._tree.model().dataChanged.connect(on_data_changed)
+
+        widget._select_all()
+
+        # The group's dataChanged must have fired
+        assert la2_states_when_group_fires, \
+            "dataChanged was never emitted for the group during _select_all()"
+
+        # When it fired, la2 must already have been Checked.
+        # If la2 was still Unchecked at that moment, the visual repaint would
+        # show the group as PartiallyChecked — that is the bug.
+        assert la2_states_when_group_fires[-1] == Qt.CheckState.Checked, (
+            f"la2 was {la2_states_when_group_fires[-1]!r} when the group's "
+            f"dataChanged fired — the view would render GroupA as PartiallyChecked "
+            f"instead of Checked"
+        )

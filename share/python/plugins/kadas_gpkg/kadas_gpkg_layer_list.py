@@ -118,13 +118,25 @@ class KadasGpkgLayersListBase(QWidget):
             self._tree.blockSignals(False)
 
     def _set_subtree_check_state(self, parent_item, state):
-        """Recursively apply *state* to all enabled children of *parent_item*."""
+        """Recursively apply *state* to all enabled children of *parent_item*.
+
+        For group items, we recurse into children FIRST before calling
+        setCheckState on the group. Qt's ItemIsAutoTristate propagates changes
+        upward via model signals. When blockSignals is active that upward
+        propagation is suppressed, so the group's model dataChanged notification
+        fires at the moment setCheckState is called on it. If we set the group
+        before updating its children, the notification fires while children are
+        still in the old (mixed) state and the view renders the group with the
+        wrong indicator. Recursing first ensures children are already in the
+        target state when the group notification fires.
+        """
         for i in range(parent_item.childCount()):
             child = parent_item.child(i)
+            if child.data(0, _LAYER_ID_ROLE) is None:
+                # Group: descend into children first, then set the group itself.
+                self._set_subtree_check_state(child, state)
             if child.flags() & Qt.ItemFlag.ItemIsEnabled:
                 child.setCheckState(0, state)
-            if child.data(0, _LAYER_ID_ROLE) is None:
-                self._set_subtree_check_state(child, state)
 
     # ------------------------------------------------------------------
     # Select / Deselect all
