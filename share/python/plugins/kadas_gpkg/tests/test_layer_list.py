@@ -383,8 +383,9 @@ class TestSelectAllGroupsRegression:
         # Put GroupA into a PartiallyChecked state
         _find_item(widget, la2.id()).setCheckState(0, Qt.CheckState.Unchecked)
         grp_a = _find_group_item(widget, "GroupA")
-        assert grp_a.checkState(0) == Qt.CheckState.PartiallyChecked, \
-            "Precondition: GroupA must be PartiallyChecked"
+        assert (
+            grp_a.checkState(0) == Qt.CheckState.PartiallyChecked
+        ), "Precondition: GroupA must be PartiallyChecked"
 
         # Capture the state of la2 AT THE MOMENT the group's dataChanged fires.
         # With the buggy order (group set before children), dataChanged for the
@@ -405,8 +406,9 @@ class TestSelectAllGroupsRegression:
         widget._select_all()
 
         # The group's dataChanged must have fired
-        assert la2_states_when_group_fires, \
-            "dataChanged was never emitted for the group during _select_all()"
+        assert (
+            la2_states_when_group_fires
+        ), "dataChanged was never emitted for the group during _select_all()"
 
         # When it fired, la2 must already have been Checked.
         # If la2 was still Unchecked at that moment, the visual repaint would
@@ -430,7 +432,7 @@ def _make_import_xml(layers, tree_ids):
     *tree_ids* is the ordered list of layer IDs to place in the layer-tree.
     """
     maplayer_blocks = "\n".join(
-        f"  <maplayer type=\"{ltype}\">\n"
+        f'  <maplayer type="{ltype}">\n'
         f"    <id>{lid}</id>\n"
         f"    <layername>{lname}</layername>\n"
         f"    <provider>ogr</provider>\n"
@@ -445,7 +447,7 @@ def _make_import_xml(layers, tree_ids):
     return (
         "<qgis>\n"
         + maplayer_blocks
-        + "\n  <layer-tree-group name=\"root\">\n"
+        + '\n  <layer-tree-group name="root">\n'
         + tree_nodes
         + "\n  </layer-tree-group>\n</qgis>"
     )
@@ -489,9 +491,9 @@ class TestImportAlreadyLoaded:
         widget, gpkg_path, loaded_id, unloaded_id = import_setup
         item = _find_item(widget, loaded_id)
         assert item is not None
-        assert not (item.flags() & Qt.ItemFlag.ItemIsEnabled), (
-            "Already-loaded layer must be disabled in the import list"
-        )
+        assert not (
+            item.flags() & Qt.ItemFlag.ItemIsEnabled
+        ), "Already-loaded layer must be disabled in the import list"
 
     def test_already_loaded_layer_excluded_from_results(self, import_setup):
         """Already-loaded layers must not appear in getSelectedLayerIds()."""
@@ -504,9 +506,9 @@ class TestImportAlreadyLoaded:
         widget, gpkg_path, loaded_id, unloaded_id = import_setup
         item = _find_item(widget, unloaded_id)
         assert item is not None
-        assert item.flags() & Qt.ItemFlag.ItemIsEnabled, (
-            "Layer not loaded from this GPKG must be enabled"
-        )
+        assert (
+            item.flags() & Qt.ItemFlag.ItemIsEnabled
+        ), "Layer not loaded from this GPKG must be enabled"
 
     def test_unloaded_layer_appears_in_results_when_checked(self, import_setup):
         """A checked unloaded layer must appear in getSelectedLayerIds()."""

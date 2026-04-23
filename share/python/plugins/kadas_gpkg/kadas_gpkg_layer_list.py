@@ -399,7 +399,9 @@ class KadasGpkgImportLayersList(KadasGpkgLayersListBase):
                 for layer_id, info in maplayer_info.items():
                     self._add_layer_item(self._tree.invisibleRootItem(), layer_id, info)
             else:
-                self._build_tree_from_xml(root_group, self._tree.invisibleRootItem(), maplayer_info)
+                self._build_tree_from_xml(
+                    root_group, self._tree.invisibleRootItem(), maplayer_info
+                )
         finally:
             self._tree.blockSignals(False)
 
@@ -477,9 +479,7 @@ class KadasGpkgImportLayersList(KadasGpkgLayersListBase):
         if layer is None:
             return False
         src = layer.source()
-        return src.startswith(self._gpkg_filename) or src.startswith(
-            "GPKG:" + self._gpkg_filename
-        )
+        return src.startswith(self._gpkg_filename) or src.startswith("GPKG:" + self._gpkg_filename)
 
     # ------------------------------------------------------------------
     # Result collection
