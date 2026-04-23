@@ -104,15 +104,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QListWidget" name="listWidgetLayers">
+       <widget class="KadasGpkgImportLayersList" name="listWidgetLayers">
         <property name="enabled">
          <bool>false</bool>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>16</width>
-          <height>16</height>
-         </size>
         </property>
        </widget>
       </item>
@@ -134,6 +128,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>KadasGpkgImportLayersList</class>
+   <extends>QWidget</extends>
+   <header>kadas_gpkg.kadas_gpkg_layer_list</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../qgis-master/images/images.qrc"/>
  </resources>

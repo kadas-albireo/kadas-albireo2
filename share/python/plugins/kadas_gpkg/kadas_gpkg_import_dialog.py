@@ -2,14 +2,12 @@ import os
 import sqlite3
 
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import QSettings, Qt
+from qgis.PyQt.QtCore import QSettings
 from qgis.PyQt.QtWidgets import (
     QDialog,
     QDialogButtonBox,
     QFileDialog,
-    QListWidgetItem,
 )
-from qgis.PyQt.QtXml import QDomDocument
 
 PLUGIN_DIR = os.path.dirname(__file__)
 
@@ -30,7 +28,6 @@ class KadasGpkgImportDialog(QDialog):
         self.ui.buttonSelectFile.clicked.connect(self.__selectInputFile)
         self.ui.radioButtonImportLayers.toggled.connect(self.ui.listWidgetLayers.setEnabled)
 
-        self.layerIdRole = Qt.ItemDataRole.UserRole + 1
         self.xml = None
 
         if filename is not None:
@@ -62,49 +59,29 @@ class KadasGpkgImportDialog(QDialog):
         else:
             self.ui.labelDataWarning.setVisible(False)
             self.ui.widgetProjectImport.setVisible(True)
+            self.ui.listWidgetLayers.loadFromGpkg(filename, self.xml)
 
         self.ui.lineEditInputFile.setText(filename)
         self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(True)
 
     def __read_gpkg_project(self, gpkg_filename):
-        self.ui.listWidgetLayers.clear()
-
         try:
             conn = sqlite3.connect(gpkg_filename)
         except Exception:
             return None
 
-        """ Read qgis project """
         project_name = "qgpkg"
         cursor = conn.cursor()
         try:
             cursor.execute("SELECT xml FROM qgis_projects WHERE name=?", (project_name,))
         except Exception:
-            return None
-        qgis_projects = cursor.fetchone()
-        if qgis_projects is None:
             conn.close()
             return None
-        xml = qgis_projects[0]
-        doc = QDomDocument()
-        doc.setContent(xml)
-        maplayers = doc.elementsByTagName("maplayer")
-
-        for i in range(0, maplayers.size()):
-            maplayer = maplayers.at(i)
-            try:
-                layerid = maplayer.firstChildElement("id").text()
-                layername = maplayer.firstChildElement("layername").text()
-            except Exception:
-                # Need at least layerid and layername
-                continue
-            item = QListWidgetItem(layername)
-            item.setCheckState(Qt.CheckState.Unchecked)
-            item.setData(self.layerIdRole, layerid)
-            self.ui.listWidgetLayers.addItem(item)
-
+        qgis_projects = cursor.fetchone()
         conn.close()
-        return xml
+        if qgis_projects is None:
+            return None
+        return qgis_projects[0]
 
     def gpkgFilename(self):
         return self.ui.lineEditInputFile.text()
@@ -116,9 +93,4 @@ class KadasGpkgImportDialog(QDialog):
         return self.ui.radioButtonImportLayers.isChecked()
 
     def selectedLayerIds(self):
-        layerIds = []
-        for i in range(0, self.ui.listWidgetLayers.count()):
-            item = self.ui.listWidgetLayers.item(i)
-            if item.checkState() == Qt.CheckState.Checked:
-                layerIds.append(item.data(self.layerIdRole))
-        return layerIds
+        return self.ui.listWidgetLayers.getSelectedLayerIds()
