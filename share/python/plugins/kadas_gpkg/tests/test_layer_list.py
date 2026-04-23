@@ -16,7 +16,11 @@ Structure used in most tests:
 """
 
 import pytest
-from kadas_gpkg.kadas_gpkg_layer_list import _LAYER_ID_ROLE, KadasGpkgLayersList
+from kadas_gpkg.kadas_gpkg_layer_list import (
+    _LAYER_ID_ROLE,
+    KadasGpkgImportLayersList,
+    KadasGpkgLayersList,
+)
 from qgis.core import (
     QgsCoordinateTransformContext,
     QgsProject,
@@ -412,3 +416,102 @@ class TestSelectAllGroupsRegression:
             f"dataChanged fired — the view would render GroupA as PartiallyChecked "
             f"instead of Checked"
         )
+
+
+# ---------------------------------------------------------------------------
+# KadasGpkgImportLayersList – already-loaded layer detection
+# ---------------------------------------------------------------------------
+
+
+def _make_import_xml(layers, tree_ids):
+    """Build a minimal QGIS project XML string for use with loadFromGpkg.
+
+    *layers* is a list of (layer_id, layer_name, layer_type) tuples.
+    *tree_ids* is the ordered list of layer IDs to place in the layer-tree.
+    """
+    maplayer_blocks = "\n".join(
+        f"  <maplayer type=\"{ltype}\">\n"
+        f"    <id>{lid}</id>\n"
+        f"    <layername>{lname}</layername>\n"
+        f"    <provider>ogr</provider>\n"
+        f"  </maplayer>"
+        for lid, lname, ltype in layers
+    )
+    tree_nodes = "\n".join(
+        f'    <layer-tree-layer id="{lid}" name="{lname}"/>'
+        for lid, lname, _ in layers
+        if lid in tree_ids
+    )
+    return (
+        "<qgis>\n"
+        + maplayer_blocks
+        + "\n  <layer-tree-group name=\"root\">\n"
+        + tree_nodes
+        + "\n  </layer-tree-group>\n</qgis>"
+    )
+
+
+class TestImportAlreadyLoaded:
+    """Tests for already-loaded layer detection in KadasGpkgImportLayersList."""
+
+    @pytest.fixture
+    def import_setup(self, tmp_path):
+        """Create an OGR layer loaded into QgsProject from a GPKG, plus an import
+        widget primed with XML describing that layer and a second unloaded layer.
+
+        Returns (widget, gpkg_path, loaded_id, unloaded_id).
+        """
+        gpkg_path = str(tmp_path / "test.gpkg")
+        loaded = _make_ogr_layer("LoadedLayer", gpkg_path)
+        loaded_id = loaded.id()
+
+        project = QgsProject.instance()
+        project.addMapLayer(loaded, False)
+        project.layerTreeRoot().addLayer(loaded)
+
+        # A second layer ID that is NOT loaded in the project
+        unloaded_id = "unloaded_layer_id_00000000"
+
+        xml = _make_import_xml(
+            [
+                (loaded_id, "LoadedLayer", "vector"),
+                (unloaded_id, "UnloadedLayer", "vector"),
+            ],
+            [loaded_id, unloaded_id],
+        )
+
+        widget = KadasGpkgImportLayersList()
+        widget.loadFromGpkg(gpkg_path, xml)
+        return widget, gpkg_path, loaded_id, unloaded_id
+
+    def test_already_loaded_layer_is_disabled(self, import_setup):
+        """A layer whose source starts with the GPKG path must be disabled."""
+        widget, gpkg_path, loaded_id, unloaded_id = import_setup
+        item = _find_item(widget, loaded_id)
+        assert item is not None
+        assert not (item.flags() & Qt.ItemFlag.ItemIsEnabled), (
+            "Already-loaded layer must be disabled in the import list"
+        )
+
+    def test_already_loaded_layer_excluded_from_results(self, import_setup):
+        """Already-loaded layers must not appear in getSelectedLayerIds()."""
+        widget, gpkg_path, loaded_id, unloaded_id = import_setup
+        result = widget.getSelectedLayerIds()
+        assert loaded_id not in result
+
+    def test_unloaded_layer_is_enabled(self, import_setup):
+        """A layer that is not yet in the project must be enabled for selection."""
+        widget, gpkg_path, loaded_id, unloaded_id = import_setup
+        item = _find_item(widget, unloaded_id)
+        assert item is not None
+        assert item.flags() & Qt.ItemFlag.ItemIsEnabled, (
+            "Layer not loaded from this GPKG must be enabled"
+        )
+
+    def test_unloaded_layer_appears_in_results_when_checked(self, import_setup):
+        """A checked unloaded layer must appear in getSelectedLayerIds()."""
+        widget, gpkg_path, loaded_id, unloaded_id = import_setup
+        item = _find_item(widget, unloaded_id)
+        item.setCheckState(0, Qt.CheckState.Checked)
+        result = widget.getSelectedLayerIds()
+        assert unloaded_id in result

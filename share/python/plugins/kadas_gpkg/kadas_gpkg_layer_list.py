@@ -340,8 +340,11 @@ class KadasGpkgImportLayersList(KadasGpkgLayersListBase):
 
     The tree is initially empty. Call loadFromGpkg() after reading the project XML
     from a GPKG file. Group structure is reconstructed from the <layer-tree-group>
-    element in the embedded project XML. All layers start unchecked and enabled;
-    re-importing a layer that is already loaded simply overwrites it.
+    element in the embedded project XML.
+
+    Layers already loaded in the current QGIS project from the same GPKG file are
+    shown with a success icon and disabled; re-importing them would only create
+    duplicates of data already available.
 
     Public API:
         loadFromGpkg(gpkg_filename, xml_bytes)
@@ -350,6 +353,7 @@ class KadasGpkgImportLayersList(KadasGpkgLayersListBase):
 
     def __init__(self, parent=None):
         KadasGpkgLayersListBase.__init__(self, parent)
+        self._gpkg_filename = None
 
     # ------------------------------------------------------------------
     # Public API
@@ -361,6 +365,8 @@ class KadasGpkgImportLayersList(KadasGpkgLayersListBase):
         *gpkg_filename* is the path to the .gpkg file.
         *xml_bytes* is the raw project XML string/bytes from the qgis_projects table.
         """
+        self._gpkg_filename = gpkg_filename
+        self._in_gpkg_ids = set()
         self._tree.blockSignals(True)
         self._tree.invisibleRootItem().takeChildren()
         self._tree.blockSignals(False)
@@ -442,8 +448,16 @@ class KadasGpkgImportLayersList(KadasGpkgLayersListBase):
         item.setText(0, info["name"])
         item.setData(0, _LAYER_ID_ROLE, layer_id)
         item.setIcon(0, self._icon_for_type(info["type"]))
-        item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsUserCheckable)
-        item.setCheckState(0, Qt.CheckState.Unchecked)
+
+        if self._is_already_loaded(layer_id):
+            self._in_gpkg_ids.add(layer_id)
+            item.setCheckState(0, Qt.CheckState.Unchecked)
+            item.setFlags(Qt.ItemFlag.ItemIsUserCheckable)  # disabled
+            item.setIcon(1, self._icon_ok)
+            item.setToolTip(1, self.tr("Layer is already loaded from this GeoPackage"))
+        else:
+            item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsUserCheckable)
+            item.setCheckState(0, Qt.CheckState.Unchecked)
 
     def _icon_for_type(self, layer_type_str):
         """Return a QIcon for a layer type string from the project XML."""
@@ -455,6 +469,18 @@ class KadasGpkgImportLayersList(KadasGpkgLayersListBase):
                 pass
         return QIcon()
 
+    def _is_already_loaded(self, layer_id):
+        """Return True if *layer_id* is currently loaded in QGIS from the same GPKG."""
+        if not self._gpkg_filename:
+            return False
+        layer = QgsProject.instance().mapLayer(layer_id)
+        if layer is None:
+            return False
+        src = layer.source()
+        return src.startswith(self._gpkg_filename) or src.startswith(
+            "GPKG:" + self._gpkg_filename
+        )
+
     # ------------------------------------------------------------------
     # Result collection
     # ------------------------------------------------------------------
@@ -465,6 +491,8 @@ class KadasGpkgImportLayersList(KadasGpkgLayersListBase):
             layer_id = item.data(0, _LAYER_ID_ROLE)
             if layer_id is None:
                 self._collect_checked_ids(item, result)
+                continue
+            if layer_id in self._in_gpkg_ids:
                 continue
             if item.checkState(0) == Qt.CheckState.Checked:
                 result.append(layer_id)
