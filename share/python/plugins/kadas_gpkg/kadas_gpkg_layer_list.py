@@ -72,9 +72,6 @@ class KadasGpkgLayersListBase(QWidget):
         self._tree.header().setSectionResizeMode(1, self._tree.header().ResizeMode.Fixed)
         self._tree.setColumnWidth(1, 22)
 
-        # itemChanged drives tristate propagation (group -> children)
-        self._tree.itemChanged.connect(self._on_item_changed)
-
         # Buttons
         btn_all = QPushButton(self.tr("Select All"))
         btn_none = QPushButton(self.tr("Deselect All"))
@@ -94,67 +91,30 @@ class KadasGpkgLayersListBase(QWidget):
         self.setLayout(layout)
 
     # ------------------------------------------------------------------
-    # Tristate propagation (group -> children)
-    # ------------------------------------------------------------------
-
-    def _on_item_changed(self, item, column):
-        """Push Checked/Unchecked from a group down to its children.
-
-        Qt's ItemIsAutoTristate already handles the upward sync (child -> parent).
-        We only need to push downward when the user clicks a group that is
-        fully Checked or Unchecked. PartiallyChecked means mixed — leave children alone.
-        """
-        if column != 0:
-            return
-        if item.data(0, _LAYER_ID_ROLE) is not None:
-            return  # layer node — nothing to propagate downward
-        state = item.checkState(0)
-        if state == Qt.CheckState.PartiallyChecked:
-            return
-        self._tree.blockSignals(True)
-        try:
-            self._set_subtree_check_state(item, state)
-        finally:
-            self._tree.blockSignals(False)
-
-    def _set_subtree_check_state(self, parent_item, state):
-        """Recursively apply *state* to all enabled children of *parent_item*.
-
-        For group items, we recurse into children FIRST before calling
-        setCheckState on the group. Qt's ItemIsAutoTristate propagates changes
-        upward via model signals. When blockSignals is active that upward
-        propagation is suppressed, so the group's model dataChanged notification
-        fires at the moment setCheckState is called on it. If we set the group
-        before updating its children, the notification fires while children are
-        still in the old (mixed) state and the view renders the group with the
-        wrong indicator. Recursing first ensures children are already in the
-        target state when the group notification fires.
-        """
-        for i in range(parent_item.childCount()):
-            child = parent_item.child(i)
-            if child.data(0, _LAYER_ID_ROLE) is None:
-                # Group: descend into children first, then set the group itself.
-                self._set_subtree_check_state(child, state)
-            if child.flags() & Qt.ItemFlag.ItemIsEnabled:
-                child.setCheckState(0, state)
-
-    # ------------------------------------------------------------------
     # Select / Deselect all
     # ------------------------------------------------------------------
 
     def _select_all(self):
-        self._tree.blockSignals(True)
-        try:
-            self._set_subtree_check_state(self._tree.invisibleRootItem(), Qt.CheckState.Checked)
-        finally:
-            self._tree.blockSignals(False)
+        self._set_leaves_check_state(self._tree.invisibleRootItem(), Qt.CheckState.Checked)
 
     def _deselect_all(self):
-        self._tree.blockSignals(True)
-        try:
-            self._set_subtree_check_state(self._tree.invisibleRootItem(), Qt.CheckState.Unchecked)
-        finally:
-            self._tree.blockSignals(False)
+        self._set_leaves_check_state(self._tree.invisibleRootItem(), Qt.CheckState.Unchecked)
+
+    def _set_leaves_check_state(self, parent_item, state):
+        """Recursively set *state* on all enabled leaf items under *parent_item*.
+
+        Only leaf (layer) items are touched. Qt's ItemIsAutoTristate automatically
+        recalculates group check states upward after each leaf change, so no
+        manual group handling is required.
+        Disabled items (e.g. layers already present in the target GPKG during
+        export) are left untouched.
+        """
+        for i in range(parent_item.childCount()):
+            child = parent_item.child(i)
+            if child.data(0, _LAYER_ID_ROLE) is None:
+                self._set_leaves_check_state(child, state)
+            elif child.flags() & Qt.ItemFlag.ItemIsEnabled:
+                child.setCheckState(0, state)
 
     # ------------------------------------------------------------------
     # File size helper
@@ -380,10 +340,8 @@ class KadasGpkgImportLayersList(KadasGpkgLayersListBase):
 
     The tree is initially empty. Call loadFromGpkg() after reading the project XML
     from a GPKG file. Group structure is reconstructed from the <layer-tree-group>
-    element in the embedded project XML.
-
-    Layers already loaded in the current QGIS project from the same GPKG file are
-    shown with a success icon and disabled. All other layers start unchecked.
+    element in the embedded project XML. All layers start unchecked and enabled;
+    re-importing a layer that is already loaded simply overwrites it.
 
     Public API:
         loadFromGpkg(gpkg_filename, xml_bytes)
@@ -392,9 +350,6 @@ class KadasGpkgImportLayersList(KadasGpkgLayersListBase):
 
     def __init__(self, parent=None):
         KadasGpkgLayersListBase.__init__(self, parent)
-
-        # path to the GPKG currently shown (used for already-loaded detection)
-        self._gpkg_filename = None
 
     # ------------------------------------------------------------------
     # Public API
@@ -406,9 +361,6 @@ class KadasGpkgImportLayersList(KadasGpkgLayersListBase):
         *gpkg_filename* is the path to the .gpkg file.
         *xml_bytes* is the raw project XML string/bytes from the qgis_projects table.
         """
-        self._gpkg_filename = gpkg_filename
-        self._in_gpkg_ids = set()
-
         self._tree.blockSignals(True)
         self._tree.invisibleRootItem().takeChildren()
         self._tree.blockSignals(False)
@@ -490,16 +442,8 @@ class KadasGpkgImportLayersList(KadasGpkgLayersListBase):
         item.setText(0, info["name"])
         item.setData(0, _LAYER_ID_ROLE, layer_id)
         item.setIcon(0, self._icon_for_type(info["type"]))
-
-        if self._is_already_loaded(layer_id):
-            self._in_gpkg_ids.add(layer_id)
-            item.setCheckState(0, Qt.CheckState.Unchecked)
-            item.setFlags(Qt.ItemFlag.ItemIsUserCheckable)  # disabled
-            item.setIcon(1, self._icon_ok)
-            item.setToolTip(1, self.tr("Layer is already loaded from this GeoPackage"))
-        else:
-            item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsUserCheckable)
-            item.setCheckState(0, Qt.CheckState.Unchecked)
+        item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsUserCheckable)
+        item.setCheckState(0, Qt.CheckState.Unchecked)
 
     def _icon_for_type(self, layer_type_str):
         """Return a QIcon for a layer type string from the project XML."""
@@ -511,18 +455,6 @@ class KadasGpkgImportLayersList(KadasGpkgLayersListBase):
                 pass
         return QIcon()
 
-    def _is_already_loaded(self, layer_id):
-        """Return True if *layer_id* is currently loaded in QGIS from the same GPKG."""
-        if not self._gpkg_filename:
-            return False
-        layer = QgsProject.instance().mapLayer(layer_id)
-        if layer is None:
-            return False
-        src = layer.source()
-        return src.startswith(self._gpkg_filename) or src.startswith(
-            "GPKG:" + self._gpkg_filename
-        )
-
     # ------------------------------------------------------------------
     # Result collection
     # ------------------------------------------------------------------
@@ -533,8 +465,6 @@ class KadasGpkgImportLayersList(KadasGpkgLayersListBase):
             layer_id = item.data(0, _LAYER_ID_ROLE)
             if layer_id is None:
                 self._collect_checked_ids(item, result)
-                continue
-            if layer_id in self._in_gpkg_ids:
                 continue
             if item.checkState(0) == Qt.CheckState.Checked:
                 result.append(layer_id)

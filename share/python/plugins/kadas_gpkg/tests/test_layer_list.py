@@ -261,18 +261,15 @@ class TestGroupTristateDownward:
         assert _find_item(widget, la1.id()).checkState(0) == Qt.CheckState.Checked
         assert _find_item(widget, la2.id()).checkState(0) == Qt.CheckState.Checked
 
-    def test_partial_group_does_not_propagate(self, four_layer_project):
-        """Clicking a partially-checked group should NOT alter child states.
-        (Cycling through partial is handled by Qt itself; we don't force a state.)
+    def test_partial_group_children_unchanged(self, four_layer_project):
+        """When auto-tristate sets a group to PartiallyChecked its children must
+        not be altered — PartiallyChecked is a read-only computed state.
         """
         widget, la1, la2, *_ = four_layer_project
-        # Put the group into a partial state by unchecking one child
         _find_item(widget, la1.id()).setCheckState(0, Qt.CheckState.Unchecked)
         grp = _find_group_item(widget, "GroupA")
         assert grp.checkState(0) == Qt.CheckState.PartiallyChecked
-        # Simulate the internal signal as if the group item itself was set to Partial
-        widget._on_item_changed(grp, 0)
-        # Children must remain unchanged
+        # Children must keep their individual states
         assert _find_item(widget, la1.id()).checkState(0) == Qt.CheckState.Unchecked
         assert _find_item(widget, la2.id()).checkState(0) == Qt.CheckState.Checked
 
@@ -365,19 +362,17 @@ class TestSelectAllGroupsRegression:
         """The group's model dataChanged must fire only after all its children are
         already in the target state.
 
-        Root cause: _set_subtree_check_state sets the GROUP item first and then
-        recurses into its children. When the group's setCheckState triggers a
-        model dataChanged notification, the view schedules a repaint. On Qt
-        versions where ItemIsAutoTristate only propagates upward (not downward),
-        the repaint happens while children are still in the old (mixed) state, so
-        the group checkbox is rendered with the wrong (PartiallyChecked) indicator.
-        On the second Select All press the children are already Checked, so the
-        notification fires in a consistent state and the group renders correctly.
+        Root cause (now fixed): the old _set_subtree_check_state set the group
+        item first and then recursed into its children. Qt's ItemIsAutoTristate
+        recalculates the group upward via model signals; with blockSignals active
+        that upward path was suppressed, so the group's dataChanged notification
+        fired while children were still in the old mixed state — causing a stale
+        repaint with a PartiallyChecked indicator.
 
-        Fix: recurse into children first so that when the group's own
-        setCheckState is called — and the model notification fires — all children
-        are already in the target state. The view then repaints the group with the
-        correct indicator on the very first press.
+        Current implementation: _set_leaves_check_state only touches enabled leaf
+        items. Qt's ItemIsAutoTristate recalculates group states upward after each
+        leaf change, so by the time the group's dataChanged fires all children are
+        already in the target state.
         """
         widget, la1, la2, lb1, lb2 = four_layer_project
 
