@@ -1,0 +1,149 @@
+---
+name: 🐧 Build - Linux
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  release:
+    types: ['published']
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: build (linux)
+    runs-on: ubuntu-24.04
+
+    strategy:
+      matrix:
+        include:
+          - triplet: x64-linux
+
+    steps:
+      - name: 🐣 Checkout
+        uses: actions/checkout@v6
+
+      - name: 🐩 Install CMake and Ninja
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: 3.31.10
+
+      - name: 🧰 Install system build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            ninja-build \
+            pkg-config \
+            git \
+            curl \
+            zip \
+            unzip \
+            tar \
+            autoconf \
+            autoconf-archive \
+            automake \
+            libltdl-dev \
+            libtool \
+            libtool-bin \
+            '^libxcb.*-dev' \
+            libx11-xcb-dev \
+            libglu1-mesa-dev \
+            libxrender-dev \
+            libxi-dev \
+            libxkbcommon-dev \
+            libxkbcommon-x11-dev \
+            libegl1-mesa-dev \
+            libsm-dev \
+            libevdev-dev \
+            libdrm-dev \
+            libgbm-dev \
+            libdbus-1-dev \
+            libatspi2.0-dev \
+            libx11-dev \
+            libegl-dev \
+            libxext-dev \
+            libxrandr-dev \
+            libgl1-mesa-dev \
+            libfontconfig1-dev \
+            bison \
+            flex \
+            gperf \
+            nasm \
+            gettext \
+            swig \
+            mono-complete \
+            patchelf \
+            perl \
+            python3 \
+            python3-pip
+
+      - name: 🔢 Determine version
+        id: version
+        uses: ./.github/actions/determine-version
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🌱 Install dependencies and generate project files
+        env:
+          X_VCPKG_ASSET_SOURCES: x-azurl,https://assetcache.open-vcpkg.org/assetcache,,read
+        run: |
+          cmake -S . \
+                -G Ninja \
+                -B build \
+                -D CMAKE_BUILD_TYPE=Release \
+                -D KADAS_VERSION=${{ steps.version.outputs.version }} \
+                -D VCPKG_TARGET_TRIPLET="${{ matrix.triplet }}" \
+                -D VCPKG_HOST_TRIPLET=x64-linux \
+                -D VCPKG_INSTALL_OPTIONS="--x-abi-tools-use-exact-versions;--allow-unsupported" \
+                -D NUGET_USERNAME=kadas-albireo \
+                -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📑 Upload vcpkg build logs
+        uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: build-logs-${{ matrix.triplet }}
+          path: |
+            build/_deps/vcpkg-src/buildtrees/**/*.log
+            build/vcpkg-manifest-install.log
+
+      - name: 📦 Create SDK
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
+        run: |
+          ./build/_deps/vcpkg-src/vcpkg export --zip --output-dir=./sdk --x-install-root=./build/vcpkg_installed --x-manifest-root=vcpkg
+          cd sdk && for f in vcpkg-export-*.zip; do mv "$f" "${f/vcpkg-export/vcpkg-export-${{ matrix.triplet }}}"; done
+
+      - name: 📤 Upload SDK
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
+        uses: actions/upload-artifact@v7
+        with:
+          archive: false
+          path: sdk/vcpkg-export-${{ matrix.triplet }}-*.zip
+
+      - name: 📝 Compile plugins translation
+        run: |
+          # lrelease is run from cmake for app
+          # plugins need to be handled
+          export PATH="${{ github.workspace }}/build/vcpkg_installed/${{ matrix.triplet }}/tools/Qt6/bin:${PATH}"
+          for PLUGIN in about gpkg print ephem; do
+            lrelease share/python/plugins/kadas_${PLUGIN}/i18n/*.ts
+          done
+
+      - name: 🌋 Build
+        run: |
+          cmake --build build --config Release
+
+      - name: 🧪 Run CTest
+        env:
+          QT_LOGGING_TO_CONSOLE: "1"
+        run: |
+          xvfb-run --server-args="-screen 0 640x480x24" ctest --test-dir build --output-on-failure --timeout 120 -C Release
+
+      - name: 📦 Package
+        run: |
+          cmake --build build --target bundle --config Release
