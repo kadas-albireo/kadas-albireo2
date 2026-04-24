@@ -91,8 +91,6 @@ bool KadasMilxClientWorker::initialize()
     connect( mProcess, &QProcess::errorOccurred, this, []( QProcess::ProcessError error ) { qWarning() << QStringLiteral( "Could not start milxserver: Error %1" ).arg( error ); } );
 
     const QString serverPath = QCoreApplication::applicationDirPath() + QStringLiteral( "/milxserver.exe" );
-<<<<<<< Updated upstream
-=======
     qWarning() << "[MILX-DEBUG] launching milxserver:" << serverPath << "exists=" << QFile::exists( serverPath );
     mProcess->setProcessChannelMode( QProcess::SeparateChannels );
     // Do not propagate Qt debug env vars to the child: QT_DEBUG_PLUGINS with stdio
@@ -100,7 +98,6 @@ bool KadasMilxClientWorker::initialize()
     QProcessEnvironment childEnv = QProcessEnvironment::systemEnvironment();
     childEnv.remove( QStringLiteral( "QT_DEBUG_PLUGINS" ) );
     mProcess->setProcessEnvironment( childEnv );
->>>>>>> Stashed changes
     mProcess->setProgram( serverPath );
     mProcess->start();
 
