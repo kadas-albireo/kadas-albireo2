@@ -153,9 +153,34 @@ install(DIRECTORY "${PROJ_DATA_PATH}/"
 install(DIRECTORY "${VCPKG_BASE_DIR}/share/gdal/"
         DESTINATION "${CMAKE_INSTALL_DATADIR}/gdal"
 )
-install(DIRECTORY "${VCPKG_BASE_DIR}/bin/Qca/crypto/"
-        DESTINATION "bin/plugins/crypto"
-) # QCA plugins
+# QCA crypto plugin (qca-ossl). Must be installed under <appdir>/Qt6/plugins,
+# which is what main.cpp sets QT_PLUGIN_PATH to, so that QCA can find it via its
+# standard "<libraryPath>/crypto/" lookup. Without this, QGIS logs
+# "Authentication system DISABLED: QCA's qca-ossl (OpenSSL) plugin is missing".
+# The vcpkg Qt6 qca port ships the plugin under bin/Qca-qt6/crypto; we also
+# support a couple of fallback layouts to be robust across vcpkg revisions.
+set(_qca_candidates
+    "${VCPKG_BASE_DIR}/bin/Qca-qt6/crypto"
+    "${VCPKG_BASE_DIR}/Qt6/plugins/crypto" "${VCPKG_BASE_DIR}/plugins/crypto"
+    "${VCPKG_BASE_DIR}/bin/Qca/crypto"
+)
+set(_qca_found FALSE)
+foreach(_qca_dir IN LISTS _qca_candidates)
+  file(GLOB _qca_plugins "${_qca_dir}/qca-ossl*.dll")
+  if(_qca_plugins)
+    message(STATUS "Installing QCA crypto plugins from ${_qca_dir}")
+    install(FILES ${_qca_plugins} DESTINATION "bin/Qt6/plugins/crypto")
+    set(_qca_found TRUE)
+    break()
+  endif()
+endforeach()
+if(NOT _qca_found)
+  message(
+    WARNING "QCA qca-ossl plugin not found in any known vcpkg layout; the QGIS "
+            "authentication system will remain disabled at runtime. Searched: "
+            "${_qca_candidates}"
+  )
+endif()
 install(
   DIRECTORY "${VCPKG_BASE_DIR}/tools/python3/"
   DESTINATION "bin"
