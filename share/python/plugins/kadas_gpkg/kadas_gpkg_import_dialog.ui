@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>557</width>
-    <height>230</height>
+    <height>438</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,11 +17,52 @@
    <item row="4" column="0" colspan="2">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
      </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QWidget" name="widgetProjectImport" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QRadioButton" name="radioButtonImportProject">
+        <property name="text">
+         <string>Load entire project</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">buttonGroupImport</string>
+        </attribute>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radioButtonImportLayers">
+        <property name="text">
+         <string>Import only selected layers:</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">buttonGroupImport</string>
+        </attribute>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item row="1" column="0" colspan="2">
@@ -65,78 +106,23 @@
      </item>
     </layout>
    </item>
-   <item row="2" column="0" colspan="2">
-    <widget class="QWidget" name="widgetProjectImport" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QRadioButton" name="radioButtonImportProject">
-        <property name="text">
-         <string>Load entire project</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">buttonGroupImport</string>
-        </attribute>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="radioButtonImportLayers">
-        <property name="text">
-         <string>Import only selected layers:</string>
-        </property>
-        <attribute name="buttonGroup">
-         <string notr="true">buttonGroupImport</string>
-        </attribute>
-       </widget>
-      </item>
-      <item>
-       <widget class="QListWidget" name="listWidgetLayers">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>16</width>
-          <height>16</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
    <item row="3" column="0" colspan="2">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+    <widget class="KadasGpkgImportLayersList" name="listWidgetLayers" native="true">
+     <property name="enabled">
+      <bool>false</bool>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
+    </widget>
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../../qgis-master/images/images.qrc"/>
- </resources>
+ <customwidgets>
+  <customwidget>
+   <class>KadasGpkgImportLayersList</class>
+   <extends>QWidget</extends>
+   <header>kadas_gpkg.kadas_gpkg_layer_list</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>

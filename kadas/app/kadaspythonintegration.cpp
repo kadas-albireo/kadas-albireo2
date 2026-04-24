@@ -182,8 +182,10 @@ void KadasPythonIntegration::initPython( KadasPluginInterface *iface, const bool
 
   if ( iface )
   {
-    // initialize 'iface' object
+    // initialize 'iface' object in qgis.utils (as QgisInterface)
     runString( QStringLiteral( "qgis.utils.initInterface(%1)" ).arg( reinterpret_cast<quint64>( iface ) ) );
+    // initialize 'iface' object in kadas.utils (cast to KadasPluginInterface)
+    runString( QStringLiteral( "import kadas.utils; kadas.utils.initInterface(%1)" ).arg( reinterpret_cast<quint64>( iface ) ) );
   }
 
   if ( !checkQgisUser() )
