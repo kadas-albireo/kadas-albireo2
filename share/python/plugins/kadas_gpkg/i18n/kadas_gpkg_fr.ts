@@ -123,47 +123,47 @@
         <translation>De plus, les couches suivantes seront ajoutées au GeoPackage:</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_dialog.ui" line="107"/>
+        <location filename="../kadas_gpkg_export_dialog.ui" line="101"/>
         <source>&lt;small&gt;&lt;i&gt;Layers already part of the output GeoPackage are disabled.&lt;/i&gt;&lt;/small&gt;</source>
         <translation>&lt;small&gt;&lt;i&gt;Les couches qui sont déjà dans le GeoPackage d&apos;export sont désactivées.&lt;/i&gt;&lt;/small&gt;</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_dialog.ui" line="133"/>
+        <location filename="../kadas_gpkg_export_dialog.ui" line="127"/>
         <source>&lt;small&gt;&lt;i&gt;Layers with unknown size or larger than 50 MB are deselected by default.&lt;/i&gt;&lt;/span&gt;</source>
         <translation>&lt;small&gt;&lt;i&gt;Les couches avec une taille inconue ou supérieures à 50 Mo sont désactivées par défaut.&lt;/i&gt;&lt;/small&gt;</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_dialog.ui" line="143"/>
+        <location filename="../kadas_gpkg_export_dialog.ui" line="137"/>
         <source>Generate pyramids (slow)</source>
         <translation>Génération des pyramides (lent)</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_dialog.ui" line="152"/>
+        <location filename="../kadas_gpkg_export_dialog.ui" line="146"/>
         <source>Specify raster export scale:</source>
         <translation>Spécifier l&apos;échelle d&apos;exportation des raster:</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_dialog.ui" line="180"/>
+        <location filename="../kadas_gpkg_export_dialog.ui" line="174"/>
         <source>Restrict extent to export:</source>
         <translation>Limiter l&apos;étendue à exporter:</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_dialog.ui" line="192"/>
+        <location filename="../kadas_gpkg_export_dialog.ui" line="186"/>
         <source>Y Max.:</source>
         <translation>Y Max.:</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_dialog.ui" line="199"/>
+        <location filename="../kadas_gpkg_export_dialog.ui" line="193"/>
         <source>X Min.:</source>
         <translation>X Min.:</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_dialog.ui" line="212"/>
+        <location filename="../kadas_gpkg_export_dialog.ui" line="206"/>
         <source>Y Min.:</source>
         <translation>Y Min.:</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_dialog.ui" line="219"/>
+        <location filename="../kadas_gpkg_export_dialog.ui" line="213"/>
         <source>X Max.:</source>
         <translation>X Max.:</translation>
     </message>
@@ -176,42 +176,63 @@
 <context>
     <name>KadasGpkgImport</name>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="234"/>
+        <location filename="../kadas_gpkg_import.py" line="122"/>
         <source>Import Errors</source>
         <translation>Erreurs d&apos;importation</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="234"/>
+        <location filename="../kadas_gpkg_import.py" line="122"/>
         <source>The following layers could not be imported:%s</source>
         <translation>Les couches suivantes n&apos;ont pas pu être importées:%s</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="243"/>
+        <location filename="../kadas_gpkg_import.py" line="131"/>
         <source>Save project?</source>
         <translation>Enregistrer le projet?</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="243"/>
+        <location filename="../kadas_gpkg_import.py" line="131"/>
         <source>The project has unsaved changes. Do you want to save them before proceeding?</source>
         <translation>Le projet a des modifications non enregistrées. Enregistrer-les avant de continuer?</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="294"/>
+        <location filename="../kadas_gpkg_import.py" line="182"/>
         <source>GPKG import completed</source>
         <translation>Importation GPKG complétée</translation>
     </message>
 </context>
 <context>
-    <name>KadasGpkgImportDialog</name>
+    <name>KadasGpkgImportLayersList</name>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="61"/>
-        <source>Select GPKG File...</source>
-        <translation>Choisir le fichier GPKG ...</translation>
+        <location filename="../kadas_gpkg_layer_list.py" line="459"/>
+        <source>Layer is already loaded from this GeoPackage</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>KadasGpkgLayersList</name>
+    <message>
+        <location filename="../kadas_gpkg_layer_list.py" line="289"/>
+        <source>Layer size is unknown or larger than 50 MB – deselected by default</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="61"/>
-        <source>GPKG Database (*.gpkg)</source>
-        <translation>Base des données GPKG (*.gpkg)</translation>
+        <location filename="../kadas_gpkg_layer_list.py" line="282"/>
+        <source>Layer is already part of the output GeoPackage</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>KadasGpkgLayersListBase</name>
+    <message>
+        <location filename="../kadas_gpkg_layer_list.py" line="76"/>
+        <source>Select All</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas_gpkg_layer_list.py" line="77"/>
+        <source>Deselect All</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

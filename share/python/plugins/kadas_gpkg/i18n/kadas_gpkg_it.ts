@@ -123,47 +123,47 @@
         <translation>In più, i seguenti layer saranno aggiunti al GeoPackage:</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_dialog.ui" line="107"/>
+        <location filename="../kadas_gpkg_export_dialog.ui" line="101"/>
         <source>&lt;small&gt;&lt;i&gt;Layers already part of the output GeoPackage are disabled.&lt;/i&gt;&lt;/small&gt;</source>
         <translation>&lt;small&gt;&lt;i&gt;I layers che già presenti nell&apos;output GeoPackage sono disabilitati.&lt;/i&gt;&lt;/small&gt;</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_dialog.ui" line="133"/>
+        <location filename="../kadas_gpkg_export_dialog.ui" line="127"/>
         <source>&lt;small&gt;&lt;i&gt;Layers with unknown size or larger than 50 MB are deselected by default.&lt;/i&gt;&lt;/span&gt;</source>
         <translation>&lt;small&gt;&lt;i&gt;I layer di dimensioni sconosciute o superiori ai 50 MB sono deselezionati di default.&lt;/i&gt;&lt;/span&gt;</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_dialog.ui" line="143"/>
+        <location filename="../kadas_gpkg_export_dialog.ui" line="137"/>
         <source>Generate pyramids (slow)</source>
         <translation>Genera piramidi (lento)</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_dialog.ui" line="152"/>
+        <location filename="../kadas_gpkg_export_dialog.ui" line="146"/>
         <source>Specify raster export scale:</source>
         <translation>Specificare scala di esportazione per layer raster:</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_dialog.ui" line="180"/>
+        <location filename="../kadas_gpkg_export_dialog.ui" line="174"/>
         <source>Restrict extent to export:</source>
         <translation>Estensione da esportare:</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_dialog.ui" line="192"/>
+        <location filename="../kadas_gpkg_export_dialog.ui" line="186"/>
         <source>Y Max.:</source>
         <translation>Y Max.:</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_dialog.ui" line="199"/>
+        <location filename="../kadas_gpkg_export_dialog.ui" line="193"/>
         <source>X Min.:</source>
         <translation>X Min.:</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_dialog.ui" line="212"/>
+        <location filename="../kadas_gpkg_export_dialog.ui" line="206"/>
         <source>Y Min.:</source>
         <translation>Y Min.:</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_export_dialog.ui" line="219"/>
+        <location filename="../kadas_gpkg_export_dialog.ui" line="213"/>
         <source>X Max.:</source>
         <translation>X Max.:</translation>
     </message>
@@ -176,42 +176,63 @@
 <context>
     <name>KadasGpkgImport</name>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="234"/>
+        <location filename="../kadas_gpkg_import.py" line="122"/>
         <source>Import Errors</source>
         <translation>Errori di importazione</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="234"/>
+        <location filename="../kadas_gpkg_import.py" line="122"/>
         <source>The following layers could not be imported:%s</source>
         <translation>Non è stato possibile importare i seguenti layer:%s</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="243"/>
+        <location filename="../kadas_gpkg_import.py" line="131"/>
         <source>Save project?</source>
         <translation>Salvare il progetto?</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="243"/>
+        <location filename="../kadas_gpkg_import.py" line="131"/>
         <source>The project has unsaved changes. Do you want to save them before proceeding?</source>
         <translation>Il progetto contiene dei cambiamenti non salvati. Salvarli prima di continuare?</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="294"/>
+        <location filename="../kadas_gpkg_import.py" line="182"/>
         <source>GPKG import completed</source>
         <translation>Importazione GPKG completata</translation>
     </message>
 </context>
 <context>
-    <name>KadasGpkgImportDialog</name>
+    <name>KadasGpkgImportLayersList</name>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="61"/>
-        <source>Select GPKG File...</source>
-        <translation>Seleziona il file GPKG...</translation>
+        <location filename="../kadas_gpkg_layer_list.py" line="459"/>
+        <source>Layer is already loaded from this GeoPackage</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>KadasGpkgLayersList</name>
+    <message>
+        <location filename="../kadas_gpkg_layer_list.py" line="289"/>
+        <source>Layer size is unknown or larger than 50 MB – deselected by default</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="61"/>
-        <source>GPKG Database (*.gpkg)</source>
-        <translation>Database GPKG (*.gpkg)</translation>
+        <location filename="../kadas_gpkg_layer_list.py" line="282"/>
+        <source>Layer is already part of the output GeoPackage</source>
+        <translation type="unfinished"/>
+    </message>
+</context>
+<context>
+    <name>KadasGpkgLayersListBase</name>
+    <message>
+        <location filename="../kadas_gpkg_layer_list.py" line="76"/>
+        <source>Select All</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas_gpkg_layer_list.py" line="77"/>
+        <source>Deselect All</source>
+        <translation type="unfinished"/>
     </message>
 </context>
 </TS>

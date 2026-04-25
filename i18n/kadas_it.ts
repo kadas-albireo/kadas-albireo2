@@ -7175,37 +7175,37 @@ geolocazione</translation>
         <translation>Impossibile caricare qgis.user.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="261"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="263"/>
         <source>An error occurred during execution of following code:</source>
         <translation>Si è verificato un errore durante l&apos;esecuzione delle istruzioni seguenti:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="276"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="278"/>
         <source>Python version:</source>
         <translation>Versione Python:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="280"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="282"/>
         <source>KADAS version:</source>
         <translation>Versione KADAS</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="284"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="286"/>
         <source>Python path:</source>
         <translation>Percorso Python:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="291"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="293"/>
         <source>Python error</source>
         <translation>Errore python</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="602"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="604"/>
         <source>Error when reading metadata of plugin %1</source>
         <translation>Errore durante la lettura dei metadati del plugin %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadaspythonintegration.cpp" line="602"/>
+        <location filename="../kadas/app/kadaspythonintegration.cpp" line="604"/>
         <source>Plugins</source>
         <translation>Plugin</translation>
     </message>
