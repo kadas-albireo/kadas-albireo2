@@ -155,7 +155,7 @@ install(DIRECTORY "${VCPKG_BASE_DIR}/share/gdal/"
 )
 install(DIRECTORY "${VCPKG_BASE_DIR}/bin/Qca/crypto/"
         DESTINATION "bin/Qt6/plugins/crypto"
-) # QCA plugins (matches QT_PLUGIN_PATH set in main.cpp to <appdir>/Qt6/plugins)
+) # QCA plugins
 install(
   DIRECTORY "${VCPKG_BASE_DIR}/tools/python3/"
   DESTINATION "bin"
