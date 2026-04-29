@@ -33,7 +33,6 @@ vcpkg_from_github(
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
   bigobj-vectorlayer.patch # https://github.com/qgis/QGIS/pull/66271
   3d-export.patch
-  reduceLayerPropertiesProviderSection.patch # https://github.com/qgis/QGIS/pull/64123
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
