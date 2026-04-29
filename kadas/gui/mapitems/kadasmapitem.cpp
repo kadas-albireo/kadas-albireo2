@@ -70,6 +70,14 @@ KadasMapItem *KadasMapItem::clone() const
   KadasMapItem *item = _clone();
   item->mDrawStatus = mDrawStatus;
   item->mEditor = mEditor;
+  item->mZIndex = mZIndex;
+  item->mTooltip = mTooltip;
+  item->mSymbolScale = mSymbolScale;
+  item->mVisible = mVisible;
+  item->mSelected = mSelected;
+  item->mIsPointSymbol = mIsPointSymbol;
+  item->mAssociatedLayer = mAssociatedLayer;
+
   if ( !useQgisAnnotations() )
   {
     for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
