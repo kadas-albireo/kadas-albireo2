@@ -92,6 +92,7 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasAbstractPointItem
 
   public:
     KadasPointItem( const QgsCoordinateReferenceSystem &crs, Qgis::MarkerShape icon = Qgis::MarkerShape::Circle );
+    ~KadasPointItem() override;
 
     virtual QgsAnnotationMarkerItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const override SIP_FACTORY;
 
@@ -123,6 +124,11 @@ class KADAS_GUI_EXPORT KadasPointItem : public KadasAbstractPointItem
     virtual void readXmlPrivate( const QDomElement &element ) override;
 
   private:
+#ifndef SIP_RUN
+    //! Private constructor taking ownership of \a qgsItem
+    KadasPointItem( const QgsCoordinateReferenceSystem &crs, Qgis::MarkerShape icon, QgsAnnotationMarkerItem *qgsItem );
+#endif
+
     void updateQgsAnnotation() override;
 
     QgsAnnotationMarkerItem *mQgsItem = nullptr;
