@@ -27,10 +27,19 @@
 
 
 KadasTextItem::KadasTextItem( const QgsCoordinateReferenceSystem &crs )
+  : KadasTextItem( crs, new QgsAnnotationPointTextItem( QString(), QgsPoint() ) )
+{}
+
+KadasTextItem::KadasTextItem( const QgsCoordinateReferenceSystem &crs, QgsAnnotationPointTextItem *qgsItem )
   : KadasAbstractPointItem( crs )
+  , mQgsItem( qgsItem )
 {
-  mQgsItem = new QgsAnnotationPointTextItem( QString(), QgsPoint() );
   connect( this, &KadasMapItem::zIndexChanged, this, [=]( int index ) { mQgsItem->setZIndex( index ); } );
+}
+
+KadasTextItem::~KadasTextItem()
+{
+  delete mQgsItem;
 }
 
 void KadasTextItem::setText( const QString &text )
@@ -83,8 +92,7 @@ void KadasTextItem::updateQgsAnnotation()
 
 KadasMapItem *KadasTextItem::_clone() const SIP_FACTORY
 {
-  KadasTextItem *item = new KadasTextItem( crs() );
-  item->mQgsItem = mQgsItem->clone();
+  KadasTextItem *item = new KadasTextItem( crs(), mQgsItem->clone() );
   item->mText = mText;
   item->mFont = mFont;
   item->mColor = mColor;

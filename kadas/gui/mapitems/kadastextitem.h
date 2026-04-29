@@ -31,6 +31,7 @@ class KADAS_GUI_EXPORT KadasTextItem : public KadasAbstractPointItem
 
   public:
     KadasTextItem( const QgsCoordinateReferenceSystem &crs );
+    ~KadasTextItem() override;
 
     QString itemName() const override { return tr( "Text" ); }
 
@@ -67,6 +68,11 @@ class KADAS_GUI_EXPORT KadasTextItem : public KadasAbstractPointItem
     virtual void readXmlPrivate( const QDomElement &element ) override;
 
   private:
+#ifndef SIP_RUN
+    //! Private constructor taking ownership of \a qgsItem
+    KadasTextItem( const QgsCoordinateReferenceSystem &crs, QgsAnnotationPointTextItem *qgsItem );
+#endif
+
     void updateQgsAnnotation() override;
 
     QgsAnnotationPointTextItem *mQgsItem = nullptr;
