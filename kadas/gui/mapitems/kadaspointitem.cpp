@@ -155,11 +155,20 @@ bool KadasAbstractPointItem::intersects( const QgsRectangle &rect, const QgsMapS
 
 
 KadasPointItem::KadasPointItem( const QgsCoordinateReferenceSystem &crs, Qgis::MarkerShape icon )
+  : KadasPointItem( crs, icon, new QgsAnnotationMarkerItem( QgsPoint() ) )
+{}
+
+KadasPointItem::KadasPointItem( const QgsCoordinateReferenceSystem &crs, Qgis::MarkerShape icon, QgsAnnotationMarkerItem *qgsItem )
   : KadasAbstractPointItem( crs )
+  , mQgsItem( qgsItem )
   , mShape( icon )
 {
-  mQgsItem = new QgsAnnotationMarkerItem( QgsPoint() );
   connect( this, &KadasMapItem::zIndexChanged, this, [=]( int index ) { mQgsItem->setZIndex( index ); } );
+}
+
+KadasPointItem::~KadasPointItem()
+{
+  delete mQgsItem;
 }
 
 QgsAnnotationMarkerItem *KadasPointItem::annotationItem( const QgsCoordinateReferenceSystem &crs ) const
@@ -233,9 +242,7 @@ void KadasPointItem::updateQgsAnnotation()
 
 KadasMapItem *KadasPointItem::_clone() const SIP_FACTORY
 {
-  KadasPointItem *item = new KadasPointItem( crs() );
-  item->mQgsItem = mQgsItem->clone();
-  item->mShape = mShape;
+  KadasPointItem *item = new KadasPointItem( crs(), mShape, mQgsItem->clone() );
   item->mIconSize = mIconSize;
   item->mStrokeColor = mStrokeColor;
   item->mStrokeWidth = mStrokeWidth;
@@ -343,7 +350,9 @@ QString KadasPointItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip )
   if ( mQgsItem->geometry().isEmpty() )
     return QString();
 
-  auto color2hex = []( const QColor &c ) { return QString( "%1%2%3%4" ).arg( c.alpha(), 2, 16, QChar( '0' ) ).arg( c.blue(), 2, 16, QChar( '0' ) ).arg( c.green(), 2, 16, QChar( '0' ) ).arg( c.red(), 2, 16, QChar( '0' ) ); };
+  auto color2hex = []( const QColor &c ) {
+    return QString( "%1%2%3%4" ).arg( c.alpha(), 2, 16, QChar( '0' ) ).arg( c.blue(), 2, 16, QChar( '0' ) ).arg( c.green(), 2, 16, QChar( '0' ) ).arg( c.red(), 2, 16, QChar( '0' ) );
+  };
 
   QString outString;
   QTextStream outStream( &outString );
