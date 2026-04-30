@@ -33,6 +33,8 @@ set(kadas_gui_SRC
     annotationitems/kadaslineannotationcontroller.cpp
     annotationitems/kadasmarkerannotationcontroller.cpp
     annotationitems/kadaspictureannotationcontroller.cpp
+    annotationitems/kadaspinannotationcontroller.cpp
+    annotationitems/kadaspinannotationitem.cpp
     annotationitems/kadaspointtextannotationcontroller.cpp
     annotationitems/kadaspolygonannotationcontroller.cpp
     annotationitems/kadasrectangleannotationcontroller.cpp
@@ -128,6 +130,8 @@ set(kadas_gui_HDR
     annotationitems/kadaslineannotationcontroller.h
     annotationitems/kadasmarkerannotationcontroller.h
     annotationitems/kadaspictureannotationcontroller.h
+    annotationitems/kadaspinannotationcontroller.h
+    annotationitems/kadaspinannotationitem.h
     annotationitems/kadaspointtextannotationcontroller.h
     annotationitems/kadaspolygonannotationcontroller.h
     annotationitems/kadasrectangleannotationcontroller.h
