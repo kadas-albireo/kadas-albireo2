@@ -2,8 +2,9 @@
 
 
 #include <qgis/qgsstyle.h>
-#include <qgis/qgsannotationlayerchunkloader_p.h>
+#include <qgis/qgsannotationlayer3drenderer.h>
 #include <qgis/qgs3dmapsettings.h>
+#include <qgis/qgsannotationlayer.h>
 
 #include "kadasmapitemlayer3drenderer.h"
 #include "kadas/gui/kadasitemlayer.h"
@@ -116,32 +117,24 @@ Qt3DCore::QEntity *KadasMapItemLayer3DRenderer::createEntity( Qgs3DMapSettings *
   // Parent it to the entity below so it is destroyed together with it.
   QgsAnnotationLayer *annotationLayer = itemLayer->qgisAnnotationLayer( map->crs() );
 
-  // For some cases we start with a maximal z range because we can't know this upfront, as it potentially involves terrain heights.
-  // This range will be refined after populating the nodes to the actual z range of the generated chunks nodes.
-  // Assuming the vertical height is in meter, then it's extremely unlikely that a real vertical
-  // height will exceed this amount!
-  constexpr double MINIMUM_ANNOTATION_Z_ESTIMATE = -100000;
-  constexpr double MAXIMUM_ANNOTATION_Z_ESTIMATE = 100000;
+  // Delegate the actual entity construction to the public QgsAnnotationLayer3DRenderer,
+  // since QgsAnnotationLayerChunkedEntity lives in a private header and is not exported.
+  QgsAnnotationLayer3DRenderer renderer;
+  renderer.setLayer( annotationLayer );
+  renderer.setAltitudeClamping( mAltClamping );
+  renderer.setZOffset( mZOffset );
+  renderer.setShowCalloutLines( mShowCalloutLines );
+  renderer.setCalloutLineColor( mCalloutLineColor );
+  renderer.setCalloutLineWidth( mCalloutLineWidth );
+  renderer.setTextFormat( mTextFormat );
 
-  double minimumZ = MINIMUM_ANNOTATION_Z_ESTIMATE;
-  double maximumZ = MAXIMUM_ANNOTATION_Z_ESTIMATE;
-  switch ( mAltClamping )
+  Qt3DCore::QEntity *entity = renderer.createEntity( map );
+  if ( !entity )
   {
-    case Qgis::AltitudeClamping::Absolute:
-      // special case where we DO know the exact z range upfront!
-      minimumZ = mZOffset;
-      maximumZ = mZOffset;
-      break;
-
-    case Qgis::AltitudeClamping::Relative:
-    case Qgis::AltitudeClamping::Terrain:
-      break;
+    delete annotationLayer;
+    return nullptr;
   }
-
-  QgsAnnotationLayerChunkedEntity *entity
-    = new QgsAnnotationLayerChunkedEntity( map, annotationLayer, mAltClamping, mZOffset, mShowCalloutLines, mCalloutLineColor, mCalloutLineWidth, mTextFormat, minimumZ, maximumZ );
-  // Tie the ephemeral annotation layer's lifetime to the entity (~QgsAnnotationLayerChunkedEntity
-  // calls cancelActiveJobs(), so no chunk loader will outlive the layer).
+  // Tie the ephemeral annotation layer's lifetime to the entity.
   annotationLayer->setParent( entity );
   return entity;
 }
