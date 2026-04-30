@@ -40,6 +40,7 @@
 
 #include "kadas/app/3d/kadas3dintegration.h"
 #include "kadas/app/3d/kadas3dmapcanvaswidget.h"
+#include "kadas/gui/kadasitemlayer.h"
 
 static const QString KADAS_3D_IDENTIFIER = QStringLiteral( "Kadas 3D" );
 
@@ -189,7 +190,16 @@ Kadas3DMapCanvasWidget *Kadas3DIntegration::createNewMapCanvas3D( const QString 
   map->setOrigin( QgsVector3D( fullExtent3d.center().x(), fullExtent3d.center().y(), 0 ) );
   map->setSelectionColor( mMapCanvas->selectionColor() );
   map->setBackgroundColor( mMapCanvas->canvasColor() );
-  map->setLayers( mMapCanvas->layers( true ) );
+  // Ensure Kadas item layers have a 3D renderer attached before they are added
+  // to the 3D scene. Construction is lazy to avoid pulling in QGIS::3D for
+  // 2D-only sessions.
+  const QList<QgsMapLayer *> canvasLayers = mMapCanvas->layers( true );
+  for ( QgsMapLayer *layer : canvasLayers )
+  {
+    if ( KadasItemLayer *itemLayer = qobject_cast<KadasItemLayer *>( layer ) )
+      itemLayer->ensureDefault3DRenderer();
+  }
+  map->setLayers( canvasLayers );
   map->setTemporalRange( mMapCanvas->temporalRange() );
 
   const Qgis::NavigationMode defaultNavMode = settings.enumValue( QStringLiteral( "map3d/defaultNavigation" ), Qgis::NavigationMode::TerrainBased, QgsSettings::App );
