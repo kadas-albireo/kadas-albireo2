@@ -88,7 +88,7 @@ void KadasMapItemLayer3DRenderer::setTextFormat( const QgsTextFormat &format )
 
 QString KadasMapItemLayer3DRenderer::type() const
 {
-  return "annotation";
+  return QStringLiteral( "mapitem" );
 }
 
 KadasMapItemLayer3DRenderer *KadasMapItemLayer3DRenderer::clone() const
