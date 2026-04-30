@@ -90,6 +90,7 @@
 #include "kadas/gui/mapitems/kadassymbolitem.h"
 #include "kadas/gui/maptools/kadasmaptooledititem.h"
 #include "kadas/gui/maptools/kadasmaptooledititemgroup.h"
+#include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptoolpan.h"
 #include "kadas/gui/milx/kadasmilxlayer.h"
 #include "kadasapplication.h"
@@ -1508,6 +1509,11 @@ void KadasApplication::handleItemPicked( const KadasFeaturePicker::PickResult &r
   {
     KadasItemLayer *layer = static_cast<KadasItemLayer *>( result.layer );
     QgsMapTool *tool = new KadasMapToolEditItem( mMainWindow->mapCanvas(), result.itemId, layer );
+    mMainWindow->mapCanvas()->setMapTool( tool );
+  }
+  else if ( result.annotationLayer && !result.annotationItemId.isEmpty() )
+  {
+    QgsMapTool *tool = new KadasMapToolEditAnnotationItem( mMainWindow->mapCanvas(), result.annotationLayer, result.annotationItemId );
     mMainWindow->mapCanvas()->setMapTool( tool );
   }
 }
