@@ -1,0 +1,185 @@
+/***************************************************************************
+    kadaspointtextannotationcontroller.cpp
+    --------------------------------------
+    copyright            : (C) 2026 by Denis Rouzaud
+    email                : denis at opengis dot ch
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
+#include <QObject>
+#include <QTextStream>
+
+#include <qgis/qgsannotationpointtextitem.h>
+#include <qgis/qgscoordinatereferencesystem.h>
+#include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgspointxy.h>
+#include <qgis/qgsproject.h>
+#include <qgis/qgstextformat.h>
+
+#include "kadas/gui/annotationitems/kadaspointtextannotationcontroller.h"
+
+namespace
+{
+  inline QgsAnnotationPointTextItem *asText( QgsAnnotationItem *item )
+  {
+    Q_ASSERT( item && item->type() == QLatin1String( "pointtext" ) );
+    return static_cast<QgsAnnotationPointTextItem *>( item );
+  }
+  inline const QgsAnnotationPointTextItem *asText( const QgsAnnotationItem *item )
+  {
+    Q_ASSERT( item && item->type() == QLatin1String( "pointtext" ) );
+    return static_cast<const QgsAnnotationPointTextItem *>( item );
+  }
+} // namespace
+
+
+QString KadasPointTextAnnotationController::itemType() const
+{
+  return QStringLiteral( "pointtext" );
+}
+
+QString KadasPointTextAnnotationController::itemName() const
+{
+  return QObject::tr( "Text" );
+}
+
+QgsAnnotationItem *KadasPointTextAnnotationController::createItem() const
+{
+  return new QgsAnnotationPointTextItem( QString(), QgsPointXY() );
+}
+
+QList<KadasMapItem::Node> KadasPointTextAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
+{
+  return { { toMapPos( KadasItemPos::fromPoint( asText( item )->point() ), ctx ) } };
+}
+
+bool KadasPointTextAnnotationController::startPart( QgsAnnotationItem *item, const KadasMapPos &firstPoint, const KadasAnnotationItemContext &ctx )
+{
+  asText( item )->setPoint( toItemPos( firstPoint, ctx ) );
+  return false;
+}
+
+bool KadasPointTextAnnotationController::startPart( QgsAnnotationItem *item, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx )
+{
+  return startPart( item, KadasMapPos( values[AttrX], values[AttrY] ), ctx );
+}
+
+void KadasPointTextAnnotationController::setCurrentPoint( QgsAnnotationItem *, const KadasMapPos &, const KadasAnnotationItemContext & )
+{}
+
+void KadasPointTextAnnotationController::setCurrentAttributes( QgsAnnotationItem *, const KadasMapItem::AttribValues &, const KadasAnnotationItemContext & )
+{}
+
+bool KadasPointTextAnnotationController::continuePart( QgsAnnotationItem *, const KadasAnnotationItemContext & )
+{
+  return false;
+}
+
+void KadasPointTextAnnotationController::endPart( QgsAnnotationItem * )
+{}
+
+KadasMapItem::AttribDefs KadasPointTextAnnotationController::drawAttribs() const
+{
+  KadasMapItem::AttribDefs attributes;
+  attributes.insert( AttrX, KadasMapItem::NumericAttribute { "x" } );
+  attributes.insert( AttrY, KadasMapItem::NumericAttribute { "y" } );
+  return attributes;
+}
+
+KadasMapItem::AttribValues KadasPointTextAnnotationController::drawAttribsFromPosition( const QgsAnnotationItem *, const KadasMapPos &pos, const KadasAnnotationItemContext & ) const
+{
+  KadasMapItem::AttribValues values;
+  values.insert( AttrX, pos.x() );
+  values.insert( AttrY, pos.y() );
+  return values;
+}
+
+KadasMapPos KadasPointTextAnnotationController::positionFromDrawAttribs( const QgsAnnotationItem *, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext & ) const
+{
+  return KadasMapPos( values[AttrX], values[AttrY] );
+}
+
+KadasMapItem::EditContext KadasPointTextAnnotationController::getEditContext( const QgsAnnotationItem *item, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx ) const
+{
+  const QgsPointXY testPos = toMapPos( QgsPointXY( asText( item )->point() ), ctx );
+  if ( pos.sqrDist( KadasMapPos::fromPoint( testPos ) ) < pickTolSqr( ctx ) )
+  {
+    return KadasMapItem::EditContext( QgsVertexId( 0, 0, 0 ), KadasMapPos::fromPoint( testPos ), drawAttribs() );
+  }
+  return KadasMapItem::EditContext();
+}
+
+void KadasPointTextAnnotationController::edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &, const KadasMapPos &newPoint, const KadasAnnotationItemContext &ctx )
+{
+  asText( item )->setPoint( toItemPos( newPoint, ctx ) );
+}
+
+void KadasPointTextAnnotationController::edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx )
+{
+  edit( item, editContext, KadasMapPos( values[AttrX], values[AttrY] ), ctx );
+}
+
+KadasMapItem::AttribValues KadasPointTextAnnotationController::editAttribsFromPosition(
+  const QgsAnnotationItem *item, const KadasMapItem::EditContext &, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx
+) const
+{
+  return drawAttribsFromPosition( item, pos, ctx );
+}
+
+KadasMapPos KadasPointTextAnnotationController::positionFromEditAttribs(
+  const QgsAnnotationItem *item, const KadasMapItem::EditContext &, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx
+) const
+{
+  return positionFromDrawAttribs( item, values, ctx );
+}
+
+KadasItemPos KadasPointTextAnnotationController::position( const QgsAnnotationItem *item ) const
+{
+  return KadasItemPos::fromPoint( asText( item )->point() );
+}
+
+void KadasPointTextAnnotationController::setPosition( QgsAnnotationItem *item, const KadasItemPos &pos )
+{
+  asText( item )->setPoint( pos );
+}
+
+void KadasPointTextAnnotationController::translate( QgsAnnotationItem *item, double dx, double dy )
+{
+  QgsAnnotationPointTextItem *text = asText( item );
+  const QgsPointXY p = text->point();
+  text->setPoint( QgsPointXY( p.x() + dx, p.y() + dy ) );
+}
+
+QString KadasPointTextAnnotationController::asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &, QuaZip * ) const
+{
+  const QgsAnnotationPointTextItem *text = asText( item );
+
+  auto color2hex = []( const QColor &c ) {
+    return QString( "%1%2%3%4" ).arg( c.alpha(), 2, 16, QChar( '0' ) ).arg( c.blue(), 2, 16, QChar( '0' ) ).arg( c.green(), 2, 16, QChar( '0' ) ).arg( c.red(), 2, 16, QChar( '0' ) );
+  };
+
+  const QgsTextFormat fmt = text->format();
+  const QColor color = fmt.color();
+  const QFont font = fmt.font();
+
+  const QgsPointXY pos = QgsCoordinateTransform( itemCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() ).transform( text->point() );
+
+  QString outString;
+  QTextStream outStream( &outString );
+  outStream << "<Placemark>" << "\n";
+  outStream << QString( "<name>%1</name>\n" ).arg( text->text() );
+  outStream << "<Style>";
+  outStream << QString( "<IconStyle><scale>0</scale></IconStyle><LabelStyle><color>%1</color><scale>%2</scale></LabelStyle></Style>" ).arg( color2hex( color ) ).arg( font.pointSizeF() / QFont().pointSizeF() );
+  outStream << QString( "<Point><coordinates>%1,%2</coordinates></Point>" ).arg( QString::number( pos.x(), 'f', 10 ) ).arg( QString::number( pos.y(), 'f', 10 ) );
+  outStream << "</Placemark>" << "\n";
+  outStream.flush();
+  return outString;
+}
