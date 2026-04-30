@@ -74,6 +74,7 @@
 #include "kadas/app/devtools/kadasdevelopertoolsdockwidget.h"
 #include "kadas/app/auth/kadasportalauth.h"
 #include "kadas/core/kadas.h"
+#include "kadas/gui/3d/kadasmapitemlayer3drenderer.h"
 #include "kadas/gui/kadasattributetabledialog.h"
 #include "kadas/gui/kadasclipboard.h"
 #include "kadas/gui/kadasitemlayer.h"
@@ -251,6 +252,9 @@ void KadasApplication::init()
 #endif
 
   QgsApplication::initQgis();
+
+  // Register Kadas item layer 3D renderer metadata
+  QgsApplication::renderer3DRegistry()->addRenderer( new KadasMapItemLayer3DRendererMetadata() );
 
   QgsCoordinateTransform::setCustomMissingRequiredGridHandler(
     [=, this]( const QgsCoordinateReferenceSystem &sourceCrs, const QgsCoordinateReferenceSystem &destinationCrs, const QgsDatumTransform::GridDetails &grid ) {
