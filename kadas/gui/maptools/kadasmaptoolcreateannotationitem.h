@@ -19,6 +19,7 @@
 
 #include <QPointer>
 #include <QString>
+#include <functional>
 
 #include <qgis/qgsmaptool.h>
 
@@ -65,6 +66,16 @@ class KADAS_GUI_EXPORT KadasMapToolCreateAnnotationItem : public QgsMapTool
 
     void setMultipart( bool multipart ) { mMultipart = multipart; }
     void setToolLabel( const QString &label ) { mToolLabel = label; }
+
+    /**
+     * Overrides the default \c controller->createItem() factory used by the
+     * tool. When set, this factory is invoked instead of the controller to
+     * obtain a fresh in-progress item; the resulting item must report a
+     * \c type() compatible with the bound controller. Use this to create
+     * pre-configured variants (e.g. a marker with a non-default symbol
+     * shape) without subclassing the controller.
+     */
+    void setItemFactory( std::function<QgsAnnotationItem *()> factory ) { mItemFactory = std::move( factory ); }
 
     //! Returns the in-progress item (owned by the target layer), or nullptr.
     QgsAnnotationItem *currentItem() const { return mItem; }
@@ -113,6 +124,7 @@ class KADAS_GUI_EXPORT KadasMapToolCreateAnnotationItem : public QgsMapTool
 
     bool mMultipart = false;
     QString mToolLabel;
+    std::function<QgsAnnotationItem *()> mItemFactory;
 
     void createItem();
     void addPoint( const KadasMapPos &pos );

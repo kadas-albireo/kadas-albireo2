@@ -14,24 +14,29 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <functional>
+
 #include <QAction>
 #include <QMenu>
 #include <QShortcut>
-#include <QSpinBox>
 #include <QToolButton>
 
+#include <qgis/qgsannotationlayer.h>
+#include <qgis/qgsannotationmarkeritem.h>
+#include <qgis/qgsmarkersymbol.h>
+#include <qgis/qgsmarkersymbollayer.h>
+#include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
 
+#include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
+#include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
+#include "kadas/gui/annotationitems/kadascircleannotationitem.h"
+#include "kadas/gui/annotationitems/kadasrectangleannotationitem.h"
 #include "kadas/gui/kadasitemlayer.h"
-#include "kadas/gui/mapitems/kadascircleitem.h"
+#include "kadas/gui/kadaslayerselectionwidget.h"
 #include "kadas/gui/mapitems/kadascoordinatecrossitem.h"
-#include "kadas/gui/mapitems/kadaslineitem.h"
-#include "kadas/gui/mapitems/kadaspointitem.h"
-#include "kadas/gui/mapitems/kadaspolygonitem.h"
-#include "kadas/gui/mapitems/kadasrectangleitem.h"
-#include "kadas/gui/mapitems/kadastextitem.h"
-#include "kadas/gui/mapitemeditors/kadasredliningitemeditor.h"
-#include "kadas/gui/mapitemeditors/kadasredliningtexteditor.h"
+#include "kadas/gui/maptools/kadasmaptoolcreateannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
 #include "kadasapplication.h"
@@ -39,77 +44,29 @@
 #include "kadasredliningintegration.h"
 
 
-KadasMapItem *KadasPointItemInterface::createItem() const
-{
-  QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasMapItem *item = new KadasPointItem( crs, Qgis::MarkerShape::Circle );
-  item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
-  return item;
-}
-
-KadasMapItem *KadasSquareItemInterface::createItem() const
-{
-  QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasMapItem *item = new KadasPointItem( crs, Qgis::MarkerShape::Square );
-  item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
-  return item;
-};
-
-KadasMapItem *KadasTriangleItemInterface::createItem() const
-{
-  QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasMapItem *item = new KadasPointItem( crs, Qgis::MarkerShape::Triangle );
-  item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
-  return item;
-};
-
-KadasMapItem *KadasLineItemInterface::createItem() const
-{
-  QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasMapItem *item = new KadasLineItem( crs );
-  item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
-  return item;
-};
-
-KadasMapItem *KadasRectangleItemInterface::createItem() const
-{
-  QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasMapItem *item = new KadasRectangleItem( crs );
-  item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
-  return item;
-};
-
-
-KadasMapItem *KadasPolygonItemInterface::createItem() const
-{
-  QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasMapItem *item = new KadasPolygonItem( crs );
-  item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
-  return item;
-};
-
-KadasMapItem *KadasCircleItemInterface::createItem() const
-{
-  QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasMapItem *item = new KadasCircleItem( crs );
-  item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
-  return item;
-};
-
-KadasMapItem *KadasTextItemInterface::createItem() const
-{
-  QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasTextItem *item = new KadasTextItem( crs );
-  item->setEditor( KadasMapItemEditor::REDLINING_TEXT );
-  return item;
-};
-
 KadasMapItem *KadasCoordCrossItemInterface::createItem() const
 {
   QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasMapItem *item = new KadasCoordinateCrossItem( crs );
-  return item;
-};
+  return new KadasCoordinateCrossItem( crs );
+}
+
+
+namespace
+{
+  //! Builds a marker annotation item with a simple-marker symbol layer of
+  //! the given shape, matching the legacy KadasPointItem default style.
+  QgsAnnotationMarkerItem *makeShapedMarker( Qgis::MarkerShape shape )
+  {
+    auto *item = new QgsAnnotationMarkerItem( QgsPoint() );
+    auto *sl = new QgsSimpleMarkerSymbolLayer( shape );
+    sl->setColor( Qt::yellow );
+    sl->setStrokeColor( Qt::red );
+    sl->setStrokeWidth( 0.4 );
+    sl->setSize( 4 );
+    item->setSymbol( new QgsMarkerSymbol( QgsSymbolLayerList() << sl ) );
+    return item;
+  }
+} // namespace
 
 
 KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObject, QObject *parent )
@@ -118,53 +75,50 @@ KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObje
 {
   QAction *actionNewMarker = new QAction( QIcon( ":/kadas/icons/redlining_point" ), tr( "Marker" ), this );
 
+  using V = AnnotationVariant;
+
   mActionNewPoint = new QAction( QIcon( ":/kadas/icons/redlining_point" ), tr( "Point" ), this );
   mActionNewPoint->setCheckable( true );
-  connect( mActionNewPoint, &QAction::triggered, this, [=, this]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasPointItemInterface>( KadasPointItemInterface() ) ) ); } );
+  connect( mActionNewPoint, &QAction::triggered, this, [this]( bool active ) { toggleAnnotation( active, V::MarkerCircle ); } );
 
   mActionNewSquare = new QAction( QIcon( ":/kadas/icons/redlining_square" ), tr( "Square" ), this );
   mActionNewSquare->setCheckable( true );
-  connect( mActionNewSquare, &QAction::triggered, this, [=, this]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasSquareItemInterface>( KadasSquareItemInterface() ) ) ); } );
+  connect( mActionNewSquare, &QAction::triggered, this, [this]( bool active ) { toggleAnnotation( active, V::MarkerSquare ); } );
 
   mActionNewTriangle = new QAction( QIcon( ":/kadas/icons/redlining_triangle" ), tr( "Triangle" ), this );
   mActionNewTriangle->setCheckable( true );
-  connect( mActionNewTriangle, &QAction::triggered, this, [=, this]( bool active ) {
-    toggleCreateItem( active, std::move( std::make_unique<KadasTriangleItemInterface>( KadasTriangleItemInterface() ) ) );
-  } );
+  connect( mActionNewTriangle, &QAction::triggered, this, [this]( bool active ) { toggleAnnotation( active, V::MarkerTriangle ); } );
 
   mActionNewLine = new QAction( QIcon( ":/kadas/icons/redlining_line" ), tr( "Line" ), this );
   mActionNewLine->setCheckable( true );
-  connect( mActionNewLine, &QAction::triggered, this, [=, this]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasLineItemInterface>( KadasLineItemInterface() ) ) ); } );
+  connect( mActionNewLine, &QAction::triggered, this, [this]( bool active ) { toggleAnnotation( active, V::Line ); } );
   connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_L ), kApp->mainWindow() ), &QShortcut::activated, mActionNewLine, &QAction::trigger );
 
   mActionNewRectangle = new QAction( QIcon( ":/kadas/icons/redlining_rectangle" ), tr( "Rectangle" ), this );
   mActionNewRectangle->setCheckable( true );
-  connect( mActionNewRectangle, &QAction::triggered, this, [=, this]( bool active ) {
-    toggleCreateItem( active, std::move( std::make_unique<KadasRectangleItemInterface>( KadasRectangleItemInterface() ) ) );
-  } );
+  connect( mActionNewRectangle, &QAction::triggered, this, [this]( bool active ) { toggleAnnotation( active, V::Rectangle ); } );
   connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_R ), kApp->mainWindow() ), &QShortcut::activated, mActionNewRectangle, &QAction::trigger );
 
   mActionNewPolygon = new QAction( QIcon( ":/kadas/icons/redlining_polygon" ), tr( "Polygon" ), this );
   mActionNewPolygon->setCheckable( true );
-  connect( mActionNewPolygon, &QAction::triggered, this, [=, this]( bool active ) {
-    toggleCreateItem( active, std::move( std::make_unique<KadasPolygonItemInterface>( KadasPolygonItemInterface() ) ) );
-  } );
+  connect( mActionNewPolygon, &QAction::triggered, this, [this]( bool active ) { toggleAnnotation( active, V::Polygon ); } );
   connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_P ), kApp->mainWindow() ), &QShortcut::activated, mActionNewPolygon, &QAction::trigger );
 
   mActionNewCircle = new QAction( QIcon( ":/kadas/icons/redlining_circle" ), tr( "Circle" ), this );
   mActionNewCircle->setCheckable( true );
-  connect( mActionNewCircle, &QAction::triggered, this, [=, this]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasCircleItemInterface>( KadasCircleItemInterface() ) ) ); } );
+  connect( mActionNewCircle, &QAction::triggered, this, [this]( bool active ) { toggleAnnotation( active, V::Circle ); } );
   connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_C ), kApp->mainWindow() ), &QShortcut::activated, mActionNewCircle, &QAction::trigger );
 
   mActionNewText = new QAction( QIcon( ":/kadas/icons/redlining_text" ), tr( "Text" ), this );
   mActionNewText->setCheckable( true );
-  connect( mActionNewText, &QAction::triggered, this, [=, this]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasTextItemInterface>( KadasTextItemInterface() ) ) ); } );
+  connect( mActionNewText, &QAction::triggered, this, [this]( bool active ) { toggleAnnotation( active, V::Text ); } );
   connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_T ), kApp->mainWindow() ), &QShortcut::activated, mActionNewText, &QAction::trigger );
 
+  // CoordinateCross has no annotation-item equivalent yet; keep it on the legacy tool.
   mActionNewCoordCross = new QAction( QIcon( ":/kadas/icons/coord_cross" ), tr( "Coordinate Cross" ), this );
   mActionNewCoordCross->setCheckable( true );
   connect( mActionNewCoordCross, &QAction::triggered, this, [=, this]( bool active ) {
-    toggleCreateItem( active, std::move( std::make_unique<KadasCoordCrossItemInterface>( KadasCoordCrossItemInterface() ) ) );
+    toggleLegacyCreateItem( active, std::move( std::make_unique<KadasCoordCrossItemInterface>( KadasCoordCrossItemInterface() ) ) );
   } );
   connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_O ), kApp->mainWindow() ), &QShortcut::activated, mActionNewCoordCross, &QAction::trigger );
 
@@ -173,6 +127,7 @@ KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObje
   menuNewMarker->addAction( mActionNewSquare );
   menuNewMarker->addAction( mActionNewTriangle );
   actionNewMarker->setMenu( menuNewMarker );
+
   QMenu *menuNewObject = new QMenu();
   menuNewObject->addAction( actionNewMarker );
   menuNewObject->addAction( mActionNewLine );
@@ -196,7 +151,83 @@ KadasItemLayer *KadasRedliningIntegration::getOrCreateLayer()
   return mLastLayer;
 }
 
-void KadasRedliningIntegration::toggleCreateItem( bool active, std::unique_ptr<KadasMapItemInterface> interface )
+QgsAnnotationLayer *KadasRedliningIntegration::getOrCreateAnnotationLayer()
+{
+  if ( !mLastAnnotationLayer )
+  {
+    mLastAnnotationLayer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::RedliningLayer );
+  }
+  return mLastAnnotationLayer;
+}
+
+void KadasRedliningIntegration::toggleAnnotation( bool active, AnnotationVariant variant )
+{
+  QgsMapCanvas *canvas = kApp->mainWindow()->mapCanvas();
+  QAction *action = qobject_cast<QAction *>( QObject::sender() );
+  if ( !active )
+  {
+    if ( canvas->mapTool() && canvas->mapTool()->action() == action )
+      canvas->unsetMapTool( canvas->mapTool() );
+    return;
+  }
+
+  // Resolve the controller and (optionally) a factory override per variant.
+  QString typeId;
+  std::function<QgsAnnotationItem *()> factory;
+  switch ( variant )
+  {
+    case AnnotationVariant::MarkerCircle:
+      typeId = QStringLiteral( "marker" );
+      factory = [] { return makeShapedMarker( Qgis::MarkerShape::Circle ); };
+      break;
+    case AnnotationVariant::MarkerSquare:
+      typeId = QStringLiteral( "marker" );
+      factory = [] { return makeShapedMarker( Qgis::MarkerShape::Square ); };
+      break;
+    case AnnotationVariant::MarkerTriangle:
+      typeId = QStringLiteral( "marker" );
+      factory = [] { return makeShapedMarker( Qgis::MarkerShape::Triangle ); };
+      break;
+    case AnnotationVariant::Line:
+      typeId = QStringLiteral( "linestring" );
+      break;
+    case AnnotationVariant::Polygon:
+      typeId = QStringLiteral( "polygon" );
+      break;
+    case AnnotationVariant::Rectangle:
+      typeId = KadasRectangleAnnotationItem::itemTypeId();
+      break;
+    case AnnotationVariant::Circle:
+      typeId = KadasCircleAnnotationItem::itemTypeId();
+      break;
+    case AnnotationVariant::Text:
+      typeId = QStringLiteral( "pointtext" );
+      break;
+  }
+
+  KadasAnnotationItemController *controller = KadasAnnotationControllerRegistry::instance()->controllerFor( typeId );
+  if ( !controller )
+    return;
+
+  QgsAnnotationLayer *layer = getOrCreateAnnotationLayer();
+  if ( !layer )
+    return;
+
+  KadasMapToolCreateAnnotationItem *tool = new KadasMapToolCreateAnnotationItem( canvas, controller, layer );
+  if ( factory )
+    tool->setItemFactory( factory );
+  tool->setMultipart( false );
+  tool->setAction( action );
+
+  connect( tool, &QgsMapTool::activated, this, &KadasRedliningIntegration::activateNewButtonObject );
+  connect( tool, &QgsMapTool::deactivated, this, &KadasRedliningIntegration::deactivateNewButtonObject );
+
+  kApp->mainWindow()->layerTreeView()->setCurrentLayer( layer );
+  kApp->mainWindow()->layerTreeView()->setLayerVisible( layer, true );
+  canvas->setMapTool( tool );
+}
+
+void KadasRedliningIntegration::toggleLegacyCreateItem( bool active, std::unique_ptr<KadasMapItemInterface> interface )
 {
   QgsMapCanvas *canvas = kApp->mainWindow()->mapCanvas();
   QAction *action = qobject_cast<QAction *>( QObject::sender() );
