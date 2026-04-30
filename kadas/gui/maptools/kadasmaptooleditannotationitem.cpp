@@ -22,11 +22,13 @@
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapmouseevent.h>
+#include <qgis/qgssettings.h>
 
 #include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontext.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/kadasbottombar.h"
+#include "kadas/gui/kadasfloatinginputwidget.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 
 
@@ -108,6 +110,7 @@ void KadasMapToolEditAnnotationItem::deactivate()
   mBottomBar = nullptr;
   delete mStateHistory;
   mStateHistory = nullptr;
+  clearNumericInput();
 }
 
 void KadasMapToolEditAnnotationItem::canvasPressEvent( QgsMapMouseEvent *e )
@@ -129,6 +132,11 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
 {
   if ( !mItem || !mController || !mLayer )
     return;
+  if ( mIgnoreNextMoveEvent )
+  {
+    mIgnoreNextMoveEvent = false;
+    return;
+  }
 
   KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
   const KadasMapPos pos = KadasMapPos::fromPoint( e->mapPoint() );
@@ -149,15 +157,33 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
     if ( !mEditContext.isValid() )
     {
       setCursor( Qt::ArrowCursor );
+      clearNumericInput();
     }
     else if ( mEditContext != oldContext )
     {
       setCursor( mEditContext.cursor );
       mMoveOffset = QgsVector( pos.x() - mEditContext.pos.x(), pos.y() - mEditContext.pos.y() );
+      setupNumericInput();
     }
     else
     {
       mMoveOffset = QgsVector( pos.x() - mEditContext.pos.x(), pos.y() - mEditContext.pos.y() );
+    }
+  }
+
+  if ( mInputWidget && mEditContext.isValid() )
+  {
+    mInputWidget->ensureFocus();
+    const KadasMapPos adjusted( pos.x() - mMoveOffset.x(), pos.y() - mMoveOffset.y() );
+    KadasMapItem::AttribValues values = mController->editAttribsFromPosition( mItem, mEditContext, adjusted, ctx );
+    for ( auto it = values.begin(), itEnd = values.end(); it != itEnd; ++it )
+      mInputWidget->inputField( it.key() )->setValue( it.value() );
+    mInputWidget->move( e->position().x(), e->position().y() + 20 );
+    mInputWidget->show();
+    if ( mInputWidget->focusedInputField() )
+    {
+      mInputWidget->focusedInputField()->setFocus();
+      mInputWidget->focusedInputField()->selectAll();
     }
   }
 }
@@ -229,4 +255,61 @@ void KadasMapToolEditAnnotationItem::stateChanged( KadasStateHistory::ChangeType
   mItem = mLayer->item( mItemId );
   mLayer->triggerRepaint();
   mEditContext = KadasMapItem::EditContext();
+  clearNumericInput();
+}
+
+void KadasMapToolEditAnnotationItem::setupNumericInput()
+{
+  clearNumericInput();
+  if ( !QgsSettings().value( "/kadas/showNumericInput", false ).toBool() )
+    return;
+  if ( !mEditContext.isValid() || mEditContext.attributes.isEmpty() )
+    return;
+
+  mInputWidget = new KadasFloatingInputWidget( canvas() );
+  const KadasMapItem::AttribDefs &attributes = mEditContext.attributes;
+  for ( auto it = attributes.begin(), itEnd = attributes.end(); it != itEnd; ++it )
+  {
+    const KadasMapItem::NumericAttribute &attribute = it.value();
+    KadasFloatingInputWidgetField *attrEdit = new KadasFloatingInputWidgetField( it.key(), attribute.precision( mCanvas->mapSettings() ), attribute.min, attribute.max );
+    connect( attrEdit, &KadasFloatingInputWidgetField::inputChanged, this, &KadasMapToolEditAnnotationItem::inputChanged );
+    mInputWidget->addInputField( attribute.name + ":", attrEdit, attribute.suffix( mCanvas->mapSettings() ) );
+  }
+  mInputWidget->setFocusedInputField( mInputWidget->inputField( attributes.begin().key() ) );
+}
+
+void KadasMapToolEditAnnotationItem::clearNumericInput()
+{
+  delete mInputWidget;
+  mInputWidget = nullptr;
+}
+
+KadasMapItem::AttribValues KadasMapToolEditAnnotationItem::collectAttributeValues() const
+{
+  KadasMapItem::AttribValues values;
+  if ( !mInputWidget )
+    return values;
+  for ( const KadasFloatingInputWidgetField *field : mInputWidget->inputFields() )
+    values.insert( field->id(), field->text().toDouble() );
+  return values;
+}
+
+void KadasMapToolEditAnnotationItem::inputChanged()
+{
+  if ( !mItem || !mController || !mLayer || !mInputWidget )
+    return;
+  if ( !mEditContext.isValid() )
+    return;
+
+  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
+  const KadasMapItem::AttribValues values = collectAttributeValues();
+
+  // Suppress the spurious move event triggered by adjustCursorAndExtent.
+  mIgnoreNextMoveEvent = true;
+  const KadasMapPos newPos = mController->positionFromEditAttribs( mItem, mEditContext, values, ctx );
+  mInputWidget->adjustCursorAndExtent( newPos );
+
+  mController->edit( mItem, mEditContext, values, ctx );
+  mLayer->triggerRepaint();
+  pushState();
 }
