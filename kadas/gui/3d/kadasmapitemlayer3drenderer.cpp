@@ -111,6 +111,9 @@ Qt3DCore::QEntity *KadasMapItemLayer3DRenderer::createEntity( Qgs3DMapSettings *
   if ( !itemLayer )
     return nullptr;
 
+  // qgisAnnotationLayer() transfers ownership; the QgsAnnotationLayerChunkLoaderFactory only
+  // stores a raw pointer to it, so we must keep the layer alive for the entity's lifetime.
+  // Parent it to the entity below so it is destroyed together with it.
   QgsAnnotationLayer *annotationLayer = itemLayer->qgisAnnotationLayer( map->crs() );
 
   // For some cases we start with a maximal z range because we can't know this upfront, as it potentially involves terrain heights.
@@ -135,7 +138,12 @@ Qt3DCore::QEntity *KadasMapItemLayer3DRenderer::createEntity( Qgs3DMapSettings *
       break;
   }
 
-  return new QgsAnnotationLayerChunkedEntity( map, annotationLayer, mAltClamping, mZOffset, mShowCalloutLines, mCalloutLineColor, mCalloutLineWidth, mTextFormat, minimumZ, maximumZ );
+  QgsAnnotationLayerChunkedEntity *entity
+    = new QgsAnnotationLayerChunkedEntity( map, annotationLayer, mAltClamping, mZOffset, mShowCalloutLines, mCalloutLineColor, mCalloutLineWidth, mTextFormat, minimumZ, maximumZ );
+  // Tie the ephemeral annotation layer's lifetime to the entity (~QgsAnnotationLayerChunkedEntity
+  // calls cancelActiveJobs(), so no chunk loader will outlive the layer).
+  annotationLayer->setParent( entity );
+  return entity;
 }
 
 void KadasMapItemLayer3DRenderer::writeXml( QDomElement &elem, const QgsReadWriteContext &context ) const
