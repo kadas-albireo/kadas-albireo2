@@ -14,44 +14,82 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <cmath>
+#include <limits>
+
 #include <qgis/qgsannotationitem.h>
-#include <qgis/qgsmapsettings.h>
+#include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsrectangle.h>
 
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 
 
-void KadasAnnotationItemController::populateContextMenu( QgsAnnotationItem *, QMenu *, const KadasMapItem::EditContext &, const KadasMapPos &, const QgsMapSettings & )
+void KadasAnnotationItemController::populateContextMenu( QgsAnnotationItem *, QMenu *, const KadasMapItem::EditContext &, const KadasMapPos &, const KadasAnnotationItemContext & )
 {}
 
-void KadasAnnotationItemController::onDoubleClick( QgsAnnotationItem *, const QgsMapSettings & )
+void KadasAnnotationItemController::onDoubleClick( QgsAnnotationItem *, const KadasAnnotationItemContext & )
 {}
 
-bool KadasAnnotationItemController::hitTest( const QgsAnnotationItem *item, const KadasMapPos &pos, const QgsMapSettings &settings ) const
+bool KadasAnnotationItemController::hitTest( const QgsAnnotationItem *item, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx ) const
 {
   if ( !item )
     return false;
-  // Default: hit if the click falls within the bounding box (in map CRS).
-  // Subclasses with cheap tighter tests (e.g. distance-to-line) should override.
-  Q_UNUSED( settings )
-  return item->boundingBox().contains( pos );
+  // Default: hit if the click falls within the item's bounding box (in map space).
+  // Subclasses with cheap tighter tests should override.
+  return toMapRect( item->boundingBox(), ctx ).contains( pos );
 }
 
-QPair<KadasMapPos, double> KadasAnnotationItemController::closestPoint( const QgsAnnotationItem *item, const KadasMapPos &pos, const QgsMapSettings &settings ) const
+QPair<KadasMapPos, double> KadasAnnotationItemController::closestPoint( const QgsAnnotationItem *item, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx ) const
 {
-  Q_UNUSED( settings )
   if ( !item )
     return { pos, std::numeric_limits<double>::max() };
-  // Fallback: report the bounding-box center. Subclasses should override.
-  const QgsPointXY center = item->boundingBox().center();
-  const KadasMapPos cp( center.x(), center.y() );
+  // Fallback: report the bounding-box center (in map space). Subclasses should override.
+  const QgsPointXY centerItem = item->boundingBox().center();
+  const QgsPointXY centerMap = toMapPos( centerItem, ctx );
+  const KadasMapPos cp( centerMap.x(), centerMap.y() );
   return { cp, std::hypot( cp.x() - pos.x(), cp.y() - pos.y() ) };
 }
 
-bool KadasAnnotationItemController::intersects( const QgsAnnotationItem *item, const QgsRectangle &rect, const QgsMapSettings &settings, bool contains ) const
+bool KadasAnnotationItemController::intersects( const QgsAnnotationItem *item, const QgsRectangle &mapRect, const KadasAnnotationItemContext &ctx, bool contains ) const
 {
-  Q_UNUSED( settings )
   if ( !item )
     return false;
-  return contains ? rect.contains( item->boundingBox() ) : rect.intersects( item->boundingBox() );
+  const QgsRectangle itemBounds = item->boundingBox();
+  const QgsRectangle itemRect = toItemRect( mapRect, ctx );
+  return contains ? itemRect.contains( itemBounds ) : itemRect.intersects( itemBounds );
+}
+
+// ----- Transform helpers ---------------------------------------------------
+
+KadasMapPos KadasAnnotationItemController::toMapPos( const KadasItemPos &itemPos, const KadasAnnotationItemContext &ctx )
+{
+  const QgsPointXY p = QgsCoordinateTransform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() ).transform( itemPos );
+  return KadasMapPos( p.x(), p.y() );
+}
+
+QgsPointXY KadasAnnotationItemController::toMapPos( const QgsPointXY &itemPos, const KadasAnnotationItemContext &ctx )
+{
+  return QgsCoordinateTransform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() ).transform( itemPos );
+}
+
+KadasItemPos KadasAnnotationItemController::toItemPos( const KadasMapPos &mapPos, const KadasAnnotationItemContext &ctx )
+{
+  const QgsPointXY p = QgsCoordinateTransform( ctx.mapSettings().destinationCrs(), ctx.itemCrs(), ctx.mapSettings().transformContext() ).transform( mapPos );
+  return KadasItemPos( p.x(), p.y() );
+}
+
+QgsRectangle KadasAnnotationItemController::toItemRect( const QgsRectangle &mapRect, const KadasAnnotationItemContext &ctx )
+{
+  return QgsCoordinateTransform( ctx.mapSettings().destinationCrs(), ctx.itemCrs(), ctx.mapSettings().transformContext() ).transform( mapRect );
+}
+
+QgsRectangle KadasAnnotationItemController::toMapRect( const QgsRectangle &itemRect, const KadasAnnotationItemContext &ctx )
+{
+  return QgsCoordinateTransform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() ).transform( itemRect );
+}
+
+double KadasAnnotationItemController::pickTolSqr( const KadasAnnotationItemContext &ctx )
+{
+  const double mupp = ctx.mapSettings().mapUnitsPerPixel();
+  return 25 * mupp * mupp;
 }

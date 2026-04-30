@@ -28,6 +28,7 @@ set(kadas_gui_SRC
     annotationitems/kadasannotationcontrollerregistry.cpp
     annotationitems/kadasannotationitemcontroller.cpp
     annotationitems/kadasannotationlayerhelpers.cpp
+    annotationitems/kadasmarkerannotationcontroller.cpp
     maptools/kadasmaptoolcreateitem.cpp
     maptools/kadasmaptooldeleteitems.cpp
     maptools/kadasmaptooledititem.cpp
@@ -111,8 +112,10 @@ set(kadas_gui_HDR
     kadastextbrowser.h
     3d/kadasmapitemlayer3drenderer.h
     annotationitems/kadasannotationcontrollerregistry.h
+    annotationitems/kadasannotationitemcontext.h
     annotationitems/kadasannotationitemcontroller.h
     annotationitems/kadasannotationlayerhelpers.h
+    annotationitems/kadasmarkerannotationcontroller.h
     maptools/kadasmaptoolcreateitem.h
     maptools/kadasmaptooldeleteitems.h
     maptools/kadasmaptooledititem.h
