@@ -25,6 +25,9 @@ set(kadas_gui_SRC
     kadasrichtexteditor.cpp
     kadastextbrowser.cpp
     3d/kadasmapitemlayer3drenderer.cpp
+    annotationitems/kadasannotationcontrollerregistry.cpp
+    annotationitems/kadasannotationitemcontroller.cpp
+    annotationitems/kadasannotationlayerhelpers.cpp
     maptools/kadasmaptoolcreateitem.cpp
     maptools/kadasmaptooldeleteitems.cpp
     maptools/kadasmaptooledititem.cpp
@@ -107,6 +110,9 @@ set(kadas_gui_HDR
     kadassearchprovider.h
     kadastextbrowser.h
     3d/kadasmapitemlayer3drenderer.h
+    annotationitems/kadasannotationcontrollerregistry.h
+    annotationitems/kadasannotationitemcontroller.h
+    annotationitems/kadasannotationlayerhelpers.h
     maptools/kadasmaptoolcreateitem.h
     maptools/kadasmaptooldeleteitems.h
     maptools/kadasmaptooledititem.h
