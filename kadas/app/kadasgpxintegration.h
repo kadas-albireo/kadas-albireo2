@@ -20,33 +20,17 @@
 #include <functional>
 
 #include <QObject>
+#include <QPointer>
 
 #include <qgis/qgscustomdrophandler.h>
 
 
-#include "kadas/gui/kadasmapiteminterface.h"
-
-
 class QAction;
 
-class KadasMapItem;
 class KadasItemLayer;
 class KadasMainWindow;
+class QgsAnnotationLayer;
 
-
-class KadasWayPointInterface : public KadasMapItemInterface
-{
-  public:
-    KadasWayPointInterface() = default;
-    KadasMapItem *createItem() const override;
-};
-
-class KadasRouteInterface : public KadasMapItemInterface
-{
-  public:
-    KadasRouteInterface() = default;
-    KadasMapItem *createItem() const override;
-};
 
 class KadasGpxDropHandler : public QgsCustomDropHandler
 {
@@ -61,16 +45,24 @@ class KadasGpxIntegration : public QObject
 {
     Q_OBJECT
   public:
+    enum class Variant
+    {
+      Waypoint,
+      Route
+    };
+
     KadasGpxIntegration( QAction *actionWaypoint, QAction *actionRoute, QAction *actionExportGpx, QAction *actionImportGpx, QObject *parent );
     ~KadasGpxIntegration();
     KadasItemLayer *getOrCreateLayer();
+    QgsAnnotationLayer *getOrCreateAnnotationLayer();
 
     static bool importGpx( const QString &filename, QString &errorMsg );
 
   private:
-    void toggleCreateItem( bool active, std::unique_ptr<KadasMapItemInterface> interface );
+    void toggleAnnotation( bool active, Variant variant );
 
     KadasGpxDropHandler mDropHandler;
+    QPointer<QgsAnnotationLayer> mLastAnnotationLayer;
 
   private slots:
     void openGpx();
