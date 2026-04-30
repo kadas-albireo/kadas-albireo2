@@ -22,10 +22,12 @@
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapmouseevent.h>
+#include <qgis/qgssettings.h>
 
 #include "kadas/gui/annotationitems/kadasannotationitemcontext.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/kadasbottombar.h"
+#include "kadas/gui/kadasfloatinginputwidget.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateannotationitem.h"
 
 
@@ -50,6 +52,7 @@ void KadasMapToolCreateAnnotationItem::activate()
   connect( mStateHistory, &KadasStateHistory::stateChanged, this, &KadasMapToolCreateAnnotationItem::stateChanged );
 
   createItem();
+  setupNumericInputWidget();
 
   // Bottom bar with optional label + undo/redo + close.
   mBottomBar = new KadasBottomBar( mCanvas );
@@ -106,6 +109,8 @@ void KadasMapToolCreateAnnotationItem::deactivate()
   mBottomBar = nullptr;
   delete mStateHistory;
   mStateHistory = nullptr;
+  delete mInputWidget;
+  mInputWidget = nullptr;
 }
 
 void KadasMapToolCreateAnnotationItem::createItem()
@@ -153,12 +158,33 @@ void KadasMapToolCreateAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
 {
   if ( !mItem || !mLayer || !mController )
     return;
+  if ( mIgnoreNextMoveEvent )
+  {
+    mIgnoreNextMoveEvent = false;
+    return;
+  }
   if ( mDrawState != DrawState::Drawing )
     return;
 
   KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
-  mController->setCurrentPoint( mItem, KadasMapPos::fromPoint( e->mapPoint() ), ctx );
+  const KadasMapPos pos = KadasMapPos::fromPoint( e->mapPoint() );
+  mController->setCurrentPoint( mItem, pos, ctx );
   mLayer->triggerRepaint();
+
+  if ( mInputWidget )
+  {
+    mInputWidget->ensureFocus();
+    KadasMapItem::AttribValues values = mController->drawAttribsFromPosition( mItem, pos, ctx );
+    for ( auto it = values.begin(), itEnd = values.end(); it != itEnd; ++it )
+      mInputWidget->inputField( it.key() )->setValue( it.value() );
+    mInputWidget->move( e->position().x(), e->position().y() + 20 );
+    mInputWidget->show();
+    if ( mInputWidget->focusedInputField() )
+    {
+      mInputWidget->focusedInputField()->setFocus();
+      mInputWidget->focusedInputField()->selectAll();
+    }
+  }
 }
 
 void KadasMapToolCreateAnnotationItem::keyPressEvent( QKeyEvent *e )
@@ -247,6 +273,21 @@ void KadasMapToolCreateAnnotationItem::startPart( const KadasMapPos &pos )
   }
 }
 
+void KadasMapToolCreateAnnotationItem::startPart( const KadasMapItem::AttribValues &values )
+{
+  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
+  if ( !mController->startPart( mItem, values, ctx ) )
+  {
+    finishPart();
+  }
+  else
+  {
+    mDrawState = DrawState::Drawing;
+    mLayer->triggerRepaint();
+    pushState();
+  }
+}
+
 void KadasMapToolCreateAnnotationItem::finishPart()
 {
   KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
@@ -280,4 +321,92 @@ void KadasMapToolCreateAnnotationItem::stateChanged( KadasStateHistory::ChangeTy
   mItem = mLayer->item( mItemId );
   mDrawState = ts->drawState;
   mLayer->triggerRepaint();
+}
+
+void KadasMapToolCreateAnnotationItem::setupNumericInputWidget()
+{
+  delete mInputWidget;
+  mInputWidget = nullptr;
+  if ( !QgsSettings().value( "/kadas/showNumericInput", false ).toBool() )
+    return;
+  if ( !mController )
+    return;
+
+  const KadasMapItem::AttribDefs attribs = mController->drawAttribs();
+  if ( attribs.isEmpty() )
+    return;
+
+  mInputWidget = new KadasFloatingInputWidget( canvas() );
+  for ( auto it = attribs.begin(), itEnd = attribs.end(); it != itEnd; ++it )
+  {
+    const KadasMapItem::NumericAttribute &attribute = it.value();
+    KadasFloatingInputWidgetField *attrEdit = new KadasFloatingInputWidgetField( it.key(), attribute.precision( mCanvas->mapSettings() ), attribute.min, attribute.max );
+    connect( attrEdit, &KadasFloatingInputWidgetField::inputChanged, this, &KadasMapToolCreateAnnotationItem::inputChanged );
+    connect( attrEdit, &KadasFloatingInputWidgetField::inputConfirmed, this, &KadasMapToolCreateAnnotationItem::acceptInput );
+    mInputWidget->addInputField( attribute.name + ":", attrEdit, attribute.suffix( mCanvas->mapSettings() ) );
+  }
+  mInputWidget->setFocusedInputField( mInputWidget->inputField( attribs.begin().key() ) );
+}
+
+KadasMapItem::AttribValues KadasMapToolCreateAnnotationItem::collectAttributeValues() const
+{
+  KadasMapItem::AttribValues attributes;
+  if ( !mInputWidget )
+    return attributes;
+  for ( const KadasFloatingInputWidgetField *field : mInputWidget->inputFields() )
+    attributes.insert( field->id(), field->text().toDouble() );
+  return attributes;
+}
+
+void KadasMapToolCreateAnnotationItem::inputChanged()
+{
+  if ( !mItem || !mController || !mLayer || !mInputWidget )
+    return;
+  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
+  const KadasMapItem::AttribValues values = collectAttributeValues();
+
+  // Suppress the move event triggered by the cursor reposition below so the
+  // mouse-move handler does not overwrite the user's typed values via
+  // setCurrentPoint.
+  mIgnoreNextMoveEvent = true;
+  const KadasMapPos newPos = mController->positionFromDrawAttribs( mItem, values, ctx );
+  mInputWidget->adjustCursorAndExtent( newPos );
+
+  if ( mDrawState == DrawState::Drawing )
+  {
+    mController->setCurrentAttributes( mItem, values, ctx );
+    mLayer->triggerRepaint();
+  }
+}
+
+void KadasMapToolCreateAnnotationItem::acceptInput()
+{
+  if ( !mItem || !mController || !mLayer )
+    return;
+  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
+
+  switch ( mDrawState )
+  {
+    case DrawState::Empty:
+      startPart( collectAttributeValues() );
+      break;
+    case DrawState::Drawing:
+      if ( !mController->continuePart( mItem, ctx ) )
+        finishPart();
+      else
+      {
+        mLayer->triggerRepaint();
+        pushState();
+      }
+      break;
+    case DrawState::Finished:
+      if ( !mMultipart )
+      {
+        clearInProgress();
+        createItem();
+        emit cleared();
+      }
+      startPart( collectAttributeValues() );
+      break;
+  }
 }

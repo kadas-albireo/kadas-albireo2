@@ -29,6 +29,7 @@
 
 class KadasAnnotationItemController;
 class KadasBottomBar;
+class KadasFloatingInputWidget;
 class QgsAnnotationItem;
 class QgsAnnotationLayer;
 
@@ -78,12 +79,18 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
 
     KadasBottomBar *mBottomBar = nullptr;
     KadasStateHistory *mStateHistory = nullptr;
+    KadasFloatingInputWidget *mInputWidget = nullptr;
+    bool mIgnoreNextMoveEvent = false;
 
     void pushState();
     void deleteItem();
+    void setupNumericInput();
+    void clearNumericInput();
+    KadasMapItem::AttribValues collectAttributeValues() const;
 
   private slots:
     void stateChanged( KadasStateHistory::ChangeType, KadasStateHistory::State *state, KadasStateHistory::State *prevState );
+    void inputChanged();
 };
 
 #endif // KADASMAPTOOLEDITANNOTATIONITEM_H
