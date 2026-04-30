@@ -31,12 +31,12 @@ namespace
 {
   inline QgsAnnotationLineItem *asLine( QgsAnnotationItem *item )
   {
-    Q_ASSERT( item && item->type() == QLatin1String( "linestring" ) );
+    Q_ASSERT( dynamic_cast<QgsAnnotationLineItem *>( item ) );
     return static_cast<QgsAnnotationLineItem *>( item );
   }
   inline const QgsAnnotationLineItem *asLine( const QgsAnnotationItem *item )
   {
-    Q_ASSERT( item && item->type() == QLatin1String( "linestring" ) );
+    Q_ASSERT( dynamic_cast<const QgsAnnotationLineItem *>( item ) );
     return static_cast<const QgsAnnotationLineItem *>( item );
   }
 
