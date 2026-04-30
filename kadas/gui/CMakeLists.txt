@@ -30,6 +30,10 @@ set(kadas_gui_SRC
     annotationitems/kadasannotationlayerhelpers.cpp
     annotationitems/kadascircleannotationcontroller.cpp
     annotationitems/kadascircleannotationitem.cpp
+    annotationitems/kadasgpxrouteannotationcontroller.cpp
+    annotationitems/kadasgpxrouteannotationitem.cpp
+    annotationitems/kadasgpxwaypointannotationcontroller.cpp
+    annotationitems/kadasgpxwaypointannotationitem.cpp
     annotationitems/kadaslineannotationcontroller.cpp
     annotationitems/kadasmarkerannotationcontroller.cpp
     annotationitems/kadaspictureannotationcontroller.cpp
@@ -127,6 +131,10 @@ set(kadas_gui_HDR
     annotationitems/kadasannotationlayerhelpers.h
     annotationitems/kadascircleannotationcontroller.h
     annotationitems/kadascircleannotationitem.h
+    annotationitems/kadasgpxrouteannotationcontroller.h
+    annotationitems/kadasgpxrouteannotationitem.h
+    annotationitems/kadasgpxwaypointannotationcontroller.h
+    annotationitems/kadasgpxwaypointannotationitem.h
     annotationitems/kadaslineannotationcontroller.h
     annotationitems/kadasmarkerannotationcontroller.h
     annotationitems/kadaspictureannotationcontroller.h
