@@ -17,67 +17,60 @@
 #ifndef KADASCIRCLEANNOTATIONITEM_H
 #define KADASCIRCLEANNOTATIONITEM_H
 
-#include <memory>
-
-#include <qgis/qgsannotationitem.h>
+#include <qgis/qgsannotationpolygonitem.h>
 #include <qgis/qgspointxy.h>
 
 #include "kadas/gui/kadas_gui.h"
-
-class QgsFillSymbol;
 
 /**
  * \ingroup gui
  * \brief Kadas-internal circle annotation item.
  *
- * Defined by a center point and a ring point (a point on the circumference);
- * radius is the distance between the two. Both points are stored in the parent
- * layer's CRS. The item renders as a 64-segment polygon approximation using a
- * \c QgsFillSymbol.
+ * Subclasses \c QgsAnnotationPolygonItem so the rendered geometry is a
+ * \c QgsCurvePolygon whose exterior ring is a \c QgsCompoundCurve made of two
+ * \c QgsCircularString arcs (top + bottom semicircle). The geometry is
+ * therefore an exact circle — no segmentation. Rendering, callouts, fill
+ * symbology and node-based editing are inherited from the parent class.
+ *
+ * Canonical state is \c center plus \c ringPoint (a point on the
+ * circumference); both are stored in the parent layer's CRS, and any
+ * mutation rebuilds the curve polygon from these parameters. \c writeXml
+ * stamps \c cx/cy/rx/ry alongside the parent's WKT serialization, but
+ * \c readXml reads only the canonical params and rebuilds the geometry, so
+ * the two representations cannot drift.
  *
  * Type id: \c "kadas:circle".
- *
- * Multi-part and geodesic mode are intentionally not supported in v1; they
- * will return as additional Kadas-internal items if needed.
  */
-class KADAS_GUI_EXPORT KadasCircleAnnotationItem : public QgsAnnotationItem
+class KADAS_GUI_EXPORT KadasCircleAnnotationItem : public QgsAnnotationPolygonItem
 {
   public:
     KadasCircleAnnotationItem( const QgsPointXY &center = QgsPointXY(), const QgsPointXY &ringPoint = QgsPointXY() );
-    ~KadasCircleAnnotationItem() override;
 
     static QString itemTypeId() { return QStringLiteral( "kadas:circle" ); }
 
     QString type() const override;
-    Qgis::AnnotationItemFlags flags() const override;
-    QgsRectangle boundingBox() const override;
-    QgsRectangle boundingBox( QgsRenderContext &context ) const override;
-    void render( QgsRenderContext &context, QgsFeedback *feedback ) override;
     bool writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const override;
     bool readXml( const QDomElement &element, const QgsReadWriteContext &context ) override;
-    QList<QgsAnnotationItemNode> nodesV2( const QgsAnnotationItemEditContext &context ) const override;
     KadasCircleAnnotationItem *clone() const override;
 
     static KadasCircleAnnotationItem *create();
 
     QgsPointXY center() const { return mCenter; }
-    void setCenter( const QgsPointXY &center ) { mCenter = center; }
-
-    //! Returns a point on the circumference; radius is the distance to center().
+    //! Returns a point on the circumference; the radius is the distance to \c center().
     QgsPointXY ringPoint() const { return mRingPoint; }
-    void setRingPoint( const QgsPointXY &ringPoint ) { mRingPoint = ringPoint; }
+
+    void setCenter( const QgsPointXY &center );
+    void setRingPoint( const QgsPointXY &ringPoint );
+    void setCircle( const QgsPointXY &center, const QgsPointXY &ringPoint );
 
     //! Returns the (planar) radius in CRS units.
     double radius() const;
 
-    const QgsFillSymbol *symbol() const;
-    //! Sets the fill symbol used to render the circle. Takes ownership.
-    void setSymbol( QgsFillSymbol *symbol );
-
   private:
     QgsPointXY mCenter;
     QgsPointXY mRingPoint;
-    std::unique_ptr<QgsFillSymbol> mSymbol;
+
+    void rebuildGeometry();
 };
 
 #endif // KADASCIRCLEANNOTATIONITEM_H
