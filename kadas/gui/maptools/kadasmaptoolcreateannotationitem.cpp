@@ -118,7 +118,7 @@ void KadasMapToolCreateAnnotationItem::createItem()
   if ( !mLayer || !mController )
     return;
 
-  mItem = mController->createItem();
+  mItem = mItemFactory ? mItemFactory() : mController->createItem();
   mItemId = mLayer->addItem( mItem );
   mDrawState = DrawState::Empty;
   mLayer->triggerRepaint();

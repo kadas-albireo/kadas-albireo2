@@ -78,6 +78,8 @@
 #include "kadas/gui/kadasattributetabledialog.h"
 #include "kadas/gui/kadasclipboard.h"
 #include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/annotationitems/kadasannotationitemcontrollers.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
 #include "kadas/gui/kadaslayerselectionwidget.h"
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/kadasprojectmigration.h"
@@ -436,6 +438,10 @@ void KadasApplication::init()
 
   // Init KadasItemLayerRegistry
   KadasItemLayerRegistry::init();
+
+  // Init annotation-item controllers and the parallel annotation-layer registry
+  KadasAnnotationItemControllers::registerBuiltins();
+  KadasAnnotationLayerRegistry::init();
 
   loadStartupProject();
 
