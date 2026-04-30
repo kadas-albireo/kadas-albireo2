@@ -34,12 +34,12 @@ namespace
 {
   inline QgsAnnotationMarkerItem *asMarker( QgsAnnotationItem *item )
   {
-    Q_ASSERT( item && item->type() == QLatin1String( "marker" ) );
+    Q_ASSERT( dynamic_cast<QgsAnnotationMarkerItem *>( item ) );
     return static_cast<QgsAnnotationMarkerItem *>( item );
   }
   inline const QgsAnnotationMarkerItem *asMarker( const QgsAnnotationItem *item )
   {
-    Q_ASSERT( item && item->type() == QLatin1String( "marker" ) );
+    Q_ASSERT( dynamic_cast<const QgsAnnotationMarkerItem *>( item ) );
     return static_cast<const QgsAnnotationMarkerItem *>( item );
   }
 } // namespace
