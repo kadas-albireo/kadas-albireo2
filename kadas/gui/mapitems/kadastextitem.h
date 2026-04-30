@@ -27,7 +27,9 @@ class KADAS_GUI_EXPORT KadasTextItem : public KadasAbstractPointItem
     Q_OBJECT
     Q_PROPERTY( QString text READ text WRITE setText )
     Q_PROPERTY( QColor color READ color WRITE setColor )
+    Q_PROPERTY( QColor outlineColor READ outlineColor WRITE setOutlineColor )
     Q_PROPERTY( QFont font READ font WRITE setFont )
+    Q_PROPERTY( double angle READ angle WRITE setAngle )
 
   public:
     KadasTextItem( const QgsCoordinateReferenceSystem &crs );
@@ -45,8 +47,16 @@ class KADAS_GUI_EXPORT KadasTextItem : public KadasAbstractPointItem
     void setColor( const QColor &color );
     QColor color() const { return mColor; }
 
+    //! Sets the text outline color. An invalid color disables the outline buffer.
+    void setOutlineColor( const QColor &color );
+    QColor outlineColor() const { return mOutlineColor; }
+
     void setFont( const QFont &font );
     const QFont &font() const { return mFont; }
+
+    //! Sets the text rotation \a angle, in degrees clockwise.
+    void setAngle( double angle );
+    double angle() const { return mAngle; }
 
     virtual QgsRectangle boundingBox() const override;
     virtual void render( QgsRenderContext &context ) const override;
@@ -79,7 +89,13 @@ class KADAS_GUI_EXPORT KadasTextItem : public KadasAbstractPointItem
 
     QString mText;
     QColor mColor;
+    QColor mOutlineColor;
     QFont mFont;
+    double mAngle = 0.0;
+    // TODO: frame (background + border) and callout were supported by the previous
+    // KadasRectangleItemBase-derived implementation. QgsAnnotationPointTextItem does
+    // not expose these; restoring parity requires either a custom QgsAnnotationItem
+    // subclass or an upstream contribution to QGIS.
 };
 
 #endif // KADASTEXTITEM_H

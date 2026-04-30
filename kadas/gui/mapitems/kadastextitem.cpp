@@ -22,6 +22,7 @@
 #include <qgis/qgsannotationpointtextitem.h>
 #include <qgis/qgsfeedback.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgstextformat.h>
 
 #include "kadas/gui/mapitems/kadastextitem.h"
 
@@ -78,6 +79,20 @@ void KadasTextItem::setColor( const QColor &color )
   updateQgsAnnotation();
 }
 
+void KadasTextItem::setOutlineColor( const QColor &color )
+{
+  mOutlineColor = color;
+  updateQgsAnnotation();
+}
+
+void KadasTextItem::setAngle( double angle )
+{
+  mAngle = angle;
+  mQgsItem->setAngle( angle );
+  update();
+  emit propertyChanged();
+}
+
 
 void KadasTextItem::updateQgsAnnotation()
 {
@@ -86,7 +101,17 @@ void KadasTextItem::updateQgsAnnotation()
   fmt.setSize( mFont.pointSize() );
   fmt.setSizeUnit( Qgis::RenderUnit::Points );
   fmt.setColor( mColor );
+  if ( mOutlineColor.isValid() )
+  {
+    QgsTextBufferSettings buffer;
+    buffer.setEnabled( true );
+    buffer.setColor( mOutlineColor );
+    buffer.setOpacity( mOutlineColor.alpha() / 255.0 );
+    buffer.setSize( 1 );
+    fmt.setBuffer( buffer );
+  }
   mQgsItem->setFormat( fmt );
+  mQgsItem->setAngle( mAngle );
   update();
 }
 
@@ -96,6 +121,8 @@ KadasMapItem *KadasTextItem::_clone() const SIP_FACTORY
   item->mText = mText;
   item->mFont = mFont;
   item->mColor = mColor;
+  item->mOutlineColor = mOutlineColor;
+  item->mAngle = mAngle;
   return item;
 }
 
@@ -116,7 +143,10 @@ void KadasTextItem::writeXmlPrivate( QDomElement &element ) const
   //element.setAttribute("status", static_cast<int>( state().drawStatus ));
   element.setAttribute( "text", mText );
   element.setAttribute( "font", mFont.toString() );
-  element.setAttribute( "color", mColor.name() );
+  element.setAttribute( "color", mColor.name( QColor::HexArgb ) );
+  if ( mOutlineColor.isValid() )
+    element.setAttribute( "outlineColor", mOutlineColor.name( QColor::HexArgb ) );
+  element.setAttribute( "angle", QString::number( mAngle ) );
   element.setAttribute( "geometry", point().asWkt() );
 }
 
@@ -135,19 +165,27 @@ void KadasTextItem::readXmlPrivate( const QDomElement &element )
 
       setText( props.value( "text" ).toString() );
       mColor = QColor( props.value( "fillColor" ).toString() );
+      if ( props.contains( "outlineColor" ) )
+        mOutlineColor = QColor( props.value( "outlineColor" ).toString() );
       mFont.fromString( props.value( "font" ).toString() );
     }
     if ( data.contains( "state" ) )
     {
-      const QJsonArray point = data.value( "state" ).toObject().value( "pos" ).toArray();
+      const QJsonObject state = data.value( "state" ).toObject();
+      const QJsonArray point = state.value( "pos" ).toArray();
       setPoint( QgsPointXY( point.at( 0 ).toDouble(), point.at( 1 ).toDouble() ) );
+      if ( state.contains( "angle" ) )
+        mAngle = state.value( "angle" ).toDouble();
     }
   }
   else
   {
     setText( element.attribute( "text" ) );
     mColor = QColor( element.attribute( "color", QColor( Qt::red ).name() ) );
+    if ( element.hasAttribute( "outlineColor" ) )
+      mOutlineColor = QColor( element.attribute( "outlineColor" ) );
     mFont.fromString( element.attribute( "font" ) );
+    mAngle = element.attribute( "angle", "0" ).toDouble();
     setPoint( QgsGeometry::fromWkt( element.attribute( "geometry" ) ).asPoint() );
   }
   updateQgsAnnotation();
