@@ -21,6 +21,7 @@
 #include <QMessageBox>
 #include <QShortcut>
 
+#include <qgis/qgsannotationlayer.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgslinestring.h>
 #include <qgis/qgsmessagebar.h>
@@ -28,6 +29,11 @@
 #include <qgis/qgsmultipoint.h>
 #include <qgis/qgsproject.h>
 
+#include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
+#include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
+#include "kadas/gui/annotationitems/kadasgpxrouteannotationitem.h"
+#include "kadas/gui/annotationitems/kadasgpxwaypointannotationitem.h"
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/kadaslayerselectionwidget.h"
 #include "kadas/gui/mapitemeditors/kadasgpxrouteeditor.h"
@@ -35,6 +41,7 @@
 #include "kadas/gui/mapitems/kadasgpxrouteitem.h"
 #include "kadas/gui/mapitems/kadasgpxwaypointitem.h"
 #include "kadas/gui/mapitems/kadaslineitem.h"
+#include "kadas/gui/maptools/kadasmaptoolcreateannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
 #include "kadasapplication.h"
@@ -42,22 +49,11 @@
 #include "kadasmainwindow.h"
 
 
-KadasMapItem *KadasWayPointInterface::createItem() const
-{
-  return new KadasGpxWaypointItem();
-}
-
-KadasMapItem *KadasRouteInterface::createItem() const
-{
-  return new KadasGpxRouteItem();
-}
-
-
 KadasGpxIntegration::KadasGpxIntegration( QAction *actionWaypoint, QAction *actionRoute, QAction *actionExportGpx, QAction *actionImportGpx, QObject *parent )
   : QObject( parent )
 {
-  connect( actionWaypoint, &QAction::triggered, this, [=, this]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasWayPointInterface>( KadasWayPointInterface() ) ) ); } );
-  connect( actionRoute, &QAction::triggered, this, [=, this]( bool active ) { toggleCreateItem( active, std::move( std::make_unique<KadasRouteInterface>( KadasRouteInterface() ) ) ); } );
+  connect( actionWaypoint, &QAction::triggered, this, [this]( bool active ) { toggleAnnotation( active, Variant::Waypoint ); } );
+  connect( actionRoute, &QAction::triggered, this, [this]( bool active ) { toggleAnnotation( active, Variant::Route ); } );
   connect( actionExportGpx, &QAction::triggered, this, &KadasGpxIntegration::saveGpx );
   connect( actionImportGpx, &QAction::triggered, this, &KadasGpxIntegration::openGpx );
 
@@ -74,29 +70,43 @@ KadasItemLayer *KadasGpxIntegration::getOrCreateLayer()
   return KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::RoutesLayer );
 }
 
-void KadasGpxIntegration::toggleCreateItem( bool active, std::unique_ptr<KadasMapItemInterface> interface )
+QgsAnnotationLayer *KadasGpxIntegration::getOrCreateAnnotationLayer()
+{
+  if ( !mLastAnnotationLayer )
+  {
+    mLastAnnotationLayer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::RoutesLayer );
+  }
+  return mLastAnnotationLayer;
+}
+
+void KadasGpxIntegration::toggleAnnotation( bool active, Variant variant )
 {
   QgsMapCanvas *canvas = kApp->mainWindow()->mapCanvas();
   QAction *action = qobject_cast<QAction *>( QObject::sender() );
-  if ( active )
+  if ( !active )
   {
-    KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, std::move( interface ), getOrCreateLayer() );
-    tool->setAction( action );
-    KadasLayerSelectionWidget::LayerFilter filter = []( QgsMapLayer *layer ) {
-      return dynamic_cast<KadasItemLayer *>( layer ) && static_cast<KadasItemLayer *>( layer )->layerTypeKey() == QString( "KadasItemLayer" );
-    };
-    KadasLayerSelectionWidget::LayerCreator creator = []( const QString &name ) {
-      return QgsProject::instance()->addMapLayer( new KadasItemLayer( name, QgsCoordinateReferenceSystem( "EPSG:3857" ) ) );
-    };
-    tool->showLayerSelection( true, kApp->mainWindow()->layerTreeView(), filter, creator );
-    kApp->mainWindow()->layerTreeView()->setCurrentLayer( getOrCreateLayer() );
-    kApp->mainWindow()->layerTreeView()->setLayerVisible( getOrCreateLayer(), true );
-    canvas->setMapTool( tool );
+    if ( canvas->mapTool() && canvas->mapTool()->action() == action )
+      canvas->unsetMapTool( canvas->mapTool() );
+    return;
   }
-  else if ( !active && canvas->mapTool() && canvas->mapTool()->action() == action )
-  {
-    canvas->unsetMapTool( canvas->mapTool() );
-  }
+
+  const QString typeId = ( variant == Variant::Waypoint ) ? KadasGpxWaypointAnnotationItem::itemTypeId() : KadasGpxRouteAnnotationItem::itemTypeId();
+
+  KadasAnnotationItemController *controller = KadasAnnotationControllerRegistry::instance()->controllerFor( typeId );
+  if ( !controller )
+    return;
+
+  QgsAnnotationLayer *layer = getOrCreateAnnotationLayer();
+  if ( !layer )
+    return;
+
+  KadasMapToolCreateAnnotationItem *tool = new KadasMapToolCreateAnnotationItem( canvas, controller, layer );
+  tool->setMultipart( false );
+  tool->setAction( action );
+
+  kApp->mainWindow()->layerTreeView()->setCurrentLayer( layer );
+  kApp->mainWindow()->layerTreeView()->setLayerVisible( layer, true );
+  canvas->setMapTool( tool );
 }
 
 void KadasGpxIntegration::openGpx()
