@@ -263,7 +263,10 @@ void KadasPointItem::writeXmlPrivate( QDomElement &element ) const
 
 void KadasPointItem::readXmlPrivate( const QDomElement &element )
 {
-  if ( !element.hasAttribute( "shape" ) )
+  // format_version 1 = legacy JSON in CDATA (Q_PROPERTY-based serialize()).
+  // format_version 2 = new annotation-based XML attributes.
+  const bool isLegacy = element.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) == QLatin1String( "1" );
+  if ( isLegacy )
   {
     // migration code
     QJsonObject data = QJsonDocument::fromJson( element.firstChild().toCDATASection().data().toLocal8Bit() ).object();
@@ -287,7 +290,8 @@ void KadasPointItem::readXmlPrivate( const QDomElement &element )
       }
 
       // this must be done at the end
-      switch ( props.value( "iconType" ).toInt( 1 ) )
+      const int iconType = props.value( "iconType" ).toInt( 1 );
+      switch ( iconType )
       {
         case 1:
           mShape = Qgis::MarkerShape::Cross;
@@ -313,6 +317,13 @@ void KadasPointItem::readXmlPrivate( const QDomElement &element )
         default:
           mShape = Qgis::MarkerShape::Circle;
           break;
+      }
+      // Legacy iconType 3 (BOX), 4 (CIRCLE), 6 (TRIANGLE) were outlined-only shapes;
+      // 5 (FULL_BOX) and 7 (FULL_TRIANGLE) were filled. Preserve that distinction
+      // by clearing the fill for outlined variants (cross/x have no fill anyway).
+      if ( iconType == 3 || iconType == 4 || iconType == 6 )
+      {
+        mFillColor = QColor( Qt::transparent );
       }
     }
     if ( data.contains( "state" ) )

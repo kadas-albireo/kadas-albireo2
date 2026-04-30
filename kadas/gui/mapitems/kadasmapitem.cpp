@@ -411,6 +411,10 @@ QDomElement KadasMapItem::writeXml( QDomDocument &document ) const
   }
   else
   {
+    // New annotation-based format. Stamp a version so loaders can distinguish
+    // it from legacy (Q_PROPERTY/JSON) payloads instead of relying on
+    // presence-of-attribute heuristics.
+    itemEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
     writeXmlPrivate( itemEl );
   }
   return itemEl;

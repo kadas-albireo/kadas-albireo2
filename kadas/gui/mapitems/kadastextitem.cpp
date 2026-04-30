@@ -152,7 +152,9 @@ void KadasTextItem::writeXmlPrivate( QDomElement &element ) const
 
 void KadasTextItem::readXmlPrivate( const QDomElement &element )
 {
-  if ( !element.hasAttribute( "text" ) )
+  // format_version 1 = legacy JSON in CDATA. format_version 2 = new attribute-based format.
+  const bool isLegacy = element.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) == QLatin1String( "1" );
+  if ( isLegacy )
   {
     // migration code
     QJsonObject data = QJsonDocument::fromJson( element.firstChild().toCDATASection().data().toLocal8Bit() ).object();
