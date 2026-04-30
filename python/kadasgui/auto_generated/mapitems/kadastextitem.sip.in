@@ -42,8 +42,20 @@ your option) any later version. *
     void setColor( const QColor &color );
     QColor color() const;
 
+    void setOutlineColor( const QColor &color );
+%Docstring
+Sets the text outline color. An invalid color disables the outline buffer.
+%End
+    QColor outlineColor() const;
+
     void setFont( const QFont &font );
     const QFont &font() const;
+
+    void setAngle( double angle );
+%Docstring
+Sets the text rotation \a angle, in degrees clockwise.
+%End
+    double angle() const;
 
     virtual QgsRectangle boundingBox() const;
     virtual void render( QgsRenderContext &context ) const;
