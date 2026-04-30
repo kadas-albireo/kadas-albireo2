@@ -17,9 +17,10 @@
 #ifndef KADASREDLININGINTEGRATION_H
 #define KADASREDLININGINTEGRATION_H
 
-#include <functional>
+#include <memory>
 
 #include <QObject>
+#include <QPointer>
 
 #include "kadas/gui/kadasmapiteminterface.h"
 
@@ -27,6 +28,7 @@
 class QAction;
 class QToolButton;
 
+class QgsAnnotationLayer;
 class QgsMapCanvas;
 class QgsMapLayer;
 
@@ -35,55 +37,11 @@ class KadasMapItem;
 class KadasMainWindow;
 
 
-class KadasPointItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasPointItemInterface() = default;
-    KadasMapItem *createItem() const override;
-};
-
-class KadasSquareItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasSquareItemInterface() = default;
-    KadasMapItem *createItem() const override;
-};
-class KadasTriangleItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasTriangleItemInterface() = default;
-    KadasMapItem *createItem() const override;
-};
-class KadasLineItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasLineItemInterface() = default;
-    KadasMapItem *createItem() const override;
-};
-class KadasRectangleItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasRectangleItemInterface() = default;
-    KadasMapItem *createItem() const override;
-};
-class KadasPolygonItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasPolygonItemInterface() = default;
-    KadasMapItem *createItem() const override;
-};
-class KadasCircleItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasCircleItemInterface() = default;
-    KadasMapItem *createItem() const override;
-};
-class KadasTextItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasTextItemInterface() = default;
-    KadasMapItem *createItem() const override;
-};
+/**
+ * Legacy KadasMapItemInterface used by the CoordinateCross action, which
+ * has no annotation-item equivalent yet and therefore still drives the
+ * legacy KadasMapToolCreateItem.
+ */
 class KadasCoordCrossItemInterface : public KadasMapItemInterface
 {
   public:
@@ -97,7 +55,14 @@ class KadasRedliningIntegration : public QObject
     Q_OBJECT
   public:
     KadasRedliningIntegration( QToolButton *buttonNewObject, QObject *parent );
+
+    //! Returns (creating if needed) the legacy redlining KadasItemLayer.
+    //! Used by the CoordinateCross action while it remains on the legacy tool.
     KadasItemLayer *getOrCreateLayer();
+
+    //! Returns (creating if needed) the redlining QgsAnnotationLayer used
+    //! by all migrated actions.
+    QgsAnnotationLayer *getOrCreateAnnotationLayer();
 
     QAction *actionNewPoint() const { return mActionNewPoint; }
     QAction *actionNewSquare() const { return mActionNewSquare; }
@@ -110,6 +75,19 @@ class KadasRedliningIntegration : public QObject
     QAction *actionNewCoordinateCross() const { return mActionNewCoordCross; }
 
   private:
+    //! The set of annotation-item kinds the redlining toolbar can create.
+    enum class AnnotationVariant
+    {
+      MarkerCircle,
+      MarkerSquare,
+      MarkerTriangle,
+      Line,
+      Rectangle,
+      Polygon,
+      Circle,
+      Text,
+    };
+
     QToolButton *mButtonNewObject = nullptr;
 
     QAction *mActionNewPoint = nullptr;
@@ -123,8 +101,10 @@ class KadasRedliningIntegration : public QObject
     QAction *mActionNewCoordCross = nullptr;
 
     QPointer<KadasItemLayer> mLastLayer;
+    QPointer<QgsAnnotationLayer> mLastAnnotationLayer;
 
-    void toggleCreateItem( bool active, std::unique_ptr<KadasMapItemInterface> interface );
+    void toggleAnnotation( bool active, AnnotationVariant variant );
+    void toggleLegacyCreateItem( bool active, std::unique_ptr<KadasMapItemInterface> interface );
 
   private slots:
     void activateNewButtonObject();

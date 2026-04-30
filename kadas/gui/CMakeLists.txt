@@ -27,7 +27,9 @@ set(kadas_gui_SRC
     3d/kadasmapitemlayer3drenderer.cpp
     annotationitems/kadasannotationcontrollerregistry.cpp
     annotationitems/kadasannotationitemcontroller.cpp
+    annotationitems/kadasannotationitemcontrollers.cpp
     annotationitems/kadasannotationlayerhelpers.cpp
+    annotationitems/kadasannotationlayerregistry.cpp
     annotationitems/kadascircleannotationcontroller.cpp
     annotationitems/kadascircleannotationitem.cpp
     annotationitems/kadasgpxrouteannotationcontroller.cpp
@@ -130,7 +132,9 @@ set(kadas_gui_HDR
     annotationitems/kadasannotationcontrollerregistry.h
     annotationitems/kadasannotationitemcontext.h
     annotationitems/kadasannotationitemcontroller.h
+    annotationitems/kadasannotationitemcontrollers.h
     annotationitems/kadasannotationlayerhelpers.h
+    annotationitems/kadasannotationlayerregistry.h
     annotationitems/kadascircleannotationcontroller.h
     annotationitems/kadascircleannotationitem.h
     annotationitems/kadasgpxrouteannotationcontroller.h
