@@ -94,7 +94,7 @@ bool KadasMilxClientWorker::initialize()
     qWarning() << "[MILX-DEBUG] launching milxserver:" << serverPath << "exists=" << QFile::exists( serverPath );
     mProcess->setProcessChannelMode( QProcess::SeparateChannels );
     // Do not propagate Qt debug env vars to the child: QT_DEBUG_PLUGINS with stdio
-    // redirection is known to destabilize QApplication construction in a QProcess child.
+    // redirection can destabilize QApplication construction in a QProcess child.
     QProcessEnvironment childEnv = QProcessEnvironment::systemEnvironment();
     childEnv.remove( QStringLiteral( "QT_DEBUG_PLUGINS" ) );
     mProcess->setProcessEnvironment( childEnv );
