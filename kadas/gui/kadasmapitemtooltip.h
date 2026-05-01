@@ -52,6 +52,7 @@ class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextEdit
     QgsMapCanvas *mCanvas = nullptr;
     bool mMouseMoved = false;
     const KadasMapItem *mItem = nullptr;
+    QString mLastText;
 
   private slots:
     void positionAndShow();
