@@ -34,6 +34,8 @@
 
 #include "kadas/gui/milx/kadasmilxitem.h"
 #include "kadas/gui/milx/kadasmilxlayer.h"
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
+#include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
 
 
 QJsonObject KadasMilxItem::State::serialize() const
@@ -373,6 +375,47 @@ void KadasMilxItem::render( QgsRenderContext &context ) const
     context.painter()->drawLine( symbol.points.front(), symbol.points.front() + constState()->userOffset * dpiScale );
   }
   context.painter()->drawImage( renderPos, result.graphic );
+}
+
+QList<QgsAnnotationItem *> KadasMilxItem::annotationItems( const QgsCoordinateReferenceSystem &crs ) const
+{
+  // KadasMilxItem and KadasMilxAnnotationItem both store points in
+  // EPSG:4326 (MilX is fixed to WGS84), so no CRS transform is needed
+  // even when \a crs is set; just copy the state across verbatim.
+  Q_UNUSED( crs )
+  if ( mMssString.isEmpty() )
+    return {};
+
+  auto *anno = new KadasMilxAnnotationItem();
+  anno->setMssString( mMssString );
+  anno->setMilitaryName( mMilitaryName );
+  anno->setSymbolType( mSymbolType );
+  anno->setMinNumPoints( mMinNPoints > 0 ? mMinNPoints : 1 );
+  anno->setHasVariablePoints( mHasVariablePoints );
+
+  QList<QgsPointXY> pts;
+  pts.reserve( constState()->points.size() );
+  for ( const KadasItemPos &p : constState()->points )
+    pts.append( QgsPointXY( p.x(), p.y() ) );
+  anno->setPoints( pts );
+  anno->setControlPoints( constState()->controlPoints );
+
+  // The legacy state stores per-attribute values in 4326 metres / degrees
+  // already; carry them across as-is.
+  QMap<KadasMilxAttrType, double> attrs;
+  for ( auto it = constState()->attributes.cbegin(), itEnd = constState()->attributes.cend(); it != itEnd; ++it )
+    attrs.insert( it.key(), it.value() );
+  anno->setAttributes( attrs );
+
+  QMap<KadasMilxAttrType, QgsPointXY> attrPts;
+  for ( auto it = constState()->attributePoints.cbegin(), itEnd = constState()->attributePoints.cend(); it != itEnd; ++it )
+    attrPts.insert( it.key(), QgsPointXY( it.value().x(), it.value().y() ) );
+  anno->setAttributePoints( attrPts );
+
+  anno->setUserOffset( constState()->userOffset );
+  anno->setDrawStatus( KadasMilxAnnotationItem::DrawStatus::Finished );
+  anno->setZIndex( zIndex() ? zIndex() : KadasAnnotationZIndex::Milx );
+  return { anno };
 }
 
 void KadasMilxItem::setState( const KadasMapItem::State *state )
