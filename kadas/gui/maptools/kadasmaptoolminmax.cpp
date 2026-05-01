@@ -23,16 +23,20 @@
 #include <QMenu>
 #include <QToolButton>
 
+#include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgsgeometrycollection.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapmouseevent.h>
+#include <qgis/qgsproject.h>
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgssettings.h>
 
 #include "kadas/core/kadas.h"
 #include "kadas/core/kadascoordinateformat.h"
 #include "kadas/analysis/kadasninecellfilter.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
+#include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 #include "kadas/gui/mapitems/kadascircleitem.h"
 #include "kadas/gui/mapitems/kadaspolygonitem.h"
 #include "kadas/gui/mapitems/kadasrectangleitem.h"
@@ -321,10 +325,13 @@ void KadasMapToolMinMax::showContextMenu( KadasMapItem *item ) const
     }
   } );
   menu.addAction( QIcon( ":/kadas/icons/pin_red" ), tr( "Add pin" ), [this, mapPos] {
-    KadasPinItem *pin = new KadasPinItem( mCanvas->mapSettings().destinationCrs() );
-    pin->setEditor( "KadasSymbolAttributesEditor" );
-    pin->setPosition( KadasItemPos( mapPos.x(), mapPos.y() ) );
-    KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PinsLayer )->addItem( pin );
+    QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::PinsLayer );
+    if ( !layer )
+      return;
+    const QgsPointXY layerPos = QgsCoordinateTransform( mCanvas->mapSettings().destinationCrs(), layer->crs(), QgsProject::instance()->transformContext() ).transform( mapPos );
+    auto *pin = new KadasPinAnnotationItem( QgsPoint( layerPos.x(), layerPos.y() ) );
+    layer->addItem( pin );
+    layer->triggerRepaint();
   } );
   item->setSelected( true );
   menu.exec( mCanvas->mapToGlobal( toCanvasCoordinates( mapPos ) ) );
