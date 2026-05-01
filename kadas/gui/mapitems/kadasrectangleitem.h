@@ -56,6 +56,8 @@ class KADAS_GUI_EXPORT KadasRectangleItem : public KadasGeometryItem
 
     const QgsMultiPolygon *geometry() const;
 
+    QList<QgsAnnotationItem *> annotationItems( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const override SIP_FACTORY;
+
     struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
         QList<KadasItemPos> p1;
