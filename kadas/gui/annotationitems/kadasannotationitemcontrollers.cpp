@@ -22,6 +22,8 @@
 #include "kadas/gui/annotationitems/kadasannotationitemcontrollers.h"
 #include "kadas/gui/annotationitems/kadascircleannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadascircleannotationitem.h"
+#include "kadas/gui/annotationitems/kadascoordcrossannotationcontroller.h"
+#include "kadas/gui/annotationitems/kadascoordcrossannotationitem.h"
 #include "kadas/gui/annotationitems/kadasgpxrouteannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadasgpxrouteannotationitem.h"
 #include "kadas/gui/annotationitems/kadasgpxwaypointannotationcontroller.h"
@@ -57,6 +59,7 @@ void KadasAnnotationItemControllers::registerBuiltins()
   registry->addController( new KadasCircleAnnotationController() );
   registry->addController( new KadasRectangleAnnotationController() );
   registry->addController( new KadasPinAnnotationController() );
+  registry->addController( new KadasCoordCrossAnnotationController() );
   registry->addController( new KadasGpxWaypointAnnotationController() );
   registry->addController( new KadasGpxRouteAnnotationController() );
 
@@ -72,6 +75,7 @@ void KadasAnnotationItemControllers::registerBuiltins()
   registerType( itemRegistry, KadasCircleAnnotationItem::itemTypeId(), QObject::tr( "Kadas Circle" ), QObject::tr( "Kadas Circles" ), [] { return new KadasCircleAnnotationItem(); } );
   registerType( itemRegistry, KadasRectangleAnnotationItem::itemTypeId(), QObject::tr( "Kadas Rectangle" ), QObject::tr( "Kadas Rectangles" ), [] { return new KadasRectangleAnnotationItem(); } );
   registerType( itemRegistry, KadasPinAnnotationItem::itemTypeId(), QObject::tr( "Kadas Pin" ), QObject::tr( "Kadas Pins" ), [] { return new KadasPinAnnotationItem(); } );
+  registerType( itemRegistry, KadasCoordCrossAnnotationItem::itemTypeId(), QObject::tr( "Coordinate Cross" ), QObject::tr( "Coordinate Crosses" ), [] { return new KadasCoordCrossAnnotationItem(); } );
   registerType( itemRegistry, KadasGpxWaypointAnnotationItem::itemTypeId(), QObject::tr( "GPX Waypoint" ), QObject::tr( "GPX Waypoints" ), [] { return new KadasGpxWaypointAnnotationItem(); } );
   registerType( itemRegistry, KadasGpxRouteAnnotationItem::itemTypeId(), QObject::tr( "GPX Route" ), QObject::tr( "GPX Routes" ), [] { return new KadasGpxRouteAnnotationItem(); } );
 }
