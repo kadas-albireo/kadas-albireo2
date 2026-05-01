@@ -35,7 +35,11 @@
 
 #include "kadas/core/kadascoordinateutils.h"
 #include "kadas/analysis/kadaslineofsight.h"
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/mapitems/kadaspictureitem.h"
+
+#include <qgis/qgsannotationpictureitem.h>
+#include <qgis/qgscoordinatetransform.h>
 
 
 class QVector3 : public QGenericMatrix<1, 3, float>
@@ -449,4 +453,23 @@ QgsPoint KadasPictureItem::findTerrainIntersection( const QgsPoint &cameraPos, Q
     }
   }
   return QgsPoint( 0.5 * ( nearPos.x() + farPos.x() ), 0.5 * ( nearPos.y() + farPos.y() ), 0.5 * ( nearPos.z() + farPos.z() ) );
+}
+
+QgsAnnotationItem *KadasPictureItem::annotationItem( const QgsCoordinateReferenceSystem &crs ) const
+{
+  QgsPoint point( position().x(), position().y() );
+  if ( crs.isValid() && mCrs != crs )
+  {
+    QgsCoordinateTransform ct( mCrs, crs, QgsProject::instance() );
+    QgsPointXY xy = ct.transform( point.x(), point.y() );
+    point = QgsPoint( xy );
+  }
+  const Qgis::PictureFormat fmt = mFilePath.endsWith( QLatin1String( ".svg" ), Qt::CaseInsensitive ) ? Qgis::PictureFormat::SVG : Qgis::PictureFormat::Raster;
+  auto *anno = new QgsAnnotationPictureItem( fmt, mFilePath, QgsRectangle( point.x(), point.y(), point.x(), point.y() ) );
+  anno->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
+  const QSize px = constState()->mSize.isValid() && !constState()->mSize.isEmpty() ? constState()->mSize : mImage.size();
+  anno->setFixedSize( QSizeF( px.width() ? px.width() : 200, px.height() ? px.height() : 200 ) );
+  anno->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
+  anno->setZIndex( zIndex() ? zIndex() : KadasAnnotationZIndex::Picture );
+  return anno;
 }
