@@ -63,6 +63,13 @@ class KADAS_GUI_EXPORT KadasMilxAnnotationController : public KadasAnnotationIte
     void translate( QgsAnnotationItem *item, double dx, double dy ) override;
 
     QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = nullptr ) const override;
+
+  private:
+    enum AttribIds
+    {
+      AttrX = -2,
+      AttrY = -1,
+    };
 };
 
 #endif // KADASMILXANNOTATIONCONTROLLER_H

@@ -95,44 +95,127 @@ QList<KadasNode> KadasMilxAnnotationController::nodes( const QgsAnnotationItem *
   return result;
 }
 
-bool KadasMilxAnnotationController::startPart( QgsAnnotationItem *, const QgsPointXY &, const KadasAnnotationItemContext & )
+bool KadasMilxAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
 {
-  // TODO slice 36: libmss IPC for new-symbol creation.
-  return false;
+  auto *milx = static_cast<KadasMilxAnnotationItem *>( item );
+  if ( milx->mssString().isEmpty() )
+    return false;
+
+  // First click: append the user point in item CRS (4326), bump the
+  // pressed-points counter, then ask libmss to materialize the symbol
+  // (which usually back-fills control points up to mMinNumPoints).
+  milx->setDrawStatus( KadasMilxAnnotationItem::DrawStatus::Drawing );
+  QList<QgsPointXY> pts = milx->points();
+  pts.append( toItemPos( firstPoint, ctx ) );
+  milx->setPoints( pts );
+  milx->setPressedPoints( 1 );
+
+  KadasMilxClient::NPointSymbol symbol = milx->toSymbol( ctx.mapSettings() );
+  KadasMilxClient::NPointSymbolGraphic result;
+  KadasMilxClient::updateSymbol(
+    KadasMilxAnnotationItem::computeScreenExtent( ctx.mapSettings() ),
+    ctx.mapSettings().outputDpi(),
+    symbol,
+    KadasMilxClient::globalSymbolSettings(),
+    result,
+    /* returnPoints */ true
+  );
+  milx->applySymbolResult( ctx.mapSettings(), result );
+
+  return milx->pressedPoints() < milx->minNumPoints() || milx->hasVariablePoints();
 }
 
-bool KadasMilxAnnotationController::startPart( QgsAnnotationItem *, const KadasAttribValues &, const KadasAnnotationItemContext & )
+bool KadasMilxAnnotationController::startPart( QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
 {
-  return false;
+  return startPart( item, positionFromDrawAttribs( item, values, ctx ), ctx );
 }
 
-void KadasMilxAnnotationController::setCurrentPoint( QgsAnnotationItem *, const QgsPointXY &, const KadasAnnotationItemContext & )
-{}
-
-void KadasMilxAnnotationController::setCurrentAttributes( QgsAnnotationItem *, const KadasAttribValues &, const KadasAnnotationItemContext & )
-{}
-
-bool KadasMilxAnnotationController::continuePart( QgsAnnotationItem *, const KadasAnnotationItemContext & )
+void KadasMilxAnnotationController::setCurrentPoint( QgsAnnotationItem *item, const QgsPointXY &p, const KadasAnnotationItemContext &ctx )
 {
-  return false;
+  auto *milx = static_cast<KadasMilxAnnotationItem *>( item );
+  if ( milx->mssString().isEmpty() || milx->drawStatus() != KadasMilxAnnotationItem::DrawStatus::Drawing )
+    return;
+
+  // Live preview: ask libmss to move the next non-pressed slot to the
+  // current cursor position. The slot index equals pressedPoints (matches
+  // the legacy KadasMilxItem semantics).
+  const QPoint screenPoint = ctx.mapSettings().mapToPixel().transform( p ).toQPointF().toPoint();
+  KadasMilxClient::NPointSymbol symbol = milx->toSymbol( ctx.mapSettings() );
+  KadasMilxClient::NPointSymbolGraphic result;
+  if ( KadasMilxClient::movePoint( KadasMilxAnnotationItem::computeScreenExtent( ctx.mapSettings() ), ctx.mapSettings().outputDpi(), symbol, milx->pressedPoints(), screenPoint, KadasMilxClient::globalSymbolSettings(), result ) )
+  {
+    milx->applySymbolResult( ctx.mapSettings(), result );
+  }
 }
 
-void KadasMilxAnnotationController::endPart( QgsAnnotationItem * )
-{}
+void KadasMilxAnnotationController::setCurrentAttributes( QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
+{
+  setCurrentPoint( item, positionFromDrawAttribs( item, values, ctx ), ctx );
+}
+
+bool KadasMilxAnnotationController::continuePart( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx )
+{
+  auto *milx = static_cast<KadasMilxAnnotationItem *>( item );
+  milx->setPressedPoints( milx->pressedPoints() + 1 );
+
+  // Once the minimum number of points has been clicked, additional clicks
+  // append a new point to the symbol (only meaningful for variable-point
+  // symbols; libmss otherwise stops at minNumPoints).
+  if ( milx->pressedPoints() >= milx->minNumPoints() && milx->hasVariablePoints() )
+  {
+    const QList<QgsPointXY> pts = milx->points();
+    const QList<int> ctrl = milx->controlPoints();
+    int index = pts.size() - 1;
+    while ( index >= 0 && ctrl.contains( index ) )
+      --index;
+    if ( index >= 0 )
+    {
+      const QgsCoordinateTransform xform( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
+      try
+      {
+        const QPoint screenPoint = ctx.mapSettings().mapToPixel().transform( xform.transform( pts[index] ) ).toQPointF().toPoint();
+        KadasMilxClient::NPointSymbol symbol = milx->toSymbol( ctx.mapSettings() );
+        KadasMilxClient::NPointSymbolGraphic result;
+        if ( KadasMilxClient::appendPoint( KadasMilxAnnotationItem::computeScreenExtent( ctx.mapSettings() ), ctx.mapSettings().outputDpi(), symbol, screenPoint, KadasMilxClient::globalSymbolSettings(), result ) )
+        {
+          milx->applySymbolResult( ctx.mapSettings(), result );
+        }
+      }
+      catch ( const QgsCsException & )
+      {}
+    }
+  }
+  return milx->pressedPoints() < milx->minNumPoints() || milx->hasVariablePoints();
+}
+
+void KadasMilxAnnotationController::endPart( QgsAnnotationItem *item )
+{
+  auto *milx = static_cast<KadasMilxAnnotationItem *>( item );
+  if ( !milx->mssString().isEmpty() )
+  {
+    milx->setDrawStatus( KadasMilxAnnotationItem::DrawStatus::Finished );
+  }
+}
 
 KadasAttribDefs KadasMilxAnnotationController::drawAttribs() const
 {
-  return {};
+  KadasAttribDefs attributes;
+  attributes.insert( AttrX, KadasNumericAttribute { "x" } );
+  attributes.insert( AttrY, KadasNumericAttribute { "y" } );
+  return attributes;
 }
 
-KadasAttribValues KadasMilxAnnotationController::drawAttribsFromPosition( const QgsAnnotationItem *, const QgsPointXY &, const KadasAnnotationItemContext & ) const
+KadasAttribValues KadasMilxAnnotationController::drawAttribsFromPosition( const QgsAnnotationItem *, const QgsPointXY &pos, const KadasAnnotationItemContext & ) const
 {
-  return {};
+  KadasAttribValues values;
+  values.insert( AttrX, pos.x() );
+  values.insert( AttrY, pos.y() );
+  return values;
 }
 
-QgsPointXY KadasMilxAnnotationController::positionFromDrawAttribs( const QgsAnnotationItem *, const KadasAttribValues &, const KadasAnnotationItemContext & ) const
+QgsPointXY KadasMilxAnnotationController::positionFromDrawAttribs( const QgsAnnotationItem *, const KadasAttribValues &values, const KadasAnnotationItemContext & ) const
 {
-  return QgsPointXY();
+  return QgsPointXY( values[AttrX], values[AttrY] );
 }
 
 KadasEditContext KadasMilxAnnotationController::getEditContext( const QgsAnnotationItem *, const QgsPointXY &, const KadasAnnotationItemContext & ) const
@@ -177,9 +260,7 @@ void KadasMilxAnnotationController::setPosition( QgsAnnotationItem *item, const 
   const QgsPointXY anchor = pts.front();
   const double dx = pos.x() - anchor.x();
   const double dy = pos.y() - anchor.y();
-  for ( QgsPointXY &p : pts )
-    p.set( p.x() + dx, p.y() + dy );
-  milx->setPoints( pts );
+  translate( milx, dx, dy );
 }
 
 void KadasMilxAnnotationController::translate( QgsAnnotationItem *item, double dx, double dy )
@@ -189,6 +270,14 @@ void KadasMilxAnnotationController::translate( QgsAnnotationItem *item, double d
   for ( QgsPointXY &p : pts )
     p.set( p.x() + dx, p.y() + dy );
   milx->setPoints( pts );
+  // Attribute points (libmss-managed handles for width/length/etc.) live in
+  // the same CRS as the geometry points; translate them in lockstep.
+  QMap<KadasMilxAttrType, QgsPointXY> aps = milx->attributePoints();
+  for ( auto it = aps.begin(), itEnd = aps.end(); it != itEnd; ++it )
+  {
+    it.value().set( it.value().x() + dx, it.value().y() + dy );
+  }
+  milx->setAttributePoints( aps );
 }
 
 QString KadasMilxAnnotationController::asKml( const QgsAnnotationItem *, const QgsCoordinateReferenceSystem &, const QgsRenderContext &, QuaZip * ) const
