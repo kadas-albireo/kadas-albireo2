@@ -53,7 +53,6 @@ class KadasGpxIntegration : public QObject
 
     KadasGpxIntegration( QAction *actionWaypoint, QAction *actionRoute, QAction *actionExportGpx, QAction *actionImportGpx, QObject *parent );
     ~KadasGpxIntegration();
-    KadasItemLayer *getOrCreateLayer();
     QgsAnnotationLayer *getOrCreateAnnotationLayer();
 
     static bool importGpx( const QString &filename, QString &errorMsg );

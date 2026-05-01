@@ -66,11 +66,6 @@ KadasGpxIntegration::~KadasGpxIntegration()
   kApp->mainWindow()->removeCustomDropHandler( &mDropHandler );
 }
 
-KadasItemLayer *KadasGpxIntegration::getOrCreateLayer()
-{
-  return KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::RoutesLayer );
-}
-
 QgsAnnotationLayer *KadasGpxIntegration::getOrCreateAnnotationLayer()
 {
   if ( !mLastAnnotationLayer )
