@@ -25,6 +25,7 @@
 
 #include "kadas/core/kadasstatehistory.h"
 #include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/kadasattributetypes.h"
 #include "kadas/gui/mapitems/kadasmapitem.h"
 
 class KadasAnnotationItemController;
@@ -138,12 +139,12 @@ class KADAS_GUI_EXPORT KadasMapToolCreateAnnotationItem : public QgsMapTool
 
   private:
     void startPart( const QgsPointXY &pos );
-    void startPart( const KadasMapItem::AttribValues &values );
+    void startPart( const KadasAttribValues &values );
     void finishPart();
     void pushState();
     void clearInProgress();
     void setupNumericInputWidget();
-    KadasMapItem::AttribValues collectAttributeValues() const;
+    KadasAttribValues collectAttributeValues() const;
 
   private slots:
     void stateChanged( KadasStateHistory::ChangeType changeType, KadasStateHistory::State *state, KadasStateHistory::State *prevState );

@@ -77,9 +77,9 @@ QgsAnnotationItem *KadasLineAnnotationController::createItem() const
   return item;
 }
 
-QList<KadasMapItem::Node> KadasLineAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
+QList<KadasNode> KadasLineAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
 {
-  QList<KadasMapItem::Node> result;
+  QList<KadasNode> result;
   const QgsCurve *curve = asLine( item )->geometry();
   if ( !curve )
     return result;
@@ -104,7 +104,7 @@ bool KadasLineAnnotationController::startPart( QgsAnnotationItem *item, const Qg
   return true;
 }
 
-bool KadasLineAnnotationController::startPart( QgsAnnotationItem *item, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx )
+bool KadasLineAnnotationController::startPart( QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
 {
   return startPart( item, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
@@ -120,7 +120,7 @@ void KadasLineAnnotationController::setCurrentPoint( QgsAnnotationItem *item, co
   ls->moveVertex( QgsVertexId( 0, 0, n - 1 ), QgsPoint( ip.x(), ip.y() ) );
 }
 
-void KadasLineAnnotationController::setCurrentAttributes( QgsAnnotationItem *item, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx )
+void KadasLineAnnotationController::setCurrentAttributes( QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
 {
   setCurrentPoint( item, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
@@ -146,32 +146,32 @@ bool KadasLineAnnotationController::continuePart( QgsAnnotationItem *item, const
 void KadasLineAnnotationController::endPart( QgsAnnotationItem * )
 {}
 
-KadasMapItem::AttribDefs KadasLineAnnotationController::drawAttribs() const
+KadasAttribDefs KadasLineAnnotationController::drawAttribs() const
 {
-  KadasMapItem::AttribDefs attributes;
-  attributes.insert( AttrX, KadasMapItem::NumericAttribute { "x" } );
-  attributes.insert( AttrY, KadasMapItem::NumericAttribute { "y" } );
+  KadasAttribDefs attributes;
+  attributes.insert( AttrX, KadasNumericAttribute { "x" } );
+  attributes.insert( AttrY, KadasNumericAttribute { "y" } );
   return attributes;
 }
 
-KadasMapItem::AttribValues KadasLineAnnotationController::drawAttribsFromPosition( const QgsAnnotationItem *, const QgsPointXY &pos, const KadasAnnotationItemContext & ) const
+KadasAttribValues KadasLineAnnotationController::drawAttribsFromPosition( const QgsAnnotationItem *, const QgsPointXY &pos, const KadasAnnotationItemContext & ) const
 {
-  KadasMapItem::AttribValues values;
+  KadasAttribValues values;
   values.insert( AttrX, pos.x() );
   values.insert( AttrY, pos.y() );
   return values;
 }
 
-QgsPointXY KadasLineAnnotationController::positionFromDrawAttribs( const QgsAnnotationItem *, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext & ) const
+QgsPointXY KadasLineAnnotationController::positionFromDrawAttribs( const QgsAnnotationItem *, const KadasAttribValues &values, const KadasAnnotationItemContext & ) const
 {
   return QgsPointXY( values[AttrX], values[AttrY] );
 }
 
-KadasMapItem::EditContext KadasLineAnnotationController::getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
+KadasEditContext KadasLineAnnotationController::getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
 {
   const QgsCurve *curve = asLine( item )->geometry();
   if ( !curve )
-    return KadasMapItem::EditContext();
+    return KadasEditContext();
   const int n = curve->numPoints();
   for ( int i = 0; i < n; ++i )
   {
@@ -179,7 +179,7 @@ KadasMapItem::EditContext KadasLineAnnotationController::getEditContext( const Q
     const QgsPointXY mp = toMapPos( QgsPointXY( p.x(), p.y() ), ctx );
     if ( pos.sqrDist( mp ) < pickTolSqr( ctx ) )
     {
-      return KadasMapItem::EditContext( QgsVertexId( 0, 0, i ), mp, drawAttribs() );
+      return KadasEditContext( QgsVertexId( 0, 0, i ), mp, drawAttribs() );
     }
   }
   // Fall back: bbox hit → whole-geometry move handle anchored at the first vertex.
@@ -187,12 +187,12 @@ KadasMapItem::EditContext KadasLineAnnotationController::getEditContext( const Q
   {
     const QgsPoint p0 = curve->vertexAt( QgsVertexId( 0, 0, 0 ) );
     const QgsPointXY refPos = toMapPos( QgsPointXY( p0.x(), p0.y() ), ctx );
-    return KadasMapItem::EditContext( QgsVertexId(), refPos, KadasMapItem::AttribDefs(), Qt::ArrowCursor );
+    return KadasEditContext( QgsVertexId(), refPos, KadasAttribDefs(), Qt::ArrowCursor );
   }
-  return KadasMapItem::EditContext();
+  return KadasEditContext();
 }
 
-void KadasLineAnnotationController::edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
+void KadasLineAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
   QgsAnnotationLineItem *line = asLine( item );
   QgsLineString *ls = takeMutableLine( line );
@@ -219,21 +219,17 @@ void KadasLineAnnotationController::edit( QgsAnnotationItem *item, const KadasMa
   }
 }
 
-void KadasLineAnnotationController::edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx )
+void KadasLineAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
 {
   edit( item, editContext, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
 
-KadasMapItem::AttribValues KadasLineAnnotationController::editAttribsFromPosition(
-  const QgsAnnotationItem *item, const KadasMapItem::EditContext &, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx
-) const
+KadasAttribValues KadasLineAnnotationController::editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
 {
   return drawAttribsFromPosition( item, pos, ctx );
 }
 
-QgsPointXY KadasLineAnnotationController::positionFromEditAttribs(
-  const QgsAnnotationItem *item, const KadasMapItem::EditContext &, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx
-) const
+QgsPointXY KadasLineAnnotationController::positionFromEditAttribs( const QgsAnnotationItem *item, const KadasEditContext &, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const
 {
   return positionFromDrawAttribs( item, values, ctx );
 }

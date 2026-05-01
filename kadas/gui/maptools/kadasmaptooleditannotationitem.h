@@ -25,6 +25,7 @@
 
 #include "kadas/core/kadasstatehistory.h"
 #include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/kadasattributetypes.h"
 #include "kadas/gui/mapitems/kadasmapitem.h"
 
 class KadasAnnotationItemController;
@@ -73,7 +74,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     QString mItemId;
     QgsAnnotationItem *mItem = nullptr;
 
-    KadasMapItem::EditContext mEditContext;
+    KadasEditContext mEditContext;
     QgsVector mMoveOffset;
     Qt::MouseButton mPressedButton = Qt::NoButton;
 
@@ -86,7 +87,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     void deleteItem();
     void setupNumericInput();
     void clearNumericInput();
-    KadasMapItem::AttribValues collectAttributeValues() const;
+    KadasAttribValues collectAttributeValues() const;
 
   private slots:
     void stateChanged( KadasStateHistory::ChangeType, KadasStateHistory::State *state, KadasStateHistory::State *prevState );

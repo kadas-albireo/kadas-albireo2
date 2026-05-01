@@ -174,7 +174,7 @@ void KadasMapToolCreateAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
   if ( mInputWidget )
   {
     mInputWidget->ensureFocus();
-    KadasMapItem::AttribValues values = mController->drawAttribsFromPosition( mItem, pos, ctx );
+    KadasAttribValues values = mController->drawAttribsFromPosition( mItem, pos, ctx );
     for ( auto it = values.begin(), itEnd = values.end(); it != itEnd; ++it )
       mInputWidget->inputField( it.key() )->setValue( it.value() );
     mInputWidget->move( e->position().x(), e->position().y() + 20 );
@@ -273,7 +273,7 @@ void KadasMapToolCreateAnnotationItem::startPart( const QgsPointXY &pos )
   }
 }
 
-void KadasMapToolCreateAnnotationItem::startPart( const KadasMapItem::AttribValues &values )
+void KadasMapToolCreateAnnotationItem::startPart( const KadasAttribValues &values )
 {
   KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
   if ( !mController->startPart( mItem, values, ctx ) )
@@ -332,14 +332,14 @@ void KadasMapToolCreateAnnotationItem::setupNumericInputWidget()
   if ( !mController )
     return;
 
-  const KadasMapItem::AttribDefs attribs = mController->drawAttribs();
+  const KadasAttribDefs attribs = mController->drawAttribs();
   if ( attribs.isEmpty() )
     return;
 
   mInputWidget = new KadasFloatingInputWidget( canvas() );
   for ( auto it = attribs.begin(), itEnd = attribs.end(); it != itEnd; ++it )
   {
-    const KadasMapItem::NumericAttribute &attribute = it.value();
+    const KadasNumericAttribute &attribute = it.value();
     KadasFloatingInputWidgetField *attrEdit = new KadasFloatingInputWidgetField( it.key(), attribute.precision( mCanvas->mapSettings() ), attribute.min, attribute.max );
     connect( attrEdit, &KadasFloatingInputWidgetField::inputChanged, this, &KadasMapToolCreateAnnotationItem::inputChanged );
     connect( attrEdit, &KadasFloatingInputWidgetField::inputConfirmed, this, &KadasMapToolCreateAnnotationItem::acceptInput );
@@ -348,9 +348,9 @@ void KadasMapToolCreateAnnotationItem::setupNumericInputWidget()
   mInputWidget->setFocusedInputField( mInputWidget->inputField( attribs.begin().key() ) );
 }
 
-KadasMapItem::AttribValues KadasMapToolCreateAnnotationItem::collectAttributeValues() const
+KadasAttribValues KadasMapToolCreateAnnotationItem::collectAttributeValues() const
 {
-  KadasMapItem::AttribValues attributes;
+  KadasAttribValues attributes;
   if ( !mInputWidget )
     return attributes;
   for ( const KadasFloatingInputWidgetField *field : mInputWidget->inputFields() )
@@ -363,7 +363,7 @@ void KadasMapToolCreateAnnotationItem::inputChanged()
   if ( !mItem || !mController || !mLayer || !mInputWidget )
     return;
   KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
-  const KadasMapItem::AttribValues values = collectAttributeValues();
+  const KadasAttribValues values = collectAttributeValues();
 
   // Suppress the move event triggered by the cursor reposition below so the
   // mouse-move handler does not overwrite the user's typed values via

@@ -99,7 +99,7 @@ QgsAnnotationItem *KadasPictureAnnotationController::createItem() const
   return item;
 }
 
-QList<KadasMapItem::Node> KadasPictureAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
+QList<KadasNode> KadasPictureAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
 {
   // Single edit handle = the geographic anchor (bounds center).
   const QgsRectangle b = asPicture( item )->bounds();
@@ -117,7 +117,7 @@ bool KadasPictureAnnotationController::startPart( QgsAnnotationItem *item, const
   return false; // single-click placement
 }
 
-bool KadasPictureAnnotationController::startPart( QgsAnnotationItem *item, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx )
+bool KadasPictureAnnotationController::startPart( QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
 {
   return startPart( item, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
@@ -129,7 +129,7 @@ void KadasPictureAnnotationController::setCurrentPoint( QgsAnnotationItem *item,
   item->setCalloutAnchor( QgsGeometry( new QgsPoint( ip.x(), ip.y() ) ) );
 }
 
-void KadasPictureAnnotationController::setCurrentAttributes( QgsAnnotationItem *item, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx )
+void KadasPictureAnnotationController::setCurrentAttributes( QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
 {
   setCurrentPoint( item, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
@@ -142,42 +142,42 @@ bool KadasPictureAnnotationController::continuePart( QgsAnnotationItem *, const 
 void KadasPictureAnnotationController::endPart( QgsAnnotationItem * )
 {}
 
-KadasMapItem::AttribDefs KadasPictureAnnotationController::drawAttribs() const
+KadasAttribDefs KadasPictureAnnotationController::drawAttribs() const
 {
-  KadasMapItem::AttribDefs attributes;
-  attributes.insert( AttrX, KadasMapItem::NumericAttribute { "x" } );
-  attributes.insert( AttrY, KadasMapItem::NumericAttribute { "y" } );
+  KadasAttribDefs attributes;
+  attributes.insert( AttrX, KadasNumericAttribute { "x" } );
+  attributes.insert( AttrY, KadasNumericAttribute { "y" } );
   return attributes;
 }
 
-KadasMapItem::AttribValues KadasPictureAnnotationController::drawAttribsFromPosition( const QgsAnnotationItem *, const QgsPointXY &pos, const KadasAnnotationItemContext & ) const
+KadasAttribValues KadasPictureAnnotationController::drawAttribsFromPosition( const QgsAnnotationItem *, const QgsPointXY &pos, const KadasAnnotationItemContext & ) const
 {
-  KadasMapItem::AttribValues values;
+  KadasAttribValues values;
   values.insert( AttrX, pos.x() );
   values.insert( AttrY, pos.y() );
   return values;
 }
 
-QgsPointXY KadasPictureAnnotationController::positionFromDrawAttribs( const QgsAnnotationItem *, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext & ) const
+QgsPointXY KadasPictureAnnotationController::positionFromDrawAttribs( const QgsAnnotationItem *, const KadasAttribValues &values, const KadasAnnotationItemContext & ) const
 {
   return QgsPointXY( values[AttrX], values[AttrY] );
 }
 
-KadasMapItem::EditContext KadasPictureAnnotationController::getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
+KadasEditContext KadasPictureAnnotationController::getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
 {
   const QgsRectangle b = asPicture( item )->bounds();
   const QgsPointXY anchor = toMapPos( QgsPointXY( b.center().x(), b.center().y() ), ctx );
   if ( pos.sqrDist( anchor ) < pickTolSqr( ctx ) )
-    return KadasMapItem::EditContext( QgsVertexId( 0, 0, 0 ), anchor, drawAttribs() );
+    return KadasEditContext( QgsVertexId( 0, 0, 0 ), anchor, drawAttribs() );
   // The picture frame itself sits at a screen-space offset and would need a
   // map-settings-aware pick test to hit-test; the whole-item move falls back
   // to anchor-relative for now.
   if ( toMapRect( b, ctx ).contains( pos ) )
-    return KadasMapItem::EditContext( QgsVertexId(), anchor, KadasMapItem::AttribDefs(), Qt::ArrowCursor );
-  return KadasMapItem::EditContext();
+    return KadasEditContext( QgsVertexId(), anchor, KadasAttribDefs(), Qt::ArrowCursor );
+  return KadasEditContext();
 }
 
-void KadasPictureAnnotationController::edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
+void KadasPictureAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
   Q_UNUSED( editContext );
   // Both the anchor handle and the whole-item move set the new anchor.
@@ -186,21 +186,17 @@ void KadasPictureAnnotationController::edit( QgsAnnotationItem *item, const Kada
   item->setCalloutAnchor( QgsGeometry( new QgsPoint( ip.x(), ip.y() ) ) );
 }
 
-void KadasPictureAnnotationController::edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx )
+void KadasPictureAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
 {
   edit( item, editContext, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
 
-KadasMapItem::AttribValues KadasPictureAnnotationController::editAttribsFromPosition(
-  const QgsAnnotationItem *item, const KadasMapItem::EditContext &, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx
-) const
+KadasAttribValues KadasPictureAnnotationController::editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
 {
   return drawAttribsFromPosition( item, pos, ctx );
 }
 
-QgsPointXY KadasPictureAnnotationController::positionFromEditAttribs(
-  const QgsAnnotationItem *item, const KadasMapItem::EditContext &, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx
-) const
+QgsPointXY KadasPictureAnnotationController::positionFromEditAttribs( const QgsAnnotationItem *item, const KadasEditContext &, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const
 {
   return positionFromDrawAttribs( item, values, ctx );
 }

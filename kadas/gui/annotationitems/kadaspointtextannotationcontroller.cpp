@@ -59,7 +59,7 @@ QgsAnnotationItem *KadasPointTextAnnotationController::createItem() const
   return item;
 }
 
-QList<KadasMapItem::Node> KadasPointTextAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
+QList<KadasNode> KadasPointTextAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
 {
   return { { toMapPos( asText( item )->point(), ctx ) } };
 }
@@ -70,7 +70,7 @@ bool KadasPointTextAnnotationController::startPart( QgsAnnotationItem *item, con
   return false;
 }
 
-bool KadasPointTextAnnotationController::startPart( QgsAnnotationItem *item, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx )
+bool KadasPointTextAnnotationController::startPart( QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
 {
   return startPart( item, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
@@ -78,7 +78,7 @@ bool KadasPointTextAnnotationController::startPart( QgsAnnotationItem *item, con
 void KadasPointTextAnnotationController::setCurrentPoint( QgsAnnotationItem *, const QgsPointXY &, const KadasAnnotationItemContext & )
 {}
 
-void KadasPointTextAnnotationController::setCurrentAttributes( QgsAnnotationItem *, const KadasMapItem::AttribValues &, const KadasAnnotationItemContext & )
+void KadasPointTextAnnotationController::setCurrentAttributes( QgsAnnotationItem *, const KadasAttribValues &, const KadasAnnotationItemContext & )
 {}
 
 bool KadasPointTextAnnotationController::continuePart( QgsAnnotationItem *, const KadasAnnotationItemContext & )
@@ -89,57 +89,53 @@ bool KadasPointTextAnnotationController::continuePart( QgsAnnotationItem *, cons
 void KadasPointTextAnnotationController::endPart( QgsAnnotationItem * )
 {}
 
-KadasMapItem::AttribDefs KadasPointTextAnnotationController::drawAttribs() const
+KadasAttribDefs KadasPointTextAnnotationController::drawAttribs() const
 {
-  KadasMapItem::AttribDefs attributes;
-  attributes.insert( AttrX, KadasMapItem::NumericAttribute { "x" } );
-  attributes.insert( AttrY, KadasMapItem::NumericAttribute { "y" } );
+  KadasAttribDefs attributes;
+  attributes.insert( AttrX, KadasNumericAttribute { "x" } );
+  attributes.insert( AttrY, KadasNumericAttribute { "y" } );
   return attributes;
 }
 
-KadasMapItem::AttribValues KadasPointTextAnnotationController::drawAttribsFromPosition( const QgsAnnotationItem *, const QgsPointXY &pos, const KadasAnnotationItemContext & ) const
+KadasAttribValues KadasPointTextAnnotationController::drawAttribsFromPosition( const QgsAnnotationItem *, const QgsPointXY &pos, const KadasAnnotationItemContext & ) const
 {
-  KadasMapItem::AttribValues values;
+  KadasAttribValues values;
   values.insert( AttrX, pos.x() );
   values.insert( AttrY, pos.y() );
   return values;
 }
 
-QgsPointXY KadasPointTextAnnotationController::positionFromDrawAttribs( const QgsAnnotationItem *, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext & ) const
+QgsPointXY KadasPointTextAnnotationController::positionFromDrawAttribs( const QgsAnnotationItem *, const KadasAttribValues &values, const KadasAnnotationItemContext & ) const
 {
   return QgsPointXY( values[AttrX], values[AttrY] );
 }
 
-KadasMapItem::EditContext KadasPointTextAnnotationController::getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
+KadasEditContext KadasPointTextAnnotationController::getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
 {
   const QgsPointXY testPos = toMapPos( QgsPointXY( asText( item )->point() ), ctx );
   if ( pos.sqrDist( testPos ) < pickTolSqr( ctx ) )
   {
-    return KadasMapItem::EditContext( QgsVertexId( 0, 0, 0 ), testPos, drawAttribs() );
+    return KadasEditContext( QgsVertexId( 0, 0, 0 ), testPos, drawAttribs() );
   }
-  return KadasMapItem::EditContext();
+  return KadasEditContext();
 }
 
-void KadasPointTextAnnotationController::edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
+void KadasPointTextAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
   asText( item )->setPoint( toItemPos( newPoint, ctx ) );
 }
 
-void KadasPointTextAnnotationController::edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx )
+void KadasPointTextAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
 {
   edit( item, editContext, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
 
-KadasMapItem::AttribValues KadasPointTextAnnotationController::editAttribsFromPosition(
-  const QgsAnnotationItem *item, const KadasMapItem::EditContext &, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx
-) const
+KadasAttribValues KadasPointTextAnnotationController::editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
 {
   return drawAttribsFromPosition( item, pos, ctx );
 }
 
-QgsPointXY KadasPointTextAnnotationController::positionFromEditAttribs(
-  const QgsAnnotationItem *item, const KadasMapItem::EditContext &, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx
-) const
+QgsPointXY KadasPointTextAnnotationController::positionFromEditAttribs( const QgsAnnotationItem *item, const KadasEditContext &, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const
 {
   return positionFromDrawAttribs( item, values, ctx );
 }

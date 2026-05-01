@@ -24,7 +24,7 @@
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 
 
-void KadasAnnotationItemController::populateContextMenu( QgsAnnotationItem *, QMenu *, const KadasMapItem::EditContext &, const QgsPointXY &, const KadasAnnotationItemContext & )
+void KadasAnnotationItemController::populateContextMenu( QgsAnnotationItem *, QMenu *, const KadasEditContext &, const QgsPointXY &, const KadasAnnotationItemContext & )
 {}
 
 void KadasAnnotationItemController::onDoubleClick( QgsAnnotationItem *, const KadasAnnotationItemContext & )
