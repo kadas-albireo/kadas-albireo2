@@ -27,6 +27,7 @@
 #include <qgis/qgsrendercontext.h>
 
 #include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgsannotationpictureitem.h>
 
 #include "kadas/core/kadascoordinateformat.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
@@ -238,6 +239,25 @@ void KadasSymbolItem::edit( const EditContext &context, const KadasMapPos &newPo
   {
     KadasAnchoredItem::edit( context, newPoint, mapSettings );
   }
+}
+
+QgsAnnotationItem *KadasSymbolItem::annotationItem( const QgsCoordinateReferenceSystem &crs ) const
+{
+  QgsPoint point( position().x(), position().y() );
+  if ( crs.isValid() && mCrs != crs )
+  {
+    QgsCoordinateTransform ct( mCrs, crs, QgsProject::instance() );
+    QgsPointXY xy = ct.transform( point.x(), point.y() );
+    point = QgsPoint( xy );
+  }
+  const Qgis::PictureFormat fmt = mFilePath.endsWith( QLatin1String( ".svg" ), Qt::CaseInsensitive ) ? Qgis::PictureFormat::SVG : Qgis::PictureFormat::Raster;
+  auto *anno = new QgsAnnotationPictureItem( fmt, mFilePath, QgsRectangle( point.x(), point.y(), point.x(), point.y() ) );
+  anno->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
+  const QSize px = constState()->size.isValid() && !constState()->size.isEmpty() ? constState()->size : mImage.size();
+  anno->setFixedSize( QSizeF( px.width() ? px.width() : 32, px.height() ? px.height() : 32 ) );
+  anno->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
+  anno->setZIndex( zIndex() ? zIndex() : KadasAnnotationZIndex::Picture );
+  return anno;
 }
 
 
