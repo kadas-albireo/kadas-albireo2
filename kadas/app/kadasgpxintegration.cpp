@@ -143,9 +143,12 @@ bool KadasGpxIntegration::importGpx( const QString &filename, QString &errorMsg 
 {
   kApp->unsetMapTool();
 
-  QString layerName = QFileInfo( filename ).baseName();
-  KadasItemLayer *layer = new KadasItemLayer( layerName, QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+  const QString layerName = QFileInfo( filename ).baseName();
+  QgsAnnotationLayer *layer = new QgsAnnotationLayer( layerName, QgsAnnotationLayer::LayerOptions( QgsProject::instance()->transformContext() ) );
+  layer->setCrs( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
   QgsProject::instance()->addMapLayer( layer );
+
+  const QgsCoordinateTransform wgs84ToLayer( QgsCoordinateReferenceSystem( "EPSG:4326" ), layer->crs(), QgsProject::instance()->transformContext() );
 
   QFile file( filename );
   if ( !file.open( QIODevice::ReadOnly ) )
@@ -160,59 +163,52 @@ bool KadasGpxIntegration::importGpx( const QString &filename, QString &errorMsg 
     errorMsg = tr( "Failed to read input file." );
     return false;
   }
-  QDomNodeList wpts = doc.elementsByTagName( "wpt" );
+  const QDomNodeList wpts = doc.elementsByTagName( "wpt" );
   for ( int i = 0, n = wpts.size(); i < n; ++i )
   {
-    QDomElement wptEl = wpts.at( i ).toElement();
-    double lat = wptEl.attribute( "lat" ).toDouble();
-    double lon = wptEl.attribute( "lon" ).toDouble();
-    QString name = wptEl.firstChildElement( "name" ).text();
+    const QDomElement wptEl = wpts.at( i ).toElement();
+    const double lat = wptEl.attribute( "lat" ).toDouble();
+    const double lon = wptEl.attribute( "lon" ).toDouble();
+    const QString name = wptEl.firstChildElement( "name" ).text();
 
-    KadasGpxWaypointItem *waypoint = new KadasGpxWaypointItem();
+    const QgsPointXY layerPos = wgs84ToLayer.transform( QgsPointXY( lon, lat ) );
+    auto *waypoint = new KadasGpxWaypointAnnotationItem( QgsPoint( layerPos ) );
     waypoint->setName( name );
-    waypoint->setPoint( QgsPoint( lon, lat ) );
     layer->addItem( waypoint );
   }
-  QDomNodeList rtes = doc.elementsByTagName( "rte" );
+  const auto readRouteParts = [&]( const QDomElement &el, const QString &tagName ) {
+    auto *line = new QgsLineString();
+    const QDomNodeList pts = ( tagName == QStringLiteral( "trk" ) ) ? el.firstChildElement( "trkseg" ).elementsByTagName( "trkpt" ) : el.elementsByTagName( "rtept" );
+    for ( int j = 0, m = pts.size(); j < m; ++j )
+    {
+      const QDomElement ptEl = pts.at( j ).toElement();
+      const double lat = ptEl.attribute( "lat" ).toDouble();
+      const double lon = ptEl.attribute( "lon" ).toDouble();
+      const QgsPointXY layerPos = wgs84ToLayer.transform( QgsPointXY( lon, lat ) );
+      line->addVertex( QgsPoint( layerPos ) );
+    }
+    return line;
+  };
+  const QDomNodeList rtes = doc.elementsByTagName( "rte" );
   for ( int i = 0, n = rtes.size(); i < n; ++i )
   {
-    QgsLineString line;
-    QDomElement rteEl = rtes.at( i ).toElement();
-    QString name = rteEl.firstChildElement( "name" ).text();
-    QString number = rteEl.firstChildElement( "name" ).text();
-    QDomNodeList rtepts = rteEl.elementsByTagName( "rtept" );
-    for ( int j = 0, m = rtepts.size(); j < m; ++j )
-    {
-      QDomElement rteptEl = rtepts.at( j ).toElement();
-      double lat = rteptEl.attribute( "lat" ).toDouble();
-      double lon = rteptEl.attribute( "lon" ).toDouble();
-      line.addVertex( QgsPoint( lon, lat ) );
-    }
-    KadasGpxRouteItem *route = new KadasGpxRouteItem();
+    const QDomElement rteEl = rtes.at( i ).toElement();
+    const QString name = rteEl.firstChildElement( "name" ).text();
+    const QString number = rteEl.firstChildElement( "number" ).text();
+    auto *route = new KadasGpxRouteAnnotationItem( readRouteParts( rteEl, QStringLiteral( "rte" ) ) );
     route->setName( name );
     route->setNumber( number );
-    route->addPartFromGeometry( line );
     layer->addItem( route );
   }
-  QDomNodeList trks = doc.elementsByTagName( "trk" );
+  const QDomNodeList trks = doc.elementsByTagName( "trk" );
   for ( int i = 0, n = trks.size(); i < n; ++i )
   {
-    QgsLineString line;
-    QDomElement trkEl = trks.at( i ).toElement();
-    QString name = trkEl.firstChildElement( "name" ).text();
-    QString number = trkEl.firstChildElement( "name" ).text();
-    QDomNodeList trkpts = trkEl.firstChildElement( "trkseg" ).elementsByTagName( "trkpt" );
-    for ( int j = 0, m = trkpts.size(); j < m; ++j )
-    {
-      QDomElement trkptEl = trkpts.at( j ).toElement();
-      double lat = trkptEl.attribute( "lat" ).toDouble();
-      double lon = trkptEl.attribute( "lon" ).toDouble();
-      line.addVertex( QgsPoint( lon, lat ) );
-    }
-    KadasGpxRouteItem *route = new KadasGpxRouteItem();
+    const QDomElement trkEl = trks.at( i ).toElement();
+    const QString name = trkEl.firstChildElement( "name" ).text();
+    const QString number = trkEl.firstChildElement( "number" ).text();
+    auto *route = new KadasGpxRouteAnnotationItem( readRouteParts( trkEl, QStringLiteral( "trk" ) ) );
     route->setName( name );
     route->setNumber( number );
-    route->addPartFromGeometry( line );
     layer->addItem( route );
   }
   return true;
@@ -226,15 +222,26 @@ void KadasGpxIntegration::saveGpx()
   dialog.setWindowTitle( tr( "Export to GPX" ) );
   dialog.setLayout( new QVBoxLayout );
   KadasLayerSelectionWidget *layerSelectionWidget = new KadasLayerSelectionWidget( kApp->mainWindow()->mapCanvas(), kApp->mainWindow()->layerTreeView(), []( QgsMapLayer *layer ) {
-    if ( !dynamic_cast<KadasItemLayer *>( layer ) )
+    if ( auto *itemLayer = dynamic_cast<KadasItemLayer *>( layer ) )
     {
+      for ( KadasMapItem *item : itemLayer->items() )
+      {
+        if ( dynamic_cast<KadasGpxWaypointItem *>( item ) || dynamic_cast<KadasGpxRouteItem *>( item ) )
+        {
+          return true;
+        }
+      }
       return false;
     }
-    for ( KadasMapItem *item : static_cast<KadasItemLayer *>( layer )->items() )
+    if ( auto *annoLayer = dynamic_cast<QgsAnnotationLayer *>( layer ) )
     {
-      if ( dynamic_cast<KadasGpxWaypointItem *>( item ) || dynamic_cast<KadasGpxRouteItem *>( item ) )
+      const QMap<QString, QgsAnnotationItem *> items = annoLayer->items();
+      for ( auto it = items.constBegin(); it != items.constEnd(); ++it )
       {
-        return true;
+        if ( dynamic_cast<KadasGpxWaypointAnnotationItem *>( it.value() ) || dynamic_cast<KadasGpxRouteAnnotationItem *>( it.value() ) )
+        {
+          return true;
+        }
       }
     }
     return false;
@@ -250,10 +257,10 @@ void KadasGpxIntegration::saveGpx()
   {
     return;
   }
-  KadasItemLayer *layer = static_cast<KadasItemLayer *>( layerSelectionWidget->getSelectedLayer() );
+  QgsMapLayer *selectedLayer = layerSelectionWidget->getSelectedLayer();
 
   QString lastDir = QgsSettings().value( "/UI/lastImportExportDir", "." ).toString();
-  QString filename = QFileDialog::getSaveFileName( kApp->mainWindow(), tr( "Export to GPX" ), QDir( lastDir ).absoluteFilePath( layer->name() + ".gpx" ), tr( "GPX Files (*.gpx)" ) );
+  QString filename = QFileDialog::getSaveFileName( kApp->mainWindow(), tr( "Export to GPX" ), QDir( lastDir ).absoluteFilePath( selectedLayer->name() + ".gpx" ), tr( "GPX Files (*.gpx)" ) );
   if ( filename.isEmpty() )
   {
     return;
@@ -277,43 +284,66 @@ void KadasGpxIntegration::saveGpx()
   gpxEl.setAttribute( "creator", "kadas" );
   doc.appendChild( gpxEl );
 
-  for ( const KadasMapItem *item : layer->items() )
-  {
-    if ( dynamic_cast<const KadasGpxWaypointItem *>( item ) )
+  const QgsCoordinateTransform layerToWgs84( selectedLayer->crs(), QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance()->transformContext() );
+
+  const auto appendWaypoint = [&]( const QgsPointXY &layerPos, const QString &name ) {
+    const QgsPointXY pt = layerToWgs84.transform( layerPos );
+    QDomElement wptEl = doc.createElement( "wpt" );
+    wptEl.setAttribute( "lon", pt.x() );
+    wptEl.setAttribute( "lat", pt.y() );
+    QDomElement nameEl = doc.createElement( "name" );
+    nameEl.appendChild( doc.createTextNode( name ) );
+    wptEl.appendChild( nameEl );
+    gpxEl.appendChild( wptEl );
+  };
+  const auto appendRoute = [&]( const QgsAbstractGeometry *geom, const QString &name, const QString &number ) {
+    QDomElement rteEl = doc.createElement( "rte" );
+    QDomElement nameEl = doc.createElement( "name" );
+    nameEl.appendChild( doc.createTextNode( name ) );
+    rteEl.appendChild( nameEl );
+    QDomElement numberEl = doc.createElement( "number" );
+    numberEl.appendChild( doc.createTextNode( number ) );
+    rteEl.appendChild( numberEl );
+    QgsPoint pt;
+    QgsVertexId vidx;
+    while ( geom->nextVertex( vidx, pt ) )
     {
-      const KadasGpxWaypointItem *waypoint = static_cast<const KadasGpxWaypointItem *>( item );
-      QgsPoint pt = QgsPoint( waypoint->point() );
-      QDomElement wptEl = doc.createElement( "wpt" );
-      wptEl.setAttribute( "lon", pt.x() );
-      wptEl.setAttribute( "lat", pt.y() );
-      QDomElement nameEl = doc.createElement( "name" );
-      QDomText nameText = doc.createTextNode( waypoint->name() );
-      nameEl.appendChild( nameText );
-      wptEl.appendChild( nameEl );
-      gpxEl.appendChild( wptEl );
+      const QgsPointXY wgs = layerToWgs84.transform( pt );
+      QDomElement rteptEl = doc.createElement( "rtept" );
+      rteptEl.setAttribute( "lon", wgs.x() );
+      rteptEl.setAttribute( "lat", wgs.y() );
+      rteEl.appendChild( rteptEl );
     }
-    if ( dynamic_cast<const KadasGpxRouteItem *>( item ) )
+    gpxEl.appendChild( rteEl );
+  };
+
+  if ( auto *itemLayer = dynamic_cast<KadasItemLayer *>( selectedLayer ) )
+  {
+    for ( const KadasMapItem *item : itemLayer->items() )
     {
-      const KadasGpxRouteItem *route = static_cast<const KadasGpxRouteItem *>( item );
-      QDomElement rteEl = doc.createElement( "rte" );
-      QDomElement nameEl = doc.createElement( "name" );
-      QDomText nameText = doc.createTextNode( route->name() );
-      nameEl.appendChild( nameText );
-      rteEl.appendChild( nameEl );
-      QDomElement numberEl = doc.createElement( "number" );
-      QDomText numberText = doc.createTextNode( route->number() );
-      numberEl.appendChild( numberText );
-      rteEl.appendChild( numberEl );
-      QgsPoint pt;
-      QgsVertexId vidx;
-      while ( route->geometry()->nextVertex( vidx, pt ) )
+      if ( const auto *waypoint = dynamic_cast<const KadasGpxWaypointItem *>( item ) )
       {
-        QDomElement rteptEl = doc.createElement( "rtept" );
-        rteptEl.setAttribute( "lon", pt.x() );
-        rteptEl.setAttribute( "lat", pt.y() );
-        rteEl.appendChild( rteptEl );
+        appendWaypoint( waypoint->point(), waypoint->name() );
       }
-      gpxEl.appendChild( rteEl );
+      else if ( const auto *route = dynamic_cast<const KadasGpxRouteItem *>( item ) )
+      {
+        appendRoute( route->geometry(), route->name(), route->number() );
+      }
+    }
+  }
+  else if ( auto *annoLayer = dynamic_cast<QgsAnnotationLayer *>( selectedLayer ) )
+  {
+    const QMap<QString, QgsAnnotationItem *> items = annoLayer->items();
+    for ( auto it = items.constBegin(); it != items.constEnd(); ++it )
+    {
+      if ( const auto *waypoint = dynamic_cast<const KadasGpxWaypointAnnotationItem *>( it.value() ) )
+      {
+        appendWaypoint( waypoint->geometry(), waypoint->name() );
+      }
+      else if ( const auto *route = dynamic_cast<const KadasGpxRouteAnnotationItem *>( it.value() ) )
+      {
+        appendRoute( route->geometry(), route->name(), route->number() );
+      }
     }
   }
 
