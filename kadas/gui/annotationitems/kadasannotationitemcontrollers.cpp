@@ -30,6 +30,7 @@
 #include "kadas/gui/annotationitems/kadasgpxwaypointannotationitem.h"
 #include "kadas/gui/annotationitems/kadaslineannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadasmarkerannotationcontroller.h"
+#include "kadas/gui/annotationitems/kadasmilxannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
 #include "kadas/gui/annotationitems/kadaspictureannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadaspinannotationcontroller.h"
@@ -63,6 +64,7 @@ void KadasAnnotationItemControllers::registerBuiltins()
   registry->addController( new KadasCoordCrossAnnotationController() );
   registry->addController( new KadasGpxWaypointAnnotationController() );
   registry->addController( new KadasGpxRouteAnnotationController() );
+  registry->addController( new KadasMilxAnnotationController() );
 
   // Register Kadas-internal annotation item types with the QGIS annotation
   // item registry so they round-trip through QgsAnnotationLayer XML.
