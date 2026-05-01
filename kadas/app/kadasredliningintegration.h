@@ -17,12 +17,8 @@
 #ifndef KADASREDLININGINTEGRATION_H
 #define KADASREDLININGINTEGRATION_H
 
-#include <memory>
-
 #include <QObject>
 #include <QPointer>
-
-#include "kadas/gui/kadasmapiteminterface.h"
 
 
 class QAction;
@@ -32,22 +28,7 @@ class QgsAnnotationLayer;
 class QgsMapCanvas;
 class QgsMapLayer;
 
-class KadasItemLayer;
-class KadasMapItem;
 class KadasMainWindow;
-
-
-/**
- * Legacy KadasMapItemInterface used by the CoordinateCross action, which
- * has no annotation-item equivalent yet and therefore still drives the
- * legacy KadasMapToolCreateItem.
- */
-class KadasCoordCrossItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasCoordCrossItemInterface() = default;
-    KadasMapItem *createItem() const override;
-};
 
 
 class KadasRedliningIntegration : public QObject
@@ -56,12 +37,8 @@ class KadasRedliningIntegration : public QObject
   public:
     KadasRedliningIntegration( QToolButton *buttonNewObject, QObject *parent );
 
-    //! Returns (creating if needed) the legacy redlining KadasItemLayer.
-    //! Used by the CoordinateCross action while it remains on the legacy tool.
-    KadasItemLayer *getOrCreateLayer();
-
     //! Returns (creating if needed) the redlining QgsAnnotationLayer used
-    //! by all migrated actions.
+    //! by the redlining toolbar actions.
     QgsAnnotationLayer *getOrCreateAnnotationLayer();
 
     QAction *actionNewPoint() const { return mActionNewPoint; }
@@ -86,6 +63,7 @@ class KadasRedliningIntegration : public QObject
       Polygon,
       Circle,
       Text,
+      CoordCross,
     };
 
     QToolButton *mButtonNewObject = nullptr;
@@ -100,16 +78,13 @@ class KadasRedliningIntegration : public QObject
     QAction *mActionNewText = nullptr;
     QAction *mActionNewCoordCross = nullptr;
 
-    QPointer<KadasItemLayer> mLastLayer;
     QPointer<QgsAnnotationLayer> mLastAnnotationLayer;
 
     void toggleAnnotation( bool active, AnnotationVariant variant );
-    void toggleLegacyCreateItem( bool active, std::unique_ptr<KadasMapItemInterface> interface );
 
   private slots:
     void activateNewButtonObject();
     void deactivateNewButtonObject();
-    void updateLastLayer( QgsMapLayer *layer );
 };
 
 #endif // KADASREDLININGINTEGRATION_H
