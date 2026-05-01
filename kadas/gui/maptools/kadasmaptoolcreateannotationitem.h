@@ -127,7 +127,16 @@ class KADAS_GUI_EXPORT KadasMapToolCreateAnnotationItem : public QgsMapTool
     std::function<QgsAnnotationItem *()> mItemFactory;
 
     void createItem();
+
+  public:
+    /**
+     * Adds a point to the in-progress item. Public so that callers (e.g. the
+     * canvas context menu) can seed an active create tool with a starting
+     * vertex right after triggering its action.
+     */
     void addPoint( const KadasMapPos &pos );
+
+  private:
     void startPart( const KadasMapPos &pos );
     void startPart( const KadasMapItem::AttribValues &values );
     void finishPart();
