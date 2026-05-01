@@ -96,14 +96,14 @@ QList<KadasMapItem::Node> KadasPolygonAnnotationController::nodes( const QgsAnno
   for ( int i = 0; i < last; ++i )
   {
     const QgsPoint p = ring->vertexAt( QgsVertexId( 0, 0, i ) );
-    result.append( { toMapPos( KadasItemPos( p.x(), p.y() ), ctx ) } );
+    result.append( { toMapPos( QgsPointXY( p.x(), p.y() ), ctx ) } );
   }
   return result;
 }
 
-bool KadasPolygonAnnotationController::startPart( QgsAnnotationItem *item, const KadasMapPos &firstPoint, const KadasAnnotationItemContext &ctx )
+bool KadasPolygonAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
 {
-  const KadasItemPos ip = toItemPos( firstPoint, ctx );
+  const QgsPointXY ip = toItemPos( firstPoint, ctx );
   // Seed with two coincident points (anchor + rubber band) plus the closing
   // vertex required to keep the ring valid.
   auto *ring = new QgsLineString();
@@ -118,10 +118,10 @@ bool KadasPolygonAnnotationController::startPart( QgsAnnotationItem *item, const
 
 bool KadasPolygonAnnotationController::startPart( QgsAnnotationItem *item, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx )
 {
-  return startPart( item, KadasMapPos( values[AttrX], values[AttrY] ), ctx );
+  return startPart( item, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
 
-void KadasPolygonAnnotationController::setCurrentPoint( QgsAnnotationItem *item, const KadasMapPos &p, const KadasAnnotationItemContext &ctx )
+void KadasPolygonAnnotationController::setCurrentPoint( QgsAnnotationItem *item, const QgsPointXY &p, const KadasAnnotationItemContext &ctx )
 {
   QgsLineString *ring = takeMutableExterior( asPolygon( item ) );
   if ( !ring )
@@ -129,7 +129,7 @@ void KadasPolygonAnnotationController::setCurrentPoint( QgsAnnotationItem *item,
   const int n = ring->numPoints();
   if ( n < 2 )
     return;
-  const KadasItemPos ip = toItemPos( p, ctx );
+  const QgsPointXY ip = toItemPos( p, ctx );
   // Move the rubber-band vertex (the second-to-last; the last is the closing
   // duplicate of the first vertex).
   ring->moveVertex( QgsVertexId( 0, 0, n - 2 ), QgsPoint( ip.x(), ip.y() ) );
@@ -137,7 +137,7 @@ void KadasPolygonAnnotationController::setCurrentPoint( QgsAnnotationItem *item,
 
 void KadasPolygonAnnotationController::setCurrentAttributes( QgsAnnotationItem *item, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx )
 {
-  setCurrentPoint( item, KadasMapPos( values[AttrX], values[AttrY] ), ctx );
+  setCurrentPoint( item, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
 
 bool KadasPolygonAnnotationController::continuePart( QgsAnnotationItem *item, const KadasAnnotationItemContext & )
@@ -171,7 +171,7 @@ KadasMapItem::AttribDefs KadasPolygonAnnotationController::drawAttribs() const
   return attributes;
 }
 
-KadasMapItem::AttribValues KadasPolygonAnnotationController::drawAttribsFromPosition( const QgsAnnotationItem *, const KadasMapPos &pos, const KadasAnnotationItemContext & ) const
+KadasMapItem::AttribValues KadasPolygonAnnotationController::drawAttribsFromPosition( const QgsAnnotationItem *, const QgsPointXY &pos, const KadasAnnotationItemContext & ) const
 {
   KadasMapItem::AttribValues values;
   values.insert( AttrX, pos.x() );
@@ -179,12 +179,12 @@ KadasMapItem::AttribValues KadasPolygonAnnotationController::drawAttribsFromPosi
   return values;
 }
 
-KadasMapPos KadasPolygonAnnotationController::positionFromDrawAttribs( const QgsAnnotationItem *, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext & ) const
+QgsPointXY KadasPolygonAnnotationController::positionFromDrawAttribs( const QgsAnnotationItem *, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext & ) const
 {
-  return KadasMapPos( values[AttrX], values[AttrY] );
+  return QgsPointXY( values[AttrX], values[AttrY] );
 }
 
-KadasMapItem::EditContext KadasPolygonAnnotationController::getEditContext( const QgsAnnotationItem *item, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx ) const
+KadasMapItem::EditContext KadasPolygonAnnotationController::getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
 {
   const QgsCurvePolygon *poly = asPolygon( item )->geometry();
   if ( !poly )
@@ -197,7 +197,7 @@ KadasMapItem::EditContext KadasPolygonAnnotationController::getEditContext( cons
   for ( int i = 0; i < last; ++i )
   {
     const QgsPoint p = ring->vertexAt( QgsVertexId( 0, 0, i ) );
-    const KadasMapPos mp = toMapPos( KadasItemPos( p.x(), p.y() ), ctx );
+    const QgsPointXY mp = toMapPos( QgsPointXY( p.x(), p.y() ), ctx );
     if ( pos.sqrDist( mp ) < pickTolSqr( ctx ) )
     {
       return KadasMapItem::EditContext( QgsVertexId( 0, 0, i ), mp, drawAttribs() );
@@ -206,13 +206,13 @@ KadasMapItem::EditContext KadasPolygonAnnotationController::getEditContext( cons
   if ( toMapRect( asPolygon( item )->boundingBox(), ctx ).contains( pos ) && last > 0 )
   {
     const QgsPoint p0 = ring->vertexAt( QgsVertexId( 0, 0, 0 ) );
-    const KadasMapPos refPos = toMapPos( KadasItemPos( p0.x(), p0.y() ), ctx );
+    const QgsPointXY refPos = toMapPos( QgsPointXY( p0.x(), p0.y() ), ctx );
     return KadasMapItem::EditContext( QgsVertexId(), refPos, KadasMapItem::AttribDefs(), Qt::ArrowCursor );
   }
   return KadasMapItem::EditContext();
 }
 
-void KadasPolygonAnnotationController::edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapPos &newPoint, const KadasAnnotationItemContext &ctx )
+void KadasPolygonAnnotationController::edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
   QgsLineString *ring = takeMutableExterior( asPolygon( item ) );
   if ( !ring )
@@ -220,7 +220,7 @@ void KadasPolygonAnnotationController::edit( QgsAnnotationItem *item, const Kada
   const int n = ring->numPoints();
   if ( editContext.vidx.vertex >= 0 && editContext.vidx.vertex < n )
   {
-    const KadasItemPos ip = toItemPos( newPoint, ctx );
+    const QgsPointXY ip = toItemPos( newPoint, ctx );
     ring->moveVertex( QgsVertexId( 0, 0, editContext.vidx.vertex ), QgsPoint( ip.x(), ip.y() ) );
     // Keep the closing vertex in sync if we moved the first one.
     if ( editContext.vidx.vertex == 0 && n > 1 && ring->pointN( 0 ) != ring->pointN( n - 1 ) )
@@ -231,14 +231,14 @@ void KadasPolygonAnnotationController::edit( QgsAnnotationItem *item, const Kada
   else if ( n > 0 )
   {
     const QgsPoint p0 = ring->pointN( 0 );
-    const KadasMapPos refMap = toMapPos( KadasItemPos( p0.x(), p0.y() ), ctx );
+    const QgsPointXY refMap = toMapPos( QgsPointXY( p0.x(), p0.y() ), ctx );
     const double dxMap = newPoint.x() - refMap.x();
     const double dyMap = newPoint.y() - refMap.y();
     for ( int i = 0; i < n; ++i )
     {
       const QgsPoint pi = ring->pointN( i );
-      const KadasMapPos mp = toMapPos( KadasItemPos( pi.x(), pi.y() ), ctx );
-      const KadasItemPos shifted = toItemPos( KadasMapPos( mp.x() + dxMap, mp.y() + dyMap ), ctx );
+      const QgsPointXY mp = toMapPos( QgsPointXY( pi.x(), pi.y() ), ctx );
+      const QgsPointXY shifted = toItemPos( QgsPointXY( mp.x() + dxMap, mp.y() + dyMap ), ctx );
       ring->moveVertex( QgsVertexId( 0, 0, i ), QgsPoint( shifted.x(), shifted.y() ) );
     }
   }
@@ -246,33 +246,33 @@ void KadasPolygonAnnotationController::edit( QgsAnnotationItem *item, const Kada
 
 void KadasPolygonAnnotationController::edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx )
 {
-  edit( item, editContext, KadasMapPos( values[AttrX], values[AttrY] ), ctx );
+  edit( item, editContext, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
 
 KadasMapItem::AttribValues KadasPolygonAnnotationController::editAttribsFromPosition(
-  const QgsAnnotationItem *item, const KadasMapItem::EditContext &, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx
+  const QgsAnnotationItem *item, const KadasMapItem::EditContext &, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx
 ) const
 {
   return drawAttribsFromPosition( item, pos, ctx );
 }
 
-KadasMapPos KadasPolygonAnnotationController::positionFromEditAttribs(
+QgsPointXY KadasPolygonAnnotationController::positionFromEditAttribs(
   const QgsAnnotationItem *item, const KadasMapItem::EditContext &, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx
 ) const
 {
   return positionFromDrawAttribs( item, values, ctx );
 }
 
-KadasItemPos KadasPolygonAnnotationController::position( const QgsAnnotationItem *item ) const
+QgsPointXY KadasPolygonAnnotationController::position( const QgsAnnotationItem *item ) const
 {
   const QgsCurvePolygon *poly = asPolygon( item )->geometry();
   if ( !poly || !poly->exteriorRing() || poly->exteriorRing()->numPoints() == 0 )
-    return KadasItemPos();
+    return QgsPointXY();
   const QgsPoint p = poly->exteriorRing()->vertexAt( QgsVertexId( 0, 0, 0 ) );
-  return KadasItemPos( p.x(), p.y() );
+  return QgsPointXY( p.x(), p.y() );
 }
 
-void KadasPolygonAnnotationController::setPosition( QgsAnnotationItem *item, const KadasItemPos &pos )
+void KadasPolygonAnnotationController::setPosition( QgsAnnotationItem *item, const QgsPointXY &pos )
 {
   QgsLineString *ring = takeMutableExterior( asPolygon( item ) );
   if ( !ring )

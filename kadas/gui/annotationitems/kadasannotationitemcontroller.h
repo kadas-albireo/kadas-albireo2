@@ -79,41 +79,41 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     // ----- Draw state machine ---------------------------------------------
 
     //! Begins a new part at \a firstPoint. Returns true if the item is ready to receive subsequent points.
-    virtual bool startPart( QgsAnnotationItem *item, const KadasMapPos &firstPoint, const KadasAnnotationItemContext &ctx ) = 0;
+    virtual bool startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx ) = 0;
     virtual bool startPart( QgsAnnotationItem *item, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx ) = 0;
-    virtual void setCurrentPoint( QgsAnnotationItem *item, const KadasMapPos &p, const KadasAnnotationItemContext &ctx ) = 0;
+    virtual void setCurrentPoint( QgsAnnotationItem *item, const QgsPointXY &p, const KadasAnnotationItemContext &ctx ) = 0;
     virtual void setCurrentAttributes( QgsAnnotationItem *item, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx ) = 0;
     virtual bool continuePart( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) = 0;
     virtual void endPart( QgsAnnotationItem *item ) = 0;
 
     virtual KadasMapItem::AttribDefs drawAttribs() const = 0;
-    virtual KadasMapItem::AttribValues drawAttribsFromPosition( const QgsAnnotationItem *item, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx ) const = 0;
-    virtual KadasMapPos positionFromDrawAttribs( const QgsAnnotationItem *item, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx ) const = 0;
+    virtual KadasMapItem::AttribValues drawAttribsFromPosition( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const = 0;
+    virtual QgsPointXY positionFromDrawAttribs( const QgsAnnotationItem *item, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx ) const = 0;
 
     // ----- Edit interface -------------------------------------------------
 
-    virtual KadasMapItem::EditContext getEditContext( const QgsAnnotationItem *item, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx ) const = 0;
-    virtual void edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapPos &newPoint, const KadasAnnotationItemContext &ctx ) = 0;
+    virtual KadasMapItem::EditContext getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const = 0;
+    virtual void edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx ) = 0;
     virtual void edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx ) = 0;
     virtual KadasMapItem::AttribValues editAttribsFromPosition(
-      const QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx
+      const QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx
     ) const = 0;
-    virtual KadasMapPos positionFromEditAttribs(
+    virtual QgsPointXY positionFromEditAttribs(
       const QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx
     ) const = 0;
-    virtual void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasMapItem::EditContext &editContext, const KadasMapPos &clickPos, const KadasAnnotationItemContext &ctx );
+    virtual void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasMapItem::EditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx );
     virtual void onDoubleClick( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx );
 
     // ----- Position helpers ----------------------------------------------
 
-    virtual KadasItemPos position( const QgsAnnotationItem *item ) const = 0;
-    virtual void setPosition( QgsAnnotationItem *item, const KadasItemPos &pos ) = 0;
+    virtual QgsPointXY position( const QgsAnnotationItem *item ) const = 0;
+    virtual void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos ) = 0;
     virtual void translate( QgsAnnotationItem *item, double dx, double dy ) = 0;
 
     // ----- Hit testing ----------------------------------------------------
 
-    virtual bool hitTest( const QgsAnnotationItem *item, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx ) const;
-    virtual QPair<KadasMapPos, double> closestPoint( const QgsAnnotationItem *item, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx ) const;
+    virtual bool hitTest( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const;
+    virtual QPair<QgsPointXY, double> closestPoint( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const;
     virtual bool intersects( const QgsAnnotationItem *item, const QgsRectangle &mapRect, const KadasAnnotationItemContext &ctx, bool contains = false ) const;
 
     // ----- KML export ----------------------------------------------------
@@ -123,9 +123,8 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
   protected:
     // ----- Transform helpers (mirror KadasMapItem's) ---------------------
 
-    static KadasMapPos toMapPos( const KadasItemPos &itemPos, const KadasAnnotationItemContext &ctx );
     static QgsPointXY toMapPos( const QgsPointXY &itemPos, const KadasAnnotationItemContext &ctx );
-    static KadasItemPos toItemPos( const KadasMapPos &mapPos, const KadasAnnotationItemContext &ctx );
+    static QgsPointXY toItemPos( const QgsPointXY &mapPos, const KadasAnnotationItemContext &ctx );
     static QgsRectangle toItemRect( const QgsRectangle &mapRect, const KadasAnnotationItemContext &ctx );
     static QgsRectangle toMapRect( const QgsRectangle &itemRect, const KadasAnnotationItemContext &ctx );
     static double pickTolSqr( const KadasAnnotationItemContext &ctx );

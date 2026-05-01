@@ -42,7 +42,7 @@ class QgsAnnotationLayer;
  * controller / annotation-layer API.  The controller is looked up from the
  * \c KadasAnnotationControllerRegistry by item type id and is used to drive
  * the draw state machine (start / continue / set-current / end) and the
- * KadasMapPos ↔ item-CRS transforms.
+ * QgsPointXY ↔ item-CRS transforms.
  *
  * The in-progress item is added to the target annotation layer immediately
  * so that QGIS's standard annotation rendering shows it during drawing.
@@ -134,10 +134,10 @@ class KADAS_GUI_EXPORT KadasMapToolCreateAnnotationItem : public QgsMapTool
      * canvas context menu) can seed an active create tool with a starting
      * vertex right after triggering its action.
      */
-    void addPoint( const KadasMapPos &pos );
+    void addPoint( const QgsPointXY &pos );
 
   private:
-    void startPart( const KadasMapPos &pos );
+    void startPart( const QgsPointXY &pos );
     void startPart( const KadasMapItem::AttribValues &values );
     void finishPart();
     void pushState();
