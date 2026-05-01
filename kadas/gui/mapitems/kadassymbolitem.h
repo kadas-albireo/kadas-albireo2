@@ -72,6 +72,8 @@ class KADAS_GUI_EXPORT KadasPinItem : public KadasSymbolItem
   public:
     KadasPinItem( const QgsCoordinateReferenceSystem &crs );
 
+    QgsAnnotationItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const override SIP_FACTORY;
+
   private slots:
     void updateTooltip();
 };
