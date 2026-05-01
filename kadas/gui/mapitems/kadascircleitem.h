@@ -63,6 +63,8 @@ class KADAS_GUI_EXPORT KadasCircleItem : public KadasGeometryItem
 
     const QgsMultiSurface *geometry() const;
 
+    QList<QgsAnnotationItem *> annotationItems( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const override SIP_FACTORY;
+
     struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
         QList<KadasItemPos> centers;
