@@ -19,6 +19,7 @@
 
 #include <qgis/qgsannotationitem.h>
 #include <qgis/qgsannotationlayer.h>
+#include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgsgeometryrubberband.h>
 #include <qgis/qgsgeometrycollection.h>
 #include <qgis/qgsmapcanvas.h>
@@ -26,6 +27,9 @@
 #include <qgis/qgsvectorlayer.h>
 
 #include "kadas/core/kadascoordinateformat.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
+#include "kadas/gui/annotationitems/kadasgpxwaypointannotationitem.h"
+#include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 #include "kadas/gui/kadasclipboard.h"
 #include "kadas/gui/kadasitemcontextmenuactions.h"
 #include "kadas/gui/kadasitemlayer.h"
@@ -96,6 +100,19 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
   }
   else if ( pickedAnnotation )
   {
+    if ( dynamic_cast<const KadasPinAnnotationItem *>( pickedAnnotation ) )
+    {
+      addAction( QIcon( ":/kadas/icons/copy_coordinates" ), tr( "Copy position" ), this, &KadasCanvasContextMenu::copyAnnotationItemPosition );
+      addAction( QgsApplication::getThemeIcon( "/mIconPointLayer.svg" ), tr( "Convert to waypoint" ), this, &KadasCanvasContextMenu::createWaypointFromPin );
+    }
+    else if ( dynamic_cast<const QgsAnnotationMarkerItem *>( pickedAnnotation ) && !dynamic_cast<const KadasGpxWaypointAnnotationItem *>( pickedAnnotation ) )
+    {
+      addAction( QIcon( ":/kadas/icons/pin_red" ), tr( "Convert to pin" ), this, &KadasCanvasContextMenu::createPinFromMarker );
+    }
+    else if ( dynamic_cast<const KadasGpxWaypointAnnotationItem *>( pickedAnnotation ) )
+    {
+      addAction( QIcon( ":/kadas/icons/pin_red" ), tr( "Convert to pin" ), this, &KadasCanvasContextMenu::createPinFromMarker );
+    }
     addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, &KadasCanvasContextMenu::editItem );
     addSeparator();
     addAction( QgsApplication::getThemeIcon( "/mActionDeleteSelected.svg" ), tr( "Delete" ), this, &KadasCanvasContextMenu::deleteAnnotationItem );
@@ -271,6 +288,62 @@ void KadasCanvasContextMenu::deleteAnnotationItem()
   if ( !mPickResult.annotationLayer || mPickResult.annotationItemId.isEmpty() )
     return;
   mPickResult.annotationLayer->removeItem( mPickResult.annotationItemId );
+  mPickResult.annotationLayer->triggerRepaint();
+}
+
+void KadasCanvasContextMenu::copyAnnotationItemPosition()
+{
+  QgsAnnotationItem *item = mPickResult.annotationLayer ? mPickResult.annotationLayer->item( mPickResult.annotationItemId ) : nullptr;
+  auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item );
+  if ( !marker )
+    return;
+  const QgsCoordinateReferenceSystem mapCrs = mCanvas->mapSettings().destinationCrs();
+  const QgsPointXY mapPos = QgsCoordinateTransform( mPickResult.annotationLayer->crs(), mapCrs, QgsProject::instance() ).transform( marker->geometry() );
+  QString posStr = KadasCoordinateFormat::instance()->getDisplayString( mapPos, mapCrs );
+  if ( posStr.isEmpty() )
+  {
+    posStr = QString( "%1 (%2)" ).arg( mapPos.toString() ).arg( mapCrs.authid() );
+  }
+  const QString text = QString( "%1\n%2" ).arg( posStr ).arg( KadasCoordinateFormat::instance()->getHeightAtPos( mapPos, mapCrs ) );
+  QApplication::clipboard()->setText( text );
+}
+
+void KadasCanvasContextMenu::createWaypointFromPin()
+{
+  QgsAnnotationItem *item = mPickResult.annotationLayer ? mPickResult.annotationLayer->item( mPickResult.annotationItemId ) : nullptr;
+  auto *pin = dynamic_cast<KadasPinAnnotationItem *>( item );
+  if ( !pin )
+    return;
+  QgsAnnotationLayer *target = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::RoutesLayer );
+  if ( !target )
+    return;
+
+  const QgsPointXY targetPos = QgsCoordinateTransform( mPickResult.annotationLayer->crs(), target->crs(), QgsProject::instance()->transformContext() ).transform( pin->geometry() );
+  auto *waypoint = new KadasGpxWaypointAnnotationItem( QgsPoint( targetPos ) );
+  waypoint->setName( pin->name() );
+  target->addItem( waypoint );
+  mPickResult.annotationLayer->removeItem( mPickResult.annotationItemId );
+  target->triggerRepaint();
+  mPickResult.annotationLayer->triggerRepaint();
+}
+
+void KadasCanvasContextMenu::createPinFromMarker()
+{
+  QgsAnnotationItem *item = mPickResult.annotationLayer ? mPickResult.annotationLayer->item( mPickResult.annotationItemId ) : nullptr;
+  auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item );
+  if ( !marker )
+    return;
+  QgsAnnotationLayer *target = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::PinsLayer );
+  if ( !target )
+    return;
+
+  const QgsPointXY targetPos = QgsCoordinateTransform( mPickResult.annotationLayer->crs(), target->crs(), QgsProject::instance()->transformContext() ).transform( marker->geometry() );
+  auto *pin = new KadasPinAnnotationItem( QgsPoint( targetPos ) );
+  if ( auto *waypoint = dynamic_cast<KadasGpxWaypointAnnotationItem *>( marker ) )
+    pin->setName( waypoint->name() );
+  target->addItem( pin );
+  mPickResult.annotationLayer->removeItem( mPickResult.annotationItemId );
+  target->triggerRepaint();
   mPickResult.annotationLayer->triggerRepaint();
 }
 
