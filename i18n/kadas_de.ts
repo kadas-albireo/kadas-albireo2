@@ -4817,42 +4817,42 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
 <context>
     <name>KadasMilxClientWorker</name>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="101"/>
+        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="108"/>
         <source>Process failed to start: %1</source>
         <translation>Prozess konnte nicht gestartet werden: %1</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="108"/>
+        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="115"/>
         <source>Could not determine process port</source>
         <translation>Port des Prozesses konnte nicht ermittelt werden</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="188"/>
+        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="195"/>
         <source>Connection failed</source>
         <translation>Verbindungsfehler</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="239"/>
+        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="246"/>
         <source>Unexpected reply</source>
         <translation>Unerwartete Antwort</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="256"/>
+        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="263"/>
         <source>Connection closed</source>
         <translation>Verbindung geschlossen</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="259"/>
+        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="266"/>
         <source>Could not find specified host</source>
         <translation>Der angegebene Host konnte nicht gefunden werden</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="262"/>
+        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="269"/>
         <source>Connection refused</source>
         <translation>Verbindung verwerigert</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="265"/>
+        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="272"/>
         <source>An error occured: %1</source>
         <translation>Ein Fehler ist aufgetreten: %1</translation>
     </message>
