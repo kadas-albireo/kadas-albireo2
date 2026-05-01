@@ -30,6 +30,7 @@ class QNetworkRequest;
 class QTemporaryDir;
 
 class QStackedWidget;
+class QgsAnnotationLayer;
 class QgsLayerTreeGroup;
 class QgsMapLayer;
 class QgsMapLayerConfigWidgetFactory;
@@ -79,7 +80,7 @@ class KadasApplication : public QgsApplication
     void addRasterLayers( const QStringList &layerUris, bool quiet = false ) const;
     QgsVectorTileLayer *addVectorTileLayer( const QString &url, const QString &baseName, bool quiet = false, bool forceUpdateUriSources = true );
     QgsPointCloudLayer *addPointCloudLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false );
-    QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> addImageItem( const QString &filename ) const;
+    QPair<QString, QgsAnnotationLayer *> addImageItem( const QString &filename ) const;
     KadasItemLayer *selectPasteTargetItemLayer( const QList<KadasMapItem *> &items );
     bool askUserForDatumTransform( const QgsCoordinateReferenceSystem &sourceCrs, const QgsCoordinateReferenceSystem &destinationCrs, const QgsMapLayer *layer );
     bool checkTasksDependOnProject();

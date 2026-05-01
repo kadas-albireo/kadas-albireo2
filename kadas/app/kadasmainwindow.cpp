@@ -56,6 +56,7 @@
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateannotationitem.h"
+#include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 #include "kadas/gui/kadasmapcanvasitem.h"
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/kadasprojecttemplateselectiondialog.h"
@@ -619,8 +620,7 @@ void KadasMainWindow::dropEvent( QDropEvent *event )
       }
       if ( addAsMapItem )
       {
-        QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> pair = kApp->addImageItem( fileName );
-        KadasItemLayerRegistry::getOrCreateItemLayer( pair.second )->addItem( pair.first );
+        kApp->addImageItem( fileName );
       }
       else
       {
@@ -1500,8 +1500,8 @@ void KadasMainWindow::addLocalPicture()
   }
   QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
 
-  QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> pair = kApp->addImageItem( filename );
-  mMapCanvas->setMapTool( new KadasMapToolEditItem( mapCanvas(), pair.first, KadasItemLayerRegistry::getOrCreateItemLayer( pair.second ) ) );
+  QPair<QString, QgsAnnotationLayer *> pair = kApp->addImageItem( filename );
+  mMapCanvas->setMapTool( new KadasMapToolEditAnnotationItem( mapCanvas(), pair.second, pair.first ) );
 }
 
 void KadasMainWindow::addRemotePicture()
@@ -1555,8 +1555,8 @@ void KadasMainWindow::addRemotePicture()
     tempfile.write( newReq.reply().content() );
     tempfile.flush();
 
-    QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> pair = kApp->addImageItem( tempfile.fileName() );
-    mMapCanvas->setMapTool( new KadasMapToolEditItem( mapCanvas(), pair.first, KadasItemLayerRegistry::getOrCreateItemLayer( pair.second ) ) );
+    QPair<QString, QgsAnnotationLayer *> pair = kApp->addImageItem( tempfile.fileName() );
+    mMapCanvas->setMapTool( new KadasMapToolEditAnnotationItem( mapCanvas(), pair.second, pair.first ) );
     break;
   }
 }
