@@ -24,7 +24,7 @@
 class QAction;
 class QToolButton;
 class KadasMainWindow;
-class KadasSymbolItem;
+class QgsRubberBand;
 
 class KadasGpsIntegration : public QObject
 {
@@ -45,7 +45,7 @@ class KadasGpsIntegration : public QObject
     QAction *mActionEnableGps = nullptr;
     QAction *mActionMoveWithGps = nullptr;
     QgsGpsConnection *mConnection = nullptr;
-    KadasSymbolItem *mMarker = nullptr;
+    QgsRubberBand *mMarker = nullptr;
     Qgis::GpsFixStatus mCurFixStatus = Qgis::GpsFixStatus::NoFix;
 
   private slots:
