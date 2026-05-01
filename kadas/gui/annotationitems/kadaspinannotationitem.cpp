@@ -21,12 +21,14 @@
 #include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgssymbollayer.h>
 
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 
 
 KadasPinAnnotationItem::KadasPinAnnotationItem( const QgsPoint &point )
   : QgsAnnotationMarkerItem( point )
 {
+  setZIndex( KadasAnnotationZIndex::Pin );
   installDefaultSymbol();
 }
 

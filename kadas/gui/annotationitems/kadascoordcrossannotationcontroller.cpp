@@ -19,6 +19,7 @@
 #include <qgis/qgsannotationmarkeritem.h>
 
 #include "kadas/gui/annotationitems/kadasannotationitemcontext.h"
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadascoordcrossannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadascoordcrossannotationitem.h"
 
@@ -44,7 +45,9 @@ QString KadasCoordCrossAnnotationController::itemName() const
 
 QgsAnnotationItem *KadasCoordCrossAnnotationController::createItem() const
 {
-  return new KadasCoordCrossAnnotationItem();
+  auto *item = new KadasCoordCrossAnnotationItem();
+  item->setZIndex( KadasAnnotationZIndex::CoordCross );
+  return item;
 }
 
 bool KadasCoordCrossAnnotationController::startPart( QgsAnnotationItem *item, const KadasMapPos &firstPoint, const KadasAnnotationItemContext &ctx )

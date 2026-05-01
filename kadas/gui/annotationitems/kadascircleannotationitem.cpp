@@ -24,6 +24,7 @@
 #include <qgis/qgspoint.h>
 #include <qgis/qgspolygon.h>
 
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadascircleannotationitem.h"
 
 
@@ -32,6 +33,7 @@ KadasCircleAnnotationItem::KadasCircleAnnotationItem( const QgsPointXY &center, 
   , mCenter( center )
   , mRingPoint( ringPoint )
 {
+  setZIndex( KadasAnnotationZIndex::Circle );
   rebuildGeometry();
 }
 

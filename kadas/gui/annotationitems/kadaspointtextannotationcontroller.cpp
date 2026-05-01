@@ -24,6 +24,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgstextformat.h>
 
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadaspointtextannotationcontroller.h"
 
 namespace
@@ -53,7 +54,9 @@ QString KadasPointTextAnnotationController::itemName() const
 
 QgsAnnotationItem *KadasPointTextAnnotationController::createItem() const
 {
-  return new QgsAnnotationPointTextItem( QString(), QgsPointXY() );
+  auto *item = new QgsAnnotationPointTextItem( QString(), QgsPointXY() );
+  item->setZIndex( KadasAnnotationZIndex::PointText );
+  return item;
 }
 
 QList<KadasMapItem::Node> KadasPointTextAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const

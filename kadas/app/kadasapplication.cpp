@@ -80,6 +80,7 @@
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontrollers.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationpictureitem.h>
 #include "kadas/gui/kadaslayerselectionwidget.h"
@@ -633,6 +634,7 @@ QPair<QString, QgsAnnotationLayer *> KadasApplication::addImageItem( const QStri
   const QgsRectangle bounds( center.x(), center.y(), center.x(), center.y() );
 
   auto *item = new QgsAnnotationPictureItem( format, attachedPath, bounds );
+  item->setZIndex( KadasAnnotationZIndex::Picture );
   item->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
   if ( isSvg )
   {
@@ -1471,6 +1473,7 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
       const QgsCoordinateTransform mapToLayer( mapCrs, layer->crs(), QgsProject::instance()->transformContext() );
       const QgsPointXY layerPos = mapToLayer.transform( pastePos );
       auto *item = new QgsAnnotationPictureItem( Qgis::PictureFormat::SVG, filename, QgsRectangle( layerPos.x(), layerPos.y(), layerPos.x(), layerPos.y() ) );
+      item->setZIndex( KadasAnnotationZIndex::Picture );
       item->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
       item->setFixedSize( QSizeF( 64, 64 ) );
       item->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
@@ -1490,6 +1493,7 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
       const QgsCoordinateTransform mapToLayer( mapCrs, layer->crs(), QgsProject::instance()->transformContext() );
       const QgsPointXY layerPos = mapToLayer.transform( pastePos );
       auto *item = new QgsAnnotationPictureItem( Qgis::PictureFormat::Raster, filename, QgsRectangle( layerPos.x(), layerPos.y(), layerPos.x(), layerPos.y() ) );
+      item->setZIndex( KadasAnnotationZIndex::Picture );
       item->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
       item->setFixedSize( QSizeF( 100, 100 ) );
       item->setFixedSizeUnit( Qgis::RenderUnit::Millimeters );

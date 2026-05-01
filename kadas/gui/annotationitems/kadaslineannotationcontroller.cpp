@@ -25,6 +25,7 @@
 #include <qgis/qgspointxy.h>
 #include <qgis/qgsproject.h>
 
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadaslineannotationcontroller.h"
 
 namespace
@@ -71,7 +72,9 @@ QString KadasLineAnnotationController::itemName() const
 
 QgsAnnotationItem *KadasLineAnnotationController::createItem() const
 {
-  return new QgsAnnotationLineItem( new QgsLineString() );
+  auto *item = new QgsAnnotationLineItem( new QgsLineString() );
+  item->setZIndex( KadasAnnotationZIndex::Line );
+  return item;
 }
 
 QList<KadasMapItem::Node> KadasLineAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const

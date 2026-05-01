@@ -28,6 +28,7 @@
 #include <qgis/qgsrendercontext.h>
 #include <qgis/qgssymbollayerutils.h>
 
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasmarkerannotationcontroller.h"
 
 namespace
@@ -57,7 +58,9 @@ QString KadasMarkerAnnotationController::itemName() const
 
 QgsAnnotationItem *KadasMarkerAnnotationController::createItem() const
 {
-  return new QgsAnnotationMarkerItem( QgsPoint() );
+  auto *item = new QgsAnnotationMarkerItem( QgsPoint() );
+  item->setZIndex( KadasAnnotationZIndex::Marker );
+  return item;
 }
 
 QList<KadasMapItem::Node> KadasMarkerAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
