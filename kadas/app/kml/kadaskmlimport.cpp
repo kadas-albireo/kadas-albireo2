@@ -47,6 +47,7 @@
 #include <qgis/qgstextformat.h>
 
 #include "kadas/core/kadasalgorithms.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadasapplication.h"
 #include <kml/kadaskmlimport.h>
@@ -168,8 +169,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
       QgsAnnotationLayer *itemLayer = placemarkLayers.value( layerName, nullptr );
       if ( !itemLayer )
       {
-        itemLayer = new QgsAnnotationLayer( layerName, QgsAnnotationLayer::LayerOptions( QgsProject::instance()->transformContext() ) );
-        itemLayer->setCrs( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+        itemLayer = KadasAnnotationLayerHelpers::createLayer( layerName, crsWgs84 );
         QgsProject::instance()->addMapLayer( itemLayer );
         placemarkLayers.insert( layerName, itemLayer );
       }

@@ -23,6 +23,7 @@
 #include "kadas/gui/kadas_gui.h"
 
 class QgsAnnotationLayer;
+class QgsCoordinateReferenceSystem;
 
 /**
  * \ingroup gui
@@ -66,6 +67,16 @@ class KADAS_GUI_EXPORT KadasAnnotationLayerHelpers
 
     //! Returns all item ids that currently have any Kadas metadata stored on \a layer.
     static QStringList itemsWithMetadata( const QgsAnnotationLayer *layer );
+
+    /**
+     * Creates a new \c QgsAnnotationLayer named \a name. If \a preferredCrs is
+     * valid it is used as the layer CRS (so callers importing data in a
+     * known native CRS can avoid round-trip reprojection). Otherwise the
+     * current project CRS is used, falling back to EPSG:3857 if the project
+     * has no CRS. The returned layer is NOT added to the project; the
+     * caller is expected to call \c QgsProject::instance()->addMapLayer().
+     */
+    static QgsAnnotationLayer *createLayer( const QString &name, const QgsCoordinateReferenceSystem &preferredCrs = QgsCoordinateReferenceSystem() );
 
   private:
     KadasAnnotationLayerHelpers() = delete;
