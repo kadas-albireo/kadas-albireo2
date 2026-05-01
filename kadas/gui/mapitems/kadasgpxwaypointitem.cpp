@@ -23,6 +23,10 @@
 #include <qgis/qgstextrenderer.h>
 #include <qgis/qgssymbollayerutils.h>
 
+#include <qgis/qgscoordinatetransform.h>
+
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
+#include "kadas/gui/annotationitems/kadasgpxwaypointannotationitem.h"
 #include "kadas/gui/mapitems/kadasgpxwaypointitem.h"
 
 
@@ -170,4 +174,21 @@ QString KadasGpxWaypointItem::asKml( const QgsRenderContext &context, QuaZip *km
   outStream << "</Placemark>\n";
   outStream.flush();
   return outString;
+}
+
+QgsAnnotationMarkerItem *KadasGpxWaypointItem::annotationItem( const QgsCoordinateReferenceSystem &crs ) const
+{
+  QgsPoint point( position().x(), position().y() );
+  if ( crs.isValid() && mCrs != crs )
+  {
+    QgsCoordinateTransform ct( mCrs, crs, QgsProject::instance() );
+    QgsPointXY xy = ct.transform( point.x(), point.y() );
+    point = QgsPoint( xy );
+  }
+  auto *anno = new KadasGpxWaypointAnnotationItem( point );
+  anno->setName( mName );
+  anno->setLabelFont( mLabelFont );
+  anno->setLabelColor( mLabelColor );
+  anno->setZIndex( zIndex() ? zIndex() : KadasAnnotationZIndex::GpxWaypoint );
+  return anno;
 }

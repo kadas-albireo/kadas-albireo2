@@ -47,6 +47,8 @@ class KADAS_GUI_EXPORT KadasGpxWaypointItem : public KadasPointItem
     QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
 #endif
 
+    QgsAnnotationMarkerItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const override SIP_FACTORY;
+
   protected:
     KadasMapItem *_clone() const override SIP_FACTORY { return new KadasGpxWaypointItem(); }
 
