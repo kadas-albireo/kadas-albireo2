@@ -63,6 +63,8 @@ class KADAS_GUI_EXPORT KadasLineItem : public KadasGeometryItem
     void addPartFromGeometry( const QgsAbstractGeometry &geom ) override;
     const QgsMultiLineString *geometry() const;
 
+    QList<QgsAnnotationItem *> annotationItems( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const override SIP_FACTORY;
+
     enum class MeasurementMode SIP_MONKEYPATCH_SCOPEENUM
     {
       MeasureLineAndSegments,

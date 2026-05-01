@@ -20,6 +20,7 @@
 #include <QScreen>
 
 #include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgsannotationitem.h>
 #include <qgis/qgslogger.h>
 #include <qgis/qgsmaplayer.h>
 #include <qgis/qgsmapsettings.h>
@@ -167,6 +168,14 @@ bool KadasMapItem::deserialize( const QJsonObject &json )
 QString KadasMapItem::exportName() const
 {
   return itemName();
+}
+
+QList<QgsAnnotationItem *> KadasMapItem::annotationItems( const QgsCoordinateReferenceSystem &crs ) const
+{
+  QList<QgsAnnotationItem *> items;
+  if ( QgsAnnotationItem *single = annotationItem( crs ) )
+    items.append( single );
+  return items;
 }
 
 void KadasMapItem::associateToLayer( QgsMapLayer *layer )

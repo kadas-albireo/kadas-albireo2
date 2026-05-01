@@ -28,6 +28,13 @@
 #include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
 
+#include <qgis/qgsannotationlineitem.h>
+#include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgslinesymbol.h>
+#include <qgis/qgslinesymbollayer.h>
+#include <qgis/qgssymbollayer.h>
+
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/mapitems/kadaslineitem.h"
 
 
@@ -343,6 +350,38 @@ const QgsMultiLineString *KadasLineItem::geometry() const
 QgsMultiLineString *KadasLineItem::geometry()
 {
   return static_cast<QgsMultiLineString *>( mGeometry );
+}
+
+QList<QgsAnnotationItem *> KadasLineItem::annotationItems( const QgsCoordinateReferenceSystem &crs ) const
+{
+  QList<QgsAnnotationItem *> items;
+  const QgsMultiLineString *mls = geometry();
+  if ( !mls || mls->isEmpty() )
+    return items;
+
+  std::unique_ptr<QgsMultiLineString> clone( mls->clone() );
+  if ( crs.isValid() && mCrs != crs )
+  {
+    QgsCoordinateTransform ct( mCrs, crs, QgsProject::instance() );
+    clone->transform( ct );
+  }
+
+  auto makeSymbol = [&]() {
+    auto *layer = new QgsSimpleLineSymbolLayer( mPen.color(), mPen.widthF(), mPen.style() );
+    layer->setWidthUnit( Qgis::RenderUnit::Pixels );
+    return new QgsLineSymbol( QgsSymbolLayerList() << layer );
+  };
+
+  const int z = zIndex() ? zIndex() : KadasAnnotationZIndex::Line;
+  for ( int i = 0, n = clone->numGeometries(); i < n; ++i )
+  {
+    const auto *ls = static_cast<const QgsLineString *>( clone->geometryN( i ) );
+    auto *anno = new QgsAnnotationLineItem( ls->clone() );
+    anno->setSymbol( makeSymbol() );
+    anno->setZIndex( z );
+    items.append( anno );
+  }
+  return items;
 }
 
 void KadasLineItem::setMeasurementMode( MeasurementMode measurementMode, Qgis::AngleUnit angleUnit )
