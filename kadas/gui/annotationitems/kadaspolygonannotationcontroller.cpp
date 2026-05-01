@@ -27,6 +27,7 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadaspolygonannotationcontroller.h"
 
 namespace
@@ -75,7 +76,9 @@ QgsAnnotationItem *KadasPolygonAnnotationController::createItem() const
 {
   auto poly = new QgsPolygon();
   poly->setExteriorRing( new QgsLineString() );
-  return new QgsAnnotationPolygonItem( poly );
+  auto *item = new QgsAnnotationPolygonItem( poly );
+  item->setZIndex( KadasAnnotationZIndex::Polygon );
+  return item;
 }
 
 QList<KadasMapItem::Node> KadasPolygonAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const

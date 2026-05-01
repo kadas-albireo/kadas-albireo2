@@ -22,6 +22,7 @@
 #include <qgis/qgspoint.h>
 #include <qgis/qgspolygon.h>
 
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasrectangleannotationitem.h"
 
 
@@ -31,6 +32,7 @@ KadasRectangleAnnotationItem::KadasRectangleAnnotationItem( const QgsPointXY &ce
   , mSize( size )
   , mAngle( angleDegrees )
 {
+  setZIndex( KadasAnnotationZIndex::Rectangle );
   rebuildGeometry();
 }
 

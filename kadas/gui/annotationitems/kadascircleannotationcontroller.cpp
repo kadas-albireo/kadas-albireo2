@@ -23,6 +23,7 @@
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsproject.h>
 
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadascircleannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadascircleannotationitem.h"
 
@@ -53,7 +54,9 @@ QString KadasCircleAnnotationController::itemName() const
 
 QgsAnnotationItem *KadasCircleAnnotationController::createItem() const
 {
-  return new KadasCircleAnnotationItem();
+  auto *item = new KadasCircleAnnotationItem();
+  item->setZIndex( KadasAnnotationZIndex::Circle );
+  return item;
 }
 
 QList<KadasMapItem::Node> KadasCircleAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const

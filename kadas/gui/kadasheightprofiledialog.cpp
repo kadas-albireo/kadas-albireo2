@@ -59,6 +59,7 @@
 #include "kadas/gui/kadasclipboardutils.h"
 #endif
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/mapitems/kadaslineitem.h"
 #include <qgis/qgsannotationlayer.h>
@@ -859,6 +860,7 @@ void KadasHeightProfileDialog::addToCanvas()
   const QgsRectangle bounds( center.x(), center.y(), center.x(), center.y() );
 
   auto *item = new QgsAnnotationPictureItem( Qgis::PictureFormat::Raster, filename, bounds );
+  item->setZIndex( KadasAnnotationZIndex::Picture );
   item->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
   const double widthMm = 80.0;
   const double aspect = image.height() > 0 ? static_cast<double>( image.width() ) / image.height() : 1.0;

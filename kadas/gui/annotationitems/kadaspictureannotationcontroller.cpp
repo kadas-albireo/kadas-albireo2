@@ -28,6 +28,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrectangle.h>
 
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadaspictureannotationcontroller.h"
 
 namespace
@@ -85,6 +86,7 @@ QgsAnnotationItem *KadasPictureAnnotationController::createItem() const
   // Default 200x150 pixel picture frame placed at the origin; the actual
   // anchor is set by startPart().
   auto *item = new QgsAnnotationPictureItem( Qgis::PictureFormat::Unknown, QString(), QgsRectangle( 0, 0, 0, 0 ) );
+  item->setZIndex( KadasAnnotationZIndex::Picture );
   item->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
   item->setFixedSize( QSizeF( 200, 150 ) );
   item->setFixedSizeUnit( Qgis::RenderUnit::Pixels );

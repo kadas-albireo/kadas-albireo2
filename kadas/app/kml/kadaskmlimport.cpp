@@ -47,6 +47,7 @@
 #include <qgis/qgstextformat.h>
 
 #include "kadas/core/kadasalgorithms.h"
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadasapplication.h"
 #include <kml/kadaskmlimport.h>
 
@@ -210,6 +211,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
         // Hot-spot anchoring is not modelled by QgsAnnotationPictureItem; centre on the placemark with a fixed pixel size.
         item->setFixedSize( QSizeF( 32, 32 ) );
         item->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
+        item->setZIndex( KadasAnnotationZIndex::Picture + iPlacemark );
         itemLayer->addItem( item );
         delete geoms.front();
       }
@@ -246,12 +248,14 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
             fmt.setColor( style.labelColor );
             fmt.setSize( fmt.size() * style.labelScale );
             item->setFormat( fmt );
+            item->setZIndex( KadasAnnotationZIndex::PointText + iPlacemark );
             itemLayer->addItem( item );
           }
           else if ( const auto *pt = dynamic_cast<const QgsPoint *>( geom ) )
           {
             auto *item = new QgsAnnotationMarkerItem( *pt );
             item->setSymbol( makeMarkerSymbol() );
+            item->setZIndex( KadasAnnotationZIndex::Marker + iPlacemark );
             itemLayer->addItem( item );
           }
           else if ( const auto *mp = dynamic_cast<const QgsMultiPoint *>( geom ) )
@@ -261,6 +265,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
               const auto *pt = static_cast<const QgsPoint *>( mp->geometryN( i ) );
               auto *item = new QgsAnnotationMarkerItem( *pt );
               item->setSymbol( makeMarkerSymbol() );
+              item->setZIndex( KadasAnnotationZIndex::Marker + iPlacemark );
               itemLayer->addItem( item );
             }
           }
@@ -268,6 +273,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
           {
             auto *item = new QgsAnnotationLineItem( ls->clone() );
             item->setSymbol( makeLineSymbol() );
+            item->setZIndex( KadasAnnotationZIndex::Line + iPlacemark );
             itemLayer->addItem( item );
           }
           else if ( const auto *mls = dynamic_cast<const QgsMultiLineString *>( geom ) )
@@ -276,6 +282,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
             {
               auto *item = new QgsAnnotationLineItem( static_cast<const QgsLineString *>( mls->geometryN( i ) )->clone() );
               item->setSymbol( makeLineSymbol() );
+              item->setZIndex( KadasAnnotationZIndex::Line + iPlacemark );
               itemLayer->addItem( item );
             }
           }
@@ -283,6 +290,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
           {
             auto *item = new QgsAnnotationPolygonItem( static_cast<QgsCurvePolygon *>( poly->clone() ) );
             item->setSymbol( makeFillSymbol() );
+            item->setZIndex( KadasAnnotationZIndex::Polygon + iPlacemark );
             itemLayer->addItem( item );
           }
           else if ( const auto *mpoly = dynamic_cast<const QgsMultiPolygon *>( geom ) )
@@ -291,6 +299,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
             {
               auto *item = new QgsAnnotationPolygonItem( static_cast<QgsCurvePolygon *>( mpoly->geometryN( i )->clone() ) );
               item->setSymbol( makeFillSymbol() );
+              item->setZIndex( KadasAnnotationZIndex::Polygon + iPlacemark );
               itemLayer->addItem( item );
             }
           }
