@@ -22,8 +22,6 @@
 
 #include <qgis/qgsmessagebaritem.h>
 
-#include "kadas/gui/kadasmapiteminterface.h"
-
 
 #include "ui_kadaswindowbase.h"
 #include "ui_kadastopwidget.h"
@@ -45,14 +43,6 @@ class KadasProjectTemplateSelectionDialog;
 class KadasPluginManager;
 class KadasRedliningIntegration;
 class KadasTemporalController;
-
-
-class KadasSymbolAttributesEditorInterface : public KadasMapItemInterface
-{
-  public:
-    KadasSymbolAttributesEditorInterface() = default;
-    KadasMapItem *createItem() const override;
-};
 
 
 class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private Ui::KadasTopWidget, private Ui::KadasStatusWidget
