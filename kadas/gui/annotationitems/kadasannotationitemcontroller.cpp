@@ -24,13 +24,13 @@
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 
 
-void KadasAnnotationItemController::populateContextMenu( QgsAnnotationItem *, QMenu *, const KadasMapItem::EditContext &, const KadasMapPos &, const KadasAnnotationItemContext & )
+void KadasAnnotationItemController::populateContextMenu( QgsAnnotationItem *, QMenu *, const KadasMapItem::EditContext &, const QgsPointXY &, const KadasAnnotationItemContext & )
 {}
 
 void KadasAnnotationItemController::onDoubleClick( QgsAnnotationItem *, const KadasAnnotationItemContext & )
 {}
 
-bool KadasAnnotationItemController::hitTest( const QgsAnnotationItem *item, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx ) const
+bool KadasAnnotationItemController::hitTest( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
 {
   if ( !item )
     return false;
@@ -39,14 +39,14 @@ bool KadasAnnotationItemController::hitTest( const QgsAnnotationItem *item, cons
   return toMapRect( item->boundingBox(), ctx ).contains( pos );
 }
 
-QPair<KadasMapPos, double> KadasAnnotationItemController::closestPoint( const QgsAnnotationItem *item, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx ) const
+QPair<QgsPointXY, double> KadasAnnotationItemController::closestPoint( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
 {
   if ( !item )
     return { pos, std::numeric_limits<double>::max() };
   // Fallback: report the bounding-box center (in map space). Subclasses should override.
   const QgsPointXY centerItem = item->boundingBox().center();
   const QgsPointXY centerMap = toMapPos( centerItem, ctx );
-  const KadasMapPos cp( centerMap.x(), centerMap.y() );
+  const QgsPointXY cp( centerMap.x(), centerMap.y() );
   return { cp, std::hypot( cp.x() - pos.x(), cp.y() - pos.y() ) };
 }
 
@@ -61,21 +61,15 @@ bool KadasAnnotationItemController::intersects( const QgsAnnotationItem *item, c
 
 // ----- Transform helpers ---------------------------------------------------
 
-KadasMapPos KadasAnnotationItemController::toMapPos( const KadasItemPos &itemPos, const KadasAnnotationItemContext &ctx )
-{
-  const QgsPointXY p = QgsCoordinateTransform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() ).transform( itemPos );
-  return KadasMapPos( p.x(), p.y() );
-}
-
 QgsPointXY KadasAnnotationItemController::toMapPos( const QgsPointXY &itemPos, const KadasAnnotationItemContext &ctx )
 {
   return QgsCoordinateTransform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() ).transform( itemPos );
 }
 
-KadasItemPos KadasAnnotationItemController::toItemPos( const KadasMapPos &mapPos, const KadasAnnotationItemContext &ctx )
+QgsPointXY KadasAnnotationItemController::toItemPos( const QgsPointXY &mapPos, const KadasAnnotationItemContext &ctx )
 {
   const QgsPointXY p = QgsCoordinateTransform( ctx.mapSettings().destinationCrs(), ctx.itemCrs(), ctx.mapSettings().transformContext() ).transform( mapPos );
-  return KadasItemPos( p.x(), p.y() );
+  return QgsPointXY( p.x(), p.y() );
 }
 
 QgsRectangle KadasAnnotationItemController::toItemRect( const QgsRectangle &mapRect, const KadasAnnotationItemContext &ctx )

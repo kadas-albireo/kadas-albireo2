@@ -40,29 +40,29 @@ class KADAS_GUI_EXPORT KadasCircleAnnotationController : public KadasAnnotationI
 
     QList<KadasMapItem::Node> nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const override;
 
-    bool startPart( QgsAnnotationItem *item, const KadasMapPos &firstPoint, const KadasAnnotationItemContext &ctx ) override;
+    bool startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx ) override;
     bool startPart( QgsAnnotationItem *item, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx ) override;
-    void setCurrentPoint( QgsAnnotationItem *item, const KadasMapPos &p, const KadasAnnotationItemContext &ctx ) override;
+    void setCurrentPoint( QgsAnnotationItem *item, const QgsPointXY &p, const KadasAnnotationItemContext &ctx ) override;
     void setCurrentAttributes( QgsAnnotationItem *item, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx ) override;
     bool continuePart( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) override;
     void endPart( QgsAnnotationItem *item ) override;
 
     KadasMapItem::AttribDefs drawAttribs() const override;
-    KadasMapItem::AttribValues drawAttribsFromPosition( const QgsAnnotationItem *item, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx ) const override;
-    KadasMapPos positionFromDrawAttribs( const QgsAnnotationItem *item, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx ) const override;
+    KadasMapItem::AttribValues drawAttribsFromPosition( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const override;
+    QgsPointXY positionFromDrawAttribs( const QgsAnnotationItem *item, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx ) const override;
 
-    KadasMapItem::EditContext getEditContext( const QgsAnnotationItem *item, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx ) const override;
-    void edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapPos &newPoint, const KadasAnnotationItemContext &ctx ) override;
+    KadasMapItem::EditContext getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const override;
+    void edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx ) override;
     void edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx ) override;
     KadasMapItem::AttribValues editAttribsFromPosition(
-      const QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx
+      const QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx
     ) const override;
-    KadasMapPos positionFromEditAttribs(
+    QgsPointXY positionFromEditAttribs(
       const QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx
     ) const override;
 
-    KadasItemPos position( const QgsAnnotationItem *item ) const override;
-    void setPosition( QgsAnnotationItem *item, const KadasItemPos &pos ) override;
+    QgsPointXY position( const QgsAnnotationItem *item ) const override;
+    void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos ) override;
     void translate( QgsAnnotationItem *item, double dx, double dy ) override;
 
     QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = nullptr ) const override;

@@ -26,9 +26,9 @@
 
 namespace
 {
-  inline KadasItemPos roundToKilometre( const KadasItemPos &p )
+  inline QgsPointXY roundToKilometre( const QgsPointXY &p )
   {
-    return KadasItemPos( std::round( p.x() / 1000.0 ) * 1000.0, std::round( p.y() / 1000.0 ) * 1000.0 );
+    return QgsPointXY( std::round( p.x() / 1000.0 ) * 1000.0, std::round( p.y() / 1000.0 ) * 1000.0 );
   }
 } // namespace
 
@@ -50,27 +50,27 @@ QgsAnnotationItem *KadasCoordCrossAnnotationController::createItem() const
   return item;
 }
 
-bool KadasCoordCrossAnnotationController::startPart( QgsAnnotationItem *item, const KadasMapPos &firstPoint, const KadasAnnotationItemContext &ctx )
+bool KadasCoordCrossAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
 {
-  const KadasItemPos itemPos = roundToKilometre( toItemPos( firstPoint, ctx ) );
+  const QgsPointXY itemPos = roundToKilometre( toItemPos( firstPoint, ctx ) );
   if ( auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item ) )
     marker->setGeometry( QgsPoint( itemPos.x(), itemPos.y() ) );
   // CoordCross is finalized on the very first click.
   return false;
 }
 
-void KadasCoordCrossAnnotationController::setPosition( QgsAnnotationItem *item, const KadasItemPos &pos )
+void KadasCoordCrossAnnotationController::setPosition( QgsAnnotationItem *item, const QgsPointXY &pos )
 {
   KadasMarkerAnnotationController::setPosition( item, roundToKilometre( pos ) );
 }
 
-void KadasCoordCrossAnnotationController::edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapPos &newPoint, const KadasAnnotationItemContext &ctx )
+void KadasCoordCrossAnnotationController::edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
   // When dragging the single vertex, snap the resulting position to a km grid.
   KadasMarkerAnnotationController::edit( item, editContext, newPoint, ctx );
   if ( auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item ) )
   {
-    const KadasItemPos snapped = roundToKilometre( KadasItemPos( marker->geometry().x(), marker->geometry().y() ) );
+    const QgsPointXY snapped = roundToKilometre( QgsPointXY( marker->geometry().x(), marker->geometry().y() ) );
     marker->setGeometry( QgsPoint( snapped.x(), snapped.y() ) );
   }
 }

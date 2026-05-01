@@ -64,14 +64,14 @@ QList<KadasMapItem::Node> KadasRectangleAnnotationController::nodes( const QgsAn
   const KadasRectangleAnnotationItem *rect = asRect( item );
   QList<KadasMapItem::Node> result;
   for ( const QgsPointXY &c : rect->corners() )
-    result.append( { toMapPos( KadasItemPos::fromPoint( c ), ctx ) } );
-  result.append( { toMapPos( KadasItemPos::fromPoint( rect->rotationHandle() ), ctx ) } );
+    result.append( { toMapPos( c, ctx ) } );
+  result.append( { toMapPos( rect->rotationHandle(), ctx ) } );
   return result;
 }
 
-bool KadasRectangleAnnotationController::startPart( QgsAnnotationItem *item, const KadasMapPos &firstPoint, const KadasAnnotationItemContext &ctx )
+bool KadasRectangleAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
 {
-  const KadasItemPos ip = toItemPos( firstPoint, ctx );
+  const QgsPointXY ip = toItemPos( firstPoint, ctx );
   // Center starts at the click; size is zero. Angle stays at 0 during draw.
   asRect( item )->setBox( QgsPointXY( ip.x(), ip.y() ), QSizeF( 0, 0 ), 0.0 );
   return true;
@@ -79,10 +79,10 @@ bool KadasRectangleAnnotationController::startPart( QgsAnnotationItem *item, con
 
 bool KadasRectangleAnnotationController::startPart( QgsAnnotationItem *item, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx )
 {
-  return startPart( item, KadasMapPos( values[AttrX], values[AttrY] ), ctx );
+  return startPart( item, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
 
-void KadasRectangleAnnotationController::setCurrentPoint( QgsAnnotationItem *item, const KadasMapPos &p, const KadasAnnotationItemContext &ctx )
+void KadasRectangleAnnotationController::setCurrentPoint( QgsAnnotationItem *item, const QgsPointXY &p, const KadasAnnotationItemContext &ctx )
 {
   // While drawing, treat the rubber-band point as the opposite corner of an
   // axis-aligned rectangle in item CRS. The center moves to the midpoint.
@@ -91,7 +91,7 @@ void KadasRectangleAnnotationController::setCurrentPoint( QgsAnnotationItem *ite
   const QgsPointXY initialCorner( anchor.x(), anchor.y() );
   Q_UNUSED( initialCorner );
 
-  const KadasItemPos cur = toItemPos( p, ctx );
+  const QgsPointXY cur = toItemPos( p, ctx );
 
   // Recover the original anchor: if size==(0,0) the anchor IS the center.
   // Once the size grows we still keep the original anchor tracked via the BL
@@ -125,7 +125,7 @@ void KadasRectangleAnnotationController::setCurrentPoint( QgsAnnotationItem *ite
 
 void KadasRectangleAnnotationController::setCurrentAttributes( QgsAnnotationItem *item, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx )
 {
-  setCurrentPoint( item, KadasMapPos( values[AttrX], values[AttrY] ), ctx );
+  setCurrentPoint( item, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
 
 bool KadasRectangleAnnotationController::continuePart( QgsAnnotationItem *, const KadasAnnotationItemContext & )
@@ -145,7 +145,7 @@ KadasMapItem::AttribDefs KadasRectangleAnnotationController::drawAttribs() const
   return attributes;
 }
 
-KadasMapItem::AttribValues KadasRectangleAnnotationController::drawAttribsFromPosition( const QgsAnnotationItem *, const KadasMapPos &pos, const KadasAnnotationItemContext & ) const
+KadasMapItem::AttribValues KadasRectangleAnnotationController::drawAttribsFromPosition( const QgsAnnotationItem *, const QgsPointXY &pos, const KadasAnnotationItemContext & ) const
 {
   KadasMapItem::AttribValues values;
   values.insert( AttrX, pos.x() );
@@ -153,37 +153,37 @@ KadasMapItem::AttribValues KadasRectangleAnnotationController::drawAttribsFromPo
   return values;
 }
 
-KadasMapPos KadasRectangleAnnotationController::positionFromDrawAttribs( const QgsAnnotationItem *, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext & ) const
+QgsPointXY KadasRectangleAnnotationController::positionFromDrawAttribs( const QgsAnnotationItem *, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext & ) const
 {
-  return KadasMapPos( values[AttrX], values[AttrY] );
+  return QgsPointXY( values[AttrX], values[AttrY] );
 }
 
-KadasMapItem::EditContext KadasRectangleAnnotationController::getEditContext( const QgsAnnotationItem *item, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx ) const
+KadasMapItem::EditContext KadasRectangleAnnotationController::getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
 {
   const KadasRectangleAnnotationItem *rect = asRect( item );
   const auto cs = rect->corners();
   for ( int i = 0; i < cs.size(); ++i )
   {
-    const KadasMapPos mp = toMapPos( KadasItemPos::fromPoint( cs[i] ), ctx );
+    const QgsPointXY mp = toMapPos( cs[i], ctx );
     if ( pos.sqrDist( mp ) < pickTolSqr( ctx ) )
       return KadasMapItem::EditContext( QgsVertexId( 0, 0, i ), mp, drawAttribs() );
   }
-  const KadasMapPos rotMap = toMapPos( KadasItemPos::fromPoint( rect->rotationHandle() ), ctx );
+  const QgsPointXY rotMap = toMapPos( rect->rotationHandle(), ctx );
   if ( pos.sqrDist( rotMap ) < pickTolSqr( ctx ) )
     return KadasMapItem::EditContext( QgsVertexId( 0, 0, RotationHandleVertex ), rotMap, drawAttribs(), Qt::CrossCursor );
 
   if ( toMapRect( rect->boundingBox(), ctx ).contains( pos ) )
   {
-    const KadasMapPos centerMap = toMapPos( KadasItemPos::fromPoint( rect->center() ), ctx );
+    const QgsPointXY centerMap = toMapPos( rect->center(), ctx );
     return KadasMapItem::EditContext( QgsVertexId(), centerMap, KadasMapItem::AttribDefs(), Qt::ArrowCursor );
   }
   return KadasMapItem::EditContext();
 }
 
-void KadasRectangleAnnotationController::edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapPos &newPoint, const KadasAnnotationItemContext &ctx )
+void KadasRectangleAnnotationController::edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
   KadasRectangleAnnotationItem *rect = asRect( item );
-  const KadasItemPos newIp = toItemPos( newPoint, ctx );
+  const QgsPointXY newIp = toItemPos( newPoint, ctx );
 
   const int v = editContext.vidx.vertex;
 
@@ -235,39 +235,39 @@ void KadasRectangleAnnotationController::edit( QgsAnnotationItem *item, const Ka
   }
 
   // Whole-item move via map-space delta on the center.
-  const KadasMapPos oldCenterMap = toMapPos( KadasItemPos::fromPoint( rect->center() ), ctx );
+  const QgsPointXY oldCenterMap = toMapPos( rect->center(), ctx );
   const double dxMap = newPoint.x() - oldCenterMap.x();
   const double dyMap = newPoint.y() - oldCenterMap.y();
-  const KadasMapPos newCenterMap( oldCenterMap.x() + dxMap, oldCenterMap.y() + dyMap );
-  const KadasItemPos newCenterIp = toItemPos( newCenterMap, ctx );
+  const QgsPointXY newCenterMap( oldCenterMap.x() + dxMap, oldCenterMap.y() + dyMap );
+  const QgsPointXY newCenterIp = toItemPos( newCenterMap, ctx );
   rect->setCenter( QgsPointXY( newCenterIp.x(), newCenterIp.y() ) );
 }
 
 void KadasRectangleAnnotationController::edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx )
 {
-  edit( item, editContext, KadasMapPos( values[AttrX], values[AttrY] ), ctx );
+  edit( item, editContext, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
 
 KadasMapItem::AttribValues KadasRectangleAnnotationController::editAttribsFromPosition(
-  const QgsAnnotationItem *item, const KadasMapItem::EditContext &, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx
+  const QgsAnnotationItem *item, const KadasMapItem::EditContext &, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx
 ) const
 {
   return drawAttribsFromPosition( item, pos, ctx );
 }
 
-KadasMapPos KadasRectangleAnnotationController::positionFromEditAttribs(
+QgsPointXY KadasRectangleAnnotationController::positionFromEditAttribs(
   const QgsAnnotationItem *item, const KadasMapItem::EditContext &, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx
 ) const
 {
   return positionFromDrawAttribs( item, values, ctx );
 }
 
-KadasItemPos KadasRectangleAnnotationController::position( const QgsAnnotationItem *item ) const
+QgsPointXY KadasRectangleAnnotationController::position( const QgsAnnotationItem *item ) const
 {
-  return KadasItemPos::fromPoint( asRect( item )->center() );
+  return asRect( item )->center();
 }
 
-void KadasRectangleAnnotationController::setPosition( QgsAnnotationItem *item, const KadasItemPos &pos )
+void KadasRectangleAnnotationController::setPosition( QgsAnnotationItem *item, const QgsPointXY &pos )
 {
   asRect( item )->setCenter( QgsPointXY( pos.x(), pos.y() ) );
 }

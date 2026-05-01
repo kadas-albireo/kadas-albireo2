@@ -49,6 +49,10 @@ class KADAS_GUI_EXPORT KadasMapPos
       : mX( x )
       , mY( y )
     {}
+    KadasMapPos( const QgsPointXY &p )
+      : mX( p.x() )
+      , mY( p.y() )
+    {}
     double x() const { return mX; }
     void setX( double x ) { mX = x; }
     double y() const { return mY; }
@@ -113,6 +117,12 @@ class KADAS_GUI_EXPORT KadasItemPos
       : mX( x )
       , mY( y )
       , mZ( z )
+    {}
+
+    KadasItemPos( const QgsPointXY &p )
+      : mX( p.x() )
+      , mY( p.y() )
+      , mZ( std::numeric_limits<double>::quiet_NaN() )
     {}
 
     bool operator==( const KadasItemPos &other ) const SIP_SKIP { return mX == other.mX && mY == other.mY && hasZ() == other.hasZ() && ( !hasZ() || mZ == other.mZ ); }

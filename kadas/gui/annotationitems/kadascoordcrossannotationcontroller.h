@@ -40,9 +40,9 @@ class KADAS_GUI_EXPORT KadasCoordCrossAnnotationController : public KadasMarkerA
     QString itemName() const override;
     QgsAnnotationItem *createItem() const override;
 
-    bool startPart( QgsAnnotationItem *item, const KadasMapPos &firstPoint, const KadasAnnotationItemContext &ctx ) override;
-    void setPosition( QgsAnnotationItem *item, const KadasItemPos &pos ) override;
-    void edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapPos &newPoint, const KadasAnnotationItemContext &ctx ) override;
+    bool startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx ) override;
+    void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos ) override;
+    void edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx ) override;
 };
 
 #endif // KADASCOORDCROSSANNOTATIONCONTROLLER_H

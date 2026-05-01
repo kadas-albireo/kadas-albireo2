@@ -139,13 +139,13 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
   }
 
   KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
-  const KadasMapPos pos = KadasMapPos::fromPoint( e->mapPoint() );
+  const QgsPointXY pos = e->mapPoint();
 
   if ( e->buttons() == Qt::LeftButton )
   {
     if ( mEditContext.isValid() )
     {
-      const KadasMapPos adjusted( pos.x() - mMoveOffset.x(), pos.y() - mMoveOffset.y() );
+      const QgsPointXY adjusted( pos.x() - mMoveOffset.x(), pos.y() - mMoveOffset.y() );
       mController->edit( mItem, mEditContext, adjusted, ctx );
       mLayer->triggerRepaint();
     }
@@ -174,7 +174,7 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
   if ( mInputWidget && mEditContext.isValid() )
   {
     mInputWidget->ensureFocus();
-    const KadasMapPos adjusted( pos.x() - mMoveOffset.x(), pos.y() - mMoveOffset.y() );
+    const QgsPointXY adjusted( pos.x() - mMoveOffset.x(), pos.y() - mMoveOffset.y() );
     KadasMapItem::AttribValues values = mController->editAttribsFromPosition( mItem, mEditContext, adjusted, ctx );
     for ( auto it = values.begin(), itEnd = values.end(); it != itEnd; ++it )
       mInputWidget->inputField( it.key() )->setValue( it.value() );
@@ -306,7 +306,7 @@ void KadasMapToolEditAnnotationItem::inputChanged()
 
   // Suppress the spurious move event triggered by adjustCursorAndExtent.
   mIgnoreNextMoveEvent = true;
-  const KadasMapPos newPos = mController->positionFromEditAttribs( mItem, mEditContext, values, ctx );
+  const QgsPointXY newPos = mController->positionFromEditAttribs( mItem, mEditContext, values, ctx );
   mInputWidget->adjustCursorAndExtent( newPos );
 
   mController->edit( mItem, mEditContext, values, ctx );

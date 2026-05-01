@@ -63,14 +63,14 @@ QList<KadasMapItem::Node> KadasCircleAnnotationController::nodes( const QgsAnnot
 {
   const KadasCircleAnnotationItem *circle = asCircle( item );
   return {
-    { toMapPos( KadasItemPos::fromPoint( circle->center() ), ctx ) },
-    { toMapPos( KadasItemPos::fromPoint( circle->ringPoint() ), ctx ) },
+    { toMapPos( circle->center(), ctx ) },
+    { toMapPos( circle->ringPoint(), ctx ) },
   };
 }
 
-bool KadasCircleAnnotationController::startPart( QgsAnnotationItem *item, const KadasMapPos &firstPoint, const KadasAnnotationItemContext &ctx )
+bool KadasCircleAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
 {
-  const KadasItemPos ip = toItemPos( firstPoint, ctx );
+  const QgsPointXY ip = toItemPos( firstPoint, ctx );
   asCircle( item )->setCenter( ip );
   asCircle( item )->setRingPoint( ip );
   return true;
@@ -78,10 +78,10 @@ bool KadasCircleAnnotationController::startPart( QgsAnnotationItem *item, const 
 
 bool KadasCircleAnnotationController::startPart( QgsAnnotationItem *item, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx )
 {
-  return startPart( item, KadasMapPos( values[AttrX], values[AttrY] ), ctx );
+  return startPart( item, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
 
-void KadasCircleAnnotationController::setCurrentPoint( QgsAnnotationItem *item, const KadasMapPos &p, const KadasAnnotationItemContext &ctx )
+void KadasCircleAnnotationController::setCurrentPoint( QgsAnnotationItem *item, const QgsPointXY &p, const KadasAnnotationItemContext &ctx )
 {
   asCircle( item )->setRingPoint( toItemPos( p, ctx ) );
 }
@@ -98,7 +98,7 @@ void KadasCircleAnnotationController::setCurrentAttributes( QgsAnnotationItem *i
     c->setRingPoint( QgsPointXY( center.x() + r, center.y() ) );
     return;
   }
-  setCurrentPoint( item, KadasMapPos( values[AttrX], values[AttrY] ), ctx );
+  setCurrentPoint( item, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
 
 bool KadasCircleAnnotationController::continuePart( QgsAnnotationItem *, const KadasAnnotationItemContext & )
@@ -119,14 +119,14 @@ KadasMapItem::AttribDefs KadasCircleAnnotationController::drawAttribs() const
   return attributes;
 }
 
-KadasMapItem::AttribValues KadasCircleAnnotationController::drawAttribsFromPosition( const QgsAnnotationItem *item, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx ) const
+KadasMapItem::AttribValues KadasCircleAnnotationController::drawAttribsFromPosition( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
 {
   KadasMapItem::AttribValues values;
   values.insert( AttrX, pos.x() );
   values.insert( AttrY, pos.y() );
   if ( item )
   {
-    const KadasItemPos ip = toItemPos( pos, ctx );
+    const QgsPointXY ip = toItemPos( pos, ctx );
     const QgsPointXY c = asCircle( item )->center();
     const double dx = ip.x() - c.x();
     const double dy = ip.y() - c.y();
@@ -139,16 +139,16 @@ KadasMapItem::AttribValues KadasCircleAnnotationController::drawAttribsFromPosit
   return values;
 }
 
-KadasMapPos KadasCircleAnnotationController::positionFromDrawAttribs( const QgsAnnotationItem *, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext & ) const
+QgsPointXY KadasCircleAnnotationController::positionFromDrawAttribs( const QgsAnnotationItem *, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext & ) const
 {
-  return KadasMapPos( values[AttrX], values[AttrY] );
+  return QgsPointXY( values[AttrX], values[AttrY] );
 }
 
-KadasMapItem::EditContext KadasCircleAnnotationController::getEditContext( const QgsAnnotationItem *item, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx ) const
+KadasMapItem::EditContext KadasCircleAnnotationController::getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
 {
   const KadasCircleAnnotationItem *circle = asCircle( item );
-  const KadasMapPos centerMap = toMapPos( KadasItemPos::fromPoint( circle->center() ), ctx );
-  const KadasMapPos ringMap = toMapPos( KadasItemPos::fromPoint( circle->ringPoint() ), ctx );
+  const QgsPointXY centerMap = toMapPos( circle->center(), ctx );
+  const QgsPointXY ringMap = toMapPos( circle->ringPoint(), ctx );
   if ( pos.sqrDist( centerMap ) < pickTolSqr( ctx ) )
     return KadasMapItem::EditContext( QgsVertexId( 0, 0, 0 ), centerMap, drawAttribs() );
   if ( pos.sqrDist( ringMap ) < pickTolSqr( ctx ) )
@@ -158,10 +158,10 @@ KadasMapItem::EditContext KadasCircleAnnotationController::getEditContext( const
   return KadasMapItem::EditContext();
 }
 
-void KadasCircleAnnotationController::edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapPos &newPoint, const KadasAnnotationItemContext &ctx )
+void KadasCircleAnnotationController::edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
   KadasCircleAnnotationItem *circle = asCircle( item );
-  const KadasItemPos newIp = toItemPos( newPoint, ctx );
+  const QgsPointXY newIp = toItemPos( newPoint, ctx );
   if ( editContext.vidx.vertex == 0 )
   {
     // Move center; keep radius (translate ring point by the same delta).
@@ -179,12 +179,12 @@ void KadasCircleAnnotationController::edit( QgsAnnotationItem *item, const Kadas
   else
   {
     // Whole-item move: shift both points by the map-space delta.
-    const KadasMapPos oldCenterMap = toMapPos( KadasItemPos::fromPoint( circle->center() ), ctx );
+    const QgsPointXY oldCenterMap = toMapPos( circle->center(), ctx );
     const double dxMap = newPoint.x() - oldCenterMap.x();
     const double dyMap = newPoint.y() - oldCenterMap.y();
-    const KadasMapPos newCenterMap( oldCenterMap.x() + dxMap, oldCenterMap.y() + dyMap );
-    const KadasMapPos oldRingMap = toMapPos( KadasItemPos::fromPoint( circle->ringPoint() ), ctx );
-    const KadasMapPos newRingMap( oldRingMap.x() + dxMap, oldRingMap.y() + dyMap );
+    const QgsPointXY newCenterMap( oldCenterMap.x() + dxMap, oldCenterMap.y() + dyMap );
+    const QgsPointXY oldRingMap = toMapPos( circle->ringPoint(), ctx );
+    const QgsPointXY newRingMap( oldRingMap.x() + dxMap, oldRingMap.y() + dyMap );
     circle->setCenter( toItemPos( newCenterMap, ctx ) );
     circle->setRingPoint( toItemPos( newRingMap, ctx ) );
   }
@@ -192,29 +192,29 @@ void KadasCircleAnnotationController::edit( QgsAnnotationItem *item, const Kadas
 
 void KadasCircleAnnotationController::edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx )
 {
-  edit( item, editContext, KadasMapPos( values[AttrX], values[AttrY] ), ctx );
+  edit( item, editContext, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
 
 KadasMapItem::AttribValues KadasCircleAnnotationController::editAttribsFromPosition(
-  const QgsAnnotationItem *item, const KadasMapItem::EditContext &, const KadasMapPos &pos, const KadasAnnotationItemContext &ctx
+  const QgsAnnotationItem *item, const KadasMapItem::EditContext &, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx
 ) const
 {
   return drawAttribsFromPosition( item, pos, ctx );
 }
 
-KadasMapPos KadasCircleAnnotationController::positionFromEditAttribs(
+QgsPointXY KadasCircleAnnotationController::positionFromEditAttribs(
   const QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const KadasMapItem::AttribValues &values, const KadasAnnotationItemContext &ctx
 ) const
 {
   return positionFromDrawAttribs( item, values, ctx );
 }
 
-KadasItemPos KadasCircleAnnotationController::position( const QgsAnnotationItem *item ) const
+QgsPointXY KadasCircleAnnotationController::position( const QgsAnnotationItem *item ) const
 {
-  return KadasItemPos::fromPoint( asCircle( item )->center() );
+  return asCircle( item )->center();
 }
 
-void KadasCircleAnnotationController::setPosition( QgsAnnotationItem *item, const KadasItemPos &pos )
+void KadasCircleAnnotationController::setPosition( QgsAnnotationItem *item, const QgsPointXY &pos )
 {
   KadasCircleAnnotationItem *circle = asCircle( item );
   const QgsPointXY oldC = circle->center();
