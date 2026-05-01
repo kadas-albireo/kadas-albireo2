@@ -42,7 +42,7 @@ class KADAS_GUI_EXPORT KadasCoordCrossAnnotationController : public KadasMarkerA
 
     bool startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx ) override;
     void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos ) override;
-    void edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx ) override;
+    void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx ) override;
 };
 
 #endif // KADASCOORDCROSSANNOTATIONCONTROLLER_H

@@ -152,7 +152,7 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
   }
   else
   {
-    KadasMapItem::EditContext oldContext = mEditContext;
+    KadasEditContext oldContext = mEditContext;
     mEditContext = mController->getEditContext( mItem, pos, ctx );
     if ( !mEditContext.isValid() )
     {
@@ -175,7 +175,7 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
   {
     mInputWidget->ensureFocus();
     const QgsPointXY adjusted( pos.x() - mMoveOffset.x(), pos.y() - mMoveOffset.y() );
-    KadasMapItem::AttribValues values = mController->editAttribsFromPosition( mItem, mEditContext, adjusted, ctx );
+    KadasAttribValues values = mController->editAttribsFromPosition( mItem, mEditContext, adjusted, ctx );
     for ( auto it = values.begin(), itEnd = values.end(); it != itEnd; ++it )
       mInputWidget->inputField( it.key() )->setValue( it.value() );
     mInputWidget->move( e->position().x(), e->position().y() + 20 );
@@ -254,7 +254,7 @@ void KadasMapToolEditAnnotationItem::stateChanged( KadasStateHistory::ChangeType
   mLayer->replaceItem( mItemId, replacement );
   mItem = mLayer->item( mItemId );
   mLayer->triggerRepaint();
-  mEditContext = KadasMapItem::EditContext();
+  mEditContext = KadasEditContext();
   clearNumericInput();
 }
 
@@ -267,10 +267,10 @@ void KadasMapToolEditAnnotationItem::setupNumericInput()
     return;
 
   mInputWidget = new KadasFloatingInputWidget( canvas() );
-  const KadasMapItem::AttribDefs &attributes = mEditContext.attributes;
+  const KadasAttribDefs &attributes = mEditContext.attributes;
   for ( auto it = attributes.begin(), itEnd = attributes.end(); it != itEnd; ++it )
   {
-    const KadasMapItem::NumericAttribute &attribute = it.value();
+    const KadasNumericAttribute &attribute = it.value();
     KadasFloatingInputWidgetField *attrEdit = new KadasFloatingInputWidgetField( it.key(), attribute.precision( mCanvas->mapSettings() ), attribute.min, attribute.max );
     connect( attrEdit, &KadasFloatingInputWidgetField::inputChanged, this, &KadasMapToolEditAnnotationItem::inputChanged );
     mInputWidget->addInputField( attribute.name + ":", attrEdit, attribute.suffix( mCanvas->mapSettings() ) );
@@ -284,9 +284,9 @@ void KadasMapToolEditAnnotationItem::clearNumericInput()
   mInputWidget = nullptr;
 }
 
-KadasMapItem::AttribValues KadasMapToolEditAnnotationItem::collectAttributeValues() const
+KadasAttribValues KadasMapToolEditAnnotationItem::collectAttributeValues() const
 {
-  KadasMapItem::AttribValues values;
+  KadasAttribValues values;
   if ( !mInputWidget )
     return values;
   for ( const KadasFloatingInputWidgetField *field : mInputWidget->inputFields() )
@@ -302,7 +302,7 @@ void KadasMapToolEditAnnotationItem::inputChanged()
     return;
 
   KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
-  const KadasMapItem::AttribValues values = collectAttributeValues();
+  const KadasAttribValues values = collectAttributeValues();
 
   // Suppress the spurious move event triggered by adjustCursorAndExtent.
   mIgnoreNextMoveEvent = true;
