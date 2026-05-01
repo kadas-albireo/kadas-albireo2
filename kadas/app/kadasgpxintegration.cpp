@@ -31,6 +31,7 @@
 
 #include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
 #include "kadas/gui/annotationitems/kadasgpxrouteannotationitem.h"
 #include "kadas/gui/annotationitems/kadasgpxwaypointannotationitem.h"
@@ -144,11 +145,9 @@ bool KadasGpxIntegration::importGpx( const QString &filename, QString &errorMsg 
   kApp->unsetMapTool();
 
   const QString layerName = QFileInfo( filename ).baseName();
-  QgsAnnotationLayer *layer = new QgsAnnotationLayer( layerName, QgsAnnotationLayer::LayerOptions( QgsProject::instance()->transformContext() ) );
-  layer->setCrs( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+  const QgsCoordinateReferenceSystem wgs84( QStringLiteral( "EPSG:4326" ) );
+  QgsAnnotationLayer *layer = KadasAnnotationLayerHelpers::createLayer( layerName, wgs84 );
   QgsProject::instance()->addMapLayer( layer );
-
-  const QgsCoordinateTransform wgs84ToLayer( QgsCoordinateReferenceSystem( "EPSG:4326" ), layer->crs(), QgsProject::instance()->transformContext() );
 
   QFile file( filename );
   if ( !file.open( QIODevice::ReadOnly ) )
@@ -171,12 +170,11 @@ bool KadasGpxIntegration::importGpx( const QString &filename, QString &errorMsg 
     const double lon = wptEl.attribute( "lon" ).toDouble();
     const QString name = wptEl.firstChildElement( "name" ).text();
 
-    const QgsPointXY layerPos = wgs84ToLayer.transform( QgsPointXY( lon, lat ) );
-    auto *waypoint = new KadasGpxWaypointAnnotationItem( QgsPoint( layerPos ) );
+    auto *waypoint = new KadasGpxWaypointAnnotationItem( QgsPoint( lon, lat ) );
     waypoint->setName( name );
     layer->addItem( waypoint );
   }
-  const auto readRouteParts = [&]( const QDomElement &el, const QString &tagName ) {
+  const auto readRouteParts = []( const QDomElement &el, const QString &tagName ) {
     auto *line = new QgsLineString();
     const QDomNodeList pts = ( tagName == QStringLiteral( "trk" ) ) ? el.firstChildElement( "trkseg" ).elementsByTagName( "trkpt" ) : el.elementsByTagName( "rtept" );
     for ( int j = 0, m = pts.size(); j < m; ++j )
@@ -184,8 +182,7 @@ bool KadasGpxIntegration::importGpx( const QString &filename, QString &errorMsg 
       const QDomElement ptEl = pts.at( j ).toElement();
       const double lat = ptEl.attribute( "lat" ).toDouble();
       const double lon = ptEl.attribute( "lon" ).toDouble();
-      const QgsPointXY layerPos = wgs84ToLayer.transform( QgsPointXY( lon, lat ) );
-      line->addVertex( QgsPoint( layerPos ) );
+      line->addVertex( QgsPoint( lon, lat ) );
     }
     return line;
   };

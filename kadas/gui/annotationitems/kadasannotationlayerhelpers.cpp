@@ -17,6 +17,8 @@
 #include <QSet>
 
 #include <qgis/qgsannotationlayer.h>
+#include <qgis/qgscoordinatereferencesystem.h>
+#include <qgis/qgsproject.h>
 
 #include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
 
@@ -108,4 +110,17 @@ QStringList KadasAnnotationLayerHelpers::itemsWithMetadata( const QgsAnnotationL
     }
   }
   return result;
+}
+
+QgsAnnotationLayer *KadasAnnotationLayerHelpers::createLayer( const QString &name, const QgsCoordinateReferenceSystem &preferredCrs )
+{
+  QgsAnnotationLayer::LayerOptions options( QgsProject::instance()->transformContext() );
+  auto *layer = new QgsAnnotationLayer( name, options );
+  QgsCoordinateReferenceSystem crs = preferredCrs;
+  if ( !crs.isValid() )
+    crs = QgsProject::instance()->crs();
+  if ( !crs.isValid() )
+    crs = QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:3857" ) );
+  layer->setCrs( crs );
+  return layer;
 }
