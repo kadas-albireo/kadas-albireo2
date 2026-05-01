@@ -24,6 +24,7 @@
 #include <qgis/qgsgeometrycollection.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsrubberband.h>
 #include <qgis/qgsvectorlayer.h>
 
 #include "kadas/core/kadascoordinateformat.h"
@@ -94,9 +95,18 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     addAction( QIcon( ":/kadas/icons/raise" ), tr( "Raise" ), this, &KadasCanvasContextMenu::raiseItem );
     KadasItemLayer *itemLayer = static_cast<KadasItemLayer *>( mPickResult.layer );
     mItemActions = new KadasItemContextMenuActions( mCanvas, this, pickedItem, itemLayer, mPickResult.itemId, this );
-    mSelRect = new KadasSelectionRectItem( mCanvas->mapSettings().destinationCrs() );
-    mSelRect->setSelectedItems( QList<KadasMapItem *>() << pickedItem );
-    KadasMapCanvasItemManager::addItem( mSelRect );
+    // Highlight the picked legacy item with a rubber band of its bounding box
+    // (transformed to the canvas CRS).
+    const QgsRectangle itemBbox
+      = QgsCoordinateTransform( pickedItem->crs(), mCanvas->mapSettings().destinationCrs(), QgsProject::instance()->transformContext() ).transformBoundingBox( pickedItem->boundingBox() );
+    mSelRectBand = new QgsRubberBand( mCanvas, Qgis::GeometryType::Polygon );
+    mSelRectBand->setFillColor( QColor( 255, 0, 0, 31 ) );
+    mSelRectBand->setStrokeColor( QColor( 255, 0, 0 ) );
+    mSelRectBand->setWidth( 2 );
+    mSelRectBand->addPoint( QgsPointXY( itemBbox.xMinimum(), itemBbox.yMinimum() ), false );
+    mSelRectBand->addPoint( QgsPointXY( itemBbox.xMaximum(), itemBbox.yMinimum() ), false );
+    mSelRectBand->addPoint( QgsPointXY( itemBbox.xMaximum(), itemBbox.yMaximum() ), false );
+    mSelRectBand->addPoint( QgsPointXY( itemBbox.xMinimum(), itemBbox.yMaximum() ), true );
   }
   else if ( pickedAnnotation )
   {
@@ -237,6 +247,7 @@ KadasCanvasContextMenu::~KadasCanvasContextMenu()
 
   delete mGeomSel;
   delete mSelRect;
+  delete mSelRectBand;
 }
 
 void KadasCanvasContextMenu::registerAction( QAction *action, Menu insertMenu )
