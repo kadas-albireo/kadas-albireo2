@@ -43,6 +43,8 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasRectangleItemBase
 
     void onDoubleClick( const QgsMapSettings &mapSettings ) override;
 
+    QgsAnnotationItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const override SIP_FACTORY;
+
 
     struct KADAS_GUI_EXPORT State : KadasRectangleItemBase::State
     {

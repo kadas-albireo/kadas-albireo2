@@ -54,6 +54,8 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
 
     void setState( const KadasMapItem::State *state ) override;
 
+    QgsAnnotationItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const override SIP_FACTORY;
+
   private:
     QString mFilePath;
     QString mName;
