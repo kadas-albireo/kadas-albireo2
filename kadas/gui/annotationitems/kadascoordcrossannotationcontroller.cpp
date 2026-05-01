@@ -64,7 +64,7 @@ void KadasCoordCrossAnnotationController::setPosition( QgsAnnotationItem *item, 
   KadasMarkerAnnotationController::setPosition( item, roundToKilometre( pos ) );
 }
 
-void KadasCoordCrossAnnotationController::edit( QgsAnnotationItem *item, const KadasMapItem::EditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
+void KadasCoordCrossAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
   // When dragging the single vertex, snap the resulting position to a km grid.
   KadasMarkerAnnotationController::edit( item, editContext, newPoint, ctx );
