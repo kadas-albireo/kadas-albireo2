@@ -16,6 +16,7 @@
 
 #include <QObject>
 #include <QPainter>
+#include <limits>
 
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgscoordinatetransform.h>
@@ -218,26 +219,208 @@ QgsPointXY KadasMilxAnnotationController::positionFromDrawAttribs( const QgsAnno
   return QgsPointXY( values[AttrX], values[AttrY] );
 }
 
-KadasEditContext KadasMilxAnnotationController::getEditContext( const QgsAnnotationItem *, const QgsPointXY &, const KadasAnnotationItemContext & ) const
+KadasEditContext KadasMilxAnnotationController::getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
 {
-  // TODO slice 37: libmss hit-test on control points.
+  const auto *milx = static_cast<const KadasMilxAnnotationItem *>( item );
+  const QgsCoordinateTransform xform( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
+  const double tolSqr = pickTolSqr( ctx );
+
+  // 1) Geometry node hit test (ring 0, vertex = point index).
+  const QList<QgsPointXY> &pts = milx->points();
+  for ( int i = 0; i < pts.size(); ++i )
+  {
+    QgsPointXY mapPos;
+    try
+    {
+      mapPos = xform.transform( pts[i] );
+    }
+    catch ( const QgsCsException & )
+    {
+      continue;
+    }
+    if ( pos.sqrDist( mapPos ) < tolSqr )
+    {
+      return KadasEditContext( QgsVertexId( 0, 0, i ), mapPos, drawAttribs() );
+    }
+  }
+
+  // 2) Attribute control point hit test (ring 1, vertex = libmss attr id).
+  const QMap<KadasMilxAttrType, QgsPointXY> attrPts = milx->attributePoints();
+  for ( auto it = attrPts.cbegin(), itEnd = attrPts.cend(); it != itEnd; ++it )
+  {
+    QgsPointXY mapPos;
+    try
+    {
+      mapPos = xform.transform( it.value() );
+    }
+    catch ( const QgsCsException & )
+    {
+      continue;
+    }
+    if ( pos.sqrDist( mapPos ) < tolSqr )
+    {
+      const double min = it.key() == MilxAttributeAttitude ? std::numeric_limits<double>::lowest() : 0;
+      const double max = std::numeric_limits<double>::max();
+      const int decimals = it.key() == MilxAttributeAttitude ? 1 : 0;
+      KadasNumericAttribute::Type type = KadasNumericAttribute::Type::TypeOther;
+      if ( it.key() == MilxAttributeLength || it.key() == MilxAttributeWidth || it.key() == MilxAttributeRadius )
+        type = KadasNumericAttribute::Type::TypeDistance;
+      else if ( it.key() == MilxAttributeAttitude )
+        type = KadasNumericAttribute::Type::TypeAngle;
+      KadasAttribDefs attrs;
+      attrs.insert( it.key(), KadasNumericAttribute { KadasMilxClient::attributeName( it.key() ), type, min, max, decimals } );
+      return KadasEditContext( QgsVertexId( 0, 1, it.key() ), mapPos, attrs );
+    }
+  }
+
+  // 3) Whole-symbol drag fallback (vidx invalid). Anchor on the first
+  //    point — for single-point symbols, shift the anchor by the user
+  //    offset so the drag visually starts on the rendered glyph.
+  if ( hitTest( item, pos, ctx ) && !pts.isEmpty() )
+  {
+    QgsPointXY refMap;
+    try
+    {
+      refMap = xform.transform( pts.front() );
+    }
+    catch ( const QgsCsException & )
+    {
+      return KadasEditContext();
+    }
+    if ( !milx->isMultiPoint() )
+    {
+      const QPoint anchorScreen = ctx.mapSettings().mapToPixel().transform( refMap ).toQPointF().toPoint();
+      refMap = ctx.mapSettings().mapToPixel().toMapCoordinates( anchorScreen + milx->userOffset() );
+    }
+    return KadasEditContext( QgsVertexId(), refMap, KadasAttribDefs(), Qt::ArrowCursor );
+  }
   return KadasEditContext();
 }
 
-void KadasMilxAnnotationController::edit( QgsAnnotationItem *, const KadasEditContext &, const QgsPointXY &, const KadasAnnotationItemContext & )
-{}
-
-void KadasMilxAnnotationController::edit( QgsAnnotationItem *, const KadasEditContext &, const KadasAttribValues &, const KadasAnnotationItemContext & )
-{}
-
-KadasAttribValues KadasMilxAnnotationController::editAttribsFromPosition( const QgsAnnotationItem *, const KadasEditContext &, const QgsPointXY &, const KadasAnnotationItemContext & ) const
+void KadasMilxAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
-  return {};
+  auto *milx = static_cast<KadasMilxAnnotationItem *>( item );
+
+  if ( editContext.vidx.isValid() )
+  {
+    // Move a single node.
+    if ( milx->isMultiPoint() )
+    {
+      const QPoint screenPoint = ctx.mapSettings().mapToPixel().transform( newPoint ).toQPointF().toPoint();
+      KadasMilxClient::NPointSymbol symbol = milx->toSymbol( ctx.mapSettings() );
+      KadasMilxClient::NPointSymbolGraphic result;
+      const QRect screenRect = KadasMilxAnnotationItem::computeScreenExtent( ctx.mapSettings() );
+      const int dpi = ctx.mapSettings().outputDpi();
+      if ( editContext.vidx.ring == 0 )
+      {
+        if ( KadasMilxClient::movePoint( screenRect, dpi, symbol, editContext.vidx.vertex, screenPoint, KadasMilxClient::globalSymbolSettings(), result ) )
+          milx->applySymbolResult( ctx.mapSettings(), result );
+      }
+      else if ( editContext.vidx.ring == 1 )
+      {
+        if ( KadasMilxClient::moveAttributePoint( screenRect, dpi, symbol, editContext.vidx.vertex, screenPoint, KadasMilxClient::globalSymbolSettings(), result ) )
+          milx->applySymbolResult( ctx.mapSettings(), result );
+      }
+    }
+    else
+    {
+      // Single-point symbols: bypass libmss and update the geometry directly.
+      const QgsPointXY itemPos = toItemPos( newPoint, ctx );
+      milx->setPoints( { itemPos } );
+    }
+  }
+  else if ( milx->isMultiPoint() )
+  {
+    // Whole-symbol drag (multipoint): translate every geometry / attribute
+    // point by the same map-space delta. No libmss round-trip needed.
+    if ( milx->points().isEmpty() )
+      return;
+    const QgsPointXY refMap = toMapPos( milx->points().front(), ctx );
+    const double mdx = newPoint.x() - refMap.x();
+    const double mdy = newPoint.y() - refMap.y();
+    QList<QgsPointXY> pts = milx->points();
+    for ( QgsPointXY &p : pts )
+    {
+      const QgsPointXY mp = toMapPos( p, ctx );
+      p = toItemPos( QgsPointXY( mp.x() + mdx, mp.y() + mdy ), ctx );
+    }
+    milx->setPoints( pts );
+    QMap<KadasMilxAttrType, QgsPointXY> aps = milx->attributePoints();
+    for ( auto it = aps.begin(), itEnd = aps.end(); it != itEnd; ++it )
+    {
+      const QgsPointXY mp = toMapPos( it.value(), ctx );
+      it.value() = toItemPos( QgsPointXY( mp.x() + mdx, mp.y() + mdy ), ctx );
+    }
+    milx->setAttributePoints( aps );
+  }
+  else
+  {
+    // Whole-symbol drag (single-point): record screen-space user offset.
+    if ( milx->points().isEmpty() )
+      return;
+    const QPoint anchorScreen = ctx.mapSettings().mapToPixel().transform( toMapPos( milx->points().front(), ctx ) ).toQPointF().toPoint();
+    const QPoint newScreen = ctx.mapSettings().mapToPixel().transform( newPoint ).toQPointF().toPoint();
+    milx->setUserOffset( newScreen - anchorScreen );
+  }
 }
 
-QgsPointXY KadasMilxAnnotationController::positionFromEditAttribs( const QgsAnnotationItem *, const KadasEditContext &, const KadasAttribValues &, const KadasAnnotationItemContext & ) const
+void KadasMilxAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
 {
-  return QgsPointXY();
+  auto *milx = static_cast<KadasMilxAnnotationItem *>( item );
+  if ( values.size() == 1 )
+  {
+    // Single shape attribute (length / width / radius / attitude): replace
+    // the stored value, then ask libmss to recompute the symbol graphic.
+    const KadasMilxAttrType attr = static_cast<KadasMilxAttrType>( values.firstKey() );
+    QMap<KadasMilxAttrType, double> attrs = milx->attributes();
+    attrs[attr] = values[values.firstKey()];
+    milx->setAttributes( attrs );
+
+    KadasMilxClient::NPointSymbol symbol = milx->toSymbol( ctx.mapSettings() );
+    KadasMilxClient::NPointSymbolGraphic result;
+    KadasMilxClient::updateSymbol(
+      KadasMilxAnnotationItem::computeScreenExtent( ctx.mapSettings() ),
+      ctx.mapSettings().outputDpi(),
+      symbol,
+      KadasMilxClient::globalSymbolSettings(),
+      result,
+      /* returnPoints */ true
+    );
+    milx->applySymbolResult( ctx.mapSettings(), result );
+  }
+  else
+  {
+    edit( item, editContext, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
+  }
+}
+
+KadasAttribValues KadasMilxAnnotationController::editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
+{
+  if ( editContext.attributes.size() == 1 )
+  {
+    // Single shape attribute: report the current stored value, not a
+    // position-derived one (the input dialog binds to the attribute id key).
+    const auto *milx = static_cast<const KadasMilxAnnotationItem *>( item );
+    const KadasMilxAttrType attr = static_cast<KadasMilxAttrType>( editContext.attributes.firstKey() );
+    KadasAttribValues values;
+    values.insert( attr, milx->attributes().value( attr, 0.0 ) );
+    return values;
+  }
+  return drawAttribsFromPosition( item, pos, ctx );
+}
+
+QgsPointXY KadasMilxAnnotationController::positionFromEditAttribs(
+  const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx
+) const
+{
+  if ( values.size() == 1 )
+  {
+    const auto *milx = static_cast<const KadasMilxAnnotationItem *>( item );
+    const KadasMilxAttrType attr = static_cast<KadasMilxAttrType>( values.firstKey() );
+    const QgsPointXY itemPos = milx->attributePoints().value( attr );
+    return toMapPos( itemPos, ctx );
+  }
+  return positionFromDrawAttribs( item, values, ctx );
 }
 
 QgsPointXY KadasMilxAnnotationController::position( const QgsAnnotationItem *item ) const
@@ -284,4 +467,29 @@ QString KadasMilxAnnotationController::asKml( const QgsAnnotationItem *, const Q
 {
   // TODO slice 38: render symbol → KMZ image placemark.
   return QString();
+}
+
+bool KadasMilxAnnotationController::hitTest( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
+{
+  const auto *milx = static_cast<const KadasMilxAnnotationItem *>( item );
+  if ( milx->points().isEmpty() || milx->mssString().isEmpty() )
+    return false;
+
+  // Defer the precise hit test to libmss — the rendered MilX glyph is
+  // typically much larger than the convex hull of its control points,
+  // so the default bounding-box test would miss most of the symbol.
+  KadasMilxClient::NPointSymbol symbol = milx->toSymbol( ctx.mapSettings() );
+  // toSymbol() doesn't throw — but a degenerate (empty xml/points) state is
+  // still possible if controller is invoked on a half-built item.
+  if ( symbol.xml.isEmpty() || symbol.points.isEmpty() )
+    return false;
+  // Account for the user-applied screen-space offset before asking libmss.
+  for ( QPoint &p : symbol.points )
+    p += milx->userOffset();
+
+  const QPoint screenPos = ctx.mapSettings().mapToPixel().transform( pos ).toQPointF().toPoint();
+  QList<KadasMilxClient::NPointSymbol> symbols { symbol };
+  int selectedSymbol = -1;
+  QRect bbox;
+  return KadasMilxClient::pickSymbol( symbols, screenPos, KadasMilxClient::globalSymbolSettings(), selectedSymbol, bbox ) && selectedSymbol >= 0;
 }
