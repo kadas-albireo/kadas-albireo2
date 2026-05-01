@@ -129,6 +129,12 @@ class KADAS_GUI_EXPORT KadasMilxAnnotationItem : public QgsAnnotationItem
     //! (helper for libmss IPC, which works in device pixels).
     static QRect computeScreenExtent( const QgsMapSettings &mapSettings );
 
+    //! True when the symbol has more than one geometry point or carries any
+    //! shape attribute (length / width / radius / attitude). Mirrors the
+    //! legacy \c KadasMilxItem::isMultiPoint() heuristic that decides whether
+    //! libmss IPC is needed for vertex moves vs a direct geometry update.
+    bool isMultiPoint() const { return mPoints.size() > 1 || !mAttributes.isEmpty(); }
+
   private:
     QString mMssString;
     QString mMilitaryName;
