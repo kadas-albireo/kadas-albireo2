@@ -35,10 +35,9 @@
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgsrasteridentifyresult.h>
 #include <qgis/qgssettings.h>
+#include <qgis/qgsrubberband.h>
 #include <qgis/qgsvectorlayer.h>
 
-#include "kadas/gui/kadasmapcanvasitemmanager.h"
-#include "kadas/gui/mapitems/kadassymbolitem.h"
 #include "kadasmapidentifydialog.h"
 
 
@@ -98,10 +97,10 @@ void KadasMapIdentifyDialog::clear()
 {
   delete mRubberband;
   mRubberband = nullptr;
-  delete mResultPin.data();
-  mResultPin.clear();
-  delete mClickPosPin.data();
-  mClickPosPin.clear();
+  delete mResultPin;
+  mResultPin = nullptr;
+  delete mClickPosPin;
+  mClickPosPin = nullptr;
   qDeleteAll( mGeometries );
   mGeometries.clear();
   if ( mRasterIdentifyReply )
@@ -119,8 +118,8 @@ void KadasMapIdentifyDialog::onItemClicked( QTreeWidgetItem *item, int /*col*/ )
 {
   delete mRubberband;
   mRubberband = nullptr;
-  delete mResultPin.data();
-  mResultPin.clear();
+  delete mResultPin;
+  mResultPin = nullptr;
 
   while ( item && item->data( 0, sGeometryRole ).isNull() )
     item = item->parent();
@@ -141,9 +140,11 @@ void KadasMapIdentifyDialog::onItemClicked( QTreeWidgetItem *item, int /*col*/ )
   if ( dynamic_cast<QgsPoint *>( geom ) )
   {
     QgsPoint *p = static_cast<QgsPoint *>( geom );
-    mResultPin = new KadasPinItem( mCanvas->mapSettings().destinationCrs() );
-    mResultPin->setPosition( KadasItemPos( p->x(), p->y() ) );
-    mResultPin->setFilePath( ":/kadas/icons/pin_blue" );
+    mResultPin = new QgsRubberBand( mCanvas, Qgis::GeometryType::Point );
+    mResultPin->setIcon( QgsRubberBand::ICON_FULL_BOX );
+    mResultPin->setColor( QColor( 0, 0, 255 ) );
+    mResultPin->setIconSize( 12 );
+    mResultPin->addPoint( QgsPointXY( p->x(), p->y() ) );
   }
   else
   {
@@ -160,9 +161,11 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
 {
   clear();
 
-  mClickPosPin = new KadasPinItem( mCanvas->mapSettings().destinationCrs() );
-  mClickPosPin->setPosition( KadasItemPos( mapPos.x(), mapPos.y() ) );
-  KadasMapCanvasItemManager::addItem( mClickPosPin );
+  mClickPosPin = new QgsRubberBand( mCanvas, Qgis::GeometryType::Point );
+  mClickPosPin->setIcon( QgsRubberBand::ICON_FULL_BOX );
+  mClickPosPin->setColor( QColor( 255, 0, 0 ) );
+  mClickPosPin->setIconSize( 12 );
+  mClickPosPin->addPoint( mapPos );
 
   // Prepare for raster layers
   const QgsCoordinateReferenceSystem &mapCrs = mCanvas->mapSettings().destinationCrs();
