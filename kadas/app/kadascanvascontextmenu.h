@@ -26,6 +26,7 @@
 class QgsGeometryRubberBand;
 class KadasItemContextMenuActions;
 class KadasSelectionRectItem;
+class QgsRubberBand;
 
 
 class KadasCanvasContextMenu : public QMenu
@@ -94,6 +95,7 @@ class KadasCanvasContextMenu : public QMenu
     KadasFeaturePicker::PickResult mPickResult;
     QgsGeometryRubberBand *mGeomSel = nullptr;
     KadasSelectionRectItem *mSelRect = nullptr;
+    QgsRubberBand *mSelRectBand = nullptr;
 };
 
 #endif // KADASCANVASCONTEXTMENU_H
