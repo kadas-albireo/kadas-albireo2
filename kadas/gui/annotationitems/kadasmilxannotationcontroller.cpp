@@ -15,11 +15,35 @@
  ***************************************************************************/
 
 #include <QObject>
+#include <QPainter>
 
+#include <qgis/qgscoordinatereferencesystem.h>
+#include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgspointxy.h>
 
 #include "kadas/gui/annotationitems/kadasmilxannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
+#include "kadas/gui/milx/kadasmilxclient.h"
+
+
+namespace
+{
+  // Mirrors the legacy KadasMilxItem node renderers so the on-canvas
+  // appearance of MilX nodes does not change when the controller takes over.
+  void posPointNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize )
+  {
+    painter->setPen( QPen( Qt::black, 1 ) );
+    painter->setBrush( Qt::yellow );
+    painter->drawEllipse( screenPoint.x() - 0.5 * nodeSize, screenPoint.y() - 0.5 * nodeSize, nodeSize, nodeSize );
+  }
+
+  void ctrlPointNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize )
+  {
+    painter->setPen( QPen( Qt::black, 1 ) );
+    painter->setBrush( Qt::red );
+    painter->drawEllipse( screenPoint.x() - 0.5 * nodeSize, screenPoint.y() - 0.5 * nodeSize, nodeSize, nodeSize );
+  }
+} // namespace
 
 
 QString KadasMilxAnnotationController::itemType() const
@@ -37,10 +61,38 @@ QgsAnnotationItem *KadasMilxAnnotationController::createItem() const
   return new KadasMilxAnnotationItem();
 }
 
-QList<KadasNode> KadasMilxAnnotationController::nodes( const QgsAnnotationItem *, const KadasAnnotationItemContext & ) const
+QList<KadasNode> KadasMilxAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
 {
-  // TODO slice 35: query KadasMilxClient for control points.
-  return {};
+  const auto *milx = static_cast<const KadasMilxAnnotationItem *>( item );
+  const QList<QgsPointXY> &pts = milx->points();
+  if ( pts.isEmpty() || milx->mssString().isEmpty() )
+    return {};
+
+  // Ask libmss which point indices are draggable control points; the rest
+  // are rendered as plain position nodes (matches legacy KadasMilxItem::nodes).
+  QList<int> controlIndices;
+  KadasMilxClient::getControlPointIndices( milx->mssString(), pts.size(), KadasMilxClient::globalSymbolSettings(), controlIndices );
+
+  // MilX points are stored in EPSG:4326; project them to the map CRS for display.
+  const QgsCoordinateTransform xform( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
+
+  QList<KadasNode> result;
+  result.reserve( pts.size() );
+  for ( int i = 0; i < pts.size(); ++i )
+  {
+    QgsPointXY mapPt = pts[i];
+    try
+    {
+      mapPt = xform.transform( pts[i] );
+    }
+    catch ( const QgsCsException & )
+    {
+      continue;
+    }
+    const auto renderer = controlIndices.contains( i ) ? &ctrlPointNodeRenderer : &posPointNodeRenderer;
+    result.append( { mapPt, renderer } );
+  }
+  return result;
 }
 
 bool KadasMilxAnnotationController::startPart( QgsAnnotationItem *, const QgsPointXY &, const KadasAnnotationItemContext & )
