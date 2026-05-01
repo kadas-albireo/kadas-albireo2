@@ -35,12 +35,9 @@
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
 #include "kadas/gui/annotationitems/kadasgpxrouteannotationitem.h"
 #include "kadas/gui/annotationitems/kadasgpxwaypointannotationitem.h"
-#include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/kadaslayerselectionwidget.h"
 #include "kadas/gui/mapitemeditors/kadasgpxrouteeditor.h"
 #include "kadas/gui/mapitemeditors/kadasgpxwaypointeditor.h"
-#include "kadas/gui/mapitems/kadasgpxrouteitem.h"
-#include "kadas/gui/mapitems/kadasgpxwaypointitem.h"
 #include "kadas/gui/mapitems/kadaslineitem.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
@@ -214,17 +211,6 @@ void KadasGpxIntegration::saveGpx()
   dialog.setWindowTitle( tr( "Export to GPX" ) );
   dialog.setLayout( new QVBoxLayout );
   KadasLayerSelectionWidget *layerSelectionWidget = new KadasLayerSelectionWidget( kApp->mainWindow()->mapCanvas(), kApp->mainWindow()->layerTreeView(), []( QgsMapLayer *layer ) {
-    if ( auto *itemLayer = dynamic_cast<KadasItemLayer *>( layer ) )
-    {
-      for ( KadasMapItem *item : itemLayer->items() )
-      {
-        if ( dynamic_cast<KadasGpxWaypointItem *>( item ) || dynamic_cast<KadasGpxRouteItem *>( item ) )
-        {
-          return true;
-        }
-      }
-      return false;
-    }
     if ( auto *annoLayer = dynamic_cast<QgsAnnotationLayer *>( layer ) )
     {
       const QMap<QString, QgsAnnotationItem *> items = annoLayer->items();
@@ -309,21 +295,7 @@ void KadasGpxIntegration::saveGpx()
     gpxEl.appendChild( rteEl );
   };
 
-  if ( auto *itemLayer = dynamic_cast<KadasItemLayer *>( selectedLayer ) )
-  {
-    for ( const KadasMapItem *item : itemLayer->items() )
-    {
-      if ( const auto *waypoint = dynamic_cast<const KadasGpxWaypointItem *>( item ) )
-      {
-        appendWaypoint( waypoint->point(), waypoint->name() );
-      }
-      else if ( const auto *route = dynamic_cast<const KadasGpxRouteItem *>( item ) )
-      {
-        appendRoute( route->geometry(), route->name(), route->number() );
-      }
-    }
-  }
-  else if ( auto *annoLayer = dynamic_cast<QgsAnnotationLayer *>( selectedLayer ) )
+  if ( auto *annoLayer = dynamic_cast<QgsAnnotationLayer *>( selectedLayer ) )
   {
     const QMap<QString, QgsAnnotationItem *> items = annoLayer->items();
     for ( auto it = items.constBegin(); it != items.constEnd(); ++it )
