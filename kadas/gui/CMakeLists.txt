@@ -42,6 +42,7 @@ set(kadas_gui_SRC
     annotationitems/kadasgpxwaypointannotationitem.cpp
     annotationitems/kadaslineannotationcontroller.cpp
     annotationitems/kadasmarkerannotationcontroller.cpp
+    annotationitems/kadasmilxannotationcontroller.cpp
     annotationitems/kadasmilxannotationitem.cpp
     annotationitems/kadaspictureannotationcontroller.cpp
     annotationitems/kadaspinannotationcontroller.cpp
@@ -153,6 +154,7 @@ set(kadas_gui_HDR
     annotationitems/kadasgpxwaypointannotationitem.h
     annotationitems/kadaslineannotationcontroller.h
     annotationitems/kadasmarkerannotationcontroller.h
+    annotationitems/kadasmilxannotationcontroller.h
     annotationitems/kadasmilxannotationitem.h
     annotationitems/kadaspictureannotationcontroller.h
     annotationitems/kadaspinannotationcontroller.h
