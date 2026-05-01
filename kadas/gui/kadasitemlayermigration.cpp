@@ -52,13 +52,15 @@ int KadasItemLayerMigration::migrateProject( QgsProject *project )
     bool allTranslatable = true;
     for ( auto it = items.constBegin(); it != items.constEnd(); ++it )
     {
-      std::unique_ptr<QgsAnnotationItem> probe( it.value()->annotationItem() );
-      if ( !probe )
+      const QList<QgsAnnotationItem *> probe = it.value()->annotationItems();
+      if ( probe.isEmpty() )
       {
         QgsDebugMsgLevel( QStringLiteral( "Skipping migration of layer %1: item type %2 has no annotationItem() override yet" ).arg( itemLayer->name(), it.value()->metaObject()->className() ), 2 );
         allTranslatable = false;
+        qDeleteAll( probe );
         break;
       }
+      qDeleteAll( probe );
     }
     if ( !allTranslatable )
       continue;
@@ -74,14 +76,15 @@ int KadasItemLayerMigration::migrateProject( QgsProject *project )
     for ( KadasItemLayer::ItemId id : orderedIds )
     {
       KadasMapItem *legacy = items[id];
-      QgsAnnotationItem *anno = legacy->annotationItem( annoLayer->crs() );
-      if ( !anno )
-        continue;
-      const QString newId = annoLayer->addItem( anno );
-      if ( !legacy->tooltip().isEmpty() )
-        KadasAnnotationLayerHelpers::setTooltip( annoLayer, newId, legacy->tooltip() );
-      if ( !legacy->editor().isEmpty() )
-        KadasAnnotationLayerHelpers::setEditorName( annoLayer, newId, legacy->editor() );
+      const QList<QgsAnnotationItem *> annos = legacy->annotationItems( annoLayer->crs() );
+      for ( QgsAnnotationItem *anno : annos )
+      {
+        const QString newId = annoLayer->addItem( anno );
+        if ( !legacy->tooltip().isEmpty() )
+          KadasAnnotationLayerHelpers::setTooltip( annoLayer, newId, legacy->tooltip() );
+        if ( !legacy->editor().isEmpty() )
+          KadasAnnotationLayerHelpers::setEditorName( annoLayer, newId, legacy->editor() );
+      }
     }
 
     project->addMapLayer( annoLayer );

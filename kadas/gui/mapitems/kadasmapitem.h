@@ -311,6 +311,16 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     //! Returns the QgsAnnotationItem in the given crs (if not specified, no transformation occurs)
     virtual QgsAnnotationItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const SIP_FACTORY { return nullptr; }
 
+    /**
+     * Returns one QgsAnnotationItem per geometry part in the given \a crs.
+     *
+     * The default implementation wraps annotationItem() in a single-element
+     * list (empty when the override is missing). Multi-part subclasses
+     * (lines/polygons) override this to emit one annotation per part, since
+     * QgsAnnotationLineItem/QgsAnnotationPolygonItem hold a single curve.
+     */
+    virtual QList<QgsAnnotationItem *> annotationItems( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const SIP_FACTORY;
+
     virtual QString itemName() const = 0;
     virtual QString exportName() const;
 
