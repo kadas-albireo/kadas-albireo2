@@ -1467,11 +1467,15 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
     {
       file.write( mimeData->data( "image/svg+xml" ) );
       file.close();
-      KadasSymbolItem *item = new KadasSymbolItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
-      QgsCoordinateTransform crst( mapCrs, item->crs(), QgsProject::instance() );
-      item->setup( filename, 0.5, 0.5 );
-      item->setPosition( KadasItemPos::fromPoint( crst.transform( pastePos ) ) );
-      return new KadasMapToolEditItem( canvas, item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::SymbolsLayer ) );
+      QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::SymbolsLayer );
+      const QgsCoordinateTransform mapToLayer( mapCrs, layer->crs(), QgsProject::instance()->transformContext() );
+      const QgsPointXY layerPos = mapToLayer.transform( pastePos );
+      auto *item = new QgsAnnotationPictureItem( Qgis::PictureFormat::SVG, filename, QgsRectangle( layerPos.x(), layerPos.y(), layerPos.x(), layerPos.y() ) );
+      item->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
+      item->setFixedSize( QSizeF( 64, 64 ) );
+      item->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
+      const QString itemId = layer->addItem( item );
+      return new KadasMapToolEditAnnotationItem( canvas, layer, itemId );
     }
   }
   else
@@ -1482,10 +1486,15 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
       QImage image = qvariant_cast<QImage>( mimeData->imageData() );
       QString filename = QgsProject::instance()->createAttachedFile( "pasted_image.png" );
       image.save( filename );
-      KadasPictureItem *item = new KadasPictureItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
-      QgsCoordinateTransform crst( mapCrs, item->crs(), QgsProject::instance() );
-      item->setup( filename, KadasItemPos::fromPoint( crst.transform( pastePos ) ) );
-      return new KadasMapToolEditItem( canvas, item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PicturesLayer ) );
+      QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::PicturesLayer );
+      const QgsCoordinateTransform mapToLayer( mapCrs, layer->crs(), QgsProject::instance()->transformContext() );
+      const QgsPointXY layerPos = mapToLayer.transform( pastePos );
+      auto *item = new QgsAnnotationPictureItem( Qgis::PictureFormat::Raster, filename, QgsRectangle( layerPos.x(), layerPos.y(), layerPos.x(), layerPos.y() ) );
+      item->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
+      item->setFixedSize( QSizeF( 100, 100 ) );
+      item->setFixedSizeUnit( Qgis::RenderUnit::Millimeters );
+      const QString itemId = layer->addItem( item );
+      return new KadasMapToolEditAnnotationItem( canvas, layer, itemId );
     }
   }
   return nullptr;
