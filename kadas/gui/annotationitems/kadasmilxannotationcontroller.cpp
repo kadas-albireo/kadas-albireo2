@@ -14,13 +14,29 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QApplication>
+#include <QIcon>
+#include <QMainWindow>
+#include <QMenu>
 #include <QObject>
 #include <QPainter>
+#include <QTextStream>
+#include <QUuid>
 #include <limits>
 
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgsmapsettings.h>
+#include <qgis/qgsmaptopixel.h>
+#include <qgis/qgspoint.h>
 #include <qgis/qgspointxy.h>
+#include <qgis/qgsproject.h>
+#include <qgis/qgsrendercontext.h>
+#include <qgis/qgsunittypes.h>
+
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
+#include <quazip/quazipnewinfo.h>
 
 #include "kadas/gui/annotationitems/kadasmilxannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
@@ -463,10 +479,191 @@ void KadasMilxAnnotationController::translate( QgsAnnotationItem *item, double d
   milx->setAttributePoints( aps );
 }
 
-QString KadasMilxAnnotationController::asKml( const QgsAnnotationItem *, const QgsCoordinateReferenceSystem &, const QgsRenderContext &, QuaZip * ) const
+QString KadasMilxAnnotationController::asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip ) const
 {
-  // TODO slice 38: render symbol → KMZ image placemark.
-  return QString();
+  // Mirrors the legacy KadasMilxItem::asKml: render the symbol at a fixed
+  // world-wide extent, store the PNG inside the KMZ, then emit either a
+  // <Placemark>+<StyleMap> (single-point) or a <GroundOverlay> (multipoint).
+  if ( !kmzZip )
+    return QString();
+
+  const auto *milx = static_cast<const KadasMilxAnnotationItem *>( item );
+  if ( milx->mssString().isEmpty() || milx->points().isEmpty() )
+    return QString();
+
+  // Build a transient QgsMapSettings that mimics the legacy export render
+  // context (world extent in EPSG:4326). Reusing item-level helpers keeps
+  // the libmss IPC path identical to the on-canvas one.
+  const QgsRectangle worldExtent( -180., -90., 180., 90. );
+  const double factor = QgsUnitTypes::fromUnitToUnitFactor( Qgis::DistanceUnit::Degrees, Qgis::DistanceUnit::Meters ) * renderContext.scaleFactor() * 1000 / renderContext.rendererScale();
+  QgsMapSettings ms;
+  ms.setDestinationCrs( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ) );
+  ms.setExtent( worldExtent );
+  ms.setOutputSize( QSize( static_cast<int>( worldExtent.width() * factor ), static_cast<int>( worldExtent.height() * factor ) ) );
+  ms.setOutputDpi( renderContext.painter() && renderContext.painter()->device() ? renderContext.painter()->device()->logicalDpiX() : 96 );
+  ms.setTransformContext( renderContext.transformContext() );
+
+  KadasMilxClient::NPointSymbol symbol = milx->toSymbol( ms );
+  KadasMilxClient::NPointSymbolGraphic result;
+  if ( !KadasMilxClient::updateSymbol( KadasMilxAnnotationItem::computeScreenExtent( ms ), ms.outputDpi(), symbol, KadasMilxClient::globalSymbolSettings(), result, /* returnPoints */ true ) )
+  {
+    return QString();
+  }
+
+  QString fileName = QUuid::createUuid().toString();
+  fileName = fileName.mid( 1, fileName.length() - 2 ) + QStringLiteral( ".png" );
+  QuaZipFile outputFile( kmzZip );
+  QuaZipNewInfo info( fileName );
+  info.setPermissions( QFile::ReadOwner | QFile::ReadUser | QFile::ReadGroup | QFile::ReadOther );
+  if ( !outputFile.open( QIODevice::WriteOnly, info ) || !result.graphic.save( &outputFile, "PNG" ) )
+  {
+    return QString();
+  }
+
+  // Item geometry is always EPSG:4326; the itemCrs argument is informational
+  // here (and matches itemCrs of the parent annotation layer in practice).
+  QgsPoint pos( milx->points().front() );
+  if ( itemCrs.isValid() && itemCrs != QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ) )
+  {
+    pos.transform( QgsCoordinateTransform( itemCrs, QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), QgsProject::instance() ) );
+  }
+
+  QString outString;
+  QTextStream outStream( &outString );
+
+  if ( !milx->isMultiPoint() )
+  {
+    const double hotSpotX = -result.offset.x();
+    const double hotSpotY = -result.offset.y();
+    QString id = QUuid::createUuid().toString();
+    id = id.mid( 1, id.length() - 2 );
+    outStream << "<StyleMap id=\"" << id << "\">\n";
+    for ( const QString &key : { QStringLiteral( "normal" ), QStringLiteral( "highlight" ) } )
+    {
+      outStream << "  <Pair>\n    <key>" << key << "</key>\n    <Style>\n      <IconStyle>\n";
+      outStream << "        <scale>1.0</scale>\n";
+      outStream << "        <Icon><href>" << fileName << "</href></Icon>\n";
+      outStream << "        <hotSpot x=\"" << hotSpotX << "\" y=\"" << hotSpotY << "\" xunits=\"insetPixels\" yunits=\"insetPixels\" />\n";
+      outStream << "      </IconStyle>\n    </Style>\n  </Pair>\n";
+    }
+    outStream << "</StyleMap>\n";
+    outStream << "<Placemark>\n";
+    outStream << "  <name>" << milx->militaryName() << "</name>\n";
+    outStream << "  <styleUrl>#" << id << "</styleUrl>\n";
+    outStream << "  <Point>\n";
+    outStream << "    <coordinates>" << QString::number( pos.x(), 'f', 10 ) << "," << QString::number( pos.y(), 'f', 10 ) << ",0</coordinates>\n";
+    outStream << "  </Point>\n";
+    outStream << "</Placemark>\n";
+  }
+  else
+  {
+    const QPoint offset = result.adjustedPoints.front() + result.offset;
+    const QgsPointXY pNW = ms.mapToPixel().toMapCoordinates( offset.x(), offset.y() );
+    const QgsPointXY pSE = ms.mapToPixel().toMapCoordinates( offset.x() + result.graphic.width(), offset.y() + result.graphic.height() );
+    outStream << "<GroundOverlay>\n";
+    outStream << "<name>" << milx->militaryName() << "</name>\n";
+    outStream << "<Icon><href>" << fileName << "</href></Icon>\n";
+    outStream << "<LatLonBox>\n";
+    outStream << "<north>" << pNW.y() << "</north>\n";
+    outStream << "<south>" << pSE.y() << "</south>\n";
+    outStream << "<east>" << pSE.x() << "</east>\n";
+    outStream << "<west>" << pNW.x() << "</west>\n";
+    outStream << "</LatLonBox>\n";
+    outStream << "</GroundOverlay>\n";
+  }
+  outStream.flush();
+  return outString;
+}
+
+namespace
+{
+  // Pick the topmost main window, used as parent for libmss' modal symbol
+  // editor dialog (mirrors the legacy KadasMilxItem behavior).
+  WId mainWindowWid()
+  {
+    for ( QWidget *widget : QApplication::topLevelWidgets() )
+    {
+      if ( qobject_cast<QMainWindow *>( widget ) )
+        return widget->effectiveWinId();
+    }
+    return 0;
+  }
+} // namespace
+
+void KadasMilxAnnotationController::populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx )
+{
+  auto *milx = static_cast<KadasMilxAnnotationItem *>( item );
+  if ( milx->mssString().isEmpty() )
+    return;
+
+  const QRect screenRect = KadasMilxAnnotationItem::computeScreenExtent( ctx.mapSettings() );
+  const int dpi = ctx.mapSettings().outputDpi();
+  const QPoint screenPos = ctx.mapSettings().mapToPixel().transform( clickPos ).toQPointF().toPoint();
+  KadasMilxClient::NPointSymbol symbol = milx->toSymbol( ctx.mapSettings() );
+
+  // Symbol editor (libmss modal dialog) — also wired up on double-click.
+  menu->addAction( QIcon( QStringLiteral( ":/kadas/icons/editor" ) ), QObject::tr( "Symbol editor..." ), [milx, &ctxRef = ctx, screenRect, dpi, symbol]() mutable {
+    KadasMilxClient::NPointSymbolGraphic result;
+    QString newMssString = milx->mssString();
+    QString newMilitaryName = milx->militaryName();
+    if ( KadasMilxClient::editSymbol( screenRect, dpi, symbol, newMssString, newMilitaryName, KadasMilxClient::globalSymbolSettings(), result, mainWindowWid() ) )
+    {
+      milx->setMssString( newMssString );
+      milx->setMilitaryName( newMilitaryName );
+      milx->applySymbolResult( ctxRef.mapSettings(), result );
+    }
+  } );
+
+  if ( milx->isMultiPoint() )
+  {
+    if ( editContext.vidx.vertex >= 0 )
+    {
+      // Right-click on an existing node → delete (if libmss says it's removable).
+      QAction *actionDeletePoint = menu->addAction( QIcon( QStringLiteral( ":/kadas/icons/delete_node" ) ), QObject::tr( "Delete node" ), [milx, &ctxRef = ctx, screenRect, dpi, symbol, editContext]() mutable {
+        KadasMilxClient::NPointSymbolGraphic result;
+        if ( KadasMilxClient::deletePoint( screenRect, dpi, symbol, editContext.vidx.vertex, KadasMilxClient::globalSymbolSettings(), result ) )
+          milx->applySymbolResult( ctxRef.mapSettings(), result );
+      } );
+      bool canDelete = false;
+      actionDeletePoint->setEnabled( KadasMilxClient::canDeletePoint( symbol, KadasMilxClient::globalSymbolSettings(), editContext.vidx.vertex, canDelete ) && canDelete );
+    }
+    else
+    {
+      // Right-click on the symbol body → insert a node at the click position.
+      menu->addAction( QIcon( QStringLiteral( ":/kadas/icons/add_node" ) ), QObject::tr( "Add node" ), [milx, &ctxRef = ctx, screenRect, dpi, symbol, screenPos]() mutable {
+        KadasMilxClient::NPointSymbolGraphic result;
+        if ( KadasMilxClient::insertPoint( screenRect, dpi, symbol, screenPos, KadasMilxClient::globalSymbolSettings(), result ) )
+          milx->applySymbolResult( ctxRef.mapSettings(), result );
+      } );
+    }
+  }
+  else
+  {
+    // Single-point symbols carry a screen-space user offset; offer to reset.
+    QAction *action = menu->addAction( QObject::tr( "Reset offset" ), [milx]() { milx->setUserOffset( QPoint() ); } );
+    action->setEnabled( !milx->userOffset().isNull() );
+  }
+}
+
+void KadasMilxAnnotationController::onDoubleClick( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx )
+{
+  auto *milx = static_cast<KadasMilxAnnotationItem *>( item );
+  if ( milx->mssString().isEmpty() )
+    return;
+
+  const QRect screenRect = KadasMilxAnnotationItem::computeScreenExtent( ctx.mapSettings() );
+  const int dpi = ctx.mapSettings().outputDpi();
+  KadasMilxClient::NPointSymbol symbol = milx->toSymbol( ctx.mapSettings() );
+
+  KadasMilxClient::NPointSymbolGraphic result;
+  QString newMssString = milx->mssString();
+  QString newMilitaryName = milx->militaryName();
+  if ( KadasMilxClient::editSymbol( screenRect, dpi, symbol, newMssString, newMilitaryName, KadasMilxClient::globalSymbolSettings(), result, mainWindowWid() ) )
+  {
+    milx->setMssString( newMssString );
+    milx->setMilitaryName( newMilitaryName );
+    milx->applySymbolResult( ctx.mapSettings(), result );
+  }
 }
 
 bool KadasMilxAnnotationController::hitTest( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
