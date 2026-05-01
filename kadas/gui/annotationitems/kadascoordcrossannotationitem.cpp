@@ -23,12 +23,14 @@
 #include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgsrendercontext.h>
 
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadascoordcrossannotationitem.h"
 
 
 KadasCoordCrossAnnotationItem::KadasCoordCrossAnnotationItem( const QgsPoint &point )
   : QgsAnnotationMarkerItem( point )
 {
+  setZIndex( KadasAnnotationZIndex::CoordCross );
   installDefaultSymbol();
 }
 

@@ -16,6 +16,7 @@
 
 #include <QObject>
 
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasgpxrouteannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadasgpxrouteannotationitem.h"
 
@@ -32,5 +33,7 @@ QString KadasGpxRouteAnnotationController::itemName() const
 
 QgsAnnotationItem *KadasGpxRouteAnnotationController::createItem() const
 {
-  return new KadasGpxRouteAnnotationItem();
+  auto *item = new KadasGpxRouteAnnotationItem();
+  item->setZIndex( KadasAnnotationZIndex::GpxRoute );
+  return item;
 }

@@ -26,12 +26,14 @@
 #include <qgis/qgstextformat.h>
 #include <qgis/qgstextrenderer.h>
 
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasgpxwaypointannotationitem.h"
 
 
 KadasGpxWaypointAnnotationItem::KadasGpxWaypointAnnotationItem( const QgsPoint &point )
   : QgsAnnotationMarkerItem( point )
 {
+  setZIndex( KadasAnnotationZIndex::GpxWaypoint );
   mLabelFont.setPointSize( 10 );
   mLabelFont.setBold( true );
   installDefaultSymbol();

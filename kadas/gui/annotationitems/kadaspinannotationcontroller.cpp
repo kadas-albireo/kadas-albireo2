@@ -16,6 +16,7 @@
 
 #include <QObject>
 
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadaspinannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 
@@ -32,5 +33,7 @@ QString KadasPinAnnotationController::itemName() const
 
 QgsAnnotationItem *KadasPinAnnotationController::createItem() const
 {
-  return new KadasPinAnnotationItem();
+  auto *item = new KadasPinAnnotationItem();
+  item->setZIndex( KadasAnnotationZIndex::Pin );
+  return item;
 }

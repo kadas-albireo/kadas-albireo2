@@ -28,12 +28,14 @@
 #include <qgis/qgsrendercontext.h>
 #include <qgis/qgssymbollayerutils.h>
 
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasgpxrouteannotationitem.h"
 
 
 KadasGpxRouteAnnotationItem::KadasGpxRouteAnnotationItem( QgsCurve *curve )
   : QgsAnnotationLineItem( curve )
 {
+  setZIndex( KadasAnnotationZIndex::GpxRoute );
   mLabelFont.setPointSize( 10 );
   mLabelFont.setBold( true );
   installDefaultSymbol();

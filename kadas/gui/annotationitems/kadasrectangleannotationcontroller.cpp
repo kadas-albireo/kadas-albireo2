@@ -23,6 +23,7 @@
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsproject.h>
 
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasrectangleannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadasrectangleannotationitem.h"
 
@@ -53,7 +54,9 @@ QString KadasRectangleAnnotationController::itemName() const
 
 QgsAnnotationItem *KadasRectangleAnnotationController::createItem() const
 {
-  return new KadasRectangleAnnotationItem();
+  auto *item = new KadasRectangleAnnotationItem();
+  item->setZIndex( KadasAnnotationZIndex::Rectangle );
+  return item;
 }
 
 QList<KadasMapItem::Node> KadasRectangleAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
