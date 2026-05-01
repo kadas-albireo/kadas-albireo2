@@ -51,6 +51,11 @@
 #include "kadas/gui/kadasclipboard.h"
 #include "kadas/gui/kadascoordinatedisplayer.h"
 #include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
+#include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
+#include "kadas/gui/annotationitems/kadaspinannotationitem.h"
+#include "kadas/gui/maptools/kadasmaptoolcreateannotationitem.h"
 #include "kadas/gui/kadasmapcanvasitem.h"
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/kadasprojecttemplateselectiondialog.h"
@@ -1468,7 +1473,13 @@ int KadasMainWindow::messageTimeout() const
 
 QgsMapTool *KadasMainWindow::addPinTool()
 {
-  return new KadasMapToolCreateItem( mapCanvas(), std::move( std::make_unique<KadasSymbolAttributesEditorInterface>( KadasSymbolAttributesEditorInterface() ) ), KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PinsLayer ) );
+  KadasAnnotationItemController *controller = KadasAnnotationControllerRegistry::instance()->controllerFor( KadasPinAnnotationItem::itemTypeId() );
+  QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::PinsLayer );
+  if ( !controller || !layer )
+    return nullptr;
+  auto *tool = new KadasMapToolCreateAnnotationItem( mapCanvas(), controller, layer );
+  tool->setMultipart( false );
+  return tool;
 }
 
 void KadasMainWindow::addLocalPicture()
