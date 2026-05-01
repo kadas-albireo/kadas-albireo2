@@ -54,6 +54,7 @@ class KadasCanvasContextMenu : public QMenu
 
     void copyFeature();
     void deleteItems();
+    void deleteAnnotationItem();
     void editItem();
     void raiseItem();
     void lowerItem();
