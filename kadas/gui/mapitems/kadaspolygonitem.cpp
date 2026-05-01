@@ -29,6 +29,14 @@
 #include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
 
+#include <qgis/qgsannotationpolygonitem.h>
+#include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgscurvepolygon.h>
+#include <qgis/qgsfillsymbol.h>
+#include <qgis/qgsfillsymbollayer.h>
+#include <qgis/qgssymbollayer.h>
+
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/mapitems/kadaspolygonitem.h"
 
 
@@ -336,6 +344,38 @@ KadasMapItem *KadasPolygonItem::_clone() const
 QgsMultiPolygon *KadasPolygonItem::geometry()
 {
   return static_cast<QgsMultiPolygon *>( mGeometry );
+}
+
+QList<QgsAnnotationItem *> KadasPolygonItem::annotationItems( const QgsCoordinateReferenceSystem &crs ) const
+{
+  QList<QgsAnnotationItem *> items;
+  const QgsMultiPolygon *mp = geometry();
+  if ( !mp || mp->isEmpty() )
+    return items;
+
+  std::unique_ptr<QgsMultiPolygon> clone( mp->clone() );
+  if ( crs.isValid() && mCrs != crs )
+  {
+    QgsCoordinateTransform ct( mCrs, crs, QgsProject::instance() );
+    clone->transform( ct );
+  }
+
+  auto makeSymbol = [&]() {
+    auto *layer = new QgsSimpleFillSymbolLayer( mBrush.color(), mBrush.style(), mPen.color(), mPen.style(), mPen.widthF() );
+    layer->setStrokeWidthUnit( Qgis::RenderUnit::Pixels );
+    return new QgsFillSymbol( QgsSymbolLayerList() << layer );
+  };
+
+  const int z = zIndex() ? zIndex() : KadasAnnotationZIndex::Polygon;
+  for ( int i = 0, n = clone->numGeometries(); i < n; ++i )
+  {
+    auto *poly = static_cast<QgsCurvePolygon *>( clone->geometryN( i )->clone() );
+    auto *anno = new QgsAnnotationPolygonItem( poly );
+    anno->setSymbol( makeSymbol() );
+    anno->setZIndex( z );
+    items.append( anno );
+  }
+  return items;
 }
 
 void KadasPolygonItem::measureGeometry()

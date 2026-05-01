@@ -63,6 +63,8 @@ class KADAS_GUI_EXPORT KadasPolygonItem : public KadasGeometryItem
     void addPartFromGeometry( const QgsAbstractGeometry &geom ) override;
     const QgsMultiPolygon *geometry() const;
 
+    QList<QgsAnnotationItem *> annotationItems( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const override SIP_FACTORY;
+
     struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
         QList<QList<KadasItemPos>> points;
