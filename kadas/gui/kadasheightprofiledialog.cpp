@@ -58,10 +58,11 @@
 #ifdef Q_OS_MAC
 #include "kadas/gui/kadasclipboardutils.h"
 #endif
-#include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/mapitems/kadaslineitem.h"
-#include "kadas/gui/mapitems/kadassymbolitem.h"
+#include <qgis/qgsannotationlayer.h>
+#include <qgis/qgsannotationpictureitem.h>
 #include "kadas/gui/maptools/kadasmaptoolheightprofile.h"
 
 
@@ -847,16 +848,24 @@ void KadasHeightProfileDialog::copyToClipboard()
 
 void KadasHeightProfileDialog::addToCanvas()
 {
-  QImage image = renderPlotImage();
+  const QImage image = renderPlotImage();
 
-  QString filename = QgsProject::instance()->createAttachedFile( "heightProfile.png" );
+  const QString filename = QgsProject::instance()->createAttachedFile( "heightProfile.png" );
   image.save( filename );
 
-  KadasSymbolItem *item = new KadasSymbolItem( mTool->canvas()->mapSettings().destinationCrs() );
-  item->setFilePath( filename );
-  item->setPosition( KadasItemPos::fromPoint( mTool->canvas()->extent().center() ) );
-  KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::SymbolsLayer )->addItem( item );
-  KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::SymbolsLayer )->triggerRepaint();
+  QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::SymbolsLayer );
+  const QgsCoordinateTransform canvasToLayer( mTool->canvas()->mapSettings().destinationCrs(), layer->crs(), QgsProject::instance()->transformContext() );
+  const QgsPointXY center = canvasToLayer.transform( mTool->canvas()->extent().center() );
+  const QgsRectangle bounds( center.x(), center.y(), center.x(), center.y() );
+
+  auto *item = new QgsAnnotationPictureItem( Qgis::PictureFormat::Raster, filename, bounds );
+  item->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
+  const double widthMm = 80.0;
+  const double aspect = image.height() > 0 ? static_cast<double>( image.width() ) / image.height() : 1.0;
+  item->setFixedSize( QSizeF( widthMm, widthMm / aspect ) );
+  item->setFixedSizeUnit( Qgis::RenderUnit::Millimeters );
+  layer->addItem( item );
+  layer->triggerRepaint();
 }
 
 void KadasHeightProfileDialog::saveToFile()
