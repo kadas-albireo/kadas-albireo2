@@ -48,6 +48,8 @@ class KADAS_GUI_EXPORT KadasGpxRouteItem : public KadasLineItem
     Margin margin() const override;
     void render( QgsRenderContext &context ) const override;
 
+    QList<QgsAnnotationItem *> annotationItems( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const override SIP_FACTORY;
+
   protected:
     KadasMapItem *_clone() const override SIP_FACTORY { return new KadasGpxRouteItem(); }
 
