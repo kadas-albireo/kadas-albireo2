@@ -37,6 +37,7 @@ class KADAS_GUI_EXPORT KadasMilxAnnotationController : public KadasAnnotationIte
 
     QString itemType() const override;
     QString itemName() const override;
+    QString defaultEditorName() const override { return QStringLiteral( "KadasMilxEditor" ); }
     QgsAnnotationItem *createItem() const override;
 
     QList<KadasNode> nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const override;
@@ -63,6 +64,8 @@ class KADAS_GUI_EXPORT KadasMilxAnnotationController : public KadasAnnotationIte
     void translate( QgsAnnotationItem *item, double dx, double dy ) override;
 
     bool hitTest( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const override;
+    void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx ) override;
+    void onDoubleClick( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) override;
 
     QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = nullptr ) const override;
 
