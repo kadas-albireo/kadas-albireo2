@@ -16,9 +16,17 @@
 
 #include <QDomDocument>
 #include <QDomElement>
+#include <QPainter>
+#include <QPaintDevice>
+
+#include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgsmaptopixel.h>
+#include <qgis/qgsproject.h>
+#include <qgis/qgsrendercontext.h>
 
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
+#include "kadas/gui/milx/kadasmilxclient.h"
 
 
 KadasMilxAnnotationItem::KadasMilxAnnotationItem()
@@ -43,11 +51,60 @@ QgsRectangle KadasMilxAnnotationItem::boundingBox() const
 
 void KadasMilxAnnotationItem::render( QgsRenderContext &context, QgsFeedback *feedback )
 {
-  // Skeleton: rendering is implemented in a later slice (delegates to
-  // KadasMilxClient::updateSymbol). No-op for now so empty MilX items load
-  // and round-trip through QgsAnnotationLayer XML.
-  Q_UNUSED( context )
   Q_UNUSED( feedback )
+  if ( mPoints.isEmpty() || mMssString.isEmpty() )
+    return;
+
+  // MilX items are stored in EPSG:4326. Project to the destination CRS, then
+  // convert to screen pixels via QgsMapToPixel — same as the legacy
+  // KadasMilxItem::toSymbol() / render() path.
+  const QgsCoordinateTransform mapCrst( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), context.coordinateTransform().destinationCrs(), context.transformContext() );
+  QList<QPoint> screenPoints;
+  screenPoints.reserve( mPoints.size() );
+  for ( const QgsPointXY &pt : mPoints )
+  {
+    QgsPointXY mapPt = pt;
+    try
+    {
+      mapPt = mapCrst.transform( pt );
+    }
+    catch ( const QgsCsException & )
+    {
+      return;
+    }
+    screenPoints.append( context.mapToPixel().transform( mapPt ).toQPointF().toPoint() );
+  }
+
+  // libmss needs the on-screen extent of the visible map area in device pixels.
+  const QgsRectangle mapExtent = context.mapExtent();
+  const QgsMapToPixel &m2p = context.mapToPixel();
+  const QPoint tl = m2p.transform( mapExtent.xMinimum(), mapExtent.yMinimum() ).toQPointF().toPoint();
+  const QPoint tr = m2p.transform( mapExtent.xMaximum(), mapExtent.yMinimum() ).toQPointF().toPoint();
+  const QPoint bl = m2p.transform( mapExtent.xMinimum(), mapExtent.yMaximum() ).toQPointF().toPoint();
+  const QPoint br = m2p.transform( mapExtent.xMaximum(), mapExtent.yMaximum() ).toQPointF().toPoint();
+  const int xMin = std::min( { tl.x(), tr.x(), bl.x(), br.x() } );
+  const int xMax = std::max( { tl.x(), tr.x(), bl.x(), br.x() } );
+  const int yMin = std::min( { tl.y(), tr.y(), bl.y(), br.y() } );
+  const int yMax = std::max( { tl.y(), tr.y(), bl.y(), br.y() } );
+  const QRect screenExtent = QRect( xMin, yMin, xMax - xMin, yMax - yMin ).normalized();
+
+  const KadasMilxClient::NPointSymbol symbol(
+    mMssString,
+    screenPoints,
+    QList<int>(),
+    QList<QPair<int, double>>(),
+    /* finalized */ true,
+    /* colored */ true
+  );
+  KadasMilxClient::NPointSymbolGraphic result;
+  const int dpi = context.painter() && context.painter()->device() ? context.painter()->device()->logicalDpiX() : 96;
+  if ( !KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, KadasMilxClient::globalSymbolSettings(), result, /* returnPoints */ false ) )
+  {
+    return;
+  }
+
+  const QPoint renderPos = symbol.points.front() + result.offset;
+  context.painter()->drawImage( renderPos, result.graphic );
 }
 
 bool KadasMilxAnnotationItem::writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const
