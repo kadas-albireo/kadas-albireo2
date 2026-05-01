@@ -27,7 +27,6 @@
 
 class QAction;
 
-class KadasItemLayer;
 class KadasMainWindow;
 class QgsAnnotationLayer;
 
