@@ -58,6 +58,8 @@ class KADAS_GUI_EXPORT KadasCoordinateCrossItem : public KadasMapItem
     KadasItemPos position() const override;
     void setPosition( const KadasItemPos &pos ) override;
 
+    QgsAnnotationItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const override SIP_FACTORY;
+
     struct KADAS_GUI_EXPORT State : KadasMapItem::State
     {
         KadasItemPos pos;
