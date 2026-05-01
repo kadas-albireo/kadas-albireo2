@@ -143,7 +143,7 @@ void KadasMapToolCreateAnnotationItem::canvasPressEvent( QgsMapMouseEvent *e )
 
   if ( e->button() == Qt::LeftButton )
   {
-    addPoint( KadasMapPos::fromPoint( e->mapPoint() ) );
+    addPoint( e->mapPoint() );
   }
   else if ( e->button() == Qt::RightButton )
   {
@@ -167,7 +167,7 @@ void KadasMapToolCreateAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
     return;
 
   KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
-  const KadasMapPos pos = KadasMapPos::fromPoint( e->mapPoint() );
+  const QgsPointXY pos = e->mapPoint();
   mController->setCurrentPoint( mItem, pos, ctx );
   mLayer->triggerRepaint();
 
@@ -218,7 +218,7 @@ void KadasMapToolCreateAnnotationItem::keyPressEvent( QKeyEvent *e )
   }
 }
 
-void KadasMapToolCreateAnnotationItem::addPoint( const KadasMapPos &pos )
+void KadasMapToolCreateAnnotationItem::addPoint( const QgsPointXY &pos )
 {
   KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
 
@@ -258,7 +258,7 @@ void KadasMapToolCreateAnnotationItem::addPoint( const KadasMapPos &pos )
   }
 }
 
-void KadasMapToolCreateAnnotationItem::startPart( const KadasMapPos &pos )
+void KadasMapToolCreateAnnotationItem::startPart( const QgsPointXY &pos )
 {
   KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
   if ( !mController->startPart( mItem, pos, ctx ) )
@@ -369,7 +369,7 @@ void KadasMapToolCreateAnnotationItem::inputChanged()
   // mouse-move handler does not overwrite the user's typed values via
   // setCurrentPoint.
   mIgnoreNextMoveEvent = true;
-  const KadasMapPos newPos = mController->positionFromDrawAttribs( mItem, values, ctx );
+  const QgsPointXY newPos = mController->positionFromDrawAttribs( mItem, values, ctx );
   mInputWidget->adjustCursorAndExtent( newPos );
 
   if ( mDrawState == DrawState::Drawing )
