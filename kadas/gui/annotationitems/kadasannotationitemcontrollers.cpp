@@ -30,6 +30,7 @@
 #include "kadas/gui/annotationitems/kadasgpxwaypointannotationitem.h"
 #include "kadas/gui/annotationitems/kadaslineannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadasmarkerannotationcontroller.h"
+#include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
 #include "kadas/gui/annotationitems/kadaspictureannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadaspinannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
@@ -78,4 +79,5 @@ void KadasAnnotationItemControllers::registerBuiltins()
   registerType( itemRegistry, KadasCoordCrossAnnotationItem::itemTypeId(), QObject::tr( "Coordinate Cross" ), QObject::tr( "Coordinate Crosses" ), [] { return new KadasCoordCrossAnnotationItem(); } );
   registerType( itemRegistry, KadasGpxWaypointAnnotationItem::itemTypeId(), QObject::tr( "GPX Waypoint" ), QObject::tr( "GPX Waypoints" ), [] { return new KadasGpxWaypointAnnotationItem(); } );
   registerType( itemRegistry, KadasGpxRouteAnnotationItem::itemTypeId(), QObject::tr( "GPX Route" ), QObject::tr( "GPX Routes" ), [] { return new KadasGpxRouteAnnotationItem(); } );
+  registerType( itemRegistry, KadasMilxAnnotationItem::itemTypeId(), QObject::tr( "MilX Symbol" ), QObject::tr( "MilX Symbols" ), [] { return new KadasMilxAnnotationItem(); } );
 }

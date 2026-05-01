@@ -48,6 +48,7 @@ namespace KadasAnnotationZIndex
   constexpr int Pin = Marker;
   constexpr int CoordCross = Marker;
   constexpr int GpxWaypoint = Marker;
+  constexpr int Milx = Marker;
 
   // Text / labels paint above everything else.
   constexpr int PointText = 40000;
