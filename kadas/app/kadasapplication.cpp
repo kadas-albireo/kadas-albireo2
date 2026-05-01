@@ -1425,46 +1425,6 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
       return new KadasMapToolEditItemGroup( canvas, items, layer );
     }
   }
-  else if ( KadasClipboard::instance()->hasFormat( KADASCLIPBOARD_FEATURESTORE_MIME ) )
-  {
-    QList<KadasMapItem *> items;
-    const QgsFeatureStore &featureStore = KadasClipboard::instance()->getStoredFeatures();
-    for ( const QgsFeature &feature : featureStore.features() )
-    {
-      if ( feature.geometry().type() == Qgis::GeometryType::Point )
-      {
-        KadasPointItem *item = new KadasPointItem( featureStore.crs() );
-        item->setPoint( *qgsgeometry_cast<const QgsPoint *>( feature.geometry().constGet() ) );
-        items.append( item );
-      }
-      else if ( feature.geometry().type() == Qgis::GeometryType::Line )
-      {
-        KadasLineItem *item = new KadasLineItem( featureStore.crs() );
-        item->addPartFromGeometry( *feature.geometry().constGet() );
-        items.append( item );
-      }
-      else if ( feature.geometry().type() == Qgis::GeometryType::Polygon )
-      {
-        KadasPolygonItem *item = new KadasPolygonItem( featureStore.crs() );
-        item->addPartFromGeometry( *feature.geometry().constGet() );
-        items.append( item );
-      }
-    }
-    KadasItemLayer *layer = kApp->selectPasteTargetItemLayer( items );
-    if ( !layer )
-    {
-      qDeleteAll( items );
-      return nullptr;
-    }
-    else if ( items.size() == 1 )
-    {
-      return new KadasMapToolEditItem( canvas, items.front(), layer );
-    }
-    else
-    {
-      return new KadasMapToolEditItemGroup( canvas, items, layer );
-    }
-  }
   else if ( KadasClipboard::instance()->hasFormat( "image/svg+xml" ) )
   {
     const QMimeData *mimeData = QApplication::clipboard()->mimeData();
