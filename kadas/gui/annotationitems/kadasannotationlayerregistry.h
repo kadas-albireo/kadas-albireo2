@@ -50,7 +50,8 @@ class KADAS_GUI_EXPORT KadasAnnotationLayerRegistry : public QObject
       SymbolsLayer,
       PicturesLayer,
       PinsLayer,
-      RoutesLayer
+      RoutesLayer,
+      MssLayer
     };
 
     //! Returns the well-known annotation layer for \a layer, creating and
