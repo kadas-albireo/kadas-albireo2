@@ -349,30 +349,9 @@ QPair<KadasMapPos, double> KadasMilxItem::closestPoint( const KadasMapPos &pos, 
 
 void KadasMilxItem::render( QgsRenderContext &context ) const
 {
-  double dpiScale = outputDpiScale( context );
-  KadasMilxClient::NPointSymbol symbol = toSymbol( context.mapToPixel(), context.coordinateTransform().destinationCrs(), true );
-  KadasMilxClient::NPointSymbolGraphic result;
-
-  int dpi = context.painter()->device()->logicalDpiX();
-  QRect screenExtent = computeScreenExtent( context.mapExtent(), context.mapToPixel() );
-  KadasMilxSymbolSettings symSettings = symbolSettings();
-#ifndef Q_OS_WIN
-  // FIXME: Why only on non-windows?
-  symSettings.lineWidth *= dpiScale;
-  symSettings.symbolSize *= dpiScale;
-#endif
-  if ( !KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, symSettings, result, false ) )
-  {
-    return;
-  }
-  QPoint renderPos = symbol.points.front() + result.offset + constState()->userOffset * dpiScale;
-  if ( !isMultiPoint() )
-  {
-    // Draw line from visual reference point to actual refrence point
-    context.painter()->setPen( QPen( symSettings.leaderLineColor, symSettings.leaderLineWidth * dpiScale ) );
-    context.painter()->drawLine( symbol.points.front(), symbol.points.front() + constState()->userOffset * dpiScale );
-  }
-  context.painter()->drawImage( renderPos, result.graphic );
+  // Legacy MilX layers are converted to QgsAnnotationLayer at project
+  // load by KadasItemLayerMigration, so this code path is unreachable.
+  Q_UNUSED( context );
 }
 
 QList<QgsAnnotationItem *> KadasMilxItem::annotationItems( const QgsCoordinateReferenceSystem &crs ) const
