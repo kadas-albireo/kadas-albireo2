@@ -138,7 +138,7 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
     return;
   }
 
-  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
+  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
   const QgsPointXY pos = e->mapPoint();
 
   if ( e->buttons() == Qt::LeftButton )
@@ -199,7 +199,7 @@ void KadasMapToolEditAnnotationItem::canvasDoubleClickEvent( QgsMapMouseEvent * 
 {
   if ( !mItem || !mController || !mLayer )
     return;
-  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
+  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
   mController->onDoubleClick( mItem, ctx );
   mLayer->triggerRepaint();
 }
@@ -301,7 +301,7 @@ void KadasMapToolEditAnnotationItem::inputChanged()
   if ( !mEditContext.isValid() )
     return;
 
-  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
+  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
   const KadasAttribValues values = collectAttributeValues();
 
   // Suppress the spurious move event triggered by adjustCursorAndExtent.
