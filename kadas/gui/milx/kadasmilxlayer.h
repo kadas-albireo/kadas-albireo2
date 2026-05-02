@@ -35,9 +35,6 @@ class KADAS_GUI_EXPORT KadasMilxLayer : public KadasItemLayer
 
     KadasItemLayer *clone() const override SIP_FACTORY;
 
-    QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
-    ItemId pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY ) const override;
-
     bool importFromMilxly( const QDomElement &milxLayerEl, int dpi, QString &errorMsg );
 
     void setOverrideMilxSymbolSettings( bool overrideSettings ) { mOverrideMilxSymbolSettings = overrideSettings; }
@@ -61,8 +58,6 @@ class KADAS_GUI_EXPORT KadasMilxLayer : public KadasItemLayer
     const KadasMilxSymbolSettings &milxSymbolSettings() const;
 
   private:
-    class Renderer;
-
     bool mOverrideMilxSymbolSettings = false;
     KadasMilxSymbolSettings mMilxSymbolSettings;
 };
