@@ -177,10 +177,6 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     virtual KadasItemLayer::ItemId pickItem(
       const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY
     ) const;
-#ifndef SIP_RUN
-    [[deprecated( "Use variant taking the mapPos as first parameter instead" )]]
-#endif
-    KadasItemLayer::ItemId pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
 
 #ifndef SIP_RUN
     // TODO: SIP
