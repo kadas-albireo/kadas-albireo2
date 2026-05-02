@@ -36,19 +36,10 @@ class KADAS_GUI_EXPORT KadasMilxLayer : public KadasItemLayer
     bool overrideMilxSymbolSettings() const { return mOverrideMilxSymbolSettings; }
 
     void setMilxSymbolSize( int symbolSize ) { mMilxSymbolSettings.symbolSize = symbolSize; }
-    int milxSymbolSize() const { return mMilxSymbolSettings.symbolSize; }
-
     void setMilxLineWidth( int lineWidth ) { mMilxSymbolSettings.lineWidth = lineWidth; }
-    int milxLineWidth() const { return mMilxSymbolSettings.lineWidth; }
-
     void setMilxWorkMode( KadasMilxSymbolSettings::WorkMode workMode ) { mMilxSymbolSettings.workMode = workMode; }
-    KadasMilxSymbolSettings::WorkMode milxWorkMode() const { return mMilxSymbolSettings.workMode; }
-
     void setMilxLeaderLineWidth( int width ) { mMilxSymbolSettings.leaderLineWidth = width; }
-    int milxLeaderLineWidth() const { return mMilxSymbolSettings.leaderLineWidth; }
-
     void setMilxLeaderLineColor( const QColor &color ) { mMilxSymbolSettings.leaderLineColor = color; }
-    QColor milxLeaderLineColor() const { return mMilxSymbolSettings.leaderLineColor; }
 
     const KadasMilxSymbolSettings &milxSymbolSettings() const;
 
