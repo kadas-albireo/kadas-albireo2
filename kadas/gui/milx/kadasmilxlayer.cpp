@@ -15,88 +15,12 @@
  ***************************************************************************/
 
 #include <QApplication>
-#include <QScreen>
-#include <QMenu>
 
-#include <qgis/qgslayertreeview.h>
-#include <qgis/qgsmaplayerrenderer.h>
-#include <qgis/qgsmapsettings.h>
-#include <qgis/qgsrendercontext.h>
+#include <qgis/qgscoordinatetransform.h>
 
 #include "kadas/gui/milx/kadasmilxclient.h"
 #include "kadas/gui/milx/kadasmilxitem.h"
 #include "kadas/gui/milx/kadasmilxlayer.h"
-
-
-class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
-{
-  public:
-    Renderer( KadasMilxLayer *layer, QgsRenderContext &rendererContext )
-      : QgsMapLayerRenderer( layer->id(), &rendererContext )
-    {
-      bool omitSinglePoint = renderContext()->customProperties().contains( "globe" );
-      for ( const KadasMapItem *item : layer->items().values() )
-      {
-        const KadasMilxItem *milxItem = dynamic_cast<const KadasMilxItem *>( item );
-        if ( !milxItem || milxItem->constState()->points.isEmpty() || ( omitSinglePoint && !milxItem->isMultiPoint() ) )
-        {
-          // Skip symbols
-          continue;
-        }
-        mRenderSymbols.append( milxItem->toSymbol( renderContext()->mapToPixel(), renderContext()->coordinateTransform().destinationCrs(), true ) );
-        mRenderItemData.append( { milxItem->constState()->userOffset, milxItem->isMultiPoint() } );
-        mSymSettings = layer->milxSymbolSettings();
-        mRenderOpacity = layer->opacity();
-      }
-    }
-    bool render() override
-    {
-      if ( mRenderSymbols.isEmpty() )
-      {
-        return true;
-      }
-      int dpi = renderContext()->painter()->device()->logicalDpiX();
-      double dpiScale = double( dpi ) / double( qApp->primaryScreen()->logicalDotsPerInchX() );
-      QList<KadasMilxClient::NPointSymbolGraphic> result;
-#ifndef Q_OS_WIN
-      // FIXME: Why only on non-windows?
-      mSymSettings.lineWidth *= dpiScale;
-      mSymSettings.symbolSize *= dpiScale;
-#endif
-      QRect screenExtent = KadasMilxItem::computeScreenExtent( renderContext()->mapExtent(), renderContext()->mapToPixel() );
-      if ( !KadasMilxClient::updateSymbols( screenExtent, dpi, mRenderSymbols, mSymSettings, result ) )
-      {
-        return false;
-      }
-      renderContext()->painter()->save();
-      renderContext()->painter()->setOpacity( mRenderOpacity );
-      for ( int i = 0, n = result.size(); i < n; ++i )
-      {
-        QPoint itemOrigin = mRenderSymbols[i].points.front();
-        QPoint renderPos = itemOrigin + result[i].offset + mRenderItemData[i].userOffset * dpiScale;
-        if ( !mRenderItemData[i].isMultiPoint )
-        {
-          // Draw line from visual reference point to actual refrence point
-          renderContext()->painter()->setPen( QPen( mSymSettings.leaderLineColor, mSymSettings.leaderLineWidth * dpiScale ) );
-          renderContext()->painter()->drawLine( itemOrigin, itemOrigin + mRenderItemData[i].userOffset * dpiScale );
-        }
-        renderContext()->painter()->drawImage( renderPos, result[i].graphic );
-      }
-      renderContext()->painter()->restore();
-      return true;
-    }
-
-  private:
-    struct RenderItemData
-    {
-        QPoint userOffset;
-        bool isMultiPoint;
-    };
-    QList<KadasMilxClient::NPointSymbol> mRenderSymbols;
-    QList<RenderItemData> mRenderItemData;
-    KadasMilxSymbolSettings mSymSettings;
-    double mRenderOpacity = 1.;
-};
 
 KadasMilxLayer::KadasMilxLayer( const QString &name )
   : KadasItemLayer( name, QgsCoordinateReferenceSystem( "EPSG:4326" ), layerType() )
@@ -124,39 +48,6 @@ KadasItemLayer *KadasMilxLayer::clone() const
 bool KadasMilxLayer::acceptsItem( const KadasMapItem *item ) const
 {
   return dynamic_cast<const KadasMilxItem *>( item );
-}
-
-QgsMapLayerRenderer *KadasMilxLayer::createMapRenderer( QgsRenderContext &rendererContext )
-{
-  return new Renderer( this, rendererContext );
-}
-
-KadasItemLayer::ItemId KadasMilxLayer::pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, PickObjective pickObjective ) const
-{
-  QPoint screenPos = mapSettings.mapToPixel().transform( mapPos ).toQPointF().toPoint();
-  QList<KadasMilxClient::NPointSymbol> symbols;
-  QMap<int, ItemId> itemIdMap;
-  for ( auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it )
-  {
-    const KadasMilxItem *milxItem = dynamic_cast<const KadasMilxItem *>( it.value() );
-    if ( !milxItem || ( pickObjective == PickObjective::PICK_OBJECTIVE_TOOLTIP && milxItem->tooltip().isEmpty() ) )
-    {
-      continue;
-    }
-    itemIdMap.insert( symbols.size(), it.key() );
-    symbols.append( milxItem->toSymbol( mapSettings.mapToPixel(), mapSettings.destinationCrs() ) );
-    for ( int i = 0, n = symbols.last().points.size(); i < n; ++i )
-    {
-      symbols.last().points[i] += milxItem->constState()->userOffset;
-    }
-  }
-  int selectedSymbol = -1;
-  QRect bbox;
-  if ( !symbols.isEmpty() && KadasMilxClient::pickSymbol( symbols, screenPos, milxSymbolSettings(), selectedSymbol, bbox ) && selectedSymbol >= 0 )
-  {
-    return itemIdMap[selectedSymbol];
-  }
-  return ITEM_ID_NULL;
 }
 
 bool KadasMilxLayer::importFromMilxly( const QDomElement &milxLayerEl, int dpi, QString &errorMsg )
