@@ -406,8 +406,7 @@ KadasItemLayer *KadasItemLayerRegistry::getOrCreateItemLayer( StandardLayer laye
 
 const QMap<KadasItemLayerRegistry::StandardLayer, QString> &KadasItemLayerRegistry::standardLayerNames()
 {
-  static QMap<StandardLayer, QString> names
-    = { { StandardLayer::RedliningLayer, tr( "Redlining" ) }, { StandardLayer::SymbolsLayer, tr( "Symbols" ) }, { StandardLayer::PicturesLayer, tr( "Pictures" ) }, { StandardLayer::PinsLayer, tr( "Pins" ) }, { StandardLayer::RoutesLayer, tr( "Routes" ) } };
+  static QMap<StandardLayer, QString> names = { { StandardLayer::PinsLayer, tr( "Pins" ) }, { StandardLayer::RoutesLayer, tr( "Routes" ) } };
   return names;
 }
 
