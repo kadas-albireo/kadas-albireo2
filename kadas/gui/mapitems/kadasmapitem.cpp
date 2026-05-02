@@ -194,13 +194,6 @@ void KadasMapItem::setSelected( bool selected )
   update();
 }
 
-// void KadasMapItem::setAuthId( const QString &authId )
-// {
-//   mCrs = QgsCoordinateReferenceSystem( authId );
-//   update();
-//   emit propertyChanged();
-// }
-
 void KadasMapItem::setZIndex( int zIndex )
 {
   mZIndex = zIndex;
