@@ -52,13 +52,10 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     QPointF symbolAnchor() const override { return mSymbolAnchor; }
 
     QgsRectangle boundingBox() const override;
-    Margin margin() const override;
 
-    QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
+    QList<KadasMapItem::Node> nodes( const QgsMapSettings & ) const override { return {}; }
 
-    bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains = false ) const override;
-    bool hitTest( const KadasMapPos &pos, const QgsMapSettings &settings ) const override;
-    QPair<KadasMapPos, double> closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const override;
+    bool intersects( const QgsRectangle &, const QgsMapSettings &, bool = false ) const override { return false; }
 
     void render( QgsRenderContext &context ) const override;
     QList<QgsAnnotationItem *> annotationItems( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const override SIP_FACTORY;
@@ -108,8 +105,6 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
     void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override;
     void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) override;
-    void populateContextMenu( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings ) override;
-    void onDoubleClick( const QgsMapSettings &mapSettings ) override;
 
     AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
     KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
