@@ -37,7 +37,6 @@
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 #include "kadas/gui/milx/kadasmilxclient.h"
 #include "kadas/gui/milx/kadasmilxeditor.h"
-#include "kadas/gui/milx/kadasmilxlayer.h"
 #include "kadas/gui/milx/kadasmilxlayerpropertiespage.h"
 #include "kadas/gui/milx/kadasmilxlibrary.h"
 #include "kadasapplication.h"
@@ -209,23 +208,19 @@ void KadasMilxIntegration::refreshMilxLayers()
 {
   for ( QgsMapLayer *layer : QgsProject::instance()->mapLayers().values() )
   {
-    if ( qobject_cast<KadasMilxLayer *>( layer ) )
+    auto *annoLayer = qobject_cast<QgsAnnotationLayer *>( layer );
+    if ( !annoLayer )
+      continue;
+    // Only repaint annotation layers that actually carry MilX content;
+    // otherwise we'd thrash unrelated redlining/symbol layers on every
+    // global setting change.
+    const QMap<QString, QgsAnnotationItem *> items = annoLayer->items();
+    for ( auto it = items.constBegin(); it != items.constEnd(); ++it )
     {
-      layer->triggerRepaint();
-    }
-    else if ( auto *annoLayer = qobject_cast<QgsAnnotationLayer *>( layer ) )
-    {
-      // Only repaint annotation layers that actually carry MilX content;
-      // otherwise we'd thrash unrelated redlining/symbol layers on every
-      // global setting change.
-      const QMap<QString, QgsAnnotationItem *> items = annoLayer->items();
-      for ( auto it = items.constBegin(); it != items.constEnd(); ++it )
+      if ( it.value() && it.value()->type() == KadasMilxAnnotationItem::itemTypeId() )
       {
-        if ( it.value() && it.value()->type() == KadasMilxAnnotationItem::itemTypeId() )
-        {
-          annoLayer->triggerRepaint();
-          break;
-        }
+        annoLayer->triggerRepaint();
+        break;
       }
     }
   }
@@ -339,34 +334,19 @@ void KadasMilxIntegration::saveMilxly()
 
   for ( const QString &layerId : exportLayers )
   {
-    QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerId );
-    if ( qobject_cast<KadasMilxLayer *>( layer ) )
+    auto *annoLayer = qobject_cast<QgsAnnotationLayer *>( QgsProject::instance()->mapLayer( layerId ) );
+    if ( !annoLayer )
+      continue;
+    QDomElement milxLayerEl = doc.createElement( "MilXLayer" );
+    const int emitted = KadasMilxAnnotationItem::exportLayerToMilxly( annoLayer, milxLayerEl, dpi );
+    if ( emitted == 0 )
+      continue;
+    milxDocumentEl.appendChild( milxLayerEl );
+    if ( cartoucheLayerId == layerId )
     {
-      QDomElement milxLayerEl = doc.createElement( "MilXLayer" );
-      milxDocumentEl.appendChild( milxLayerEl );
-      static_cast<KadasMilxLayer *>( layer )->exportToMilxly( milxLayerEl, dpi );
-
-      if ( cartoucheLayerId == layerId )
-      {
-        QDomDocument cartoucheDoc;
-        cartoucheDoc.setContent( cartouche );
-        milxLayerEl.appendChild( cartoucheDoc.documentElement() );
-      }
-    }
-    else if ( auto *annoLayer = qobject_cast<QgsAnnotationLayer *>( layer ) )
-    {
-      QDomElement milxLayerEl = doc.createElement( "MilXLayer" );
-      const int emitted = KadasMilxAnnotationItem::exportLayerToMilxly( annoLayer, milxLayerEl, dpi );
-      if ( emitted > 0 )
-      {
-        milxDocumentEl.appendChild( milxLayerEl );
-        if ( cartoucheLayerId == layerId )
-        {
-          QDomDocument cartoucheDoc;
-          cartoucheDoc.setContent( cartouche );
-          milxLayerEl.appendChild( cartoucheDoc.documentElement() );
-        }
-      }
+      QDomDocument cartoucheDoc;
+      cartoucheDoc.setContent( cartouche );
+      milxLayerEl.appendChild( cartoucheDoc.documentElement() );
     }
   }
   QString inputXml = doc.toString();
@@ -473,34 +453,19 @@ void KadasMilxIntegration::exportKml()
 
   for ( const QString &layerId : exportLayers )
   {
-    QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerId );
-    if ( qobject_cast<KadasMilxLayer *>( layer ) )
+    auto *annoLayer = qobject_cast<QgsAnnotationLayer *>( QgsProject::instance()->mapLayer( layerId ) );
+    if ( !annoLayer )
+      continue;
+    QDomElement milxLayerEl = doc.createElement( "MilXLayer" );
+    const int emitted = KadasMilxAnnotationItem::exportLayerToMilxly( annoLayer, milxLayerEl, dpi );
+    if ( emitted == 0 )
+      continue;
+    milxDocumentEl.appendChild( milxLayerEl );
+    if ( cartoucheLayerId == layerId )
     {
-      QDomElement milxLayerEl = doc.createElement( "MilXLayer" );
-      milxDocumentEl.appendChild( milxLayerEl );
-      static_cast<KadasMilxLayer *>( layer )->exportToMilxly( milxLayerEl, dpi );
-
-      if ( cartoucheLayerId == layerId )
-      {
-        QDomDocument cartoucheDoc;
-        cartoucheDoc.setContent( cartouche );
-        milxLayerEl.appendChild( cartoucheDoc.documentElement() );
-      }
-    }
-    else if ( auto *annoLayer = qobject_cast<QgsAnnotationLayer *>( layer ) )
-    {
-      QDomElement milxLayerEl = doc.createElement( "MilXLayer" );
-      const int emitted = KadasMilxAnnotationItem::exportLayerToMilxly( annoLayer, milxLayerEl, dpi );
-      if ( emitted > 0 )
-      {
-        milxDocumentEl.appendChild( milxLayerEl );
-        if ( cartoucheLayerId == layerId )
-        {
-          QDomDocument cartoucheDoc;
-          cartoucheDoc.setContent( cartouche );
-          milxLayerEl.appendChild( cartoucheDoc.documentElement() );
-        }
-      }
+      QDomDocument cartoucheDoc;
+      cartoucheDoc.setContent( cartouche );
+      milxLayerEl.appendChild( cartoucheDoc.documentElement() );
     }
   }
   QString inputXml = doc.toString();
