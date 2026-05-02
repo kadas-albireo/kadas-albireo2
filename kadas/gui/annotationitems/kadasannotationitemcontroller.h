@@ -66,13 +66,6 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     //! state machine. Caller takes ownership.
     virtual QgsAnnotationItem *createItem() const = 0;
 
-    // ----- Metadata --------------------------------------------------------
-
-    //! Returns the type-level default editor widget name for items of this kind.
-    //! May be empty if no editor is associated. Per-instance overrides are stored
-    //! by \c KadasAnnotationLayerHelpers on the owning QgsAnnotationLayer.
-    virtual QString defaultEditorName() const { return QString(); }
-
     // ----- Edit nodes (snap & vertex handles) ------------------------------
 
     virtual QList<KadasNode> nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const = 0;
