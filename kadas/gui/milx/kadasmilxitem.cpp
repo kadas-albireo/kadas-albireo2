@@ -14,16 +14,9 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QApplication>
 #include <QJsonArray>
-#include <QVector2D>
-
-#include <qgis/qgsdistancearea.h>
-#include <qgis/qgsproject.h>
-#include <qgis/qgsunittypes.h>
 
 #include "kadas/gui/milx/kadasmilxitem.h"
-#include "kadas/gui/milx/kadasmilxlayer.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
 
@@ -276,107 +269,4 @@ void KadasMilxItem::setState( const KadasMapItem::State *state )
 bool KadasMilxItem::isMultiPoint() const
 {
   return constState()->points.size() > 1 || !constState()->attributes.isEmpty();
-}
-
-KadasMilxItem *KadasMilxItem::fromMilx( const QDomElement &itemElement, const QgsCoordinateTransform &crst, int symbolSize )
-{
-  KadasMilxItem *item = new KadasMilxItem();
-
-  item->mMilitaryName = itemElement.firstChildElement( "Name" ).text();
-  item->mMssString = itemElement.firstChildElement( "MssStringXML" ).text();
-
-  bool isCorridor = itemElement.firstChildElement( "IsMIPCorridorPointList" ).text().toInt();
-
-  QDomNodeList pointEls = itemElement.firstChildElement( "PointList" ).elementsByTagName( "Point" );
-  for ( int iPoint = 0, nPoints = pointEls.count(); iPoint < nPoints; ++iPoint )
-  {
-    QDomElement pointEl = pointEls.at( iPoint ).toElement();
-    double x = pointEl.firstChildElement( "X" ).text().toDouble();
-    double y = pointEl.firstChildElement( "Y" ).text().toDouble();
-    QgsPointXY pos = crst.transform( QgsPoint( x, y ) );
-    item->state()->points.append( KadasItemPos( pos.x(), pos.y() ) );
-  }
-  QDomNodeList attribEls = itemElement.firstChildElement( "LocationAttributeList" ).elementsByTagName( "LocationAttribute" );
-  for ( int iAttr = 0, nAttrs = attribEls.count(); iAttr < nAttrs; ++iAttr )
-  {
-    QDomElement attribEl = attribEls.at( iAttr ).toElement();
-    item->state()->attributes.insert( KadasMilxClient::attributeIdx( attribEl.firstChildElement( "AttrType" ).text() ), attribEl.firstChildElement( "Value" ).text().toDouble() );
-  }
-  double offsetX = itemElement.firstChildElement( "Offset" ).firstChildElement( "FactorX" ).text().toDouble() * symbolSize;
-  double offsetY = -1. * ( itemElement.firstChildElement( "Offset" ).firstChildElement( "FactorY" ).text().toDouble() * symbolSize );
-
-  item->state()->userOffset = QPoint( offsetX, offsetY );
-
-  finalize( item, isCorridor );
-
-  return item;
-}
-
-void KadasMilxItem::finalize( KadasMilxItem *item, bool isCorridor )
-{
-  if ( item->state()->points.size() > 1 )
-  {
-    if ( isCorridor )
-    {
-      const QList<KadasItemPos> &points = item->state()->points;
-
-      // Do some fake geo -> screen transform, since here we have no idea about screen coordinates
-      double scale = 100000.;
-      QPoint origin = QPoint( points[0].x() * scale, points[0].y() * scale );
-      QList<QPoint> screenPoints = QList<QPoint>() << QPoint( 0, 0 );
-      for ( int i = 1, n = points.size(); i < n; ++i )
-      {
-        screenPoints.append( QPoint( points[i].x() * scale, points[i].y() * scale ) - origin );
-      }
-      QList<QPair<int, double>> screenAttributes;
-      if ( !item->state()->attributes.isEmpty() )
-      {
-        QgsDistanceArea da;
-        da.setSourceCrs( QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance()->transformContext() );
-        da.setEllipsoid( "WGS84" );
-        QgsPointXY otherPoint( points[0].x() + 0.001, points[0].y() );
-        QPointF otherScreenPoint = QPointF( otherPoint.x() * scale, otherPoint.y() * scale ) - origin;
-        double ellipsoidDist = da.measureLine( points[0], otherPoint ) * QgsUnitTypes::fromUnitToUnitFactor( da.lengthUnits(), Qgis::DistanceUnit::Meters );
-        double screenDist = QVector2D( screenPoints[0] - otherScreenPoint ).length();
-        for ( auto it = item->constState()->attributes.begin(), itEnd = item->constState()->attributes.end(); it != itEnd; ++it )
-        {
-          double value = it.value();
-          if ( it.key() != MilxAttributeAttitude )
-          {
-            value = value / ellipsoidDist * screenDist;
-          }
-          screenAttributes.append( qMakePair( it.key(), value ) );
-        }
-        item->state()->attributes.clear();
-      }
-      if ( KadasMilxClient::getControlPoints( item->mMssString, screenPoints, screenAttributes, item->state()->controlPoints, isCorridor, item->symbolSettings() ) )
-      {
-        item->state()->points.clear();
-        for ( const QPoint &screenPoint : screenPoints )
-        {
-          double x = ( origin.x() + screenPoint.x() ) / scale;
-          double y = ( origin.y() + screenPoint.y() ) / scale;
-          item->state()->points.append( KadasItemPos( x, y ) );
-        }
-      }
-    }
-    else
-    {
-      KadasMilxClient::getControlPointIndices( item->mMssString, item->state()->points.count(), item->symbolSettings(), item->state()->controlPoints );
-    }
-  }
-
-  if ( item->mMilitaryName.isEmpty() )
-  {
-    KadasMilxClient::getMilitaryName( item->mMssString, item->mMilitaryName );
-  }
-
-  item->setDrawStatus( DrawStatus::Finished );
-  item->mIsPointSymbol = !item->isMultiPoint();
-}
-
-
-const KadasMilxSymbolSettings &KadasMilxItem::symbolSettings() const
-{
-  return mOwnerLayer ? static_cast<KadasMilxLayer *>( mOwnerLayer )->milxSymbolSettings() : KadasMilxClient::globalSymbolSettings();
 }
