@@ -243,6 +243,21 @@ void KadasMilxIntegration::refreshMilxLayers()
     {
       layer->triggerRepaint();
     }
+    else if ( auto *annoLayer = qobject_cast<QgsAnnotationLayer *>( layer ) )
+    {
+      // Only repaint annotation layers that actually carry MilX content;
+      // otherwise we'd thrash unrelated redlining/symbol layers on every
+      // global setting change.
+      const QMap<QString, QgsAnnotationItem *> items = annoLayer->items();
+      for ( auto it = items.constBegin(); it != items.constEnd(); ++it )
+      {
+        if ( it.value() && it.value()->type() == KadasMilxAnnotationItem::itemTypeId() )
+        {
+          annoLayer->triggerRepaint();
+          break;
+        }
+      }
+    }
   }
 }
 
@@ -368,6 +383,21 @@ void KadasMilxIntegration::saveMilxly()
         milxLayerEl.appendChild( cartoucheDoc.documentElement() );
       }
     }
+    else if ( auto *annoLayer = qobject_cast<QgsAnnotationLayer *>( layer ) )
+    {
+      QDomElement milxLayerEl = doc.createElement( "MilXLayer" );
+      const int emitted = KadasMilxAnnotationItem::exportLayerToMilxly( annoLayer, milxLayerEl, dpi );
+      if ( emitted > 0 )
+      {
+        milxDocumentEl.appendChild( milxLayerEl );
+        if ( cartoucheLayerId == layerId )
+        {
+          QDomDocument cartoucheDoc;
+          cartoucheDoc.setContent( cartouche );
+          milxLayerEl.appendChild( cartoucheDoc.documentElement() );
+        }
+      }
+    }
   }
   QString inputXml = doc.toString();
   QString outputXml;
@@ -485,6 +515,21 @@ void KadasMilxIntegration::exportKml()
         QDomDocument cartoucheDoc;
         cartoucheDoc.setContent( cartouche );
         milxLayerEl.appendChild( cartoucheDoc.documentElement() );
+      }
+    }
+    else if ( auto *annoLayer = qobject_cast<QgsAnnotationLayer *>( layer ) )
+    {
+      QDomElement milxLayerEl = doc.createElement( "MilXLayer" );
+      const int emitted = KadasMilxAnnotationItem::exportLayerToMilxly( annoLayer, milxLayerEl, dpi );
+      if ( emitted > 0 )
+      {
+        milxDocumentEl.appendChild( milxLayerEl );
+        if ( cartoucheLayerId == layerId )
+        {
+          QDomDocument cartoucheDoc;
+          cartoucheDoc.setContent( cartouche );
+          milxLayerEl.appendChild( cartoucheDoc.documentElement() );
+        }
       }
     }
   }
@@ -606,14 +651,17 @@ bool KadasMilxIntegration::importMilxly( const QString &filename, QString &error
   int dpi = kApp->mainWindow()->mapCanvas()->mapSettings().outputDpi();
 
   QDomNodeList milxLayerEls = milxDocumentEl.elementsByTagName( "MilXLayer" );
-  QList<KadasMilxLayer *> importedLayers;
+  QList<QgsAnnotationLayer *> importedLayers;
   QList<QPair<QString, QString>> cartouches;
   for ( int iLayer = 0, nLayers = milxLayerEls.count(); iLayer < nLayers; ++iLayer )
   {
     QDomElement milxLayerEl = milxLayerEls.at( iLayer ).toElement();
-    KadasMilxLayer *layer = new KadasMilxLayer();
-    if ( !layer->importFromMilxly( milxLayerEl, dpi, errorMsg ) )
+    QgsAnnotationLayer::LayerOptions options( QgsProject::instance()->transformContext() );
+    auto *layer = new QgsAnnotationLayer( QString(), options );
+    layer->setCrs( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ) );
+    if ( !KadasMilxAnnotationItem::importLayerFromMilxly( layer, milxLayerEl, dpi, QgsProject::instance()->transformContext(), errorMsg ) )
     {
+      delete layer;
       break;
     }
     importedLayers.append( layer );
@@ -629,7 +677,7 @@ bool KadasMilxIntegration::importMilxly( const QString &filename, QString &error
 
   if ( errorMsg.isEmpty() )
   {
-    for ( KadasMilxLayer *layer : importedLayers )
+    for ( QgsAnnotationLayer *layer : importedLayers )
     {
       QgsProject::instance()->addMapLayer( layer );
     }

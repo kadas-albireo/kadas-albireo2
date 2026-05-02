@@ -20,6 +20,7 @@
 #include <QPaintDevice>
 #include <QVector2D>
 
+#include <qgis/qgsannotationlayer.h>
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsdistancearea.h>
 #include <qgis/qgsmapsettings.h>
@@ -240,6 +241,223 @@ KadasMilxAnnotationItem *KadasMilxAnnotationItem::clone() const
 KadasMilxAnnotationItem *KadasMilxAnnotationItem::create()
 {
   return new KadasMilxAnnotationItem();
+}
+
+void KadasMilxAnnotationItem::writeMilx( QDomDocument &doc, QDomElement &itemElement, int symbolSize ) const
+{
+  QDomElement stringXmlEl = doc.createElement( QStringLiteral( "MssStringXML" ) );
+  stringXmlEl.appendChild( doc.createTextNode( mMssString ) );
+  itemElement.appendChild( stringXmlEl );
+
+  QDomElement nameEl = doc.createElement( QStringLiteral( "Name" ) );
+  nameEl.appendChild( doc.createTextNode( mMilitaryName ) );
+  itemElement.appendChild( nameEl );
+
+  QDomElement pointListEl = doc.createElement( QStringLiteral( "PointList" ) );
+  itemElement.appendChild( pointListEl );
+  for ( const QgsPointXY &p : mPoints )
+  {
+    QDomElement pEl = doc.createElement( QStringLiteral( "Point" ) );
+    pointListEl.appendChild( pEl );
+    QDomElement pXEl = doc.createElement( QStringLiteral( "X" ) );
+    pXEl.appendChild( doc.createTextNode( QString::number( p.x(), 'f', 6 ) ) );
+    pEl.appendChild( pXEl );
+    QDomElement pYEl = doc.createElement( QStringLiteral( "Y" ) );
+    pYEl.appendChild( doc.createTextNode( QString::number( p.y(), 'f', 6 ) ) );
+    pEl.appendChild( pYEl );
+  }
+
+  if ( !mAttributes.isEmpty() )
+  {
+    QDomElement attribListEl = doc.createElement( QStringLiteral( "LocationAttributeList" ) );
+    itemElement.appendChild( attribListEl );
+    for ( auto it = mAttributes.cbegin(), itEnd = mAttributes.cend(); it != itEnd; ++it )
+    {
+      QDomElement attrTypeEl = doc.createElement( QStringLiteral( "AttrType" ) );
+      attrTypeEl.appendChild( doc.createTextNode( KadasMilxClient::attributeName( it.key() ) ) );
+      QDomElement attrValueEl = doc.createElement( QStringLiteral( "Value" ) );
+      attrValueEl.appendChild( doc.createTextNode( QString::number( it.value() ) ) );
+      QDomElement attribEl = doc.createElement( QStringLiteral( "LocationAttribute" ) );
+      attribEl.appendChild( attrTypeEl );
+      attribEl.appendChild( attrValueEl );
+      attribListEl.appendChild( attribEl );
+    }
+  }
+
+  if ( !isMultiPoint() && symbolSize > 0 )
+  {
+    QDomElement offsetEl = doc.createElement( QStringLiteral( "Offset" ) );
+    itemElement.appendChild( offsetEl );
+
+    QDomElement factorXEl = doc.createElement( QStringLiteral( "FactorX" ) );
+    factorXEl.appendChild( doc.createTextNode( QString::number( double( mUserOffset.x() ) / symbolSize ) ) );
+    offsetEl.appendChild( factorXEl );
+
+    QDomElement factorYEl = doc.createElement( QStringLiteral( "FactorY" ) );
+    factorYEl.appendChild( doc.createTextNode( QString::number( -double( mUserOffset.y() ) / symbolSize ) ) );
+    offsetEl.appendChild( factorYEl );
+  }
+}
+
+KadasMilxAnnotationItem *KadasMilxAnnotationItem::fromMilx( const QDomElement &itemElement, const QgsCoordinateTransform &crst, int symbolSize )
+{
+  auto *item = new KadasMilxAnnotationItem();
+  item->mMilitaryName = itemElement.firstChildElement( QStringLiteral( "Name" ) ).text();
+  item->mMssString = itemElement.firstChildElement( QStringLiteral( "MssStringXML" ) ).text();
+
+  QList<QgsPointXY> pts;
+  const QDomNodeList pointEls = itemElement.firstChildElement( QStringLiteral( "PointList" ) ).elementsByTagName( QStringLiteral( "Point" ) );
+  for ( int i = 0, n = pointEls.count(); i < n; ++i )
+  {
+    const QDomElement pEl = pointEls.at( i ).toElement();
+    const double x = pEl.firstChildElement( QStringLiteral( "X" ) ).text().toDouble();
+    const double y = pEl.firstChildElement( QStringLiteral( "Y" ) ).text().toDouble();
+    try
+    {
+      const QgsPointXY pos = crst.transform( QgsPointXY( x, y ) );
+      pts.append( pos );
+    }
+    catch ( const QgsCsException & )
+    {
+      pts.append( QgsPointXY( x, y ) );
+    }
+  }
+  item->mPoints = pts;
+
+  const QDomNodeList attribEls = itemElement.firstChildElement( QStringLiteral( "LocationAttributeList" ) ).elementsByTagName( QStringLiteral( "LocationAttribute" ) );
+  for ( int i = 0, n = attribEls.count(); i < n; ++i )
+  {
+    const QDomElement attribEl = attribEls.at( i ).toElement();
+    item->mAttributes.insert( KadasMilxClient::attributeIdx( attribEl.firstChildElement( QStringLiteral( "AttrType" ) ).text() ), attribEl.firstChildElement( QStringLiteral( "Value" ) ).text().toDouble() );
+  }
+
+  const QDomElement offsetEl = itemElement.firstChildElement( QStringLiteral( "Offset" ) );
+  if ( !offsetEl.isNull() && symbolSize > 0 )
+  {
+    const double offsetX = offsetEl.firstChildElement( QStringLiteral( "FactorX" ) ).text().toDouble() * symbolSize;
+    const double offsetY = -1.0 * offsetEl.firstChildElement( QStringLiteral( "FactorY" ) ).text().toDouble() * symbolSize;
+    item->mUserOffset = QPoint( static_cast<int>( offsetX ), static_cast<int>( offsetY ) );
+  }
+
+  // Fill in derived metadata via libmss (control point indices, military
+  // name fallback, symbol type / point cardinality). This mirrors the
+  // tail of \c KadasMilxItem::finalize() but skips its corridor-only
+  // \c getControlPoints projection branch (the legacy importer never
+  // emitted IsMIPCorridorPointList for the cases we care about; if it
+  // shows up in real MILXly files we'll port that too).
+  if ( item->mPoints.size() > 1 )
+  {
+    KadasMilxClient::getControlPointIndices( item->mMssString, item->mPoints.count(), KadasMilxClient::globalSymbolSettings(), item->mControlPoints );
+  }
+  if ( item->mMilitaryName.isEmpty() )
+    KadasMilxClient::getMilitaryName( item->mMssString, item->mMilitaryName );
+
+  KadasMilxSymbolDesc desc;
+  if ( KadasMilxClient::getSymbolMetadata( item->mMssString, desc ) )
+  {
+    item->mSymbolType = desc.symbolType;
+    item->mMinNumPoints = desc.minNumPoints;
+    item->mHasVariablePoints = desc.hasVariablePoints;
+  }
+
+  item->mDrawStatus = DrawStatus::Finished;
+  return item;
+}
+
+int KadasMilxAnnotationItem::exportLayerToMilxly( QgsAnnotationLayer *annoLayer, QDomElement &milxLayerEl, int dpi )
+{
+  if ( !annoLayer )
+    return 0;
+
+  QDomDocument doc = milxLayerEl.ownerDocument();
+
+  QDomElement nameEl = doc.createElement( QStringLiteral( "Name" ) );
+  nameEl.appendChild( doc.createTextNode( annoLayer->name() ) );
+  milxLayerEl.appendChild( nameEl );
+
+  QDomElement typeEl = doc.createElement( QStringLiteral( "LayerType" ) );
+  typeEl.appendChild( doc.createTextNode( QStringLiteral( "Normal" ) ) );
+  milxLayerEl.appendChild( typeEl );
+
+  QDomElement graphicListEl = doc.createElement( QStringLiteral( "GraphicList" ) );
+  milxLayerEl.appendChild( graphicListEl );
+
+  const KadasMilxSymbolSettings settings = KadasMilxLayerSettings::resolve( annoLayer );
+
+  int count = 0;
+  const QMap<QString, QgsAnnotationItem *> items = annoLayer->items();
+  for ( auto it = items.constBegin(); it != items.constEnd(); ++it )
+  {
+    if ( const auto *milx = dynamic_cast<const KadasMilxAnnotationItem *>( it.value() ) )
+    {
+      QDomElement graphicEl = doc.createElement( QStringLiteral( "MilXGraphic" ) );
+      milx->writeMilx( doc, graphicEl, settings.symbolSize );
+      graphicListEl.appendChild( graphicEl );
+      ++count;
+    }
+  }
+
+  QDomElement crsEl = doc.createElement( QStringLiteral( "CoordSystemType" ) );
+  crsEl.appendChild( doc.createTextNode( QStringLiteral( "WGS84" ) ) );
+  milxLayerEl.appendChild( crsEl );
+
+  QDomElement symbolSizeEl = doc.createElement( QStringLiteral( "SymbolSize" ) );
+  symbolSizeEl.appendChild( doc.createTextNode( QString::number( ( settings.symbolSize * 25.4 ) / dpi ) ) );
+  milxLayerEl.appendChild( symbolSizeEl );
+
+  QDomElement bwEl = doc.createElement( QStringLiteral( "DisplayBW" ) );
+  // The "approved" / black-and-white flag does not have an annotation-layer
+  // analogue yet; default to off until the per-layer property is rewired.
+  bwEl.appendChild( doc.createTextNode( QStringLiteral( "0" ) ) );
+  milxLayerEl.appendChild( bwEl );
+
+  return count;
+}
+
+bool KadasMilxAnnotationItem::importLayerFromMilxly( QgsAnnotationLayer *annoLayer, const QDomElement &milxLayerEl, int dpi, const QgsCoordinateTransformContext &transformContext, QString &errorMsg )
+{
+  if ( !annoLayer )
+  {
+    errorMsg = QObject::tr( "No target annotation layer" );
+    return false;
+  }
+
+  annoLayer->setName( milxLayerEl.firstChildElement( QStringLiteral( "Name" ) ).text() );
+
+  float symbolSizeMm = milxLayerEl.firstChildElement( QStringLiteral( "SymbolSize" ) ).text().toFloat();
+  const int symbolSizePx = static_cast<int>( ( symbolSizeMm * dpi ) / 25.4f );
+
+  const QString crsTag = milxLayerEl.firstChildElement( QStringLiteral( "CoordSystemType" ) ).text();
+  if ( crsTag.isEmpty() )
+  {
+    errorMsg = QObject::tr( "The file is corrupt" );
+    return false;
+  }
+  const QString utmZone = milxLayerEl.firstChildElement( QStringLiteral( "CoordSystemUtmZone" ) ).text();
+  QgsCoordinateReferenceSystem srcCrs;
+  if ( crsTag == QLatin1String( "SwissLv03" ) )
+  {
+    srcCrs = QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:21781" ) );
+  }
+  else if ( crsTag == QLatin1String( "WGS84" ) )
+  {
+    srcCrs = QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) );
+  }
+  else if ( crsTag == QLatin1String( "UTM" ) )
+  {
+    const QString zoneLetter = utmZone.right( 1 ).toUpper();
+    const QString zoneNumber = utmZone.left( utmZone.length() - 1 );
+    const QString projZone = zoneNumber + ( zoneLetter == QLatin1String( "S" ) ? QStringLiteral( " +south" ) : QString() );
+    srcCrs.createFromProj( QStringLiteral( "+proj=utm +zone=%1 +datum=WGS84 +units=m +no_defs" ).arg( projZone ) );
+  }
+  const QgsCoordinateTransform crst( srcCrs, QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), transformContext );
+
+  const QDomNodeList graphicEls = milxLayerEl.firstChildElement( QStringLiteral( "GraphicList" ) ).elementsByTagName( QStringLiteral( "MilXGraphic" ) );
+  for ( int i = 0, n = graphicEls.count(); i < n; ++i )
+  {
+    annoLayer->addItem( fromMilx( graphicEls.at( i ).toElement(), crst, symbolSizePx ) );
+  }
+  return true;
 }
 
 // ----- libmss helpers -------------------------------------------------------
