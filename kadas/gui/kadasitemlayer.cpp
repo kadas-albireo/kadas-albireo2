@@ -76,13 +76,6 @@ KadasItemLayer::KadasItemLayer( const QString &name, const QgsCoordinateReferenc
   mValid = true;
 }
 
-KadasItemLayer::KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs, const QString &layerType )
-  : KadasPluginLayer( layerType, name )
-{
-  setCrs( crs );
-  mValid = true;
-}
-
 void KadasItemLayer::ensureDefault3DRenderer()
 {
   if ( renderer3D() )
@@ -90,15 +83,10 @@ void KadasItemLayer::ensureDefault3DRenderer()
 
   std::unique_ptr<KadasMapItemLayer3DRenderer> r = std::make_unique<KadasMapItemLayer3DRenderer>();
   r->setLayer( this );
-  // The base KadasItemLayer ships a yellow text/callout default; subclasses that
-  // want a different look should override this method.
-  if ( layerTypeKey() == layerType() )
-  {
-    QgsTextFormat format = r->textFormat();
-    format.setColor( QColor( Qt::yellow ) );
-    r->setTextFormat( format );
-    r->setCalloutLineColor( QColor( Qt::yellow ) );
-  }
+  QgsTextFormat format = r->textFormat();
+  format.setColor( QColor( Qt::yellow ) );
+  r->setTextFormat( format );
+  r->setCalloutLineColor( QColor( Qt::yellow ) );
   setRenderer3D( r.release() );
 }
 

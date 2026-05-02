@@ -199,7 +199,6 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     void itemRemoved( KadasItemLayer::ItemId itemId );
 
   protected:
-    KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs, const QString &layerType );
     class Renderer;
 
     QMap<ItemId, KadasMapItem *> mItems;
