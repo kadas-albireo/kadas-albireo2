@@ -37,7 +37,6 @@ class KADAS_GUI_EXPORT KadasMilxAnnotationController : public KadasAnnotationIte
 
     QString itemType() const override;
     QString itemName() const override;
-    QString defaultEditorName() const override { return QStringLiteral( "KadasMilxEditor" ); }
     QgsAnnotationItem *createItem() const override;
 
     QList<KadasNode> nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const override;
