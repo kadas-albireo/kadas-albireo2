@@ -296,7 +296,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     Q_PROPERTY( int zIndex READ zIndex WRITE setZIndex NOTIFY zIndexChanged )
     Q_PROPERTY( double symbolScale READ symbolScale WRITE setSymbolScale )
     Q_PROPERTY( QString editor READ editor WRITE setEditor )
-    //Q_PROPERTY( QString authId READ authId WRITE setAuthId )
     Q_PROPERTY( QString tooltip READ tooltip WRITE setTooltip )
 
   public:
@@ -401,10 +400,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     /* symbol scale */
     void setSymbolScale( double scale );
     double symbolScale() const { return mSymbolScale; }
-
-    /* authid */
-    //void setAuthId( const QString &authId );
-    //QString authId() const { return mCrs.authid(); }
 
     /* tooltip */
     void setTooltip( const QString &tooltip );
