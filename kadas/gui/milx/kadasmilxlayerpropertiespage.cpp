@@ -110,19 +110,6 @@ void KadasMilxLayerPropertiesPage::apply()
   KadasMilxLayerSettings::setLayerSettings( mLayer, settings );
   KadasMilxLayerSettings::setOverrideEnabled( mLayer, mGroupBox->isChecked() );
 
-  // Mirror onto the legacy KadasMilxLayer setters too — the legacy
-  // renderer still consults these directly until the layer type is
-  // retired.
-  if ( auto *milxLayer = qobject_cast<KadasMilxLayer *>( mLayer ) )
-  {
-    milxLayer->setOverrideMilxSymbolSettings( mGroupBox->isChecked() );
-    milxLayer->setMilxSymbolSize( settings.symbolSize );
-    milxLayer->setMilxLineWidth( settings.lineWidth );
-    milxLayer->setMilxWorkMode( settings.workMode );
-    milxLayer->setMilxLeaderLineWidth( settings.leaderLineWidth );
-    milxLayer->setMilxLeaderLineColor( settings.leaderLineColor );
-  }
-
   if ( mLayer )
     mLayer->triggerRepaint();
 }
@@ -132,8 +119,13 @@ void KadasMilxLayerPropertiesPage::apply()
 KadasMilxLayerPropertiesPageFactory::KadasMilxLayerPropertiesPageFactory( QObject *parent )
   : QObject( parent )
 {
+  // Legacy `KadasMilxLayer` projects stored MilX overrides as DOM
+  // attributes on the maplayer element. Translate those onto the
+  // legacy layer at read time so `KadasItemLayerMigration` can copy
+  // them onto the annotation layer's custom properties. New annotation
+  // layers persist the same information via `QgsMapLayer::customProperty`
+  // (round-tripped automatically by Qgs).
   connect( QgsProject::instance(), &QgsProject::readMapLayer, this, &KadasMilxLayerPropertiesPageFactory::readLayerConfig );
-  connect( QgsProject::instance(), &QgsProject::writeMapLayer, this, &KadasMilxLayerPropertiesPageFactory::writeLayerConfig );
 }
 
 QgsMapLayerConfigWidget *KadasMilxLayerPropertiesPageFactory::createWidget( QgsMapLayer *layer, QgsMapCanvas *canvas, bool dockWidget, QWidget *parent ) const
@@ -154,14 +146,11 @@ QString KadasMilxLayerPropertiesPageFactory::title() const
 
 bool KadasMilxLayerPropertiesPageFactory::supportsLayer( QgsMapLayer *layer ) const
 {
-  return qobject_cast<KadasMilxLayer *>( layer ) || isMilxAnnotationLayer( layer );
+  return isMilxAnnotationLayer( layer );
 }
 
 void KadasMilxLayerPropertiesPageFactory::readLayerConfig( QgsMapLayer *mapLayer, const QDomElement &elem )
 {
-  // Legacy KadasMilxLayer projects stored MilX overrides as DOM attributes
-  // on the maplayer element. New annotation layers persist the same
-  // information via QgsMapLayer::customProperty (round-tripped automatically).
   KadasMilxLayer *milxLayer = qobject_cast<KadasMilxLayer *>( mapLayer );
   if ( !milxLayer )
     return;
@@ -174,19 +163,4 @@ void KadasMilxLayerPropertiesPageFactory::readLayerConfig( QgsMapLayer *mapLayer
   );
   milxLayer->setMilxLeaderLineWidth( elem.attribute( "milx_leader_line_width" ).toInt() );
   milxLayer->setMilxLeaderLineColor( elem.attribute( "milx_leader_line_color" ) );
-}
-
-void KadasMilxLayerPropertiesPageFactory::writeLayerConfig( QgsMapLayer *mapLayer, QDomElement &elem, QDomDocument &doc )
-{
-  Q_UNUSED( doc )
-  KadasMilxLayer *milxLayer = qobject_cast<KadasMilxLayer *>( mapLayer );
-  if ( !milxLayer )
-    return;
-
-  elem.setAttribute( "milx_override_symbol_settings", milxLayer->overrideMilxSymbolSettings() );
-  elem.setAttribute( "milx_symbol_size", milxLayer->milxSymbolSize() );
-  elem.setAttribute( "milx_line_width", milxLayer->milxLineWidth() );
-  elem.setAttribute( "milx_work_mode", static_cast<int>( milxLayer->milxWorkMode() ) );
-  elem.setAttribute( "milx_leader_line_width", milxLayer->milxLeaderLineWidth() );
-  elem.setAttribute( "milx_leader_line_color", milxLayer->milxLeaderLineColor().name() );
 }
