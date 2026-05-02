@@ -60,6 +60,13 @@ void KadasMilxAnnotationItem::render( QgsRenderContext &context, QgsFeedback *fe
   if ( mPoints.isEmpty() || mMssString.isEmpty() )
     return;
 
+  // Thread-safety: this method may be invoked from a non-GUI thread
+  // (3D / async map renderers). All KadasMilxClient calls funnel through
+  // KadasMilxClient::processRequest(), which dispatches via
+  // Qt::BlockingQueuedConnection to its own worker thread when invoked
+  // outside the GUI thread; the lazy `instance()` getter is mutex-guarded.
+  // See kadasmilxclient.cpp for the dispatch logic.
+
   // Build a transient QgsMapSettings from the render context so we can reuse
   // toSymbol() / computeScreenExtent() (the libmss IPC path is shared with
   // the controller's draw/edit state machine).
