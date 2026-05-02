@@ -172,7 +172,6 @@ that are never used in a 3D scene. Safe to call multiple times.
     void itemRemoved( KadasItemLayer::ItemId itemId );
 
   protected:
-    KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs, const QString &layerType );
 
 };
 

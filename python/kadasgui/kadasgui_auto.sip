@@ -19,13 +19,10 @@
 %Include auto_generated/kadasprojectmigration.sip
 %Include auto_generated/kadascatalogprovider.sip
 %Include auto_generated/kadascrsselection.sip
-%Include auto_generated/milx/kadasmilxeditor.sip
 %Include auto_generated/milx/kadasmilxclient.sip
 %Include auto_generated/milx/kadasmilxlibrary.sip
-%Include auto_generated/milx/kadasmilxlayer.sip
 %Include auto_generated/milx/kadasmilxlayerpropertiespage.sip
 %Include auto_generated/milx/kadasmilxinterface.sip
-%Include auto_generated/milx/kadasmilxitem.sip
 %Include auto_generated/kadastextbrowser.sip
 %Include auto_generated/catalog/kadasvbscatalogprovider.sip
 %Include auto_generated/catalog/kadasarcgisportalcatalogprovider.sip

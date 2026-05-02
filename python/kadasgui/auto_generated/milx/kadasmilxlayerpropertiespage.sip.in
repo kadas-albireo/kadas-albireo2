@@ -29,7 +29,7 @@ your option) any later version. *
 #include "kadas/gui/milx/kadasmilxlayerpropertiespage.h"
 %End
   public:
-    explicit KadasMilxLayerPropertiesPage( KadasMilxLayer *layer, QgsMapCanvas *canvas, QWidget *parent = 0 );
+    explicit KadasMilxLayerPropertiesPage( QgsMapLayer *layer, QgsMapCanvas *canvas, QWidget *parent = 0 );
 
   public slots:
     virtual void apply();
