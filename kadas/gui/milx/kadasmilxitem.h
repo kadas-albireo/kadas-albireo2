@@ -117,16 +117,6 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     KadasMilxItem::State *createEmptyState() const override SIP_FACTORY { return new State(); }
 
   private:
-    enum AttribIds
-    {
-      AttrX = -2,
-      AttrY = -1,
-      AttrW = MilxAttributeWidth,
-      AttrL = MilxAttributeLength,
-      AttrR = MilxAttributeRadius,
-      AttrA = MilxAttributeAttitude
-    };
-
     QString mMssString;
     QString mMilitaryName;
     // These are only used when first drawing
