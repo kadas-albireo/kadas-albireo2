@@ -30,7 +30,6 @@
 
 #include "kadas/gui/annotationitems/kadasmilxlayersettings.h"
 #include "kadas/gui/milx/kadasmilxclient.h"
-#include "kadas/gui/milx/kadasmilxlayer.h"
 #include "kadas/gui/milx/kadasmilxlayerpropertiespage.h"
 
 
@@ -118,15 +117,7 @@ void KadasMilxLayerPropertiesPage::apply()
 
 KadasMilxLayerPropertiesPageFactory::KadasMilxLayerPropertiesPageFactory( QObject *parent )
   : QObject( parent )
-{
-  // Legacy `KadasMilxLayer` projects stored MilX overrides as DOM
-  // attributes on the maplayer element. Translate those onto the
-  // legacy layer at read time so `KadasItemLayerMigration` can copy
-  // them onto the annotation layer's custom properties. New annotation
-  // layers persist the same information via `QgsMapLayer::customProperty`
-  // (round-tripped automatically by Qgs).
-  connect( QgsProject::instance(), &QgsProject::readMapLayer, this, &KadasMilxLayerPropertiesPageFactory::readLayerConfig );
-}
+{}
 
 QgsMapLayerConfigWidget *KadasMilxLayerPropertiesPageFactory::createWidget( QgsMapLayer *layer, QgsMapCanvas *canvas, bool dockWidget, QWidget *parent ) const
 {
@@ -147,20 +138,4 @@ QString KadasMilxLayerPropertiesPageFactory::title() const
 bool KadasMilxLayerPropertiesPageFactory::supportsLayer( QgsMapLayer *layer ) const
 {
   return isMilxAnnotationLayer( layer );
-}
-
-void KadasMilxLayerPropertiesPageFactory::readLayerConfig( QgsMapLayer *mapLayer, const QDomElement &elem )
-{
-  KadasMilxLayer *milxLayer = qobject_cast<KadasMilxLayer *>( mapLayer );
-  if ( !milxLayer )
-    return;
-
-  milxLayer->setOverrideMilxSymbolSettings( elem.attribute( "milx_override_symbol_settings" ).toInt() );
-  milxLayer->setMilxSymbolSize( elem.attribute( "milx_symbol_size", QString::number( KadasMilxSymbolSettings::DefaultSymbolSize ) ).toInt() );
-  milxLayer->setMilxLineWidth( elem.attribute( "milx_line_width", QString::number( KadasMilxSymbolSettings::DefaultLineWidth ) ).toInt() );
-  milxLayer->setMilxWorkMode(
-    static_cast<KadasMilxSymbolSettings::WorkMode>( elem.attribute( "milx_work_mode", QString::number( static_cast<int>( KadasMilxSymbolSettings::DefaultWorkMode ) ) ).toInt() )
-  );
-  milxLayer->setMilxLeaderLineWidth( elem.attribute( "milx_leader_line_width" ).toInt() );
-  milxLayer->setMilxLeaderLineColor( elem.attribute( "milx_leader_line_color" ) );
 }

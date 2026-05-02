@@ -22,11 +22,9 @@
 #include <qgis/qgsproject.h>
 
 #include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
-#include "kadas/gui/annotationitems/kadasmilxlayersettings.h"
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/kadasitemlayermigration.h"
 #include "kadas/gui/mapitems/kadasmapitem.h"
-#include "kadas/gui/milx/kadasmilxlayer.h"
 
 
 int KadasItemLayerMigration::migrateProject( QgsProject *project )
@@ -68,17 +66,6 @@ int KadasItemLayerMigration::migrateProject( QgsProject *project )
       continue;
 
     auto *annoLayer = KadasAnnotationLayerHelpers::createLayer( itemLayer->name(), itemLayer->crs() );
-
-    // Carry over any per-layer overrides specific to legacy KadasMilxLayer
-    // (override flag + symbol settings) onto the new annotation layer's
-    // custom properties. The legacy layer never persisted these to XML,
-    // so this only matters for projects migrated in-memory.
-    if ( auto *milxLayer = qobject_cast<KadasMilxLayer *>( itemLayer ) )
-    {
-      KadasMilxLayerSettings::setOverrideEnabled( annoLayer, milxLayer->overrideMilxSymbolSettings() );
-      if ( milxLayer->overrideMilxSymbolSettings() )
-        KadasMilxLayerSettings::setLayerSettings( annoLayer, milxLayer->milxSymbolSettings() );
-    }
 
     // Iterate by ascending KadasMapItem::zIndex() so the legacy paint
     // order is preserved when items happen to share a Kadas annotation
