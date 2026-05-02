@@ -31,9 +31,6 @@ class KADAS_GUI_EXPORT KadasMilxLayer : public KadasItemLayer
 
     KadasMilxLayer( const QString &name = "MilX" );
     QString layerTypeKey() const override { return layerType(); }
-    bool acceptsItem( const KadasMapItem *item ) const override;
-
-    KadasItemLayer *clone() const override SIP_FACTORY;
 
     bool importFromMilxly( const QDomElement &milxLayerEl, int dpi, QString &errorMsg );
 
