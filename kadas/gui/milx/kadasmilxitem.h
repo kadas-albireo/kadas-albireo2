@@ -63,7 +63,9 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     void render( QgsRenderContext &context ) const override;
     QList<QgsAnnotationItem *> annotationItems( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const override SIP_FACTORY;
 #ifndef SIP_RUN
-    QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
+    // Legacy MilX layers are converted to annotation layers at project load
+    // by KadasItemLayerMigration, so this code path is never exercised.
+    QString asKml( const QgsRenderContext &, QuaZip * = nullptr ) const override { return QString(); }
 #endif
 
     // State interface
