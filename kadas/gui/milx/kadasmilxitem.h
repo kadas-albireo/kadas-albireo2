@@ -48,9 +48,6 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
 
     QString itemName() const override { return mMilitaryName; }
 
-    QImage symbolImage() const override;
-    QPointF symbolAnchor() const override { return mSymbolAnchor; }
-
     QgsRectangle boundingBox() const override;
 
     QList<KadasMapItem::Node> nodes( const QgsMapSettings & ) const override { return {}; }
@@ -118,10 +115,6 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
 
     static KadasMilxItem *fromMilx( const QDomElement &itemElement, const QgsCoordinateTransform &crst, int symbolSize );
 
-    static QRect computeScreenExtent( const QgsRectangle &mapExtent, const QgsMapToPixel &mapToPixel );
-
-    static bool validateMssString( const QString &mssString, QString &adjustedMssString SIP_OUT, QString &messages SIP_OUT );
-
   protected:
     KadasMapItem *_clone() const override SIP_FACTORY { return new KadasMilxItem(); }
     KadasMilxItem::State *createEmptyState() const override SIP_FACTORY { return new State(); }
@@ -146,23 +139,12 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     bool mHasVariablePoints = false;
     QString mSymbolType;
 
-    // Symbol cache
-    mutable QImage mSymbolGraphic;
-    mutable QPointF mSymbolAnchor;
-
     KadasMilxItem::State *state() { return static_cast<State *>( mState ); }
 
-    QList<QPoint> computeScreenPoints( const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
-    QList<QPair<int, double>> computeScreenAttributes( const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
-    KadasMilxClient::NPointSymbol toSymbol( const QgsMapToPixel &mapToPixel, const QgsCoordinateReferenceSystem &mapCrs, bool colored = true ) const;
-    double metersToPixels( const QgsPointXY &refPoint, const QgsMapToPixel &mapToPixel, const QgsCoordinateTransform &mapCrst ) const;
-    void updateSymbol( const QgsMapSettings &mapSettings, const KadasMilxClient::NPointSymbolGraphic &result );
     void updateSymbolMargin( const KadasMilxClient::NPointSymbolGraphic &result );
     const KadasMilxSymbolSettings &symbolSettings() const;
 
     static void finalize( KadasMilxItem *item, bool isCorridor );
-    static void posPointNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
-    static void ctrlPointNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize );
 };
 
 #endif // KADASMILXITEM_H
