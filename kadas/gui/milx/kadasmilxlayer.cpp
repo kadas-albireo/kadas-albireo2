@@ -26,30 +26,6 @@ KadasMilxLayer::KadasMilxLayer( const QString &name )
   : KadasItemLayer( name, QgsCoordinateReferenceSystem( "EPSG:4326" ), layerType() )
 {}
 
-KadasItemLayer *KadasMilxLayer::clone() const
-{
-  auto layer = std::make_unique<KadasMilxLayer>( name() );
-  layer->mTransformContext = mTransformContext;
-  layer->mOpacity = mOpacity;
-  for ( auto it = mItems.begin(), itEnd = mItems.end(); it != itEnd; ++it )
-  {
-    layer->mItems.insert( it.key(), it.value()->clone() );
-  }
-  layer->mItemOrder = mItemOrder;
-  layer->mItemBounds = mItemBounds;
-  layer->mIdCounter = mIdCounter;
-  layer->mFreeIds = mFreeIds;
-  layer->mSymbolScale = mSymbolScale;
-  layer->mOverrideMilxSymbolSettings = mOverrideMilxSymbolSettings;
-  layer->mMilxSymbolSettings = mMilxSymbolSettings;
-  return layer.release();
-}
-
-bool KadasMilxLayer::acceptsItem( const KadasMapItem *item ) const
-{
-  return dynamic_cast<const KadasMilxItem *>( item );
-}
-
 bool KadasMilxLayer::importFromMilxly( const QDomElement &milxLayerEl, int dpi, QString &errorMsg )
 {
   setName( milxLayerEl.firstChildElement( "Name" ).text() );
