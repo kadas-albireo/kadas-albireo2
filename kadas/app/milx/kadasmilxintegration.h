@@ -21,8 +21,6 @@
 
 #include <qgis/qgscustomdrophandler.h>
 
-#include "kadas/gui/kadasmapiteminterface.h"
-
 
 class QAction;
 class QComboBox;
@@ -31,17 +29,9 @@ class QSpinBox;
 class QTabWidget;
 class QgsColorButton;
 class QgsMapLayer;
-class KadasMilxLayer;
 class KadasMilxLayerPropertiesPageFactory;
 class KadasMilxLibrary;
 
-
-class KadasMilxInterface : public KadasMapItemInterface
-{
-  public:
-    KadasMilxInterface() = default;
-    KadasMapItem *createItem() const override;
-};
 
 class KadasMilxDropHandler : public QgsCustomDropHandler
 {
@@ -80,8 +70,6 @@ class KadasMilxIntegration : public QObject
     KadasMilxLibrary *mMilxLibrary = nullptr;
     KadasMilxLayerPropertiesPageFactory *mLayerPropertiesFactory = nullptr;
     KadasMilxDropHandler mDropHandler;
-    KadasMilxLayer *getLayer();
-    KadasMilxLayer *getOrCreateLayer();
 
     void refreshMilxLayers();
     static void showMessageDialog( const QString &title, const QString &body, const QString &messages );

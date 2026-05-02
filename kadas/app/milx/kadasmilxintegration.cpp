@@ -37,7 +37,6 @@
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 #include "kadas/gui/milx/kadasmilxclient.h"
 #include "kadas/gui/milx/kadasmilxeditor.h"
-#include "kadas/gui/milx/kadasmilxitem.h"
 #include "kadas/gui/milx/kadasmilxlayer.h"
 #include "kadas/gui/milx/kadasmilxlayerpropertiespage.h"
 #include "kadas/gui/milx/kadasmilxlibrary.h"
@@ -45,12 +44,6 @@
 #include "kadasmainwindow.h"
 #include "milx/kadasmilxintegration.h"
 #include "milx/kadasmilxexportdialog.h"
-
-
-KadasMapItem *KadasMilxInterface::createItem() const
-{
-  return new KadasMilxItem();
-}
 
 
 KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
@@ -139,29 +132,6 @@ KadasMilxIntegration::~KadasMilxIntegration()
   kApp->mainWindow()->removeCustomDropHandler( &mDropHandler );
   KadasMilxClient::quit();
   delete mMilxLibrary;
-}
-
-KadasMilxLayer *KadasMilxIntegration::getLayer()
-{
-  for ( QgsMapLayer *layer : QgsProject::instance()->mapLayers() )
-  {
-    if ( dynamic_cast<KadasMilxLayer *>( layer ) )
-    {
-      return static_cast<KadasMilxLayer *>( layer );
-    }
-  }
-  return nullptr;
-}
-
-KadasMilxLayer *KadasMilxIntegration::getOrCreateLayer()
-{
-  KadasMilxLayer *layer = getLayer();
-  if ( !layer )
-  {
-    layer = new KadasMilxLayer();
-    QgsProject::instance()->addMapLayer( layer );
-  }
-  return layer;
 }
 
 void KadasMilxIntegration::createMilx( bool active )
