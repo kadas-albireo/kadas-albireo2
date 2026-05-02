@@ -82,8 +82,6 @@ int KadasItemLayerMigration::migrateProject( QgsProject *project )
         const QString newId = annoLayer->addItem( anno );
         if ( !legacy->tooltip().isEmpty() )
           KadasAnnotationLayerHelpers::setTooltip( annoLayer, newId, legacy->tooltip() );
-        if ( !legacy->editor().isEmpty() )
-          KadasAnnotationLayerHelpers::setEditorName( annoLayer, newId, legacy->editor() );
       }
     }
 

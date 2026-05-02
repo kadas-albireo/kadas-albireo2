@@ -45,14 +45,6 @@ class QgsCoordinateReferenceSystem;
 class KADAS_GUI_EXPORT KadasAnnotationLayerHelpers
 {
   public:
-    //! Returns the editor widget name stored for \a itemId on \a layer, or
-    //! an empty string if none is set.
-    static QString editorName( const QgsAnnotationLayer *layer, const QString &itemId );
-
-    //! Sets the editor widget \a name for \a itemId on \a layer. Passing an
-    //! empty \a name removes the override.
-    static void setEditorName( QgsAnnotationLayer *layer, const QString &itemId, const QString &name );
-
     //! Returns the tooltip stored for \a itemId on \a layer, or an empty
     //! string if none is set.
     static QString tooltip( const QgsAnnotationLayer *layer, const QString &itemId );

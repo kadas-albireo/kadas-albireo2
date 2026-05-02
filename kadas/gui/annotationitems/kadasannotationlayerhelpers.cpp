@@ -26,7 +26,6 @@
 namespace
 {
   const QString KEY_PREFIX = QStringLiteral( "kadas:item-meta:" );
-  const QString FIELD_EDITOR = QStringLiteral( "editor" );
   const QString FIELD_TOOLTIP = QStringLiteral( "tooltip" );
 
   QString makeKey( const QString &itemId, const QString &field )
@@ -53,16 +52,6 @@ namespace
   }
 } // namespace
 
-
-QString KadasAnnotationLayerHelpers::editorName( const QgsAnnotationLayer *layer, const QString &itemId )
-{
-  return readField( layer, itemId, FIELD_EDITOR );
-}
-
-void KadasAnnotationLayerHelpers::setEditorName( QgsAnnotationLayer *layer, const QString &itemId, const QString &name )
-{
-  writeField( layer, itemId, FIELD_EDITOR, name );
-}
 
 QString KadasAnnotationLayerHelpers::tooltip( const QgsAnnotationLayer *layer, const QString &itemId )
 {
