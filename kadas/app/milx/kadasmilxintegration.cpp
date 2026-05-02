@@ -34,9 +34,7 @@
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateannotationitem.h"
-#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 #include "kadas/gui/milx/kadasmilxclient.h"
-#include "kadas/gui/milx/kadasmilxeditor.h"
 #include "kadas/gui/milx/kadasmilxlayerpropertiespage.h"
 #include "kadas/gui/milx/kadasmilxlibrary.h"
 #include "kadasapplication.h"
@@ -117,8 +115,6 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
   connect( mUi.mLeaderLineColorButton, &QgsColorButton::colorChanged, this, &KadasMilxIntegration::setMilxLeaderLineColor );
 
   mMilxLibrary = new KadasMilxLibrary( kApp->mainWindow()->winId() );
-
-  KadasMapItemEditor::registry()->insert( "KadasMilxEditor", [this]( KadasMapItem *item, KadasMapItemEditor::EditorType type ) { return new KadasMilxEditor( item, type, mMilxLibrary ); } );
 
   kApp->mainWindow()->addCustomDropHandler( &mDropHandler );
 
