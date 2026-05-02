@@ -22,6 +22,8 @@
 
 #include "kadas/gui/kadas_gui.h"
 
+class QgsMapLayer;
+
 /**
  * \ingroup gui
  * \brief Bundles the per-call context that \c KadasAnnotationItemController
@@ -37,9 +39,10 @@ class KADAS_GUI_EXPORT KadasAnnotationItemContext
 {
   public:
     KadasAnnotationItemContext() = default;
-    KadasAnnotationItemContext( const QgsCoordinateReferenceSystem &itemCrs, const QgsMapSettings &mapSettings )
+    KadasAnnotationItemContext( const QgsCoordinateReferenceSystem &itemCrs, const QgsMapSettings &mapSettings, QgsMapLayer *layer = nullptr )
       : mItemCrs( itemCrs )
       , mMapSettings( mapSettings )
+      , mLayer( layer )
     {}
 
     //! CRS of the item (i.e. the parent annotation layer's CRS).
@@ -48,9 +51,13 @@ class KADAS_GUI_EXPORT KadasAnnotationItemContext
     //! Map canvas settings; \c destinationCrs() is the map CRS.
     const QgsMapSettings &mapSettings() const { return mMapSettings; }
 
+    //! Owning annotation layer, or \c nullptr if not known.
+    QgsMapLayer *layer() const { return mLayer; }
+
   private:
     QgsCoordinateReferenceSystem mItemCrs;
     QgsMapSettings mMapSettings;
+    QgsMapLayer *mLayer = nullptr;
 };
 
 #endif // KADASANNOTATIONITEMCONTEXT_H

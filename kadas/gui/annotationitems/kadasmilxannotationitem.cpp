@@ -30,6 +30,7 @@
 
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
+#include "kadas/gui/annotationitems/kadasmilxlayersettings.h"
 #include "kadas/gui/milx/kadasmilxclient.h"
 
 
@@ -83,7 +84,7 @@ void KadasMilxAnnotationItem::render( QgsRenderContext &context, QgsFeedback *fe
   if ( symbol.points.isEmpty() || symbol.xml.isEmpty() )
     return;
 
-  if ( !KadasMilxClient::updateSymbol( computeScreenExtent( ms ), ms.outputDpi(), symbol, KadasMilxClient::globalSymbolSettings(), result, /* returnPoints */ false ) )
+  if ( !KadasMilxClient::updateSymbol( computeScreenExtent( ms ), ms.outputDpi(), symbol, KadasMilxLayerSettings::resolve( context ), result, /* returnPoints */ false ) )
   {
     return;
   }
