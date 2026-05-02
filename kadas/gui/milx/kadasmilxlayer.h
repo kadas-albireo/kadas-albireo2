@@ -32,8 +32,6 @@ class KADAS_GUI_EXPORT KadasMilxLayer : public KadasItemLayer
     KadasMilxLayer( const QString &name = "MilX" );
     QString layerTypeKey() const override { return layerType(); }
 
-    bool importFromMilxly( const QDomElement &milxLayerEl, int dpi, QString &errorMsg );
-
     void setOverrideMilxSymbolSettings( bool overrideSettings ) { mOverrideMilxSymbolSettings = overrideSettings; }
     bool overrideMilxSymbolSettings() const { return mOverrideMilxSymbolSettings; }
 

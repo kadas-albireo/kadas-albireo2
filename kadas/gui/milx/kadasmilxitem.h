@@ -112,15 +112,11 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
 
     bool isMultiPoint() const;
 
-    static KadasMilxItem *fromMilx( const QDomElement &itemElement, const QgsCoordinateTransform &crst, int symbolSize );
-
   protected:
     KadasMapItem *_clone() const override SIP_FACTORY { return new KadasMilxItem(); }
     KadasMilxItem::State *createEmptyState() const override SIP_FACTORY { return new State(); }
 
   private:
-    friend class KadasMilxLayer;
-
     enum AttribIds
     {
       AttrX = -2,
@@ -139,10 +135,6 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     QString mSymbolType;
 
     KadasMilxItem::State *state() { return static_cast<State *>( mState ); }
-
-    const KadasMilxSymbolSettings &symbolSettings() const;
-
-    static void finalize( KadasMilxItem *item, bool isCorridor );
 };
 
 #endif // KADASMILXITEM_H
