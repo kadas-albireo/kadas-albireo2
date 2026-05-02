@@ -24,8 +24,6 @@
 
 #include "kadas/gui/kadas_gui.h"
 
-class QDomDocument;
-class QDomElement;
 class QComboBox;
 class QGroupBox;
 class QSlider;
