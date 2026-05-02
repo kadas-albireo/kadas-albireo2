@@ -44,6 +44,7 @@ set(kadas_gui_SRC
     annotationitems/kadasmarkerannotationcontroller.cpp
     annotationitems/kadasmilxannotationcontroller.cpp
     annotationitems/kadasmilxannotationitem.cpp
+    annotationitems/kadasmilxlayersettings.cpp
     annotationitems/kadaspictureannotationcontroller.cpp
     annotationitems/kadaspinannotationcontroller.cpp
     annotationitems/kadaspinannotationitem.cpp
@@ -156,6 +157,7 @@ set(kadas_gui_HDR
     annotationitems/kadasmarkerannotationcontroller.h
     annotationitems/kadasmilxannotationcontroller.h
     annotationitems/kadasmilxannotationitem.h
+    annotationitems/kadasmilxlayersettings.h
     annotationitems/kadaspictureannotationcontroller.h
     annotationitems/kadaspinannotationcontroller.h
     annotationitems/kadaspinannotationitem.h

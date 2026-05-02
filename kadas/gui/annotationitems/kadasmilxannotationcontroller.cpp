@@ -40,6 +40,7 @@
 
 #include "kadas/gui/annotationitems/kadasmilxannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
+#include "kadas/gui/annotationitems/kadasmilxlayersettings.h"
 #include "kadas/gui/milx/kadasmilxclient.h"
 
 
@@ -88,7 +89,7 @@ QList<KadasNode> KadasMilxAnnotationController::nodes( const QgsAnnotationItem *
   // Ask libmss which point indices are draggable control points; the rest
   // are rendered as plain position nodes (matches legacy KadasMilxItem::nodes).
   QList<int> controlIndices;
-  KadasMilxClient::getControlPointIndices( milx->mssString(), pts.size(), KadasMilxClient::globalSymbolSettings(), controlIndices );
+  KadasMilxClient::getControlPointIndices( milx->mssString(), pts.size(), KadasMilxLayerSettings::resolve( ctx.layer() ), controlIndices );
 
   // MilX points are stored in EPSG:4326; project them to the map CRS for display.
   const QgsCoordinateTransform xform( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
@@ -133,7 +134,7 @@ bool KadasMilxAnnotationController::startPart( QgsAnnotationItem *item, const Qg
     KadasMilxAnnotationItem::computeScreenExtent( ctx.mapSettings() ),
     ctx.mapSettings().outputDpi(),
     symbol,
-    KadasMilxClient::globalSymbolSettings(),
+    KadasMilxLayerSettings::resolve( ctx.layer() ),
     result,
     /* returnPoints */ true
   );
@@ -159,7 +160,10 @@ void KadasMilxAnnotationController::setCurrentPoint( QgsAnnotationItem *item, co
   const QPoint screenPoint = ctx.mapSettings().mapToPixel().transform( p ).toQPointF().toPoint();
   KadasMilxClient::NPointSymbol symbol = milx->toSymbol( ctx.mapSettings() );
   KadasMilxClient::NPointSymbolGraphic result;
-  if ( KadasMilxClient::movePoint( KadasMilxAnnotationItem::computeScreenExtent( ctx.mapSettings() ), ctx.mapSettings().outputDpi(), symbol, milx->pressedPoints(), screenPoint, KadasMilxClient::globalSymbolSettings(), result ) )
+  if (
+    KadasMilxClient::
+      movePoint( KadasMilxAnnotationItem::computeScreenExtent( ctx.mapSettings() ), ctx.mapSettings().outputDpi(), symbol, milx->pressedPoints(), screenPoint, KadasMilxLayerSettings::resolve( ctx.layer() ), result )
+  )
   {
     milx->applySymbolResult( ctx.mapSettings(), result );
   }
@@ -193,7 +197,7 @@ bool KadasMilxAnnotationController::continuePart( QgsAnnotationItem *item, const
         const QPoint screenPoint = ctx.mapSettings().mapToPixel().transform( xform.transform( pts[index] ) ).toQPointF().toPoint();
         KadasMilxClient::NPointSymbol symbol = milx->toSymbol( ctx.mapSettings() );
         KadasMilxClient::NPointSymbolGraphic result;
-        if ( KadasMilxClient::appendPoint( KadasMilxAnnotationItem::computeScreenExtent( ctx.mapSettings() ), ctx.mapSettings().outputDpi(), symbol, screenPoint, KadasMilxClient::globalSymbolSettings(), result ) )
+        if ( KadasMilxClient::appendPoint( KadasMilxAnnotationItem::computeScreenExtent( ctx.mapSettings() ), ctx.mapSettings().outputDpi(), symbol, screenPoint, KadasMilxLayerSettings::resolve( ctx.layer() ), result ) )
         {
           milx->applySymbolResult( ctx.mapSettings(), result );
         }
@@ -329,12 +333,12 @@ void KadasMilxAnnotationController::edit( QgsAnnotationItem *item, const KadasEd
       const int dpi = ctx.mapSettings().outputDpi();
       if ( editContext.vidx.ring == 0 )
       {
-        if ( KadasMilxClient::movePoint( screenRect, dpi, symbol, editContext.vidx.vertex, screenPoint, KadasMilxClient::globalSymbolSettings(), result ) )
+        if ( KadasMilxClient::movePoint( screenRect, dpi, symbol, editContext.vidx.vertex, screenPoint, KadasMilxLayerSettings::resolve( ctx.layer() ), result ) )
           milx->applySymbolResult( ctx.mapSettings(), result );
       }
       else if ( editContext.vidx.ring == 1 )
       {
-        if ( KadasMilxClient::moveAttributePoint( screenRect, dpi, symbol, editContext.vidx.vertex, screenPoint, KadasMilxClient::globalSymbolSettings(), result ) )
+        if ( KadasMilxClient::moveAttributePoint( screenRect, dpi, symbol, editContext.vidx.vertex, screenPoint, KadasMilxLayerSettings::resolve( ctx.layer() ), result ) )
           milx->applySymbolResult( ctx.mapSettings(), result );
       }
     }
@@ -398,7 +402,7 @@ void KadasMilxAnnotationController::edit( QgsAnnotationItem *item, const KadasEd
       KadasMilxAnnotationItem::computeScreenExtent( ctx.mapSettings() ),
       ctx.mapSettings().outputDpi(),
       symbol,
-      KadasMilxClient::globalSymbolSettings(),
+      KadasMilxLayerSettings::resolve( ctx.layer() ),
       result,
       /* returnPoints */ true
     );
@@ -505,7 +509,7 @@ QString KadasMilxAnnotationController::asKml( const QgsAnnotationItem *item, con
 
   KadasMilxClient::NPointSymbol symbol = milx->toSymbol( ms );
   KadasMilxClient::NPointSymbolGraphic result;
-  if ( !KadasMilxClient::updateSymbol( KadasMilxAnnotationItem::computeScreenExtent( ms ), ms.outputDpi(), symbol, KadasMilxClient::globalSymbolSettings(), result, /* returnPoints */ true ) )
+  if ( !KadasMilxClient::updateSymbol( KadasMilxAnnotationItem::computeScreenExtent( ms ), ms.outputDpi(), symbol, KadasMilxLayerSettings::resolve( renderContext ), result, /* returnPoints */ true ) )
   {
     return QString();
   }
@@ -606,7 +610,7 @@ void KadasMilxAnnotationController::populateContextMenu( QgsAnnotationItem *item
     KadasMilxClient::NPointSymbolGraphic result;
     QString newMssString = milx->mssString();
     QString newMilitaryName = milx->militaryName();
-    if ( KadasMilxClient::editSymbol( screenRect, dpi, symbol, newMssString, newMilitaryName, KadasMilxClient::globalSymbolSettings(), result, mainWindowWid() ) )
+    if ( KadasMilxClient::editSymbol( screenRect, dpi, symbol, newMssString, newMilitaryName, KadasMilxLayerSettings::resolve( ctxRef.layer() ), result, mainWindowWid() ) )
     {
       milx->setMssString( newMssString );
       milx->setMilitaryName( newMilitaryName );
@@ -621,18 +625,18 @@ void KadasMilxAnnotationController::populateContextMenu( QgsAnnotationItem *item
       // Right-click on an existing node → delete (if libmss says it's removable).
       QAction *actionDeletePoint = menu->addAction( QIcon( QStringLiteral( ":/kadas/icons/delete_node" ) ), QObject::tr( "Delete node" ), [milx, &ctxRef = ctx, screenRect, dpi, symbol, editContext]() mutable {
         KadasMilxClient::NPointSymbolGraphic result;
-        if ( KadasMilxClient::deletePoint( screenRect, dpi, symbol, editContext.vidx.vertex, KadasMilxClient::globalSymbolSettings(), result ) )
+        if ( KadasMilxClient::deletePoint( screenRect, dpi, symbol, editContext.vidx.vertex, KadasMilxLayerSettings::resolve( ctxRef.layer() ), result ) )
           milx->applySymbolResult( ctxRef.mapSettings(), result );
       } );
       bool canDelete = false;
-      actionDeletePoint->setEnabled( KadasMilxClient::canDeletePoint( symbol, KadasMilxClient::globalSymbolSettings(), editContext.vidx.vertex, canDelete ) && canDelete );
+      actionDeletePoint->setEnabled( KadasMilxClient::canDeletePoint( symbol, KadasMilxLayerSettings::resolve( ctx.layer() ), editContext.vidx.vertex, canDelete ) && canDelete );
     }
     else
     {
       // Right-click on the symbol body → insert a node at the click position.
       menu->addAction( QIcon( QStringLiteral( ":/kadas/icons/add_node" ) ), QObject::tr( "Add node" ), [milx, &ctxRef = ctx, screenRect, dpi, symbol, screenPos]() mutable {
         KadasMilxClient::NPointSymbolGraphic result;
-        if ( KadasMilxClient::insertPoint( screenRect, dpi, symbol, screenPos, KadasMilxClient::globalSymbolSettings(), result ) )
+        if ( KadasMilxClient::insertPoint( screenRect, dpi, symbol, screenPos, KadasMilxLayerSettings::resolve( ctxRef.layer() ), result ) )
           milx->applySymbolResult( ctxRef.mapSettings(), result );
       } );
     }
@@ -658,7 +662,7 @@ void KadasMilxAnnotationController::onDoubleClick( QgsAnnotationItem *item, cons
   KadasMilxClient::NPointSymbolGraphic result;
   QString newMssString = milx->mssString();
   QString newMilitaryName = milx->militaryName();
-  if ( KadasMilxClient::editSymbol( screenRect, dpi, symbol, newMssString, newMilitaryName, KadasMilxClient::globalSymbolSettings(), result, mainWindowWid() ) )
+  if ( KadasMilxClient::editSymbol( screenRect, dpi, symbol, newMssString, newMilitaryName, KadasMilxLayerSettings::resolve( ctx.layer() ), result, mainWindowWid() ) )
   {
     milx->setMssString( newMssString );
     milx->setMilitaryName( newMilitaryName );
@@ -688,5 +692,5 @@ bool KadasMilxAnnotationController::hitTest( const QgsAnnotationItem *item, cons
   QList<KadasMilxClient::NPointSymbol> symbols { symbol };
   int selectedSymbol = -1;
   QRect bbox;
-  return KadasMilxClient::pickSymbol( symbols, screenPos, KadasMilxClient::globalSymbolSettings(), selectedSymbol, bbox ) && selectedSymbol >= 0;
+  return KadasMilxClient::pickSymbol( symbols, screenPos, KadasMilxLayerSettings::resolve( ctx.layer() ), selectedSymbol, bbox ) && selectedSymbol >= 0;
 }

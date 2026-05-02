@@ -166,7 +166,7 @@ void KadasMapToolCreateAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
   if ( mDrawState != DrawState::Drawing )
     return;
 
-  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
+  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
   const QgsPointXY pos = e->mapPoint();
   mController->setCurrentPoint( mItem, pos, ctx );
   mLayer->triggerRepaint();
@@ -220,7 +220,7 @@ void KadasMapToolCreateAnnotationItem::keyPressEvent( QKeyEvent *e )
 
 void KadasMapToolCreateAnnotationItem::addPoint( const QgsPointXY &pos )
 {
-  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
+  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
 
   switch ( mDrawState )
   {
@@ -260,7 +260,7 @@ void KadasMapToolCreateAnnotationItem::addPoint( const QgsPointXY &pos )
 
 void KadasMapToolCreateAnnotationItem::startPart( const QgsPointXY &pos )
 {
-  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
+  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
   if ( !mController->startPart( mItem, pos, ctx ) )
   {
     finishPart();
@@ -275,7 +275,7 @@ void KadasMapToolCreateAnnotationItem::startPart( const QgsPointXY &pos )
 
 void KadasMapToolCreateAnnotationItem::startPart( const KadasAttribValues &values )
 {
-  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
+  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
   if ( !mController->startPart( mItem, values, ctx ) )
   {
     finishPart();
@@ -290,7 +290,7 @@ void KadasMapToolCreateAnnotationItem::startPart( const KadasAttribValues &value
 
 void KadasMapToolCreateAnnotationItem::finishPart()
 {
-  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
+  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
   mController->endPart( mItem );
   mDrawState = DrawState::Finished;
   mLayer->triggerRepaint();
@@ -362,7 +362,7 @@ void KadasMapToolCreateAnnotationItem::inputChanged()
 {
   if ( !mItem || !mController || !mLayer || !mInputWidget )
     return;
-  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
+  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
   const KadasAttribValues values = collectAttributeValues();
 
   // Suppress the move event triggered by the cursor reposition below so the
@@ -383,7 +383,7 @@ void KadasMapToolCreateAnnotationItem::acceptInput()
 {
   if ( !mItem || !mController || !mLayer )
     return;
-  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings() );
+  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
 
   switch ( mDrawState )
   {
