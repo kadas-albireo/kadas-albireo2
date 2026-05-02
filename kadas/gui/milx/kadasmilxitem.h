@@ -34,15 +34,15 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     KadasMilxItem();
 
     const QString &mssString() const { return mMssString; }
-    void setMssString( const QString &mssString );
+    void setMssString( const QString &mssString ) { mMssString = mssString; }
     const QString &militaryName() const { return mMilitaryName; }
-    void setMilitaryName( const QString &militaryName );
+    void setMilitaryName( const QString &militaryName ) { mMilitaryName = militaryName; }
     int minNPoints() const { return mMinNPoints; }
-    void setMinNPoints( int minNPoints );
+    void setMinNPoints( int minNPoints ) { mMinNPoints = minNPoints; }
     bool hasVariablePoints() const { return mHasVariablePoints; }
-    void setHasVariablePoints( bool hasVariablePoints );
+    void setHasVariablePoints( bool hasVariablePoints ) { mHasVariablePoints = hasVariablePoints; }
     QString symbolType() const { return mSymbolType; }
-    void setSymbolType( const QString &symbolType );
+    void setSymbolType( const QString &symbolType ) { mSymbolType = symbolType; }
 
 
     QString itemName() const override { return mMilitaryName; }
