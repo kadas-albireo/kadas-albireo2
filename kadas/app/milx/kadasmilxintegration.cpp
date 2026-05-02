@@ -23,11 +23,17 @@
 #include <QTabWidget>
 #include <quazip/quazipfile.h>
 
+#include <qgis/qgsannotationlayer.h>
 #include <qgis/qgslogger.h>
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 
+#include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
+#include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
+#include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
+#include "kadas/gui/maptools/kadasmaptoolcreateannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 #include "kadas/gui/milx/kadasmilxclient.h"
 #include "kadas/gui/milx/kadasmilxeditor.h"
@@ -161,22 +167,28 @@ KadasMilxLayer *KadasMilxIntegration::getOrCreateLayer()
 void KadasMilxIntegration::createMilx( bool active )
 {
   QgsMapCanvas *canvas = kApp->mainWindow()->mapCanvas();
-  if ( active )
+  if ( !active )
   {
-    KadasLayerSelectionWidget::LayerFilter layerFilter = []( QgsMapLayer *layer ) { return dynamic_cast<KadasMilxLayer *>( layer ); };
-    KadasLayerSelectionWidget::LayerCreator layerCreator = []( const QString &name ) { return new KadasMilxLayer( name ); };
+    if ( canvas->mapTool() && canvas->mapTool()->action() == mUi.mActionMilx )
+      canvas->unsetMapTool( canvas->mapTool() );
+    return;
+  }
 
-    KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, std::make_unique<KadasMilxInterface>(), getOrCreateLayer() );
-    tool->setAction( mUi.mActionMilx );
-    tool->showLayerSelection( true, kApp->mainWindow()->layerTreeView(), layerFilter, layerCreator );
-    kApp->mainWindow()->layerTreeView()->setCurrentLayer( getOrCreateLayer() );
-    kApp->mainWindow()->layerTreeView()->setLayerVisible( getOrCreateLayer(), true );
-    canvas->setMapTool( tool );
-  }
-  else if ( !active && canvas->mapTool() && canvas->mapTool()->action() == mUi.mActionMilx )
-  {
-    canvas->unsetMapTool( canvas->mapTool() );
-  }
+  KadasAnnotationItemController *controller = KadasAnnotationControllerRegistry::instance()->controllerFor( KadasMilxAnnotationItem::itemTypeId() );
+  if ( !controller )
+    return;
+
+  QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::MssLayer );
+  if ( !layer )
+    return;
+
+  KadasMapToolCreateAnnotationItem *tool = new KadasMapToolCreateAnnotationItem( canvas, controller, layer );
+  tool->setMultipart( false );
+  tool->setAction( mUi.mActionMilx );
+
+  kApp->mainWindow()->layerTreeView()->setCurrentLayer( layer );
+  kApp->mainWindow()->layerTreeView()->setLayerVisible( layer, true );
+  canvas->setMapTool( tool );
 }
 
 void KadasMilxIntegration::readProjectSettings()

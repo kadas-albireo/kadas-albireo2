@@ -81,7 +81,10 @@ QgsAnnotationLayer *KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( St
   {
     QgsAnnotationLayer::LayerOptions options( QgsProject::instance()->transformContext() );
     annoLayer = new QgsAnnotationLayer( standardLayerNames()[layer], options );
-    annoLayer->setCrs( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:3857" ) ) );
+    // MilX/MSS content is always WGS84 (libmss IPC convention); other
+    // standard layers default to web-mercator.
+    const QString crsAuthid = ( layer == StandardLayer::MssLayer ) ? QStringLiteral( "EPSG:4326" ) : QStringLiteral( "EPSG:3857" );
+    annoLayer->setCrs( QgsCoordinateReferenceSystem( crsAuthid ) );
     QgsProject::instance()->addMapLayer( annoLayer );
     instance()->mLayerIdMap[layer] = annoLayer->id();
   }
@@ -96,6 +99,7 @@ const QMap<KadasAnnotationLayerRegistry::StandardLayer, QString> &KadasAnnotatio
     { StandardLayer::PicturesLayer, tr( "Pictures" ) },
     { StandardLayer::PinsLayer, tr( "Pins" ) },
     { StandardLayer::RoutesLayer, tr( "Routes" ) },
+    { StandardLayer::MssLayer, tr( "MSS" ) },
   };
   return names;
 }
