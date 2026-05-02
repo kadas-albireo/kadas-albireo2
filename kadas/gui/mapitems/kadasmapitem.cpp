@@ -45,7 +45,6 @@
 #include "kadas/gui/mapitems/kadasselectionrectitem.h"
 #include "kadas/gui/mapitems/kadassymbolitem.h"
 #include "kadas/gui/mapitems/kadastextitem.h"
-#include "kadas/gui/milx/kadasmilxitem.h"
 
 Q_GLOBAL_STATIC( KadasMapItem::Registry, sRegistry )
 
@@ -366,7 +365,6 @@ KadasMapItem::Registry *KadasMapItem::registry()
     sRegistry->insert( QStringLiteral( "KadasSymbolItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasSymbolItem( crs ); } );
     sRegistry->insert( QStringLiteral( "KadasPinItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasPinItem( crs ); } );
     sRegistry->insert( QStringLiteral( "KadasTextItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasTextItem( crs ); } );
-    sRegistry->insert( QStringLiteral( "KadasMilxItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasMilxItem(); } );
   } );
 
   return sRegistry;

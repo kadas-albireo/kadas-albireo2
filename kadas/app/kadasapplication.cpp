@@ -96,7 +96,6 @@
 #include "kadas/gui/maptools/kadasmaptooledititemgroup.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptoolpan.h"
-#include "kadas/gui/milx/kadasmilxlayer.h"
 #include "kadasapplication.h"
 #include "kadasapplayerhandling.h"
 #include "kadascanvascontextmenu.h"
@@ -415,7 +414,6 @@ void KadasApplication::init()
 
   // Register plugin layers
   mKadasPluginLayerTypes.append( new KadasItemLayerType() );
-  mKadasPluginLayerTypes.append( new KadasMilxLayerType() );
   mKadasPluginLayerTypes.append( new KadasBullseyeLayerType( mMainWindow->actionBullseye() ) );
   mKadasPluginLayerTypes.append( new KadasGuideGridLayerType( mMainWindow->actionGuideGrid() ) );
   mKadasPluginLayerTypes.append( new KadasMapGridLayerType( mMainWindow->actionMapGrid() ) );
