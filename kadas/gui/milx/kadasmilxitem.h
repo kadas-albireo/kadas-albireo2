@@ -121,7 +121,6 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
 
     void writeMilx( QDomDocument &doc, QDomElement &itemElement ) const;
     static KadasMilxItem *fromMilx( const QDomElement &itemElement, const QgsCoordinateTransform &crst, int symbolSize );
-    static KadasMilxItem *fromMssStringAndPoints( const QString &mssString, const QList<KadasItemPos> &points );
 
     static QRect computeScreenExtent( const QgsRectangle &mapExtent, const QgsMapToPixel &mapToPixel );
 

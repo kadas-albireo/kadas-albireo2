@@ -35,14 +35,8 @@ class KADAS_GUI_EXPORT KadasMilxLayer : public KadasItemLayer
 
     KadasItemLayer *clone() const override SIP_FACTORY;
 
-    bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
-    bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const override;
-
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
     ItemId pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY ) const override;
-
-    void setApproved( bool approved );
-    bool isApproved() const { return mIsApproved; }
 
     bool importFromMilxly( const QDomElement &milxLayerEl, int dpi, QString &errorMsg );
 
@@ -66,13 +60,9 @@ class KADAS_GUI_EXPORT KadasMilxLayer : public KadasItemLayer
 
     const KadasMilxSymbolSettings &milxSymbolSettings() const;
 
-  signals:
-    void approvedChanged( bool approved );
-
   private:
     class Renderer;
 
-    bool mIsApproved = false;
     bool mOverrideMilxSymbolSettings = false;
     KadasMilxSymbolSettings mMilxSymbolSettings;
 };
@@ -88,7 +78,6 @@ class KADAS_GUI_EXPORT KadasMilxLayerType : public KadasPluginLayerType
     {}
     QgsPluginLayer *createLayer() override SIP_FACTORY { return new KadasMilxLayer(); }
     QgsPluginLayer *createLayer( const QString &uri ) override SIP_FACTORY { return new KadasMilxLayer(); }
-    void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const override;
 };
 
 #endif // KADASMILXLAYER_H

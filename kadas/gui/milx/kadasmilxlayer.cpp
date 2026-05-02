@@ -43,7 +43,7 @@ class KadasMilxLayer::Renderer : public QgsMapLayerRenderer
           // Skip symbols
           continue;
         }
-        mRenderSymbols.append( milxItem->toSymbol( renderContext()->mapToPixel(), renderContext()->coordinateTransform().destinationCrs(), !layer->mIsApproved ) );
+        mRenderSymbols.append( milxItem->toSymbol( renderContext()->mapToPixel(), renderContext()->coordinateTransform().destinationCrs(), true ) );
         mRenderItemData.append( { milxItem->constState()->userOffset, milxItem->isMultiPoint() } );
         mSymSettings = layer->milxSymbolSettings();
         mRenderOpacity = layer->opacity();
@@ -116,7 +116,6 @@ KadasItemLayer *KadasMilxLayer::clone() const
   layer->mIdCounter = mIdCounter;
   layer->mFreeIds = mFreeIds;
   layer->mSymbolScale = mSymbolScale;
-  layer->mIsApproved = mIsApproved;
   layer->mOverrideMilxSymbolSettings = mOverrideMilxSymbolSettings;
   layer->mMilxSymbolSettings = mMilxSymbolSettings;
   return layer.release();
@@ -134,11 +133,6 @@ QgsMapLayerRenderer *KadasMilxLayer::createMapRenderer( QgsRenderContext &render
 
 KadasItemLayer::ItemId KadasMilxLayer::pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, PickObjective pickObjective ) const
 {
-  if ( mIsApproved )
-  {
-    // No items can be picked from approved layer
-    return ITEM_ID_NULL;
-  }
   QPoint screenPos = mapSettings.mapToPixel().transform( mapPos ).toQPointF().toPoint();
   QList<KadasMilxClient::NPointSymbol> symbols;
   QMap<int, ItemId> itemIdMap;
@@ -163,29 +157,6 @@ KadasItemLayer::ItemId KadasMilxLayer::pickItem( const KadasMapPos &mapPos, cons
     return itemIdMap[selectedSymbol];
   }
   return ITEM_ID_NULL;
-}
-
-void KadasMilxLayer::setApproved( bool approved )
-{
-  mIsApproved = approved;
-  emit approvedChanged( approved );
-  triggerRepaint();
-}
-
-bool KadasMilxLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext &context )
-{
-  bool success = KadasItemLayer::readXml( layer_node, context );
-  QDomElement layerEl = layer_node.toElement();
-  mIsApproved = layerEl.attribute( "approved" ).toInt() == 1;
-  return success;
-}
-
-bool KadasMilxLayer::writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const
-{
-  bool success = KadasItemLayer::writeXml( layer_node, document, context );
-  QDomElement layerEl = layer_node.toElement();
-  layerEl.setAttribute( "approved", mIsApproved ? "1" : "0" );
-  return success;
 }
 
 bool KadasMilxLayer::importFromMilxly( const QDomElement &milxLayerEl, int dpi, QString &errorMsg )
@@ -218,8 +189,6 @@ bool KadasMilxLayer::importFromMilxly( const QDomElement &milxLayerEl, int dpi, 
   }
   QgsCoordinateTransform crst( srcCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), mTransformContext );
 
-  mIsApproved = milxLayerEl.firstChildElement( "DisplayBW" ).text().toInt();
-
   QDomNodeList graphicEls = milxLayerEl.firstChildElement( "GraphicList" ).elementsByTagName( "MilXGraphic" );
   for ( int iGraphic = 0, nGraphics = graphicEls.count(); iGraphic < nGraphics; ++iGraphic )
   {
@@ -238,16 +207,5 @@ const KadasMilxSymbolSettings &KadasMilxLayer::milxSymbolSettings() const
   else
   {
     return KadasMilxClient::globalSymbolSettings();
-  }
-}
-
-void KadasMilxLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const
-{
-  if ( dynamic_cast<KadasMilxLayer *>( layer ) )
-  {
-    KadasMilxLayer *milxLayer = static_cast<KadasMilxLayer *>( layer );
-    QAction *action = menu->addAction( tr( "Approved layer" ), [milxLayer] { milxLayer->setApproved( !milxLayer->isApproved() ); } );
-    action->setCheckable( true );
-    action->setChecked( milxLayer->isApproved() );
   }
 }

@@ -1002,18 +1002,6 @@ KadasMilxItem *KadasMilxItem::fromMilx( const QDomElement &itemElement, const Qg
   return item;
 }
 
-KadasMilxItem *KadasMilxItem::fromMssStringAndPoints( const QString &mssString, const QList<KadasItemPos> &points )
-{
-  KadasMilxItem *item = new KadasMilxItem();
-
-  item->mMssString = mssString;
-  item->state()->points = points;
-
-  finalize( item, false );
-
-  return item;
-}
-
 void KadasMilxItem::finalize( KadasMilxItem *item, bool isCorridor )
 {
   if ( item->state()->points.size() > 1 )
