@@ -59,21 +59,12 @@ QJsonObject KadasMilxItem::State::serialize() const
   offset.append( userOffset.x() );
   offset.append( userOffset.y() );
 
-  QJsonArray marginArray;
-  marginArray.append( margin.left );
-  marginArray.append( margin.top );
-  marginArray.append( margin.right );
-  marginArray.append( margin.bottom );
-
   QJsonObject json;
-  // TODO json["status"] = static_cast<int>( drawStatus );
   json["points"] = pts;
   json["attributes"] = attrs;
   json["attributePoints"] = attrPts;
   json["controlPoints"] = ctrlPts;
   json["userOffset"] = offset;
-  json["pressedPoints"] = pressedPoints;
-  json["margin"] = marginArray;
   return json;
 }
 
@@ -108,15 +99,6 @@ bool KadasMilxItem::State::deserialize( const QJsonObject &json )
   QJsonArray offset = json["userOffset"].toArray();
   userOffset.setX( offset.at( 0 ).toDouble() );
   userOffset.setY( offset.at( 1 ).toDouble() );
-  pressedPoints = json["pressedPoints"].toInt();
-  QJsonArray marginArray = json["margin"].toArray();
-  if ( marginArray.size() == 4 )
-  {
-    margin.left = marginArray[0].toInt();
-    margin.top = marginArray[1].toInt();
-    margin.right = marginArray[2].toInt();
-    margin.bottom = marginArray[3].toInt();
-  }
   return attributes.size() == attributePoints.size();
 }
 
