@@ -224,9 +224,6 @@ class KADAS_GUI_EXPORT KadasItemLayerRegistry : public QObject
   public:
     enum class StandardLayer SIP_MONKEYPATCH_SCOPEENUM
     {
-      RedliningLayer,
-      SymbolsLayer,
-      PicturesLayer,
       PinsLayer,
       RoutesLayer
     };
