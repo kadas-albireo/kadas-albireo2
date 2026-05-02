@@ -24,6 +24,7 @@
 #include <QJsonObject>
 #include <QMap>
 
+#include <qgis/qgsannotationlayer.h>
 #include <qgis/qgscircularstring.h>
 #include <qgis/qgslinestring.h>
 #include <qgis/qgslogger.h>
@@ -33,6 +34,7 @@
 #include <qgis/qgssymbollayerutils.h>
 
 #include "kadas/core/kadas.h"
+#include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/kadasprojectmigration.h"
 #include "kadas/gui/mapitems/kadascircleitem.h"
@@ -45,7 +47,6 @@
 #include "kadas/gui/mapitems/kadasrectangleitem.h"
 #include "kadas/gui/mapitems/kadassymbolitem.h"
 #include "kadas/gui/mapitems/kadastextitem.h"
-#include "kadas/gui/milx/kadasmilxlayer.h"
 
 
 QString KadasProjectMigration::migrateProject( const QString &fileName, QStringList &filesToAttach )
@@ -478,14 +479,19 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
     {
       continue;
     }
-    KadasMilxLayer layer( mapLayerEl.firstChildElement( "layername" ).text() );
-    int dpi = qApp->primaryScreen()->logicalDotsPerInchX();
+    const QString layerName = mapLayerEl.firstChildElement( "layername" ).text();
+    const int dpi = qApp->primaryScreen()->logicalDotsPerInchX();
+
+    QgsAnnotationLayer::LayerOptions options( QgsProject::instance()->transformContext() );
+    auto annoLayer = std::make_unique<QgsAnnotationLayer>( layerName, options );
+    annoLayer->setCrs( QgsCoordinateReferenceSystem( "EPSG:4326" ) );
+
     QString err;
-    layer.importFromMilxly( mapLayerEl.firstChildElement( "MilXLayer" ), dpi, err );
+    KadasMilxAnnotationItem::importLayerFromMilxly( annoLayer.get(), mapLayerEl.firstChildElement( "MilXLayer" ), dpi, QgsProject::instance()->transformContext(), err );
 
     QDomElement newMapLayerEl = doc.createElement( "maplayer" );
     QgsReadWriteContext context;
-    layer.writeXml( newMapLayerEl, doc, context );
+    annoLayer->writeLayerXml( newMapLayerEl, doc, context );
     newMapLayerEl.appendChild( mapLayerEl.firstChildElement( "id" ).cloneNode() );
     newMapLayerEl.appendChild( mapLayerEl.firstChildElement( "layername" ).cloneNode() );
 
