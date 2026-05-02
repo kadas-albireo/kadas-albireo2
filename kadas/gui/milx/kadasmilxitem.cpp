@@ -30,8 +30,6 @@
 #include <qgis/qgsrendercontext.h>
 #include <qgis/qgsunittypes.h>
 
-#include <quazip/quazipfile.h>
-
 #include "kadas/gui/milx/kadasmilxitem.h"
 #include "kadas/gui/milx/kadasmilxlayer.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
@@ -422,108 +420,6 @@ void KadasMilxItem::setState( const KadasMapItem::State *state )
 {
   KadasMapItem::setState( state );
   mIsPointSymbol = !isMultiPoint();
-}
-
-QString KadasMilxItem::asKml( const QgsRenderContext &context, QuaZip *kmzZip ) const
-{
-  if ( !kmzZip )
-  {
-    // Can only export to KMZ
-    return "";
-  }
-
-  // Render symbols to a world-wide extent to ensure they are not cut off
-  QgsRectangle worldExtent( -180., -90., 180., 90. );
-  QgsRenderContext exportContext = context;
-  exportContext.setExtent( worldExtent );
-  exportContext.setMapExtent( worldExtent );
-  double factor = QgsUnitTypes::fromUnitToUnitFactor( Qgis::DistanceUnit::Degrees, Qgis::DistanceUnit::Meters ) * context.scaleFactor() * 1000 / context.rendererScale();
-  exportContext.setMapToPixel( QgsMapToPixel( 1.0 / factor, worldExtent.center().x(), worldExtent.center().y(), worldExtent.width() * factor, worldExtent.height() * factor, 0 ) );
-
-  KadasMilxClient::NPointSymbol symbol = toSymbol( exportContext.mapToPixel(), exportContext.coordinateTransform().destinationCrs() );
-  KadasMilxClient::NPointSymbolGraphic result;
-
-  int dpi = exportContext.painter()->device()->logicalDpiX();
-  QRect screenExtent = computeScreenExtent( exportContext.mapExtent(), exportContext.mapToPixel() );
-  if ( !KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, symbolSettings(), result, true ) )
-  {
-    return "";
-  }
-
-  QString fileName = QUuid::createUuid().toString();
-  fileName = fileName.mid( 1, fileName.length() - 2 ) + ".png";
-  QuaZipFile outputFile( kmzZip );
-  QuaZipNewInfo info( fileName );
-  info.setPermissions( QFile::ReadOwner | QFile::ReadUser | QFile::ReadGroup | QFile::ReadOther );
-  if ( !outputFile.open( QIODevice::WriteOnly, info ) || !result.graphic.save( &outputFile, "PNG" ) )
-  {
-    return "";
-  }
-
-  QgsPoint pos = QgsPoint( position() );
-  pos.transform( QgsCoordinateTransform( mCrs, QgsCoordinateReferenceSystem( "EPSG:4326" ), QgsProject::instance() ) );
-
-  QString outString;
-  QTextStream outStream( &outString );
-
-  if ( !isMultiPoint() )
-  {
-    double hotSpotX = -result.offset.x();
-    double hotSpotY = -result.offset.y();
-
-    QString id = QUuid::createUuid().toString();
-    id = id.mid( 1, id.length() - 2 );
-    outStream << "<StyleMap id=\"" << id << "\">" << "\n";
-    outStream << "  <Pair>" << "\n";
-    outStream << "    <key>normal</key>" << "\n";
-    outStream << "    <Style>" << "\n";
-    outStream << "      <IconStyle>" << "\n";
-    outStream << "        <scale>1.0</scale>" << "\n";
-    outStream << "        <Icon><href>" << fileName << "</href></Icon>" << "\n";
-    outStream << "        <hotSpot x=\"" << hotSpotX << "\" y=\"" << hotSpotY << "\" xunits=\"insetPixels\" yunits=\"insetPixels\" />" << "\n";
-    outStream << "      </IconStyle>" << "\n";
-    outStream << "    </Style>" << "\n";
-    outStream << "  </Pair>" << "\n";
-    outStream << "  <Pair>" << "\n";
-    outStream << "    <key>highlight</key>" << "\n";
-    outStream << "    <Style>" << "\n";
-    outStream << "      <IconStyle>" << "\n";
-    outStream << "        <scale>1.0</scale>" << "\n";
-    outStream << "        <Icon><href>" << fileName << "</href></Icon>" << "\n";
-    outStream << "        <hotSpot x=\"" << hotSpotX << "\" y=\"" << hotSpotY << "\" xunits=\"insetPixels\" yunits=\"insetPixels\" />" << "\n";
-    outStream << "      </IconStyle>" << "\n";
-    outStream << "    </Style>" << "\n";
-    outStream << "  </Pair>" << "\n";
-    outStream << "</StyleMap>" << "\n";
-    outStream << "<Placemark>" << "\n";
-    outStream << "  <name>" << militaryName() << "</name>" << "\n";
-    outStream << "  <styleUrl>#" << id << "</styleUrl>" << "\n";
-    outStream << "  <Point>" << "\n";
-    outStream << "    <coordinates>" << QString::number( pos.x(), 'f', 10 ) << "," << QString::number( pos.y(), 'f', 10 ) << ",0</coordinates>" << "\n";
-    outStream << "  </Point>" << "\n";
-    outStream << "</Placemark>" << "\n";
-  }
-  else
-  {
-    QPoint offset = result.adjustedPoints.front() + result.offset;
-
-    QgsPointXY pNW = exportContext.mapToPixel().toMapCoordinates( offset.x(), offset.y() );
-    QgsPointXY pSE = exportContext.mapToPixel().toMapCoordinates( offset.x() + result.graphic.width(), offset.y() + result.graphic.height() );
-
-    outStream << "<GroundOverlay>" << "\n";
-    outStream << "<name>" << militaryName() << "</name>" << "\n";
-    outStream << "<Icon><href>" << fileName << "</href></Icon>" << "\n";
-    outStream << "<LatLonBox>" << "\n";
-    outStream << "<north>" << pNW.y() << "</north>" << "\n";
-    outStream << "<south>" << pSE.y() << "</south>" << "\n";
-    outStream << "<east>" << pSE.x() << "</east>" << "\n";
-    outStream << "<west>" << pNW.x() << "</west>" << "\n";
-    outStream << "</LatLonBox>" << "\n";
-    outStream << "</GroundOverlay>" << "\n";
-  }
-  outStream.flush();
-
-  return outString;
 }
 
 bool KadasMilxItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )
