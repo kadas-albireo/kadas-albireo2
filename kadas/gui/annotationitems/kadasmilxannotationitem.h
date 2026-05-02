@@ -29,6 +29,9 @@
 #include "kadas/gui/milx/kadasmilxclient.h"
 
 class QgsMapSettings;
+class QgsCoordinateTransform;
+class QgsCoordinateTransformContext;
+class QgsAnnotationLayer;
 
 /**
  * \ingroup gui
@@ -56,6 +59,40 @@ class KADAS_GUI_EXPORT KadasMilxAnnotationItem : public QgsAnnotationItem
     KadasMilxAnnotationItem *clone() const override;
 
     static KadasMilxAnnotationItem *create();
+
+    /**
+     * Write this item as a `<MilXGraphic>` DOM element matching the legacy
+     * MilXly schema. \a symbolSize is the layer's effective symbol size
+     * in pixels (used to convert the screen-space user offset to a
+     * factor relative to the symbol).
+     */
+    void writeMilx( QDomDocument &doc, QDomElement &itemElement, int symbolSize ) const;
+
+    /**
+     * Construct a \c KadasMilxAnnotationItem from a `<MilXGraphic>` DOM
+     * element. \a crst projects the source CRS coordinates to EPSG:4326
+     * (this item's storage CRS); \a symbolSize is the effective layer
+     * symbol size for offset reconstruction. Caller takes ownership.
+     */
+    static KadasMilxAnnotationItem *fromMilx( const QDomElement &itemElement, const QgsCoordinateTransform &crst, int symbolSize );
+
+    /**
+     * Serialize all `kadas:milx` items in \a annoLayer into \a milxLayerEl
+     * as a complete `<MilXLayer>` block (Name / LayerType / GraphicList /
+     * CoordSystemType / SymbolSize / DisplayBW). \a dpi is used to
+     * convert the layer's effective symbol size from pixels to mm for
+     * the schema. Returns the number of items emitted.
+     */
+    static int exportLayerToMilxly( QgsAnnotationLayer *annoLayer, QDomElement &milxLayerEl, int dpi );
+
+    /**
+     * Populate \a annoLayer with `kadas:milx` items parsed from
+     * \a milxLayerEl (a `<MilXLayer>` block). \a dpi is used to convert
+     * the schema's mm symbol size back to pixels for offset
+     * reconstruction. Returns true on success; sets \a errorMsg on
+     * failure.
+     */
+    static bool importLayerFromMilxly( QgsAnnotationLayer *annoLayer, const QDomElement &milxLayerEl, int dpi, const QgsCoordinateTransformContext &transformContext, QString &errorMsg );
 
     //! MSS (Military Symbology Standard) symbol string.
     QString mssString() const { return mMssString; }
