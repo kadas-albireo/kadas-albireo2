@@ -911,63 +911,6 @@ KadasMilxClient::NPointSymbol KadasMilxItem::toSymbol( const QgsMapToPixel &mapT
   return KadasMilxClient::NPointSymbol( mMssString, points, constState()->controlPoints, screenAttribs, finalized, colored );
 }
 
-void KadasMilxItem::writeMilx( QDomDocument &doc, QDomElement &itemElement ) const
-{
-  QDomElement stringXmlEl = doc.createElement( "MssStringXML" );
-  stringXmlEl.appendChild( doc.createTextNode( mMssString ) );
-  itemElement.appendChild( stringXmlEl );
-
-  QDomElement nameEl = doc.createElement( "Name" );
-  nameEl.appendChild( doc.createTextNode( mMilitaryName ) );
-  itemElement.appendChild( nameEl );
-
-  QDomElement pointListEl = doc.createElement( "PointList" );
-  itemElement.appendChild( pointListEl );
-
-  for ( const KadasItemPos &p : constState()->points )
-  {
-    QDomElement pEl = doc.createElement( "Point" );
-    pointListEl.appendChild( pEl );
-
-    QDomElement pXEl = doc.createElement( "X" );
-    pXEl.appendChild( doc.createTextNode( QString::number( p.x(), 'f', 6 ) ) );
-    pEl.appendChild( pXEl );
-    QDomElement pYEl = doc.createElement( "Y" );
-    pYEl.appendChild( doc.createTextNode( QString::number( p.y(), 'f', 6 ) ) );
-    pEl.appendChild( pYEl );
-  }
-  if ( !constState()->attributes.isEmpty() )
-  {
-    QDomElement attribListEl = doc.createElement( "LocationAttributeList" );
-    itemElement.appendChild( attribListEl );
-    for ( auto it = constState()->attributes.begin(), itEnd = constState()->attributes.end(); it != itEnd; ++it )
-    {
-      QDomElement attrTypeEl = doc.createElement( "AttrType" );
-      attrTypeEl.appendChild( doc.createTextNode( KadasMilxClient::attributeName( it.key() ) ) );
-      QDomElement attrValueEl = doc.createElement( "Value" );
-      attrValueEl.appendChild( doc.createTextNode( QString::number( it.value() ) ) );
-      QDomElement attribEl = doc.createElement( "LocationAttribute" );
-      attribEl.appendChild( attrTypeEl );
-      attribEl.appendChild( attrValueEl );
-      attribListEl.appendChild( attribEl );
-    }
-  }
-
-  if ( !isMultiPoint() )
-  {
-    QDomElement offsetEl = doc.createElement( "Offset" );
-    itemElement.appendChild( offsetEl );
-
-    QDomElement factorXEl = doc.createElement( "FactorX" );
-    factorXEl.appendChild( doc.createTextNode( QString::number( double( constState()->userOffset.x() ) / symbolSettings().symbolSize ) ) );
-    offsetEl.appendChild( factorXEl );
-
-    QDomElement factorYEl = doc.createElement( "FactorY" );
-    factorYEl.appendChild( doc.createTextNode( QString::number( -double( constState()->userOffset.y() ) / symbolSettings().symbolSize ) ) );
-    offsetEl.appendChild( factorYEl );
-  }
-}
-
 KadasMilxItem *KadasMilxItem::fromMilx( const QDomElement &itemElement, const QgsCoordinateTransform &crst, int symbolSize )
 {
   KadasMilxItem *item = new KadasMilxItem();
