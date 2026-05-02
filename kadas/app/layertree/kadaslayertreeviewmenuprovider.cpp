@@ -27,7 +27,6 @@
 #include <qgis/qgsvectorlayer.h>
 
 #include "kadas/core/kadaspluginlayer.h"
-#include "kadas/gui/milx/kadasmilxlayer.h"
 #include "kadasapplication.h"
 #include "kadaslayerrefreshmanager.h"
 #include "kadaslayertreeviewmenuprovider.h"

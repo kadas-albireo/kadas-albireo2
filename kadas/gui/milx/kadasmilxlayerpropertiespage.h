@@ -64,9 +64,6 @@ class KADAS_GUI_EXPORT KadasMilxLayerPropertiesPageFactory : public QObject, pub
     QString title() const override;
     bool supportLayerPropertiesDialog() const override { return true; }
     bool supportsLayer( QgsMapLayer *layer ) const override;
-
-  private slots:
-    void readLayerConfig( QgsMapLayer *mapLayer, const QDomElement &elem );
 };
 
 #endif // KADASMILXLAYERPROPERTIESPAGE_H
