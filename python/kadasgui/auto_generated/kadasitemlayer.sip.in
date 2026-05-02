@@ -160,7 +160,6 @@ that are never used in a 3D scene. Safe to call multiple times.
     virtual KadasItemLayer::ItemId pickItem(
       const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY
     ) const;
-    KadasItemLayer::ItemId pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
 
 
 
