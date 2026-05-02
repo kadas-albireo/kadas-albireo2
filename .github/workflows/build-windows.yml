@@ -45,7 +45,7 @@ jobs:
           echo "DEBUG_OPTIONS=-D SHOW_CONSOLE=ON" >> $GITHUB_ENV
 
       - name: Setup oras
-        uses: oras-project/setup-oras@v1
+        uses: oras-project/setup-oras@v2
 
       - name: Fetch tif
         run: |
