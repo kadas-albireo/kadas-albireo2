@@ -119,7 +119,6 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
 
     bool isMultiPoint() const;
 
-    void writeMilx( QDomDocument &doc, QDomElement &itemElement ) const;
     static KadasMilxItem *fromMilx( const QDomElement &itemElement, const QgsCoordinateTransform &crst, int symbolSize );
 
     static QRect computeScreenExtent( const QgsRectangle &mapExtent, const QgsMapToPixel &mapToPixel );
