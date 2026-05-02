@@ -89,25 +89,27 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
     void setState( const KadasMapItem::State *state ) override;
     const State *constState() const { return static_cast<State *>( mState ); }
 
-    // Draw interface (all points in item crs)
-    bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) override;
-    bool startPart( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
-    void setCurrentPoint( const KadasMapPos &p, const QgsMapSettings &mapSettings ) override;
-    void setCurrentAttributes( const AttribValues &values, const QgsMapSettings &mapSettings ) override;
-    bool continuePart( const QgsMapSettings &mapSettings ) override;
-    void endPart() override;
+    // Draw / edit interface — legacy KadasMilxLayer is converted to
+    // QgsAnnotationLayer at project load by KadasItemLayerMigration, so
+    // these code paths are unreachable. The new flow uses
+    // KadasMilxAnnotationController via the annotation map tools.
+    bool startPart( const KadasMapPos &, const QgsMapSettings & ) override { return false; }
+    bool startPart( const AttribValues &, const QgsMapSettings & ) override { return false; }
+    void setCurrentPoint( const KadasMapPos &, const QgsMapSettings & ) override {}
+    void setCurrentAttributes( const AttribValues &, const QgsMapSettings & ) override {}
+    bool continuePart( const QgsMapSettings & ) override { return false; }
+    void endPart() override {}
 
-    AttribDefs drawAttribs() const override;
-    AttribValues drawAttribsFromPosition( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
-    KadasMapPos positionFromDrawAttribs( const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
+    AttribDefs drawAttribs() const override { return {}; }
+    AttribValues drawAttribsFromPosition( const KadasMapPos &, const QgsMapSettings & ) const override { return {}; }
+    KadasMapPos positionFromDrawAttribs( const AttribValues &, const QgsMapSettings & ) const override { return {}; }
 
-    // Edit interface (all points in item crs)
-    EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
-    void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override;
-    void edit( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) override;
+    EditContext getEditContext( const KadasMapPos &, const QgsMapSettings & ) const override { return {}; }
+    void edit( const EditContext &, const KadasMapPos &, const QgsMapSettings & ) override {}
+    void edit( const EditContext &, const AttribValues &, const QgsMapSettings & ) override {}
 
-    AttribValues editAttribsFromPosition( const EditContext &context, const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const override;
-    KadasMapPos positionFromEditAttribs( const EditContext &context, const AttribValues &values, const QgsMapSettings &mapSettings ) const override;
+    AttribValues editAttribsFromPosition( const EditContext &, const KadasMapPos &, const QgsMapSettings & ) const override { return {}; }
+    KadasMapPos positionFromEditAttribs( const EditContext &, const AttribValues &, const QgsMapSettings & ) const override { return {}; }
 
     KadasItemPos position() const override;
     void setPosition( const KadasItemPos &pos ) override;
