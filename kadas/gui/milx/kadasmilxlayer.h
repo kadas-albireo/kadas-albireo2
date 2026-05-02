@@ -44,7 +44,6 @@ class KADAS_GUI_EXPORT KadasMilxLayer : public KadasItemLayer
     void setApproved( bool approved );
     bool isApproved() const { return mIsApproved; }
 
-    void exportToMilxly( QDomElement &milxLayerEl, int dpi );
     bool importFromMilxly( const QDomElement &milxLayerEl, int dpi, QString &errorMsg );
 
     void setOverrideMilxSymbolSettings( bool overrideSettings ) { mOverrideMilxSymbolSettings = overrideSettings; }

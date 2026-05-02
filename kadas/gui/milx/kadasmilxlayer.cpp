@@ -188,44 +188,6 @@ bool KadasMilxLayer::writeXml( QDomNode &layer_node, QDomDocument &document, con
   return success;
 }
 
-void KadasMilxLayer::exportToMilxly( QDomElement &milxLayerEl, int dpi )
-{
-  QDomDocument doc = milxLayerEl.ownerDocument();
-
-  QDomElement milxLayerNameEl = doc.createElement( "Name" );
-  milxLayerNameEl.appendChild( doc.createTextNode( name() ) );
-  milxLayerEl.appendChild( milxLayerNameEl );
-
-  QDomElement milxLayerTypeEl = doc.createElement( "LayerType" );
-  milxLayerTypeEl.appendChild( doc.createTextNode( "Normal" ) );
-  milxLayerEl.appendChild( milxLayerTypeEl );
-
-  QDomElement graphicListEl = doc.createElement( "GraphicList" );
-  milxLayerEl.appendChild( graphicListEl );
-
-  for ( const KadasMapItem *item : mItems )
-  {
-    if ( dynamic_cast<const KadasMilxItem *>( item ) )
-    {
-      QDomElement graphicEl = doc.createElement( "MilXGraphic" );
-      static_cast<const KadasMilxItem *>( item )->writeMilx( doc, graphicEl );
-      graphicListEl.appendChild( graphicEl );
-    }
-  }
-
-  QDomElement crsEl = doc.createElement( "CoordSystemType" );
-  crsEl.appendChild( doc.createTextNode( "WGS84" ) );
-  milxLayerEl.appendChild( crsEl );
-
-  QDomElement symbolSizeEl = doc.createElement( "SymbolSize" );
-  symbolSizeEl.appendChild( doc.createTextNode( QString::number( ( milxSymbolSettings().symbolSize * 25.4 ) / dpi ) ) );
-  milxLayerEl.appendChild( symbolSizeEl );
-
-  QDomElement bwEl = doc.createElement( "DisplayBW" );
-  bwEl.appendChild( doc.createTextNode( mIsApproved ? "1" : "0" ) );
-  milxLayerEl.appendChild( bwEl );
-}
-
 bool KadasMilxLayer::importFromMilxly( const QDomElement &milxLayerEl, int dpi, QString &errorMsg )
 {
   setName( milxLayerEl.firstChildElement( "Name" ).text() );
