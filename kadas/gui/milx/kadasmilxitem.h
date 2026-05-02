@@ -32,7 +32,6 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
 
   public:
     KadasMilxItem();
-    void setSymbol( const KadasMilxSymbolDesc &symbolDesc );
 
     const QString &mssString() const { return mMssString; }
     void setMssString( const QString &mssString );

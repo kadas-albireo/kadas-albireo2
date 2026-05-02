@@ -139,19 +139,7 @@ bool KadasMilxItem::State::deserialize( const QJsonObject &json )
 KadasMilxItem::KadasMilxItem()
   : KadasMapItem( QgsCoordinateReferenceSystem( "EPSG:4326" ) )
 {
-  setEditor( "KadasMilxEditor" );
   clear();
-}
-
-void KadasMilxItem::setSymbol( const KadasMilxSymbolDesc &symbolDesc )
-{
-  mMssString = symbolDesc.symbolXml;
-  mMilitaryName = symbolDesc.militaryName;
-  mHasVariablePoints = symbolDesc.hasVariablePoints;
-  mMinNPoints = symbolDesc.minNumPoints;
-  mSymbolType = symbolDesc.symbolType;
-  update();
-  emit propertyChanged();
 }
 
 void KadasMilxItem::setMssString( const QString &mssString )
