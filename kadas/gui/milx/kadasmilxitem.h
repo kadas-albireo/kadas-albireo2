@@ -74,8 +74,6 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
 #endif
         QList<int> controlPoints;
         QPoint userOffset;
-        int pressedPoints = 0;
-        Margin margin;
 
         void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
         State *clone() const override SIP_FACTORY { return new State( *this ); }
