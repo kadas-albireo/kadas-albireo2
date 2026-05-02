@@ -15,19 +15,11 @@
  ***************************************************************************/
 
 #include <QApplication>
-#include <QScreen>
 #include <QJsonArray>
-#include <QMainWindow>
-#include <QMenu>
 #include <QVector2D>
 
 #include <qgis/qgsdistancearea.h>
-#include <qgis/qgslinestring.h>
-#include <qgis/qgsmapsettings.h>
-#include <qgis/qgsmaptopixel.h>
-#include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
-#include <qgis/qgsrendercontext.h>
 #include <qgis/qgsunittypes.h>
 
 #include "kadas/gui/milx/kadasmilxitem.h"
@@ -381,37 +373,8 @@ void KadasMilxItem::finalize( KadasMilxItem *item, bool isCorridor )
 
   item->setDrawStatus( DrawStatus::Finished );
   item->mIsPointSymbol = !item->isMultiPoint();
-
-  KadasMilxClient::NPointSymbol symbol( item->mMssString, QList<QPoint>() << QPoint( 0, 0 ), QList<int>(), QList<QPair<int, double>>(), true, true );
-  QRect screenExtent( 0, 0, 100, 100 );
-  KadasMilxClient::NPointSymbolGraphic result;
-  int dpi = qApp->primaryScreen()->logicalDotsPerInchX();
-  if ( KadasMilxClient::updateSymbol( screenExtent, dpi, symbol, item->symbolSettings(), result, false ) )
-  {
-    item->updateSymbolMargin( result );
-  }
 }
 
-
-void KadasMilxItem::updateSymbolMargin( const KadasMilxClient::NPointSymbolGraphic &result )
-{
-  QRect pointBounds( result.adjustedPoints.front(), result.adjustedPoints.front() );
-  for ( int i = 1, n = result.adjustedPoints.size(); i < n; ++i )
-  {
-    const QPoint &p = result.adjustedPoints[i];
-    pointBounds.setLeft( std::min( pointBounds.left(), p.x() ) );
-    pointBounds.setRight( std::max( pointBounds.right(), p.x() ) );
-    pointBounds.setTop( std::min( pointBounds.top(), p.y() ) );
-    pointBounds.setBottom( std::max( pointBounds.bottom(), p.y() ) );
-  }
-
-  QPoint offset = result.adjustedPoints.front() + result.offset;
-  QRect symbolBounds( offset.x(), offset.y(), result.graphic.width(), result.graphic.height() );
-  state()->margin.left = std::max( 0, pointBounds.left() - symbolBounds.left() );
-  state()->margin.top = std::max( 0, pointBounds.top() - symbolBounds.top() );
-  state()->margin.right = std::max( 0, symbolBounds.right() - pointBounds.right() );
-  state()->margin.bottom = std::max( 0, symbolBounds.bottom() - pointBounds.bottom() );
-}
 
 const KadasMilxSymbolSettings &KadasMilxItem::symbolSettings() const
 {

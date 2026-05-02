@@ -140,7 +140,6 @@ class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
 
     KadasMilxItem::State *state() { return static_cast<State *>( mState ); }
 
-    void updateSymbolMargin( const KadasMilxClient::NPointSymbolGraphic &result );
     const KadasMilxSymbolSettings &symbolSettings() const;
 
     static void finalize( KadasMilxItem *item, bool isCorridor );
