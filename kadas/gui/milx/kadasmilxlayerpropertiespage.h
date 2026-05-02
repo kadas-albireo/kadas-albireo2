@@ -67,7 +67,6 @@ class KADAS_GUI_EXPORT KadasMilxLayerPropertiesPageFactory : public QObject, pub
 
   private slots:
     void readLayerConfig( QgsMapLayer *mapLayer, const QDomElement &elem );
-    void writeLayerConfig( QgsMapLayer *mapLayer, QDomElement &elem, QDomDocument &doc );
 };
 
 #endif // KADASMILXLAYERPROPERTIESPAGE_H
