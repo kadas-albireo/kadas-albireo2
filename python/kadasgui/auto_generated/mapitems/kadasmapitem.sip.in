@@ -50,8 +50,6 @@ class KadasMapRect
   public:
     KadasMapRect( double xMin = 0., double yMin = 0., double xMax = 0., double yMax = 0. );
 
-    KadasMapRect( const KadasMapPos &p1, const KadasMapPos &p2 );
-
     KadasMapRect( const KadasMapPos &center, double span );
 
     double xMinimum() const;
@@ -63,7 +61,6 @@ class KadasMapRect
     double yMaximum() const;
     void setYMaximum( double ymax );
     operator QgsRectangle() const;
-    KadasMapPos center() const;
 
 };
 
