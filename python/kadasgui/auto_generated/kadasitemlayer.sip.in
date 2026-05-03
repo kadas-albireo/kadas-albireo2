@@ -165,10 +165,6 @@ that are never used in a 3D scene. Safe to call multiple times.
     void setSymbolScale( double scale );
     double symbolScale() const;
 
-  signals:
-    void itemAdded( KadasItemLayer::ItemId itemId );
-    void itemRemoved( KadasItemLayer::ItemId itemId );
-
   protected:
 
 };

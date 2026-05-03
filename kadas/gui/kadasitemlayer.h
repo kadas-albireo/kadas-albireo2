@@ -189,10 +189,6 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     void setSymbolScale( double scale );
     double symbolScale() const { return mSymbolScale; }
 
-  signals:
-    void itemAdded( KadasItemLayer::ItemId itemId );
-    void itemRemoved( KadasItemLayer::ItemId itemId );
-
   protected:
     class Renderer;
 

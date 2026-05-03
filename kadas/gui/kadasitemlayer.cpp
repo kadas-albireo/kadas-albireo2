@@ -136,7 +136,6 @@ KadasItemLayer::ItemId KadasItemLayer::addItem( KadasMapItem *item )
   QgsCoordinateTransform trans( item->crs(), crs(), mTransformContext );
   mItemBounds.insert( id, trans.transformBoundingBox( item->boundingBox() ) );
   item->setSymbolScale( mSymbolScale );
-  emit itemAdded( id );
   emit repaintRequested();
   return id;
 }
@@ -166,7 +165,6 @@ KadasMapItem *KadasItemLayer::takeItem( const ItemId &itemId )
     mFreeIds.append( itemId );
     mItemBounds.remove( itemId );
     mItemOrder.removeOne( itemId );
-    emit itemRemoved( itemId );
     emit repaintRequested();
   }
   return item;
