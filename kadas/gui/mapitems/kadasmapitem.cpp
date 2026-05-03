@@ -465,34 +465,6 @@ KadasMapItem *KadasMapItem::fromXml( const QDomElement &element )
   return nullptr;
 }
 
-QMap<QString, QVariant> KadasMapItem::getProps() const
-{
-  QMap<QString, QVariant> result;
-  for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
-  {
-    QMetaProperty prop = metaObject()->property( i );
-    result[prop.name()] = prop.read( this );
-  }
-  return result;
-}
-
-void KadasMapItem::setProps( const QMap<QString, QVariant> &props )
-{
-  blockSignals( true );
-  for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
-  {
-    QMetaProperty prop = metaObject()->property( i );
-    auto it = props.find( prop.name() );
-    if ( it != props.end() )
-    {
-      prop.write( this, it.value() );
-    }
-  }
-  blockSignals( false );
-  emit changed();
-  emit propertyChanged();
-}
-
 QJsonValue KadasMapItem::serializeProperty( const QString &name, const QVariant &variant ) const
 {
   QJsonValue value = variant.toJsonValue();

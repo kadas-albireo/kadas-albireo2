@@ -445,9 +445,6 @@ Once every item has been migrated this should become pure virtual
 
     void preventAttachmentCleanup();
 
-    QMap<QString, QVariant> getProps() const;
-    void setProps( const QMap<QString, QVariant> &props );
-
   signals:
     void aboutToBeDestroyed();
     void changed();
