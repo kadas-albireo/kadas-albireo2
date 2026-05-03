@@ -98,8 +98,6 @@ class KadasItemRect
   public:
     KadasItemRect( double xMin = 0., double yMin = 0., double xMax = 0., double yMax = 0. );
 
-    KadasItemRect( const KadasItemPos &p1, const KadasItemPos &p2 );
-
     double xMinimum() const;
     void setXMinimum( double xMin );
     double yMinimum() const;
@@ -109,7 +107,6 @@ class KadasItemRect
     double yMaximum() const;
     void setYMaximum( double ymax );
     operator QgsRectangle() const;
-    KadasItemPos center() const;
 
 };
 
