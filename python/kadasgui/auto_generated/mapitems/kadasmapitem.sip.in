@@ -34,9 +34,7 @@ your option) any later version. *
 
     KadasMapPos( double x = 0., double y = 0. );
     double x() const;
-    void setX( double x );
     double y() const;
-    void setY( double y );
     operator QgsPointXY() const;
     double sqrDist( const KadasMapPos &p ) const;
 
