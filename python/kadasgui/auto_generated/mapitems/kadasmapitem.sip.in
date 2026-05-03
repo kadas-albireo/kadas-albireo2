@@ -356,8 +356,7 @@ Trigger a redraw */
         {
           TypeCoordinate,
           TypeDistance,
-          TypeAngle,
-          TypeOther
+          TypeAngle
         };
         Type type;
         double min;

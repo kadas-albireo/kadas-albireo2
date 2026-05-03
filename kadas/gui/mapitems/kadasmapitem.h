@@ -415,8 +415,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
         {
           TypeCoordinate,
           TypeDistance,
-          TypeAngle,
-          TypeOther
+          TypeAngle
         };
         // clang-format on
         Type type = Type::TypeCoordinate;
