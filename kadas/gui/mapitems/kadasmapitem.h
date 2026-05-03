@@ -133,34 +133,6 @@ class KADAS_GUI_EXPORT KadasItemPos
 };
 
 
-class KADAS_GUI_EXPORT KadasItemRect
-{
-  public:
-    KadasItemRect( double xMin = 0., double yMin = 0., double xMax = 0., double yMax = 0. )
-      : mXmin( xMin )
-      , mYmin( yMin )
-      , mXmax( xMax )
-      , mYmax( yMax )
-    {}
-
-    double xMinimum() const { return mXmin; }
-    void setXMinimum( double xMin ) { mXmin = xMin; }
-    double yMinimum() const { return mYmin; }
-    void setYMinimum( double yMin ) { mYmin = yMin; }
-    double xMaximum() const { return mXmax; }
-    void setXMaximum( double xMax ) { mXmax = xMax; }
-    double yMaximum() const { return mYmax; }
-    void setYMaximum( double ymax ) { mYmax = ymax; }
-    operator QgsRectangle() const { return QgsRectangle( mXmin, mYmin, mXmax, mYmax ); }
-
-  private:
-    double mXmin = 0.;
-    double mYmin = 0.;
-    double mXmax = 0.;
-    double mYmax = 0.;
-};
-
-
 #ifdef SIP_RUN
 // clang-format off
 //
