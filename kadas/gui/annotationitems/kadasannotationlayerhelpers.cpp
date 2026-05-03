@@ -14,8 +14,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QSet>
-
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgsproject.h>
@@ -50,44 +48,6 @@ void KadasAnnotationLayerHelpers::setTooltip( QgsAnnotationLayer *layer, const Q
     layer->removeCustomProperty( key );
   else
     layer->setCustomProperty( key, tooltip );
-}
-
-void KadasAnnotationLayerHelpers::clearMetadata( QgsAnnotationLayer *layer, const QString &itemId )
-{
-  if ( !layer || itemId.isEmpty() )
-    return;
-  const QString prefix = KEY_PREFIX + itemId + QLatin1Char( ':' );
-  const QStringList keys = layer->customPropertyKeys();
-  for ( const QString &key : keys )
-  {
-    if ( key.startsWith( prefix ) )
-      layer->removeCustomProperty( key );
-  }
-}
-
-QStringList KadasAnnotationLayerHelpers::itemsWithMetadata( const QgsAnnotationLayer *layer )
-{
-  if ( !layer )
-    return {};
-  QStringList result;
-  QSet<QString> seen;
-  const QStringList keys = layer->customPropertyKeys();
-  for ( const QString &key : keys )
-  {
-    if ( !key.startsWith( KEY_PREFIX ) )
-      continue;
-    const QString remainder = key.mid( KEY_PREFIX.size() );
-    const int sep = remainder.indexOf( QLatin1Char( ':' ) );
-    if ( sep <= 0 )
-      continue;
-    const QString itemId = remainder.left( sep );
-    if ( !seen.contains( itemId ) )
-    {
-      seen.insert( itemId );
-      result.append( itemId );
-    }
-  }
-  return result;
 }
 
 QgsAnnotationLayer *KadasAnnotationLayerHelpers::createLayer( const QString &name, const QgsCoordinateReferenceSystem &preferredCrs )
