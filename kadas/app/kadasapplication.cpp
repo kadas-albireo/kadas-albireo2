@@ -657,18 +657,8 @@ KadasItemLayer *KadasApplication::selectPasteTargetItemLayer( const QList<KadasM
   dialog.layout()->setContentsMargins( 2, 2, 2, 2 );
   dialog.layout()->addWidget( new QLabel( tr( "Select layer to paste items to:" ) ) );
   KadasLayerSelectionWidget *layerSelectionWidget = new KadasLayerSelectionWidget( mMainWindow->mapCanvas(), mMainWindow->layerTreeView(), [&]( QgsMapLayer *layer ) {
-    if ( !dynamic_cast<KadasItemLayer *>( layer ) )
-    {
-      return false;
-    }
-    for ( const KadasMapItem *item : items )
-    {
-      if ( !static_cast<KadasItemLayer *>( layer )->acceptsItem( item ) )
-      {
-        return false;
-      }
-    }
-    return true;
+    Q_UNUSED( items )
+    return dynamic_cast<KadasItemLayer *>( layer ) != nullptr;
   } );
   dialog.layout()->addWidget( layerSelectionWidget );
   QDialogButtonBox *buttonBox = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel );
