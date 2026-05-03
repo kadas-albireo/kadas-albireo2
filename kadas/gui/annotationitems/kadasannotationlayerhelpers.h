@@ -18,7 +18,6 @@
 #define KADASANNOTATIONLAYERHELPERS_H
 
 #include <QString>
-#include <QStringList>
 
 #include "kadas/gui/kadas_gui.h"
 
@@ -52,13 +51,6 @@ class KADAS_GUI_EXPORT KadasAnnotationLayerHelpers
     //! Sets the \a tooltip for \a itemId on \a layer. Passing an empty
     //! \a tooltip removes it.
     static void setTooltip( QgsAnnotationLayer *layer, const QString &itemId, const QString &tooltip );
-
-    //! Removes all Kadas metadata stored for \a itemId on \a layer.
-    //! Should be invoked when the item is removed from the layer.
-    static void clearMetadata( QgsAnnotationLayer *layer, const QString &itemId );
-
-    //! Returns all item ids that currently have any Kadas metadata stored on \a layer.
-    static QStringList itemsWithMetadata( const QgsAnnotationLayer *layer );
 
     /**
      * Creates a new \c QgsAnnotationLayer named \a name. If \a preferredCrs is
