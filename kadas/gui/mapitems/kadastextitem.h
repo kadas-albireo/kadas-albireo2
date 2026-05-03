@@ -74,8 +74,6 @@ class KADAS_GUI_EXPORT KadasTextItem : public KadasAbstractPointItem
 
   protected:
     virtual KadasMapItem *_clone() const override;
-    virtual void writeXmlPrivate( QDomElement &element ) const override;
-    virtual void readXmlPrivate( const QDomElement &element ) override;
 
   private:
 #ifndef SIP_RUN

@@ -65,8 +65,6 @@ Sets the text rotation \a angle, in degrees clockwise.
 
   protected:
     virtual KadasMapItem *_clone() const;
-    virtual void writeXmlPrivate( QDomElement &element ) const;
-    virtual void readXmlPrivate( const QDomElement &element );
 
 };
 
