@@ -131,9 +131,7 @@ class KADAS_GUI_EXPORT KadasItemPos
     void setX( double x ) { mX = x; }
     double y() const { return mY; }
     void setY( double y ) { mY = y; }
-    double z() const { return mZ; }
-    void setZ( double z ) { mZ = z; }
-    bool hasZ() const { return !std::isnan( mZ ); }
+    bool hasZ() const SIP_SKIP { return !std::isnan( mZ ); }
     operator QgsPointXY() const { return QgsPointXY( mX, mY ); }
     operator QgsPoint() const { return QgsPoint( mX, mY, mZ ); }
     double sqrDist( const KadasItemPos &p ) const { return ( mX - p.mX ) * ( mX - p.mX ) + ( mY - p.mY ) * ( mY - p.mY ); }
