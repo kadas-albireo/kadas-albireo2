@@ -15,7 +15,6 @@
  ***************************************************************************/
 
 #include <QHBoxLayout>
-#include <QLabel>
 #include <QPushButton>
 
 #include <qgis/qgsannotationitem.h>
@@ -54,18 +53,10 @@ void KadasMapToolCreateAnnotationItem::activate()
   createItem();
   setupNumericInputWidget();
 
-  // Bottom bar with optional label + undo/redo + close.
+  // Bottom bar with undo/redo + close.
   mBottomBar = new KadasBottomBar( mCanvas );
   QHBoxLayout *layout = new QHBoxLayout( mCanvas );
   layout->setContentsMargins( 8, 4, 8, 4 );
-  if ( !mToolLabel.isEmpty() )
-  {
-    QLabel *label = new QLabel( mToolLabel );
-    QFont font = label->font();
-    font.setBold( true );
-    label->setFont( font );
-    layout->addWidget( label );
-  }
 
   QPushButton *undoButton = new QPushButton();
   undoButton->setIcon( QIcon( ":/kadas/icons/undo" ) );
