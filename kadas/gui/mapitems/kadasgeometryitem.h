@@ -113,6 +113,15 @@ class KADAS_GUI_EXPORT KadasGeometryItem : public KadasMapItem SIP_ABSTRACT
     // Geometry in item CRS
     const QgsAbstractGeometry *geometry() const { return mGeometry; }
 
+#ifndef SIP_RUN
+    //! Writes the base outline/fill/icon attributes to \a element. Used by
+    //! subclasses migrated to the typed-XML (format_version=2) write path.
+    void writeGeometryBaseAttributes( QDomElement &element ) const;
+    //! Reads the base outline/fill/icon attributes from a format_version=2
+    //! \a element. Falls back to the in-ctor defaults for missing attributes.
+    void readGeometryBaseAttributesV2( const QDomElement &element );
+#endif
+
   signals:
     void geometryChanged();
 

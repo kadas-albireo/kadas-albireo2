@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QPainter>
+#include <QDomElement>
 
 #include <qgis/qgsabstractgeometry.h>
 #include <qgis/qgscircularstring.h>
@@ -76,6 +77,38 @@ KadasGeometryItem::KadasGeometryItem( const QgsCoordinateReferenceSystem &crs )
 KadasGeometryItem::~KadasGeometryItem()
 {
   delete mGeometry;
+}
+
+void KadasGeometryItem::writeGeometryBaseAttributes( QDomElement &element ) const
+{
+  element.setAttribute( QStringLiteral( "outline_color" ), mPen.color().name( QColor::HexArgb ) );
+  element.setAttribute( QStringLiteral( "outline_width" ), mPen.widthF() );
+  element.setAttribute( QStringLiteral( "outline_style" ), static_cast<int>( mPen.style() ) );
+  element.setAttribute( QStringLiteral( "fill_color" ), mBrush.color().name( QColor::HexArgb ) );
+  element.setAttribute( QStringLiteral( "fill_style" ), static_cast<int>( mBrush.style() ) );
+  element.setAttribute( QStringLiteral( "icon_type" ), static_cast<int>( mIconType ) );
+  element.setAttribute( QStringLiteral( "icon_size" ), mIconSize );
+  element.setAttribute( QStringLiteral( "icon_outline_color" ), mIconPen.color().name( QColor::HexArgb ) );
+  element.setAttribute( QStringLiteral( "icon_outline_width" ), mIconPen.widthF() );
+  element.setAttribute( QStringLiteral( "icon_outline_style" ), static_cast<int>( mIconPen.style() ) );
+  element.setAttribute( QStringLiteral( "icon_fill_color" ), mIconBrush.color().name( QColor::HexArgb ) );
+  element.setAttribute( QStringLiteral( "icon_fill_style" ), static_cast<int>( mIconBrush.style() ) );
+}
+
+void KadasGeometryItem::readGeometryBaseAttributesV2( const QDomElement &element )
+{
+  mPen.setColor( QColor( element.attribute( QStringLiteral( "outline_color" ), mPen.color().name( QColor::HexArgb ) ) ) );
+  mPen.setWidthF( element.attribute( QStringLiteral( "outline_width" ), QString::number( mPen.widthF() ) ).toDouble() );
+  mPen.setStyle( static_cast<Qt::PenStyle>( element.attribute( QStringLiteral( "outline_style" ), QString::number( mPen.style() ) ).toInt() ) );
+  mBrush.setColor( QColor( element.attribute( QStringLiteral( "fill_color" ), mBrush.color().name( QColor::HexArgb ) ) ) );
+  mBrush.setStyle( static_cast<Qt::BrushStyle>( element.attribute( QStringLiteral( "fill_style" ), QString::number( mBrush.style() ) ).toInt() ) );
+  mIconType = static_cast<IconType>( element.attribute( QStringLiteral( "icon_type" ), QString::number( static_cast<int>( mIconType ) ) ).toInt() );
+  mIconSize = element.attribute( QStringLiteral( "icon_size" ), QString::number( mIconSize ) ).toInt();
+  mIconPen.setColor( QColor( element.attribute( QStringLiteral( "icon_outline_color" ), mIconPen.color().name( QColor::HexArgb ) ) ) );
+  mIconPen.setWidthF( element.attribute( QStringLiteral( "icon_outline_width" ), QString::number( mIconPen.widthF() ) ).toDouble() );
+  mIconPen.setStyle( static_cast<Qt::PenStyle>( element.attribute( QStringLiteral( "icon_outline_style" ), QString::number( mIconPen.style() ) ).toInt() ) );
+  mIconBrush.setColor( QColor( element.attribute( QStringLiteral( "icon_fill_color" ), mIconBrush.color().name( QColor::HexArgb ) ) ) );
+  mIconBrush.setStyle( static_cast<Qt::BrushStyle>( element.attribute( QStringLiteral( "icon_fill_style" ), QString::number( mIconBrush.style() ) ).toInt() ) );
 }
 
 void KadasGeometryItem::render( QgsRenderContext &context ) const

@@ -16,6 +16,8 @@
 
 #include <QMenu>
 #include <QJsonArray>
+#include <QJsonDocument>
+#include <QDomElement>
 
 #include <GeographicLib/Geodesic.hpp>
 #include <GeographicLib/GeodesicLine.hpp>
@@ -394,9 +396,51 @@ void KadasLineItem::setMeasurementMode( MeasurementMode measurementMode, Qgis::A
 
 KadasMapItem *KadasLineItem::_clone() const
 {
-  KadasLineItem *item = new KadasLineItem( crs() );
+  KadasLineItem *item = new KadasLineItem( crs(), mGeodesic );
   item->mGeometry = mGeometry->clone();
+  item->mPen = mPen;
+  item->mBrush = mBrush;
+  item->mIconType = mIconType;
+  item->mIconSize = mIconSize;
+  item->mIconPen = mIconPen;
+  item->mIconBrush = mIconBrush;
   return item;
+}
+
+void KadasLineItem::writeXmlPrivate( QDomElement &element ) const
+{
+  writeGeometryBaseAttributes( element );
+  element.setAttribute( QStringLiteral( "geodesic" ), mGeodesic ? QStringLiteral( "1" ) : QStringLiteral( "0" ) );
+  if ( mGeometry )
+  {
+    element.setAttribute( QStringLiteral( "geometry" ), mGeometry->asWkt() );
+  }
+}
+
+void KadasLineItem::readXmlPrivate( const QDomElement &element )
+{
+  // format_version 1 = legacy JSON in CDATA (Q_PROPERTY-based serialize());
+  // format_version 2 = typed XML attributes.
+  const bool isLegacy = element.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) == QLatin1String( "1" );
+  if ( isLegacy )
+  {
+    QJsonObject data = QJsonDocument::fromJson( element.firstChild().toCDATASection().data().toLocal8Bit() ).object();
+    deserialize( data );
+    return;
+  }
+
+  readGeometryBaseAttributesV2( element );
+  mGeodesic = element.attribute( QStringLiteral( "geodesic" ), QStringLiteral( "0" ) ) == QLatin1String( "1" );
+  clear();
+  const QString wkt = element.attribute( QStringLiteral( "geometry" ) );
+  if ( !wkt.isEmpty() )
+  {
+    QgsGeometry g = QgsGeometry::fromWkt( wkt );
+    if ( const QgsAbstractGeometry *geom = g.constGet() )
+    {
+      addPartFromGeometry( *geom );
+    }
+  }
 }
 
 void KadasLineItem::measureGeometry()
