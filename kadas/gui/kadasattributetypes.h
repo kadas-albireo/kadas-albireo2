@@ -90,7 +90,6 @@ struct KADAS_GUI_EXPORT KadasEditContext
     KadasAttribDefs attributes;
     Qt::CursorShape cursor = Qt::CrossCursor;
     bool isValid() const { return mValid; }
-    bool operator==( const KadasEditContext &other ) const { return vidx == other.vidx && mValid == other.mValid; }
     bool operator!=( const KadasEditContext &other ) const { return vidx != other.vidx || mValid != other.mValid; }
 };
 
