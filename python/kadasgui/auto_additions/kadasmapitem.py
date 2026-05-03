@@ -22,15 +22,11 @@ KadasMapItem.NumericAttribute.Type.TypeDistance.__doc__ = ""
 KadasMapItem.NumericAttribute.TypeAngle = KadasMapItem.NumericAttribute.Type.TypeAngle
 KadasMapItem.NumericAttribute.TypeAngle.is_monkey_patched = True
 KadasMapItem.NumericAttribute.Type.TypeAngle.__doc__ = ""
-KadasMapItem.NumericAttribute.TypeOther = KadasMapItem.NumericAttribute.Type.TypeOther
-KadasMapItem.NumericAttribute.TypeOther.is_monkey_patched = True
-KadasMapItem.NumericAttribute.Type.TypeOther.__doc__ = ""
 KadasMapItem.NumericAttribute.Type.__doc__ = """
 
 * ``TypeCoordinate``: 
 * ``TypeDistance``: 
 * ``TypeAngle``: 
-* ``TypeOther``: 
 
 """
 # --
