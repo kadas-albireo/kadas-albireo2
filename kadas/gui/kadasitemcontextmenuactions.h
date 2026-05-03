@@ -26,7 +26,6 @@
 
 class QMenu;
 class QgsMapCanvas;
-class KadasItemLayer;
 class KadasMapItem;
 
 class KADAS_GUI_EXPORT KadasItemContextMenuActions : public QObject
