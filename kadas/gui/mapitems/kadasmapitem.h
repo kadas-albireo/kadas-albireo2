@@ -153,13 +153,6 @@ class KADAS_GUI_EXPORT KadasItemRect
       , mYmax( yMax )
     {}
 
-    KadasItemRect( const KadasItemPos &p1, const KadasItemPos &p2 )
-      : mXmin( std::min( p1.x(), p2.x() ) )
-      , mYmin( std::min( p1.y(), p2.y() ) )
-      , mXmax( std::max( p1.x(), p2.x() ) )
-      , mYmax( std::max( p1.y(), p2.y() ) )
-    {}
-
     double xMinimum() const { return mXmin; }
     void setXMinimum( double xMin ) { mXmin = xMin; }
     double yMinimum() const { return mYmin; }
@@ -169,7 +162,6 @@ class KADAS_GUI_EXPORT KadasItemRect
     double yMaximum() const { return mYmax; }
     void setYMaximum( double ymax ) { mYmax = ymax; }
     operator QgsRectangle() const { return QgsRectangle( mXmin, mYmin, mXmax, mYmax ); }
-    KadasItemPos center() const { return KadasItemPos( 0.5 * ( mXmin + mXmax ), 0.5 * ( mYmin + mYmax ) ); }
 
   private:
     double mXmin = 0.;
