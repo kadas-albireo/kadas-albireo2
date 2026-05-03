@@ -132,7 +132,6 @@ The QGIS annotation layer will only contain items/annotations inheriting from :p
     KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs );
     ~KadasItemLayer();
     virtual QString layerTypeKey() const;
-    virtual bool acceptsItem( const KadasMapItem *item ) const;
 
     void ensureDefault3DRenderer();
 %Docstring
