@@ -374,8 +374,6 @@ QString KadasMapItem::NumericAttribute::suffix( const QgsMapSettings &mapSetting
       return QgsUnitTypes::toAbbreviatedString( mapSettings.destinationCrs().mapUnits() );
     case Type::TypeAngle:
       return QString( "°" );
-    case Type::TypeOther:
-      return QString();
   }
   return QString();
 }
