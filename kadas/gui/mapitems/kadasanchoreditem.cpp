@@ -58,7 +58,6 @@ bool KadasAnchoredItem::State::deserialize( const QJsonObject &json )
 KadasAnchoredItem::KadasAnchoredItem( const QgsCoordinateReferenceSystem &crs )
   : KadasMapItem( crs )
 {
-  mIsPointSymbol = true;
   clear();
 }
 

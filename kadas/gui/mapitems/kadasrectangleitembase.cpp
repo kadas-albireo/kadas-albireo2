@@ -99,7 +99,6 @@ bool KadasRectangleItemBase::State::deserialize( const QJsonObject &json )
 KadasRectangleItemBase::KadasRectangleItemBase( const QgsCoordinateReferenceSystem &crs )
   : KadasMapItem( crs )
 {
-  mIsPointSymbol = true;
   clear();
 }
 
