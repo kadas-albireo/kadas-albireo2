@@ -464,7 +464,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
         AttribDefs attributes;
         Qt::CursorShape cursor;
         bool isValid() const { return mValid; }
-        bool operator==( const EditContext &other ) const { return vidx == other.vidx && mValid == other.mValid; }
         bool operator!=( const EditContext &other ) const { return vidx != other.vidx || mValid != other.mValid; }
     };
     virtual EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const = 0;

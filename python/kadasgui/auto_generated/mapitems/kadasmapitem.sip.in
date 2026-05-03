@@ -394,7 +394,6 @@ Trigger a redraw */
         AttribDefs attributes;
         Qt::CursorShape cursor;
         bool isValid() const;
-        bool operator==( const EditContext &other ) const;
         bool operator!=( const EditContext &other ) const;
     };
     virtual EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const = 0;
