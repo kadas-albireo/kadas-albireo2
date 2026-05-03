@@ -16,7 +16,6 @@
 
 
 #include <QAction>
-#include <QJsonArray>
 #include <QMenu>
 
 #include <qgis/qgsannotationpointtextitem.h>
@@ -135,62 +134,6 @@ void KadasTextItem::render( QgsRenderContext &context ) const
 {
   QgsFeedback fb;
   mQgsItem->render( context, &fb );
-}
-
-
-void KadasTextItem::writeXmlPrivate( QDomElement &element ) const
-{
-  //element.setAttribute("status", static_cast<int>( state().drawStatus ));
-  element.setAttribute( "text", mText );
-  element.setAttribute( "font", mFont.toString() );
-  element.setAttribute( "color", mColor.name( QColor::HexArgb ) );
-  if ( mOutlineColor.isValid() )
-    element.setAttribute( "outlineColor", mOutlineColor.name( QColor::HexArgb ) );
-  element.setAttribute( "angle", QString::number( mAngle ) );
-  element.setAttribute( "geometry", point().asWkt() );
-}
-
-void KadasTextItem::readXmlPrivate( const QDomElement &element )
-{
-  // format_version 1 = legacy JSON in CDATA. format_version 2 = new attribute-based format.
-  const bool isLegacy = element.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) == QLatin1String( "1" );
-  if ( isLegacy )
-  {
-    // migration code
-    QJsonObject data = QJsonDocument::fromJson( element.firstChild().toCDATASection().data().toLocal8Bit() ).object();
-    if ( data.contains( "props" ) )
-    {
-      QJsonObject props = data["props"].toObject();
-
-      mCrs = QgsCoordinateReferenceSystem( props.value( "authId" ).toString() );
-      mEditor = props.value( "editor" ).toString();
-
-      setText( props.value( "text" ).toString() );
-      mColor = QColor( props.value( "fillColor" ).toString() );
-      if ( props.contains( "outlineColor" ) )
-        mOutlineColor = QColor( props.value( "outlineColor" ).toString() );
-      mFont.fromString( props.value( "font" ).toString() );
-    }
-    if ( data.contains( "state" ) )
-    {
-      const QJsonObject state = data.value( "state" ).toObject();
-      const QJsonArray point = state.value( "pos" ).toArray();
-      setPoint( QgsPointXY( point.at( 0 ).toDouble(), point.at( 1 ).toDouble() ) );
-      if ( state.contains( "angle" ) )
-        mAngle = state.value( "angle" ).toDouble();
-    }
-  }
-  else
-  {
-    setText( element.attribute( "text" ) );
-    mColor = QColor( element.attribute( "color", QColor( Qt::red ).name() ) );
-    if ( element.hasAttribute( "outlineColor" ) )
-      mOutlineColor = QColor( element.attribute( "outlineColor" ) );
-    mFont.fromString( element.attribute( "font" ) );
-    mAngle = element.attribute( "angle", "0" ).toDouble();
-    setPoint( QgsGeometry::fromWkt( element.attribute( "geometry" ) ).asPoint() );
-  }
-  updateQgsAnnotation();
 }
 
 
