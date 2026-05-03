@@ -41,9 +41,7 @@ KadasItemLayerRegistry.StandardLayer.__doc__ = """
 # --
 try:
     KadasItemLayer.layerType = staticmethod(KadasItemLayer.layerType)
-    KadasItemLayer.__virtual_methods__ = ['acceptsItem']
     KadasItemLayer.__overridden_methods__ = ['layerTypeKey', 'clone', 'createMapRenderer', 'extent', 'readXml', 'writeXml']
-    KadasItemLayer.__signal_arguments__ = {'itemAdded': ['itemId: KadasItemLayer.ItemId'], 'itemRemoved': ['itemId: KadasItemLayer.ItemId']}
 except (NameError, AttributeError):
     pass
 try:
