@@ -23,6 +23,11 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsrendercontext.h>
 
+#include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgsproject.h>
+
+#include "kadas/gui/annotationitems/kadascoordcrossannotationitem.h"
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/mapitems/kadascoordinatecrossitem.h"
 
 
@@ -163,6 +168,20 @@ void KadasCoordinateCrossItem::setPosition( const KadasItemPos &pos )
 {
   state()->pos = roundToKilometre( pos );
   update();
+}
+
+QgsAnnotationItem *KadasCoordinateCrossItem::annotationItem( const QgsCoordinateReferenceSystem &crs ) const
+{
+  QgsPoint point( constState()->pos.x(), constState()->pos.y() );
+  if ( crs.isValid() && mCrs != crs )
+  {
+    QgsCoordinateTransform ct( mCrs, crs, QgsProject::instance() );
+    QgsPointXY xy = ct.transform( point.x(), point.y() );
+    point = QgsPoint( xy );
+  }
+  auto *anno = new KadasCoordCrossAnnotationItem( point );
+  anno->setZIndex( zIndex() ? zIndex() : KadasAnnotationZIndex::CoordCross );
+  return anno;
 }
 
 bool KadasCoordinateCrossItem::startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings )

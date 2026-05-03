@@ -41,9 +41,6 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
     void setRemarks( const QString &remarks );
     const QString &remarks() const { return mRemarks; }
 
-    QImage symbolImage() const override { return mImage; }
-    QPointF symbolAnchor() const override { return QPointF( anchorX(), anchorY() ); }
-
     void render( QgsRenderContext &context ) const override;
 #ifndef SIP_RUN
     QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
@@ -53,6 +50,8 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
     void edit( const EditContext &context, const KadasMapPos &newPoint, const QgsMapSettings &mapSettings ) override;
 
     void setState( const KadasMapItem::State *state ) override;
+
+    QgsAnnotationItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const override SIP_FACTORY;
 
   private:
     QString mFilePath;
@@ -71,6 +70,8 @@ class KADAS_GUI_EXPORT KadasPinItem : public KadasSymbolItem
 
   public:
     KadasPinItem( const QgsCoordinateReferenceSystem &crs );
+
+    QgsAnnotationItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const override SIP_FACTORY;
 
   private slots:
     void updateTooltip();

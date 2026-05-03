@@ -14,15 +14,6 @@ KadasItemLayer.PickObjective.__doc__ = """
 """
 # --
 # monkey patching scoped based enum
-KadasItemLayerRegistry.RedliningLayer = KadasItemLayerRegistry.StandardLayer.RedliningLayer
-KadasItemLayerRegistry.RedliningLayer.is_monkey_patched = True
-KadasItemLayerRegistry.StandardLayer.RedliningLayer.__doc__ = ""
-KadasItemLayerRegistry.SymbolsLayer = KadasItemLayerRegistry.StandardLayer.SymbolsLayer
-KadasItemLayerRegistry.SymbolsLayer.is_monkey_patched = True
-KadasItemLayerRegistry.StandardLayer.SymbolsLayer.__doc__ = ""
-KadasItemLayerRegistry.PicturesLayer = KadasItemLayerRegistry.StandardLayer.PicturesLayer
-KadasItemLayerRegistry.PicturesLayer.is_monkey_patched = True
-KadasItemLayerRegistry.StandardLayer.PicturesLayer.__doc__ = ""
 KadasItemLayerRegistry.PinsLayer = KadasItemLayerRegistry.StandardLayer.PinsLayer
 KadasItemLayerRegistry.PinsLayer.is_monkey_patched = True
 KadasItemLayerRegistry.StandardLayer.PinsLayer.__doc__ = ""
@@ -31,9 +22,6 @@ KadasItemLayerRegistry.RoutesLayer.is_monkey_patched = True
 KadasItemLayerRegistry.StandardLayer.RoutesLayer.__doc__ = ""
 KadasItemLayerRegistry.StandardLayer.__doc__ = """
 
-* ``RedliningLayer``: 
-* ``SymbolsLayer``: 
-* ``PicturesLayer``: 
 * ``PinsLayer``: 
 * ``RoutesLayer``: 
 
@@ -41,9 +29,7 @@ KadasItemLayerRegistry.StandardLayer.__doc__ = """
 # --
 try:
     KadasItemLayer.layerType = staticmethod(KadasItemLayer.layerType)
-    KadasItemLayer.__virtual_methods__ = ['acceptsItem']
     KadasItemLayer.__overridden_methods__ = ['layerTypeKey', 'clone', 'createMapRenderer', 'extent', 'readXml', 'writeXml']
-    KadasItemLayer.__signal_arguments__ = {'itemAdded': ['itemId: KadasItemLayer.ItemId'], 'itemRemoved': ['itemId: KadasItemLayer.ItemId']}
 except (NameError, AttributeError):
     pass
 try:

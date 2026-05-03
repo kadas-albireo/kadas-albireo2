@@ -22,28 +22,20 @@ KadasMapItem.NumericAttribute.Type.TypeDistance.__doc__ = ""
 KadasMapItem.NumericAttribute.TypeAngle = KadasMapItem.NumericAttribute.Type.TypeAngle
 KadasMapItem.NumericAttribute.TypeAngle.is_monkey_patched = True
 KadasMapItem.NumericAttribute.Type.TypeAngle.__doc__ = ""
-KadasMapItem.NumericAttribute.TypeOther = KadasMapItem.NumericAttribute.Type.TypeOther
-KadasMapItem.NumericAttribute.TypeOther.is_monkey_patched = True
-KadasMapItem.NumericAttribute.Type.TypeOther.__doc__ = ""
 KadasMapItem.NumericAttribute.Type.__doc__ = """
 
 * ``TypeCoordinate``: 
 * ``TypeDistance``: 
 * ``TypeAngle``: 
-* ``TypeOther``: 
 
 """
 # --
 # monkey patching scoped based enum
-KadasMapItem.EditNoAction = KadasMapItem.ContextMenuActions.EditNoAction
-KadasMapItem.EditNoAction.is_monkey_patched = True
-KadasMapItem.ContextMenuActions.EditNoAction.__doc__ = ""
 KadasMapItem.EditSwitchToDrawingTool = KadasMapItem.ContextMenuActions.EditSwitchToDrawingTool
 KadasMapItem.EditSwitchToDrawingTool.is_monkey_patched = True
 KadasMapItem.ContextMenuActions.EditSwitchToDrawingTool.__doc__ = ""
 KadasMapItem.ContextMenuActions.__doc__ = """
 
-* ``EditNoAction``: 
 * ``EditSwitchToDrawingTool``: 
 
 """

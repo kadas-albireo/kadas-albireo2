@@ -132,7 +132,6 @@ The QGIS annotation layer will only contain items/annotations inheriting from :p
     KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs );
     ~KadasItemLayer();
     virtual QString layerTypeKey() const;
-    virtual bool acceptsItem( const KadasMapItem *item ) const;
 
     void ensureDefault3DRenderer();
 %Docstring
@@ -160,19 +159,13 @@ that are never used in a 3D scene. Safe to call multiple times.
     virtual KadasItemLayer::ItemId pickItem(
       const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY
     ) const;
-    KadasItemLayer::ItemId pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
 
 
 
     void setSymbolScale( double scale );
     double symbolScale() const;
 
-  signals:
-    void itemAdded( KadasItemLayer::ItemId itemId );
-    void itemRemoved( KadasItemLayer::ItemId itemId );
-
   protected:
-    KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs, const QString &layerType );
 
 };
 
@@ -197,9 +190,6 @@ class KadasItemLayerRegistry : QObject
   public:
     enum class StandardLayer
     {
-      RedliningLayer,
-      SymbolsLayer,
-      PicturesLayer,
       PinsLayer,
       RoutesLayer
     };

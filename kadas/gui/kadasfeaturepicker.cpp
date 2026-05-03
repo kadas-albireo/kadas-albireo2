@@ -15,6 +15,9 @@
  ***************************************************************************/
 
 #include <qgis/qgis.h>
+#include <qgis/qgsannotationitem.h>
+#include <qgis/qgsannotationlayer.h>
+#include <qgis/qgsfeedback.h>
 #include <qgis/qgsrenderer.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgspallabeling.h>
@@ -26,7 +29,6 @@
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/kadasfeaturepicker.h"
 #include "kadas/gui/mapitems/kadasgeometryitem.h"
-#include "kadas/gui/milx/kadasmilxitem.h"
 
 KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *canvas, const QgsPointXY &mapPos, Qgis::GeometryType geomType, KadasItemLayer::PickObjective pickObjective )
 {
@@ -38,6 +40,10 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *can
     {
       pickResult = pickItemLayer( static_cast<KadasItemLayer *>( layer ), canvas, KadasMapPos::fromPoint( mapPos ), pickObjective );
     }
+    else if ( qobject_cast<QgsAnnotationLayer *>( layer ) )
+    {
+      pickResult = pickAnnotationLayer( static_cast<QgsAnnotationLayer *>( layer ), canvas, mapPos );
+    }
     else if ( qobject_cast<QgsVectorLayer *>( layer ) && pickObjective != KadasItemLayer::PickObjective::PICK_OBJECTIVE_TOOLTIP )
     {
       pickResult = pickVectorLayer( static_cast<QgsVectorLayer *>( layer ), canvas, mapPos, geomType );
@@ -48,12 +54,6 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *can
     }
   }
   return pickResult;
-}
-
-KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, Qgis::GeometryType geomType )
-{
-  Q_UNUSED( canvasPos );
-  return pick( canvas, mapPos, geomType );
 }
 
 KadasFeaturePicker::PickResult KadasFeaturePicker::pickItemLayer( KadasItemLayer *layer, const QgsMapCanvas *canvas, const KadasMapPos &mapPos, KadasItemLayer::PickObjective pickObjective )
@@ -69,11 +69,32 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickItemLayer( KadasItemLayer
     {
       pickResult.geom = static_cast<KadasGeometryItem *>( item )->geometry()->clone();
     }
-    else if ( dynamic_cast<KadasMilxItem *>( item ) )
-    {
-      pickResult.geom = static_cast<KadasMilxItem *>( item )->toGeometry();
-    }
   }
+  return pickResult;
+}
+
+KadasFeaturePicker::PickResult KadasFeaturePicker::pickAnnotationLayer( QgsAnnotationLayer *layer, const QgsMapCanvas *canvas, const QgsPointXY &mapPos )
+{
+  PickResult pickResult;
+
+  QgsRenderContext renderContext = QgsRenderContext::fromMapSettings( canvas->mapSettings() );
+  double radiusmm = QgsSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
+  radiusmm = radiusmm > 0 ? radiusmm : Qgis::DEFAULT_SEARCH_RADIUS_MM;
+  const double radiusmu = radiusmm * renderContext.scaleFactor() * renderContext.mapToPixel().mapUnitsPerPixel();
+
+  const QgsRectangle mapBounds( mapPos.x() - radiusmu, mapPos.y() - radiusmu, mapPos.x() + radiusmu, mapPos.y() + radiusmu );
+  const QgsRectangle layerBounds = canvas->mapSettings().mapToLayerCoordinates( layer, mapBounds );
+
+  QgsFeedback feedback;
+  const QStringList hits = layer->itemsInBounds( layerBounds, renderContext, &feedback );
+  if ( hits.isEmpty() )
+  {
+    return pickResult;
+  }
+
+  pickResult.annotationLayer = layer;
+  pickResult.annotationItemId = hits.first();
+  pickResult.crs = layer->crs();
   return pickResult;
 }
 

@@ -17,11 +17,11 @@
 #include <qgis/qgsapplication.h>
 #include <qgis/qgsgpsconnectionregistry.h>
 #include <qgis/qgsgpsdetector.h>
+#include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsrubberband.h>
 
-#include "kadas/gui/kadasmapcanvasitemmanager.h"
-#include "kadas/gui/mapitems/kadassymbolitem.h"
 #include "kadasgpsintegration.h"
 #include "kadasmainwindow.h"
 
@@ -161,12 +161,27 @@ void KadasGpsIntegration::gpsStateChanged( const QgsGpsInformation &info )
   // Update marker
   if ( !mMarker )
   {
-    mMarker = new KadasSymbolItem( QgsCoordinateReferenceSystem( "EPSG:4326" ) );
-    mMarker->setup( ":/kadas/icons/gpsarrow", 0.5, 0.5, 92, 92 );
-    KadasMapCanvasItemManager::addItem( mMarker );
+    mMarker = new QgsRubberBand( mMainWindow->mapCanvas(), Qgis::GeometryType::Point );
+    mMarker->setIcon( QgsRubberBand::ICON_SVG );
+    mMarker->setSvgIcon( ":/kadas/icons/gpsarrow", QPoint( -46, -46 ) );
   }
-  mMarker->setPosition( KadasItemPos::fromPoint( position ) );
-  mMarker->setAngle( -info.direction );
+  // Reproject WGS84 position to canvas CRS for the rubber band
+  const QgsCoordinateTransform t( QgsCoordinateReferenceSystem( "EPSG:4326" ), mMainWindow->mapCanvas()->mapSettings().destinationCrs(), QgsProject::instance()->transformContext() );
+  QgsPointXY canvasPos;
+  try
+  {
+    canvasPos = t.transform( position );
+  }
+  catch ( const QgsCsException & )
+  {
+    canvasPos = position;
+  }
+  mMarker->reset( Qgis::GeometryType::Point );
+  mMarker->addPoint( canvasPos );
+  // NOTE: rotation lost in port from KadasSymbolItem (info.direction); QgsRubberBand
+  // does not currently support icon rotation. Re-add via a transient
+  // QgsAnnotationLayer + QgsAnnotationMarkerItem (SVG marker symbol with angle)
+  // if heading display is needed.
 }
 
 void KadasGpsIntegration::updateGpsFixIcon()

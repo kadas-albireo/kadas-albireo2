@@ -78,8 +78,14 @@
 #include "kadas/gui/kadasattributetabledialog.h"
 #include "kadas/gui/kadasclipboard.h"
 #include "kadas/gui/kadasitemlayer.h"
+#include "kadas/gui/annotationitems/kadasannotationitemcontrollers.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
+#include <qgis/qgsannotationlayer.h>
+#include <qgis/qgsannotationpictureitem.h>
 #include "kadas/gui/kadaslayerselectionwidget.h"
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
+#include "kadas/gui/kadasitemlayermigration.h"
 #include "kadas/gui/kadasprojectmigration.h"
 #include "kadas/gui/mapitems/kadaspointitem.h"
 #include "kadas/gui/mapitems/kadaslineitem.h"
@@ -88,8 +94,8 @@
 #include "kadas/gui/mapitems/kadassymbolitem.h"
 #include "kadas/gui/maptools/kadasmaptooledititem.h"
 #include "kadas/gui/maptools/kadasmaptooledititemgroup.h"
+#include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptoolpan.h"
-#include "kadas/gui/milx/kadasmilxlayer.h"
 #include "kadasapplication.h"
 #include "kadasapplayerhandling.h"
 #include "kadascanvascontextmenu.h"
@@ -408,7 +414,6 @@ void KadasApplication::init()
 
   // Register plugin layers
   mKadasPluginLayerTypes.append( new KadasItemLayerType() );
-  mKadasPluginLayerTypes.append( new KadasMilxLayerType() );
   mKadasPluginLayerTypes.append( new KadasBullseyeLayerType( mMainWindow->actionBullseye() ) );
   mKadasPluginLayerTypes.append( new KadasGuideGridLayerType( mMainWindow->actionGuideGrid() ) );
   mKadasPluginLayerTypes.append( new KadasMapGridLayerType( mMainWindow->actionMapGrid() ) );
@@ -436,6 +441,10 @@ void KadasApplication::init()
 
   // Init KadasItemLayerRegistry
   KadasItemLayerRegistry::init();
+
+  // Init annotation-item controllers and the parallel annotation-layer registry
+  KadasAnnotationItemControllers::registerBuiltins();
+  KadasAnnotationLayerRegistry::init();
 
   loadStartupProject();
 
@@ -607,27 +616,37 @@ QgsPointCloudLayer *KadasApplication::addPointCloudLayer( const QString &uri, co
   return KadasAppLayerHandling::addPointCloudLayer( uri, baseName, providerKey, !quiet );
 }
 
-QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> KadasApplication::addImageItem( const QString &filename ) const
+QPair<QString, QgsAnnotationLayer *> KadasApplication::addImageItem( const QString &filename ) const
 {
-  QString attachedPath = QgsProject::instance()->createAttachedFile( QFileInfo( filename ).fileName() );
+  const QString attachedPath = QgsProject::instance()->createAttachedFile( QFileInfo( filename ).fileName() );
   QFile( attachedPath ).remove();
   QFile( filename ).copy( attachedPath );
   QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
-  QgsCoordinateReferenceSystem crs( "EPSG:3857" );
-  QgsCoordinateTransform crst( mMainWindow->mapCanvas()->mapSettings().destinationCrs(), crs, QgsProject::instance()->transformContext() );
-  if ( filename.endsWith( ".svg", Qt::CaseInsensitive ) )
+
+  const bool isSvg = filename.endsWith( QLatin1String( ".svg" ), Qt::CaseInsensitive );
+  const Qgis::PictureFormat format = isSvg ? Qgis::PictureFormat::SVG : Qgis::PictureFormat::Raster;
+  const KadasAnnotationLayerRegistry::StandardLayer standardLayer = isSvg ? KadasAnnotationLayerRegistry::StandardLayer::SymbolsLayer : KadasAnnotationLayerRegistry::StandardLayer::PicturesLayer;
+  QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( standardLayer );
+
+  const QgsCoordinateTransform canvasToLayer( mMainWindow->mapCanvas()->mapSettings().destinationCrs(), layer->crs(), QgsProject::instance()->transformContext() );
+  const QgsPointXY center = canvasToLayer.transform( mMainWindow->mapCanvas()->extent().center() );
+  const QgsRectangle bounds( center.x(), center.y(), center.x(), center.y() );
+
+  auto *item = new QgsAnnotationPictureItem( format, attachedPath, bounds );
+  item->setZIndex( KadasAnnotationZIndex::Picture );
+  item->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
+  if ( isSvg )
   {
-    KadasSymbolItem *item = new KadasSymbolItem( crs );
-    item->setup( attachedPath, 0.5, 0.5, 0, 64 );
-    item->setPosition( KadasItemPos::fromPoint( crst.transform( mMainWindow->mapCanvas()->extent().center() ) ) );
-    return qMakePair( item, KadasItemLayerRegistry::StandardLayer::SymbolsLayer );
+    item->setFixedSize( QSizeF( 64, 64 ) );
+    item->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
   }
   else
   {
-    KadasPictureItem *item = new KadasPictureItem( crs );
-    item->setup( attachedPath, KadasItemPos::fromPoint( crst.transform( mMainWindow->mapCanvas()->extent().center() ) ), false, 0, 0, 100, 100 );
-    return qMakePair( item, KadasItemLayerRegistry::StandardLayer::PicturesLayer );
+    item->setFixedSize( QSizeF( 100, 100 ) );
+    item->setFixedSizeUnit( Qgis::RenderUnit::Millimeters );
   }
+  const QString itemId = layer->addItem( item );
+  return qMakePair( itemId, layer );
 }
 
 KadasItemLayer *KadasApplication::selectPasteTargetItemLayer( const QList<KadasMapItem *> &items )
@@ -638,18 +657,8 @@ KadasItemLayer *KadasApplication::selectPasteTargetItemLayer( const QList<KadasM
   dialog.layout()->setContentsMargins( 2, 2, 2, 2 );
   dialog.layout()->addWidget( new QLabel( tr( "Select layer to paste items to:" ) ) );
   KadasLayerSelectionWidget *layerSelectionWidget = new KadasLayerSelectionWidget( mMainWindow->mapCanvas(), mMainWindow->layerTreeView(), [&]( QgsMapLayer *layer ) {
-    if ( !dynamic_cast<KadasItemLayer *>( layer ) )
-    {
-      return false;
-    }
-    for ( const KadasMapItem *item : items )
-    {
-      if ( !static_cast<KadasItemLayer *>( layer )->acceptsItem( item ) )
-      {
-        return false;
-      }
-    }
-    return true;
+    Q_UNUSED( items )
+    return dynamic_cast<KadasItemLayer *>( layer ) != nullptr;
   } );
   dialog.layout()->addWidget( layerSelectionWidget );
   QDialogButtonBox *buttonBox = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel );
@@ -790,6 +799,10 @@ bool KadasApplication::projectOpen( const QString &projectFile )
 
   if ( success )
   {
+    const int migratedLayers = KadasItemLayerMigration::migrateProject( QgsProject::instance() );
+    if ( migratedLayers > 0 )
+      QgsProject::instance()->setDirty( true );
+
     emit projectRead();
 
     if ( migratedFileName != openFileName )
@@ -1400,46 +1413,6 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
       return new KadasMapToolEditItemGroup( canvas, items, layer );
     }
   }
-  else if ( KadasClipboard::instance()->hasFormat( KADASCLIPBOARD_FEATURESTORE_MIME ) )
-  {
-    QList<KadasMapItem *> items;
-    const QgsFeatureStore &featureStore = KadasClipboard::instance()->getStoredFeatures();
-    for ( const QgsFeature &feature : featureStore.features() )
-    {
-      if ( feature.geometry().type() == Qgis::GeometryType::Point )
-      {
-        KadasPointItem *item = new KadasPointItem( featureStore.crs() );
-        item->setPoint( *qgsgeometry_cast<const QgsPoint *>( feature.geometry().constGet() ) );
-        items.append( item );
-      }
-      else if ( feature.geometry().type() == Qgis::GeometryType::Line )
-      {
-        KadasLineItem *item = new KadasLineItem( featureStore.crs() );
-        item->addPartFromGeometry( *feature.geometry().constGet() );
-        items.append( item );
-      }
-      else if ( feature.geometry().type() == Qgis::GeometryType::Polygon )
-      {
-        KadasPolygonItem *item = new KadasPolygonItem( featureStore.crs() );
-        item->addPartFromGeometry( *feature.geometry().constGet() );
-        items.append( item );
-      }
-    }
-    KadasItemLayer *layer = kApp->selectPasteTargetItemLayer( items );
-    if ( !layer )
-    {
-      qDeleteAll( items );
-      return nullptr;
-    }
-    else if ( items.size() == 1 )
-    {
-      return new KadasMapToolEditItem( canvas, items.front(), layer );
-    }
-    else
-    {
-      return new KadasMapToolEditItemGroup( canvas, items, layer );
-    }
-  }
   else if ( KadasClipboard::instance()->hasFormat( "image/svg+xml" ) )
   {
     const QMimeData *mimeData = QApplication::clipboard()->mimeData();
@@ -1449,11 +1422,16 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
     {
       file.write( mimeData->data( "image/svg+xml" ) );
       file.close();
-      KadasSymbolItem *item = new KadasSymbolItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
-      QgsCoordinateTransform crst( mapCrs, item->crs(), QgsProject::instance() );
-      item->setup( filename, 0.5, 0.5 );
-      item->setPosition( KadasItemPos::fromPoint( crst.transform( pastePos ) ) );
-      return new KadasMapToolEditItem( canvas, item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::SymbolsLayer ) );
+      QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::SymbolsLayer );
+      const QgsCoordinateTransform mapToLayer( mapCrs, layer->crs(), QgsProject::instance()->transformContext() );
+      const QgsPointXY layerPos = mapToLayer.transform( pastePos );
+      auto *item = new QgsAnnotationPictureItem( Qgis::PictureFormat::SVG, filename, QgsRectangle( layerPos.x(), layerPos.y(), layerPos.x(), layerPos.y() ) );
+      item->setZIndex( KadasAnnotationZIndex::Picture );
+      item->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
+      item->setFixedSize( QSizeF( 64, 64 ) );
+      item->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
+      const QString itemId = layer->addItem( item );
+      return new KadasMapToolEditAnnotationItem( canvas, layer, itemId );
     }
   }
   else
@@ -1464,10 +1442,16 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
       QImage image = qvariant_cast<QImage>( mimeData->imageData() );
       QString filename = QgsProject::instance()->createAttachedFile( "pasted_image.png" );
       image.save( filename );
-      KadasPictureItem *item = new KadasPictureItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
-      QgsCoordinateTransform crst( mapCrs, item->crs(), QgsProject::instance() );
-      item->setup( filename, KadasItemPos::fromPoint( crst.transform( pastePos ) ) );
-      return new KadasMapToolEditItem( canvas, item, KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PicturesLayer ) );
+      QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::PicturesLayer );
+      const QgsCoordinateTransform mapToLayer( mapCrs, layer->crs(), QgsProject::instance()->transformContext() );
+      const QgsPointXY layerPos = mapToLayer.transform( pastePos );
+      auto *item = new QgsAnnotationPictureItem( Qgis::PictureFormat::Raster, filename, QgsRectangle( layerPos.x(), layerPos.y(), layerPos.x(), layerPos.y() ) );
+      item->setZIndex( KadasAnnotationZIndex::Picture );
+      item->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
+      item->setFixedSize( QSizeF( 100, 100 ) );
+      item->setFixedSizeUnit( Qgis::RenderUnit::Millimeters );
+      const QString itemId = layer->addItem( item );
+      return new KadasMapToolEditAnnotationItem( canvas, layer, itemId );
     }
   }
   return nullptr;
@@ -1502,6 +1486,11 @@ void KadasApplication::handleItemPicked( const KadasFeaturePicker::PickResult &r
   {
     KadasItemLayer *layer = static_cast<KadasItemLayer *>( result.layer );
     QgsMapTool *tool = new KadasMapToolEditItem( mMainWindow->mapCanvas(), result.itemId, layer );
+    mMainWindow->mapCanvas()->setMapTool( tool );
+  }
+  else if ( result.annotationLayer && !result.annotationItemId.isEmpty() )
+  {
+    QgsMapTool *tool = new KadasMapToolEditAnnotationItem( mMainWindow->mapCanvas(), result.annotationLayer, result.annotationItemId );
     mMainWindow->mapCanvas()->setMapTool( tool );
   }
 }

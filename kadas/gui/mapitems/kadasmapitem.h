@@ -49,10 +49,12 @@ class KADAS_GUI_EXPORT KadasMapPos
       : mX( x )
       , mY( y )
     {}
+    KadasMapPos( const QgsPointXY &p )
+      : mX( p.x() )
+      , mY( p.y() )
+    {}
     double x() const { return mX; }
-    void setX( double x ) { mX = x; }
     double y() const { return mY; }
-    void setY( double y ) { mY = y; }
     operator QgsPointXY() const { return QgsPointXY( mX, mY ); }
     double sqrDist( const KadasMapPos &p ) const { return ( mX - p.mX ) * ( mX - p.mX ) + ( mY - p.mY ) * ( mY - p.mY ); }
 
@@ -71,13 +73,6 @@ class KADAS_GUI_EXPORT KadasMapRect
       , mYmax( yMax )
     {}
 
-    KadasMapRect( const KadasMapPos &p1, const KadasMapPos &p2 )
-      : mXmin( std::min( p1.x(), p2.x() ) )
-      , mYmin( std::min( p1.y(), p2.y() ) )
-      , mXmax( std::max( p1.x(), p2.x() ) )
-      , mYmax( std::max( p1.y(), p2.y() ) )
-    {}
-
     KadasMapRect( const KadasMapPos &center, double span )
       : mXmin( center.x() - span )
       , mYmin( center.y() - span )
@@ -94,7 +89,6 @@ class KADAS_GUI_EXPORT KadasMapRect
     double yMaximum() const { return mYmax; }
     void setYMaximum( double ymax ) { mYmax = ymax; }
     operator QgsRectangle() const { return QgsRectangle( mXmin, mYmin, mXmax, mYmax ); }
-    KadasMapPos center() const { return KadasMapPos( 0.5 * ( mXmin + mXmax ), 0.5 * ( mYmin + mYmax ) ); }
 
   private:
     double mXmin = 0.;
@@ -115,15 +109,19 @@ class KADAS_GUI_EXPORT KadasItemPos
       , mZ( z )
     {}
 
+    KadasItemPos( const QgsPointXY &p )
+      : mX( p.x() )
+      , mY( p.y() )
+      , mZ( std::numeric_limits<double>::quiet_NaN() )
+    {}
+
     bool operator==( const KadasItemPos &other ) const SIP_SKIP { return mX == other.mX && mY == other.mY && hasZ() == other.hasZ() && ( !hasZ() || mZ == other.mZ ); }
 
     double x() const { return mX; }
     void setX( double x ) { mX = x; }
     double y() const { return mY; }
     void setY( double y ) { mY = y; }
-    double z() const { return mZ; }
-    void setZ( double z ) { mZ = z; }
-    bool hasZ() const { return !std::isnan( mZ ); }
+    bool hasZ() const SIP_SKIP { return !std::isnan( mZ ); }
     operator QgsPointXY() const { return QgsPointXY( mX, mY ); }
     operator QgsPoint() const { return QgsPoint( mX, mY, mZ ); }
     double sqrDist( const KadasItemPos &p ) const { return ( mX - p.mX ) * ( mX - p.mX ) + ( mY - p.mY ) * ( mY - p.mY ); }
@@ -132,42 +130,6 @@ class KADAS_GUI_EXPORT KadasItemPos
     double mX = 0.;
     double mY = 0.;
     double mZ = 0.;
-};
-
-
-class KADAS_GUI_EXPORT KadasItemRect
-{
-  public:
-    KadasItemRect( double xMin = 0., double yMin = 0., double xMax = 0., double yMax = 0. )
-      : mXmin( xMin )
-      , mYmin( yMin )
-      , mXmax( xMax )
-      , mYmax( yMax )
-    {}
-
-    KadasItemRect( const KadasItemPos &p1, const KadasItemPos &p2 )
-      : mXmin( std::min( p1.x(), p2.x() ) )
-      , mYmin( std::min( p1.y(), p2.y() ) )
-      , mXmax( std::max( p1.x(), p2.x() ) )
-      , mYmax( std::max( p1.y(), p2.y() ) )
-    {}
-
-    double xMinimum() const { return mXmin; }
-    void setXMinimum( double xMin ) { mXmin = xMin; }
-    double yMinimum() const { return mYmin; }
-    void setYMinimum( double yMin ) { mYmin = yMin; }
-    double xMaximum() const { return mXmax; }
-    void setXMaximum( double xMax ) { mXmax = xMax; }
-    double yMaximum() const { return mYmax; }
-    void setYMaximum( double ymax ) { mYmax = ymax; }
-    operator QgsRectangle() const { return QgsRectangle( mXmin, mYmin, mXmax, mYmax ); }
-    KadasItemPos center() const { return KadasItemPos( 0.5 * ( mXmin + mXmax ), 0.5 * ( mYmin + mYmax ) ); }
-
-  private:
-    double mXmin = 0.;
-    double mYmin = 0.;
-    double mXmax = 0.;
-    double mYmax = 0.;
 };
 
 
@@ -286,7 +248,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     Q_PROPERTY( int zIndex READ zIndex WRITE setZIndex NOTIFY zIndexChanged )
     Q_PROPERTY( double symbolScale READ symbolScale WRITE setSymbolScale )
     Q_PROPERTY( QString editor READ editor WRITE setEditor )
-    //Q_PROPERTY( QString authId READ authId WRITE setAuthId )
     Q_PROPERTY( QString tooltip READ tooltip WRITE setTooltip )
 
   public:
@@ -310,6 +271,16 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
     //! Returns the QgsAnnotationItem in the given crs (if not specified, no transformation occurs)
     virtual QgsAnnotationItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const SIP_FACTORY { return nullptr; }
+
+    /**
+     * Returns one QgsAnnotationItem per geometry part in the given \a crs.
+     *
+     * The default implementation wraps annotationItem() in a single-element
+     * list (empty when the override is missing). Multi-part subclasses
+     * (lines/polygons) override this to emit one annotation per part, since
+     * QgsAnnotationLineItem/QgsAnnotationPolygonItem hold a single curve.
+     */
+    virtual QList<QgsAnnotationItem *> annotationItems( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const SIP_FACTORY;
 
     virtual QString itemName() const = 0;
     virtual QString exportName() const;
@@ -382,10 +353,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     void setSymbolScale( double scale );
     double symbolScale() const { return mSymbolScale; }
 
-    /* authid */
-    //void setAuthId( const QString &authId );
-    //QString authId() const { return mCrs.authid(); }
-
     /* tooltip */
     void setTooltip( const QString &tooltip );
     const QString &tooltip() const { return mTooltip; }
@@ -393,10 +360,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     /* visibility */
     void setVisible( bool visible );
     bool isVisible() const { return mVisible; }
-
-    bool isPointSymbol() const { return mIsPointSymbol; }
-    virtual QImage symbolImage() const { return QImage(); }
-    virtual QPointF symbolAnchor() const { return QPointF( 0.5, 0.5 ); }
 
     /* Trigger a redraw */
     void update();
@@ -422,8 +385,7 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
         {
           TypeCoordinate,
           TypeDistance,
-          TypeAngle,
-          TypeOther
+          TypeAngle
         };
         // clang-format on
         Type type = Type::TypeCoordinate;
@@ -471,7 +433,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
         AttribDefs attributes;
         Qt::CursorShape cursor;
         bool isValid() const { return mValid; }
-        bool operator==( const EditContext &other ) const { return vidx == other.vidx && mValid == other.mValid; }
         bool operator!=( const EditContext &other ) const { return vidx != other.vidx || mValid != other.mValid; }
     };
     virtual EditContext getEditContext( const KadasMapPos &pos, const QgsMapSettings &mapSettings ) const = 0;
@@ -480,7 +441,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
     enum class ContextMenuActions SIP_MONKEYPATCH_SCOPEENUM
     {
-      EditNoAction,
       EditSwitchToDrawingTool
     };
     virtual void populateContextMenu( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings ) {}
@@ -518,10 +478,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
     void preventAttachmentCleanup() { mDontCleanupAttachment = true; }
 
-    // Props
-    QMap<QString, QVariant> getProps() const;
-    void setProps( const QMap<QString, QVariant> &props );
-
   signals:
     void aboutToBeDestroyed();
     void changed();
@@ -539,7 +495,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     double mSymbolScale = 1.0;
     QgsMapLayer *mAssociatedLayer = nullptr;
     KadasItemLayer *mOwnerLayer = nullptr;
-    bool mIsPointSymbol = false;
     DrawStatus mDrawStatus = DrawStatus::Empty;
 
 
@@ -558,8 +513,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     KadasMapPos toMapPos( const KadasItemPos &itemPos, const QgsMapSettings &settings ) const;
     QgsPointXY toMapPos( const QgsPointXY &itemPos, const QgsMapSettings &settings ) const;
     KadasItemPos toItemPos( const KadasMapPos &mapPos, const QgsMapSettings &settings ) const;
-    QgsRectangle toMapRect( const QgsRectangle &itemRect, const QgsMapSettings &settings ) const;
-    KadasItemRect toItemRect( const KadasMapRect &itemRect, const QgsMapSettings &settings ) const;
     double pickTolSqr( const QgsMapSettings &settings ) const;
     double pickTol( const QgsMapSettings &settings ) const;
     void cleanupAttachment( const QString &filePath ) const;

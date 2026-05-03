@@ -48,10 +48,9 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
     }
     bool render() override
     {
-      bool omitSinglePoint = renderContext()->customProperties().contains( "globe" );
       for ( const KadasMapItem *item : std::as_const( mRenderItems ) )
       {
-        if ( item && item->isVisible() && ( !omitSinglePoint || !item->isPointSymbol() ) )
+        if ( item && item->isVisible() )
         {
           renderContext()->painter()->save();
           renderContext()->painter()->setOpacity( mRenderOpacity );
@@ -76,13 +75,6 @@ KadasItemLayer::KadasItemLayer( const QString &name, const QgsCoordinateReferenc
   mValid = true;
 }
 
-KadasItemLayer::KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs, const QString &layerType )
-  : KadasPluginLayer( layerType, name )
-{
-  setCrs( crs );
-  mValid = true;
-}
-
 void KadasItemLayer::ensureDefault3DRenderer()
 {
   if ( renderer3D() )
@@ -90,15 +82,10 @@ void KadasItemLayer::ensureDefault3DRenderer()
 
   std::unique_ptr<KadasMapItemLayer3DRenderer> r = std::make_unique<KadasMapItemLayer3DRenderer>();
   r->setLayer( this );
-  // The base KadasItemLayer ships a yellow text/callout default; subclasses that
-  // want a different look should override this method.
-  if ( layerTypeKey() == layerType() )
-  {
-    QgsTextFormat format = r->textFormat();
-    format.setColor( QColor( Qt::yellow ) );
-    r->setTextFormat( format );
-    r->setCalloutLineColor( QColor( Qt::yellow ) );
-  }
+  QgsTextFormat format = r->textFormat();
+  format.setColor( QColor( Qt::yellow ) );
+  r->setTextFormat( format );
+  r->setCalloutLineColor( QColor( Qt::yellow ) );
   setRenderer3D( r.release() );
 }
 
@@ -148,7 +135,6 @@ KadasItemLayer::ItemId KadasItemLayer::addItem( KadasMapItem *item )
   QgsCoordinateTransform trans( item->crs(), crs(), mTransformContext );
   mItemBounds.insert( id, trans.transformBoundingBox( item->boundingBox() ) );
   item->setSymbolScale( mSymbolScale );
-  emit itemAdded( id );
   emit repaintRequested();
   return id;
 }
@@ -178,7 +164,6 @@ KadasMapItem *KadasItemLayer::takeItem( const ItemId &itemId )
     mFreeIds.append( itemId );
     mItemBounds.remove( itemId );
     mItemOrder.removeOne( itemId );
-    emit itemRemoved( itemId );
     emit repaintRequested();
   }
   return item;
@@ -295,11 +280,6 @@ KadasItemLayer::ItemId KadasItemLayer::pickItem( const KadasMapPos &mapPos, cons
     }
   }
   return ITEM_ID_NULL;
-}
-
-KadasItemLayer::ItemId KadasItemLayer::pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const
-{
-  return pickItem( KadasMapPos::fromPoint( pickRect.center() ), mapSettings );
 }
 
 QPair<QgsPointXY, double> KadasItemLayer::snapToVertex( const QgsPointXY &mapPos, const QgsMapSettings &settings, double tolPixels ) const
@@ -423,8 +403,7 @@ KadasItemLayer *KadasItemLayerRegistry::getOrCreateItemLayer( StandardLayer laye
 
 const QMap<KadasItemLayerRegistry::StandardLayer, QString> &KadasItemLayerRegistry::standardLayerNames()
 {
-  static QMap<StandardLayer, QString> names
-    = { { StandardLayer::RedliningLayer, tr( "Redlining" ) }, { StandardLayer::SymbolsLayer, tr( "Symbols" ) }, { StandardLayer::PicturesLayer, tr( "Pictures" ) }, { StandardLayer::PinsLayer, tr( "Pins" ) }, { StandardLayer::RoutesLayer, tr( "Routes" ) } };
+  static QMap<StandardLayer, QString> names = { { StandardLayer::PinsLayer, tr( "Pins" ) }, { StandardLayer::RoutesLayer, tr( "Routes" ) } };
   return names;
 }
 

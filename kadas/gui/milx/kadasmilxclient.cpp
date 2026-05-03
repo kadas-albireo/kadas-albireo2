@@ -24,6 +24,7 @@
 #include <QEventLoop>
 #include <QHostAddress>
 #include <QImage>
+#include <QMutex>
 #include <QProcess>
 #include <QTcpSocket>
 #include <QThread>
@@ -272,9 +273,17 @@ KadasMilxClient *KadasMilxClient::sInstance = 0;
 
 KadasMilxClient *KadasMilxClient::instance()
 {
+  // Lazy-init guard: with QgsAnnotationItem::render() now potentially
+  // executing off the GUI thread (3D / async map renderers), the
+  // first hit on instance() may race between threads. Serialize
+  // construction with a static mutex; subsequent calls remain a
+  // single pointer load.
+  static QMutex sInstanceMutex;
   if ( !sInstance )
   {
-    sInstance = new KadasMilxClient();
+    QMutexLocker locker( &sInstanceMutex );
+    if ( !sInstance )
+      sInstance = new KadasMilxClient();
   }
   return sInstance;
 }

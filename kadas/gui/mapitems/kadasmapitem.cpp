@@ -20,6 +20,7 @@
 #include <QScreen>
 
 #include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgsannotationitem.h>
 #include <qgis/qgslogger.h>
 #include <qgis/qgsmaplayer.h>
 #include <qgis/qgsmapsettings.h>
@@ -44,7 +45,6 @@
 #include "kadas/gui/mapitems/kadasselectionrectitem.h"
 #include "kadas/gui/mapitems/kadassymbolitem.h"
 #include "kadas/gui/mapitems/kadastextitem.h"
-#include "kadas/gui/milx/kadasmilxitem.h"
 
 Q_GLOBAL_STATIC( KadasMapItem::Registry, sRegistry )
 
@@ -75,7 +75,6 @@ KadasMapItem *KadasMapItem::clone() const
   item->mSymbolScale = mSymbolScale;
   item->mVisible = mVisible;
   item->mSelected = mSelected;
-  item->mIsPointSymbol = mIsPointSymbol;
   item->mAssociatedLayer = mAssociatedLayer;
 
   if ( !useQgisAnnotations() )
@@ -169,6 +168,14 @@ QString KadasMapItem::exportName() const
   return itemName();
 }
 
+QList<QgsAnnotationItem *> KadasMapItem::annotationItems( const QgsCoordinateReferenceSystem &crs ) const
+{
+  QList<QgsAnnotationItem *> items;
+  if ( QgsAnnotationItem *single = annotationItem( crs ) )
+    items.append( single );
+  return items;
+}
+
 void KadasMapItem::associateToLayer( QgsMapLayer *layer )
 {
   mAssociatedLayer = layer;
@@ -185,13 +192,6 @@ void KadasMapItem::setSelected( bool selected )
   mSelected = selected;
   update();
 }
-
-// void KadasMapItem::setAuthId( const QString &authId )
-// {
-//   mCrs = QgsCoordinateReferenceSystem( authId );
-//   update();
-//   emit propertyChanged();
-// }
 
 void KadasMapItem::setZIndex( int zIndex )
 {
@@ -263,18 +263,6 @@ KadasItemPos KadasMapItem::toItemPos( const KadasMapPos &mapPos, const QgsMapSet
 {
   QgsPointXY pos = QgsCoordinateTransform( settings.destinationCrs(), mCrs, settings.transformContext() ).transform( mapPos );
   return KadasItemPos( pos.x(), pos.y() );
-}
-
-QgsRectangle KadasMapItem::toMapRect( const QgsRectangle &itemRect, const QgsMapSettings &settings ) const
-{
-  QgsRectangle rect = QgsCoordinateTransform( mCrs, settings.destinationCrs(), settings.transformContext() ).transform( itemRect );
-  return rect;
-}
-
-KadasItemRect KadasMapItem::toItemRect( const KadasMapRect &itemRect, const QgsMapSettings &settings ) const
-{
-  QgsRectangle rect = QgsCoordinateTransform( settings.destinationCrs(), mCrs, settings.transformContext() ).transform( itemRect );
-  return KadasItemRect( rect.xMinimum(), rect.yMinimum(), rect.xMaximum(), rect.yMaximum() );
 }
 
 double KadasMapItem::pickTolSqr( const QgsMapSettings &settings ) const
@@ -357,7 +345,6 @@ KadasMapItem::Registry *KadasMapItem::registry()
     sRegistry->insert( QStringLiteral( "KadasSymbolItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasSymbolItem( crs ); } );
     sRegistry->insert( QStringLiteral( "KadasPinItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasPinItem( crs ); } );
     sRegistry->insert( QStringLiteral( "KadasTextItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasTextItem( crs ); } );
-    sRegistry->insert( QStringLiteral( "KadasMilxItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasMilxItem(); } );
   } );
 
   return sRegistry;
@@ -386,8 +373,6 @@ QString KadasMapItem::NumericAttribute::suffix( const QgsMapSettings &mapSetting
       return QgsUnitTypes::toAbbreviatedString( mapSettings.destinationCrs().mapUnits() );
     case Type::TypeAngle:
       return QString( "°" );
-    case Type::TypeOther:
-      return QString();
   }
   return QString();
 }
@@ -463,34 +448,6 @@ KadasMapItem *KadasMapItem::fromXml( const QDomElement &element )
     QgsDebugMsgLevel( QString( "Unknown item: %1" ).arg( name ), 2 );
   }
   return nullptr;
-}
-
-QMap<QString, QVariant> KadasMapItem::getProps() const
-{
-  QMap<QString, QVariant> result;
-  for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
-  {
-    QMetaProperty prop = metaObject()->property( i );
-    result[prop.name()] = prop.read( this );
-  }
-  return result;
-}
-
-void KadasMapItem::setProps( const QMap<QString, QVariant> &props )
-{
-  blockSignals( true );
-  for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
-  {
-    QMetaProperty prop = metaObject()->property( i );
-    auto it = props.find( prop.name() );
-    if ( it != props.end() )
-    {
-      prop.write( this, it.value() );
-    }
-  }
-  blockSignals( false );
-  emit changed();
-  emit propertyChanged();
 }
 
 QJsonValue KadasMapItem::serializeProperty( const QString &name, const QVariant &variant ) const

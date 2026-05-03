@@ -14,11 +14,13 @@
  ***************************************************************************/
 
 
+#include <qgis/qgsannotationitem.h>
+#include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsproject.h>
 
 #include "kadasapplication.h"
 #include "kadasmainwindow.h"
-#include "kadas/gui/milx/kadasmilxlayer.h"
+#include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
 #include "milx/kadasmilxexportdialog.h"
 
 KadasMilxExportDialog::KadasMilxExportDialog( QWidget *parent )
@@ -33,14 +35,27 @@ KadasMilxExportDialog::KadasMilxExportDialog( QWidget *parent )
   const QList<QgsMapLayer *> layers = QgsProject::instance()->mapLayers().values();
   for ( QgsMapLayer *layer : layers )
   {
-    if ( qobject_cast<KadasMilxLayer *>( layer ) )
+    auto *annoLayer = qobject_cast<QgsAnnotationLayer *>( layer );
+    if ( !annoLayer )
+      continue;
+    // Only show annotation layers that actually carry MilX symbols.
+    bool hasMilx = false;
+    const QMap<QString, QgsAnnotationItem *> items = annoLayer->items();
+    for ( auto it = items.constBegin(); it != items.constEnd(); ++it )
     {
-      QListWidgetItem *item = new QListWidgetItem( layer->name() );
-      item->setData( Qt::UserRole, layer->id() );
-      item->setCheckState( KadasApplication::instance()->mainWindow()->mapCanvas()->layers().contains( layer ) ? Qt::Checked : Qt::Unchecked );
-      ui.listWidget->addItem( item );
-      ui.comboCartouche->addItem( layer->name(), layer->id() );
+      if ( it.value() && it.value()->type() == KadasMilxAnnotationItem::itemTypeId() )
+      {
+        hasMilx = true;
+        break;
+      }
     }
+    if ( !hasMilx )
+      continue;
+    QListWidgetItem *item = new QListWidgetItem( layer->name() );
+    item->setData( Qt::UserRole, layer->id() );
+    item->setCheckState( KadasApplication::instance()->mainWindow()->mapCanvas()->layers().contains( layer ) ? Qt::Checked : Qt::Unchecked );
+    ui.listWidget->addItem( item );
+    ui.comboCartouche->addItem( layer->name(), layer->id() );
   }
 }
 

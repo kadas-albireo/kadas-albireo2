@@ -156,7 +156,6 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs );
     ~KadasItemLayer();
     QString layerTypeKey() const override { return layerType(); }
-    virtual bool acceptsItem( const KadasMapItem *item ) const { return true; }
 
     //! Lazily create and attach a default Kadas 3D renderer to this layer if it does not already have one.
     //! This avoids constructing a 3D renderer (and thereby pulling in QGIS::3D dependencies) for layers
@@ -177,10 +176,6 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     virtual KadasItemLayer::ItemId pickItem(
       const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY
     ) const;
-#ifndef SIP_RUN
-    [[deprecated( "Use variant taking the mapPos as first parameter instead" )]]
-#endif
-    KadasItemLayer::ItemId pickItem( const QgsRectangle &pickRect, const QgsMapSettings &mapSettings ) const;
 
 #ifndef SIP_RUN
     // TODO: SIP
@@ -194,12 +189,7 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     void setSymbolScale( double scale );
     double symbolScale() const { return mSymbolScale; }
 
-  signals:
-    void itemAdded( KadasItemLayer::ItemId itemId );
-    void itemRemoved( KadasItemLayer::ItemId itemId );
-
   protected:
-    KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs, const QString &layerType );
     class Renderer;
 
     QMap<ItemId, KadasMapItem *> mItems;
@@ -229,9 +219,6 @@ class KADAS_GUI_EXPORT KadasItemLayerRegistry : public QObject
   public:
     enum class StandardLayer SIP_MONKEYPATCH_SCOPEENUM
     {
-      RedliningLayer,
-      SymbolsLayer,
-      PicturesLayer,
       PinsLayer,
       RoutesLayer
     };

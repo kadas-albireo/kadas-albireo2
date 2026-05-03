@@ -26,6 +26,7 @@
 class QgsGeometryRubberBand;
 class KadasItemContextMenuActions;
 class KadasSelectionRectItem;
+class QgsRubberBand;
 
 
 class KadasCanvasContextMenu : public QMenu
@@ -54,6 +55,10 @@ class KadasCanvasContextMenu : public QMenu
 
     void copyFeature();
     void deleteItems();
+    void deleteAnnotationItem();
+    void copyAnnotationItemPosition();
+    void createWaypointFromPin();
+    void createPinFromMarker();
     void editItem();
     void raiseItem();
     void lowerItem();
@@ -90,6 +95,7 @@ class KadasCanvasContextMenu : public QMenu
     KadasFeaturePicker::PickResult mPickResult;
     QgsGeometryRubberBand *mGeomSel = nullptr;
     KadasSelectionRectItem *mSelRect = nullptr;
+    QgsRubberBand *mSelRectBand = nullptr;
 };
 
 #endif // KADASCANVASCONTEXTMENU_H

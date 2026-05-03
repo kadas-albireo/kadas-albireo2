@@ -26,7 +26,12 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrendercontext.h>
 
+#include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgsannotationpictureitem.h>
+
 #include "kadas/core/kadascoordinateformat.h"
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
+#include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 #include "kadas/gui/mapitems/kadassymbolitem.h"
 
 
@@ -236,12 +241,47 @@ void KadasSymbolItem::edit( const EditContext &context, const KadasMapPos &newPo
   }
 }
 
+QgsAnnotationItem *KadasSymbolItem::annotationItem( const QgsCoordinateReferenceSystem &crs ) const
+{
+  QgsPoint point( position().x(), position().y() );
+  if ( crs.isValid() && mCrs != crs )
+  {
+    QgsCoordinateTransform ct( mCrs, crs, QgsProject::instance() );
+    QgsPointXY xy = ct.transform( point.x(), point.y() );
+    point = QgsPoint( xy );
+  }
+  const Qgis::PictureFormat fmt = mFilePath.endsWith( QLatin1String( ".svg" ), Qt::CaseInsensitive ) ? Qgis::PictureFormat::SVG : Qgis::PictureFormat::Raster;
+  auto *anno = new QgsAnnotationPictureItem( fmt, mFilePath, QgsRectangle( point.x(), point.y(), point.x(), point.y() ) );
+  anno->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
+  const QSize px = constState()->size.isValid() && !constState()->size.isEmpty() ? constState()->size : mImage.size();
+  anno->setFixedSize( QSizeF( px.width() ? px.width() : 32, px.height() ? px.height() : 32 ) );
+  anno->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
+  anno->setZIndex( zIndex() ? zIndex() : KadasAnnotationZIndex::Picture );
+  return anno;
+}
+
 
 KadasPinItem::KadasPinItem( const QgsCoordinateReferenceSystem &crs )
   : KadasSymbolItem( crs )
 {
   setup( ":/kadas/icons/pin_red", 0.5, 1.0 );
   connect( this, &KadasPinItem::changed, this, &KadasPinItem::updateTooltip );
+}
+
+QgsAnnotationItem *KadasPinItem::annotationItem( const QgsCoordinateReferenceSystem &crs ) const
+{
+  QgsPoint point( position().x(), position().y() );
+  if ( crs.isValid() && mCrs != crs )
+  {
+    QgsCoordinateTransform ct( mCrs, crs, QgsProject::instance() );
+    QgsPointXY xy = ct.transform( point.x(), point.y() );
+    point = QgsPoint( xy );
+  }
+  auto *anno = new KadasPinAnnotationItem( point );
+  anno->setName( name() );
+  anno->setRemarks( remarks() );
+  anno->setZIndex( zIndex() ? zIndex() : KadasAnnotationZIndex::Pin );
+  return anno;
 }
 
 void KadasPinItem::updateTooltip()

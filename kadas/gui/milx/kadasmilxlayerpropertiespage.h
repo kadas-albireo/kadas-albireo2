@@ -24,28 +24,25 @@
 
 #include "kadas/gui/kadas_gui.h"
 
-class QDomDocument;
-class QDomElement;
 class QComboBox;
 class QGroupBox;
 class QSlider;
 class QSpinBox;
 class QgsColorButton;
 class QgsMapLayer;
-class KadasMilxLayer;
 
 class KADAS_GUI_EXPORT KadasMilxLayerPropertiesPage : public QgsMapLayerConfigWidget
 {
     Q_OBJECT
 
   public:
-    explicit KadasMilxLayerPropertiesPage( KadasMilxLayer *layer, QgsMapCanvas *canvas, QWidget *parent = nullptr );
+    explicit KadasMilxLayerPropertiesPage( QgsMapLayer *layer, QgsMapCanvas *canvas, QWidget *parent = nullptr );
 
   public slots:
     void apply() override;
 
   private:
-    KadasMilxLayer *mLayer = nullptr;
+    QgsMapLayer *mLayer = nullptr;
     QGroupBox *mGroupBox = nullptr;
     QSlider *mSymbolSizeSlider = nullptr;
     QSlider *mLineWidthSlider = nullptr;
@@ -65,10 +62,6 @@ class KADAS_GUI_EXPORT KadasMilxLayerPropertiesPageFactory : public QObject, pub
     QString title() const override;
     bool supportLayerPropertiesDialog() const override { return true; }
     bool supportsLayer( QgsMapLayer *layer ) const override;
-
-  private slots:
-    void readLayerConfig( QgsMapLayer *mapLayer, const QDomElement &elem );
-    void writeLayerConfig( QgsMapLayer *mapLayer, QDomElement &elem, QDomDocument &doc );
 };
 
-#endif // KADASGLOBEVECTORLAYERPROPERTIES_H
+#endif // KADASMILXLAYERPROPERTIESPAGE_H

@@ -23,8 +23,20 @@
 
 #include <quazip/quazipfile.h>
 
+#include <qgis/qgsannotationlayer.h>
+#include <qgis/qgsannotationlineitem.h>
+#include <qgis/qgsannotationmarkeritem.h>
+#include <qgis/qgsannotationpictureitem.h>
+#include <qgis/qgsannotationpointtextitem.h>
+#include <qgis/qgsannotationpolygonitem.h>
+#include <qgis/qgsfillsymbol.h>
+#include <qgis/qgsfillsymbollayer.h>
 #include <qgis/qgslinestring.h>
+#include <qgis/qgslinesymbol.h>
+#include <qgis/qgslinesymbollayer.h>
 #include <qgis/qgslogger.h>
+#include <qgis/qgsmarkersymbol.h>
+#include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgsmultipoint.h>
 #include <qgis/qgsmultilinestring.h>
 #include <qgis/qgsmultipolygon.h>
@@ -32,16 +44,11 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgssymbollayerutils.h>
+#include <qgis/qgstextformat.h>
 
 #include "kadas/core/kadasalgorithms.h"
-#include "kadas/gui/kadasitemlayer.h"
-#include "kadas/gui/mapitems/kadaslineitem.h"
-#include "kadas/gui/mapitems/kadassymbolitem.h"
-#include "kadas/gui/mapitems/kadaspointitem.h"
-#include "kadas/gui/mapitems/kadaspolygonitem.h"
-#include "kadas/gui/mapitems/kadastextitem.h"
-#include "kadas/gui/mapitemeditors/kadasredliningitemeditor.h"
-#include "kadas/gui/mapitemeditors/kadasredliningtexteditor.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadasapplication.h"
 #include <kml/kadaskmlimport.h>
 
@@ -145,7 +152,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
 
 
     // Placemarks
-    QMap<QString, KadasItemLayer *> placemarkLayers;
+    QMap<QString, QgsAnnotationLayer *> placemarkLayers;
 
     for ( int iPlacemark = 0, nPlacemarks = placemarkEls.size(); iPlacemark < nPlacemarks; ++iPlacemark )
     {
@@ -159,10 +166,10 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
         layerName = QString( "%1 [%2]" ).arg( placemarkEl.parentNode().firstChildElement( "name" ).text() ).arg( filename );
       }
 
-      KadasItemLayer *itemLayer = placemarkLayers.value( layerName, nullptr );
+      QgsAnnotationLayer *itemLayer = placemarkLayers.value( layerName, nullptr );
       if ( !itemLayer )
       {
-        itemLayer = new KadasItemLayer( layerName, QgsCoordinateReferenceSystem( "EPSG:3857" ) );
+        itemLayer = KadasAnnotationLayerHelpers::createLayer( layerName, crsWgs84 );
         QgsProject::instance()->addMapLayer( itemLayer );
         placemarkLayers.insert( layerName, itemLayer );
       }
@@ -195,15 +202,16 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
 
       QMap<QString, QString> attributes = parseExtendedData( placemarkEl );
 
-      // If there is an icon and the geometry is a point, add as symbol item, otherwise as redlining symbol
+      // If there is an icon and the geometry is a point, add as picture item, otherwise as redlining-style annotation
       if ( geoms.size() == 1 && !style.icon.isEmpty() && dynamic_cast<QgsPoint *>( geoms.front() ) )
       {
-        QgsPointXY pos = itemCrst.transform( *static_cast<QgsPoint *>( geoms.front() ) );
-        KadasSymbolItem *item = new KadasSymbolItem( itemLayer->crs() );
-        item->setFilePath( style.icon );
-        item->setAnchorX( style.hotSpot.x() / item->constState()->size.width() );
-        item->setAnchorY( style.hotSpot.y() / item->constState()->size.height() );
-        item->setPosition( KadasItemPos::fromPoint( pos ) );
+        const QgsPointXY pos = itemCrst.transform( *static_cast<QgsPoint *>( geoms.front() ) );
+        const Qgis::PictureFormat fmt = style.icon.endsWith( QLatin1String( ".svg" ), Qt::CaseInsensitive ) ? Qgis::PictureFormat::SVG : Qgis::PictureFormat::Raster;
+        auto *item = new QgsAnnotationPictureItem( fmt, style.icon, QgsRectangle( pos.x(), pos.y(), pos.x(), pos.y() ) );
+        // Hot-spot anchoring is not modelled by QgsAnnotationPictureItem; centre on the placemark with a fixed pixel size.
+        item->setFixedSize( QSizeF( 32, 32 ) );
+        item->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
+        item->setZIndex( KadasAnnotationZIndex::Picture + iPlacemark );
         itemLayer->addItem( item );
         delete geoms.front();
       }
@@ -212,52 +220,88 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
         for ( QgsAbstractGeometry *geom : geoms )
         {
           geom->transform( itemCrst );
-          Qgis::MarkerShape iconType = static_cast<Qgis::MarkerShape>( attributes.value( "icon_type" ).toInt() );
-          Qt::PenStyle outlineStyle = QgsSymbolLayerUtils::decodePenStyle( attributes.value( "outline_style" ) );
-          Qt::BrushStyle fillStyle = QgsSymbolLayerUtils::decodeBrushStyle( attributes.value( "fill_style" ) );
+          const Qgis::MarkerShape iconType = static_cast<Qgis::MarkerShape>( attributes.value( "icon_type" ).toInt() );
+          const Qt::PenStyle outlineStyle = QgsSymbolLayerUtils::decodePenStyle( attributes.value( "outline_style" ) );
+          const Qt::BrushStyle fillStyle = QgsSymbolLayerUtils::decodeBrushStyle( attributes.value( "fill_style" ) );
           bool hasZ = false;
 
-          if ( dynamic_cast<QgsPoint *>( geom ) && style.isLabel )
+          auto makeMarkerSymbol = [&]() {
+            auto *symLayer = new QgsSimpleMarkerSymbolLayer( iconType, 10 + 2 * style.outlineSize );
+            symLayer->setFillColor( style.fillColor );
+            symLayer->setStrokeColor( style.outlineColor );
+            symLayer->setStrokeWidth( style.outlineSize / 4.0 );
+            return new QgsMarkerSymbol( QgsSymbolLayerList() << symLayer );
+          };
+          auto makeLineSymbol = [&]() {
+            auto *symLayer = new QgsSimpleLineSymbolLayer( style.outlineColor, style.outlineSize, outlineStyle );
+            return new QgsLineSymbol( QgsSymbolLayerList() << symLayer );
+          };
+          auto makeFillSymbol = [&]() {
+            auto *symLayer = new QgsSimpleFillSymbolLayer( style.fillColor, fillStyle, style.outlineColor, outlineStyle, style.outlineSize );
+            return new QgsFillSymbol( QgsSymbolLayerList() << symLayer );
+          };
+
+          if ( const auto *pt = dynamic_cast<const QgsPoint *>( geom ); pt && style.isLabel )
           {
-            QgsPointXY pos = *static_cast<QgsPoint *>( geom );
-            KadasTextItem *item = new KadasTextItem( itemLayer->crs() );
-            item->setEditor( "KadasRedliningTextEditor" );
-            item->setText( name );
-            item->setColor( style.labelColor );
-            QFont font = item->font();
-            font.setPointSizeF( font.pointSizeF() * style.labelScale );
-            item->setFont( font );
-            item->setPosition( KadasItemPos::fromPoint( pos ) );
+            auto *item = new QgsAnnotationPointTextItem( name, QgsPointXY( pt->x(), pt->y() ) );
+            QgsTextFormat fmt = item->format();
+            fmt.setColor( style.labelColor );
+            fmt.setSize( fmt.size() * style.labelScale );
+            item->setFormat( fmt );
+            item->setZIndex( KadasAnnotationZIndex::PointText + iPlacemark );
             itemLayer->addItem( item );
           }
-          else if ( dynamic_cast<QgsPoint *>( geom ) || dynamic_cast<QgsMultiPoint *>( geom ) )
+          else if ( const auto *pt = dynamic_cast<const QgsPoint *>( geom ) )
           {
-            KadasPointItem *item = new KadasPointItem( itemLayer->crs() );
-            item->setEditor( "KadasRedliningItemEditor" );
-            item->setPoint( *qgsgeometry_cast<const QgsPoint *>( geom ) );
-            item->setShape( iconType );
-            item->setIconSize( 10 + 2 * style.outlineSize );
-            item->setStrokeColor( style.outlineColor );
-            item->setStrokeWidth( style.outlineSize / 4 );
-            item->setColor( style.fillColor );
+            auto *item = new QgsAnnotationMarkerItem( *pt );
+            item->setSymbol( makeMarkerSymbol() );
+            item->setZIndex( KadasAnnotationZIndex::Marker + iPlacemark );
             itemLayer->addItem( item );
           }
-          else if ( dynamic_cast<QgsLineString *>( geom ) || dynamic_cast<QgsMultiLineString *>( geom ) )
+          else if ( const auto *mp = dynamic_cast<const QgsMultiPoint *>( geom ) )
           {
-            KadasLineItem *item = new KadasLineItem( itemLayer->crs() );
-            item->setEditor( "KadasRedliningItemEditor" );
-            item->addPartFromGeometry( *geom );
-            item->setOutline( QPen( style.outlineColor, style.outlineSize, outlineStyle ) );
+            for ( int i = 0, n = mp->numGeometries(); i < n; ++i )
+            {
+              const auto *pt = static_cast<const QgsPoint *>( mp->geometryN( i ) );
+              auto *item = new QgsAnnotationMarkerItem( *pt );
+              item->setSymbol( makeMarkerSymbol() );
+              item->setZIndex( KadasAnnotationZIndex::Marker + iPlacemark );
+              itemLayer->addItem( item );
+            }
+          }
+          else if ( const auto *ls = dynamic_cast<const QgsLineString *>( geom ) )
+          {
+            auto *item = new QgsAnnotationLineItem( ls->clone() );
+            item->setSymbol( makeLineSymbol() );
+            item->setZIndex( KadasAnnotationZIndex::Line + iPlacemark );
             itemLayer->addItem( item );
           }
-          else if ( dynamic_cast<QgsPolygon *>( geom ) || dynamic_cast<QgsMultiPolygon *>( geom ) )
+          else if ( const auto *mls = dynamic_cast<const QgsMultiLineString *>( geom ) )
           {
-            KadasPolygonItem *item = new KadasPolygonItem( itemLayer->crs() );
-            item->setEditor( "KadasRedliningItemEditor" );
-            item->addPartFromGeometry( *geom );
-            item->setOutline( QPen( style.outlineColor, style.outlineSize, outlineStyle ) );
-            item->setFill( QBrush( style.fillColor, fillStyle ) );
+            for ( int i = 0, n = mls->numGeometries(); i < n; ++i )
+            {
+              auto *item = new QgsAnnotationLineItem( static_cast<const QgsLineString *>( mls->geometryN( i ) )->clone() );
+              item->setSymbol( makeLineSymbol() );
+              item->setZIndex( KadasAnnotationZIndex::Line + iPlacemark );
+              itemLayer->addItem( item );
+            }
+          }
+          else if ( const auto *poly = dynamic_cast<const QgsPolygon *>( geom ) )
+          {
+            auto *item = new QgsAnnotationPolygonItem( static_cast<QgsCurvePolygon *>( poly->clone() ) );
+            item->setSymbol( makeFillSymbol() );
+            item->setZIndex( KadasAnnotationZIndex::Polygon + iPlacemark );
             itemLayer->addItem( item );
+          }
+          else if ( const auto *mpoly = dynamic_cast<const QgsMultiPolygon *>( geom ) )
+          {
+            for ( int i = 0, n = mpoly->numGeometries(); i < n; ++i )
+            {
+              auto *item = new QgsAnnotationPolygonItem( static_cast<QgsCurvePolygon *>( mpoly->geometryN( i )->clone() ) );
+              item->setSymbol( makeFillSymbol() );
+              item->setZIndex( KadasAnnotationZIndex::Polygon + iPlacemark );
+              itemLayer->addItem( item );
+            }
           }
           hasZ = QgsWkbTypes::hasZ( geom->wkbType() );
 

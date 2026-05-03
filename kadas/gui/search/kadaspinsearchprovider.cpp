@@ -16,9 +16,12 @@
 
 #include <QGraphicsItem>
 
+#include <qgis/qgsannotationlayer.h>
+#include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsmapcanvas.h>
 
+#include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/mapitems/kadassymbolitem.h"
 #include "kadas/gui/search/kadaspinsearchprovider.h"
@@ -42,30 +45,52 @@ void KadasPinSearchProvider::fetchResults( const QString &string, const QgsLocat
   const QList<QgsMapLayer *> layers = mMapCanvas->layers();
   for ( QgsMapLayer *layer : layers )
   {
-    KadasItemLayer *itemLayer = dynamic_cast<KadasItemLayer *>( layer );
-    if ( !itemLayer )
+    if ( KadasItemLayer *itemLayer = dynamic_cast<KadasItemLayer *>( layer ) )
     {
-      return;
-    }
-    for ( KadasMapItem *item : itemLayer->items() )
-    {
-      const KadasSymbolItem *symbolItem = dynamic_cast<KadasSymbolItem *>( item );
-      if ( !symbolItem )
+      for ( KadasMapItem *item : itemLayer->items() )
       {
-        continue;
+        const KadasSymbolItem *symbolItem = dynamic_cast<KadasSymbolItem *>( item );
+        if ( !symbolItem )
+        {
+          continue;
+        }
+        if ( symbolItem->name().contains( string, Qt::CaseInsensitive ) || symbolItem->remarks().contains( string, Qt::CaseInsensitive ) )
+        {
+          QgsLocatorResult result;
+          QVariantMap resultData;
+
+          //searchResult.zoomScale = 1000;
+          result.displayString = tr( "Pin %1" ).arg( symbolItem->name() );
+          resultData[QStringLiteral( "pos" )] = QgsPointXY( symbolItem->constState()->pos );
+          resultData[QStringLiteral( "crs" )] = symbolItem->crs().authid();
+
+          result.setUserData( resultData );
+          emit resultFetched( result );
+        }
       }
-      if ( symbolItem->name().contains( string, Qt::CaseInsensitive ) || symbolItem->remarks().contains( string, Qt::CaseInsensitive ) )
+    }
+    else if ( QgsAnnotationLayer *annoLayer = dynamic_cast<QgsAnnotationLayer *>( layer ) )
+    {
+      const QMap<QString, QgsAnnotationItem *> items = annoLayer->items();
+      for ( auto it = items.constBegin(); it != items.constEnd(); ++it )
       {
-        QgsLocatorResult result;
-        QVariantMap resultData;
+        const KadasPinAnnotationItem *pin = dynamic_cast<const KadasPinAnnotationItem *>( it.value() );
+        if ( !pin )
+        {
+          continue;
+        }
+        if ( pin->name().contains( string, Qt::CaseInsensitive ) || pin->remarks().contains( string, Qt::CaseInsensitive ) )
+        {
+          QgsLocatorResult result;
+          QVariantMap resultData;
 
-        //searchResult.zoomScale = 1000;
-        result.displayString = tr( "Pin %1" ).arg( symbolItem->name() );
-        resultData[QStringLiteral( "pos" )] = QgsPointXY( symbolItem->constState()->pos );
-        resultData[QStringLiteral( "crs" )] = symbolItem->crs().authid();
+          result.displayString = tr( "Pin %1" ).arg( pin->name() );
+          resultData[QStringLiteral( "pos" )] = pin->geometry();
+          resultData[QStringLiteral( "crs" )] = annoLayer->crs().authid();
 
-        result.setUserData( resultData );
-        emit resultFetched( result );
+          result.setUserData( resultData );
+          emit resultFetched( result );
+        }
       }
     }
   }

@@ -26,6 +26,7 @@
 #include "kadas/gui/kadas_gui.h"
 #include "kadas/gui/kadasitemlayer.h"
 
+class QgsAnnotationLayer;
 class QgsMapLayer;
 class QgsMapCanvas;
 
@@ -43,6 +44,8 @@ class KADAS_GUI_EXPORT KadasFeaturePicker
           crs = other.crs;
           feature = other.feature;
           itemId = other.itemId;
+          annotationLayer = other.annotationLayer;
+          annotationItemId = other.annotationItemId;
         }
         ~PickResult() { delete geom; }
         const PickResult &operator=( const PickResult &other )
@@ -52,15 +55,22 @@ class KADAS_GUI_EXPORT KadasFeaturePicker
           crs = other.crs;
           feature = other.feature;
           itemId = other.itemId;
+          annotationLayer = other.annotationLayer;
+          annotationItemId = other.annotationItemId;
           return *this;
         }
-        bool isEmpty() const { return layer == nullptr; }
+        bool isEmpty() const { return layer == nullptr && annotationLayer == nullptr; }
 
         QgsMapLayer *layer = nullptr;
         QgsAbstractGeometry *geom = nullptr;
         QgsCoordinateReferenceSystem crs;
         QgsFeature feature;
         KadasItemLayer::ItemId itemId = KadasItemLayer::ITEM_ID_NULL;
+
+        //! When non-null, the pick hit a QgsAnnotationItem in this layer.
+        QgsAnnotationLayer *annotationLayer = nullptr;
+        //! Identifier of the picked annotation item within \a annotationLayer.
+        QString annotationItemId;
     };
 
     static PickResult pick(
@@ -69,13 +79,10 @@ class KADAS_GUI_EXPORT KadasFeaturePicker
       Qgis::GeometryType geomType = Qgis::GeometryType::Unknown,
       KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY
     );
-#ifndef SIP_RUN
-    [[deprecated( "Use variant without canvasPos instead" )]]
-#endif
-    static PickResult pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, Qgis::GeometryType geomType );
 
   private:
     static PickResult pickItemLayer( KadasItemLayer *layer, const QgsMapCanvas *canvas, const KadasMapPos &mapPos, KadasItemLayer::PickObjective pickObjective );
+    static PickResult pickAnnotationLayer( QgsAnnotationLayer *layer, const QgsMapCanvas *canvas, const QgsPointXY &mapPos );
     static PickResult pickVectorLayer( QgsVectorLayer *vlayer, const QgsMapCanvas *canvas, const QgsPointXY &mapPos, Qgis::GeometryType geomType );
 };
 

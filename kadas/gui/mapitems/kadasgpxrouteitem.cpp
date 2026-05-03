@@ -20,6 +20,16 @@
 
 #include <qgis/qgsrendercontext.h>
 
+#include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgslinestring.h>
+#include <qgis/qgslinesymbol.h>
+#include <qgis/qgslinesymbollayer.h>
+#include <qgis/qgsmultilinestring.h>
+#include <qgis/qgsproject.h>
+#include <qgis/qgssymbollayer.h>
+
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
+#include "kadas/gui/annotationitems/kadasgpxrouteannotationitem.h"
 #include "kadas/gui/mapitems/kadasgpxrouteitem.h"
 
 
@@ -140,4 +150,40 @@ void KadasGpxRouteItem::render( QgsRenderContext &context ) const
       walkDist -= dist;
     }
   }
+}
+
+QList<QgsAnnotationItem *> KadasGpxRouteItem::annotationItems( const QgsCoordinateReferenceSystem &crs ) const
+{
+  QList<QgsAnnotationItem *> items;
+  const QgsMultiLineString *mls = geometry();
+  if ( !mls || mls->isEmpty() )
+    return items;
+
+  std::unique_ptr<QgsMultiLineString> clone( mls->clone() );
+  if ( crs.isValid() && mCrs != crs )
+  {
+    QgsCoordinateTransform ct( mCrs, crs, QgsProject::instance() );
+    clone->transform( ct );
+  }
+
+  auto makeSymbol = [&]() {
+    auto *layer = new QgsSimpleLineSymbolLayer( mPen.color(), mPen.widthF(), mPen.style() );
+    layer->setWidthUnit( Qgis::RenderUnit::Pixels );
+    return new QgsLineSymbol( QgsSymbolLayerList() << layer );
+  };
+
+  const int z = zIndex() ? zIndex() : KadasAnnotationZIndex::GpxRoute;
+  for ( int i = 0, n = clone->numGeometries(); i < n; ++i )
+  {
+    const auto *ls = static_cast<const QgsLineString *>( clone->geometryN( i ) );
+    auto *anno = new KadasGpxRouteAnnotationItem( ls->clone() );
+    anno->setSymbol( makeSymbol() );
+    anno->setName( mName );
+    anno->setNumber( mNumber );
+    anno->setLabelFont( mLabelFont );
+    anno->setLabelColor( mLabelColor );
+    anno->setZIndex( z );
+    items.append( anno );
+  }
+  return items;
 }

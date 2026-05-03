@@ -26,21 +26,12 @@
 
 class QMenu;
 class QgsMapCanvas;
-class KadasItemLayer;
-class KadasCircleItem;
 class KadasMapItem;
-class KadasPinItem;
-class KadasPointItem;
 
 class KADAS_GUI_EXPORT KadasItemContextMenuActions : public QObject
 {
     Q_OBJECT
   public:
-    enum ItemParent
-    {
-      ParentIsTool,
-      ParentIsLayer
-    };
     KadasItemContextMenuActions( QgsMapCanvas *canvas, QMenu *menu, KadasMapItem *item, KadasItemLayer *layer, KadasItemLayer::ItemId layerItemId = KadasItemLayer::ITEM_ID_NULL, QObject *parent = nullptr );
 
   private slots:
