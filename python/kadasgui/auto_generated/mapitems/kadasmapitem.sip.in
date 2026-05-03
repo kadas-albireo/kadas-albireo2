@@ -342,8 +342,6 @@ visibility */
     bool isVisible() const;
 
     bool isPointSymbol() const;
-    virtual QImage symbolImage() const;
-    virtual QPointF symbolAnchor() const;
 
     void update();
 %Docstring

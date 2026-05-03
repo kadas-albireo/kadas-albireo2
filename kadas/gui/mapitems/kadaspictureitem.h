@@ -35,8 +35,6 @@ class KADAS_GUI_EXPORT KadasPictureItem : public KadasRectangleItemBase
 
     QString itemName() const override { return tr( "Picture" ); }
 
-    QImage symbolImage() const override { return mImage; }
-
 #ifndef SIP_RUN
     QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;
 #endif
