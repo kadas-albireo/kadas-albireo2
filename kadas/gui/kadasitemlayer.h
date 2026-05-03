@@ -156,7 +156,6 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs );
     ~KadasItemLayer();
     QString layerTypeKey() const override { return layerType(); }
-    virtual bool acceptsItem( const KadasMapItem *item ) const { return true; }
 
     //! Lazily create and attach a default Kadas 3D renderer to this layer if it does not already have one.
     //! This avoids constructing a 3D renderer (and thereby pulling in QGIS::3D dependencies) for layers
