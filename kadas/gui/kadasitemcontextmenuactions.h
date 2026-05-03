@@ -27,10 +27,7 @@
 class QMenu;
 class QgsMapCanvas;
 class KadasItemLayer;
-class KadasCircleItem;
 class KadasMapItem;
-class KadasPinItem;
-class KadasPointItem;
 
 class KADAS_GUI_EXPORT KadasItemContextMenuActions : public QObject
 {
