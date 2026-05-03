@@ -85,27 +85,6 @@ class KadasItemPos
 };
 
 
-class KadasItemRect
-{
-%TypeHeaderCode
-#include "kadas/gui/mapitems/kadasmapitem.h"
-%End
-  public:
-    KadasItemRect( double xMin = 0., double yMin = 0., double xMax = 0., double yMax = 0. );
-
-    double xMinimum() const;
-    void setXMinimum( double xMin );
-    double yMinimum() const;
-    void setYMinimum( double yMin );
-    double xMaximum() const;
-    void setXMaximum( double xMax );
-    double yMaximum() const;
-    void setYMaximum( double ymax );
-    operator QgsRectangle() const;
-
-};
-
-
 //
 // adapted from PyQt5 QPair<_TYPE1_, _TYPE2_> and QPair<float, float>
 //

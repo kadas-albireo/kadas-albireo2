@@ -58,7 +58,7 @@ QgsRectangle KadasSelectionRectItem::boundingBox() const
 {
   if ( mItems.isEmpty() )
   {
-    return KadasItemRect();
+    return QgsRectangle();
   }
   QgsCoordinateTransformContext tctx = QgsProject::instance()->transformContext();
   QgsRectangle rect = QgsCoordinateTransform( mItems.front()->crs(), crs(), tctx ).transformBoundingBox( mItems.front()->boundingBox() );
