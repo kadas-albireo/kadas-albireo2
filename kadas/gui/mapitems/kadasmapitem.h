@@ -75,13 +75,6 @@ class KADAS_GUI_EXPORT KadasMapRect
       , mYmax( yMax )
     {}
 
-    KadasMapRect( const KadasMapPos &p1, const KadasMapPos &p2 )
-      : mXmin( std::min( p1.x(), p2.x() ) )
-      , mYmin( std::min( p1.y(), p2.y() ) )
-      , mXmax( std::max( p1.x(), p2.x() ) )
-      , mYmax( std::max( p1.y(), p2.y() ) )
-    {}
-
     KadasMapRect( const KadasMapPos &center, double span )
       : mXmin( center.x() - span )
       , mYmin( center.y() - span )
@@ -98,7 +91,6 @@ class KADAS_GUI_EXPORT KadasMapRect
     double yMaximum() const { return mYmax; }
     void setYMaximum( double ymax ) { mYmax = ymax; }
     operator QgsRectangle() const { return QgsRectangle( mXmin, mYmin, mXmax, mYmax ); }
-    KadasMapPos center() const { return KadasMapPos( 0.5 * ( mXmin + mXmax ), 0.5 * ( mYmin + mYmax ) ); }
 
   private:
     double mXmin = 0.;
