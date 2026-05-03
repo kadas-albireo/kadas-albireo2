@@ -66,7 +66,6 @@ class KADAS_GUI_EXPORT KadasMapToolCreateAnnotationItem : public QgsMapTool
     void keyPressEvent( QKeyEvent *e ) override;
 
     void setMultipart( bool multipart ) { mMultipart = multipart; }
-    void setToolLabel( const QString &label ) { mToolLabel = label; }
 
     /**
      * Overrides the default \c controller->createItem() factory used by the
@@ -120,7 +119,6 @@ class KADAS_GUI_EXPORT KadasMapToolCreateAnnotationItem : public QgsMapTool
     bool mIgnoreNextMoveEvent = false;
 
     bool mMultipart = false;
-    QString mToolLabel;
     std::function<QgsAnnotationItem *()> mItemFactory;
 
     void createItem();
