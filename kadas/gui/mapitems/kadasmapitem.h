@@ -389,8 +389,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     void setVisible( bool visible );
     bool isVisible() const { return mVisible; }
 
-    bool isPointSymbol() const { return mIsPointSymbol; }
-
     /* Trigger a redraw */
     void update();
 
@@ -525,7 +523,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     double mSymbolScale = 1.0;
     QgsMapLayer *mAssociatedLayer = nullptr;
     KadasItemLayer *mOwnerLayer = nullptr;
-    bool mIsPointSymbol = false;
     DrawStatus mDrawStatus = DrawStatus::Empty;
 
 

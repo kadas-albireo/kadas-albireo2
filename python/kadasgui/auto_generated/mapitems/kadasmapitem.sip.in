@@ -330,8 +330,6 @@ visibility */
 %End
     bool isVisible() const;
 
-    bool isPointSymbol() const;
-
     void update();
 %Docstring
 Trigger a redraw */

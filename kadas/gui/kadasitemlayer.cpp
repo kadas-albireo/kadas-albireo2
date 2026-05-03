@@ -48,10 +48,9 @@ class KadasItemLayer::Renderer : public QgsMapLayerRenderer
     }
     bool render() override
     {
-      bool omitSinglePoint = renderContext()->customProperties().contains( "globe" );
       for ( const KadasMapItem *item : std::as_const( mRenderItems ) )
       {
-        if ( item && item->isVisible() && ( !omitSinglePoint || !item->isPointSymbol() ) )
+        if ( item && item->isVisible() )
         {
           renderContext()->painter()->save();
           renderContext()->painter()->setOpacity( mRenderOpacity );

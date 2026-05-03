@@ -75,7 +75,6 @@ KadasMapItem *KadasMapItem::clone() const
   item->mSymbolScale = mSymbolScale;
   item->mVisible = mVisible;
   item->mSelected = mSelected;
-  item->mIsPointSymbol = mIsPointSymbol;
   item->mAssociatedLayer = mAssociatedLayer;
 
   if ( !useQgisAnnotations() )
