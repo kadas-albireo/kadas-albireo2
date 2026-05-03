@@ -266,18 +266,6 @@ KadasItemPos KadasMapItem::toItemPos( const KadasMapPos &mapPos, const QgsMapSet
   return KadasItemPos( pos.x(), pos.y() );
 }
 
-QgsRectangle KadasMapItem::toMapRect( const QgsRectangle &itemRect, const QgsMapSettings &settings ) const
-{
-  QgsRectangle rect = QgsCoordinateTransform( mCrs, settings.destinationCrs(), settings.transformContext() ).transform( itemRect );
-  return rect;
-}
-
-KadasItemRect KadasMapItem::toItemRect( const KadasMapRect &itemRect, const QgsMapSettings &settings ) const
-{
-  QgsRectangle rect = QgsCoordinateTransform( settings.destinationCrs(), mCrs, settings.transformContext() ).transform( itemRect );
-  return KadasItemRect( rect.xMinimum(), rect.yMinimum(), rect.xMaximum(), rect.yMaximum() );
-}
-
 double KadasMapItem::pickTolSqr( const QgsMapSettings &settings ) const
 {
   return 25 * settings.mapUnitsPerPixel() * settings.mapUnitsPerPixel();

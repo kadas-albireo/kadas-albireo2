@@ -546,8 +546,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     KadasMapPos toMapPos( const KadasItemPos &itemPos, const QgsMapSettings &settings ) const;
     QgsPointXY toMapPos( const QgsPointXY &itemPos, const QgsMapSettings &settings ) const;
     KadasItemPos toItemPos( const KadasMapPos &mapPos, const QgsMapSettings &settings ) const;
-    QgsRectangle toMapRect( const QgsRectangle &itemRect, const QgsMapSettings &settings ) const;
-    KadasItemRect toItemRect( const KadasMapRect &itemRect, const QgsMapSettings &settings ) const;
     double pickTolSqr( const QgsMapSettings &settings ) const;
     double pickTol( const QgsMapSettings &settings ) const;
     void cleanupAttachment( const QString &filePath ) const;
