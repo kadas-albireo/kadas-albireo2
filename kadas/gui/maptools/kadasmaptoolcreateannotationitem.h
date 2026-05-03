@@ -81,10 +81,6 @@ class KADAS_GUI_EXPORT KadasMapToolCreateAnnotationItem : public QgsMapTool
     //! Returns the in-progress item (owned by the target layer), or nullptr.
     QgsAnnotationItem *currentItem() const { return mItem; }
 
-    //! Returns the id under which \c currentItem() is registered on the
-    //! target layer, or an empty string if no item is currently bound.
-    QString currentItemId() const { return mItemId; }
-
   signals:
     //! Emitted whenever a part is finished (single-part mode: the only part).
     void partFinished();
