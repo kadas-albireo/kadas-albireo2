@@ -61,9 +61,6 @@ class KADAS_GUI_EXPORT KadasAnnotationLayerRegistry : public QObject
     //! Returns the human-readable layer names keyed by \c StandardLayer.
     static const QMap<StandardLayer, QString> &standardLayerNames();
 
-    //! Returns all \c QgsAnnotationLayer instances in the current project.
-    static QList<QgsAnnotationLayer *> getAnnotationLayers();
-
     //! Connects to project signals; must be called once at app startup.
     static void init();
 

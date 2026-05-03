@@ -19,7 +19,6 @@
 
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgscoordinatereferencesystem.h>
-#include <qgis/qgsmaplayer.h>
 #include <qgis/qgsproject.h>
 
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
@@ -102,18 +101,6 @@ const QMap<KadasAnnotationLayerRegistry::StandardLayer, QString> &KadasAnnotatio
     { StandardLayer::MssLayer, tr( "MSS" ) },
   };
   return names;
-}
-
-QList<QgsAnnotationLayer *> KadasAnnotationLayerRegistry::getAnnotationLayers()
-{
-  QList<QgsAnnotationLayer *> result;
-  const QList<QgsMapLayer *> layers = QgsProject::instance()->mapLayers().values();
-  for ( QgsMapLayer *layer : layers )
-  {
-    if ( QgsAnnotationLayer *al = qobject_cast<QgsAnnotationLayer *>( layer ) )
-      result.append( al );
-  }
-  return result;
 }
 
 KadasAnnotationLayerRegistry *KadasAnnotationLayerRegistry::instance()
