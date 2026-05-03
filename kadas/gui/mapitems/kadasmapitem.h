@@ -491,7 +491,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
     enum class ContextMenuActions SIP_MONKEYPATCH_SCOPEENUM
     {
-      EditNoAction,
       EditSwitchToDrawingTool
     };
     virtual void populateContextMenu( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings ) {}

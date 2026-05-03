@@ -411,7 +411,6 @@ Trigger a redraw */
 
     enum class ContextMenuActions
     {
-      EditNoAction,
       EditSwitchToDrawingTool
     };
     virtual void populateContextMenu( QMenu *menu, const EditContext &context, const KadasMapPos &clickPos, const QgsMapSettings &mapSettings );

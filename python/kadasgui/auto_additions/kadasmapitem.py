@@ -35,15 +35,11 @@ KadasMapItem.NumericAttribute.Type.__doc__ = """
 """
 # --
 # monkey patching scoped based enum
-KadasMapItem.EditNoAction = KadasMapItem.ContextMenuActions.EditNoAction
-KadasMapItem.EditNoAction.is_monkey_patched = True
-KadasMapItem.ContextMenuActions.EditNoAction.__doc__ = ""
 KadasMapItem.EditSwitchToDrawingTool = KadasMapItem.ContextMenuActions.EditSwitchToDrawingTool
 KadasMapItem.EditSwitchToDrawingTool.is_monkey_patched = True
 KadasMapItem.ContextMenuActions.EditSwitchToDrawingTool.__doc__ = ""
 KadasMapItem.ContextMenuActions.__doc__ = """
 
-* ``EditNoAction``: 
 * ``EditSwitchToDrawingTool``: 
 
 """
