@@ -54,9 +54,7 @@ class KADAS_GUI_EXPORT KadasMapPos
       , mY( p.y() )
     {}
     double x() const { return mX; }
-    void setX( double x ) { mX = x; }
     double y() const { return mY; }
-    void setY( double y ) { mY = y; }
     operator QgsPointXY() const { return QgsPointXY( mX, mY ); }
     double sqrDist( const KadasMapPos &p ) const { return ( mX - p.mX ) * ( mX - p.mX ) + ( mY - p.mY ) * ( mY - p.mY ); }
 
