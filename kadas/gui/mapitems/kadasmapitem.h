@@ -410,8 +410,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     bool isVisible() const { return mVisible; }
 
     bool isPointSymbol() const { return mIsPointSymbol; }
-    virtual QImage symbolImage() const { return QImage(); }
-    virtual QPointF symbolAnchor() const { return QPointF( 0.5, 0.5 ); }
 
     /* Trigger a redraw */
     void update();

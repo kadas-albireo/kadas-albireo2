@@ -41,9 +41,6 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
     void setRemarks( const QString &remarks );
     const QString &remarks() const { return mRemarks; }
 
-    QImage symbolImage() const override { return mImage; }
-    QPointF symbolAnchor() const override { return QPointF( anchorX(), anchorY() ); }
-
     void render( QgsRenderContext &context ) const override;
 #ifndef SIP_RUN
     QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr ) const override;

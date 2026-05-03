@@ -36,8 +36,6 @@ your option) any later version. *
 
     virtual QString itemName() const;
 
-    virtual QImage symbolImage() const;
-
 
     virtual void onDoubleClick( const QgsMapSettings &mapSettings );
 
