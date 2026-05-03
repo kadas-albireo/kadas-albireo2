@@ -50,7 +50,6 @@ your option) any later version. *
       Qgis::GeometryType geomType = Qgis::GeometryType::Unknown,
       KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY
     );
-    static PickResult pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, Qgis::GeometryType geomType );
 
 };
 
