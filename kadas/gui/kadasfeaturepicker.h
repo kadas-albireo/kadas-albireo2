@@ -79,10 +79,6 @@ class KADAS_GUI_EXPORT KadasFeaturePicker
       Qgis::GeometryType geomType = Qgis::GeometryType::Unknown,
       KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY
     );
-#ifndef SIP_RUN
-    [[deprecated( "Use variant without canvasPos instead" )]]
-#endif
-    static PickResult pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, Qgis::GeometryType geomType );
 
   private:
     static PickResult pickItemLayer( KadasItemLayer *layer, const QgsMapCanvas *canvas, const KadasMapPos &mapPos, KadasItemLayer::PickObjective pickObjective );
