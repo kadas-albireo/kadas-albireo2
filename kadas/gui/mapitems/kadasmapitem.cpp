@@ -42,7 +42,6 @@
 #include "kadas/gui/mapitems/kadaspointitem.h"
 #include "kadas/gui/mapitems/kadaspolygonitem.h"
 #include "kadas/gui/mapitems/kadasrectangleitem.h"
-#include "kadas/gui/mapitems/kadasselectionrectitem.h"
 #include "kadas/gui/mapitems/kadassymbolitem.h"
 #include "kadas/gui/mapitems/kadastextitem.h"
 
@@ -275,7 +274,6 @@ KadasMapItem::Registry *KadasMapItem::registry()
     sRegistry->insert( QStringLiteral( "KadasPointItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasPointItem( crs ); } );
     sRegistry->insert( QStringLiteral( "KadasPolygonItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasPolygonItem( crs ); } );
     sRegistry->insert( QStringLiteral( "KadasRectangleItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasRectangleItem( crs ); } );
-    sRegistry->insert( QStringLiteral( "KadasSelectionRectItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasSelectionRectItem( crs ); } );
     sRegistry->insert( QStringLiteral( "KadasSymbolItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasSymbolItem( crs ); } );
     sRegistry->insert( QStringLiteral( "KadasPinItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasPinItem( crs ); } );
     sRegistry->insert( QStringLiteral( "KadasTextItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasTextItem( crs ); } );
