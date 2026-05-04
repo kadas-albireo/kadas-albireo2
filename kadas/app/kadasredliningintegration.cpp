@@ -34,7 +34,7 @@
 #include "kadas/gui/annotationitems/kadascircleannotationitem.h"
 #include "kadas/gui/annotationitems/kadascoordcrossannotationitem.h"
 #include "kadas/gui/annotationitems/kadasrectangleannotationitem.h"
-#include "kadas/gui/maptools/kadasmaptoolcreateannotationitem.h"
+#include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 
 #include "kadasapplication.h"
 #include "kadasmainwindow.h"
@@ -195,7 +195,7 @@ void KadasRedliningIntegration::toggleAnnotation( bool active, AnnotationVariant
   if ( !layer )
     return;
 
-  KadasMapToolCreateAnnotationItem *tool = new KadasMapToolCreateAnnotationItem( canvas, controller, layer );
+  KadasMapToolEditAnnotationItem *tool = new KadasMapToolEditAnnotationItem( canvas, controller, layer );
   if ( factory )
     tool->setItemFactory( factory );
   tool->setMultipart( false );

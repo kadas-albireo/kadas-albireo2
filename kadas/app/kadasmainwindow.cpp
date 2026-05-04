@@ -55,7 +55,7 @@
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
-#include "kadas/gui/maptools/kadasmaptoolcreateannotationitem.h"
+#include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 #include "kadas/gui/kadasmapcanvasitem.h"
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
@@ -1470,7 +1470,7 @@ QgsMapTool *KadasMainWindow::addPinTool()
   QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::PinsLayer );
   if ( !controller || !layer )
     return nullptr;
-  auto *tool = new KadasMapToolCreateAnnotationItem( mapCanvas(), controller, layer );
+  auto *tool = new KadasMapToolEditAnnotationItem( mapCanvas(), controller, layer );
   tool->setMultipart( false );
   return tool;
 }

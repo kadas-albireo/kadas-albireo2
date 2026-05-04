@@ -33,7 +33,7 @@
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
-#include "kadas/gui/maptools/kadasmaptoolcreateannotationitem.h"
+#include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 #include "kadas/gui/milx/kadasmilxclient.h"
 #include "kadas/gui/milx/kadasmilxlayerpropertiespage.h"
 #include "kadas/gui/milx/kadasmilxlibrary.h"
@@ -147,7 +147,7 @@ void KadasMilxIntegration::createMilx( bool active )
   if ( !layer )
     return;
 
-  KadasMapToolCreateAnnotationItem *tool = new KadasMapToolCreateAnnotationItem( canvas, controller, layer );
+  KadasMapToolEditAnnotationItem *tool = new KadasMapToolEditAnnotationItem( canvas, controller, layer );
   tool->setMultipart( false );
   tool->setAction( mUi.mActionMilx );
 
