@@ -28,6 +28,8 @@ class KADAS_GUI_EXPORT KadasRectangleItem : public KadasGeometryItem
   public:
     KadasRectangleItem( const QgsCoordinateReferenceSystem &crs );
 
+    bool useQgisAnnotations() const override { return true; }
+
     QString itemName() const override { return tr( "Rectangle" ); }
 
     bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings ) override;
@@ -73,6 +75,9 @@ class KADAS_GUI_EXPORT KadasRectangleItem : public KadasGeometryItem
     State *createEmptyState() const override SIP_FACTORY { return new State(); }
     void recomputeDerived() override;
     void measureGeometry() override;
+
+    void writeXmlPrivate( QDomElement &element ) const override;
+    void readXmlPrivate( const QDomElement &element ) override;
 
   private:
     enum AttribIds
