@@ -28,13 +28,6 @@
 #include "kadas/gui/mapitems/kadasselectionrectitem.h"
 
 
-bool KadasSelectionRectItem::State::deserialize( const QJsonObject &json )
-{
-  //drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
-  return true;
-}
-
-
 KadasSelectionRectItem::KadasSelectionRectItem( const QgsCoordinateReferenceSystem &crs )
   : KadasMapItem( crs )
 {
