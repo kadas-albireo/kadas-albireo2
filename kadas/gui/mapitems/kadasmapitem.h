@@ -262,7 +262,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     KadasMapItem( const QgsCoordinateReferenceSystem &crs );
     ~KadasMapItem();
     KadasMapItem *clone() const;
-    QJsonObject serialize() const;
     bool deserialize( const QJsonObject &json );
 
     // Old annotations use QObject properties
@@ -519,8 +518,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
 
   private:
     bool mDontCleanupAttachment = false;
-
-    QJsonValue serializeProperty( const QString &name, const QVariant &variant ) const;
 
     virtual KadasMapItem *_clone() const = 0 SIP_FACTORY;
 };

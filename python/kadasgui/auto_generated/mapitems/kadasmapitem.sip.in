@@ -206,7 +206,6 @@ class KadasMapItem : QObject /Abstract/
     KadasMapItem( const QgsCoordinateReferenceSystem &crs );
     ~KadasMapItem();
     KadasMapItem *clone() const;
-    QJsonObject serialize() const;
     bool deserialize( const QJsonObject &json );
 
     virtual bool useQgisAnnotations() const;
