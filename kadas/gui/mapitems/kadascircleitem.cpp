@@ -15,6 +15,8 @@
  ***************************************************************************/
 
 #include <QJsonArray>
+#include <QJsonDocument>
+#include <QDomElement>
 
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgscircularstring.h>
@@ -357,9 +359,59 @@ const QgsMultiSurface *KadasCircleItem::geometry() const
 
 KadasMapItem *KadasCircleItem::_clone() const
 {
-  KadasCircleItem *item = new KadasCircleItem( crs() );
+  KadasCircleItem *item = new KadasCircleItem( crs(), mGeodesic );
   item->mGeometry = mGeometry->clone();
+  item->mPen = mPen;
+  item->mBrush = mBrush;
+  item->mIconType = mIconType;
+  item->mIconSize = mIconSize;
+  item->mIconPen = mIconPen;
+  item->mIconBrush = mIconBrush;
   return item;
+}
+
+void KadasCircleItem::writeXmlPrivate( QDomElement &element ) const
+{
+  writeGeometryBaseAttributes( element );
+  element.setAttribute( QStringLiteral( "geodesic" ), mGeodesic ? QStringLiteral( "1" ) : QStringLiteral( "0" ) );
+  QStringList centersStr;
+  for ( const KadasItemPos &p : constState()->centers )
+    centersStr << QStringLiteral( "%1,%2" ).arg( p.x(), 0, 'g', 17 ).arg( p.y(), 0, 'g', 17 );
+  QStringList ringStr;
+  for ( const KadasItemPos &p : constState()->ringpos )
+    ringStr << QStringLiteral( "%1,%2" ).arg( p.x(), 0, 'g', 17 ).arg( p.y(), 0, 'g', 17 );
+  element.setAttribute( QStringLiteral( "centers" ), centersStr.join( QChar( ';' ) ) );
+  element.setAttribute( QStringLiteral( "ringpos" ), ringStr.join( QChar( ';' ) ) );
+}
+
+void KadasCircleItem::readXmlPrivate( const QDomElement &element )
+{
+  const bool isLegacy = element.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) == QLatin1String( "1" );
+  if ( isLegacy )
+  {
+    QJsonObject data = QJsonDocument::fromJson( element.firstChild().toCDATASection().data().toLocal8Bit() ).object();
+    deserialize( data );
+    return;
+  }
+
+  readGeometryBaseAttributesV2( element );
+  mGeodesic = element.attribute( QStringLiteral( "geodesic" ), QStringLiteral( "0" ) ) == QLatin1String( "1" );
+  clear();
+  auto parsePoints = []( const QString &s ) {
+    QList<KadasItemPos> out;
+    if ( s.isEmpty() )
+      return out;
+    for ( const QString &pair : s.split( QChar( ';' ), Qt::SkipEmptyParts ) )
+    {
+      const QStringList xy = pair.split( QChar( ',' ) );
+      if ( xy.size() == 2 )
+        out.append( KadasItemPos( xy[0].toDouble(), xy[1].toDouble() ) );
+    }
+    return out;
+  };
+  state()->centers = parsePoints( element.attribute( QStringLiteral( "centers" ) ) );
+  state()->ringpos = parsePoints( element.attribute( QStringLiteral( "ringpos" ) ) );
+  recomputeDerived();
 }
 
 QgsMultiSurface *KadasCircleItem::geometry()

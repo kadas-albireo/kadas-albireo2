@@ -25,10 +25,11 @@ class QgsMultiSurface;
 class KADAS_GUI_EXPORT KadasCircleItem : public KadasGeometryItem
 {
     Q_OBJECT
-    Q_PROPERTY( bool geodesic READ geodesic WRITE setGeodesic )
 
   public:
     KadasCircleItem( const QgsCoordinateReferenceSystem &crs, bool geodesic = false );
+
+    bool useQgisAnnotations() const override { return true; }
 
     bool geodesic() const { return mGeodesic; }
     void setGeodesic( bool geodesic );
@@ -81,6 +82,9 @@ class KADAS_GUI_EXPORT KadasCircleItem : public KadasGeometryItem
     State *createEmptyState() const override SIP_FACTORY { return new State(); }
     void recomputeDerived() override;
     void measureGeometry() override;
+
+    void writeXmlPrivate( QDomElement &element ) const override;
+    void readXmlPrivate( const QDomElement &element ) override;
 
   private:
     enum AttribIds
