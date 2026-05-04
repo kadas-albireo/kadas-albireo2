@@ -23,8 +23,6 @@
 class KADAS_GUI_EXPORT KadasAnchoredItem : public KadasMapItem SIP_ABSTRACT
 {
     Q_OBJECT
-    Q_PROPERTY( double anchorX READ anchorX WRITE setAnchorX )
-    Q_PROPERTY( double anchorY READ anchorY WRITE setAnchorY )
 
   public:
     KadasAnchoredItem( const QgsCoordinateReferenceSystem &crs );
