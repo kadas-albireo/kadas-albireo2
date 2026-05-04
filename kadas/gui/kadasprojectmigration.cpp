@@ -19,9 +19,6 @@
 #include <QDomDocument>
 #include <QScreen>
 #include <QFile>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QMap>
 
 #include <qgis/qgsannotationlayer.h>
@@ -315,14 +312,7 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
         continue;
       }
 
-      QDomElement mapItemEl = doc.createElement( "MapItem" );
-      mapItemEl.setAttribute( "name", item->metaObject()->className() );
-      mapItemEl.setAttribute( "crs", item->crs().authid() );
-      QJsonDocument jsonDoc;
-      jsonDoc.setObject( item->serialize() );
-      mapItemEl.appendChild( doc.createCDATASection( jsonDoc.toJson( QJsonDocument::Compact ) ) );
-
-      newMapLayerEl.appendChild( mapItemEl );
+      newMapLayerEl.appendChild( item->writeXml( doc ) );
       delete item;
     }
     root.firstChildElement( "projectlayers" ).replaceChild( newMapLayerEl, mapLayerEl );
@@ -368,15 +358,7 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
       symbolItem.setPosition( KadasItemPos::fromPoint( QgsPointXY( annotationItemEl.attribute( "geoPosX" ).toDouble(), annotationItemEl.attribute( "geoPosY" ).toDouble() ) ) );
       symbolItem.setAngle( -angle );
 
-      QDomElement mapItemEl = doc.createElement( "MapItem" );
-      mapItemEl.setAttribute( "name", "KadasSymbolItem" );
-      mapItemEl.setAttribute( "crs", annotationItemEl.attribute( "mapGeoPosAuthID" ) );
-
-      QJsonDocument jsonDoc;
-      jsonDoc.setObject( symbolItem.serialize() );
-      mapItemEl.appendChild( doc.createCDATASection( jsonDoc.toJson( QJsonDocument::Compact ) ) );
-
-      newMapLayerEl.appendChild( mapItemEl );
+      newMapLayerEl.appendChild( symbolItem.writeXml( doc ) );
     }
   }
 
@@ -418,15 +400,7 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
       KadasPictureItem pictureItem( ( QgsCoordinateReferenceSystem( annotationItemEl.attribute( "mapGeoPosAuthID" ) ) ) );
       pictureItem.setup( fileName, KadasItemPos::fromPoint( pos ), true, offsetX, offsetY, width );
 
-      QDomElement mapItemEl = doc.createElement( "MapItem" );
-      mapItemEl.setAttribute( "name", "KadasPictureItem" );
-      mapItemEl.setAttribute( "crs", annotationItemEl.attribute( "mapGeoPosAuthID" ) );
-
-      QJsonDocument jsonDoc;
-      jsonDoc.setObject( pictureItem.serialize() );
-      mapItemEl.appendChild( doc.createCDATASection( jsonDoc.toJson( QJsonDocument::Compact ) ) );
-
-      newMapLayerEl.appendChild( mapItemEl );
+      newMapLayerEl.appendChild( pictureItem.writeXml( doc ) );
     }
   }
 
@@ -458,16 +432,7 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
       pinItem.setName( pinItemEl.attribute( "pinName" ) );
       pinItem.setRemarks( pinItemEl.firstChildElement( "PinRemarks" ).text() );
 
-      QDomElement mapItemEl = doc.createElement( "MapItem" );
-      mapItemEl.setAttribute( "name", "KadasPinItem" );
-      mapItemEl.setAttribute( "crs", annotationItemEl.attribute( "mapGeoPosAuthID" ) );
-      mapItemEl.setAttribute( "editor", "KadasSymbolAttributesEditor" );
-
-      QJsonDocument jsonDoc;
-      jsonDoc.setObject( pinItem.serialize() );
-      mapItemEl.appendChild( doc.createCDATASection( jsonDoc.toJson( QJsonDocument::Compact ) ) );
-
-      newMapLayerEl.appendChild( mapItemEl );
+      newMapLayerEl.appendChild( pinItem.writeXml( doc ) );
     }
   }
 
