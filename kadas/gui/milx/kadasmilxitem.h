@@ -24,11 +24,6 @@
 class KADAS_GUI_EXPORT KadasMilxItem : public KadasMapItem
 {
     Q_OBJECT
-    Q_PROPERTY( QString mssString READ mssString WRITE setMssString )
-    Q_PROPERTY( QString militaryName READ militaryName WRITE setMilitaryName )
-    Q_PROPERTY( int minNPoints READ minNPoints WRITE setMinNPoints )
-    Q_PROPERTY( bool hasVariablePoints READ hasVariablePoints WRITE setHasVariablePoints )
-    Q_PROPERTY( QString symbolType READ symbolType WRITE setSymbolType )
 
   public:
     KadasMilxItem();
