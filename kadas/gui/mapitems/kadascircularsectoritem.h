@@ -28,6 +28,8 @@ class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
   public:
     KadasCircularSectorItem( const QgsCoordinateReferenceSystem &crs );
 
+    bool useQgisAnnotations() const override { return true; }
+
     QString itemName() const override { return tr( "Circular Sector" ); }
 
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
@@ -84,6 +86,9 @@ class KADAS_GUI_EXPORT KadasCircularSectorItem : public KadasGeometryItem
     State *createEmptyState() const override SIP_FACTORY { return new State(); }
     void recomputeDerived() override;
     void measureGeometry() override;
+
+    void writeXmlPrivate( QDomElement &element ) const override;
+    void readXmlPrivate( const QDomElement &element ) override;
 
   private:
     enum AttribIds
