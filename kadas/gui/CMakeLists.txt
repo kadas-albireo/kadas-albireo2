@@ -89,7 +89,6 @@ set(kadas_gui_SRC
     mapitems/kadasanchoreditem.cpp
     mapitems/kadascircleitem.cpp
     mapitems/kadascircularsectoritem.cpp
-    mapitems/kadascoordinatecrossitem.cpp
     mapitems/kadasgeometryitem.cpp
     mapitems/kadasgpxrouteitem.cpp
     mapitems/kadasgpxwaypointitem.cpp
@@ -201,7 +200,6 @@ set(kadas_gui_HDR
     mapitems/kadasanchoreditem.h
     mapitems/kadascircleitem.h
     mapitems/kadascircularsectoritem.h
-    mapitems/kadascoordinatecrossitem.h
     mapitems/kadasgeometryitem.h
     mapitems/kadasgpxrouteitem.h
     mapitems/kadasgpxwaypointitem.h
