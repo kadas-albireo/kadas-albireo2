@@ -23,7 +23,6 @@
 class KADAS_GUI_EXPORT KadasRectangleItemBase : public KadasMapItem SIP_ABSTRACT
 {
     Q_OBJECT
-    Q_PROPERTY( bool posLocked READ positionLocked WRITE setPositionLocked )
 
   public:
     KadasRectangleItemBase( const QgsCoordinateReferenceSystem &crs );
@@ -89,6 +88,11 @@ class KADAS_GUI_EXPORT KadasRectangleItemBase : public KadasMapItem SIP_ABSTRACT
     State *createEmptyState() const override SIP_FACTORY { return new State(); }
 
     bool mPosLocked = false;
+
+#ifndef SIP_RUN
+    void writeRectangleBaseAttributes( QDomElement &element ) const;
+    void readRectangleBaseAttributesV2( const QDomElement &element );
+#endif
 
   private:
     virtual void renderPrivate( QgsRenderContext &context, const QPointF &center, const QRect &rect, double dpiScale ) const = 0;

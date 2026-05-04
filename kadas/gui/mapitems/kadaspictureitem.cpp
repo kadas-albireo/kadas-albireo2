@@ -18,6 +18,8 @@
 #include <QGenericMatrix>
 #include <QImageReader>
 #include <QJsonArray>
+#include <QJsonDocument>
+#include <QDomElement>
 #include <QMenu>
 #include <QRegularExpression>
 
@@ -472,4 +474,43 @@ QgsAnnotationItem *KadasPictureItem::annotationItem( const QgsCoordinateReferenc
   anno->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
   anno->setZIndex( zIndex() ? zIndex() : KadasAnnotationZIndex::Picture );
   return anno;
+}
+
+KadasMapItem *KadasPictureItem::_clone() const
+{
+  KadasPictureItem *item = new KadasPictureItem( crs() );
+  item->setup( mFilePath, constState()->mPos, /*ignoreExiv*/ true, constState()->mOffsetX, constState()->mOffsetY, constState()->mSize.width(), constState()->mSize.height() );
+  item->mPosLocked = mPosLocked;
+  item->state()->mAngle = constState()->mAngle;
+  item->state()->mFrame = constState()->mFrame;
+  item->state()->mFootprint = constState()->mFootprint;
+  item->state()->mRectangleCenterPoint = constState()->mRectangleCenterPoint;
+  return item;
+}
+
+void KadasPictureItem::writeXmlPrivate( QDomElement &element ) const
+{
+  writeRectangleBaseAttributes( element );
+  element.setAttribute( QStringLiteral( "file_path" ), QgsProject::instance()->writePath( mFilePath ) );
+}
+
+void KadasPictureItem::readXmlPrivate( const QDomElement &element )
+{
+  const bool isLegacy = element.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) == QLatin1String( "1" );
+  if ( isLegacy )
+  {
+    QJsonObject data = QJsonDocument::fromJson( element.firstChild().toCDATASection().data().toLocal8Bit() ).object();
+    deserialize( data );
+    return;
+  }
+
+  const QString filePath = QgsProject::instance()->readPath( element.attribute( QStringLiteral( "file_path" ) ) );
+  const double offsetX = element.attribute( QStringLiteral( "offset_x" ), QStringLiteral( "0" ) ).toDouble();
+  const double offsetY = element.attribute( QStringLiteral( "offset_y" ), QStringLiteral( "50" ) ).toDouble();
+  const int w = element.attribute( QStringLiteral( "size_w" ), QStringLiteral( "0" ) ).toInt();
+  const int h = element.attribute( QStringLiteral( "size_h" ), QStringLiteral( "0" ) ).toInt();
+  const KadasItemPos fallbackPos( element.attribute( QStringLiteral( "pos_x" ), QStringLiteral( "0" ) ).toDouble(), element.attribute( QStringLiteral( "pos_y" ), QStringLiteral( "0" ) ).toDouble() );
+  setup( filePath, fallbackPos, /*ignoreExiv*/ true, offsetX, offsetY, w, h );
+  // setup() may overwrite state from the file. Re-apply persisted state.
+  readRectangleBaseAttributesV2( element );
 }

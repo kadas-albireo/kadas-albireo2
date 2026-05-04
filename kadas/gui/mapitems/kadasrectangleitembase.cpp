@@ -18,6 +18,7 @@
 #include <QGenericMatrix>
 #include <QImageReader>
 #include <QJsonArray>
+#include <QDomElement>
 #include <QMenu>
 
 #include <array>
@@ -506,4 +507,47 @@ static QMatrix3x3 rotAngleAxis( const std::array<float, 3> &u, float angle )
     }
       .data()
   );
+}
+
+void KadasRectangleItemBase::writeRectangleBaseAttributes( QDomElement &element ) const
+{
+  element.setAttribute( QStringLiteral( "pos_locked" ), mPosLocked ? QStringLiteral( "1" ) : QStringLiteral( "0" ) );
+  element.setAttribute( QStringLiteral( "pos_x" ), constState()->mPos.x() );
+  element.setAttribute( QStringLiteral( "pos_y" ), constState()->mPos.y() );
+  element.setAttribute( QStringLiteral( "angle" ), constState()->mAngle );
+  element.setAttribute( QStringLiteral( "offset_x" ), constState()->mOffsetX );
+  element.setAttribute( QStringLiteral( "offset_y" ), constState()->mOffsetY );
+  element.setAttribute( QStringLiteral( "size_w" ), constState()->mSize.width() );
+  element.setAttribute( QStringLiteral( "size_h" ), constState()->mSize.height() );
+  element.setAttribute( QStringLiteral( "frame" ), constState()->mFrame ? QStringLiteral( "1" ) : QStringLiteral( "0" ) );
+  element.setAttribute( QStringLiteral( "rect_center_x" ), constState()->mRectangleCenterPoint.x() );
+  element.setAttribute( QStringLiteral( "rect_center_y" ), constState()->mRectangleCenterPoint.y() );
+  QStringList footprintStr;
+  for ( const KadasItemPos &p : constState()->mFootprint )
+    footprintStr << QStringLiteral( "%1,%2" ).arg( p.x(), 0, 'g', 17 ).arg( p.y(), 0, 'g', 17 );
+  element.setAttribute( QStringLiteral( "footprint" ), footprintStr.join( QChar( ';' ) ) );
+}
+
+void KadasRectangleItemBase::readRectangleBaseAttributesV2( const QDomElement &element )
+{
+  mPosLocked = element.attribute( QStringLiteral( "pos_locked" ), QStringLiteral( "0" ) ) == QLatin1String( "1" );
+  state()->mPos = KadasItemPos( element.attribute( QStringLiteral( "pos_x" ), QStringLiteral( "0" ) ).toDouble(), element.attribute( QStringLiteral( "pos_y" ), QStringLiteral( "0" ) ).toDouble() );
+  state()->mAngle = element.attribute( QStringLiteral( "angle" ), QStringLiteral( "0" ) ).toDouble();
+  state()->mOffsetX = element.attribute( QStringLiteral( "offset_x" ), QStringLiteral( "0" ) ).toDouble();
+  state()->mOffsetY = element.attribute( QStringLiteral( "offset_y" ), QStringLiteral( "0" ) ).toDouble();
+  state()->mSize = QSize( element.attribute( QStringLiteral( "size_w" ), QStringLiteral( "0" ) ).toInt(), element.attribute( QStringLiteral( "size_h" ), QStringLiteral( "0" ) ).toInt() );
+  state()->mFrame = element.attribute( QStringLiteral( "frame" ), QStringLiteral( "1" ) ) == QLatin1String( "1" );
+  state()->mRectangleCenterPoint
+    = KadasItemPos( element.attribute( QStringLiteral( "rect_center_x" ), QStringLiteral( "0" ) ).toDouble(), element.attribute( QStringLiteral( "rect_center_y" ), QStringLiteral( "0" ) ).toDouble() );
+  state()->mFootprint.clear();
+  const QString fp = element.attribute( QStringLiteral( "footprint" ) );
+  if ( !fp.isEmpty() )
+  {
+    for ( const QString &pair : fp.split( QChar( ';' ), Qt::SkipEmptyParts ) )
+    {
+      const QStringList xy = pair.split( QChar( ',' ) );
+      if ( xy.size() == 2 )
+        state()->mFootprint.append( KadasItemPos( xy[0].toDouble(), xy[1].toDouble() ) );
+    }
+  }
 }
