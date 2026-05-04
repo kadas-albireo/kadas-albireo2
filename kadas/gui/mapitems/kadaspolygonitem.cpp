@@ -42,28 +42,6 @@
 #include "kadas/gui/mapitems/kadaspolygonitem.h"
 
 
-QJsonObject KadasPolygonItem::State::serialize() const
-{
-  QJsonArray pts;
-  for ( const QList<KadasItemPos> &part : points )
-  {
-    QJsonArray prt;
-    for ( const KadasItemPos &pos : part )
-    {
-      QJsonArray p;
-      p.append( pos.x() );
-      p.append( pos.y() );
-      prt.append( p );
-    }
-    pts.append( prt );
-  }
-  QJsonObject json;
-  //json["status"] = static_cast<int>( drawStatus );
-  ;
-  json["points"] = pts;
-  return json;
-}
-
 bool KadasPolygonItem::State::deserialize( const QJsonObject &json )
 {
   //drawStatus = static_cast<DrawStatus>( json["status"].toInt() );

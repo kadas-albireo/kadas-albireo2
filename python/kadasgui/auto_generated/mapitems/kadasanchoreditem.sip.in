@@ -88,7 +88,6 @@ your option) any later version. *
         QSize size;
         virtual void assign( const KadasMapItem::State *other );
         virtual State *clone() const /Factory/;
-        virtual QJsonObject serialize() const;
 
         virtual bool deserialize( const QJsonObject &json );
 

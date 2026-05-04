@@ -76,7 +76,6 @@ class KADAS_GUI_EXPORT KadasRectangleItemBase : public KadasMapItem SIP_ABSTRACT
         bool frame() const { return mFrame; }
         virtual void assign( const KadasMapItem::State *other ) override { *this = *static_cast<const State *>( other ); }
         virtual State *clone() const override SIP_FACTORY { return new State( *this ); }
-        virtual QJsonObject serialize() const override;
         virtual bool deserialize( const QJsonObject &json ) override;
     };
     const State *constState() const { return static_cast<State *>( mState ); }

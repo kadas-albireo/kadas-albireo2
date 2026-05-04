@@ -37,31 +37,6 @@
 #include "kadas/gui/mapitems/kadasrectangleitem.h"
 
 
-QJsonObject KadasRectangleItem::State::serialize() const
-{
-  QJsonArray pt1;
-  for ( const KadasItemPos &pos : p1 )
-  {
-    QJsonArray p;
-    p.append( pos.x() );
-    p.append( pos.y() );
-    pt1.append( p );
-  }
-  QJsonArray pt2;
-  for ( const KadasItemPos &pos : p2 )
-  {
-    QJsonArray p;
-    p.append( pos.x() );
-    p.append( pos.y() );
-    pt2.append( p );
-  }
-  QJsonObject json;
-  //json["status"] = static_cast<int>( drawStatus );
-  json["p1"] = pt1;
-  json["p2"] = pt2;
-  return json;
-}
-
 bool KadasRectangleItem::State::deserialize( const QJsonObject &json )
 {
   p1.clear();

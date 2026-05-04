@@ -57,41 +57,6 @@ static double toRadAngle( double ageo )
   return arad;
 }
 
-QJsonObject KadasCircularSectorItem::State::serialize() const
-{
-  QJsonArray c;
-  for ( const KadasItemPos &pos : centers )
-  {
-    QJsonArray p;
-    p.append( pos.x() );
-    p.append( pos.y() );
-    c.append( p );
-  }
-  QJsonArray r;
-  for ( double radius : radii )
-  {
-    r.append( radius );
-  }
-  QJsonArray a1;
-  for ( double startAngle : startAngles )
-  {
-    a1.append( startAngle );
-  }
-  QJsonArray a2;
-  for ( double stopAngle : stopAngles )
-  {
-    a2.append( stopAngle );
-  }
-  QJsonObject json;
-  //json["status"] = static_cast<int>( drawStatus );
-  json["centers"] = c;
-  json["radii"] = r;
-  json["startAngles"] = a1;
-  json["stopAngles"] = a2;
-  json["sectorStatus"] = static_cast<int>( sectorStatus );
-  return json;
-}
-
 bool KadasCircularSectorItem::State::deserialize( const QJsonObject &json )
 {
   centers.clear();

@@ -39,32 +39,6 @@
 #include "kadas/gui/mapitems/kadascircleitem.h"
 
 
-QJsonObject KadasCircleItem::State::serialize() const
-{
-  QJsonArray c;
-  for ( const KadasItemPos &pos : centers )
-  {
-    QJsonArray p;
-    p.append( pos.x() );
-    p.append( pos.y() );
-    c.append( p );
-  }
-  QJsonArray r;
-  for ( const KadasItemPos &pos : ringpos )
-  {
-    QJsonArray p;
-    p.append( pos.x() );
-    p.append( pos.y() );
-    r.append( p );
-  }
-  QJsonObject json;
-  //json["status"] = static_cast<int>( drawStatus );
-  ;
-  json["centers"] = c;
-  json["ringpos"] = r;
-  return json;
-}
-
 bool KadasCircleItem::State::deserialize( const QJsonObject &json )
 {
   centers.clear();
