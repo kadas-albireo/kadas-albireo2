@@ -33,7 +33,6 @@
 
 #include "kadas/gui/mapitems/kadascircleitem.h"
 #include "kadas/gui/mapitems/kadascircularsectoritem.h"
-#include "kadas/gui/mapitems/kadascoordinatecrossitem.h"
 #include "kadas/gui/mapitems/kadasgpxrouteitem.h"
 #include "kadas/gui/mapitems/kadasgpxwaypointitem.h"
 #include "kadas/gui/mapitems/kadaslineitem.h"
@@ -266,7 +265,6 @@ KadasMapItem::Registry *KadasMapItem::registry()
   std::call_once( onceFlagMapItemRegistry, []() {
     sRegistry->insert( QStringLiteral( "KadasCircleItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasCircleItem( crs ); } );
     sRegistry->insert( QStringLiteral( "KadasCircularSectorItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasCircularSectorItem( crs ); } );
-    sRegistry->insert( QStringLiteral( "KadasCoordinateCrossItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasCoordinateCrossItem( crs ); } );
     sRegistry->insert( QStringLiteral( "KadasGpxRouteItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasGpxRouteItem(); } );
     sRegistry->insert( QStringLiteral( "KadasGpxWaypointItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasGpxWaypointItem(); } );
     sRegistry->insert( QStringLiteral( "KadasLineItem" ), []( const QgsCoordinateReferenceSystem &crs ) { return new KadasLineItem( crs ); } );
