@@ -16,6 +16,6 @@ try:
 except (NameError, AttributeError):
     pass
 try:
-    KadasCircularSectorItem.State.__overridden_methods__ = ['assign', 'clone', 'serialize', 'deserialize']
+    KadasCircularSectorItem.State.__overridden_methods__ = ['assign', 'clone', 'deserialize']
 except (NameError, AttributeError):
     pass
