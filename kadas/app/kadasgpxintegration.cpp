@@ -39,7 +39,7 @@
 #include "kadas/gui/mapitemeditors/kadasgpxrouteeditor.h"
 #include "kadas/gui/mapitemeditors/kadasgpxwaypointeditor.h"
 #include "kadas/gui/mapitems/kadaslineitem.h"
-#include "kadas/gui/maptools/kadasmaptoolcreateannotationitem.h"
+#include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
 #include "kadasapplication.h"
@@ -93,7 +93,7 @@ void KadasGpxIntegration::toggleAnnotation( bool active, Variant variant )
   if ( !layer )
     return;
 
-  KadasMapToolCreateAnnotationItem *tool = new KadasMapToolCreateAnnotationItem( canvas, controller, layer );
+  KadasMapToolEditAnnotationItem *tool = new KadasMapToolEditAnnotationItem( canvas, controller, layer );
   tool->setMultipart( false );
   tool->setAction( action );
 

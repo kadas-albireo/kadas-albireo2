@@ -36,9 +36,8 @@
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/mapitems/kadasselectionrectitem.h"
-#include "kadas/gui/maptools/kadasmaptoolcreateannotationitem.h"
-#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
+#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 #include "kadas/gui/maptools/kadasmaptooledititem.h"
 #include "kadas/gui/maptools/kadasmaptoolhillshade.h"
 #include "kadas/gui/maptools/kadasmaptoolminmax.h"
@@ -58,12 +57,12 @@ Q_GLOBAL_STATIC( RegisteredAction, sRegisteredActions )
 namespace
 {
   //! Forward an initial point to whichever create map tool is now active
-  //! (legacy KadasMapToolCreateItem or new KadasMapToolCreateAnnotationItem).
+  //! (legacy KadasMapToolCreateItem or new KadasMapToolEditAnnotationItem in create-mode).
   void seedActiveCreateToolWithPoint( QgsMapCanvas *canvas, const KadasMapPos &pos )
   {
     if ( auto *tool = dynamic_cast<KadasMapToolCreateItem *>( canvas->mapTool() ) )
       tool->addPoint( pos );
-    else if ( auto *tool = dynamic_cast<KadasMapToolCreateAnnotationItem *>( canvas->mapTool() ) )
+    else if ( auto *tool = dynamic_cast<KadasMapToolEditAnnotationItem *>( canvas->mapTool() ) )
       tool->addPoint( pos );
   }
 } // namespace

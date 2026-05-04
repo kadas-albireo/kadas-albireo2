@@ -22,6 +22,7 @@
 #include <QPixmap>
 #include <QPushButton>
 #include <QSignalBlocker>
+#include <QDoubleSpinBox>
 #include <QSpinBox>
 #include <QVBoxLayout>
 #include <cmath>
@@ -42,6 +43,7 @@
 #include <qgis/qgsmarkersymbol.h>
 #include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgssettings.h>
+#include <qgis/qgssettingsentryimpl.h>
 #include <qgis/qgssymbollayerutils.h>
 
 #include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
@@ -50,6 +52,40 @@
 #include "kadas/gui/kadasbottombar.h"
 #include "kadas/gui/kadasfloatinginputwidget.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
+
+
+// ----- Persisted last-used styles, reapplied on freshly created items. ---
+
+const QgsSettingsEntryInteger *KadasMapToolEditAnnotationItem::settingsMarkerShape
+  = new QgsSettingsEntryInteger( QStringLiteral( "marker-shape" ), sTreeAnnotation, static_cast<int>( Qgis::MarkerShape::Circle ), QStringLiteral( "Last-used marker shape." ) );
+const QgsSettingsEntryInteger *KadasMapToolEditAnnotationItem::settingsMarkerSize
+  = new QgsSettingsEntryInteger( QStringLiteral( "marker-size" ), sTreeAnnotation, 3, QStringLiteral( "Last-used marker size (mm)." ) );
+const QgsSettingsEntryDouble *KadasMapToolEditAnnotationItem::settingsMarkerStrokeWidth
+  = new QgsSettingsEntryDouble( QStringLiteral( "marker-stroke-width" ), sTreeAnnotation, 0.0, QStringLiteral( "Last-used marker outline width (mm)." ) );
+const QgsSettingsEntryColor *KadasMapToolEditAnnotationItem::settingsMarkerFillColor
+  = new QgsSettingsEntryColor( QStringLiteral( "marker-fill-color" ), sTreeAnnotation, QColor( 255, 0, 0 ), QStringLiteral( "Last-used marker fill color." ) );
+const QgsSettingsEntryColor *KadasMapToolEditAnnotationItem::settingsMarkerStrokeColor
+  = new QgsSettingsEntryColor( QStringLiteral( "marker-stroke-color" ), sTreeAnnotation, QColor( 0, 0, 0 ), QStringLiteral( "Last-used marker outline color." ) );
+const QgsSettingsEntryInteger *KadasMapToolEditAnnotationItem::settingsMarkerStrokeStyle
+  = new QgsSettingsEntryInteger( QStringLiteral( "marker-stroke-style" ), sTreeAnnotation, static_cast<int>( Qt::SolidLine ), QStringLiteral( "Last-used marker outline style." ) );
+
+const QgsSettingsEntryDouble *KadasMapToolEditAnnotationItem::settingsLineWidth
+  = new QgsSettingsEntryDouble( QStringLiteral( "line-width" ), sTreeAnnotation, 0.5, QStringLiteral( "Last-used line width (mm)." ) );
+const QgsSettingsEntryColor *KadasMapToolEditAnnotationItem::settingsLineColor
+  = new QgsSettingsEntryColor( QStringLiteral( "line-color" ), sTreeAnnotation, QColor( 255, 0, 0 ), QStringLiteral( "Last-used line color." ) );
+const QgsSettingsEntryInteger *KadasMapToolEditAnnotationItem::settingsLineStyle
+  = new QgsSettingsEntryInteger( QStringLiteral( "line-style" ), sTreeAnnotation, static_cast<int>( Qt::SolidLine ), QStringLiteral( "Last-used line style." ) );
+
+const QgsSettingsEntryDouble *KadasMapToolEditAnnotationItem::settingsPolygonStrokeWidth
+  = new QgsSettingsEntryDouble( QStringLiteral( "polygon-stroke-width" ), sTreeAnnotation, 0.5, QStringLiteral( "Last-used polygon outline width (mm)." ) );
+const QgsSettingsEntryColor *KadasMapToolEditAnnotationItem::settingsPolygonFillColor
+  = new QgsSettingsEntryColor( QStringLiteral( "polygon-fill-color" ), sTreeAnnotation, QColor( 255, 0, 0, 80 ), QStringLiteral( "Last-used polygon fill color." ) );
+const QgsSettingsEntryColor *KadasMapToolEditAnnotationItem::settingsPolygonStrokeColor
+  = new QgsSettingsEntryColor( QStringLiteral( "polygon-stroke-color" ), sTreeAnnotation, QColor( 255, 0, 0 ), QStringLiteral( "Last-used polygon outline color." ) );
+const QgsSettingsEntryInteger *KadasMapToolEditAnnotationItem::settingsPolygonStrokeStyle
+  = new QgsSettingsEntryInteger( QStringLiteral( "polygon-stroke-style" ), sTreeAnnotation, static_cast<int>( Qt::SolidLine ), QStringLiteral( "Last-used polygon outline style." ) );
+const QgsSettingsEntryInteger *KadasMapToolEditAnnotationItem::settingsPolygonBrushStyle
+  = new QgsSettingsEntryInteger( QStringLiteral( "polygon-brush-style" ), sTreeAnnotation, static_cast<int>( Qt::SolidPattern ), QStringLiteral( "Last-used polygon fill style." ) );
 
 
 namespace
@@ -129,20 +165,46 @@ KadasMapToolEditAnnotationItem::KadasMapToolEditAnnotationItem( QgsMapCanvas *ca
     if ( mItem )
       mController = KadasAnnotationControllerRegistry::instance()->controllerFor( mItem->type() );
   }
+  mDrawState = DrawState::Finished;
+  mAllowCreate = false;
+}
+
+KadasMapToolEditAnnotationItem::KadasMapToolEditAnnotationItem( QgsMapCanvas *canvas, KadasAnnotationItemController *controller, QgsAnnotationLayer *layer )
+  : QgsMapTool( canvas )
+  , mController( controller )
+  , mLayer( layer )
+{
+  mDrawState = DrawState::Empty;
+  mAllowCreate = true;
 }
 
 void KadasMapToolEditAnnotationItem::activate()
 {
   QgsMapTool::activate();
   setCursor( Qt::ArrowCursor );
-  if ( !mItem || !mController || !mLayer )
+  if ( !mController || !mLayer )
+  {
+    canvas()->unsetMapTool( this );
+    return;
+  }
+
+  if ( mAllowCreate && !mItem )
+  {
+    createInitialItem();
+    if ( !mItem )
+    {
+      canvas()->unsetMapTool( this );
+      return;
+    }
+  }
+  else if ( !mItem )
   {
     canvas()->unsetMapTool( this );
     return;
   }
 
   mStateHistory = new KadasStateHistory( this );
-  mStateHistory->push( new ToolState( mItem->clone() ) );
+  mStateHistory->push( new ToolState( mItem->clone(), mDrawState ) );
   connect( mStateHistory, &KadasStateHistory::stateChanged, this, &KadasMapToolEditAnnotationItem::stateChanged );
 
   mBottomBar = new KadasBottomBar( canvas() );
@@ -153,7 +215,7 @@ void KadasMapToolEditAnnotationItem::activate()
   auto *topRow = new QHBoxLayout();
   outer->addLayout( topRow );
 
-  QLabel *label = new QLabel( tr( "Edit %1" ).arg( mController->itemName() ) );
+  QLabel *label = new QLabel( ( mAllowCreate ? tr( "Draw %1" ) : tr( "Edit %1" ) ).arg( mController->itemName() ) );
   QFont font = label->font();
   font.setBold( true );
   label->setFont( font );
@@ -190,6 +252,9 @@ void KadasMapToolEditAnnotationItem::activate()
 void KadasMapToolEditAnnotationItem::deactivate()
 {
   QgsMapTool::deactivate();
+  // Drop the uncommitted in-progress item if the user closed the tool mid-draw.
+  if ( mAllowCreate && mDrawState != DrawState::Finished )
+    clearInProgressItem();
   if ( mLayer )
     mLayer->triggerRepaint();
   delete mBottomBar;
@@ -218,7 +283,66 @@ void KadasMapToolEditAnnotationItem::canvasPressEvent( QgsMapMouseEvent *e )
 
   if ( e->button() == Qt::RightButton )
   {
-    canvas()->unsetMapTool( this );
+    // Right-click during digitizing finalizes the part; otherwise close.
+    if ( mAllowCreate && mDrawState == DrawState::InProgress )
+      finishPart();
+    else
+      canvas()->unsetMapTool( this );
+    return;
+  }
+
+  if ( e->button() != Qt::LeftButton )
+    return;
+
+  // Click on a vertex/handle is handled by canvasMoveEvent (drag) +
+  // canvasReleaseEvent (pushState). Nothing to do here.
+  if ( mEditContext.isValid() )
+    return;
+
+  if ( !mAllowCreate )
+    return;
+
+  addPoint( e->mapPoint() );
+}
+
+void KadasMapToolEditAnnotationItem::addPoint( const QgsPointXY &pos )
+{
+  if ( !mAllowCreate || !mItem || !mController || !mLayer )
+    return;
+
+  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
+
+  switch ( mDrawState )
+  {
+    case DrawState::Empty:
+      startPart( pos );
+      break;
+
+    case DrawState::InProgress:
+      mController->setCurrentPoint( mItem, pos, ctx );
+      if ( !mController->continuePart( mItem, ctx ) )
+      {
+        finishPart();
+      }
+      else
+      {
+        mLayer->triggerRepaint();
+        pushState();
+      }
+      break;
+
+    case DrawState::Finished:
+      if ( !mMultipart )
+      {
+        clearInProgressItem();
+        createInitialItem();
+        if ( !mItem )
+          return;
+        readStyleToWidgets();
+        emit cleared();
+      }
+      startPart( pos );
+      break;
   }
 }
 
@@ -252,6 +376,12 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
     {
       setCursor( Qt::ArrowCursor );
       clearNumericInput();
+      // While digitizing with no node under the cursor, preview the next vertex.
+      if ( mAllowCreate && mDrawState == DrawState::InProgress )
+      {
+        mController->setCurrentPoint( mItem, pos, ctx );
+        mLayer->triggerRepaint();
+      }
     }
     else if ( mEditContext != oldContext )
     {
@@ -302,7 +432,25 @@ void KadasMapToolEditAnnotationItem::keyPressEvent( QKeyEvent *e )
 {
   if ( e->key() == Qt::Key_Escape )
   {
-    canvas()->unsetMapTool( this );
+    if ( mAllowCreate && mDrawState == DrawState::InProgress )
+    {
+      // Discard the current part and start fresh.
+      clearInProgressItem();
+      createInitialItem();
+      if ( mItem )
+      {
+        readStyleToWidgets();
+        emit cleared();
+      }
+    }
+    else
+    {
+      canvas()->unsetMapTool( this );
+    }
+  }
+  else if ( ( e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter ) && mAllowCreate && mDrawState == DrawState::InProgress )
+  {
+    finishPart();
   }
   else if ( ( e->key() == Qt::Key_Z && e->modifiers() == Qt::ControlModifier ) || e->key() == Qt::Key_Backspace )
   {
@@ -323,7 +471,7 @@ void KadasMapToolEditAnnotationItem::keyPressEvent( QKeyEvent *e )
 void KadasMapToolEditAnnotationItem::pushState()
 {
   if ( mStateHistory && mItem )
-    mStateHistory->push( new ToolState( mItem->clone() ) );
+    mStateHistory->push( new ToolState( mItem->clone(), mDrawState ) );
 }
 
 void KadasMapToolEditAnnotationItem::deleteItem()
@@ -347,6 +495,7 @@ void KadasMapToolEditAnnotationItem::stateChanged( KadasStateHistory::ChangeType
   QgsAnnotationItem *replacement = ts->itemClone->clone();
   mLayer->replaceItem( mItemId, replacement );
   mItem = mLayer->item( mItemId );
+  mDrawState = ts->drawState;
   mLayer->triggerRepaint();
   mEditContext = KadasEditContext();
   clearNumericInput();
@@ -437,8 +586,10 @@ void KadasMapToolEditAnnotationItem::setupStyleWidgets( QBoxLayout *outer )
   }
 
   // Stroke width (all)
-  mStrokeWidthSpin = new QSpinBox();
-  mStrokeWidthSpin->setRange( 0, 20 );
+  mStrokeWidthSpin = new QDoubleSpinBox();
+  mStrokeWidthSpin->setRange( 0.0, 20.0 );
+  mStrokeWidthSpin->setDecimals( 1 );
+  mStrokeWidthSpin->setSingleStep( 0.1 );
   mStrokeWidthSpin->setToolTip( isMarker ? tr( "Outline width" ) : tr( "Line width" ) );
   row->addWidget( mStrokeWidthSpin );
 
@@ -488,7 +639,7 @@ void KadasMapToolEditAnnotationItem::setupStyleWidgets( QBoxLayout *outer )
     connect( mShapeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, applyAndPush );
   if ( mSizeSpin )
     connect( mSizeSpin, qOverload<int>( &QSpinBox::valueChanged ), this, applyAndPush );
-  connect( mStrokeWidthSpin, qOverload<int>( &QSpinBox::valueChanged ), this, applyAndPush );
+  connect( mStrokeWidthSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, applyAndPush );
   if ( mFillColorBtn )
     connect( mFillColorBtn, &QgsColorButton::colorChanged, this, applyAndPush );
   connect( mStrokeColorBtn, &QgsColorButton::colorChanged, this, applyAndPush );
@@ -512,7 +663,7 @@ void KadasMapToolEditAnnotationItem::readStyleToWidgets()
     if ( shapeIdx >= 0 )
       mShapeCombo->setCurrentIndex( shapeIdx );
     mSizeSpin->setValue( static_cast<int>( std::round( sl->size() ) ) );
-    mStrokeWidthSpin->setValue( static_cast<int>( std::round( sl->strokeWidth() ) ) );
+    mStrokeWidthSpin->setValue( sl->strokeWidth() );
     mFillColorBtn->setColor( sl->color() );
     mStrokeColorBtn->setColor( sl->strokeColor() );
     const int styleIdx = mStrokeStyleCombo->findData( static_cast<int>( sl->strokeStyle() ) );
@@ -525,7 +676,7 @@ void KadasMapToolEditAnnotationItem::readStyleToWidgets()
     if ( !sl )
       return;
     const QSignalBlocker b1( mStrokeWidthSpin ), b2( mStrokeColorBtn ), b3( mStrokeStyleCombo );
-    mStrokeWidthSpin->setValue( static_cast<int>( std::round( sl->width() ) ) );
+    mStrokeWidthSpin->setValue( sl->width() );
     mStrokeColorBtn->setColor( sl->color() );
     const int styleIdx = mStrokeStyleCombo->findData( static_cast<int>( sl->penStyle() ) );
     if ( styleIdx >= 0 )
@@ -537,7 +688,7 @@ void KadasMapToolEditAnnotationItem::readStyleToWidgets()
     if ( !sl )
       return;
     const QSignalBlocker b1( mStrokeWidthSpin ), b2( mFillColorBtn ), b3( mStrokeColorBtn ), b4( mStrokeStyleCombo ), b5( mFillStyleCombo );
-    mStrokeWidthSpin->setValue( static_cast<int>( std::round( sl->strokeWidth() ) ) );
+    mStrokeWidthSpin->setValue( sl->strokeWidth() );
     mFillColorBtn->setColor( sl->color() );
     mStrokeColorBtn->setColor( sl->strokeColor() );
     const int styleIdx = mStrokeStyleCombo->findData( static_cast<int>( sl->strokeStyle() ) );
@@ -610,4 +761,157 @@ void KadasMapToolEditAnnotationItem::applyStyleFromWidgets()
     sl->setBrushStyle( static_cast<Qt::BrushStyle>( mFillStyleCombo->currentData().toInt() ) );
     poly->setSymbol( sym.release() );
   }
+
+  persistStyleToSettings();
+}
+
+void KadasMapToolEditAnnotationItem::persistStyleToSettings()
+{
+  if ( !mStrokeColorBtn || !mItem )
+    return;
+  if ( dynamic_cast<QgsAnnotationMarkerItem *>( mItem ) )
+  {
+    settingsMarkerShape->setValue( mShapeCombo->currentData().toInt() );
+    settingsMarkerSize->setValue( mSizeSpin->value() );
+    settingsMarkerStrokeWidth->setValue( mStrokeWidthSpin->value() );
+    settingsMarkerFillColor->setValue( mFillColorBtn->color() );
+    settingsMarkerStrokeColor->setValue( mStrokeColorBtn->color() );
+    settingsMarkerStrokeStyle->setValue( mStrokeStyleCombo->currentData().toInt() );
+  }
+  else if ( dynamic_cast<QgsAnnotationLineItem *>( mItem ) )
+  {
+    settingsLineWidth->setValue( mStrokeWidthSpin->value() );
+    settingsLineColor->setValue( mStrokeColorBtn->color() );
+    settingsLineStyle->setValue( mStrokeStyleCombo->currentData().toInt() );
+  }
+  else if ( dynamic_cast<QgsAnnotationPolygonItem *>( mItem ) )
+  {
+    settingsPolygonStrokeWidth->setValue( mStrokeWidthSpin->value() );
+    settingsPolygonFillColor->setValue( mFillColorBtn->color() );
+    settingsPolygonStrokeColor->setValue( mStrokeColorBtn->color() );
+    settingsPolygonStrokeStyle->setValue( mStrokeStyleCombo->currentData().toInt() );
+    settingsPolygonBrushStyle->setValue( mFillStyleCombo->currentData().toInt() );
+  }
+}
+
+void KadasMapToolEditAnnotationItem::applyPersistedStyle( QgsAnnotationItem *item ) const
+{
+  if ( !item )
+    return;
+  if ( auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item ) )
+  {
+    if ( !settingsMarkerStrokeColor->exists() )
+      return; // never customized — keep controller defaults.
+    std::unique_ptr<QgsMarkerSymbol> sym( marker->symbol() ? marker->symbol()->clone() : new QgsMarkerSymbol() );
+    if ( sym->symbolLayerCount() == 0 )
+      sym->appendSymbolLayer( new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Circle ) );
+    auto *sl = dynamic_cast<QgsSimpleMarkerSymbolLayer *>( sym->symbolLayer( 0 ) );
+    if ( !sl )
+    {
+      auto *replacement = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Circle );
+      sym->changeSymbolLayer( 0, replacement );
+      sl = replacement;
+    }
+    sl->setShape( static_cast<Qgis::MarkerShape>( settingsMarkerShape->value() ) );
+    sl->setSize( settingsMarkerSize->value() );
+    sl->setStrokeWidth( settingsMarkerStrokeWidth->value() );
+    sl->setColor( settingsMarkerFillColor->value() );
+    sl->setStrokeColor( settingsMarkerStrokeColor->value() );
+    sl->setStrokeStyle( static_cast<Qt::PenStyle>( settingsMarkerStrokeStyle->value() ) );
+    marker->setSymbol( sym.release() );
+  }
+  else if ( auto *line = dynamic_cast<QgsAnnotationLineItem *>( item ) )
+  {
+    if ( !settingsLineColor->exists() )
+      return;
+    std::unique_ptr<QgsLineSymbol> sym( line->symbol() ? line->symbol()->clone() : new QgsLineSymbol() );
+    if ( sym->symbolLayerCount() == 0 )
+      sym->appendSymbolLayer( new QgsSimpleLineSymbolLayer() );
+    auto *sl = dynamic_cast<QgsSimpleLineSymbolLayer *>( sym->symbolLayer( 0 ) );
+    if ( !sl )
+    {
+      auto *replacement = new QgsSimpleLineSymbolLayer();
+      sym->changeSymbolLayer( 0, replacement );
+      sl = replacement;
+    }
+    sl->setWidth( settingsLineWidth->value() );
+    sl->setColor( settingsLineColor->value() );
+    sl->setPenStyle( static_cast<Qt::PenStyle>( settingsLineStyle->value() ) );
+    line->setSymbol( sym.release() );
+  }
+  else if ( auto *poly = dynamic_cast<QgsAnnotationPolygonItem *>( item ) )
+  {
+    if ( !settingsPolygonStrokeColor->exists() )
+      return;
+    std::unique_ptr<QgsFillSymbol> sym( poly->symbol() ? poly->symbol()->clone() : new QgsFillSymbol() );
+    if ( sym->symbolLayerCount() == 0 )
+      sym->appendSymbolLayer( new QgsSimpleFillSymbolLayer() );
+    auto *sl = dynamic_cast<QgsSimpleFillSymbolLayer *>( sym->symbolLayer( 0 ) );
+    if ( !sl )
+    {
+      auto *replacement = new QgsSimpleFillSymbolLayer();
+      sym->changeSymbolLayer( 0, replacement );
+      sl = replacement;
+    }
+    sl->setStrokeWidth( settingsPolygonStrokeWidth->value() );
+    sl->setColor( settingsPolygonFillColor->value() );
+    sl->setStrokeColor( settingsPolygonStrokeColor->value() );
+    sl->setStrokeStyle( static_cast<Qt::PenStyle>( settingsPolygonStrokeStyle->value() ) );
+    sl->setBrushStyle( static_cast<Qt::BrushStyle>( settingsPolygonBrushStyle->value() ) );
+    poly->setSymbol( sym.release() );
+  }
+}
+
+void KadasMapToolEditAnnotationItem::createInitialItem()
+{
+  if ( !mLayer || !mController )
+    return;
+  QgsAnnotationItem *fresh = mItemFactory ? mItemFactory() : mController->createItem();
+  if ( !fresh )
+    return;
+  applyPersistedStyle( fresh );
+  mItemId = mLayer->addItem( fresh );
+  mItem = mLayer->item( mItemId );
+  mDrawState = DrawState::Empty;
+  mLayer->triggerRepaint();
+}
+
+void KadasMapToolEditAnnotationItem::clearInProgressItem()
+{
+  if ( mLayer && !mItemId.isEmpty() )
+  {
+    mLayer->removeItem( mItemId );
+    mLayer->triggerRepaint();
+  }
+  mItem = nullptr;
+  mItemId.clear();
+  mDrawState = DrawState::Empty;
+}
+
+void KadasMapToolEditAnnotationItem::startPart( const QgsPointXY &pos )
+{
+  if ( !mItem || !mController || !mLayer )
+    return;
+  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
+  if ( !mController->startPart( mItem, pos, ctx ) )
+  {
+    finishPart();
+  }
+  else
+  {
+    mDrawState = DrawState::InProgress;
+    mLayer->triggerRepaint();
+    pushState();
+  }
+}
+
+void KadasMapToolEditAnnotationItem::finishPart()
+{
+  if ( !mItem || !mController || !mLayer )
+    return;
+  mController->endPart( mItem );
+  mDrawState = DrawState::Finished;
+  mLayer->triggerRepaint();
+  pushState();
+  emit partFinished();
 }

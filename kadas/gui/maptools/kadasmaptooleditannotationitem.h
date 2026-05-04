@@ -19,10 +19,12 @@
 
 #include <QPointer>
 #include <QString>
+#include <functional>
 
 #include <qgis/qgsmaptool.h>
 #include <qgis/qgsvector.h>
 
+#include "kadas/core/kadassettingstree.h"
 #include "kadas/core/kadasstatehistory.h"
 #include "kadas/gui/kadas_gui.h"
 #include "kadas/gui/kadasattributetypes.h"
@@ -33,26 +35,39 @@ class KadasBottomBar;
 class KadasFloatingInputWidget;
 class QBoxLayout;
 class QComboBox;
+class QDoubleSpinBox;
 class QSpinBox;
 class QgsAnnotationItem;
 class QgsAnnotationLayer;
 class QgsColorButton;
+class QgsSettingsEntryColor;
+class QgsSettingsEntryDouble;
+class QgsSettingsEntryInteger;
 
 /**
  * \ingroup gui
- * \brief Map tool that edits an existing \c QgsAnnotationItem on a
+ * \brief Map tool that creates and/or edits a \c QgsAnnotationItem on a
  *        \c QgsAnnotationLayer, driven by a \c KadasAnnotationItemController.
  *
- * Equivalent of the legacy \c KadasMapToolEditItem. The item stays on the
- * target layer at all times; edits mutate it in place and undo/redo
- * snapshots are stored as cloned items, restored via
- * \c QgsAnnotationLayer::replaceItem.
+ * The tool has two entry modes:
+ *  - **Edit mode**: started with an existing \a itemId; clicks on vertices
+ *    drag them, the styling row in the bottom bar updates the symbol.
+ *  - **Create mode**: started with a \a controller and a target \a layer;
+ *    clicks place vertices for a fresh item, a right-click / Enter finalizes
+ *    the part. After finalization, clicks on existing vertices keep editing
+ *    them, while clicks on empty canvas start a brand-new item (single-part).
+ *
+ * Last-used styling per geometry kind (marker / line / polygon) is persisted
+ * via \c QgsSettingsEntry and re-applied to freshly created items.
  */
 class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
 {
     Q_OBJECT
   public:
+    //! Edit an existing annotation item in place.
     KadasMapToolEditAnnotationItem( QgsMapCanvas *canvas, QgsAnnotationLayer *layer, const QString &itemId );
+    //! Create a new annotation item via \a controller, then keep editing it.
+    KadasMapToolEditAnnotationItem( QgsMapCanvas *canvas, KadasAnnotationItemController *controller, QgsAnnotationLayer *layer );
 
     void activate() override;
     void deactivate() override;
@@ -63,20 +78,71 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     void canvasDoubleClickEvent( QgsMapMouseEvent *e ) override;
     void keyPressEvent( QKeyEvent *e ) override;
 
+    //! Create-mode: when true, finalized parts accumulate on the same item; default false.
+    void setMultipart( bool multipart ) { mMultipart = multipart; }
+
+    //! Create-mode: overrides the controller's createItem() factory.
+    void setItemFactory( std::function<QgsAnnotationItem *()> factory ) { mItemFactory = std::move( factory ); }
+
+    /**
+     * Create-mode: drives the create state machine with an explicit point,
+     * as if the user had left-clicked at \a pos. No-op in pure edit mode.
+     */
+    void addPoint( const QgsPointXY &pos );
+
+#ifndef SIP_RUN
+    static inline QgsSettingsTreeNode *sTreeAnnotation = KadasSettingsTree::sTreeKadas->createChildNode( QStringLiteral( "annotation" ) );
+
+    static const QgsSettingsEntryInteger *settingsMarkerShape;
+    static const QgsSettingsEntryInteger *settingsMarkerSize;
+    static const QgsSettingsEntryDouble *settingsMarkerStrokeWidth;
+    static const QgsSettingsEntryColor *settingsMarkerFillColor;
+    static const QgsSettingsEntryColor *settingsMarkerStrokeColor;
+    static const QgsSettingsEntryInteger *settingsMarkerStrokeStyle;
+    static const QgsSettingsEntryDouble *settingsLineWidth;
+    static const QgsSettingsEntryColor *settingsLineColor;
+    static const QgsSettingsEntryInteger *settingsLineStyle;
+    static const QgsSettingsEntryDouble *settingsPolygonStrokeWidth;
+    static const QgsSettingsEntryColor *settingsPolygonFillColor;
+    static const QgsSettingsEntryColor *settingsPolygonStrokeColor;
+    static const QgsSettingsEntryInteger *settingsPolygonStrokeStyle;
+    static const QgsSettingsEntryInteger *settingsPolygonBrushStyle;
+#endif
+
+  signals:
+    //! Create-mode: emitted whenever a part is finalized.
+    void partFinished();
+    //! Create-mode: emitted after a fresh item replaces the previous one.
+    void cleared();
+
   private:
+    enum class DrawState
+    {
+      Empty,
+      InProgress,
+      Finished,
+    };
+
     struct ToolState : KadasStateHistory::State
     {
-        explicit ToolState( QgsAnnotationItem *clone )
+        ToolState( QgsAnnotationItem *clone, DrawState ds )
           : itemClone( clone )
+          , drawState( ds )
         {}
         ~ToolState() override;
         QgsAnnotationItem *itemClone = nullptr;
+        DrawState drawState = DrawState::Finished;
     };
 
     KadasAnnotationItemController *mController = nullptr;
     QPointer<QgsAnnotationLayer> mLayer;
     QString mItemId;
     QgsAnnotationItem *mItem = nullptr;
+
+    bool mAllowCreate = false;
+    bool mMultipart = false;
+    DrawState mDrawState = DrawState::Finished;
+    std::function<QgsAnnotationItem *()> mItemFactory;
 
     KadasEditContext mEditContext;
     QgsVector mMoveOffset;
@@ -87,15 +153,13 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     KadasFloatingInputWidget *mInputWidget = nullptr;
     bool mIgnoreNextMoveEvent = false;
 
-    // Styling row (created for marker / line / polygon-based annotation items).
-    // Widgets that are not relevant for a given item type stay hidden.
-    QComboBox *mShapeCombo = nullptr;          // marker only
-    QSpinBox *mSizeSpin = nullptr;             // marker only
-    QSpinBox *mStrokeWidthSpin = nullptr;      // all
-    QgsColorButton *mFillColorBtn = nullptr;   // marker + polygon-based
-    QgsColorButton *mStrokeColorBtn = nullptr; // all
-    QComboBox *mStrokeStyleCombo = nullptr;    // all
-    QComboBox *mFillStyleCombo = nullptr;      // polygon-based only
+    QComboBox *mShapeCombo = nullptr;
+    QSpinBox *mSizeSpin = nullptr;
+    QDoubleSpinBox *mStrokeWidthSpin = nullptr;
+    QgsColorButton *mFillColorBtn = nullptr;
+    QgsColorButton *mStrokeColorBtn = nullptr;
+    QComboBox *mStrokeStyleCombo = nullptr;
+    QComboBox *mFillStyleCombo = nullptr;
 
     void pushState();
     void deleteItem();
@@ -103,12 +167,17 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     void clearNumericInput();
     KadasAttribValues collectAttributeValues() const;
 
-    //! Builds the styling row in the bottom bar; no-op for unsupported item types.
     void setupStyleWidgets( QBoxLayout *outer );
-    //! Reflects the current item's symbol in the widgets.
     void readStyleToWidgets();
-    //! Applies the widgets' current values back into the item's symbol.
     void applyStyleFromWidgets();
+    void persistStyleToSettings();
+    void applyPersistedStyle( QgsAnnotationItem *item ) const;
+
+    // Create-flow helpers.
+    void createInitialItem();
+    void clearInProgressItem();
+    void startPart( const QgsPointXY &pos );
+    void finishPart();
 
   private slots:
     void stateChanged( KadasStateHistory::ChangeType, KadasStateHistory::State *state, KadasStateHistory::State *prevState );
