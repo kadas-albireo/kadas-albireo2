@@ -38,39 +38,6 @@
 #include "kadas/gui/mapitems/kadasrectangleitembase.h"
 
 
-QJsonObject KadasRectangleItemBase::State::serialize() const
-{
-  QJsonArray pos;
-  pos.append( mPos.x() );
-  pos.append( mPos.y() );
-  QJsonArray size;
-  size.append( mSize.width() );
-  size.append( mSize.height() );
-  QJsonArray footprint;
-  for ( const KadasItemPos &footprintPos : mFootprint )
-  {
-    QJsonArray fp;
-    fp.append( footprintPos.x() );
-    fp.append( footprintPos.y() );
-    footprint.append( fp );
-  }
-  QJsonArray rectCenterPoint;
-  rectCenterPoint.append( mRectangleCenterPoint.x() );
-  rectCenterPoint.append( mRectangleCenterPoint.y() );
-
-  QJsonObject json;
-  //json["status"] = static_cast<int>( drawStatus );
-  json["pos"] = pos;
-  json["angle"] = mAngle;
-  json["offsetX"] = mOffsetX;
-  json["offsetY"] = mOffsetY;
-  json["size"] = size;
-  json["footprint"] = footprint;
-  json["rectangle-center"] = rectCenterPoint;
-  json["frame"] = mFrame;
-  return json;
-}
-
 bool KadasRectangleItemBase::State::deserialize( const QJsonObject &json )
 {
   // frame is enable by default, but for openng of older projects with texts (that had no frame), we disable it

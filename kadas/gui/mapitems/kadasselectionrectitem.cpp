@@ -28,13 +28,6 @@
 #include "kadas/gui/mapitems/kadasselectionrectitem.h"
 
 
-QJsonObject KadasSelectionRectItem::State::serialize() const
-{
-  QJsonObject json;
-  //json["status"] = static_cast<int>( drawStatus );
-  return json;
-}
-
 bool KadasSelectionRectItem::State::deserialize( const QJsonObject &json )
 {
   //drawStatus = static_cast<DrawStatus>( json["status"].toInt() );

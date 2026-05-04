@@ -369,7 +369,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
       public:
         virtual void assign( const State *other ) = 0;
         virtual State *clone() const = 0 SIP_FACTORY;
-        virtual QJsonObject serialize() const = 0;
         virtual bool deserialize( const QJsonObject &json ) = 0;
     };
     const State *constState() const { return mState; }

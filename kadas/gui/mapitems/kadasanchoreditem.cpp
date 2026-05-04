@@ -25,24 +25,6 @@
 #include "kadas/gui/mapitems/kadasanchoreditem.h"
 
 
-QJsonObject KadasAnchoredItem::State::serialize() const
-{
-  QJsonArray p;
-  p.append( pos.x() );
-  p.append( pos.y() );
-  QJsonArray s;
-  s.append( size.width() );
-  s.append( size.height() );
-
-  QJsonObject json;
-  //json["status"] = static_cast<int>( drawStatus );
-  ;
-  json["pos"] = p;
-  json["angle"] = angle;
-  json["size"] = s;
-  return json;
-}
-
 bool KadasAnchoredItem::State::deserialize( const QJsonObject &json )
 {
   //drawStatus = static_cast<DrawStatus>( json["status"].toInt() );

@@ -63,11 +63,6 @@ class QVector3 : public QGenericMatrix<1, 3, float>
 };
 
 
-QJsonObject KadasPictureItem::State::serialize() const
-{
-  return KadasRectangleItemBase::State::serialize();
-}
-
 bool KadasPictureItem::State::deserialize( const QJsonObject &json )
 {
   if ( json.contains( "cameraTarget" ) )

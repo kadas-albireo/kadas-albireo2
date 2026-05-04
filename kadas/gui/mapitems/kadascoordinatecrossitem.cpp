@@ -33,16 +33,6 @@
 #include "kadas/gui/mapitems/kadascoordinatecrossitem.h"
 
 
-QJsonObject KadasCoordinateCrossItem::State::serialize() const
-{
-  QJsonObject json;
-  //json["status"] = static_cast<int>( drawStatus );
-  ;
-  json["x"] = pos.x();
-  json["y"] = pos.y();
-  return json;
-}
-
 bool KadasCoordinateCrossItem::State::deserialize( const QJsonObject &json )
 {
   //drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
