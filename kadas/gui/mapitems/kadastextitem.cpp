@@ -17,6 +17,7 @@
 
 #include <QAction>
 #include <QMenu>
+#include <QDomElement>
 
 #include <qgis/qgsannotationpointtextitem.h>
 #include <qgis/qgsfeedback.h>
@@ -123,6 +124,39 @@ KadasMapItem *KadasTextItem::_clone() const SIP_FACTORY
   item->mOutlineColor = mOutlineColor;
   item->mAngle = mAngle;
   return item;
+}
+
+void KadasTextItem::writeXmlPrivate( QDomElement &element ) const
+{
+  element.setAttribute( QStringLiteral( "text" ), mText );
+  element.setAttribute( QStringLiteral( "color" ), mColor.name( QColor::HexArgb ) );
+  element.setAttribute( QStringLiteral( "outline_color" ), mOutlineColor.name( QColor::HexArgb ) );
+  element.setAttribute( QStringLiteral( "font" ), mFont.toString() );
+  element.setAttribute( QStringLiteral( "angle" ), mAngle );
+  element.setAttribute( QStringLiteral( "geometry" ), QgsPoint( point() ).asWkt() );
+}
+
+void KadasTextItem::readXmlPrivate( const QDomElement &element )
+{
+  mText = element.attribute( QStringLiteral( "text" ) );
+  const QString colorStr = element.attribute( QStringLiteral( "color" ) );
+  if ( !colorStr.isEmpty() )
+    mColor = QColor( colorStr );
+  const QString outlineStr = element.attribute( QStringLiteral( "outline_color" ) );
+  if ( !outlineStr.isEmpty() )
+    mOutlineColor = QColor( outlineStr );
+  const QString fontStr = element.attribute( QStringLiteral( "font" ) );
+  if ( !fontStr.isEmpty() )
+    mFont.fromString( fontStr );
+  mAngle = element.attribute( QStringLiteral( "angle" ), QStringLiteral( "0" ) ).toDouble();
+  const QString wkt = element.attribute( QStringLiteral( "geometry" ) );
+  if ( !wkt.isEmpty() )
+  {
+    QgsGeometry g = QgsGeometry::fromWkt( wkt );
+    if ( !g.isNull() )
+      setPoint( g.asPoint() );
+  }
+  updateQgsAnnotation();
 }
 
 QgsRectangle KadasTextItem::boundingBox() const
