@@ -17,6 +17,7 @@
 #include <QFontMetrics>
 #include <QPainter>
 #include <QPainterPath>
+#include <QDomElement>
 
 #include <qgis/qgsrendercontext.h>
 
@@ -186,4 +187,46 @@ QList<QgsAnnotationItem *> KadasGpxRouteItem::annotationItems( const QgsCoordina
     items.append( anno );
   }
   return items;
+}
+
+KadasMapItem *KadasGpxRouteItem::_clone() const
+{
+  KadasGpxRouteItem *item = new KadasGpxRouteItem();
+  item->mGeometry = mGeometry->clone();
+  item->mPen = mPen;
+  item->mBrush = mBrush;
+  item->mIconType = mIconType;
+  item->mIconSize = mIconSize;
+  item->mIconPen = mIconPen;
+  item->mIconBrush = mIconBrush;
+  item->mName = mName;
+  item->mNumber = mNumber;
+  item->mLabelFont = mLabelFont;
+  item->mLabelColor = mLabelColor;
+  return item;
+}
+
+void KadasGpxRouteItem::writeXmlPrivate( QDomElement &element ) const
+{
+  KadasLineItem::writeXmlPrivate( element );
+  element.setAttribute( QStringLiteral( "gpx_name" ), mName );
+  element.setAttribute( QStringLiteral( "gpx_number" ), mNumber );
+  element.setAttribute( QStringLiteral( "label_font" ), mLabelFont.toString() );
+  element.setAttribute( QStringLiteral( "label_color" ), mLabelColor.name( QColor::HexArgb ) );
+}
+
+void KadasGpxRouteItem::readXmlPrivate( const QDomElement &element )
+{
+  KadasLineItem::readXmlPrivate( element );
+  const bool isLegacy = element.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) == QLatin1String( "1" );
+  if ( isLegacy )
+    return;
+  mName = element.attribute( QStringLiteral( "gpx_name" ) );
+  mNumber = element.attribute( QStringLiteral( "gpx_number" ) );
+  const QString fontStr = element.attribute( QStringLiteral( "label_font" ) );
+  if ( !fontStr.isEmpty() )
+    mLabelFont.fromString( fontStr );
+  const QString colorStr = element.attribute( QStringLiteral( "label_color" ) );
+  if ( !colorStr.isEmpty() )
+    mLabelColor = QColor( colorStr );
 }
