@@ -28,6 +28,8 @@ class KADAS_GUI_EXPORT KadasCoordinateCrossItem : public KadasMapItem
 
     QString itemName() const override { return tr( "Coordinate cross" ); }
 
+    bool useQgisAnnotations() const override { return true; }
+
     QgsRectangle boundingBox() const override;
     Margin margin() const override;
     QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const override;
@@ -73,6 +75,9 @@ class KADAS_GUI_EXPORT KadasCoordinateCrossItem : public KadasMapItem
   protected:
     KadasMapItem *_clone() const override SIP_FACTORY { return new KadasCoordinateCrossItem( crs() ); }
     State *createEmptyState() const override SIP_FACTORY { return new State(); }
+
+    void writeXmlPrivate( QDomElement &element ) const override;
+    void readXmlPrivate( const QDomElement &element ) override;
 
   private:
     enum AttribIds

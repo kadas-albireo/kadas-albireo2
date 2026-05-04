@@ -15,6 +15,8 @@
  ***************************************************************************/
 
 #include <QJsonArray>
+#include <QJsonDocument>
+#include <QDomElement>
 
 #include <qgis/qgsgeometryengine.h>
 #include <qgis/qgslinestring.h>
@@ -217,6 +219,28 @@ bool KadasCoordinateCrossItem::continuePart( const QgsMapSettings &mapSettings )
 void KadasCoordinateCrossItem::endPart()
 {
   mDrawStatus = DrawStatus::Finished;
+}
+
+void KadasCoordinateCrossItem::writeXmlPrivate( QDomElement &element ) const
+{
+  element.setAttribute( QStringLiteral( "x" ), constState()->pos.x() );
+  element.setAttribute( QStringLiteral( "y" ), constState()->pos.y() );
+}
+
+void KadasCoordinateCrossItem::readXmlPrivate( const QDomElement &element )
+{
+  // format_version 1 = legacy JSON in CDATA (Q_PROPERTY-based serialize());
+  // format_version 2 = typed XML attributes.
+  const bool isLegacy = element.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) == QLatin1String( "1" );
+  if ( isLegacy )
+  {
+    QJsonObject data = QJsonDocument::fromJson( element.firstChild().toCDATASection().data().toLocal8Bit() ).object();
+    deserialize( data );
+    return;
+  }
+  clear();
+  state()->pos = KadasItemPos( element.attribute( QStringLiteral( "x" ) ).toDouble(), element.attribute( QStringLiteral( "y" ) ).toDouble() );
+  update();
 }
 
 KadasMapItem::AttribDefs KadasCoordinateCrossItem::drawAttribs() const
