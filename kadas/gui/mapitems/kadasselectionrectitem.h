@@ -75,9 +75,6 @@ class KADAS_GUI_EXPORT KadasSelectionRectItem : public KadasMapItem
     KadasMapItem *_clone() const override SIP_FACTORY { return new KadasSelectionRectItem( crs() ); }
     State *createEmptyState() const override SIP_FACTORY { return new State(); }
 
-    void writeXmlPrivate( QDomElement &element ) const override { Q_UNUSED( element ); }
-    void readXmlPrivate( const QDomElement &element ) override { Q_UNUSED( element ); }
-
   private:
     QList<KadasMapItem *> mItems;
 
