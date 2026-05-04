@@ -22,10 +22,6 @@
 class KADAS_GUI_EXPORT KadasGpxRouteItem : public KadasLineItem
 {
     Q_OBJECT
-    Q_PROPERTY( QString name READ name WRITE setName )
-    Q_PROPERTY( QString number READ number WRITE setNumber )
-    Q_PROPERTY( QFont labelFont READ labelFont WRITE setLabelFont )
-    Q_PROPERTY( QColor labelColor READ labelColor WRITE setLabelColor )
 
   public:
     KadasGpxRouteItem( QObject *parent = nullptr );
@@ -51,7 +47,10 @@ class KADAS_GUI_EXPORT KadasGpxRouteItem : public KadasLineItem
     QList<QgsAnnotationItem *> annotationItems( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const override SIP_FACTORY;
 
   protected:
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasGpxRouteItem(); }
+    KadasMapItem *_clone() const override SIP_FACTORY;
+
+    void writeXmlPrivate( QDomElement &element ) const override;
+    void readXmlPrivate( const QDomElement &element ) override;
 
     QString mName;
     QString mNumber;
