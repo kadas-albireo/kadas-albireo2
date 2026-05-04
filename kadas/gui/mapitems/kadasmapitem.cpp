@@ -77,14 +77,6 @@ KadasMapItem *KadasMapItem::clone() const
   item->mSelected = mSelected;
   item->mAssociatedLayer = mAssociatedLayer;
 
-  if ( !useQgisAnnotations() )
-  {
-    for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
-    {
-      QMetaProperty prop = metaObject()->property( i );
-      prop.write( item, prop.read( this ) );
-    }
-  }
   if ( mState )
     item->mState = mState->clone();
 
