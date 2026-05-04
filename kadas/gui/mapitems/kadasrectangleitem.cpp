@@ -15,6 +15,8 @@
  ***************************************************************************/
 
 #include <QJsonArray>
+#include <QJsonDocument>
+#include <QDomElement>
 
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgslinestring.h>
@@ -364,7 +366,55 @@ KadasMapItem *KadasRectangleItem::_clone() const
 {
   KadasRectangleItem *item = new KadasRectangleItem( crs() );
   item->mGeometry = mGeometry->clone();
+  item->mPen = mPen;
+  item->mBrush = mBrush;
+  item->mIconType = mIconType;
+  item->mIconSize = mIconSize;
+  item->mIconPen = mIconPen;
+  item->mIconBrush = mIconBrush;
   return item;
+}
+
+void KadasRectangleItem::writeXmlPrivate( QDomElement &element ) const
+{
+  writeGeometryBaseAttributes( element );
+  QStringList p1Str;
+  for ( const KadasItemPos &p : constState()->p1 )
+    p1Str << QStringLiteral( "%1,%2" ).arg( p.x(), 0, 'g', 17 ).arg( p.y(), 0, 'g', 17 );
+  QStringList p2Str;
+  for ( const KadasItemPos &p : constState()->p2 )
+    p2Str << QStringLiteral( "%1,%2" ).arg( p.x(), 0, 'g', 17 ).arg( p.y(), 0, 'g', 17 );
+  element.setAttribute( QStringLiteral( "p1" ), p1Str.join( QChar( ';' ) ) );
+  element.setAttribute( QStringLiteral( "p2" ), p2Str.join( QChar( ';' ) ) );
+}
+
+void KadasRectangleItem::readXmlPrivate( const QDomElement &element )
+{
+  const bool isLegacy = element.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) == QLatin1String( "1" );
+  if ( isLegacy )
+  {
+    QJsonObject data = QJsonDocument::fromJson( element.firstChild().toCDATASection().data().toLocal8Bit() ).object();
+    deserialize( data );
+    return;
+  }
+
+  readGeometryBaseAttributesV2( element );
+  clear();
+  auto parsePoints = []( const QString &s ) {
+    QList<KadasItemPos> out;
+    if ( s.isEmpty() )
+      return out;
+    for ( const QString &pair : s.split( QChar( ';' ), Qt::SkipEmptyParts ) )
+    {
+      const QStringList xy = pair.split( QChar( ',' ) );
+      if ( xy.size() == 2 )
+        out.append( KadasItemPos( xy[0].toDouble(), xy[1].toDouble() ) );
+    }
+    return out;
+  };
+  state()->p1 = parsePoints( element.attribute( QStringLiteral( "p1" ) ) );
+  state()->p2 = parsePoints( element.attribute( QStringLiteral( "p2" ) ) );
+  recomputeDerived();
 }
 
 void KadasRectangleItem::recomputeDerived()
