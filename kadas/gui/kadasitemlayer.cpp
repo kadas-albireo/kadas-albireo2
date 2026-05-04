@@ -105,9 +105,6 @@ QgsAnnotationLayer *KadasItemLayer::qgisAnnotationLayer( const QgsCoordinateRefe
 
   for ( ItemId id : std::as_const( mItemOrder ) )
   {
-    if ( !mItems[id]->useQgisAnnotations() )
-      continue;
-
     items << mItems[id]->annotationItem( crs );
   }
   std::stable_sort( items.begin(), items.end(), []( QgsAnnotationItem *a, QgsAnnotationItem *b ) { return a->zIndex() < b->zIndex(); } );
