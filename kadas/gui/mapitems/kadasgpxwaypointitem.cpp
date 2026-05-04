@@ -17,6 +17,7 @@
 #include <QFontMetrics>
 #include <QPainter>
 #include <QPainterPath>
+#include <QDomElement>
 
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrendercontext.h>
@@ -191,4 +192,43 @@ QgsAnnotationMarkerItem *KadasGpxWaypointItem::annotationItem( const QgsCoordina
   anno->setLabelColor( mLabelColor );
   anno->setZIndex( zIndex() ? zIndex() : KadasAnnotationZIndex::GpxWaypoint );
   return anno;
+}
+
+KadasMapItem *KadasGpxWaypointItem::_clone() const
+{
+  KadasGpxWaypointItem *item = new KadasGpxWaypointItem();
+  item->setShape( shape() );
+  item->setIconSize( iconSize() );
+  item->setColor( color() );
+  item->setStrokeColor( strokeColor() );
+  item->setStrokeWidth( strokeWidth() );
+  item->setStrokeStyle( strokeStyle() );
+  item->setPoint( point() );
+  item->mName = mName;
+  item->mLabelFont = mLabelFont;
+  item->mLabelColor = mLabelColor;
+  return item;
+}
+
+void KadasGpxWaypointItem::writeXmlPrivate( QDomElement &element ) const
+{
+  KadasPointItem::writeXmlPrivate( element );
+  element.setAttribute( QStringLiteral( "gpx_name" ), mName );
+  element.setAttribute( QStringLiteral( "label_font" ), mLabelFont.toString() );
+  element.setAttribute( QStringLiteral( "label_color" ), mLabelColor.name( QColor::HexArgb ) );
+}
+
+void KadasGpxWaypointItem::readXmlPrivate( const QDomElement &element )
+{
+  KadasPointItem::readXmlPrivate( element );
+  const bool isLegacy = element.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) == QLatin1String( "1" );
+  if ( isLegacy )
+    return;
+  mName = element.attribute( QStringLiteral( "gpx_name" ) );
+  const QString fontStr = element.attribute( QStringLiteral( "label_font" ) );
+  if ( !fontStr.isEmpty() )
+    mLabelFont.fromString( fontStr );
+  const QString colorStr = element.attribute( QStringLiteral( "label_color" ) );
+  if ( !colorStr.isEmpty() )
+    mLabelColor = QColor( colorStr );
 }

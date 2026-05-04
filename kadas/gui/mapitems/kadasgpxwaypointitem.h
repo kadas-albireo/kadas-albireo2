@@ -22,9 +22,6 @@
 class KADAS_GUI_EXPORT KadasGpxWaypointItem : public KadasPointItem
 {
     Q_OBJECT
-    Q_PROPERTY( QString name READ name WRITE setName )
-    Q_PROPERTY( QFont labelFont READ labelFont WRITE setLabelFont )
-    Q_PROPERTY( QColor labelColor READ labelColor WRITE setLabelColor )
 
   public:
     KadasGpxWaypointItem();
@@ -50,7 +47,10 @@ class KADAS_GUI_EXPORT KadasGpxWaypointItem : public KadasPointItem
     QgsAnnotationMarkerItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const override SIP_FACTORY;
 
   protected:
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasGpxWaypointItem(); }
+    KadasMapItem *_clone() const override SIP_FACTORY;
+
+    void writeXmlPrivate( QDomElement &element ) const override;
+    void readXmlPrivate( const QDomElement &element ) override;
 
     QString mName;
     QFont mLabelFont;
