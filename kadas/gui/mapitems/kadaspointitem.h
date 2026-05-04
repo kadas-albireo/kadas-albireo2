@@ -83,12 +83,6 @@ class KADAS_GUI_EXPORT KadasAbstractPointItem : public KadasMapItem SIP_ABSTRACT
 class KADAS_GUI_EXPORT KadasPointItem : public KadasAbstractPointItem
 {
     Q_OBJECT
-    Q_PROPERTY( Qgis::MarkerShape mShape READ shape WRITE setShape )
-    Q_PROPERTY( int mIconSize READ iconSize WRITE setIconSize )
-    Q_PROPERTY( QColor mFillColor READ color WRITE setColor )
-    Q_PROPERTY( QColor mStrokeColor READ strokeColor WRITE setStrokeColor )
-    Q_PROPERTY( double mStrokeWidth READ strokeWidth WRITE setStrokeWidth )
-    Q_PROPERTY( Qt::PenStyle mStrokeStyle READ strokeStyle WRITE setStrokeStyle )
 
   public:
     KadasPointItem( const QgsCoordinateReferenceSystem &crs, Qgis::MarkerShape icon = Qgis::MarkerShape::Circle );
