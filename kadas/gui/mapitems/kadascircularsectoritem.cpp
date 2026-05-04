@@ -15,6 +15,8 @@
  ***************************************************************************/
 
 #include <QJsonArray>
+#include <QJsonDocument>
+#include <QDomElement>
 
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgscircularstring.h>
@@ -356,7 +358,76 @@ KadasMapItem *KadasCircularSectorItem::_clone() const
 {
   KadasCircularSectorItem *item = new KadasCircularSectorItem( crs() );
   item->mGeometry = mGeometry->clone();
+  item->mPen = mPen;
+  item->mBrush = mBrush;
+  item->mIconType = mIconType;
+  item->mIconSize = mIconSize;
+  item->mIconPen = mIconPen;
+  item->mIconBrush = mIconBrush;
   return item;
+}
+
+void KadasCircularSectorItem::writeXmlPrivate( QDomElement &element ) const
+{
+  writeGeometryBaseAttributes( element );
+  element.setAttribute( QStringLiteral( "sector_status" ), static_cast<int>( constState()->sectorStatus ) );
+  QStringList centersStr;
+  for ( const KadasItemPos &p : constState()->centers )
+    centersStr << QStringLiteral( "%1,%2" ).arg( p.x(), 0, 'g', 17 ).arg( p.y(), 0, 'g', 17 );
+  QStringList radiiStr;
+  for ( double r : constState()->radii )
+    radiiStr << QString::number( r, 'g', 17 );
+  QStringList startAnglesStr;
+  for ( double a : constState()->startAngles )
+    startAnglesStr << QString::number( a, 'g', 17 );
+  QStringList stopAnglesStr;
+  for ( double a : constState()->stopAngles )
+    stopAnglesStr << QString::number( a, 'g', 17 );
+  element.setAttribute( QStringLiteral( "centers" ), centersStr.join( QChar( ';' ) ) );
+  element.setAttribute( QStringLiteral( "radii" ), radiiStr.join( QChar( ';' ) ) );
+  element.setAttribute( QStringLiteral( "start_angles" ), startAnglesStr.join( QChar( ';' ) ) );
+  element.setAttribute( QStringLiteral( "stop_angles" ), stopAnglesStr.join( QChar( ';' ) ) );
+}
+
+void KadasCircularSectorItem::readXmlPrivate( const QDomElement &element )
+{
+  const bool isLegacy = element.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) == QLatin1String( "1" );
+  if ( isLegacy )
+  {
+    QJsonObject data = QJsonDocument::fromJson( element.firstChild().toCDATASection().data().toLocal8Bit() ).object();
+    deserialize( data );
+    return;
+  }
+
+  readGeometryBaseAttributesV2( element );
+  clear();
+  state()->sectorStatus = static_cast<State::SectorStatus>( element.attribute( QStringLiteral( "sector_status" ), QStringLiteral( "0" ) ).toInt() );
+  state()->centers.clear();
+  state()->radii.clear();
+  state()->startAngles.clear();
+  state()->stopAngles.clear();
+  const QString centersAttr = element.attribute( QStringLiteral( "centers" ) );
+  if ( !centersAttr.isEmpty() )
+  {
+    for ( const QString &pair : centersAttr.split( QChar( ';' ), Qt::SkipEmptyParts ) )
+    {
+      const QStringList xy = pair.split( QChar( ',' ) );
+      if ( xy.size() == 2 )
+        state()->centers.append( KadasItemPos( xy[0].toDouble(), xy[1].toDouble() ) );
+    }
+  }
+  auto parseDoubles = []( const QString &s ) {
+    QList<double> out;
+    if ( s.isEmpty() )
+      return out;
+    for ( const QString &v : s.split( QChar( ';' ), Qt::SkipEmptyParts ) )
+      out.append( v.toDouble() );
+    return out;
+  };
+  state()->radii = parseDoubles( element.attribute( QStringLiteral( "radii" ) ) );
+  state()->startAngles = parseDoubles( element.attribute( QStringLiteral( "start_angles" ) ) );
+  state()->stopAngles = parseDoubles( element.attribute( QStringLiteral( "stop_angles" ) ) );
+  recomputeDerived();
 }
 
 QgsMultiSurface *KadasCircularSectorItem::geometry()
