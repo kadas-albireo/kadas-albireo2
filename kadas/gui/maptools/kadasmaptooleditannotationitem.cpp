@@ -14,15 +14,29 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QComboBox>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QList>
+#include <QPainter>
+#include <QPixmap>
 #include <QPushButton>
+#include <QSignalBlocker>
+#include <QSpinBox>
+#include <QVBoxLayout>
+#include <cmath>
+#include <memory>
 
 #include <qgis/qgsannotationitem.h>
 #include <qgis/qgsannotationlayer.h>
+#include <qgis/qgsannotationmarkeritem.h>
+#include <qgis/qgscolorbutton.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapmouseevent.h>
+#include <qgis/qgsmarkersymbol.h>
+#include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgssettings.h>
+#include <qgis/qgssymbollayerutils.h>
 
 #include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontext.h"
@@ -30,6 +44,46 @@
 #include "kadas/gui/kadasbottombar.h"
 #include "kadas/gui/kadasfloatinginputwidget.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
+
+
+namespace
+{
+  //! Standard marker shapes exposed in the styling row, in display order.
+  static const QList<Qgis::MarkerShape> sShapeChoices = {
+    Qgis::MarkerShape::Circle,
+    Qgis::MarkerShape::Square,
+    Qgis::MarkerShape::Triangle,
+    Qgis::MarkerShape::Diamond,
+    Qgis::MarkerShape::Pentagon,
+    Qgis::MarkerShape::Star,
+    Qgis::MarkerShape::Cross,
+    Qgis::MarkerShape::Cross2,
+  };
+
+  QIcon outlineStyleIcon( Qt::PenStyle style )
+  {
+    QPixmap pix( 24, 16 );
+    pix.fill( Qt::transparent );
+    QPainter p( &pix );
+    p.setRenderHint( QPainter::Antialiasing );
+    QPen pen( Qt::black );
+    pen.setStyle( style );
+    pen.setWidth( 2 );
+    p.setPen( pen );
+    p.drawLine( 0, 8, 24, 8 );
+    return pix;
+  }
+
+  QgsSimpleMarkerSymbolLayer *firstSimpleMarker( QgsAnnotationMarkerItem *item )
+  {
+    if ( !item )
+      return nullptr;
+    QgsMarkerSymbol *sym = const_cast<QgsMarkerSymbol *>( item->symbol() );
+    if ( !sym || sym->symbolLayerCount() == 0 )
+      return nullptr;
+    return dynamic_cast<QgsSimpleMarkerSymbolLayer *>( sym->symbolLayer( 0 ) );
+  }
+} // namespace
 
 
 KadasMapToolEditAnnotationItem::ToolState::~ToolState()
@@ -66,14 +120,18 @@ void KadasMapToolEditAnnotationItem::activate()
   connect( mStateHistory, &KadasStateHistory::stateChanged, this, &KadasMapToolEditAnnotationItem::stateChanged );
 
   mBottomBar = new KadasBottomBar( canvas() );
-  mBottomBar->setLayout( new QHBoxLayout() );
-  mBottomBar->layout()->setContentsMargins( 8, 4, 8, 4 );
+  auto *outer = new QVBoxLayout();
+  outer->setContentsMargins( 8, 4, 8, 4 );
+  mBottomBar->setLayout( outer );
+
+  auto *topRow = new QHBoxLayout();
+  outer->addLayout( topRow );
 
   QLabel *label = new QLabel( tr( "Edit %1" ).arg( mController->itemName() ) );
   QFont font = label->font();
   font.setBold( true );
   label->setFont( font );
-  mBottomBar->layout()->addWidget( label );
+  topRow->addWidget( label );
 
   QPushButton *undoButton = new QPushButton();
   undoButton->setIcon( QIcon( ":/kadas/icons/undo" ) );
@@ -81,7 +139,7 @@ void KadasMapToolEditAnnotationItem::activate()
   undoButton->setEnabled( false );
   connect( undoButton, &QPushButton::clicked, this, [this] { mStateHistory->undo(); } );
   connect( mStateHistory, &KadasStateHistory::canUndoChanged, undoButton, &QPushButton::setEnabled );
-  mBottomBar->layout()->addWidget( undoButton );
+  topRow->addWidget( undoButton );
 
   QPushButton *redoButton = new QPushButton();
   redoButton->setIcon( QIcon( ":/kadas/icons/redo" ) );
@@ -89,13 +147,16 @@ void KadasMapToolEditAnnotationItem::activate()
   redoButton->setEnabled( false );
   connect( redoButton, &QPushButton::clicked, this, [this] { mStateHistory->redo(); } );
   connect( mStateHistory, &KadasStateHistory::canRedoChanged, redoButton, &QPushButton::setEnabled );
-  mBottomBar->layout()->addWidget( redoButton );
+  topRow->addWidget( redoButton );
 
   QPushButton *closeButton = new QPushButton();
   closeButton->setIcon( QIcon( ":/kadas/icons/close" ) );
   closeButton->setToolTip( tr( "Close" ) );
   connect( closeButton, &QPushButton::clicked, this, [this] { canvas()->unsetMapTool( this ); } );
-  mBottomBar->layout()->addWidget( closeButton );
+  topRow->addWidget( closeButton );
+
+  if ( auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( mItem ) )
+    setupMarkerStyleWidgets( marker, outer );
 
   mBottomBar->adjustSize();
   mBottomBar->show();
@@ -108,6 +169,13 @@ void KadasMapToolEditAnnotationItem::deactivate()
     mLayer->triggerRepaint();
   delete mBottomBar;
   mBottomBar = nullptr;
+  // Style widgets were children of mBottomBar; their pointers are now dangling.
+  mShapeCombo = nullptr;
+  mSizeSpin = nullptr;
+  mStrokeWidthSpin = nullptr;
+  mFillColorBtn = nullptr;
+  mStrokeColorBtn = nullptr;
+  mStrokeStyleCombo = nullptr;
   delete mStateHistory;
   mStateHistory = nullptr;
   clearNumericInput();
@@ -256,6 +324,7 @@ void KadasMapToolEditAnnotationItem::stateChanged( KadasStateHistory::ChangeType
   mLayer->triggerRepaint();
   mEditContext = KadasEditContext();
   clearNumericInput();
+  readMarkerStyleToWidgets();
 }
 
 void KadasMapToolEditAnnotationItem::setupNumericInput()
@@ -312,4 +381,129 @@ void KadasMapToolEditAnnotationItem::inputChanged()
   mController->edit( mItem, mEditContext, values, ctx );
   mLayer->triggerRepaint();
   pushState();
+}
+
+void KadasMapToolEditAnnotationItem::setupMarkerStyleWidgets( QgsAnnotationMarkerItem *item, QBoxLayout *outer )
+{
+  if ( !item )
+    return;
+
+  auto *row = new QHBoxLayout();
+  outer->addLayout( row );
+
+  // Shape
+  mShapeCombo = new QComboBox();
+  for ( Qgis::MarkerShape shape : sShapeChoices )
+    mShapeCombo->addItem( QgsSimpleMarkerSymbolLayerBase::encodeShape( shape ), QVariant::fromValue( static_cast<int>( shape ) ) );
+  mShapeCombo->setToolTip( tr( "Marker shape" ) );
+  row->addWidget( mShapeCombo );
+
+  // Size
+  mSizeSpin = new QSpinBox();
+  mSizeSpin->setRange( 1, 100 );
+  mSizeSpin->setSuffix( QStringLiteral( " mm" ) );
+  mSizeSpin->setToolTip( tr( "Marker size" ) );
+  row->addWidget( mSizeSpin );
+
+  // Stroke width
+  mStrokeWidthSpin = new QSpinBox();
+  mStrokeWidthSpin->setRange( 0, 20 );
+  mStrokeWidthSpin->setToolTip( tr( "Outline width" ) );
+  row->addWidget( mStrokeWidthSpin );
+
+  // Fill color
+  mFillColorBtn = new QgsColorButton();
+  mFillColorBtn->setAllowOpacity( true );
+  mFillColorBtn->setShowNoColor( true );
+  mFillColorBtn->setToolTip( tr( "Fill color" ) );
+  row->addWidget( mFillColorBtn );
+
+  // Stroke color
+  mStrokeColorBtn = new QgsColorButton();
+  mStrokeColorBtn->setAllowOpacity( true );
+  mStrokeColorBtn->setShowNoColor( true );
+  mStrokeColorBtn->setToolTip( tr( "Outline color" ) );
+  row->addWidget( mStrokeColorBtn );
+
+  // Stroke style
+  mStrokeStyleCombo = new QComboBox();
+  for ( Qt::PenStyle style : { Qt::NoPen, Qt::SolidLine, Qt::DashLine, Qt::DashDotLine, Qt::DotLine } )
+    mStrokeStyleCombo->addItem( outlineStyleIcon( style ), QString(), QVariant::fromValue( static_cast<int>( style ) ) );
+  mStrokeStyleCombo->setToolTip( tr( "Outline style" ) );
+  row->addWidget( mStrokeStyleCombo );
+
+  readMarkerStyleToWidgets();
+
+  auto applyAndPush = [this] {
+    applyMarkerStyleFromWidgets();
+    if ( mLayer )
+      mLayer->triggerRepaint();
+    pushState();
+  };
+  connect( mShapeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, applyAndPush );
+  connect( mSizeSpin, qOverload<int>( &QSpinBox::valueChanged ), this, applyAndPush );
+  connect( mStrokeWidthSpin, qOverload<int>( &QSpinBox::valueChanged ), this, applyAndPush );
+  connect( mFillColorBtn, &QgsColorButton::colorChanged, this, applyAndPush );
+  connect( mStrokeColorBtn, &QgsColorButton::colorChanged, this, applyAndPush );
+  connect( mStrokeStyleCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, applyAndPush );
+}
+
+void KadasMapToolEditAnnotationItem::readMarkerStyleToWidgets()
+{
+  if ( !mShapeCombo )
+    return; // styling row not built (item is not a marker)
+  auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( mItem );
+  QgsSimpleMarkerSymbolLayer *sl = firstSimpleMarker( marker );
+  if ( !sl )
+    return;
+
+  const QSignalBlocker b1( mShapeCombo );
+  const QSignalBlocker b2( mSizeSpin );
+  const QSignalBlocker b3( mStrokeWidthSpin );
+  const QSignalBlocker b4( mFillColorBtn );
+  const QSignalBlocker b5( mStrokeColorBtn );
+  const QSignalBlocker b6( mStrokeStyleCombo );
+
+  const int shapeIdx = mShapeCombo->findData( static_cast<int>( sl->shape() ) );
+  if ( shapeIdx >= 0 )
+    mShapeCombo->setCurrentIndex( shapeIdx );
+  mSizeSpin->setValue( static_cast<int>( std::round( sl->size() ) ) );
+  mStrokeWidthSpin->setValue( static_cast<int>( std::round( sl->strokeWidth() ) ) );
+  mFillColorBtn->setColor( sl->color() );
+  mStrokeColorBtn->setColor( sl->strokeColor() );
+  const int styleIdx = mStrokeStyleCombo->findData( static_cast<int>( sl->strokeStyle() ) );
+  if ( styleIdx >= 0 )
+    mStrokeStyleCombo->setCurrentIndex( styleIdx );
+}
+
+void KadasMapToolEditAnnotationItem::applyMarkerStyleFromWidgets()
+{
+  if ( !mShapeCombo || !mItem || !mLayer )
+    return;
+  auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( mItem );
+  if ( !marker )
+    return;
+
+  // Clone the existing symbol so we can replace its first simple-marker layer.
+  std::unique_ptr<QgsMarkerSymbol> sym( marker->symbol() ? marker->symbol()->clone() : new QgsMarkerSymbol() );
+  if ( sym->symbolLayerCount() == 0 )
+    sym->appendSymbolLayer( new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Circle ) );
+
+  auto *sl = dynamic_cast<QgsSimpleMarkerSymbolLayer *>( sym->symbolLayer( 0 ) );
+  if ( !sl )
+  {
+    auto *replacement = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Circle );
+    sym->changeSymbolLayer( 0, replacement );
+    sl = replacement;
+  }
+
+  const auto shape = static_cast<Qgis::MarkerShape>( mShapeCombo->currentData().toInt() );
+  sl->setShape( shape );
+  sl->setSize( mSizeSpin->value() );
+  sl->setStrokeWidth( mStrokeWidthSpin->value() );
+  sl->setColor( mFillColorBtn->color() );
+  sl->setStrokeColor( mStrokeColorBtn->color() );
+  sl->setStrokeStyle( static_cast<Qt::PenStyle>( mStrokeStyleCombo->currentData().toInt() ) );
+
+  marker->setSymbol( sym.release() );
 }

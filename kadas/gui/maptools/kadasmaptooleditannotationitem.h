@@ -31,8 +31,13 @@
 class KadasAnnotationItemController;
 class KadasBottomBar;
 class KadasFloatingInputWidget;
+class QBoxLayout;
+class QComboBox;
+class QSpinBox;
 class QgsAnnotationItem;
 class QgsAnnotationLayer;
+class QgsAnnotationMarkerItem;
+class QgsColorButton;
 
 /**
  * \ingroup gui
@@ -83,11 +88,26 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     KadasFloatingInputWidget *mInputWidget = nullptr;
     bool mIgnoreNextMoveEvent = false;
 
+    // Marker styling row (only created when editing a QgsAnnotationMarkerItem).
+    QComboBox *mShapeCombo = nullptr;
+    QSpinBox *mSizeSpin = nullptr;
+    QSpinBox *mStrokeWidthSpin = nullptr;
+    QgsColorButton *mFillColorBtn = nullptr;
+    QgsColorButton *mStrokeColorBtn = nullptr;
+    QComboBox *mStrokeStyleCombo = nullptr;
+
     void pushState();
     void deleteItem();
     void setupNumericInput();
     void clearNumericInput();
     KadasAttribValues collectAttributeValues() const;
+
+    //! Builds the marker styling row in the bottom bar; no-op when \a item is not a marker.
+    void setupMarkerStyleWidgets( QgsAnnotationMarkerItem *item, QBoxLayout *outer );
+    //! Reflects the current item's first simple-marker layer style in the widgets.
+    void readMarkerStyleToWidgets();
+    //! Applies the widgets' current values back into the item's marker symbol.
+    void applyMarkerStyleFromWidgets();
 
   private slots:
     void stateChanged( KadasStateHistory::ChangeType, KadasStateHistory::State *state, KadasStateHistory::State *prevState );
