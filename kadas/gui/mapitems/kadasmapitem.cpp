@@ -400,6 +400,10 @@ QDomElement KadasMapItem::writeXml( QDomDocument &document ) const
     // it from legacy (Q_PROPERTY/JSON) payloads instead of relying on
     // presence-of-attribute heuristics.
     itemEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
+    itemEl.setAttribute( QStringLiteral( "z_index" ), mZIndex );
+    itemEl.setAttribute( QStringLiteral( "symbol_scale" ), mSymbolScale );
+    if ( !mTooltip.isEmpty() )
+      itemEl.setAttribute( QStringLiteral( "tooltip" ), mTooltip );
     writeXmlPrivate( itemEl );
   }
   return itemEl;
@@ -439,6 +443,9 @@ KadasMapItem *KadasMapItem::fromXml( const QDomElement &element )
     }
     else
     {
+      item->setZIndex( itemEl.attribute( QStringLiteral( "z_index" ), QStringLiteral( "0" ) ).toInt() );
+      item->setSymbolScale( itemEl.attribute( QStringLiteral( "symbol_scale" ), QStringLiteral( "1" ) ).toDouble() );
+      item->setTooltip( itemEl.attribute( QStringLiteral( "tooltip" ) ) );
       item->readXmlPrivate( element );
       return item;
     }
