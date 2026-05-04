@@ -87,40 +87,6 @@ KadasMapItem *KadasMapItem::clone() const
 
 bool KadasMapItem::deserialize( const QJsonObject &json )
 {
-  QJsonObject props = json["props"].toObject();
-  for ( int i = 0, n = metaObject()->propertyCount(); i < n; ++i )
-  {
-    QMetaProperty prop = metaObject()->property( i );
-    QJsonValue value = props[prop.name()];
-    QVariant variant( prop.metaType() );
-    // TODO: use custom type
-    if ( prop.name() == QString( "filePath" ) )
-    {
-      prop.write( this, QVariant::fromValue( QgsProject::instance()->readPath( value.toString() ) ) );
-    }
-    else if ( prop.metaType() == QMetaType::fromType<QPen>() )
-    {
-      QStringList penStr = value.toString().split( ";" );
-      if ( penStr.size() == 3 )
-      {
-        QPen pen( QColor( penStr[0] ), penStr[1].toInt(), static_cast<Qt::PenStyle>( penStr[2].toInt() ) );
-        prop.write( this, QVariant::fromValue( pen ) );
-      }
-    }
-    else if ( prop.metaType() == QMetaType::fromType<QBrush>() )
-    {
-      QStringList brushStr = value.toString().split( ";" );
-      if ( brushStr.size() == 2 )
-      {
-        QBrush brush( QColor( brushStr[0] ), static_cast<Qt::BrushStyle>( brushStr[1].toInt() ) );
-        prop.write( this, QVariant::fromValue( brush ) );
-      }
-    }
-    else
-    {
-      prop.write( this, value.toVariant() );
-    }
-  }
   State *state = createEmptyState();
   bool success = state->deserialize( json["state"].toObject() );
   if ( success )
