@@ -388,24 +388,15 @@ QDomElement KadasMapItem::writeXml( QDomDocument &document ) const
   {
     itemEl.setAttribute( "associatedLayer", associatedLayer()->id() );
   }
-  QJsonDocument doc;
-  if ( !useQgisAnnotations() )
-  {
-    doc.setObject( serialize() );
-    itemEl.appendChild( document.createCDATASection( doc.toJson( QJsonDocument::Compact ) ) );
-  }
-  else
-  {
-    // New annotation-based format. Stamp a version so loaders can distinguish
-    // it from legacy (Q_PROPERTY/JSON) payloads instead of relying on
-    // presence-of-attribute heuristics.
-    itemEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
-    itemEl.setAttribute( QStringLiteral( "z_index" ), mZIndex );
-    itemEl.setAttribute( QStringLiteral( "symbol_scale" ), mSymbolScale );
-    if ( !mTooltip.isEmpty() )
-      itemEl.setAttribute( QStringLiteral( "tooltip" ), mTooltip );
-    writeXmlPrivate( itemEl );
-  }
+  // New annotation-based format. Stamp a version so loaders can distinguish
+  // it from legacy (Q_PROPERTY/JSON) payloads instead of relying on
+  // presence-of-attribute heuristics.
+  itemEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
+  itemEl.setAttribute( QStringLiteral( "z_index" ), mZIndex );
+  itemEl.setAttribute( QStringLiteral( "symbol_scale" ), mSymbolScale );
+  if ( !mTooltip.isEmpty() )
+    itemEl.setAttribute( QStringLiteral( "tooltip" ), mTooltip );
+  writeXmlPrivate( itemEl );
   return itemEl;
 }
 
@@ -428,27 +419,11 @@ KadasMapItem *KadasMapItem::fromXml( const QDomElement &element )
     {
       item->associateToLayer( QgsProject::instance()->mapLayer( layerId ) );
     }
-    if ( !item->useQgisAnnotations() )
-    {
-      QJsonDocument data = QJsonDocument::fromJson( itemEl.firstChild().toCDATASection().data().toLocal8Bit() );
-      if ( item->deserialize( data.object() ) )
-      {
-        return item;
-      }
-      else
-      {
-        delete item;
-        QgsDebugMsgLevel( QString( "Item deserialization failed: %1" ).arg( name ), 2 );
-      }
-    }
-    else
-    {
-      item->setZIndex( itemEl.attribute( QStringLiteral( "z_index" ), QStringLiteral( "0" ) ).toInt() );
-      item->setSymbolScale( itemEl.attribute( QStringLiteral( "symbol_scale" ), QStringLiteral( "1" ) ).toDouble() );
-      item->setTooltip( itemEl.attribute( QStringLiteral( "tooltip" ) ) );
-      item->readXmlPrivate( element );
-      return item;
-    }
+    item->setZIndex( itemEl.attribute( QStringLiteral( "z_index" ), QStringLiteral( "0" ) ).toInt() );
+    item->setSymbolScale( itemEl.attribute( QStringLiteral( "symbol_scale" ), QStringLiteral( "1" ) ).toDouble() );
+    item->setTooltip( itemEl.attribute( QStringLiteral( "tooltip" ) ) );
+    item->readXmlPrivate( element );
+    return item;
   }
   else
   {
