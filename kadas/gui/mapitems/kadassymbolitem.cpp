@@ -16,6 +16,7 @@
 
 #include <QSvgRenderer>
 #include <QImageReader>
+#include <QDomElement>
 
 #include <quazip/quazipfile.h>
 
@@ -300,4 +301,43 @@ void KadasPinItem::updateTooltip()
   blockSignals( true ); // block changed() signal as it would end up triggering updateTooltip again
   setTooltip( toolTipText );
   blockSignals( false );
+}
+
+KadasMapItem *KadasSymbolItem::_clone() const
+{
+  KadasSymbolItem *item = new KadasSymbolItem( crs() );
+  item->setup( mFilePath, mAnchorX, mAnchorY, constState()->size.width(), constState()->size.height() );
+  item->mName = mName;
+  item->mRemarks = mRemarks;
+  item->state()->pos = constState()->pos;
+  item->state()->angle = constState()->angle;
+  return item;
+}
+
+void KadasSymbolItem::writeXmlPrivate( QDomElement &element ) const
+{
+  element.setAttribute( QStringLiteral( "anchor_x" ), mAnchorX );
+  element.setAttribute( QStringLiteral( "anchor_y" ), mAnchorY );
+  element.setAttribute( QStringLiteral( "pos_x" ), constState()->pos.x() );
+  element.setAttribute( QStringLiteral( "pos_y" ), constState()->pos.y() );
+  element.setAttribute( QStringLiteral( "angle" ), constState()->angle );
+  element.setAttribute( QStringLiteral( "size_w" ), constState()->size.width() );
+  element.setAttribute( QStringLiteral( "size_h" ), constState()->size.height() );
+  element.setAttribute( QStringLiteral( "file_path" ), QgsProject::instance()->writePath( mFilePath ) );
+  element.setAttribute( QStringLiteral( "name" ), mName );
+  element.setAttribute( QStringLiteral( "remarks" ), mRemarks );
+}
+
+void KadasSymbolItem::readXmlPrivate( const QDomElement &element )
+{
+  const double ax = element.attribute( QStringLiteral( "anchor_x" ), QStringLiteral( "0.5" ) ).toDouble();
+  const double ay = element.attribute( QStringLiteral( "anchor_y" ), QStringLiteral( "0.5" ) ).toDouble();
+  const int w = element.attribute( QStringLiteral( "size_w" ), QStringLiteral( "0" ) ).toInt();
+  const int h = element.attribute( QStringLiteral( "size_h" ), QStringLiteral( "0" ) ).toInt();
+  const QString filePath = QgsProject::instance()->readPath( element.attribute( QStringLiteral( "file_path" ) ) );
+  setup( filePath, ax, ay, w, h );
+  mName = element.attribute( QStringLiteral( "name" ) );
+  mRemarks = element.attribute( QStringLiteral( "remarks" ) );
+  state()->pos = KadasItemPos( element.attribute( QStringLiteral( "pos_x" ), QStringLiteral( "0" ) ).toDouble(), element.attribute( QStringLiteral( "pos_y" ), QStringLiteral( "0" ) ).toDouble() );
+  state()->angle = element.attribute( QStringLiteral( "angle" ), QStringLiteral( "0" ) ).toDouble();
 }

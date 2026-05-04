@@ -23,14 +23,13 @@
 class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
 {
     Q_OBJECT
-    Q_PROPERTY( QString filePath READ filePath WRITE setFilePath )
-    Q_PROPERTY( QString name READ name WRITE setName )
-    Q_PROPERTY( QString remarks READ remarks WRITE setRemarks )
 
   public:
     KadasSymbolItem( const QgsCoordinateReferenceSystem &crs );
     ~KadasSymbolItem();
     void setup( const QString &path, double anchorX, double anchorY, int width = 0, int height = 0 );
+
+    bool useQgisAnnotations() const override { return true; }
 
     QString itemName() const override { return tr( "Symbol" ); }
 
@@ -60,7 +59,10 @@ class KADAS_GUI_EXPORT KadasSymbolItem : public KadasAnchoredItem
     QImage mImage;
     bool mScalable = false;
 
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasSymbolItem( crs() ); }
+  protected:
+    KadasMapItem *_clone() const override SIP_FACTORY;
+    void writeXmlPrivate( QDomElement &element ) const override;
+    void readXmlPrivate( const QDomElement &element ) override;
 };
 
 
