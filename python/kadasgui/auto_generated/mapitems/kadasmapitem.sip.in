@@ -318,7 +318,7 @@ Trigger a redraw */
       public:
         virtual void assign( const State *other ) = 0;
         virtual State *clone() const = 0 /Factory/;
-        virtual bool deserialize( const QJsonObject &json ) = 0;
+        virtual bool deserialize( const QJsonObject &json );
     };
     const State *constState() const;
     virtual void setState( const State *state );

@@ -14,8 +14,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QJsonArray>
-
 #include <qgis/qgsgeometryengine.h>
 #include <qgis/qgslinestring.h>
 #include <qgis/qgsmapsettings.h>
@@ -23,18 +21,6 @@
 #include <qgis/qgsproject.h>
 
 #include "kadas/gui/mapitems/kadasanchoreditem.h"
-
-
-bool KadasAnchoredItem::State::deserialize( const QJsonObject &json )
-{
-  //drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
-  QJsonArray p = json["pos"].toArray();
-  pos = KadasItemPos( p.at( 0 ).toDouble(), p.at( 1 ).toDouble() );
-  angle = json["angle"].toDouble();
-  QJsonArray s = json["size"].toArray();
-  size = QSize( s.at( 0 ).toDouble(), s.at( 1 ).toDouble() );
-  return true;
-}
 
 
 KadasAnchoredItem::KadasAnchoredItem( const QgsCoordinateReferenceSystem &crs )

@@ -48,8 +48,6 @@ your option) any later version. *
         virtual void assign( const KadasMapItem::State *other );
         virtual State *clone() const /Factory/;
 
-        virtual bool deserialize( const QJsonObject &json );
-
     };
 
     virtual bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings );

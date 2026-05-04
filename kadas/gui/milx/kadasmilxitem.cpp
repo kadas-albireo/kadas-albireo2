@@ -14,46 +14,9 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QJsonArray>
-
 #include "kadas/gui/milx/kadasmilxitem.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
-
-
-bool KadasMilxItem::State::deserialize( const QJsonObject &json )
-{
-  points.clear();
-  attributes.clear();
-  attributePoints.clear();
-  controlPoints.clear();
-
-  // TODO drawStatus = static_cast<DrawStatus>( json["status"].toInt() );
-  for ( QJsonValue val : json["points"].toArray() )
-  {
-    QJsonArray pos = val.toArray();
-    points.append( KadasItemPos( pos.at( 0 ).toDouble(), pos.at( 1 ).toDouble() ) );
-  }
-  for ( QJsonValue attrVal : json["attributes"].toArray() )
-  {
-    QJsonArray attr = attrVal.toArray();
-    attributes.insert( static_cast<KadasMilxAttrType>( attr.at( 0 ).toInt() ), attr.at( 1 ).toDouble() );
-  }
-  for ( QJsonValue attrPtVal : json["attributePoints"].toArray() )
-  {
-    QJsonArray attrPt = attrPtVal.toArray();
-    QJsonArray pt = attrPt.at( 1 ).toArray();
-    attributePoints.insert( static_cast<KadasMilxAttrType>( attrPt.at( 0 ).toInt() ), KadasItemPos( pt.at( 0 ).toDouble(), pt.at( 1 ).toDouble() ) );
-  }
-  for ( QJsonValue val : json["controlPoints"].toArray() )
-  {
-    controlPoints.append( val.toInt() );
-  }
-  QJsonArray offset = json["userOffset"].toArray();
-  userOffset.setX( offset.at( 0 ).toDouble() );
-  userOffset.setY( offset.at( 1 ).toDouble() );
-  return attributes.size() == attributePoints.size();
-}
 
 
 KadasMilxItem::KadasMilxItem()

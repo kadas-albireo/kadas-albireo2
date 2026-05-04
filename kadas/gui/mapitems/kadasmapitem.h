@@ -365,7 +365,14 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
       public:
         virtual void assign( const State *other ) = 0;
         virtual State *clone() const = 0 SIP_FACTORY;
-        virtual bool deserialize( const QJsonObject &json ) = 0;
+        // Legacy v1 (Q_PROPERTY/JSON) hook: only the per-item readXmlPrivate
+        // fallback paths still need it. Defaults to a no-op for items that
+        // never had a v1 payload (Symbol/Pin/Anchored, SelectionRect, Milx).
+        virtual bool deserialize( const QJsonObject &json )
+        {
+          Q_UNUSED( json );
+          return false;
+        }
     };
     const State *constState() const { return mState; }
     virtual void setState( const State *state );
