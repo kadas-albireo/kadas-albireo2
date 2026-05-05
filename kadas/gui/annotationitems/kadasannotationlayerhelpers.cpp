@@ -115,7 +115,16 @@ void KadasAnnotationLayerHelpers::stripShadowsFromLayer( QgsAnnotationLayer *lay
 {
   if ( !layer )
     return;
-  // Snapshot ids first to avoid iterator invalidation while we remove items.
+  // Collect the set of (master, shadow ids) first. We can NOT keep iterating
+  // a snapshot of layer->items() while deleting items from the layer, since
+  // removeItem() destroys the item and any dangling pointer in our snapshot
+  // would crash on the next dynamic_cast. Capture all the work, then act.
+  struct Work
+  {
+      QgsAnnotationItem *master;
+      QStringList ids;
+  };
+  QList<Work> work;
   const QMap<QString, QgsAnnotationItem *> snapshot = layer->items();
   for ( auto it = snapshot.constBegin(); it != snapshot.constEnd(); ++it )
   {
@@ -123,9 +132,14 @@ void KadasAnnotationLayerHelpers::stripShadowsFromLayer( QgsAnnotationLayer *lay
     const QStringList ids = masterShadowIds( master );
     if ( ids.isEmpty() )
       continue;
-    for ( const QString &id : ids )
+    work.append( { master, ids } );
+  }
+
+  for ( const Work &w : work )
+  {
+    for ( const QString &id : w.ids )
       layer->removeItem( id );
-    setMasterShadowIds( master, {} );
+    setMasterShadowIds( w.master, {} );
   }
 }
 

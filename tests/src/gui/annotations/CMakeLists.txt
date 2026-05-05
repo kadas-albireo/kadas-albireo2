@@ -1,4 +1,4 @@
-set(TESTS testkadasannotationcontrollers.cpp)
+set(TESTS testkadasannotationcontrollers.cpp testkadasannotationshadows.cpp)
 
 foreach(TESTSRC ${TESTS})
   add_kadas_test(${TESTSRC} MODULE gui LINKEDLIBRARIES kadas_gui)
