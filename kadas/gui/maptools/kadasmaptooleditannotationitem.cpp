@@ -102,10 +102,15 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
 };
 
 
-KadasMapToolEditAnnotationItem::ToolState::~ToolState()
+struct KadasMapToolEditAnnotationItem::ToolState : KadasStateHistory::State
 {
-  delete itemClone;
-}
+    ToolState( QgsAnnotationItem *clone, DrawState ds )
+      : itemClone( clone )
+      , drawState( ds )
+    {}
+    std::unique_ptr<QgsAnnotationItem> itemClone;
+    DrawState drawState = DrawState::Finished;
+};
 
 
 KadasMapToolEditAnnotationItem::KadasMapToolEditAnnotationItem( QgsMapCanvas *canvas, QgsAnnotationLayer *layer, const QString &itemId )

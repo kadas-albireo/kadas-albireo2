@@ -97,16 +97,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
       Finished,
     };
 
-    struct ToolState : KadasStateHistory::State
-    {
-        ToolState( QgsAnnotationItem *clone, DrawState ds )
-          : itemClone( clone )
-          , drawState( ds )
-        {}
-        ~ToolState() override;
-        QgsAnnotationItem *itemClone = nullptr;
-        DrawState drawState = DrawState::Finished;
-    };
+    struct ToolState;
 
     KadasAnnotationItemController *mController = nullptr;
     QPointer<QgsAnnotationLayer> mLayer;
