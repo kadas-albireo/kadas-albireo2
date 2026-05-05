@@ -65,6 +65,8 @@ class KADAS_GUI_EXPORT KadasCircleAnnotationController : public KadasAnnotationI
 
     KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = nullptr ) const override;
 
+    QList<QgsAnnotationItem *> generateShadows( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const override;
+
   private:
     enum AttribIds
     {

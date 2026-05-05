@@ -16,6 +16,10 @@
 
 #include <QObject>
 
+#include <qgis/qgsannotationmarkeritem.h>
+#include <qgis/qgsmarkersymbol.h>
+#include <qgis/qgspoint.h>
+
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadaspinannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
@@ -36,4 +40,16 @@ QgsAnnotationItem *KadasPinAnnotationController::createItem() const
   auto *item = new KadasPinAnnotationItem();
   item->setZIndex( KadasAnnotationZIndex::Pin );
   return item;
+}
+
+QList<QgsAnnotationItem *> KadasPinAnnotationController::generateShadows( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
+{
+  Q_UNUSED( ctx );
+  const auto *master = static_cast<const KadasPinAnnotationItem *>( item );
+  const QgsPointXY pt = master->geometry();
+  auto *shadow = new QgsAnnotationMarkerItem( QgsPoint( pt.x(), pt.y() ) );
+  if ( master->symbol() )
+    shadow->setSymbol( master->symbol()->clone() );
+  shadow->setZIndex( master->zIndex() );
+  return { shadow };
 }

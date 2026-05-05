@@ -151,6 +151,27 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
       return nullptr;
     }
 
+    // ----- QGIS-compat shadows --------------------------------------------
+    //
+    // Kadas-specific item types (kadas:rectangle, kadas:circle, kadas:pin,
+    // kadas:coordcross) are not registered in vanilla QGIS and would be
+    // dropped on read. To keep them visible when the same project is
+    // opened in QGIS, controllers can emit parallel "shadow" items in
+    // stock QGIS types (polygon / marker / pointtext / linestring).
+    // Shadows are added to the layer immediately before save and removed
+    // immediately after; on load, shadows present in the layer XML are
+    // also stripped (they were re-emitted from the master items by the
+    // pre-save pass that wrote the project).
+    //
+    // Returns freshly allocated shadow items; caller takes ownership.
+    // Default implementation returns an empty list.
+    virtual QList<QgsAnnotationItem *> generateShadows( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
+    {
+      Q_UNUSED( item );
+      Q_UNUSED( ctx );
+      return {};
+    }
+
   protected:
     // ----- Transform helpers (mirror KadasMapItem's) ---------------------
 

@@ -25,6 +25,7 @@
 #include <qgis/qgspolygon.h>
 
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
+#include "kadas/gui/annotationitems/kadasannotationshadow.h"
 #include "kadas/gui/annotationitems/kadascircleannotationitem.h"
 
 
@@ -111,6 +112,8 @@ bool KadasCircleAnnotationItem::writeXml( QDomElement &element, QDomDocument &do
   element.setAttribute( QStringLiteral( "cy" ), qgsDoubleToString( mCenter.y() ) );
   element.setAttribute( QStringLiteral( "rx" ), qgsDoubleToString( mRingPoint.x() ) );
   element.setAttribute( QStringLiteral( "ry" ), qgsDoubleToString( mRingPoint.y() ) );
+  if ( !mShadowIds.isEmpty() )
+    element.setAttribute( KadasAnnotationShadow::shadowIdsAttribute(), KadasAnnotationShadow::encodeIds( mShadowIds ) );
   return true;
 }
 
@@ -119,6 +122,7 @@ bool KadasCircleAnnotationItem::readXml( const QDomElement &element, const QgsRe
   QgsAnnotationPolygonItem::readXml( element, context );
   mCenter = QgsPointXY( element.attribute( QStringLiteral( "cx" ) ).toDouble(), element.attribute( QStringLiteral( "cy" ) ).toDouble() );
   mRingPoint = QgsPointXY( element.attribute( QStringLiteral( "rx" ) ).toDouble(), element.attribute( QStringLiteral( "ry" ) ).toDouble() );
+  mShadowIds = KadasAnnotationShadow::decodeIds( element.attribute( KadasAnnotationShadow::shadowIdsAttribute() ) );
   rebuildGeometry();
   return true;
 }

@@ -37,6 +37,8 @@ class KADAS_GUI_EXPORT KadasPinAnnotationController : public KadasMarkerAnnotati
     QString itemType() const override;
     QString itemName() const override;
     QgsAnnotationItem *createItem() const override;
+
+    QList<QgsAnnotationItem *> generateShadows( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const override;
 };
 
 #endif // KADASPINANNOTATIONCONTROLLER_H
