@@ -153,6 +153,9 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     // Switches the tool to edit \a itemId on the current layer, rebuilding
     // the styling row to match the new item's geometry kind.
     void switchToItem( const QString &itemId );
+    // Pops up a context menu for \a itemId at the given global screen
+    // position with bring-to-front / send-to-back / forward / backward.
+    void showContextMenu( const QString &itemId, const QPoint &globalPos );
 
   private slots:
     void stateChanged( KadasStateHistory::ChangeType, KadasStateHistory::State *state, KadasStateHistory::State *prevState );
