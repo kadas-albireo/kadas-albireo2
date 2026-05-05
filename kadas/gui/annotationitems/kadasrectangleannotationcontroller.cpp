@@ -72,6 +72,10 @@ QList<KadasNode> KadasRectangleAnnotationController::nodes( const QgsAnnotationI
 bool KadasRectangleAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
 {
   const QgsPointXY ip = toItemPos( firstPoint, ctx );
+  // Remember the click anchor for the duration of the draw; setCurrentPoint
+  // grows the rectangle from this anchor toward the cursor.
+  mDrawAnchor = ip;
+  mDrawAnchorValid = true;
   // Center starts at the click; size is zero. Angle stays at 0 during draw.
   asRect( item )->setBox( QgsPointXY( ip.x(), ip.y() ), QSizeF( 0, 0 ), 0.0 );
   return true;
@@ -84,42 +88,13 @@ bool KadasRectangleAnnotationController::startPart( QgsAnnotationItem *item, con
 
 void KadasRectangleAnnotationController::setCurrentPoint( QgsAnnotationItem *item, const QgsPointXY &p, const KadasAnnotationItemContext &ctx )
 {
-  // While drawing, treat the rubber-band point as the opposite corner of an
-  // axis-aligned rectangle in item CRS. The center moves to the midpoint.
   KadasRectangleAnnotationItem *rect = asRect( item );
-  const QgsPointXY anchor = rect->center(); // first-click position when size is (0,0)
-  const QgsPointXY initialCorner( anchor.x(), anchor.y() );
-  Q_UNUSED( initialCorner );
-
   const QgsPointXY cur = toItemPos( p, ctx );
+  const QgsPointXY anchor = mDrawAnchorValid ? mDrawAnchor : rect->center();
 
-  // Recover the original anchor: if size==(0,0) the anchor IS the center.
-  // Once the size grows we still keep the original anchor tracked via the BL
-  // corner of the rectangle in its (un-rotated) frame.
-  QgsPointXY originAnchor = anchor;
-  if ( !qgsDoubleNear( rect->size().width(), 0.0 ) || !qgsDoubleNear( rect->size().height(), 0.0 ) )
-  {
-    // Anchor = the corner opposite to the rubber-band corner. We assumed
-    // angle=0 during draw, so corners()[0] is BL and corners()[2] is TR.
-    const auto cs = rect->corners();
-    // Pick the corner farthest from the cursor as the anchor.
-    double bestSqr = -1.0;
-    for ( const QgsPointXY &c : cs )
-    {
-      const double dx = c.x() - cur.x();
-      const double dy = c.y() - cur.y();
-      const double s = dx * dx + dy * dy;
-      if ( s > bestSqr )
-      {
-        bestSqr = s;
-        originAnchor = c;
-      }
-    }
-  }
-
-  const double w = std::abs( cur.x() - originAnchor.x() );
-  const double h = std::abs( cur.y() - originAnchor.y() );
-  const QgsPointXY newCenter( 0.5 * ( originAnchor.x() + cur.x() ), 0.5 * ( originAnchor.y() + cur.y() ) );
+  const double w = std::abs( cur.x() - anchor.x() );
+  const double h = std::abs( cur.y() - anchor.y() );
+  const QgsPointXY newCenter( 0.5 * ( anchor.x() + cur.x() ), 0.5 * ( anchor.y() + cur.y() ) );
   rect->setBox( newCenter, QSizeF( w, h ), 0.0 );
 }
 
@@ -135,7 +110,9 @@ bool KadasRectangleAnnotationController::continuePart( QgsAnnotationItem *, cons
 }
 
 void KadasRectangleAnnotationController::endPart( QgsAnnotationItem * )
-{}
+{
+  mDrawAnchorValid = false;
+}
 
 KadasAttribDefs KadasRectangleAnnotationController::drawAttribs() const
 {

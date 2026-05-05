@@ -17,6 +17,7 @@
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QList>
 #include <QPainter>
 #include <QPixmap>
@@ -33,6 +34,7 @@
 #include <qgis/qgsannotationlineitem.h>
 #include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgsannotationpolygonitem.h>
+#include <qgis/qgsannotationpointtextitem.h>
 #include <qgis/qgscolorbutton.h>
 #include <qgis/qgsfillsymbol.h>
 #include <qgis/qgsfillsymbollayer.h>
@@ -365,7 +367,7 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
   // While actively digitizing a part, skip vertex hit-testing entirely:
   // the just-placed vertex sits at (or very near) the cursor and would
   // make mEditContext flip-flop, causing flicker and unnecessary work.
-  if ( mAllowCreate && mDrawState == DrawState::InProgress && e->buttons() == Qt::NoButton )
+  if ( mAllowCreate && mDrawState == DrawState::InProgress )
   {
     if ( mEditContext.isValid() )
     {
@@ -576,6 +578,28 @@ void KadasMapToolEditAnnotationItem::setupStyleWidgets( QBoxLayout *outer )
   const bool isMarker = dynamic_cast<QgsAnnotationMarkerItem *>( mItem ) != nullptr;
   const bool isLine = dynamic_cast<QgsAnnotationLineItem *>( mItem ) != nullptr;
   const bool isPolygon = dynamic_cast<QgsAnnotationPolygonItem *>( mItem ) != nullptr;
+  const bool isPointText = dynamic_cast<QgsAnnotationPointTextItem *>( mItem ) != nullptr;
+
+  // Text input row (point-text only).
+  if ( isPointText )
+  {
+    auto *textRow = new QHBoxLayout();
+    outer->addLayout( textRow );
+    textRow->addWidget( new QLabel( tr( "Text:" ) ) );
+    mTextEdit = new QLineEdit();
+    mTextEdit->setPlaceholderText( tr( "Enter text" ) );
+    textRow->addWidget( mTextEdit, 1 );
+    connect( mTextEdit, &QLineEdit::textChanged, this, [this]( const QString &t ) {
+      auto *pt = dynamic_cast<QgsAnnotationPointTextItem *>( mItem );
+      if ( !pt )
+        return;
+      pt->setText( t );
+      if ( mLayer )
+        mLayer->triggerRepaint();
+    } );
+    connect( mTextEdit, &QLineEdit::editingFinished, this, [this]() { pushState(); } );
+  }
+
   if ( !isMarker && !isLine && !isPolygon )
     return;
 
@@ -663,6 +687,17 @@ void KadasMapToolEditAnnotationItem::setupStyleWidgets( QBoxLayout *outer )
 
 void KadasMapToolEditAnnotationItem::readStyleToWidgets()
 {
+  if ( mTextEdit )
+  {
+    if ( auto *pt = dynamic_cast<QgsAnnotationPointTextItem *>( mItem ) )
+    {
+      const QSignalBlocker b( mTextEdit );
+      mTextEdit->setText( pt->text() );
+      mTextEdit->setFocus();
+      mTextEdit->selectAll();
+    }
+  }
+
   if ( !mStrokeColorBtn )
     return; // styling row not built
 
@@ -782,7 +817,11 @@ void KadasMapToolEditAnnotationItem::persistStyleToSettings()
 {
   if ( !mStrokeColorBtn || !mItem )
     return;
-  if ( dynamic_cast<QgsAnnotationMarkerItem *>( mItem ) )
+  // Only the three stock geometry types feed the persisted defaults so that
+  // specialized items (rectangle / circle / coord-cross / pin / gpx-route
+  // / picture / pointtext) keep their own controller defaults.
+  const QString t = mItem->type();
+  if ( t == QStringLiteral( "marker" ) )
   {
     settingsMarkerShape->setValue( mShapeCombo->currentData().toInt() );
     settingsMarkerSize->setValue( mSizeSpin->value() );
@@ -791,13 +830,13 @@ void KadasMapToolEditAnnotationItem::persistStyleToSettings()
     settingsMarkerStrokeColor->setValue( mStrokeColorBtn->color() );
     settingsMarkerStrokeStyle->setValue( mStrokeStyleCombo->currentData().toInt() );
   }
-  else if ( dynamic_cast<QgsAnnotationLineItem *>( mItem ) )
+  else if ( t == QStringLiteral( "linestring" ) )
   {
     settingsLineWidth->setValue( mStrokeWidthSpin->value() );
     settingsLineColor->setValue( mStrokeColorBtn->color() );
     settingsLineStyle->setValue( mStrokeStyleCombo->currentData().toInt() );
   }
-  else if ( dynamic_cast<QgsAnnotationPolygonItem *>( mItem ) )
+  else if ( t == QStringLiteral( "polygon" ) )
   {
     settingsPolygonStrokeWidth->setValue( mStrokeWidthSpin->value() );
     settingsPolygonFillColor->setValue( mFillColorBtn->color() );
@@ -811,8 +850,13 @@ void KadasMapToolEditAnnotationItem::applyPersistedStyle( QgsAnnotationItem *ite
 {
   if ( !item )
     return;
-  if ( auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item ) )
+  // Only the three stock geometry types pick up the persisted defaults so
+  // that specialized items (rectangle / circle / coord-cross / pin / gpx
+  // / picture / pointtext) keep their controller-supplied symbol unchanged.
+  const QString t = item->type();
+  if ( t == QStringLiteral( "marker" ) )
   {
+    auto *marker = static_cast<QgsAnnotationMarkerItem *>( item );
     if ( !settingsMarkerStrokeColor->exists() )
       return; // never customized — keep controller defaults.
     std::unique_ptr<QgsMarkerSymbol> sym( marker->symbol() ? marker->symbol()->clone() : new QgsMarkerSymbol() );
@@ -833,8 +877,9 @@ void KadasMapToolEditAnnotationItem::applyPersistedStyle( QgsAnnotationItem *ite
     sl->setStrokeStyle( static_cast<Qt::PenStyle>( settingsMarkerStrokeStyle->value() ) );
     marker->setSymbol( sym.release() );
   }
-  else if ( auto *line = dynamic_cast<QgsAnnotationLineItem *>( item ) )
+  else if ( t == QStringLiteral( "linestring" ) )
   {
+    auto *line = static_cast<QgsAnnotationLineItem *>( item );
     if ( !settingsLineColor->exists() )
       return;
     std::unique_ptr<QgsLineSymbol> sym( line->symbol() ? line->symbol()->clone() : new QgsLineSymbol() );
@@ -852,8 +897,9 @@ void KadasMapToolEditAnnotationItem::applyPersistedStyle( QgsAnnotationItem *ite
     sl->setPenStyle( static_cast<Qt::PenStyle>( settingsLineStyle->value() ) );
     line->setSymbol( sym.release() );
   }
-  else if ( auto *poly = dynamic_cast<QgsAnnotationPolygonItem *>( item ) )
+  else if ( t == QStringLiteral( "polygon" ) )
   {
+    auto *poly = static_cast<QgsAnnotationPolygonItem *>( item );
     if ( !settingsPolygonStrokeColor->exists() )
       return;
     std::unique_ptr<QgsFillSymbol> sym( poly->symbol() ? poly->symbol()->clone() : new QgsFillSymbol() );
