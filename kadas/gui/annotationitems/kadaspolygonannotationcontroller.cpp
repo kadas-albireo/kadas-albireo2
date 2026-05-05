@@ -32,6 +32,7 @@
 #include <qgis/qgssettingsentryimpl.h>
 
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
+#include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadaspolygonannotationcontroller.h"
 
 
@@ -381,4 +382,9 @@ void KadasPolygonAnnotationController::persistStyle( const QgsAnnotationItem *it
   settingsStrokeColor->setValue( sl->strokeColor() );
   settingsStrokeStyle->setValue( static_cast<int>( sl->strokeStyle() ) );
   settingsBrushStyle->setValue( static_cast<int>( sl->brushStyle() ) );
+}
+
+KadasAnnotationStyleEditor *KadasPolygonAnnotationController::createStyleEditor( QWidget *parent ) const
+{
+  return new KadasPolygonStyleEditor( parent );
 }

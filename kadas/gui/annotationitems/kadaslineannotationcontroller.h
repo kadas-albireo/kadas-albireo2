@@ -64,6 +64,7 @@ class KADAS_GUI_EXPORT KadasLineAnnotationController : public KadasAnnotationIte
 
     void applyPersistedStyle( QgsAnnotationItem *item ) const override;
     void persistStyle( const QgsAnnotationItem *item ) const override;
+    KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = nullptr ) const override;
 
 #ifndef SIP_RUN
     static const QgsSettingsEntryDouble *settingsWidth;

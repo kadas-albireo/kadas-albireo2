@@ -26,6 +26,7 @@
 #include "kadas/gui/mapitems/kadasmapitem.h"
 
 class QMenu;
+class QWidget;
 class QgsAnnotationItem;
 class QgsCoordinateReferenceSystem;
 class QgsRectangle;
@@ -34,6 +35,7 @@ class QgsSettingsEntryColor;
 class QgsSettingsEntryDouble;
 class QgsSettingsEntryInteger;
 class QuaZip;
+class KadasAnnotationStyleEditor;
 
 /**
  * \ingroup gui
@@ -136,6 +138,18 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     //! Stores the current style of \a item back into QgsSettingsEntry as the
     //! new defaults. Called whenever the user edits the styling row.
     virtual void persistStyle( const QgsAnnotationItem *item ) const { Q_UNUSED( item ); }
+
+    //! Returns a freshly constructed style editor widget for this item type,
+    //! parented to \a parent and owned by the caller. Default returns
+    //! \c nullptr — specialized controllers (rectangle, circle, coord-cross,
+    //! pin, gpx, milx, picture, ...) inherit this and contribute no styling
+    //! row. Only the canonical generic controllers (marker / linestring /
+    //! polygon / pointtext) override it.
+    virtual KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = nullptr ) const
+    {
+      Q_UNUSED( parent );
+      return nullptr;
+    }
 
   protected:
     // ----- Transform helpers (mirror KadasMapItem's) ---------------------

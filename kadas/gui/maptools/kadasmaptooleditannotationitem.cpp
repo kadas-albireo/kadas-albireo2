@@ -14,111 +14,28 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QComboBox>
-#include <QFontComboBox>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QLineEdit>
-#include <QList>
-#include <QPainter>
-#include <QPixmap>
 #include <QPushButton>
-#include <QSignalBlocker>
-#include <QDoubleSpinBox>
-#include <QSpinBox>
 #include <QVBoxLayout>
-#include <cmath>
 #include <memory>
 
 #include <qgis/qgsannotationitem.h>
 #include <qgis/qgsannotationlayer.h>
-#include <qgis/qgsannotationlineitem.h>
-#include <qgis/qgsannotationmarkeritem.h>
-#include <qgis/qgsannotationpolygonitem.h>
-#include <qgis/qgsannotationpointtextitem.h>
-#include <qgis/qgscolorbutton.h>
-#include <qgis/qgsfillsymbol.h>
-#include <qgis/qgsfillsymbollayer.h>
-#include <qgis/qgslinesymbol.h>
-#include <qgis/qgslinesymbollayer.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapmouseevent.h>
-#include <qgis/qgsmarkersymbol.h>
-#include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgsrectangle.h>
 #include <qgis/qgsrendercontext.h>
 #include <qgis/qgsfeedback.h>
 #include <qgis/qgssettings.h>
-#include <qgis/qgssettingsentryimpl.h>
-#include <qgis/qgssymbollayerutils.h>
-#include <qgis/qgstextformat.h>
 
 #include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontext.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
+#include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/kadasbottombar.h"
 #include "kadas/gui/kadasfloatinginputwidget.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
-
-
-namespace
-{
-  //! Standard marker shapes exposed in the styling row, in display order.
-  static const QList<Qgis::MarkerShape> sShapeChoices = {
-    Qgis::MarkerShape::Circle,
-    Qgis::MarkerShape::Square,
-    Qgis::MarkerShape::Triangle,
-    Qgis::MarkerShape::Diamond,
-    Qgis::MarkerShape::Pentagon,
-    Qgis::MarkerShape::Star,
-    Qgis::MarkerShape::Cross,
-    Qgis::MarkerShape::Cross2,
-  };
-
-  QIcon outlineStyleIcon( Qt::PenStyle style )
-  {
-    QPixmap pix( 24, 16 );
-    pix.fill( Qt::transparent );
-    QPainter p( &pix );
-    p.setRenderHint( QPainter::Antialiasing );
-    QPen pen( Qt::black );
-    pen.setStyle( style );
-    pen.setWidth( 2 );
-    p.setPen( pen );
-    p.drawLine( 0, 8, 24, 8 );
-    return pix;
-  }
-
-  QgsSimpleMarkerSymbolLayer *firstSimpleMarker( QgsAnnotationMarkerItem *item )
-  {
-    if ( !item )
-      return nullptr;
-    QgsMarkerSymbol *sym = const_cast<QgsMarkerSymbol *>( item->symbol() );
-    if ( !sym || sym->symbolLayerCount() == 0 )
-      return nullptr;
-    return dynamic_cast<QgsSimpleMarkerSymbolLayer *>( sym->symbolLayer( 0 ) );
-  }
-
-  QgsSimpleLineSymbolLayer *firstSimpleLine( QgsAnnotationLineItem *item )
-  {
-    if ( !item )
-      return nullptr;
-    QgsLineSymbol *sym = const_cast<QgsLineSymbol *>( item->symbol() );
-    if ( !sym || sym->symbolLayerCount() == 0 )
-      return nullptr;
-    return dynamic_cast<QgsSimpleLineSymbolLayer *>( sym->symbolLayer( 0 ) );
-  }
-
-  QgsSimpleFillSymbolLayer *firstSimpleFill( QgsAnnotationPolygonItem *item )
-  {
-    if ( !item )
-      return nullptr;
-    QgsFillSymbol *sym = const_cast<QgsFillSymbol *>( item->symbol() );
-    if ( !sym || sym->symbolLayerCount() == 0 )
-      return nullptr;
-    return dynamic_cast<QgsSimpleFillSymbolLayer *>( sym->symbolLayer( 0 ) );
-  }
-} // namespace
 
 
 KadasMapToolEditAnnotationItem::ToolState::~ToolState()
@@ -216,7 +133,7 @@ void KadasMapToolEditAnnotationItem::activate()
   connect( closeButton, &QPushButton::clicked, this, [this] { canvas()->unsetMapTool( this ); } );
   topRow->addWidget( closeButton );
 
-  setupStyleWidgets( outer );
+  setupStyleEditor( outer );
 
   mBottomBar->adjustSize();
   mBottomBar->show();
@@ -232,20 +149,8 @@ void KadasMapToolEditAnnotationItem::deactivate()
     mLayer->triggerRepaint();
   delete mBottomBar;
   mBottomBar = nullptr;
-  // Style widgets were children of mBottomBar; their pointers are now dangling.
-  mShapeCombo = nullptr;
-  mSizeSpin = nullptr;
-  mStrokeWidthSpin = nullptr;
-  mFillColorBtn = nullptr;
-  mStrokeColorBtn = nullptr;
-  mStrokeStyleCombo = nullptr;
-  mFillStyleCombo = nullptr;
-  mTextEdit = nullptr;
-  mTextFontCombo = nullptr;
-  mTextSizeSpin = nullptr;
-  mTextColorBtn = nullptr;
-  mTextBufferColorBtn = nullptr;
-  mTextBufferWidthSpin = nullptr;
+  // Style editor was a child of mBottomBar; its pointer is now dangling.
+  mStyleEditor = nullptr;
   delete mStateHistory;
   mStateHistory = nullptr;
   clearNumericInput();
@@ -333,7 +238,8 @@ void KadasMapToolEditAnnotationItem::addPoint( const QgsPointXY &pos )
         createInitialItem();
         if ( !mItem )
           return;
-        readStyleToWidgets();
+        if ( mStyleEditor )
+          mStyleEditor->loadFromItem( mItem );
         emit cleared();
       }
       startPart( pos );
@@ -444,7 +350,8 @@ void KadasMapToolEditAnnotationItem::keyPressEvent( QKeyEvent *e )
       createInitialItem();
       if ( mItem )
       {
-        readStyleToWidgets();
+        if ( mStyleEditor )
+          mStyleEditor->loadFromItem( mItem );
         emit cleared();
       }
     }
@@ -504,7 +411,8 @@ void KadasMapToolEditAnnotationItem::stateChanged( KadasStateHistory::ChangeType
   mLayer->triggerRepaint();
   mEditContext = KadasEditContext();
   clearNumericInput();
-  readStyleToWidgets();
+  if ( mStyleEditor )
+    mStyleEditor->loadFromItem( mItem );
 }
 
 void KadasMapToolEditAnnotationItem::setupNumericInput()
@@ -563,336 +471,34 @@ void KadasMapToolEditAnnotationItem::inputChanged()
   pushState();
 }
 
-void KadasMapToolEditAnnotationItem::setupStyleWidgets( QBoxLayout *outer )
+void KadasMapToolEditAnnotationItem::setupStyleEditor( QBoxLayout *outer )
 {
-  const bool isMarker = dynamic_cast<QgsAnnotationMarkerItem *>( mItem ) != nullptr;
-  const bool isLine = dynamic_cast<QgsAnnotationLineItem *>( mItem ) != nullptr;
-  const bool isPolygon = dynamic_cast<QgsAnnotationPolygonItem *>( mItem ) != nullptr;
-  const bool isPointText = dynamic_cast<QgsAnnotationPointTextItem *>( mItem ) != nullptr;
-
-  // Text input row (point-text only).
-  if ( isPointText )
-  {
-    auto *textRow = new QHBoxLayout();
-    outer->addLayout( textRow );
-    textRow->addWidget( new QLabel( tr( "Text:" ) ) );
-    mTextEdit = new QLineEdit();
-    mTextEdit->setPlaceholderText( tr( "Enter text" ) );
-    textRow->addWidget( mTextEdit, 1 );
-    connect( mTextEdit, &QLineEdit::textChanged, this, [this]( const QString &t ) {
-      auto *pt = dynamic_cast<QgsAnnotationPointTextItem *>( mItem );
-      if ( !pt )
-        return;
-      pt->setText( t );
-      if ( mLayer )
-        mLayer->triggerRepaint();
-    } );
-    connect( mTextEdit, &QLineEdit::editingFinished, this, [this]() { pushState(); } );
-
-    // Styling row: font, size, color, border (buffer) color + width.
-    auto *styleRow = new QHBoxLayout();
-    outer->addLayout( styleRow );
-
-    mTextFontCombo = new QFontComboBox();
-    mTextFontCombo->setToolTip( tr( "Font family" ) );
-    styleRow->addWidget( mTextFontCombo, 1 );
-
-    mTextSizeSpin = new QDoubleSpinBox();
-    mTextSizeSpin->setRange( 1.0, 200.0 );
-    mTextSizeSpin->setDecimals( 1 );
-    mTextSizeSpin->setSingleStep( 0.5 );
-    mTextSizeSpin->setSuffix( QStringLiteral( " pt" ) );
-    mTextSizeSpin->setToolTip( tr( "Font size" ) );
-    styleRow->addWidget( mTextSizeSpin );
-
-    mTextColorBtn = new QgsColorButton();
-    mTextColorBtn->setAllowOpacity( true );
-    mTextColorBtn->setToolTip( tr( "Text color" ) );
-    styleRow->addWidget( mTextColorBtn );
-
-    styleRow->addWidget( new QLabel( tr( "Border:" ) ) );
-    mTextBufferColorBtn = new QgsColorButton();
-    mTextBufferColorBtn->setAllowOpacity( true );
-    mTextBufferColorBtn->setShowNoColor( true );
-    mTextBufferColorBtn->setToolTip( tr( "Text border color" ) );
-    styleRow->addWidget( mTextBufferColorBtn );
-
-    mTextBufferWidthSpin = new QDoubleSpinBox();
-    mTextBufferWidthSpin->setRange( 0.0, 10.0 );
-    mTextBufferWidthSpin->setDecimals( 1 );
-    mTextBufferWidthSpin->setSingleStep( 0.1 );
-    mTextBufferWidthSpin->setSuffix( QStringLiteral( " mm" ) );
-    mTextBufferWidthSpin->setToolTip( tr( "Text border width" ) );
-    styleRow->addWidget( mTextBufferWidthSpin );
-
-    auto applyAndPush = [this]() {
-      applyStyleFromWidgets();
-      pushState();
-    };
-    connect( mTextFontCombo, &QFontComboBox::currentFontChanged, this, applyAndPush );
-    connect( mTextSizeSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, applyAndPush );
-    connect( mTextColorBtn, &QgsColorButton::colorChanged, this, applyAndPush );
-    connect( mTextBufferColorBtn, &QgsColorButton::colorChanged, this, applyAndPush );
-    connect( mTextBufferWidthSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, applyAndPush );
+  if ( !mController )
     return;
-  }
-
-  if ( !isMarker && !isLine && !isPolygon )
+  mStyleEditor = mController->createStyleEditor( mBottomBar );
+  if ( !mStyleEditor )
     return;
+  mStyleEditor->loadFromItem( mItem );
+  outer->addWidget( mStyleEditor );
 
-  auto *row = new QHBoxLayout();
-  outer->addLayout( row );
+  // Live preview: apply state to the item and repaint, but don't push history.
+  connect( mStyleEditor, &KadasAnnotationStyleEditor::previewChanged, this, [this] {
+    if ( !mItem || !mLayer )
+      return;
+    mStyleEditor->applyToItem( mItem );
+    mLayer->triggerRepaint();
+  } );
 
-  // Shape (marker only)
-  if ( isMarker )
-  {
-    mShapeCombo = new QComboBox();
-    for ( Qgis::MarkerShape shape : sShapeChoices )
-      mShapeCombo->addItem( QgsSimpleMarkerSymbolLayerBase::encodeShape( shape ), QVariant::fromValue( static_cast<int>( shape ) ) );
-    mShapeCombo->setToolTip( tr( "Marker shape" ) );
-    row->addWidget( mShapeCombo );
-
-    mSizeSpin = new QSpinBox();
-    mSizeSpin->setRange( 1, 100 );
-    mSizeSpin->setSuffix( QStringLiteral( " mm" ) );
-    mSizeSpin->setToolTip( tr( "Marker size" ) );
-    row->addWidget( mSizeSpin );
-  }
-
-  // Stroke width (all)
-  mStrokeWidthSpin = new QDoubleSpinBox();
-  mStrokeWidthSpin->setRange( 0.0, 20.0 );
-  mStrokeWidthSpin->setDecimals( 1 );
-  mStrokeWidthSpin->setSingleStep( 0.1 );
-  mStrokeWidthSpin->setToolTip( isMarker ? tr( "Outline width" ) : tr( "Line width" ) );
-  row->addWidget( mStrokeWidthSpin );
-
-  // Fill color (marker + polygon)
-  if ( isMarker || isPolygon )
-  {
-    mFillColorBtn = new QgsColorButton();
-    mFillColorBtn->setAllowOpacity( true );
-    mFillColorBtn->setShowNoColor( true );
-    mFillColorBtn->setToolTip( tr( "Fill color" ) );
-    row->addWidget( mFillColorBtn );
-  }
-
-  // Stroke color (all)
-  mStrokeColorBtn = new QgsColorButton();
-  mStrokeColorBtn->setAllowOpacity( true );
-  mStrokeColorBtn->setShowNoColor( true );
-  mStrokeColorBtn->setToolTip( isMarker || isPolygon ? tr( "Outline color" ) : tr( "Line color" ) );
-  row->addWidget( mStrokeColorBtn );
-
-  // Stroke style (all)
-  mStrokeStyleCombo = new QComboBox();
-  for ( Qt::PenStyle style : { Qt::NoPen, Qt::SolidLine, Qt::DashLine, Qt::DashDotLine, Qt::DotLine } )
-    mStrokeStyleCombo->addItem( outlineStyleIcon( style ), QString(), QVariant::fromValue( static_cast<int>( style ) ) );
-  mStrokeStyleCombo->setToolTip( isMarker || isPolygon ? tr( "Outline style" ) : tr( "Line style" ) );
-  row->addWidget( mStrokeStyleCombo );
-
-  // Fill style (polygon only)
-  if ( isPolygon )
-  {
-    mFillStyleCombo = new QComboBox();
-    for ( Qt::BrushStyle style : { Qt::NoBrush, Qt::SolidPattern, Qt::HorPattern, Qt::VerPattern, Qt::BDiagPattern, Qt::FDiagPattern, Qt::CrossPattern, Qt::DiagCrossPattern } )
-      mFillStyleCombo->addItem( QgsSymbolLayerUtils::encodeBrushStyle( style ), QVariant::fromValue( static_cast<int>( style ) ) );
-    mFillStyleCombo->setToolTip( tr( "Fill style" ) );
-    row->addWidget( mFillStyleCombo );
-  }
-
-  readStyleToWidgets();
-
-  auto applyAndPush = [this] {
-    applyStyleFromWidgets();
-    if ( mLayer )
-      mLayer->triggerRepaint();
+  // Committed: apply, repaint, persist as defaults, and push a history entry.
+  connect( mStyleEditor, &KadasAnnotationStyleEditor::committed, this, [this] {
+    if ( !mItem || !mLayer )
+      return;
+    mStyleEditor->applyToItem( mItem );
+    mLayer->triggerRepaint();
+    if ( mController )
+      mController->persistStyle( mItem );
     pushState();
-  };
-  if ( mShapeCombo )
-    connect( mShapeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, applyAndPush );
-  if ( mSizeSpin )
-    connect( mSizeSpin, qOverload<int>( &QSpinBox::valueChanged ), this, applyAndPush );
-  connect( mStrokeWidthSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, applyAndPush );
-  if ( mFillColorBtn )
-    connect( mFillColorBtn, &QgsColorButton::colorChanged, this, applyAndPush );
-  connect( mStrokeColorBtn, &QgsColorButton::colorChanged, this, applyAndPush );
-  connect( mStrokeStyleCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, applyAndPush );
-  if ( mFillStyleCombo )
-    connect( mFillStyleCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, applyAndPush );
-}
-
-void KadasMapToolEditAnnotationItem::readStyleToWidgets()
-{
-  if ( mTextEdit )
-  {
-    if ( auto *pt = dynamic_cast<QgsAnnotationPointTextItem *>( mItem ) )
-    {
-      const QSignalBlocker b( mTextEdit );
-      mTextEdit->setText( pt->text() );
-      mTextEdit->setFocus();
-      mTextEdit->selectAll();
-    }
-  }
-
-  if ( mTextFontCombo )
-  {
-    if ( auto *pt = dynamic_cast<QgsAnnotationPointTextItem *>( mItem ) )
-    {
-      const QgsTextFormat fmt = pt->format();
-      const QSignalBlocker b1( mTextFontCombo ), b2( mTextSizeSpin ), b3( mTextColorBtn ), b4( mTextBufferColorBtn ), b5( mTextBufferWidthSpin );
-      mTextFontCombo->setCurrentFont( fmt.font() );
-      mTextSizeSpin->setValue( fmt.size() );
-      mTextColorBtn->setColor( fmt.color() );
-      const QgsTextBufferSettings buf = fmt.buffer();
-      mTextBufferColorBtn->setColor( buf.enabled() ? buf.color() : QColor( 0, 0, 0, 0 ) );
-      mTextBufferWidthSpin->setValue( buf.enabled() ? buf.size() : 0.0 );
-    }
-  }
-
-  if ( !mStrokeColorBtn )
-    return; // styling row not built
-
-  if ( auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( mItem ) )
-  {
-    QgsSimpleMarkerSymbolLayer *sl = firstSimpleMarker( marker );
-    if ( !sl )
-      return;
-    const QSignalBlocker b1( mShapeCombo ), b2( mSizeSpin ), b3( mStrokeWidthSpin ), b4( mFillColorBtn ), b5( mStrokeColorBtn ), b6( mStrokeStyleCombo );
-    const int shapeIdx = mShapeCombo->findData( static_cast<int>( sl->shape() ) );
-    if ( shapeIdx >= 0 )
-      mShapeCombo->setCurrentIndex( shapeIdx );
-    mSizeSpin->setValue( static_cast<int>( std::round( sl->size() ) ) );
-    mStrokeWidthSpin->setValue( sl->strokeWidth() );
-    mFillColorBtn->setColor( sl->color() );
-    mStrokeColorBtn->setColor( sl->strokeColor() );
-    const int styleIdx = mStrokeStyleCombo->findData( static_cast<int>( sl->strokeStyle() ) );
-    if ( styleIdx >= 0 )
-      mStrokeStyleCombo->setCurrentIndex( styleIdx );
-  }
-  else if ( auto *line = dynamic_cast<QgsAnnotationLineItem *>( mItem ) )
-  {
-    QgsSimpleLineSymbolLayer *sl = firstSimpleLine( line );
-    if ( !sl )
-      return;
-    const QSignalBlocker b1( mStrokeWidthSpin ), b2( mStrokeColorBtn ), b3( mStrokeStyleCombo );
-    mStrokeWidthSpin->setValue( sl->width() );
-    mStrokeColorBtn->setColor( sl->color() );
-    const int styleIdx = mStrokeStyleCombo->findData( static_cast<int>( sl->penStyle() ) );
-    if ( styleIdx >= 0 )
-      mStrokeStyleCombo->setCurrentIndex( styleIdx );
-  }
-  else if ( auto *poly = dynamic_cast<QgsAnnotationPolygonItem *>( mItem ) )
-  {
-    QgsSimpleFillSymbolLayer *sl = firstSimpleFill( poly );
-    if ( !sl )
-      return;
-    const QSignalBlocker b1( mStrokeWidthSpin ), b2( mFillColorBtn ), b3( mStrokeColorBtn ), b4( mStrokeStyleCombo ), b5( mFillStyleCombo );
-    mStrokeWidthSpin->setValue( sl->strokeWidth() );
-    mFillColorBtn->setColor( sl->color() );
-    mStrokeColorBtn->setColor( sl->strokeColor() );
-    const int styleIdx = mStrokeStyleCombo->findData( static_cast<int>( sl->strokeStyle() ) );
-    if ( styleIdx >= 0 )
-      mStrokeStyleCombo->setCurrentIndex( styleIdx );
-    const int fillIdx = mFillStyleCombo->findData( static_cast<int>( sl->brushStyle() ) );
-    if ( fillIdx >= 0 )
-      mFillStyleCombo->setCurrentIndex( fillIdx );
-  }
-}
-
-void KadasMapToolEditAnnotationItem::applyStyleFromWidgets()
-{
-  if ( !mItem || !mLayer )
-    return;
-
-  if ( mTextFontCombo )
-  {
-    if ( auto *pt = dynamic_cast<QgsAnnotationPointTextItem *>( mItem ) )
-    {
-      QgsTextFormat fmt = pt->format();
-      QFont f = mTextFontCombo->currentFont();
-      fmt.setFont( f );
-      fmt.setSize( mTextSizeSpin->value() );
-      fmt.setSizeUnit( Qgis::RenderUnit::Points );
-      fmt.setColor( mTextColorBtn->color() );
-      QgsTextBufferSettings buf = fmt.buffer();
-      const double bw = mTextBufferWidthSpin->value();
-      const QColor bc = mTextBufferColorBtn->color();
-      buf.setEnabled( bw > 0.0 && bc.alpha() > 0 );
-      buf.setColor( bc );
-      buf.setSize( bw );
-      buf.setSizeUnit( Qgis::RenderUnit::Millimeters );
-      fmt.setBuffer( buf );
-      pt->setFormat( fmt );
-      mLayer->triggerRepaint();
-      if ( mController )
-        mController->persistStyle( mItem );
-      return;
-    }
-  }
-
-  if ( !mStrokeColorBtn )
-    return;
-
-  if ( auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( mItem ) )
-  {
-    std::unique_ptr<QgsMarkerSymbol> sym( marker->symbol() ? marker->symbol()->clone() : new QgsMarkerSymbol() );
-    if ( sym->symbolLayerCount() == 0 )
-      sym->appendSymbolLayer( new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Circle ) );
-    auto *sl = dynamic_cast<QgsSimpleMarkerSymbolLayer *>( sym->symbolLayer( 0 ) );
-    if ( !sl )
-    {
-      auto *replacement = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Circle );
-      sym->changeSymbolLayer( 0, replacement );
-      sl = replacement;
-    }
-    sl->setShape( static_cast<Qgis::MarkerShape>( mShapeCombo->currentData().toInt() ) );
-    sl->setSize( mSizeSpin->value() );
-    sl->setStrokeWidth( mStrokeWidthSpin->value() );
-    sl->setColor( mFillColorBtn->color() );
-    sl->setStrokeColor( mStrokeColorBtn->color() );
-    sl->setStrokeStyle( static_cast<Qt::PenStyle>( mStrokeStyleCombo->currentData().toInt() ) );
-    marker->setSymbol( sym.release() );
-  }
-  else if ( auto *line = dynamic_cast<QgsAnnotationLineItem *>( mItem ) )
-  {
-    std::unique_ptr<QgsLineSymbol> sym( line->symbol() ? line->symbol()->clone() : new QgsLineSymbol() );
-    if ( sym->symbolLayerCount() == 0 )
-      sym->appendSymbolLayer( new QgsSimpleLineSymbolLayer() );
-    auto *sl = dynamic_cast<QgsSimpleLineSymbolLayer *>( sym->symbolLayer( 0 ) );
-    if ( !sl )
-    {
-      auto *replacement = new QgsSimpleLineSymbolLayer();
-      sym->changeSymbolLayer( 0, replacement );
-      sl = replacement;
-    }
-    sl->setWidth( mStrokeWidthSpin->value() );
-    sl->setColor( mStrokeColorBtn->color() );
-    sl->setPenStyle( static_cast<Qt::PenStyle>( mStrokeStyleCombo->currentData().toInt() ) );
-    line->setSymbol( sym.release() );
-  }
-  else if ( auto *poly = dynamic_cast<QgsAnnotationPolygonItem *>( mItem ) )
-  {
-    std::unique_ptr<QgsFillSymbol> sym( poly->symbol() ? poly->symbol()->clone() : new QgsFillSymbol() );
-    if ( sym->symbolLayerCount() == 0 )
-      sym->appendSymbolLayer( new QgsSimpleFillSymbolLayer() );
-    auto *sl = dynamic_cast<QgsSimpleFillSymbolLayer *>( sym->symbolLayer( 0 ) );
-    if ( !sl )
-    {
-      auto *replacement = new QgsSimpleFillSymbolLayer();
-      sym->changeSymbolLayer( 0, replacement );
-      sl = replacement;
-    }
-    sl->setStrokeWidth( mStrokeWidthSpin->value() );
-    sl->setColor( mFillColorBtn->color() );
-    sl->setStrokeColor( mStrokeColorBtn->color() );
-    sl->setStrokeStyle( static_cast<Qt::PenStyle>( mStrokeStyleCombo->currentData().toInt() ) );
-    sl->setBrushStyle( static_cast<Qt::BrushStyle>( mFillStyleCombo->currentData().toInt() ) );
-    poly->setSymbol( sym.release() );
-  }
-
-  if ( mController )
-    mController->persistStyle( mItem );
+  } );
 }
 
 void KadasMapToolEditAnnotationItem::createInitialItem()

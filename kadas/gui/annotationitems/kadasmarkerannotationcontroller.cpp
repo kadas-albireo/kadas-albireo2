@@ -32,6 +32,7 @@
 #include <qgis/qgssymbollayerutils.h>
 
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
+#include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadasmarkerannotationcontroller.h"
 
 
@@ -290,4 +291,9 @@ void KadasMarkerAnnotationController::persistStyle( const QgsAnnotationItem *ite
   settingsFillColor->setValue( sl->color() );
   settingsStrokeColor->setValue( sl->strokeColor() );
   settingsStrokeStyle->setValue( static_cast<int>( sl->strokeStyle() ) );
+}
+
+KadasAnnotationStyleEditor *KadasMarkerAnnotationController::createStyleEditor( QWidget *parent ) const
+{
+  return new KadasMarkerStyleEditor( parent );
 }
