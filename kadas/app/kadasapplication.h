@@ -54,6 +54,7 @@ class KadasPluginInterface;
 class KadasPortalAuth;
 class KadasPythonIntegration;
 class KadasRedliningIntegration;
+class KadasAnnotationProjectIntegration;
 
 #define kApp KadasApplication::instance()
 
@@ -157,6 +158,7 @@ class KadasApplication : public QgsApplication
     QgsNetworkLogger *mNetworkLogger = nullptr;
     KadasPortalAuth *mPortalAuth = nullptr;
     KadasDeveloperToolsDockWidget *mNetworkLoggerDockWidget = nullptr;
+    KadasAnnotationProjectIntegration *mAnnotationProjectIntegration = nullptr;
 
     void loadPythonSupport();
     QString migrateDatasource( const QString &path ) const;
