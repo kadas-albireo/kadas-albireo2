@@ -18,7 +18,14 @@
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgsproject.h>
 
+#include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
+#include "kadas/gui/annotationitems/kadasannotationitemcontext.h"
+#include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
+#include "kadas/gui/annotationitems/kadascircleannotationitem.h"
+#include "kadas/gui/annotationitems/kadascoordcrossannotationitem.h"
+#include "kadas/gui/annotationitems/kadaspinannotationitem.h"
+#include "kadas/gui/annotationitems/kadasrectangleannotationitem.h"
 
 
 namespace
@@ -28,6 +35,47 @@ namespace
   QString tooltipKey( const QString &itemId )
   {
     return KEY_PREFIX + itemId + QStringLiteral( ":tooltip" );
+  }
+
+  // Polymorphic accessors over the (currently 4) Kadas master types that
+  // carry a shadow-ids list. Centralized here so callers don't sprinkle
+  // dynamic_casts. Returns nullptr for items that aren't Kadas masters.
+  QStringList masterShadowIds( const QgsAnnotationItem *item )
+  {
+    if ( const auto *m = dynamic_cast<const KadasRectangleAnnotationItem *>( item ) )
+      return m->shadowIds();
+    if ( const auto *m = dynamic_cast<const KadasCircleAnnotationItem *>( item ) )
+      return m->shadowIds();
+    if ( const auto *m = dynamic_cast<const KadasPinAnnotationItem *>( item ) )
+      return m->shadowIds();
+    if ( const auto *m = dynamic_cast<const KadasCoordCrossAnnotationItem *>( item ) )
+      return m->shadowIds();
+    return {};
+  }
+
+  bool setMasterShadowIds( QgsAnnotationItem *item, const QStringList &ids )
+  {
+    if ( auto *m = dynamic_cast<KadasRectangleAnnotationItem *>( item ) )
+    {
+      m->setShadowIds( ids );
+      return true;
+    }
+    if ( auto *m = dynamic_cast<KadasCircleAnnotationItem *>( item ) )
+    {
+      m->setShadowIds( ids );
+      return true;
+    }
+    if ( auto *m = dynamic_cast<KadasPinAnnotationItem *>( item ) )
+    {
+      m->setShadowIds( ids );
+      return true;
+    }
+    if ( auto *m = dynamic_cast<KadasCoordCrossAnnotationItem *>( item ) )
+    {
+      m->setShadowIds( ids );
+      return true;
+    }
+    return false;
   }
 } // namespace
 
@@ -61,4 +109,62 @@ QgsAnnotationLayer *KadasAnnotationLayerHelpers::createLayer( const QString &nam
     crs = QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:3857" ) );
   layer->setCrs( crs );
   return layer;
+}
+
+void KadasAnnotationLayerHelpers::stripShadowsFromLayer( QgsAnnotationLayer *layer )
+{
+  if ( !layer )
+    return;
+  // Snapshot ids first to avoid iterator invalidation while we remove items.
+  const QMap<QString, QgsAnnotationItem *> snapshot = layer->items();
+  for ( auto it = snapshot.constBegin(); it != snapshot.constEnd(); ++it )
+  {
+    QgsAnnotationItem *master = it.value();
+    const QStringList ids = masterShadowIds( master );
+    if ( ids.isEmpty() )
+      continue;
+    for ( const QString &id : ids )
+      layer->removeItem( id );
+    setMasterShadowIds( master, {} );
+  }
+}
+
+void KadasAnnotationLayerHelpers::prepareLayerForSave( QgsAnnotationLayer *layer )
+{
+  if ( !layer )
+    return;
+
+  // Drop any pre-existing shadows so repeated saves don't accumulate them.
+  stripShadowsFromLayer( layer );
+
+  auto *registry = KadasAnnotationControllerRegistry::instance();
+  if ( !registry )
+    return;
+
+  const KadasAnnotationItemContext ctx( layer->crs(), QgsMapSettings(), layer );
+
+  // Snapshot master ids/items first; addItem() during iteration would
+  // mutate the underlying map.
+  const QMap<QString, QgsAnnotationItem *> snapshot = layer->items();
+  for ( auto it = snapshot.constBegin(); it != snapshot.constEnd(); ++it )
+  {
+    QgsAnnotationItem *master = it.value();
+    if ( !master )
+      continue;
+    KadasAnnotationItemController *controller = registry->controllerFor( master->type() );
+    if ( !controller )
+      continue;
+    const QList<QgsAnnotationItem *> shadows = controller->generateShadows( master, ctx );
+    if ( shadows.isEmpty() )
+      continue;
+    QStringList shadowIds;
+    shadowIds.reserve( shadows.size() );
+    for ( QgsAnnotationItem *shadow : shadows )
+    {
+      const QString id = layer->addItem( shadow ); // takes ownership
+      if ( !id.isEmpty() )
+        shadowIds.append( id );
+    }
+    setMasterShadowIds( master, shadowIds );
+  }
 }
