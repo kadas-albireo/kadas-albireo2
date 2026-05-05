@@ -150,7 +150,33 @@ KadasEditContext KadasRectangleAnnotationController::getEditContext( const QgsAn
   if ( pos.sqrDist( rotMap ) < pickTolSqr( ctx ) )
     return KadasEditContext( QgsVertexId( 0, 0, RotationHandleVertex ), rotMap, drawAttribs(), Qt::CrossCursor );
 
-  if ( toMapRect( rect->boundingBox(), ctx ).contains( pos ) )
+  // Body test: point-in-rotated-quad. Using the AABB would falsely select
+  // the rectangle for clicks in the corners of its bounding box that lie
+  // outside the actual rotated shape.
+  const auto csMap = [&]() {
+    QVector<QgsPointXY> v;
+    v.reserve( cs.size() );
+    for ( const QgsPointXY &c : cs )
+      v.append( toMapPos( c, ctx ) );
+    return v;
+  }();
+  auto pointInQuad = [&]( const QgsPointXY &p ) {
+    // Standard ray-casting: count crossings of horizontal ray from p.
+    bool inside = false;
+    const int n = csMap.size();
+    for ( int i = 0, j = n - 1; i < n; j = i++ )
+    {
+      const double yi = csMap[i].y(), yj = csMap[j].y();
+      if ( ( yi > p.y() ) != ( yj > p.y() ) )
+      {
+        const double xCross = csMap[j].x() + ( csMap[i].x() - csMap[j].x() ) * ( p.y() - yj ) / ( yi - yj );
+        if ( p.x() < xCross )
+          inside = !inside;
+      }
+    }
+    return inside;
+  };
+  if ( pointInQuad( pos ) )
   {
     const QgsPointXY centerMap = toMapPos( rect->center(), ctx );
     return KadasEditContext( QgsVertexId(), centerMap, KadasAttribDefs(), Qt::ArrowCursor );
