@@ -39,7 +39,7 @@ QString KadasPinAnnotationItem::type() const
 
 QString KadasPinAnnotationItem::defaultIconPath()
 {
-  return QStringLiteral( ":/kadas/icons/pin_red.svg" );
+  return QStringLiteral( ":/kadas/icons/pin_red" );
 }
 
 void KadasPinAnnotationItem::installDefaultSymbol()
