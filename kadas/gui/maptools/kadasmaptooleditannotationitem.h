@@ -36,6 +36,7 @@ class KadasFloatingInputWidget;
 class QBoxLayout;
 class QComboBox;
 class QDoubleSpinBox;
+class QFontComboBox;
 class QLineEdit;
 class QSpinBox;
 class QgsAnnotationItem;
@@ -108,6 +109,10 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     static const QgsSettingsEntryColor *settingsPolygonStrokeColor;
     static const QgsSettingsEntryInteger *settingsPolygonStrokeStyle;
     static const QgsSettingsEntryInteger *settingsPolygonBrushStyle;
+    static const QgsSettingsEntryDouble *settingsTextSize;
+    static const QgsSettingsEntryColor *settingsTextColor;
+    static const QgsSettingsEntryColor *settingsTextBufferColor;
+    static const QgsSettingsEntryDouble *settingsTextBufferWidth;
 #endif
 
   signals:
@@ -162,6 +167,11 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     QComboBox *mStrokeStyleCombo = nullptr;
     QComboBox *mFillStyleCombo = nullptr;
     QLineEdit *mTextEdit = nullptr;
+    QFontComboBox *mTextFontCombo = nullptr;
+    QDoubleSpinBox *mTextSizeSpin = nullptr;
+    QgsColorButton *mTextColorBtn = nullptr;
+    QgsColorButton *mTextBufferColorBtn = nullptr;
+    QDoubleSpinBox *mTextBufferWidthSpin = nullptr;
 
     void pushState();
     void deleteItem();
@@ -180,6 +190,13 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     void clearInProgressItem();
     void startPart( const QgsPointXY &pos );
     void finishPart();
+
+    // Returns the id of an annotation item on mLayer hit by a click at
+    // \a mapPos, or an empty string if none.
+    QString pickItemAt( const QgsPointXY &mapPos ) const;
+    // Switches the tool to edit \a itemId on the current layer, rebuilding
+    // the styling row to match the new item's geometry kind.
+    void switchToItem( const QString &itemId );
 
   private slots:
     void stateChanged( KadasStateHistory::ChangeType, KadasStateHistory::State *state, KadasStateHistory::State *prevState );
