@@ -18,6 +18,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <limits>
 #include <memory>
 
 #include <qgis/qgsannotationitem.h>
@@ -568,7 +569,29 @@ QString KadasMapToolEditAnnotationItem::pickItemAt( const QgsPointXY &mapPos ) c
   const QgsRectangle layerBounds = canvas()->mapSettings().mapToLayerCoordinates( mLayer.data(), mapBounds );
   QgsFeedback feedback;
   const QStringList hits = mLayer->itemsInBounds( layerBounds, rc, &feedback );
-  return hits.isEmpty() ? QString() : hits.first();
+  if ( hits.isEmpty() )
+    return QString();
+
+  // QgsAnnotationLayer::itemsInBounds is a bounding-box test, so a click on
+  // a small item that sits inside a larger item's bbox (e.g. a circle on
+  // top of a rectangle) may match both. Pick the most specific candidate:
+  // the one with the smallest bounding box area.
+  QString best;
+  double bestArea = std::numeric_limits<double>::infinity();
+  for ( const QString &id : hits )
+  {
+    QgsAnnotationItem *cand = mLayer->item( id );
+    if ( !cand )
+      continue;
+    const QgsRectangle bb = cand->boundingBox();
+    const double area = bb.width() * bb.height();
+    if ( area < bestArea )
+    {
+      bestArea = area;
+      best = id;
+    }
+  }
+  return best;
 }
 
 void KadasMapToolEditAnnotationItem::switchToItem( const QString &itemId )
