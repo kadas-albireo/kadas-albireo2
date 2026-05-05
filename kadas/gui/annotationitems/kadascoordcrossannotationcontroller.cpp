@@ -92,9 +92,12 @@ QList<QgsAnnotationItem *> KadasCoordCrossAnnotationController::generateShadows(
 
   QList<QgsAnnotationItem *> shadows;
 
-  // Cross-shaped marker shadow.
+  // Cross-shaped marker shadow. The Kadas master draws an 80px-wide cross
+  // (~21mm at 96 DPI); match that order of magnitude for the QGIS shadow
+  // so the cross has comparable visual weight when rendered with the
+  // mm-based simple-marker layer.
   auto *cross = new QgsAnnotationMarkerItem( QgsPoint( pt.x(), pt.y() ) );
-  auto *layer = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Cross, 8.0 );
+  auto *layer = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Cross, 20.0 );
   layer->setStrokeColor( QColor( 0, 0, 0 ) );
   layer->setStrokeWidth( 0.4 );
   auto *symbol = new QgsMarkerSymbol( QgsSymbolLayerList() << layer );

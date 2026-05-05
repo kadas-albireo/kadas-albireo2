@@ -15,14 +15,46 @@
  ***************************************************************************/
 
 #include <QObject>
+#include <QFile>
 
 #include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgsmarkersymbol.h>
+#include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgspoint.h>
+#include <qgis/qgssymbollayer.h>
 
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadaspinannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
+
+
+namespace
+{
+  // Walk the symbol layer list and rewrite any SvgMarker layer whose path
+  // points at a Qt resource (\":/...\") to an inline base64-encoded payload.
+  // This makes the saved QGIS shadow self-contained: vanilla QGIS can't
+  // resolve Kadas qrc paths, so without this the shadow would render as a
+  // missing-SVG placeholder. \\see QgsSymbolLayerUtils::svgSymbolNameToPath.
+  void embedQrcSvgPaths( QgsMarkerSymbol *symbol )
+  {
+    if ( !symbol )
+      return;
+    for ( int i = 0; i < symbol->symbolLayerCount(); ++i )
+    {
+      auto *svg = dynamic_cast<QgsSvgMarkerSymbolLayer *>( symbol->symbolLayer( i ) );
+      if ( !svg )
+        continue;
+      const QString path = svg->path();
+      if ( !path.startsWith( QLatin1Char( ':' ) ) )
+        continue; // not a qrc path; leave it
+      QFile f( path );
+      if ( !f.open( QIODevice::ReadOnly ) )
+        continue;
+      const QByteArray data = f.readAll();
+      svg->setPath( QStringLiteral( "base64:" ) + QString::fromLatin1( data.toBase64() ) );
+    }
+  }
+} // namespace
 
 
 QString KadasPinAnnotationController::itemType() const
@@ -49,7 +81,11 @@ QList<QgsAnnotationItem *> KadasPinAnnotationController::generateShadows( const 
   const QgsPointXY pt = master->geometry();
   auto *shadow = new QgsAnnotationMarkerItem( QgsPoint( pt.x(), pt.y() ) );
   if ( master->symbol() )
-    shadow->setSymbol( master->symbol()->clone() );
+  {
+    QgsMarkerSymbol *cloned = master->symbol()->clone();
+    embedQrcSvgPaths( cloned );
+    shadow->setSymbol( cloned );
+  }
   shadow->setZIndex( master->zIndex() );
   return { shadow };
 }
