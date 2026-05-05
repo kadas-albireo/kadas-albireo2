@@ -277,10 +277,17 @@ void KadasMarkerAnnotationController::applyPersistedStyle( QgsAnnotationItem *it
     // symbol that must not be replaced by the generic-marker defaults.
     return;
   }
-  sl->setShape( static_cast<Qgis::MarkerShape>( settingsShape->value() ) );
-  sl->setSize( settingsSize->value() );
+  // Preserve the shape chosen by the toolbar / item factory; persist only
+  // the visual style attributes (size, colors, stroke).
+  const int size = std::max( 1, settingsSize->value() );
+  sl->setSize( size );
   sl->setStrokeWidth( settingsStrokeWidth->value() );
-  sl->setColor( settingsFillColor->value() );
+  // Reject fully-transparent fills, which would make every freshly placed
+  // marker invisible after a single accidental persist.
+  QColor fill = settingsFillColor->value();
+  if ( fill.alpha() == 0 )
+    fill.setAlpha( 255 );
+  sl->setColor( fill );
   sl->setStrokeColor( settingsStrokeColor->value() );
   sl->setStrokeStyle( static_cast<Qt::PenStyle>( settingsStrokeStyle->value() ) );
   marker->setSymbol( sym.release() );
@@ -294,7 +301,6 @@ void KadasMarkerAnnotationController::persistStyle( const QgsAnnotationItem *ite
   const auto *sl = dynamic_cast<const QgsSimpleMarkerSymbolLayer *>( marker->symbol()->symbolLayer( 0 ) );
   if ( !sl )
     return;
-  settingsShape->setValue( static_cast<int>( sl->shape() ) );
   settingsSize->setValue( static_cast<int>( std::round( sl->size() ) ) );
   settingsStrokeWidth->setValue( sl->strokeWidth() );
   settingsFillColor->setValue( sl->color() );
