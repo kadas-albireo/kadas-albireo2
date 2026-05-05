@@ -16,19 +16,37 @@
 
 #include <QObject>
 #include <QTextStream>
+#include <memory>
 
 #include <qgis/qgsannotationpolygonitem.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgscurvepolygon.h>
+#include <qgis/qgsfillsymbol.h>
+#include <qgis/qgsfillsymbollayer.h>
 #include <qgis/qgslinestring.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgspointxy.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgssettingsentryimpl.h>
 
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadaspolygonannotationcontroller.h"
+
+
+// ----- Persisted last-used style ----------------------------------------
+
+const QgsSettingsEntryDouble *KadasPolygonAnnotationController::settingsStrokeWidth
+  = new QgsSettingsEntryDouble( QStringLiteral( "polygon-stroke-width" ), sTreeAnnotation, 0.5, QStringLiteral( "Last-used polygon outline width (mm)." ) );
+const QgsSettingsEntryColor *KadasPolygonAnnotationController::settingsFillColor
+  = new QgsSettingsEntryColor( QStringLiteral( "polygon-fill-color" ), sTreeAnnotation, QColor( 255, 0, 0, 80 ), QStringLiteral( "Last-used polygon fill color." ) );
+const QgsSettingsEntryColor *KadasPolygonAnnotationController::settingsStrokeColor
+  = new QgsSettingsEntryColor( QStringLiteral( "polygon-stroke-color" ), sTreeAnnotation, QColor( 255, 0, 0 ), QStringLiteral( "Last-used polygon outline color." ) );
+const QgsSettingsEntryInteger *KadasPolygonAnnotationController::settingsStrokeStyle
+  = new QgsSettingsEntryInteger( QStringLiteral( "polygon-stroke-style" ), sTreeAnnotation, static_cast<int>( Qt::SolidLine ), QStringLiteral( "Last-used polygon outline style." ) );
+const QgsSettingsEntryInteger *KadasPolygonAnnotationController::settingsBrushStyle
+  = new QgsSettingsEntryInteger( QStringLiteral( "polygon-brush-style" ), sTreeAnnotation, static_cast<int>( Qt::SolidPattern ), QStringLiteral( "Last-used polygon fill style." ) );
 
 namespace
 {
@@ -325,4 +343,42 @@ QString KadasPolygonAnnotationController::asKml( const QgsAnnotationItem *item, 
   outStream << "</Placemark>\n";
   outStream.flush();
   return outString;
+}
+
+void KadasPolygonAnnotationController::applyPersistedStyle( QgsAnnotationItem *item ) const
+{
+  auto *poly = dynamic_cast<QgsAnnotationPolygonItem *>( item );
+  if ( !poly || !settingsStrokeColor->exists() )
+    return;
+  std::unique_ptr<QgsFillSymbol> sym( poly->symbol() ? poly->symbol()->clone() : new QgsFillSymbol() );
+  if ( sym->symbolLayerCount() == 0 )
+    sym->appendSymbolLayer( new QgsSimpleFillSymbolLayer() );
+  auto *sl = dynamic_cast<QgsSimpleFillSymbolLayer *>( sym->symbolLayer( 0 ) );
+  if ( !sl )
+  {
+    auto *replacement = new QgsSimpleFillSymbolLayer();
+    sym->changeSymbolLayer( 0, replacement );
+    sl = replacement;
+  }
+  sl->setStrokeWidth( settingsStrokeWidth->value() );
+  sl->setColor( settingsFillColor->value() );
+  sl->setStrokeColor( settingsStrokeColor->value() );
+  sl->setStrokeStyle( static_cast<Qt::PenStyle>( settingsStrokeStyle->value() ) );
+  sl->setBrushStyle( static_cast<Qt::BrushStyle>( settingsBrushStyle->value() ) );
+  poly->setSymbol( sym.release() );
+}
+
+void KadasPolygonAnnotationController::persistStyle( const QgsAnnotationItem *item ) const
+{
+  const auto *poly = dynamic_cast<const QgsAnnotationPolygonItem *>( item );
+  if ( !poly || !poly->symbol() || poly->symbol()->symbolLayerCount() == 0 )
+    return;
+  const auto *sl = dynamic_cast<const QgsSimpleFillSymbolLayer *>( poly->symbol()->symbolLayer( 0 ) );
+  if ( !sl )
+    return;
+  settingsStrokeWidth->setValue( sl->strokeWidth() );
+  settingsFillColor->setValue( sl->color() );
+  settingsStrokeColor->setValue( sl->strokeColor() );
+  settingsStrokeStyle->setValue( static_cast<int>( sl->strokeStyle() ) );
+  settingsBrushStyle->setValue( static_cast<int>( sl->brushStyle() ) );
 }

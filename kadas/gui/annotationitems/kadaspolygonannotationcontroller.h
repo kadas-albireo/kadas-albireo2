@@ -61,6 +61,17 @@ class KADAS_GUI_EXPORT KadasPolygonAnnotationController : public KadasAnnotation
 
     QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = nullptr ) const override;
 
+    void applyPersistedStyle( QgsAnnotationItem *item ) const override;
+    void persistStyle( const QgsAnnotationItem *item ) const override;
+
+#ifndef SIP_RUN
+    static const QgsSettingsEntryDouble *settingsStrokeWidth;
+    static const QgsSettingsEntryColor *settingsFillColor;
+    static const QgsSettingsEntryColor *settingsStrokeColor;
+    static const QgsSettingsEntryInteger *settingsStrokeStyle;
+    static const QgsSettingsEntryInteger *settingsBrushStyle;
+#endif
+
   private:
     enum AttribIds
     {

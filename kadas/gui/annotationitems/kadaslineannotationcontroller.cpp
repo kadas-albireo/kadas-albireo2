@@ -16,17 +16,31 @@
 
 #include <QObject>
 #include <QTextStream>
+#include <memory>
 
 #include <qgis/qgsannotationlineitem.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgslinestring.h>
+#include <qgis/qgslinesymbol.h>
+#include <qgis/qgslinesymbollayer.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgspointxy.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgssettingsentryimpl.h>
 
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadaslineannotationcontroller.h"
+
+
+// ----- Persisted last-used style ----------------------------------------
+
+const QgsSettingsEntryDouble *KadasLineAnnotationController::settingsWidth
+  = new QgsSettingsEntryDouble( QStringLiteral( "line-width" ), sTreeAnnotation, 0.5, QStringLiteral( "Last-used line width (mm)." ) );
+const QgsSettingsEntryColor *KadasLineAnnotationController::settingsColor
+  = new QgsSettingsEntryColor( QStringLiteral( "line-color" ), sTreeAnnotation, QColor( 255, 0, 0 ), QStringLiteral( "Last-used line color." ) );
+const QgsSettingsEntryInteger *KadasLineAnnotationController::settingsStyle
+  = new QgsSettingsEntryInteger( QStringLiteral( "line-style" ), sTreeAnnotation, static_cast<int>( Qt::SolidLine ), QStringLiteral( "Last-used line style." ) );
 
 namespace
 {
@@ -298,4 +312,38 @@ QString KadasLineAnnotationController::asKml( const QgsAnnotationItem *item, con
   outStream << "</Placemark>\n";
   outStream.flush();
   return outString;
+}
+
+void KadasLineAnnotationController::applyPersistedStyle( QgsAnnotationItem *item ) const
+{
+  auto *line = dynamic_cast<QgsAnnotationLineItem *>( item );
+  if ( !line || !settingsColor->exists() )
+    return;
+  std::unique_ptr<QgsLineSymbol> sym( line->symbol() ? line->symbol()->clone() : new QgsLineSymbol() );
+  if ( sym->symbolLayerCount() == 0 )
+    sym->appendSymbolLayer( new QgsSimpleLineSymbolLayer() );
+  auto *sl = dynamic_cast<QgsSimpleLineSymbolLayer *>( sym->symbolLayer( 0 ) );
+  if ( !sl )
+  {
+    auto *replacement = new QgsSimpleLineSymbolLayer();
+    sym->changeSymbolLayer( 0, replacement );
+    sl = replacement;
+  }
+  sl->setWidth( settingsWidth->value() );
+  sl->setColor( settingsColor->value() );
+  sl->setPenStyle( static_cast<Qt::PenStyle>( settingsStyle->value() ) );
+  line->setSymbol( sym.release() );
+}
+
+void KadasLineAnnotationController::persistStyle( const QgsAnnotationItem *item ) const
+{
+  const auto *line = dynamic_cast<const QgsAnnotationLineItem *>( item );
+  if ( !line || !line->symbol() || line->symbol()->symbolLayerCount() == 0 )
+    return;
+  const auto *sl = dynamic_cast<const QgsSimpleLineSymbolLayer *>( line->symbol()->symbolLayer( 0 ) );
+  if ( !sl )
+    return;
+  settingsWidth->setValue( sl->width() );
+  settingsColor->setValue( sl->color() );
+  settingsStyle->setValue( static_cast<int>( sl->penStyle() ) );
 }
