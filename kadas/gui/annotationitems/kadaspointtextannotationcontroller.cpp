@@ -26,6 +26,7 @@
 #include <qgis/qgstextformat.h>
 
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
+#include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadaspointtextannotationcontroller.h"
 
 
@@ -227,4 +228,9 @@ void KadasPointTextAnnotationController::persistStyle( const QgsAnnotationItem *
   const QgsTextBufferSettings buf = fmt.buffer();
   settingsBufferColor->setValue( buf.enabled() ? buf.color() : QColor( 0, 0, 0, 0 ) );
   settingsBufferWidth->setValue( buf.enabled() ? buf.size() : 0.0 );
+}
+
+KadasAnnotationStyleEditor *KadasPointTextAnnotationController::createStyleEditor( QWidget *parent ) const
+{
+  return new KadasPointTextStyleEditor( parent );
 }

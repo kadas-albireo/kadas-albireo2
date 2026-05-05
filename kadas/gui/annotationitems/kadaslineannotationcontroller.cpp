@@ -30,6 +30,7 @@
 #include <qgis/qgssettingsentryimpl.h>
 
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
+#include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadaslineannotationcontroller.h"
 
 
@@ -346,4 +347,9 @@ void KadasLineAnnotationController::persistStyle( const QgsAnnotationItem *item 
   settingsWidth->setValue( sl->width() );
   settingsColor->setValue( sl->color() );
   settingsStyle->setValue( static_cast<int>( sl->penStyle() ) );
+}
+
+KadasAnnotationStyleEditor *KadasLineAnnotationController::createStyleEditor( QWidget *parent ) const
+{
+  return new KadasLineStyleEditor( parent );
 }

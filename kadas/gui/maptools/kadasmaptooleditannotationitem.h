@@ -30,17 +30,12 @@
 #include "kadas/gui/mapitems/kadasmapitem.h"
 
 class KadasAnnotationItemController;
+class KadasAnnotationStyleEditor;
 class KadasBottomBar;
 class KadasFloatingInputWidget;
 class QBoxLayout;
-class QComboBox;
-class QDoubleSpinBox;
-class QFontComboBox;
-class QLineEdit;
-class QSpinBox;
 class QgsAnnotationItem;
 class QgsAnnotationLayer;
-class QgsColorButton;
 
 /**
  * \ingroup gui
@@ -132,19 +127,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     KadasFloatingInputWidget *mInputWidget = nullptr;
     bool mIgnoreNextMoveEvent = false;
 
-    QComboBox *mShapeCombo = nullptr;
-    QSpinBox *mSizeSpin = nullptr;
-    QDoubleSpinBox *mStrokeWidthSpin = nullptr;
-    QgsColorButton *mFillColorBtn = nullptr;
-    QgsColorButton *mStrokeColorBtn = nullptr;
-    QComboBox *mStrokeStyleCombo = nullptr;
-    QComboBox *mFillStyleCombo = nullptr;
-    QLineEdit *mTextEdit = nullptr;
-    QFontComboBox *mTextFontCombo = nullptr;
-    QDoubleSpinBox *mTextSizeSpin = nullptr;
-    QgsColorButton *mTextColorBtn = nullptr;
-    QgsColorButton *mTextBufferColorBtn = nullptr;
-    QDoubleSpinBox *mTextBufferWidthSpin = nullptr;
+    KadasAnnotationStyleEditor *mStyleEditor = nullptr;
 
     void pushState();
     void deleteItem();
@@ -152,9 +135,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     void clearNumericInput();
     KadasAttribValues collectAttributeValues() const;
 
-    void setupStyleWidgets( QBoxLayout *outer );
-    void readStyleToWidgets();
-    void applyStyleFromWidgets();
+    void setupStyleEditor( QBoxLayout *outer );
 
     // Create-flow helpers.
     void createInitialItem();
