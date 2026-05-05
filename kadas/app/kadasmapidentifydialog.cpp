@@ -38,6 +38,7 @@
 #include <qgis/qgsrubberband.h>
 #include <qgis/qgsvectorlayer.h>
 
+#include "kadasguidegridlayer.h"
 #include "kadasmapidentifydialog.h"
 
 
@@ -197,6 +198,16 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
         addPluginLayerResults( pluginLayer, results );
       }
     }
+    else if ( auto *gg = dynamic_cast<KadasGuideGridLayer *>( layer ) )
+    {
+      // KadasGuideGridLayer is a QgsAnnotationLayer subclass but still
+      // exposes an identify() returning the legacy IdentifyResult type.
+      QList<KadasPluginLayer::IdentifyResult> results = gg->identify( mapPos, mCanvas->mapSettings() );
+      if ( !results.isEmpty() )
+      {
+        addPluginLayerResults( gg, results );
+      }
+    }
     else if ( dynamic_cast<QgsRasterLayer *>( layer ) )
     {
       QgsRasterLayer *rlayer = static_cast<QgsRasterLayer *>( layer );
@@ -324,7 +335,7 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
   }
 }
 
-void KadasMapIdentifyDialog::addPluginLayerResults( KadasPluginLayer *pLayer, const QList<KadasPluginLayer::IdentifyResult> &results )
+void KadasMapIdentifyDialog::addPluginLayerResults( QgsMapLayer *pLayer, const QList<KadasPluginLayer::IdentifyResult> &results )
 {
   if ( !mLayerTreeItemMap[pLayer->id()] )
   {
