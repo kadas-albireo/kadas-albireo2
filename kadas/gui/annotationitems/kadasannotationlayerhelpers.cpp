@@ -14,6 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <qgis/qgsannotationitem.h>
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgsproject.h>
@@ -22,10 +23,6 @@
 #include "kadas/gui/annotationitems/kadasannotationitemcontext.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
-#include "kadas/gui/annotationitems/kadascircleannotationitem.h"
-#include "kadas/gui/annotationitems/kadascoordcrossannotationitem.h"
-#include "kadas/gui/annotationitems/kadaspinannotationitem.h"
-#include "kadas/gui/annotationitems/kadasrectangleannotationitem.h"
 
 
 namespace
@@ -37,45 +34,30 @@ namespace
     return KEY_PREFIX + itemId + QStringLiteral( ":tooltip" );
   }
 
-  // Polymorphic accessors over the (currently 4) Kadas master types that
-  // carry a shadow-ids list. Centralized here so callers don't sprinkle
-  // dynamic_casts. Returns nullptr for items that aren't Kadas masters.
-  QStringList masterShadowIds( const QgsAnnotationItem *item )
+  // Dispatch shadow-id access through the controller registry so that
+  // adding a new master type only requires overriding shadowIds() /
+  // setShadowIds() on its controller. Returns the controller for \a item,
+  // or nullptr if no controller is registered for the item's type.
+  KadasAnnotationItemController *controllerFor( const QgsAnnotationItem *item )
   {
-    if ( const auto *m = dynamic_cast<const KadasRectangleAnnotationItem *>( item ) )
-      return m->shadowIds();
-    if ( const auto *m = dynamic_cast<const KadasCircleAnnotationItem *>( item ) )
-      return m->shadowIds();
-    if ( const auto *m = dynamic_cast<const KadasPinAnnotationItem *>( item ) )
-      return m->shadowIds();
-    if ( const auto *m = dynamic_cast<const KadasCoordCrossAnnotationItem *>( item ) )
-      return m->shadowIds();
-    return {};
+    if ( !item )
+      return nullptr;
+    auto *registry = KadasAnnotationControllerRegistry::instance();
+    if ( !registry )
+      return nullptr;
+    return registry->controllerFor( item->type() );
   }
 
-  bool setMasterShadowIds( QgsAnnotationItem *item, const QStringList &ids )
+  QStringList masterShadowIds( const QgsAnnotationItem *item )
   {
-    if ( auto *m = dynamic_cast<KadasRectangleAnnotationItem *>( item ) )
-    {
-      m->setShadowIds( ids );
-      return true;
-    }
-    if ( auto *m = dynamic_cast<KadasCircleAnnotationItem *>( item ) )
-    {
-      m->setShadowIds( ids );
-      return true;
-    }
-    if ( auto *m = dynamic_cast<KadasPinAnnotationItem *>( item ) )
-    {
-      m->setShadowIds( ids );
-      return true;
-    }
-    if ( auto *m = dynamic_cast<KadasCoordCrossAnnotationItem *>( item ) )
-    {
-      m->setShadowIds( ids );
-      return true;
-    }
-    return false;
+    KadasAnnotationItemController *c = controllerFor( item );
+    return c ? c->shadowIds( item ) : QStringList();
+  }
+
+  void setMasterShadowIds( QgsAnnotationItem *item, const QStringList &ids )
+  {
+    if ( KadasAnnotationItemController *c = controllerFor( item ) )
+      c->setShadowIds( item, ids );
   }
 } // namespace
 

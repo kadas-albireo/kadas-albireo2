@@ -53,3 +53,13 @@ QList<QgsAnnotationItem *> KadasPinAnnotationController::generateShadows( const 
   shadow->setZIndex( master->zIndex() );
   return { shadow };
 }
+
+QStringList KadasPinAnnotationController::shadowIds( const QgsAnnotationItem *item ) const
+{
+  return static_cast<const KadasPinAnnotationItem *>( item )->shadowIds();
+}
+
+void KadasPinAnnotationController::setShadowIds( QgsAnnotationItem *item, const QStringList &ids ) const
+{
+  static_cast<KadasPinAnnotationItem *>( item )->setShadowIds( ids );
+}

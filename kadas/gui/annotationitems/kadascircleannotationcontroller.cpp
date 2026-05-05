@@ -283,3 +283,13 @@ QList<QgsAnnotationItem *> KadasCircleAnnotationController::generateShadows( con
   shadow->setZIndex( master->zIndex() );
   return { shadow };
 }
+
+QStringList KadasCircleAnnotationController::shadowIds( const QgsAnnotationItem *item ) const
+{
+  return static_cast<const KadasCircleAnnotationItem *>( item )->shadowIds();
+}
+
+void KadasCircleAnnotationController::setShadowIds( QgsAnnotationItem *item, const QStringList &ids ) const
+{
+  static_cast<KadasCircleAnnotationItem *>( item )->setShadowIds( ids );
+}

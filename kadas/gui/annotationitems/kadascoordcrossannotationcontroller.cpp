@@ -110,3 +110,13 @@ QList<QgsAnnotationItem *> KadasCoordCrossAnnotationController::generateShadows(
 
   return shadows;
 }
+
+QStringList KadasCoordCrossAnnotationController::shadowIds( const QgsAnnotationItem *item ) const
+{
+  return static_cast<const KadasCoordCrossAnnotationItem *>( item )->shadowIds();
+}
+
+void KadasCoordCrossAnnotationController::setShadowIds( QgsAnnotationItem *item, const QStringList &ids ) const
+{
+  static_cast<KadasCoordCrossAnnotationItem *>( item )->setShadowIds( ids );
+}

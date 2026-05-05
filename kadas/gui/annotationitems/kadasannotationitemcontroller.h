@@ -18,6 +18,7 @@
 #define KADASANNOTATIONITEMCONTROLLER_H
 
 #include <QString>
+#include <QStringList>
 
 #include "kadas/core/kadassettingstree.h"
 #include "kadas/gui/kadas_gui.h"
@@ -170,6 +171,23 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
       Q_UNUSED( item );
       Q_UNUSED( ctx );
       return {};
+    }
+
+    // Read/write the shadow id list stored on a master item. Controllers
+    // whose master type carries shadow ids must override both. The
+    // helpers in KadasAnnotationLayerHelpers dispatch through the
+    // controller registry so adding a new master type only requires
+    // overriding these (no central registry of dynamic_casts to keep in
+    // sync).
+    virtual QStringList shadowIds( const QgsAnnotationItem *item ) const
+    {
+      Q_UNUSED( item );
+      return {};
+    }
+    virtual void setShadowIds( QgsAnnotationItem *item, const QStringList &ids ) const
+    {
+      Q_UNUSED( item );
+      Q_UNUSED( ids );
     }
 
   protected:
