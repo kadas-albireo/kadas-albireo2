@@ -334,7 +334,10 @@ void KadasMapToolEditAnnotationItem::addPoint( const QgsPointXY &pos )
     case DrawState::Finished:
       if ( !mMultipart )
       {
-        clearInProgressItem();
+        // Detach from the just-finalized item (it stays on the layer) and
+        // create a fresh one in its place.
+        mItem = nullptr;
+        mItemId.clear();
         createInitialItem();
         if ( !mItem )
           return;
@@ -359,6 +362,22 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
   KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
   const QgsPointXY pos = e->mapPoint();
 
+  // While actively digitizing a part, skip vertex hit-testing entirely:
+  // the just-placed vertex sits at (or very near) the cursor and would
+  // make mEditContext flip-flop, causing flicker and unnecessary work.
+  if ( mAllowCreate && mDrawState == DrawState::InProgress && e->buttons() == Qt::NoButton )
+  {
+    if ( mEditContext.isValid() )
+    {
+      mEditContext = KadasEditContext();
+      setCursor( Qt::ArrowCursor );
+      clearNumericInput();
+    }
+    mController->setCurrentPoint( mItem, pos, ctx );
+    mLayer->triggerRepaint();
+    return;
+  }
+
   if ( e->buttons() == Qt::LeftButton )
   {
     if ( mEditContext.isValid() )
@@ -376,12 +395,6 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
     {
       setCursor( Qt::ArrowCursor );
       clearNumericInput();
-      // While digitizing with no node under the cursor, preview the next vertex.
-      if ( mAllowCreate && mDrawState == DrawState::InProgress )
-      {
-        mController->setCurrentPoint( mItem, pos, ctx );
-        mLayer->triggerRepaint();
-      }
     }
     else if ( mEditContext != oldContext )
     {
