@@ -129,6 +129,10 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
 
     KadasAnnotationStyleEditor *mStyleEditor = nullptr;
 
+    class HandlesOverlay;
+    HandlesOverlay *mHandles = nullptr;
+
+    void refreshHandles();
     void pushState();
     void deleteItem();
     void setupNumericInput();

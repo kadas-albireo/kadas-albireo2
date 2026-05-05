@@ -16,14 +16,17 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QPainter>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <functional>
 #include <limits>
 #include <memory>
 
 #include <qgis/qgsannotationitem.h>
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsmapcanvas.h>
+#include <qgis/qgsmapcanvasitem.h>
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgsrectangle.h>
 #include <qgis/qgsrendercontext.h>
@@ -37,6 +40,65 @@
 #include "kadas/gui/kadasbottombar.h"
 #include "kadas/gui/kadasfloatinginputwidget.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
+
+
+/**
+ * \brief Lightweight canvas overlay that paints the controller-supplied
+ *        edit handles (vertices) for the item being created/edited.
+ *
+ * Lives only while the tool is active; the tool calls update() after any
+ * change to the item to keep the handles in sync.
+ */
+class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
+{
+  public:
+    using NodesProvider = std::function<QList<KadasNode>()>;
+
+    HandlesOverlay( QgsMapCanvas *canvas, NodesProvider provider )
+      : QgsMapCanvasItem( canvas )
+      , mProvider( std::move( provider ) )
+    {
+      setZValue( std::numeric_limits<double>::max() );
+      updateRect();
+    }
+
+    void updateRect()
+    {
+      // Cover the visible map extent so handles outside the item bbox are
+      // still painted (e.g. a rotation handle offset above the rect).
+      setRect( mMapCanvas->mapSettings().visibleExtent() );
+    }
+
+    void paint( QPainter *painter ) override
+    {
+      if ( !mProvider )
+        return;
+      const QList<KadasNode> nodes = mProvider();
+      painter->save();
+      painter->setRenderHint( QPainter::Antialiasing, false );
+      painter->setBrush( QBrush( Qt::white ) );
+      painter->setPen( QPen( Qt::black, 1 ) );
+      constexpr int sz = 8;
+      for ( const KadasNode &n : nodes )
+      {
+        const QPointF screen = toCanvasCoordinates( n.pos );
+        if ( n.render )
+        {
+          painter->save();
+          n.render( painter, screen, sz );
+          painter->restore();
+        }
+        else
+        {
+          painter->drawRect( QRectF( screen.x() - 0.5 * sz, screen.y() - 0.5 * sz, sz, sz ) );
+        }
+      }
+      painter->restore();
+    }
+
+  private:
+    NodesProvider mProvider;
+};
 
 
 KadasMapToolEditAnnotationItem::ToolState::~ToolState()
@@ -136,8 +198,30 @@ void KadasMapToolEditAnnotationItem::activate()
 
   setupStyleEditor( outer );
 
+  mHandles = new HandlesOverlay( canvas(), [this]() -> QList<KadasNode> {
+    if ( !mItem || !mController || !mLayer )
+      return {};
+    KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
+    return mController->nodes( mItem, ctx );
+  } );
+  connect( canvas(), &QgsMapCanvas::extentsChanged, this, [this] {
+    if ( mHandles )
+    {
+      mHandles->updateRect();
+      mHandles->update();
+    }
+  } );
+  // Any layer repaint (i.e. any item mutation by this tool) refreshes handles.
+  connect( mLayer.data(), &QgsMapLayer::repaintRequested, this, &KadasMapToolEditAnnotationItem::refreshHandles );
+
   mBottomBar->adjustSize();
   mBottomBar->show();
+}
+
+void KadasMapToolEditAnnotationItem::refreshHandles()
+{
+  if ( mHandles )
+    mHandles->update();
 }
 
 void KadasMapToolEditAnnotationItem::deactivate()
@@ -152,6 +236,12 @@ void KadasMapToolEditAnnotationItem::deactivate()
   mBottomBar = nullptr;
   // Style editor was a child of mBottomBar; its pointer is now dangling.
   mStyleEditor = nullptr;
+  if ( mHandles )
+  {
+    canvas()->scene()->removeItem( mHandles );
+    delete mHandles;
+    mHandles = nullptr;
+  }
   delete mStateHistory;
   mStateHistory = nullptr;
   clearNumericInput();
