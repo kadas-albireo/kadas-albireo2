@@ -671,12 +671,14 @@ QString KadasMapToolEditAnnotationItem::pickItemAt( const QgsPointXY &mapPos ) c
   if ( hits.isEmpty() )
     return QString();
 
-  // QgsAnnotationLayer::itemsInBounds is a bounding-box test, so a click on
-  // a small item that sits inside a larger item's bbox (e.g. a coordinate
-  // cross marker on top of a rectangle) may match both. Refine by asking
-  // each candidate controller for an edit context at the click: only items
+  // QgsAnnotationLayer::itemsInBounds is a bounding-box test, so a click
+  // on a small item that sits inside a larger item's bbox (e.g. a marker
+  // on top of a rectangle) may match both. Refine by asking each
+  // candidate controller for an edit context at the click: only items
   // that actually consider themselves hit (vertex / handle / body) are
-  // kept. Among those, prefer the smallest bbox area as a final tiebreaker.
+  // kept. Among those, prefer the smallest bbox area as a final
+  // tiebreaker. If a candidate has no registered controller, fall back
+  // to the bbox-only smallest-area heuristic for that candidate.
   KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
   QString best;
   double bestArea = std::numeric_limits<double>::infinity();
@@ -690,18 +692,17 @@ QString KadasMapToolEditAnnotationItem::pickItemAt( const QgsPointXY &mapPos ) c
     const QgsRectangle bb = cand->boundingBox();
     const double area = bb.width() * bb.height();
 
-    // Track an unconditional smallest-bbox fallback so we still return
-    // something for items whose controller has no precise hit-test (or
-    // when the registry is missing a controller for the type).
-    if ( area < fallbackArea )
-    {
-      fallbackArea = area;
-      fallback = id;
-    }
-
     KadasAnnotationItemController *cc = KadasAnnotationControllerRegistry::instance()->controllerFor( cand->type() );
     if ( !cc )
+    {
+      // No controller -> can't precise-test; keep as bbox-only fallback.
+      if ( area < fallbackArea )
+      {
+        fallbackArea = area;
+        fallback = id;
+      }
       continue;
+    }
     const KadasEditContext ec = cc->getEditContext( cand, mapPos, ctx );
     if ( !ec.isValid() )
       continue;
