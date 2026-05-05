@@ -23,6 +23,7 @@
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsproject.h>
 
+#include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasrectangleannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadasrectangleannotationitem.h"
@@ -280,4 +281,9 @@ QString KadasRectangleAnnotationController::asKml( const QgsAnnotationItem *item
   outStream << "</Placemark>\n";
   outStream.flush();
   return outString;
+}
+
+KadasAnnotationStyleEditor *KadasRectangleAnnotationController::createStyleEditor( QWidget *parent ) const
+{
+  return new KadasPolygonStyleEditor( parent );
 }
