@@ -84,6 +84,7 @@
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontrollers.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
+#include "kadas/gui/annotationitems/kadasannotationprojectintegration.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationpictureitem.h>
@@ -364,6 +365,8 @@ void KadasApplication::init()
   splash.show();
   mMainWindow = new KadasMainWindow();
   mMainWindow->init();
+
+  mAnnotationProjectIntegration = new KadasAnnotationProjectIntegration( this );
 
   connect( mMainWindow->layerTreeView(), &QgsLayerTreeView::currentLayerChanged, this, &KadasApplication::onActiveLayerChanged );
   connect( mMainWindow->mapCanvas(), &QgsMapCanvas::mapToolSet, this, &KadasApplication::onMapToolChanged );
@@ -967,7 +970,14 @@ bool KadasApplication::projectSave( const QString &fileName, bool promptFileName
       QgsProject::instance()->layoutManager()->removeLayout( layout );
     }
   }
+  // Inject save-time QGIS-compat shadows into annotation layers (so vanilla
+  // QGIS can render Kadas annotations), write, then strip them so the
+  // running session keeps a pristine in-memory state.
+  if ( mAnnotationProjectIntegration )
+    mAnnotationProjectIntegration->prepareForSave();
   bool success = QgsProject::instance()->write();
+  if ( mAnnotationProjectIntegration )
+    mAnnotationProjectIntegration->stripAfterSave();
 
   mMainWindow->mapCanvas()->freeze( false );
   mMainWindow->mapCanvas()->refresh();
