@@ -376,6 +376,20 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
     return;
   }
 
+  // In single-part create mode, after a part is finalized the next click
+  // must place a new item — not drag the just-placed one. Suppress the
+  // edit context so canvasPressEvent never enters the drag branch.
+  if ( mAllowCreate && !mMultipart && mDrawState == DrawState::Finished )
+  {
+    if ( mEditContext.isValid() )
+    {
+      mEditContext = KadasEditContext();
+      setCursor( Qt::ArrowCursor );
+      clearNumericInput();
+    }
+    return;
+  }
+
   if ( e->buttons() == Qt::LeftButton )
   {
     if ( mEditContext.isValid() )
