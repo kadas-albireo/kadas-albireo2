@@ -264,9 +264,9 @@ void KadasMarkerAnnotationController::applyPersistedStyle( QgsAnnotationItem *it
   auto *sl = dynamic_cast<QgsSimpleMarkerSymbolLayer *>( sym->symbolLayer( 0 ) );
   if ( !sl )
   {
-    auto *replacement = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Circle );
-    sym->changeSymbolLayer( 0, replacement );
-    sl = replacement;
+    // Subclasses (pin SVG, coord cross, GPX waypoint, ...) ship a custom
+    // symbol that must not be replaced by the generic-marker defaults.
+    return;
   }
   sl->setShape( static_cast<Qgis::MarkerShape>( settingsShape->value() ) );
   sl->setSize( settingsSize->value() );
