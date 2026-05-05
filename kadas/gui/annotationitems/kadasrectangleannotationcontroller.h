@@ -74,6 +74,13 @@ class KADAS_GUI_EXPORT KadasRectangleAnnotationController : public KadasAnnotati
 
     //! Vertex 4 is the rotation handle; vertices 0..3 are the corners.
     static constexpr int RotationHandleVertex = 4;
+
+    // Transient draw-anchor: the position of the first click. Reset on every
+    // startPart() and consulted by setCurrentPoint() to grow the rectangle
+    // from the click toward the cursor regardless of which quadrant the
+    // cursor traverses. Item-CRS coordinates.
+    QgsPointXY mDrawAnchor;
+    bool mDrawAnchorValid = false;
 };
 
 #endif // KADASRECTANGLEANNOTATIONCONTROLLER_H

@@ -36,6 +36,7 @@ class KadasFloatingInputWidget;
 class QBoxLayout;
 class QComboBox;
 class QDoubleSpinBox;
+class QLineEdit;
 class QSpinBox;
 class QgsAnnotationItem;
 class QgsAnnotationLayer;
@@ -160,6 +161,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     QgsColorButton *mStrokeColorBtn = nullptr;
     QComboBox *mStrokeStyleCombo = nullptr;
     QComboBox *mFillStyleCombo = nullptr;
+    QLineEdit *mTextEdit = nullptr;
 
     void pushState();
     void deleteItem();
