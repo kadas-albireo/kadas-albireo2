@@ -23,6 +23,7 @@
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsproject.h>
 
+#include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadascircleannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadascircleannotationitem.h"
@@ -260,4 +261,9 @@ QString KadasCircleAnnotationController::asKml( const QgsAnnotationItem *item, c
   outStream << "</Placemark>\n";
   outStream.flush();
   return outString;
+}
+
+KadasAnnotationStyleEditor *KadasCircleAnnotationController::createStyleEditor( QWidget *parent ) const
+{
+  return new KadasPolygonStyleEditor( parent );
 }

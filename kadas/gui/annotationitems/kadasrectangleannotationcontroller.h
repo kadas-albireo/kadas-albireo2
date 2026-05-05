@@ -65,6 +65,8 @@ class KADAS_GUI_EXPORT KadasRectangleAnnotationController : public KadasAnnotati
 
     QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = nullptr ) const override;
 
+    KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = nullptr ) const override;
+
   private:
     enum AttribIds
     {
