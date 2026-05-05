@@ -61,7 +61,7 @@ class KadasMapIdentifyDialog : public QDialog
     QMap<QString, QTreeWidgetItem *> mLayerTreeItemMap;
 
     void collectInfo( const QgsPointXY &mapPos );
-    void addPluginLayerResults( KadasPluginLayer *pLayer, const QList<KadasPluginLayer::IdentifyResult> &results );
+    void addPluginLayerResults( QgsMapLayer *pLayer, const QList<KadasPluginLayer::IdentifyResult> &results );
     void addVectorLayerResult( QgsVectorLayer *vLayer, const QgsFeature &feature );
     void addRasterIdentifyResult( QgsRasterLayer *rLayer, const QgsRasterIdentifyResult &result );
 
