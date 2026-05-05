@@ -82,6 +82,13 @@ QgsPointXY KadasRectangleAnnotationItem::rotationHandle() const
 
 void KadasRectangleAnnotationItem::rebuildGeometry()
 {
+  if ( mSize.isEmpty() )
+  {
+    // Degenerate (zero width or height): keep an empty polygon to avoid
+    // tripping up the layer renderer with coincident vertices.
+    setGeometry( new QgsPolygon() );
+    return;
+  }
   const QVector<QgsPointXY> c = corners();
   auto *ring = new QgsLineString();
   for ( const QgsPointXY &p : c )
