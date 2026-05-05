@@ -62,6 +62,29 @@ class KADAS_GUI_EXPORT KadasAnnotationLayerHelpers
      */
     static QgsAnnotationLayer *createLayer( const QString &name, const QgsCoordinateReferenceSystem &preferredCrs = QgsCoordinateReferenceSystem() );
 
+    /**
+     * For every Kadas master annotation item in \a layer that has a registered
+     * controller exposing \c generateShadows(), creates the shadow items,
+     * inserts them into the layer, and stores their ids on the master via
+     * \c setShadowIds(). Idempotent: existing shadows referenced by the
+     * master are stripped first to avoid accumulation across repeated saves.
+     *
+     * Intended to be called immediately before \c QgsProject::write().
+     */
+    static void prepareLayerForSave( QgsAnnotationLayer *layer );
+
+    /**
+     * For every Kadas master annotation item in \a layer that has non-empty
+     * \c shadowIds(), removes the referenced shadow items from the layer and
+     * clears the master's shadow id list.
+     *
+     * Intended to be called immediately after \c QgsProject::write() (to
+     * leave the in-memory layer pristine for the running session) and after
+     * \c QgsProject::read() (to drop any shadows that survived the
+     * round-trip when the project was saved by a previous Kadas session).
+     */
+    static void stripShadowsFromLayer( QgsAnnotationLayer *layer );
+
   private:
     KadasAnnotationLayerHelpers() = delete;
 };
