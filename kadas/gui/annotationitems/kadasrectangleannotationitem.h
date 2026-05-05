@@ -18,6 +18,7 @@
 #define KADASRECTANGLEANNOTATIONITEM_H
 
 #include <QSizeF>
+#include <QStringList>
 
 #include <qgis/qgsannotationpolygonitem.h>
 #include <qgis/qgspointxy.h>
@@ -73,10 +74,16 @@ class KADAS_GUI_EXPORT KadasRectangleAnnotationItem : public QgsAnnotationPolygo
     //! offset outward by a fraction of the height in CRS units).
     QgsPointXY rotationHandle() const;
 
+    //! UUIDs of save-time QGIS-compat shadow items linked to this master.
+    //! See \c KadasAnnotationShadow.
+    const QStringList &shadowIds() const { return mShadowIds; }
+    void setShadowIds( const QStringList &ids ) { mShadowIds = ids; }
+
   private:
     QgsPointXY mCenter;
     QSizeF mSize;
     double mAngle = 0.0;
+    QStringList mShadowIds;
 
     void rebuildGeometry();
 };

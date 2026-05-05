@@ -21,6 +21,9 @@
 
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgsannotationpolygonitem.h>
+#include <qgis/qgscurvepolygon.h>
+#include <qgis/qgsfillsymbol.h>
 #include <qgis/qgsproject.h>
 
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
@@ -312,4 +315,17 @@ QString KadasRectangleAnnotationController::asKml( const QgsAnnotationItem *item
 KadasAnnotationStyleEditor *KadasRectangleAnnotationController::createStyleEditor( QWidget *parent ) const
 {
   return new KadasPolygonStyleEditor( parent );
+}
+
+QList<QgsAnnotationItem *> KadasRectangleAnnotationController::generateShadows( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
+{
+  Q_UNUSED( ctx );
+  const auto *master = static_cast<const KadasRectangleAnnotationItem *>( item );
+  if ( !master->geometry() || master->size().isEmpty() )
+    return {};
+  auto *shadow = new QgsAnnotationPolygonItem( master->geometry()->clone() );
+  if ( master->symbol() )
+    shadow->setSymbol( master->symbol()->clone() );
+  shadow->setZIndex( master->zIndex() );
+  return { shadow };
 }

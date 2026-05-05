@@ -17,6 +17,8 @@
 #ifndef KADASCOORDCROSSANNOTATIONITEM_H
 #define KADASCOORDCROSSANNOTATIONITEM_H
 
+#include <QStringList>
+
 #include <qgis/qgsannotationmarkeritem.h>
 
 #include "kadas/gui/kadas_gui.h"
@@ -49,12 +51,21 @@ class KADAS_GUI_EXPORT KadasCoordCrossAnnotationItem : public QgsAnnotationMarke
     QgsRectangle boundingBox() const override;
     QgsRectangle boundingBox( QgsRenderContext &context ) const override;
     KadasCoordCrossAnnotationItem *clone() const override;
+    bool writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const override;
+    bool readXml( const QDomElement &element, const QgsReadWriteContext &context ) override;
 
     static KadasCoordCrossAnnotationItem *create();
+
+    //! UUIDs of save-time QGIS-compat shadow items linked to this master.
+    //! See \c KadasAnnotationShadow.
+    const QStringList &shadowIds() const { return mShadowIds; }
+    void setShadowIds( const QStringList &ids ) { mShadowIds = ids; }
 
   private:
     static constexpr int sCrossSizePx = 80;
     static constexpr int sFontSizePx = 24;
+
+    QStringList mShadowIds;
 
     void installDefaultSymbol();
 };

@@ -17,6 +17,9 @@
 #include <QObject>
 
 #include <qgis/qgsannotationmarkeritem.h>
+#include <qgis/qgsannotationpointtextitem.h>
+#include <qgis/qgsmarkersymbol.h>
+#include <qgis/qgsmarkersymbollayer.h>
 
 #include "kadas/gui/annotationitems/kadasannotationitemcontext.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
@@ -73,4 +76,37 @@ void KadasCoordCrossAnnotationController::edit( QgsAnnotationItem *item, const K
     const QgsPointXY snapped = roundToKilometre( QgsPointXY( marker->geometry().x(), marker->geometry().y() ) );
     marker->setGeometry( QgsPoint( snapped.x(), snapped.y() ) );
   }
+}
+
+QList<QgsAnnotationItem *> KadasCoordCrossAnnotationController::generateShadows( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
+{
+  Q_UNUSED( ctx );
+  // The Kadas coord-cross is screen-space (cross arms in pixels, label rendered
+  // at canvas-pixel offsets relative to the cross). For a project-time shadow we
+  // can only emit a map-space marker + a single coordinate label at the same
+  // point. The four-quadrant labels and screen-pixel arm length cannot be
+  // reproduced without canvas state, so the QGIS shadow is a single \"+\" marker
+  // with one km-coordinate text label colocated with it.\n
+  const auto *master = static_cast<const KadasCoordCrossAnnotationItem *>( item );
+  const QgsPointXY pt = master->geometry();
+
+  QList<QgsAnnotationItem *> shadows;
+
+  // Cross-shaped marker shadow.
+  auto *cross = new QgsAnnotationMarkerItem( QgsPoint( pt.x(), pt.y() ) );
+  auto *layer = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Cross, 8.0 );
+  layer->setStrokeColor( QColor( 0, 0, 0 ) );
+  layer->setStrokeWidth( 0.4 );
+  auto *symbol = new QgsMarkerSymbol( QgsSymbolLayerList() << layer );
+  cross->setSymbol( symbol );
+  cross->setZIndex( master->zIndex() );
+  shadows.append( cross );
+
+  // Coordinate label shadow.
+  const QString label = QStringLiteral( "%1 / %2" ).arg( QString::number( pt.x() / 1000.0, 'f', 0 ) ).arg( QString::number( pt.y() / 1000.0, 'f', 0 ) );
+  auto *text = new QgsAnnotationPointTextItem( label, pt );
+  text->setZIndex( master->zIndex() );
+  shadows.append( text );
+
+  return shadows;
 }

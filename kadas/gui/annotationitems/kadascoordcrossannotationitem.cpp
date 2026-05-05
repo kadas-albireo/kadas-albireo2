@@ -24,6 +24,7 @@
 #include <qgis/qgsrendercontext.h>
 
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
+#include "kadas/gui/annotationitems/kadasannotationshadow.h"
 #include "kadas/gui/annotationitems/kadascoordcrossannotationitem.h"
 
 
@@ -125,6 +126,21 @@ KadasCoordCrossAnnotationItem *KadasCoordCrossAnnotationItem::clone() const
     item->setSymbol( symbol()->clone() );
   item->copyCommonProperties( this );
   return item;
+}
+
+bool KadasCoordCrossAnnotationItem::writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const
+{
+  QgsAnnotationMarkerItem::writeXml( element, document, context );
+  if ( !mShadowIds.isEmpty() )
+    element.setAttribute( KadasAnnotationShadow::shadowIdsAttribute(), KadasAnnotationShadow::encodeIds( mShadowIds ) );
+  return true;
+}
+
+bool KadasCoordCrossAnnotationItem::readXml( const QDomElement &element, const QgsReadWriteContext &context )
+{
+  QgsAnnotationMarkerItem::readXml( element, context );
+  mShadowIds = KadasAnnotationShadow::decodeIds( element.attribute( KadasAnnotationShadow::shadowIdsAttribute() ) );
+  return true;
 }
 
 KadasCoordCrossAnnotationItem *KadasCoordCrossAnnotationItem::create()

@@ -18,6 +18,7 @@
 #define KADASPINANNOTATIONITEM_H
 
 #include <QString>
+#include <QStringList>
 
 #include <qgis/qgsannotationmarkeritem.h>
 
@@ -57,9 +58,15 @@ class KADAS_GUI_EXPORT KadasPinAnnotationItem : public QgsAnnotationMarkerItem
     //! Path of the SVG icon used by default for new pins (resource path).
     static QString defaultIconPath();
 
+    //! UUIDs of save-time QGIS-compat shadow items linked to this master.
+    //! See \c KadasAnnotationShadow.
+    const QStringList &shadowIds() const { return mShadowIds; }
+    void setShadowIds( const QStringList &ids ) { mShadowIds = ids; }
+
   private:
     QString mName;
     QString mRemarks;
+    QStringList mShadowIds;
 
     void installDefaultSymbol();
 };

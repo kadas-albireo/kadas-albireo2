@@ -20,6 +20,8 @@
 #include <qgis/qgsannotationpolygonitem.h>
 #include <qgis/qgspointxy.h>
 
+#include <QStringList>
+
 #include "kadas/gui/kadas_gui.h"
 
 /**
@@ -61,6 +63,11 @@ class KADAS_GUI_EXPORT KadasCircleAnnotationItem : public QgsAnnotationPolygonIt
 
     void setCenter( const QgsPointXY &center );
     void setRingPoint( const QgsPointXY &ringPoint );
+
+    //! UUIDs of save-time QGIS-compat shadow items linked to this master.
+    //! See \c KadasAnnotationShadow.
+    const QStringList &shadowIds() const { return mShadowIds; }
+    void setShadowIds( const QStringList &ids ) { mShadowIds = ids; }
     void setCircle( const QgsPointXY &center, const QgsPointXY &ringPoint );
 
     //! Returns the (planar) radius in CRS units.
@@ -69,6 +76,7 @@ class KADAS_GUI_EXPORT KadasCircleAnnotationItem : public QgsAnnotationPolygonIt
   private:
     QgsPointXY mCenter;
     QgsPointXY mRingPoint;
+    QStringList mShadowIds;
 
     void rebuildGeometry();
 };

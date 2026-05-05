@@ -23,6 +23,7 @@
 #include <qgis/qgspolygon.h>
 
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
+#include "kadas/gui/annotationitems/kadasannotationshadow.h"
 #include "kadas/gui/annotationitems/kadasrectangleannotationitem.h"
 
 
@@ -136,6 +137,8 @@ bool KadasRectangleAnnotationItem::writeXml( QDomElement &element, QDomDocument 
   element.setAttribute( QStringLiteral( "w" ), qgsDoubleToString( mSize.width() ) );
   element.setAttribute( QStringLiteral( "h" ), qgsDoubleToString( mSize.height() ) );
   element.setAttribute( QStringLiteral( "angle" ), qgsDoubleToString( mAngle ) );
+  if ( !mShadowIds.isEmpty() )
+    element.setAttribute( KadasAnnotationShadow::shadowIdsAttribute(), KadasAnnotationShadow::encodeIds( mShadowIds ) );
   return true;
 }
 
@@ -147,6 +150,7 @@ bool KadasRectangleAnnotationItem::readXml( const QDomElement &element, const Qg
   mCenter = QgsPointXY( element.attribute( QStringLiteral( "cx" ) ).toDouble(), element.attribute( QStringLiteral( "cy" ) ).toDouble() );
   mSize = QSizeF( element.attribute( QStringLiteral( "w" ) ).toDouble(), element.attribute( QStringLiteral( "h" ) ).toDouble() );
   mAngle = element.attribute( QStringLiteral( "angle" ) ).toDouble();
+  mShadowIds = KadasAnnotationShadow::decodeIds( element.attribute( KadasAnnotationShadow::shadowIdsAttribute() ) );
   rebuildGeometry();
   return true;
 }

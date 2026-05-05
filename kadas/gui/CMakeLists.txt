@@ -140,6 +140,7 @@ set(kadas_gui_HDR
     annotationitems/kadasannotationitemcontrollers.h
     annotationitems/kadasannotationlayerhelpers.h
     annotationitems/kadasannotationlayerregistry.h
+    annotationitems/kadasannotationshadow.h
     annotationitems/kadasannotationstyleeditor.h
     annotationitems/kadasannotationzindex.h
     annotationitems/kadascircleannotationcontroller.h
