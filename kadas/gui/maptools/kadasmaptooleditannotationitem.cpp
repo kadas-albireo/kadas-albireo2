@@ -663,11 +663,16 @@ QString KadasMapToolEditAnnotationItem::pickItemAt( const QgsPointXY &mapPos ) c
     return QString();
 
   // QgsAnnotationLayer::itemsInBounds is a bounding-box test, so a click on
-  // a small item that sits inside a larger item's bbox (e.g. a circle on
-  // top of a rectangle) may match both. Pick the most specific candidate:
-  // the one with the smallest bounding box area.
+  // a small item that sits inside a larger item's bbox (e.g. a coordinate
+  // cross marker on top of a rectangle) may match both. Refine by asking
+  // each candidate controller for an edit context at the click: only items
+  // that actually consider themselves hit (vertex / handle / body) are
+  // kept. Among those, prefer the smallest bbox area as a final tiebreaker.
+  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
   QString best;
   double bestArea = std::numeric_limits<double>::infinity();
+  QString fallback;
+  double fallbackArea = std::numeric_limits<double>::infinity();
   for ( const QString &id : hits )
   {
     QgsAnnotationItem *cand = mLayer->item( id );
@@ -675,13 +680,29 @@ QString KadasMapToolEditAnnotationItem::pickItemAt( const QgsPointXY &mapPos ) c
       continue;
     const QgsRectangle bb = cand->boundingBox();
     const double area = bb.width() * bb.height();
+
+    // Track an unconditional smallest-bbox fallback so we still return
+    // something for items whose controller has no precise hit-test (or
+    // when the registry is missing a controller for the type).
+    if ( area < fallbackArea )
+    {
+      fallbackArea = area;
+      fallback = id;
+    }
+
+    KadasAnnotationItemController *cc = KadasAnnotationControllerRegistry::instance()->controllerFor( cand->type() );
+    if ( !cc )
+      continue;
+    const KadasEditContext ec = cc->getEditContext( cand, mapPos, ctx );
+    if ( !ec.isValid() )
+      continue;
     if ( area < bestArea )
     {
       bestArea = area;
       best = id;
     }
   }
-  return best;
+  return best.isEmpty() ? fallback : best;
 }
 
 void KadasMapToolEditAnnotationItem::switchToItem( const QString &itemId )
