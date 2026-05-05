@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QComboBox>
+#include <QFontComboBox>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
@@ -44,9 +45,13 @@
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgsmarkersymbol.h>
 #include <qgis/qgsmarkersymbollayer.h>
+#include <qgis/qgsrectangle.h>
+#include <qgis/qgsrendercontext.h>
+#include <qgis/qgsfeedback.h>
 #include <qgis/qgssettings.h>
 #include <qgis/qgssettingsentryimpl.h>
 #include <qgis/qgssymbollayerutils.h>
+#include <qgis/qgstextformat.h>
 
 #include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontext.h"
@@ -88,6 +93,15 @@ const QgsSettingsEntryInteger *KadasMapToolEditAnnotationItem::settingsPolygonSt
   = new QgsSettingsEntryInteger( QStringLiteral( "polygon-stroke-style" ), sTreeAnnotation, static_cast<int>( Qt::SolidLine ), QStringLiteral( "Last-used polygon outline style." ) );
 const QgsSettingsEntryInteger *KadasMapToolEditAnnotationItem::settingsPolygonBrushStyle
   = new QgsSettingsEntryInteger( QStringLiteral( "polygon-brush-style" ), sTreeAnnotation, static_cast<int>( Qt::SolidPattern ), QStringLiteral( "Last-used polygon fill style." ) );
+
+const QgsSettingsEntryDouble *KadasMapToolEditAnnotationItem::settingsTextSize
+  = new QgsSettingsEntryDouble( QStringLiteral( "text-size" ), sTreeAnnotation, 10.0, QStringLiteral( "Last-used point-text size (points)." ) );
+const QgsSettingsEntryColor *KadasMapToolEditAnnotationItem::settingsTextColor
+  = new QgsSettingsEntryColor( QStringLiteral( "text-color" ), sTreeAnnotation, QColor( 0, 0, 0 ), QStringLiteral( "Last-used point-text color." ) );
+const QgsSettingsEntryColor *KadasMapToolEditAnnotationItem::settingsTextBufferColor
+  = new QgsSettingsEntryColor( QStringLiteral( "text-buffer-color" ), sTreeAnnotation, QColor( 255, 255, 255, 0 ), QStringLiteral( "Last-used point-text buffer (border) color." ) );
+const QgsSettingsEntryDouble *KadasMapToolEditAnnotationItem::settingsTextBufferWidth
+  = new QgsSettingsEntryDouble( QStringLiteral( "text-buffer-width" ), sTreeAnnotation, 0.0, QStringLiteral( "Last-used point-text buffer (border) width (mm)." ) );
 
 
 namespace
@@ -269,6 +283,12 @@ void KadasMapToolEditAnnotationItem::deactivate()
   mStrokeColorBtn = nullptr;
   mStrokeStyleCombo = nullptr;
   mFillStyleCombo = nullptr;
+  mTextEdit = nullptr;
+  mTextFontCombo = nullptr;
+  mTextSizeSpin = nullptr;
+  mTextColorBtn = nullptr;
+  mTextBufferColorBtn = nullptr;
+  mTextBufferWidthSpin = nullptr;
   delete mStateHistory;
   mStateHistory = nullptr;
   clearNumericInput();
@@ -300,6 +320,19 @@ void KadasMapToolEditAnnotationItem::canvasPressEvent( QgsMapMouseEvent *e )
   // canvasReleaseEvent (pushState). Nothing to do here.
   if ( mEditContext.isValid() )
     return;
+
+  // Outside of a digitizing part, a click on a different item on the same
+  // layer switches the tool to editing that item, instead of starting a
+  // brand new one (or doing nothing in pure edit mode).
+  if ( mDrawState != DrawState::InProgress )
+  {
+    const QString hit = pickItemAt( e->mapPoint() );
+    if ( !hit.isEmpty() && hit != mItemId )
+    {
+      switchToItem( hit );
+      return;
+    }
+  }
 
   if ( !mAllowCreate )
     return;
@@ -598,6 +631,53 @@ void KadasMapToolEditAnnotationItem::setupStyleWidgets( QBoxLayout *outer )
         mLayer->triggerRepaint();
     } );
     connect( mTextEdit, &QLineEdit::editingFinished, this, [this]() { pushState(); } );
+
+    // Styling row: font, size, color, border (buffer) color + width.
+    auto *styleRow = new QHBoxLayout();
+    outer->addLayout( styleRow );
+
+    mTextFontCombo = new QFontComboBox();
+    mTextFontCombo->setToolTip( tr( "Font family" ) );
+    styleRow->addWidget( mTextFontCombo, 1 );
+
+    mTextSizeSpin = new QDoubleSpinBox();
+    mTextSizeSpin->setRange( 1.0, 200.0 );
+    mTextSizeSpin->setDecimals( 1 );
+    mTextSizeSpin->setSingleStep( 0.5 );
+    mTextSizeSpin->setSuffix( QStringLiteral( " pt" ) );
+    mTextSizeSpin->setToolTip( tr( "Font size" ) );
+    styleRow->addWidget( mTextSizeSpin );
+
+    mTextColorBtn = new QgsColorButton();
+    mTextColorBtn->setAllowOpacity( true );
+    mTextColorBtn->setToolTip( tr( "Text color" ) );
+    styleRow->addWidget( mTextColorBtn );
+
+    styleRow->addWidget( new QLabel( tr( "Border:" ) ) );
+    mTextBufferColorBtn = new QgsColorButton();
+    mTextBufferColorBtn->setAllowOpacity( true );
+    mTextBufferColorBtn->setShowNoColor( true );
+    mTextBufferColorBtn->setToolTip( tr( "Text border color" ) );
+    styleRow->addWidget( mTextBufferColorBtn );
+
+    mTextBufferWidthSpin = new QDoubleSpinBox();
+    mTextBufferWidthSpin->setRange( 0.0, 10.0 );
+    mTextBufferWidthSpin->setDecimals( 1 );
+    mTextBufferWidthSpin->setSingleStep( 0.1 );
+    mTextBufferWidthSpin->setSuffix( QStringLiteral( " mm" ) );
+    mTextBufferWidthSpin->setToolTip( tr( "Text border width" ) );
+    styleRow->addWidget( mTextBufferWidthSpin );
+
+    auto applyAndPush = [this]() {
+      applyStyleFromWidgets();
+      pushState();
+    };
+    connect( mTextFontCombo, &QFontComboBox::currentFontChanged, this, applyAndPush );
+    connect( mTextSizeSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, applyAndPush );
+    connect( mTextColorBtn, &QgsColorButton::colorChanged, this, applyAndPush );
+    connect( mTextBufferColorBtn, &QgsColorButton::colorChanged, this, applyAndPush );
+    connect( mTextBufferWidthSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, applyAndPush );
+    return;
   }
 
   if ( !isMarker && !isLine && !isPolygon )
@@ -698,6 +778,21 @@ void KadasMapToolEditAnnotationItem::readStyleToWidgets()
     }
   }
 
+  if ( mTextFontCombo )
+  {
+    if ( auto *pt = dynamic_cast<QgsAnnotationPointTextItem *>( mItem ) )
+    {
+      const QgsTextFormat fmt = pt->format();
+      const QSignalBlocker b1( mTextFontCombo ), b2( mTextSizeSpin ), b3( mTextColorBtn ), b4( mTextBufferColorBtn ), b5( mTextBufferWidthSpin );
+      mTextFontCombo->setCurrentFont( fmt.font() );
+      mTextSizeSpin->setValue( fmt.size() );
+      mTextColorBtn->setColor( fmt.color() );
+      const QgsTextBufferSettings buf = fmt.buffer();
+      mTextBufferColorBtn->setColor( buf.enabled() ? buf.color() : QColor( 0, 0, 0, 0 ) );
+      mTextBufferWidthSpin->setValue( buf.enabled() ? buf.size() : 0.0 );
+    }
+  }
+
   if ( !mStrokeColorBtn )
     return; // styling row not built
 
@@ -750,7 +845,35 @@ void KadasMapToolEditAnnotationItem::readStyleToWidgets()
 
 void KadasMapToolEditAnnotationItem::applyStyleFromWidgets()
 {
-  if ( !mStrokeColorBtn || !mItem || !mLayer )
+  if ( !mItem || !mLayer )
+    return;
+
+  if ( mTextFontCombo )
+  {
+    if ( auto *pt = dynamic_cast<QgsAnnotationPointTextItem *>( mItem ) )
+    {
+      QgsTextFormat fmt = pt->format();
+      QFont f = mTextFontCombo->currentFont();
+      fmt.setFont( f );
+      fmt.setSize( mTextSizeSpin->value() );
+      fmt.setSizeUnit( Qgis::RenderUnit::Points );
+      fmt.setColor( mTextColorBtn->color() );
+      QgsTextBufferSettings buf = fmt.buffer();
+      const double bw = mTextBufferWidthSpin->value();
+      const QColor bc = mTextBufferColorBtn->color();
+      buf.setEnabled( bw > 0.0 && bc.alpha() > 0 );
+      buf.setColor( bc );
+      buf.setSize( bw );
+      buf.setSizeUnit( Qgis::RenderUnit::Millimeters );
+      fmt.setBuffer( buf );
+      pt->setFormat( fmt );
+      mLayer->triggerRepaint();
+      persistStyleToSettings();
+      return;
+    }
+  }
+
+  if ( !mStrokeColorBtn )
     return;
 
   if ( auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( mItem ) )
@@ -815,12 +938,24 @@ void KadasMapToolEditAnnotationItem::applyStyleFromWidgets()
 
 void KadasMapToolEditAnnotationItem::persistStyleToSettings()
 {
-  if ( !mStrokeColorBtn || !mItem )
+  if ( !mItem )
     return;
-  // Only the three stock geometry types feed the persisted defaults so that
-  // specialized items (rectangle / circle / coord-cross / pin / gpx-route
-  // / picture / pointtext) keep their own controller defaults.
+  // Only the three stock geometry types and pointtext feed the persisted
+  // defaults so that specialized items (rectangle / circle / coord-cross /
+  // pin / gpx-route / picture) keep their own controller defaults.
   const QString t = mItem->type();
+  if ( t == QStringLiteral( "pointtext" ) )
+  {
+    if ( !mTextFontCombo )
+      return;
+    settingsTextSize->setValue( mTextSizeSpin->value() );
+    settingsTextColor->setValue( mTextColorBtn->color() );
+    settingsTextBufferColor->setValue( mTextBufferColorBtn->color() );
+    settingsTextBufferWidth->setValue( mTextBufferWidthSpin->value() );
+    return;
+  }
+  if ( !mStrokeColorBtn )
+    return;
   if ( t == QStringLiteral( "marker" ) )
   {
     settingsMarkerShape->setValue( mShapeCombo->currentData().toInt() );
@@ -850,10 +985,30 @@ void KadasMapToolEditAnnotationItem::applyPersistedStyle( QgsAnnotationItem *ite
 {
   if ( !item )
     return;
-  // Only the three stock geometry types pick up the persisted defaults so
-  // that specialized items (rectangle / circle / coord-cross / pin / gpx
-  // / picture / pointtext) keep their controller-supplied symbol unchanged.
+  // Only the three stock geometry types and pointtext pick up the persisted
+  // defaults so that specialized items (rectangle / circle / coord-cross /
+  // pin / gpx / picture) keep their controller-supplied symbol unchanged.
   const QString t = item->type();
+  if ( t == QStringLiteral( "pointtext" ) )
+  {
+    if ( !settingsTextColor->exists() )
+      return;
+    auto *pt = static_cast<QgsAnnotationPointTextItem *>( item );
+    QgsTextFormat fmt = pt->format();
+    fmt.setSize( settingsTextSize->value() );
+    fmt.setSizeUnit( Qgis::RenderUnit::Points );
+    fmt.setColor( settingsTextColor->value() );
+    QgsTextBufferSettings buf = fmt.buffer();
+    const double bw = settingsTextBufferWidth->value();
+    const QColor bc = settingsTextBufferColor->value();
+    buf.setEnabled( bw > 0.0 && bc.alpha() > 0 );
+    buf.setColor( bc );
+    buf.setSize( bw );
+    buf.setSizeUnit( Qgis::RenderUnit::Millimeters );
+    fmt.setBuffer( buf );
+    pt->setFormat( fmt );
+    return;
+  }
   if ( t == QStringLiteral( "marker" ) )
   {
     auto *marker = static_cast<QgsAnnotationMarkerItem *>( item );
@@ -973,4 +1128,29 @@ void KadasMapToolEditAnnotationItem::finishPart()
   mLayer->triggerRepaint();
   pushState();
   emit partFinished();
+}
+
+QString KadasMapToolEditAnnotationItem::pickItemAt( const QgsPointXY &mapPos ) const
+{
+  if ( !mLayer || !canvas() )
+    return QString();
+  QgsRenderContext rc = QgsRenderContext::fromMapSettings( canvas()->mapSettings() );
+  double radiusmm = QgsSettings().value( QStringLiteral( "/Map/searchRadiusMM" ), Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
+  if ( radiusmm <= 0 )
+    radiusmm = Qgis::DEFAULT_SEARCH_RADIUS_MM;
+  const double radiusmu = radiusmm * rc.scaleFactor() * rc.mapToPixel().mapUnitsPerPixel();
+  const QgsRectangle mapBounds( mapPos.x() - radiusmu, mapPos.y() - radiusmu, mapPos.x() + radiusmu, mapPos.y() + radiusmu );
+  const QgsRectangle layerBounds = canvas()->mapSettings().mapToLayerCoordinates( mLayer.data(), mapBounds );
+  QgsFeedback feedback;
+  const QStringList hits = mLayer->itemsInBounds( layerBounds, rc, &feedback );
+  return hits.isEmpty() ? QString() : hits.first();
+}
+
+void KadasMapToolEditAnnotationItem::switchToItem( const QString &itemId )
+{
+  if ( !canvas() || !mLayer || itemId.isEmpty() )
+    return;
+  // Replace the active tool with a fresh edit-mode tool bound to the
+  // clicked item. The current tool is destroyed by setMapTool().
+  canvas()->setMapTool( new KadasMapToolEditAnnotationItem( canvas(), mLayer.data(), itemId ) );
 }
