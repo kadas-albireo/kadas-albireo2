@@ -14,17 +14,22 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QApplication>
 #include <QDomDocument>
 #include <QDomElement>
 #include <QFont>
+#include <QPainter>
+#include <QScreen>
 
 #include <qgis/qgsannotationlineitem.h>
 #include <qgis/qgsannotationpointtextitem.h>
 #include <qgis/qgscoordinatetransformcontext.h>
 #include <qgis/qgslinestring.h>
 #include <qgis/qgslinesymbol.h>
+#include <qgis/qgsmaplayerrenderer.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsrendercontext.h>
 #include <qgis/qgssymbollayerutils.h>
 #include <qgis/qgstextformat.h>
 
@@ -59,6 +64,241 @@ namespace
 } // namespace
 
 
+/// Kadas-only QPainter-based renderer that preserves the dynamic
+/// "labels follow the visible map edge" behavior of the original guide
+/// grid. In vanilla QGIS, this class is not used — the stock annotation
+/// items stored on the layer (lines + labels at fixed positions) are
+/// rendered through QgsAnnotationLayerRenderer instead.
+class KadasGuideGridRenderer : public QgsMapLayerRenderer
+{
+  public:
+    using GridConfig = KadasGuideGridLayer::GridConfig;
+    using LabelingPos = KadasGuideGridLayer::LabelingPos;
+    using QuadrantLabeling = KadasGuideGridLayer::QuadrantLabeling;
+
+    KadasGuideGridRenderer( KadasGuideGridLayer *layer, QgsRenderContext &rendererContext )
+      : QgsMapLayerRenderer( layer->id(), &rendererContext )
+      , mGridConfig( layer->mGridConfig )
+      , mOpacity( layer->opacity() )
+    {}
+
+    bool render() override
+    {
+      if ( mGridConfig.rows == 0 || mGridConfig.cols == 0 )
+        return true;
+      const bool previewJob = renderContext()->flags() & Qgis::RenderContextFlag::RenderPreviewJob;
+
+      QPainter *p = renderContext()->painter();
+      p->save();
+      p->setOpacity( mOpacity );
+      p->setCompositionMode( QPainter::CompositionMode_Source );
+      p->setPen( QPen( mGridConfig.color, mGridConfig.lineWidth ) );
+      p->setBrush( mGridConfig.color );
+
+      const QVariantMap &flags = renderContext()->customProperties();
+      const bool adaptLabelsToScreen = !( flags["globe"].toBool() || flags["kml"].toBool() );
+
+      const QColor bufferColor = ( 0.2126 * mGridConfig.color.red() + 0.7152 * mGridConfig.color.green() + 0.0722 * mGridConfig.color.blue() ) > 128 ? Qt::black : Qt::white;
+      const double dpiScale = double( p->device()->logicalDpiX() ) / qApp->primaryScreen()->logicalDotsPerInchX();
+
+      QFont smallFont;
+      smallFont.setPixelSize( 0.5 * mGridConfig.fontSize * dpiScale );
+      QFontMetrics smallFontMetrics( smallFont );
+
+      QFont font;
+      font.setPixelSize( mGridConfig.fontSize * dpiScale );
+      QFontMetrics fontMetrics( font );
+
+      const int labelBoxSize = fontMetrics.height();
+      const int smallLabelBoxSize = smallFontMetrics.height();
+
+      const QgsCoordinateTransform crst = renderContext()->coordinateTransform();
+      const QgsMapToPixel &mapToPixel = renderContext()->mapToPixel();
+      const QgsRectangle &gridRect = mGridConfig.gridRect;
+      const QgsPoint pTL( renderContext()->mapExtent().xMinimum(), renderContext()->mapExtent().yMaximum() );
+      const QgsPoint pBR( renderContext()->mapExtent().xMaximum(), renderContext()->mapExtent().yMinimum() );
+      const QPointF screenTL = mapToPixel.transform( crst.transform( pTL ) ).toQPointF();
+      const QPointF screenBR = mapToPixel.transform( crst.transform( pBR ) ).toQPointF();
+      const QRectF screenRect( screenTL, screenBR );
+
+      const double ix = gridRect.width() / mGridConfig.cols;
+      const double iy = gridRect.height() / mGridConfig.rows;
+
+      // Vertical lines
+      QPolygonF vLine1 = vScreenLine( gridRect.xMinimum(), iy );
+      {
+        QPainterPath path;
+        path.addPolygon( vLine1 );
+        p->drawPath( path );
+      }
+      double sy1 = adaptLabelsToScreen ? std::max( vLine1.first().y(), screenRect.top() ) : vLine1.first().y();
+      double sy2 = adaptLabelsToScreen ? std::min( vLine1.last().y(), screenRect.bottom() ) : vLine1.last().y();
+      QuadrantLabeling quadrantLabeling = mGridConfig.quadrantLabeling;
+      for ( int col = 1; col <= mGridConfig.cols; ++col )
+      {
+        const double x2 = gridRect.xMinimum() + col * ix;
+        const QPolygonF vLine2 = vScreenLine( x2, iy );
+        QPainterPath path;
+        path.addPolygon( vLine2 );
+        p->drawPath( path );
+
+        if ( !previewJob )
+        {
+          const double sx1 = vLine1.first().x();
+          const double sx2 = vLine2.first().x();
+          const QString label = gridLabel( mGridConfig.colChar, col - 1 );
+          if ( mGridConfig.labelingPos == KadasGuideGridLayer::LabelsOutside && vLine1.first().y() - labelBoxSize > screenRect.top() )
+            drawGridLabel( 0.5 * ( sx1 + sx2 ), sy1 - 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
+          else if ( sy1 < vLine1.last().y() - 2 * labelBoxSize )
+            drawGridLabel( 0.5 * ( sx1 + sx2 ), sy1 + 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
+          if ( mGridConfig.labelingPos == KadasGuideGridLayer::LabelsOutside && vLine1.last().y() + labelBoxSize < screenRect.bottom() )
+            drawGridLabel( 0.5 * ( sx1 + sx2 ), sy2 + 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
+          else if ( sy2 > vLine1.first().y() + 2 * labelBoxSize )
+            drawGridLabel( 0.5 * ( sx1 + sx2 ), sy2 - 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
+        }
+
+        if ( quadrantLabeling != KadasGuideGridLayer::DontLabelQuadrants )
+        {
+          p->save();
+          p->setPen( QPen( mGridConfig.color, mGridConfig.lineWidth, Qt::DashLine ) );
+          QPolygonF vLineMid;
+          for ( int i = 0, n = vLine1.size(); i < n; ++i )
+          {
+            vLineMid.append( 0.5 * ( vLine1.at( i ) + vLine2.at( i ) ) );
+            if ( i < n - 1 && 0.4 * qAbs( vLine1.at( i ).x() - vLine2.at( i ).x() ) > smallLabelBoxSize )
+            {
+              drawGridLabel( vLine1.at( i ).x() + 0.5 * smallLabelBoxSize, vLine1.at( i ).y() + 0.5 * smallLabelBoxSize, "A", smallFont, smallFontMetrics, bufferColor );
+              drawGridLabel( vLine2.at( i ).x() - 0.5 * smallLabelBoxSize, vLine2.at( i ).y() + 0.5 * smallLabelBoxSize, "B", smallFont, smallFontMetrics, bufferColor );
+              drawGridLabel( vLine1.at( i + 1 ).x() + 0.5 * smallLabelBoxSize, vLine1.at( i + 1 ).y() - 0.5 * smallLabelBoxSize, "D", smallFont, smallFontMetrics, bufferColor );
+              drawGridLabel( vLine2.at( i + 1 ).x() - 0.5 * smallLabelBoxSize, vLine2.at( i + 1 ).y() - 0.5 * smallLabelBoxSize, "C", smallFont, smallFontMetrics, bufferColor );
+            }
+            if ( quadrantLabeling == KadasGuideGridLayer::LabelOneQuadrant )
+            {
+              vLineMid.append( 0.5 * ( vLine1.at( i + 1 ) + vLine2.at( i + 1 ) ) );
+              quadrantLabeling = KadasGuideGridLayer::DontLabelQuadrants;
+              break;
+            }
+          }
+          QPainterPath qpath;
+          qpath.addPolygon( vLineMid );
+          p->drawPath( qpath );
+          p->restore();
+        }
+
+        vLine1 = vLine2;
+      }
+
+      // Horizontal lines
+      QPolygonF hLine1 = hScreenLine( gridRect.yMaximum(), ix );
+      {
+        QPainterPath path;
+        path.addPolygon( hLine1 );
+        p->drawPath( path );
+      }
+      double sx1 = adaptLabelsToScreen ? std::max( hLine1.first().x(), screenRect.left() ) : hLine1.first().x();
+      double sx2 = adaptLabelsToScreen ? std::min( hLine1.last().x(), screenRect.right() ) : hLine1.last().x();
+      quadrantLabeling = mGridConfig.quadrantLabeling;
+      for ( int row = 1; row <= mGridConfig.rows; ++row )
+      {
+        const double y = gridRect.yMaximum() - row * iy;
+        const QPolygonF hLine2 = hScreenLine( y, ix );
+        QPainterPath path;
+        path.addPolygon( hLine2 );
+        p->drawPath( path );
+
+        if ( !previewJob )
+        {
+          const double sy1h = hLine1.first().y();
+          const double sy2h = hLine2.first().y();
+          const QString label = gridLabel( mGridConfig.rowChar, row - 1 );
+          if ( mGridConfig.labelingPos == KadasGuideGridLayer::LabelsOutside && hLine1.first().x() - labelBoxSize > screenRect.left() )
+            drawGridLabel( sx1 - 0.5 * labelBoxSize, 0.5 * ( sy1h + sy2h ), label, font, fontMetrics, bufferColor );
+          else if ( sx1 < hLine1.last().x() - 2 * labelBoxSize )
+            drawGridLabel( sx1 + 0.5 * labelBoxSize, 0.5 * ( sy1h + sy2h ), label, font, fontMetrics, bufferColor );
+          if ( mGridConfig.labelingPos == KadasGuideGridLayer::LabelsOutside && hLine1.last().x() + labelBoxSize < screenRect.right() )
+            drawGridLabel( sx2 + 0.5 * labelBoxSize, 0.5 * ( sy1h + sy2h ), label, font, fontMetrics, bufferColor );
+          else if ( sx2 > hLine1.first().x() + 2 * labelBoxSize )
+            drawGridLabel( sx2 - 0.5 * labelBoxSize, 0.5 * ( sy1h + sy2h ), label, font, fontMetrics, bufferColor );
+        }
+
+        if ( quadrantLabeling != KadasGuideGridLayer::DontLabelQuadrants )
+        {
+          p->save();
+          p->setPen( QPen( mGridConfig.color, mGridConfig.lineWidth, Qt::DashLine ) );
+          QPolygonF hLineMid;
+          if ( quadrantLabeling == KadasGuideGridLayer::LabelOneQuadrant )
+          {
+            hLineMid.append( 0.5 * ( hLine1.at( 0 ) + hLine2.at( 0 ) ) );
+            hLineMid.append( 0.5 * ( hLine1.at( 1 ) + hLine2.at( 1 ) ) );
+            quadrantLabeling = KadasGuideGridLayer::DontLabelQuadrants;
+          }
+          else
+          {
+            for ( int i = 0, n = hLine1.size(); i < n; ++i )
+              hLineMid.append( 0.5 * ( hLine1.at( i ) + hLine2.at( i ) ) );
+          }
+          QPainterPath qpath;
+          qpath.addPolygon( hLineMid );
+          p->drawPath( qpath );
+          p->restore();
+        }
+
+        hLine1 = hLine2;
+      }
+
+      p->restore();
+      return true;
+    }
+
+  private:
+    GridConfig mGridConfig;
+    double mOpacity = 1.0;
+
+    void drawGridLabel( double x, double y, const QString &text, const QFont &font, const QFontMetrics &metrics, const QColor &bufferColor )
+    {
+      QPainterPath path;
+      x -= 0.5 * metrics.horizontalAdvance( text );
+      y = y - metrics.descent() + 0.5 * metrics.height();
+      path.addText( x, y, font, text );
+      QPainter *p = renderContext()->painter();
+      p->save();
+      p->setPen( QPen( bufferColor, qRound( mGridConfig.fontSize / 8. ) ) );
+      p->drawPath( path );
+      p->setPen( Qt::NoPen );
+      p->drawPath( path );
+      p->restore();
+    }
+
+    QPolygonF vScreenLine( double x, double iy ) const
+    {
+      const QgsCoordinateTransform crst = renderContext()->coordinateTransform();
+      const QgsMapToPixel &mapToPixel = renderContext()->mapToPixel();
+      const QgsRectangle &gridRect = mGridConfig.gridRect;
+      QPolygonF screenPoints;
+      for ( int row = 0; row <= mGridConfig.rows; ++row )
+      {
+        const QgsPoint pt( x, gridRect.yMaximum() - row * iy );
+        screenPoints.append( mapToPixel.transform( crst.transform( pt ) ).toQPointF() );
+      }
+      return screenPoints;
+    }
+
+    QPolygonF hScreenLine( double y, double ix ) const
+    {
+      const QgsCoordinateTransform crst = renderContext()->coordinateTransform();
+      const QgsMapToPixel &mapToPixel = renderContext()->mapToPixel();
+      const QgsRectangle &gridRect = mGridConfig.gridRect;
+      QPolygonF screenPoints;
+      for ( int col = 0; col <= mGridConfig.cols; ++col )
+      {
+        const QgsPoint pt( gridRect.xMinimum() + col * ix, y );
+        screenPoints.append( mapToPixel.transform( crst.transform( pt ) ).toQPointF() );
+      }
+      return screenPoints;
+    }
+};
+
+
 KadasGuideGridLayer::KadasGuideGridLayer( const QString &name )
   : QgsAnnotationLayer( name, QgsAnnotationLayer::LayerOptions( transformContextForLayer() ) )
 {
@@ -84,6 +324,16 @@ KadasGuideGridLayer *KadasGuideGridLayer::clone() const
   layer->mGridConfig = mGridConfig;
   layer->regenerate();
   return layer;
+}
+
+QgsMapLayerRenderer *KadasGuideGridLayer::createMapRenderer( QgsRenderContext &rendererContext )
+{
+  // Inside Kadas: use the dedicated QPainter renderer so labels follow the
+  // visible map edge (labels are *not* fixed in map space). The static
+  // annotation items stored on the layer are intentionally ignored here:
+  // they exist solely to be picked up by the stock QgsAnnotationLayer
+  // pipeline when the project is opened in vanilla QGIS.
+  return new KadasGuideGridRenderer( this, rendererContext );
 }
 
 QList<KadasPluginLayer::IdentifyResult> KadasGuideGridLayer::identify( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings )

@@ -25,11 +25,19 @@
 /**
  * Guide grid layer: draws a numbered/lettered rectangular grid over the map.
  *
- * Implemented as a QgsAnnotationLayer subclass: configuration is stored at
- * the layer level (as XML attributes on the layer node) and the visual grid
- * (lines + cell labels) is materialized as plain QgsAnnotationLineItem +
- * QgsAnnotationPointTextItem items so that vanilla QGIS can render the
- * layer natively, without any Kadas-specific code.
+ * Implemented as a QgsAnnotationLayer subclass:
+ *
+ * - Configuration is stored at the layer level (as a `<KadasGuideGrid>`
+ *   child element on the layer node).
+ * - The visual grid (lines + cell labels) is also materialized as plain
+ *   QgsAnnotationLineItem + QgsAnnotationPointTextItem items, so that
+ *   vanilla QGIS can render the layer natively without any Kadas code.
+ * - Inside Kadas, `createMapRenderer()` is overridden to return a custom
+ *   renderer that paints lines + labels directly with QPainter. This
+ *   preserves the dynamic "labels follow the visible map edge" behavior
+ *   that Kadas users rely on; the stored annotation items are ignored at
+ *   paint time inside Kadas (they only exist to feed the QGIS render
+ *   pipeline when the project is opened in vanilla QGIS).
  */
 class KadasGuideGridLayer : public QgsAnnotationLayer
 {
@@ -55,6 +63,7 @@ class KadasGuideGridLayer : public QgsAnnotationLayer
 
     KadasGuideGridLayer *clone() const override;
     QgsRectangle extent() const override { return mGridConfig.gridRect; }
+    QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
 
     QList<KadasPluginLayer::IdentifyResult> identify( const QgsPointXY &mapPos, const QgsMapSettings &mapSettings );
 
@@ -108,6 +117,8 @@ class KadasGuideGridLayer : public QgsAnnotationLayer
     bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const override;
 
   private:
+    friend class KadasGuideGridRenderer;
+
     struct GridConfig
     {
         QgsRectangle gridRect;
