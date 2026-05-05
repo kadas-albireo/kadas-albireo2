@@ -19,6 +19,7 @@
 
 #include <QString>
 
+#include "kadas/core/kadassettingstree.h"
 #include "kadas/gui/kadas_gui.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontext.h"
 #include "kadas/gui/kadasattributetypes.h"
@@ -29,6 +30,9 @@ class QgsAnnotationItem;
 class QgsCoordinateReferenceSystem;
 class QgsRectangle;
 class QgsRenderContext;
+class QgsSettingsEntryColor;
+class QgsSettingsEntryDouble;
+class QgsSettingsEntryInteger;
 class QuaZip;
 
 /**
@@ -51,6 +55,12 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
 {
   public:
     virtual ~KadasAnnotationItemController() = default;
+
+#ifndef SIP_RUN
+    //! Settings tree node shared by all canonical controllers for their
+    //! persisted last-used style entries (kadas/annotation/...).
+    static inline QgsSettingsTreeNode *sTreeAnnotation = KadasSettingsTree::sTreeKadas->createChildNode( QStringLiteral( "annotation" ) );
+#endif
 
     // ----- Identity --------------------------------------------------------
 
@@ -109,6 +119,23 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     // ----- KML export ----------------------------------------------------
 
     virtual QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = nullptr ) const = 0;
+
+    // ----- Persisted last-used style --------------------------------------
+    //
+    // Hooks for the styling row in KadasMapToolEditAnnotationItem to feed the
+    // user's last-used style back into a freshly created item. Only the
+    // canonical generic controllers (marker / linestring / polygon /
+    // pointtext) override these; specialized controllers (rectangle,
+    // circle, coord-cross, pin, gpx, milx, picture, ...) inherit the no-op
+    // default so their controller-supplied symbol stays untouched.
+
+    //! Applies the persisted defaults stored via QgsSettingsEntry to \a item.
+    //! Called once on creation, before the item is added to the layer.
+    virtual void applyPersistedStyle( QgsAnnotationItem *item ) const { Q_UNUSED( item ); }
+
+    //! Stores the current style of \a item back into QgsSettingsEntry as the
+    //! new defaults. Called whenever the user edits the styling row.
+    virtual void persistStyle( const QgsAnnotationItem *item ) const { Q_UNUSED( item ); }
 
   protected:
     // ----- Transform helpers (mirror KadasMapItem's) ---------------------

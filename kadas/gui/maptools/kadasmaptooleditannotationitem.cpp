@@ -61,49 +61,6 @@
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 
 
-// ----- Persisted last-used styles, reapplied on freshly created items. ---
-
-const QgsSettingsEntryInteger *KadasMapToolEditAnnotationItem::settingsMarkerShape
-  = new QgsSettingsEntryInteger( QStringLiteral( "marker-shape" ), sTreeAnnotation, static_cast<int>( Qgis::MarkerShape::Circle ), QStringLiteral( "Last-used marker shape." ) );
-const QgsSettingsEntryInteger *KadasMapToolEditAnnotationItem::settingsMarkerSize
-  = new QgsSettingsEntryInteger( QStringLiteral( "marker-size" ), sTreeAnnotation, 3, QStringLiteral( "Last-used marker size (mm)." ) );
-const QgsSettingsEntryDouble *KadasMapToolEditAnnotationItem::settingsMarkerStrokeWidth
-  = new QgsSettingsEntryDouble( QStringLiteral( "marker-stroke-width" ), sTreeAnnotation, 0.0, QStringLiteral( "Last-used marker outline width (mm)." ) );
-const QgsSettingsEntryColor *KadasMapToolEditAnnotationItem::settingsMarkerFillColor
-  = new QgsSettingsEntryColor( QStringLiteral( "marker-fill-color" ), sTreeAnnotation, QColor( 255, 0, 0 ), QStringLiteral( "Last-used marker fill color." ) );
-const QgsSettingsEntryColor *KadasMapToolEditAnnotationItem::settingsMarkerStrokeColor
-  = new QgsSettingsEntryColor( QStringLiteral( "marker-stroke-color" ), sTreeAnnotation, QColor( 0, 0, 0 ), QStringLiteral( "Last-used marker outline color." ) );
-const QgsSettingsEntryInteger *KadasMapToolEditAnnotationItem::settingsMarkerStrokeStyle
-  = new QgsSettingsEntryInteger( QStringLiteral( "marker-stroke-style" ), sTreeAnnotation, static_cast<int>( Qt::SolidLine ), QStringLiteral( "Last-used marker outline style." ) );
-
-const QgsSettingsEntryDouble *KadasMapToolEditAnnotationItem::settingsLineWidth
-  = new QgsSettingsEntryDouble( QStringLiteral( "line-width" ), sTreeAnnotation, 0.5, QStringLiteral( "Last-used line width (mm)." ) );
-const QgsSettingsEntryColor *KadasMapToolEditAnnotationItem::settingsLineColor
-  = new QgsSettingsEntryColor( QStringLiteral( "line-color" ), sTreeAnnotation, QColor( 255, 0, 0 ), QStringLiteral( "Last-used line color." ) );
-const QgsSettingsEntryInteger *KadasMapToolEditAnnotationItem::settingsLineStyle
-  = new QgsSettingsEntryInteger( QStringLiteral( "line-style" ), sTreeAnnotation, static_cast<int>( Qt::SolidLine ), QStringLiteral( "Last-used line style." ) );
-
-const QgsSettingsEntryDouble *KadasMapToolEditAnnotationItem::settingsPolygonStrokeWidth
-  = new QgsSettingsEntryDouble( QStringLiteral( "polygon-stroke-width" ), sTreeAnnotation, 0.5, QStringLiteral( "Last-used polygon outline width (mm)." ) );
-const QgsSettingsEntryColor *KadasMapToolEditAnnotationItem::settingsPolygonFillColor
-  = new QgsSettingsEntryColor( QStringLiteral( "polygon-fill-color" ), sTreeAnnotation, QColor( 255, 0, 0, 80 ), QStringLiteral( "Last-used polygon fill color." ) );
-const QgsSettingsEntryColor *KadasMapToolEditAnnotationItem::settingsPolygonStrokeColor
-  = new QgsSettingsEntryColor( QStringLiteral( "polygon-stroke-color" ), sTreeAnnotation, QColor( 255, 0, 0 ), QStringLiteral( "Last-used polygon outline color." ) );
-const QgsSettingsEntryInteger *KadasMapToolEditAnnotationItem::settingsPolygonStrokeStyle
-  = new QgsSettingsEntryInteger( QStringLiteral( "polygon-stroke-style" ), sTreeAnnotation, static_cast<int>( Qt::SolidLine ), QStringLiteral( "Last-used polygon outline style." ) );
-const QgsSettingsEntryInteger *KadasMapToolEditAnnotationItem::settingsPolygonBrushStyle
-  = new QgsSettingsEntryInteger( QStringLiteral( "polygon-brush-style" ), sTreeAnnotation, static_cast<int>( Qt::SolidPattern ), QStringLiteral( "Last-used polygon fill style." ) );
-
-const QgsSettingsEntryDouble *KadasMapToolEditAnnotationItem::settingsTextSize
-  = new QgsSettingsEntryDouble( QStringLiteral( "text-size" ), sTreeAnnotation, 10.0, QStringLiteral( "Last-used point-text size (points)." ) );
-const QgsSettingsEntryColor *KadasMapToolEditAnnotationItem::settingsTextColor
-  = new QgsSettingsEntryColor( QStringLiteral( "text-color" ), sTreeAnnotation, QColor( 0, 0, 0 ), QStringLiteral( "Last-used point-text color." ) );
-const QgsSettingsEntryColor *KadasMapToolEditAnnotationItem::settingsTextBufferColor
-  = new QgsSettingsEntryColor( QStringLiteral( "text-buffer-color" ), sTreeAnnotation, QColor( 255, 255, 255, 0 ), QStringLiteral( "Last-used point-text buffer (border) color." ) );
-const QgsSettingsEntryDouble *KadasMapToolEditAnnotationItem::settingsTextBufferWidth
-  = new QgsSettingsEntryDouble( QStringLiteral( "text-buffer-width" ), sTreeAnnotation, 0.0, QStringLiteral( "Last-used point-text buffer (border) width (mm)." ) );
-
-
 namespace
 {
   //! Standard marker shapes exposed in the styling row, in display order.
@@ -868,7 +825,8 @@ void KadasMapToolEditAnnotationItem::applyStyleFromWidgets()
       fmt.setBuffer( buf );
       pt->setFormat( fmt );
       mLayer->triggerRepaint();
-      persistStyleToSettings();
+      if ( mController )
+        mController->persistStyle( mItem );
       return;
     }
   }
@@ -933,147 +891,8 @@ void KadasMapToolEditAnnotationItem::applyStyleFromWidgets()
     poly->setSymbol( sym.release() );
   }
 
-  persistStyleToSettings();
-}
-
-void KadasMapToolEditAnnotationItem::persistStyleToSettings()
-{
-  if ( !mItem )
-    return;
-  // Only the three stock geometry types and pointtext feed the persisted
-  // defaults so that specialized items (rectangle / circle / coord-cross /
-  // pin / gpx-route / picture) keep their own controller defaults.
-  const QString t = mItem->type();
-  if ( t == QStringLiteral( "pointtext" ) )
-  {
-    if ( !mTextFontCombo )
-      return;
-    settingsTextSize->setValue( mTextSizeSpin->value() );
-    settingsTextColor->setValue( mTextColorBtn->color() );
-    settingsTextBufferColor->setValue( mTextBufferColorBtn->color() );
-    settingsTextBufferWidth->setValue( mTextBufferWidthSpin->value() );
-    return;
-  }
-  if ( !mStrokeColorBtn )
-    return;
-  if ( t == QStringLiteral( "marker" ) )
-  {
-    settingsMarkerShape->setValue( mShapeCombo->currentData().toInt() );
-    settingsMarkerSize->setValue( mSizeSpin->value() );
-    settingsMarkerStrokeWidth->setValue( mStrokeWidthSpin->value() );
-    settingsMarkerFillColor->setValue( mFillColorBtn->color() );
-    settingsMarkerStrokeColor->setValue( mStrokeColorBtn->color() );
-    settingsMarkerStrokeStyle->setValue( mStrokeStyleCombo->currentData().toInt() );
-  }
-  else if ( t == QStringLiteral( "linestring" ) )
-  {
-    settingsLineWidth->setValue( mStrokeWidthSpin->value() );
-    settingsLineColor->setValue( mStrokeColorBtn->color() );
-    settingsLineStyle->setValue( mStrokeStyleCombo->currentData().toInt() );
-  }
-  else if ( t == QStringLiteral( "polygon" ) )
-  {
-    settingsPolygonStrokeWidth->setValue( mStrokeWidthSpin->value() );
-    settingsPolygonFillColor->setValue( mFillColorBtn->color() );
-    settingsPolygonStrokeColor->setValue( mStrokeColorBtn->color() );
-    settingsPolygonStrokeStyle->setValue( mStrokeStyleCombo->currentData().toInt() );
-    settingsPolygonBrushStyle->setValue( mFillStyleCombo->currentData().toInt() );
-  }
-}
-
-void KadasMapToolEditAnnotationItem::applyPersistedStyle( QgsAnnotationItem *item ) const
-{
-  if ( !item )
-    return;
-  // Only the three stock geometry types and pointtext pick up the persisted
-  // defaults so that specialized items (rectangle / circle / coord-cross /
-  // pin / gpx / picture) keep their controller-supplied symbol unchanged.
-  const QString t = item->type();
-  if ( t == QStringLiteral( "pointtext" ) )
-  {
-    if ( !settingsTextColor->exists() )
-      return;
-    auto *pt = static_cast<QgsAnnotationPointTextItem *>( item );
-    QgsTextFormat fmt = pt->format();
-    fmt.setSize( settingsTextSize->value() );
-    fmt.setSizeUnit( Qgis::RenderUnit::Points );
-    fmt.setColor( settingsTextColor->value() );
-    QgsTextBufferSettings buf = fmt.buffer();
-    const double bw = settingsTextBufferWidth->value();
-    const QColor bc = settingsTextBufferColor->value();
-    buf.setEnabled( bw > 0.0 && bc.alpha() > 0 );
-    buf.setColor( bc );
-    buf.setSize( bw );
-    buf.setSizeUnit( Qgis::RenderUnit::Millimeters );
-    fmt.setBuffer( buf );
-    pt->setFormat( fmt );
-    return;
-  }
-  if ( t == QStringLiteral( "marker" ) )
-  {
-    auto *marker = static_cast<QgsAnnotationMarkerItem *>( item );
-    if ( !settingsMarkerStrokeColor->exists() )
-      return; // never customized — keep controller defaults.
-    std::unique_ptr<QgsMarkerSymbol> sym( marker->symbol() ? marker->symbol()->clone() : new QgsMarkerSymbol() );
-    if ( sym->symbolLayerCount() == 0 )
-      sym->appendSymbolLayer( new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Circle ) );
-    auto *sl = dynamic_cast<QgsSimpleMarkerSymbolLayer *>( sym->symbolLayer( 0 ) );
-    if ( !sl )
-    {
-      auto *replacement = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Circle );
-      sym->changeSymbolLayer( 0, replacement );
-      sl = replacement;
-    }
-    sl->setShape( static_cast<Qgis::MarkerShape>( settingsMarkerShape->value() ) );
-    sl->setSize( settingsMarkerSize->value() );
-    sl->setStrokeWidth( settingsMarkerStrokeWidth->value() );
-    sl->setColor( settingsMarkerFillColor->value() );
-    sl->setStrokeColor( settingsMarkerStrokeColor->value() );
-    sl->setStrokeStyle( static_cast<Qt::PenStyle>( settingsMarkerStrokeStyle->value() ) );
-    marker->setSymbol( sym.release() );
-  }
-  else if ( t == QStringLiteral( "linestring" ) )
-  {
-    auto *line = static_cast<QgsAnnotationLineItem *>( item );
-    if ( !settingsLineColor->exists() )
-      return;
-    std::unique_ptr<QgsLineSymbol> sym( line->symbol() ? line->symbol()->clone() : new QgsLineSymbol() );
-    if ( sym->symbolLayerCount() == 0 )
-      sym->appendSymbolLayer( new QgsSimpleLineSymbolLayer() );
-    auto *sl = dynamic_cast<QgsSimpleLineSymbolLayer *>( sym->symbolLayer( 0 ) );
-    if ( !sl )
-    {
-      auto *replacement = new QgsSimpleLineSymbolLayer();
-      sym->changeSymbolLayer( 0, replacement );
-      sl = replacement;
-    }
-    sl->setWidth( settingsLineWidth->value() );
-    sl->setColor( settingsLineColor->value() );
-    sl->setPenStyle( static_cast<Qt::PenStyle>( settingsLineStyle->value() ) );
-    line->setSymbol( sym.release() );
-  }
-  else if ( t == QStringLiteral( "polygon" ) )
-  {
-    auto *poly = static_cast<QgsAnnotationPolygonItem *>( item );
-    if ( !settingsPolygonStrokeColor->exists() )
-      return;
-    std::unique_ptr<QgsFillSymbol> sym( poly->symbol() ? poly->symbol()->clone() : new QgsFillSymbol() );
-    if ( sym->symbolLayerCount() == 0 )
-      sym->appendSymbolLayer( new QgsSimpleFillSymbolLayer() );
-    auto *sl = dynamic_cast<QgsSimpleFillSymbolLayer *>( sym->symbolLayer( 0 ) );
-    if ( !sl )
-    {
-      auto *replacement = new QgsSimpleFillSymbolLayer();
-      sym->changeSymbolLayer( 0, replacement );
-      sl = replacement;
-    }
-    sl->setStrokeWidth( settingsPolygonStrokeWidth->value() );
-    sl->setColor( settingsPolygonFillColor->value() );
-    sl->setStrokeColor( settingsPolygonStrokeColor->value() );
-    sl->setStrokeStyle( static_cast<Qt::PenStyle>( settingsPolygonStrokeStyle->value() ) );
-    sl->setBrushStyle( static_cast<Qt::BrushStyle>( settingsPolygonBrushStyle->value() ) );
-    poly->setSymbol( sym.release() );
-  }
+  if ( mController )
+    mController->persistStyle( mItem );
 }
 
 void KadasMapToolEditAnnotationItem::createInitialItem()
@@ -1083,7 +902,7 @@ void KadasMapToolEditAnnotationItem::createInitialItem()
   QgsAnnotationItem *fresh = mItemFactory ? mItemFactory() : mController->createItem();
   if ( !fresh )
     return;
-  applyPersistedStyle( fresh );
+  mController->applyPersistedStyle( fresh );
   mItemId = mLayer->addItem( fresh );
   mItem = mLayer->item( mItemId );
   mDrawState = DrawState::Empty;

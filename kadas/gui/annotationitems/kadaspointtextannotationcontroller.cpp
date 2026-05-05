@@ -22,10 +22,23 @@
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgspointxy.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgssettingsentryimpl.h>
 #include <qgis/qgstextformat.h>
 
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadaspointtextannotationcontroller.h"
+
+
+// ----- Persisted last-used style ----------------------------------------
+
+const QgsSettingsEntryDouble *KadasPointTextAnnotationController::settingsSize
+  = new QgsSettingsEntryDouble( QStringLiteral( "text-size" ), sTreeAnnotation, 10.0, QStringLiteral( "Last-used point-text size (points)." ) );
+const QgsSettingsEntryColor *KadasPointTextAnnotationController::settingsColor
+  = new QgsSettingsEntryColor( QStringLiteral( "text-color" ), sTreeAnnotation, QColor( 0, 0, 0 ), QStringLiteral( "Last-used point-text color." ) );
+const QgsSettingsEntryColor *KadasPointTextAnnotationController::settingsBufferColor
+  = new QgsSettingsEntryColor( QStringLiteral( "text-buffer-color" ), sTreeAnnotation, QColor( 255, 255, 255, 0 ), QStringLiteral( "Last-used point-text buffer (border) color." ) );
+const QgsSettingsEntryDouble *KadasPointTextAnnotationController::settingsBufferWidth
+  = new QgsSettingsEntryDouble( QStringLiteral( "text-buffer-width" ), sTreeAnnotation, 0.0, QStringLiteral( "Last-used point-text buffer (border) width (mm)." ) );
 
 namespace
 {
@@ -181,4 +194,37 @@ QString KadasPointTextAnnotationController::asKml( const QgsAnnotationItem *item
   outStream << "</Placemark>" << "\n";
   outStream.flush();
   return outString;
+}
+
+void KadasPointTextAnnotationController::applyPersistedStyle( QgsAnnotationItem *item ) const
+{
+  auto *pt = dynamic_cast<QgsAnnotationPointTextItem *>( item );
+  if ( !pt || !settingsColor->exists() )
+    return;
+  QgsTextFormat fmt = pt->format();
+  fmt.setSize( settingsSize->value() );
+  fmt.setSizeUnit( Qgis::RenderUnit::Points );
+  fmt.setColor( settingsColor->value() );
+  QgsTextBufferSettings buf = fmt.buffer();
+  const double bw = settingsBufferWidth->value();
+  const QColor bc = settingsBufferColor->value();
+  buf.setEnabled( bw > 0.0 && bc.alpha() > 0 );
+  buf.setColor( bc );
+  buf.setSize( bw );
+  buf.setSizeUnit( Qgis::RenderUnit::Millimeters );
+  fmt.setBuffer( buf );
+  pt->setFormat( fmt );
+}
+
+void KadasPointTextAnnotationController::persistStyle( const QgsAnnotationItem *item ) const
+{
+  const auto *pt = dynamic_cast<const QgsAnnotationPointTextItem *>( item );
+  if ( !pt )
+    return;
+  const QgsTextFormat fmt = pt->format();
+  settingsSize->setValue( fmt.size() );
+  settingsColor->setValue( fmt.color() );
+  const QgsTextBufferSettings buf = fmt.buffer();
+  settingsBufferColor->setValue( buf.enabled() ? buf.color() : QColor( 0, 0, 0, 0 ) );
+  settingsBufferWidth->setValue( buf.enabled() ? buf.size() : 0.0 );
 }

@@ -16,6 +16,8 @@
 
 #include <QObject>
 #include <QTextStream>
+#include <cmath>
+#include <memory>
 
 #include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgscoordinatereferencesystem.h>
@@ -26,10 +28,27 @@
 #include <qgis/qgspointxy.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrendercontext.h>
+#include <qgis/qgssettingsentryimpl.h>
 #include <qgis/qgssymbollayerutils.h>
 
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasmarkerannotationcontroller.h"
+
+
+// ----- Persisted last-used style ----------------------------------------
+
+const QgsSettingsEntryInteger *KadasMarkerAnnotationController::settingsShape
+  = new QgsSettingsEntryInteger( QStringLiteral( "marker-shape" ), sTreeAnnotation, static_cast<int>( Qgis::MarkerShape::Circle ), QStringLiteral( "Last-used marker shape." ) );
+const QgsSettingsEntryInteger *KadasMarkerAnnotationController::settingsSize
+  = new QgsSettingsEntryInteger( QStringLiteral( "marker-size" ), sTreeAnnotation, 3, QStringLiteral( "Last-used marker size (mm)." ) );
+const QgsSettingsEntryDouble *KadasMarkerAnnotationController::settingsStrokeWidth
+  = new QgsSettingsEntryDouble( QStringLiteral( "marker-stroke-width" ), sTreeAnnotation, 0.0, QStringLiteral( "Last-used marker outline width (mm)." ) );
+const QgsSettingsEntryColor *KadasMarkerAnnotationController::settingsFillColor
+  = new QgsSettingsEntryColor( QStringLiteral( "marker-fill-color" ), sTreeAnnotation, QColor( 255, 0, 0 ), QStringLiteral( "Last-used marker fill color." ) );
+const QgsSettingsEntryColor *KadasMarkerAnnotationController::settingsStrokeColor
+  = new QgsSettingsEntryColor( QStringLiteral( "marker-stroke-color" ), sTreeAnnotation, QColor( 0, 0, 0 ), QStringLiteral( "Last-used marker outline color." ) );
+const QgsSettingsEntryInteger *KadasMarkerAnnotationController::settingsStrokeStyle
+  = new QgsSettingsEntryInteger( QStringLiteral( "marker-stroke-style" ), sTreeAnnotation, static_cast<int>( Qt::SolidLine ), QStringLiteral( "Last-used marker outline style." ) );
 
 namespace
 {
@@ -231,4 +250,44 @@ QString KadasMarkerAnnotationController::asKml( const QgsAnnotationItem *item, c
   outStream << "</Placemark>\n";
   outStream.flush();
   return outString;
+}
+
+void KadasMarkerAnnotationController::applyPersistedStyle( QgsAnnotationItem *item ) const
+{
+  auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item );
+  if ( !marker || !settingsStrokeColor->exists() )
+    return;
+  std::unique_ptr<QgsMarkerSymbol> sym( marker->symbol() ? marker->symbol()->clone() : new QgsMarkerSymbol() );
+  if ( sym->symbolLayerCount() == 0 )
+    sym->appendSymbolLayer( new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Circle ) );
+  auto *sl = dynamic_cast<QgsSimpleMarkerSymbolLayer *>( sym->symbolLayer( 0 ) );
+  if ( !sl )
+  {
+    auto *replacement = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Circle );
+    sym->changeSymbolLayer( 0, replacement );
+    sl = replacement;
+  }
+  sl->setShape( static_cast<Qgis::MarkerShape>( settingsShape->value() ) );
+  sl->setSize( settingsSize->value() );
+  sl->setStrokeWidth( settingsStrokeWidth->value() );
+  sl->setColor( settingsFillColor->value() );
+  sl->setStrokeColor( settingsStrokeColor->value() );
+  sl->setStrokeStyle( static_cast<Qt::PenStyle>( settingsStrokeStyle->value() ) );
+  marker->setSymbol( sym.release() );
+}
+
+void KadasMarkerAnnotationController::persistStyle( const QgsAnnotationItem *item ) const
+{
+  const auto *marker = dynamic_cast<const QgsAnnotationMarkerItem *>( item );
+  if ( !marker || !marker->symbol() || marker->symbol()->symbolLayerCount() == 0 )
+    return;
+  const auto *sl = dynamic_cast<const QgsSimpleMarkerSymbolLayer *>( marker->symbol()->symbolLayer( 0 ) );
+  if ( !sl )
+    return;
+  settingsShape->setValue( static_cast<int>( sl->shape() ) );
+  settingsSize->setValue( static_cast<int>( std::round( sl->size() ) ) );
+  settingsStrokeWidth->setValue( sl->strokeWidth() );
+  settingsFillColor->setValue( sl->color() );
+  settingsStrokeColor->setValue( sl->strokeColor() );
+  settingsStrokeStyle->setValue( static_cast<int>( sl->strokeStyle() ) );
 }

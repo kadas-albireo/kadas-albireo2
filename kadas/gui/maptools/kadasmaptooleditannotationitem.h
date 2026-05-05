@@ -24,7 +24,6 @@
 #include <qgis/qgsmaptool.h>
 #include <qgis/qgsvector.h>
 
-#include "kadas/core/kadassettingstree.h"
 #include "kadas/core/kadasstatehistory.h"
 #include "kadas/gui/kadas_gui.h"
 #include "kadas/gui/kadasattributetypes.h"
@@ -42,9 +41,6 @@ class QSpinBox;
 class QgsAnnotationItem;
 class QgsAnnotationLayer;
 class QgsColorButton;
-class QgsSettingsEntryColor;
-class QgsSettingsEntryDouble;
-class QgsSettingsEntryInteger;
 
 /**
  * \ingroup gui
@@ -91,29 +87,6 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
      * as if the user had left-clicked at \a pos. No-op in pure edit mode.
      */
     void addPoint( const QgsPointXY &pos );
-
-#ifndef SIP_RUN
-    static inline QgsSettingsTreeNode *sTreeAnnotation = KadasSettingsTree::sTreeKadas->createChildNode( QStringLiteral( "annotation" ) );
-
-    static const QgsSettingsEntryInteger *settingsMarkerShape;
-    static const QgsSettingsEntryInteger *settingsMarkerSize;
-    static const QgsSettingsEntryDouble *settingsMarkerStrokeWidth;
-    static const QgsSettingsEntryColor *settingsMarkerFillColor;
-    static const QgsSettingsEntryColor *settingsMarkerStrokeColor;
-    static const QgsSettingsEntryInteger *settingsMarkerStrokeStyle;
-    static const QgsSettingsEntryDouble *settingsLineWidth;
-    static const QgsSettingsEntryColor *settingsLineColor;
-    static const QgsSettingsEntryInteger *settingsLineStyle;
-    static const QgsSettingsEntryDouble *settingsPolygonStrokeWidth;
-    static const QgsSettingsEntryColor *settingsPolygonFillColor;
-    static const QgsSettingsEntryColor *settingsPolygonStrokeColor;
-    static const QgsSettingsEntryInteger *settingsPolygonStrokeStyle;
-    static const QgsSettingsEntryInteger *settingsPolygonBrushStyle;
-    static const QgsSettingsEntryDouble *settingsTextSize;
-    static const QgsSettingsEntryColor *settingsTextColor;
-    static const QgsSettingsEntryColor *settingsTextBufferColor;
-    static const QgsSettingsEntryDouble *settingsTextBufferWidth;
-#endif
 
   signals:
     //! Create-mode: emitted whenever a part is finalized.
@@ -182,8 +155,6 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     void setupStyleWidgets( QBoxLayout *outer );
     void readStyleToWidgets();
     void applyStyleFromWidgets();
-    void persistStyleToSettings();
-    void applyPersistedStyle( QgsAnnotationItem *item ) const;
 
     // Create-flow helpers.
     void createInitialItem();
