@@ -83,12 +83,11 @@ QgsAnnotationItem *KadasMarkerAnnotationController::createItem() const
   // QgsAnnotationMarkerItem ships with an empty QgsMarkerSymbol (zero
   // symbol layers), which renders nothing. Install a sensible default so
   // a freshly placed marker is visible even before any persisted style.
-  QgsMarkerSymbol *sym = new QgsMarkerSymbol();
   auto *sl = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Circle );
   sl->setSize( 3.0 );
   sl->setColor( QColor( 255, 0, 0 ) );
   sl->setStrokeColor( QColor( 0, 0, 0 ) );
-  sym->changeSymbolLayer( 0, sl );
+  QgsMarkerSymbol *sym = new QgsMarkerSymbol( QgsSymbolLayerList() << sl );
   item->setSymbol( sym );
   return item;
 }
