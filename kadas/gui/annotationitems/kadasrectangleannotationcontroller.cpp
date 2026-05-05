@@ -329,3 +329,13 @@ QList<QgsAnnotationItem *> KadasRectangleAnnotationController::generateShadows( 
   shadow->setZIndex( master->zIndex() );
   return { shadow };
 }
+
+QStringList KadasRectangleAnnotationController::shadowIds( const QgsAnnotationItem *item ) const
+{
+  return static_cast<const KadasRectangleAnnotationItem *>( item )->shadowIds();
+}
+
+void KadasRectangleAnnotationController::setShadowIds( QgsAnnotationItem *item, const QStringList &ids ) const
+{
+  static_cast<KadasRectangleAnnotationItem *>( item )->setShadowIds( ids );
+}
