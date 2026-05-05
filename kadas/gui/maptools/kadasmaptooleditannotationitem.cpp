@@ -16,6 +16,7 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QMenu>
 #include <QPainter>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -258,9 +259,17 @@ void KadasMapToolEditAnnotationItem::canvasPressEvent( QgsMapMouseEvent *e )
 
   if ( e->button() == Qt::RightButton )
   {
-    // Right-click during digitizing finalizes the part; otherwise close.
+    // Right-click during digitizing finalizes the part.
     if ( mAllowCreate && mDrawState == DrawState::InProgress )
+    {
       finishPart();
+      return;
+    }
+    // Otherwise, if the click hits an annotation, show a z-order menu;
+    // a click on empty canvas closes the tool.
+    const QString hit = pickItemAt( e->mapPoint() );
+    if ( !hit.isEmpty() )
+      showContextMenu( hit, e->globalPosition().toPoint() );
     else
       canvas()->unsetMapTool( this );
     return;
@@ -712,4 +721,84 @@ void KadasMapToolEditAnnotationItem::switchToItem( const QString &itemId )
   // Replace the active tool with a fresh edit-mode tool bound to the
   // clicked item. The current tool is destroyed by setMapTool().
   canvas()->setMapTool( new KadasMapToolEditAnnotationItem( canvas(), mLayer.data(), itemId ) );
+}
+
+void KadasMapToolEditAnnotationItem::showContextMenu( const QString &itemId, const QPoint &globalPos )
+{
+  if ( !mLayer )
+    return;
+  QgsAnnotationItem *target = mLayer->item( itemId );
+  if ( !target )
+    return;
+
+  // Collect z-indices of all items on this layer to compute neighbor swaps
+  // and front/back extremes.
+  const QMap<QString, QgsAnnotationItem *> all = mLayer->items();
+  QList<int> zs;
+  zs.reserve( all.size() );
+  for ( auto it = all.constBegin(), itEnd = all.constEnd(); it != itEnd; ++it )
+    zs.append( it.value()->zIndex() );
+  if ( zs.isEmpty() )
+    return;
+  std::sort( zs.begin(), zs.end() );
+  const int curZ = target->zIndex();
+  const int minZ = zs.first();
+  const int maxZ = zs.last();
+
+  // Find next higher and next lower distinct z values.
+  int nextHigher = curZ;
+  bool hasHigher = false;
+  for ( int z : zs )
+  {
+    if ( z > curZ )
+    {
+      nextHigher = z;
+      hasHigher = true;
+      break;
+    }
+  }
+  int nextLower = curZ;
+  bool hasLower = false;
+  for ( int i = zs.size() - 1; i >= 0; --i )
+  {
+    if ( zs[i] < curZ )
+    {
+      nextLower = zs[i];
+      hasLower = true;
+      break;
+    }
+  }
+
+  QMenu menu;
+  QAction *toFront = menu.addAction( tr( "Bring to Front" ) );
+  QAction *forward = menu.addAction( tr( "Bring Forward" ) );
+  QAction *backward = menu.addAction( tr( "Send Backward" ) );
+  QAction *toBack = menu.addAction( tr( "Send to Back" ) );
+  toFront->setEnabled( curZ < maxZ );
+  forward->setEnabled( hasHigher );
+  backward->setEnabled( hasLower );
+  toBack->setEnabled( curZ > minZ );
+
+  QAction *chosen = menu.exec( globalPos );
+  if ( !chosen )
+    return;
+
+  int newZ = curZ;
+  if ( chosen == toFront )
+    newZ = maxZ + 1;
+  else if ( chosen == toBack )
+    newZ = minZ - 1;
+  else if ( chosen == forward )
+    newZ = nextHigher + 1;
+  else if ( chosen == backward )
+    newZ = nextLower - 1;
+  if ( newZ == curZ )
+    return;
+
+  target->setZIndex( newZ );
+  mLayer->triggerRepaint();
+  // If the right-clicked item is the one currently being edited, keep
+  // history in sync.
+  if ( itemId == mItemId )
+    pushState();
 }
