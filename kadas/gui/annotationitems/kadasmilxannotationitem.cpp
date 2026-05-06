@@ -55,6 +55,25 @@ QgsRectangle KadasMilxAnnotationItem::boundingBox() const
   return bbox;
 }
 
+Qgis::AnnotationItemFlags KadasMilxAnnotationItem::flags() const
+{
+  // The symbol is a fixed-screen-pixel bitmap painted around mPoints[0]
+  // with libmss-computed offsets, plus optional leader/attribute points
+  // far outside the mPoints extent — the rendered footprint is scale-
+  // dependent and not captured by the raw mPoints bounding box.
+  //
+  // Marking the item ScaleDependentBoundingBox makes
+  // `QgsAnnotationLayer::addItem` route us to `mNonIndexedItems` instead
+  // of the spatial index. That matters because the layer indexes items
+  // *at addItem time*: the create-mode tool inserts a fresh, empty MILX
+  // item (no mPoints yet, bbox() == empty rect), then mutates it as the
+  // user clicks. The spatial index still holds the original empty bbox,
+  // so `queryIndex(extent)` never returns the item and the renderer
+  // never paints it. Non-indexed items are always added to the cull
+  // candidate set, sidestepping this entirely.
+  return Qgis::AnnotationItemFlag::ScaleDependentBoundingBox;
+}
+
 void KadasMilxAnnotationItem::render( QgsRenderContext &context, QgsFeedback *feedback )
 {
   Q_UNUSED( feedback )
