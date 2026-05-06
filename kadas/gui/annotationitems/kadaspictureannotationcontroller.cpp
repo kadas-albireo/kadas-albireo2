@@ -76,22 +76,37 @@ namespace
    * clicks on the visible picture fall through to the anchor-handle
    * path and the user can never grab the frame body.
    */
+  /// Returns the picture's geographic anchor in item-CRS coordinates.
+  /// This is what the renderer uses to place the rect — the callout
+  /// anchor geometry, NOT bounds.center. Falls back to bounds.center
+  /// only if calloutAnchor is empty (defensive — startPart sets both).
+  QgsPointXY pictureAnchorItem( const QgsAnnotationPictureItem *pic )
+  {
+    const QgsGeometry g = pic->calloutAnchor();
+    if ( !g.isEmpty() )
+    {
+      const QPointF p = g.asQPointF();
+      return QgsPointXY( p.x(), p.y() );
+    }
+    return pic->bounds().center();
+  }
+
   QRectF frameScreenRect( const QgsAnnotationPictureItem *pic, const QgsMapSettings &ms, const QgsCoordinateTransform &xform )
   {
     if ( pic->placementMode() != Qgis::AnnotationPlacementMode::FixedSize )
       return QRectF();
-    const QgsPointXY itemCenter = pic->bounds().center();
-    QgsPointXY mapCenter = itemCenter;
+    const QgsPointXY itemAnchor = pictureAnchorItem( pic );
+    QgsPointXY mapAnchor = itemAnchor;
     try
     {
       if ( xform.isValid() )
-        mapCenter = xform.transform( itemCenter );
+        mapAnchor = xform.transform( itemAnchor );
     }
     catch ( const QgsCsException & )
     {
       return QRectF();
     }
-    const QPointF anchorPx = ms.mapToPixel().transform( mapCenter ).toQPointF();
+    const QPointF anchorPx = ms.mapToPixel().transform( mapAnchor ).toQPointF();
     const QSizeF off = pic->offsetFromCallout();
     const QSizeF size = pic->fixedSize();
     return QRectF( anchorPx.x() + off.width(), anchorPx.y() + off.height(), size.width(), size.height() );
@@ -184,9 +199,9 @@ QgsAnnotationItem *KadasPictureAnnotationController::createItem() const
 
 QList<KadasNode> KadasPictureAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
 {
-  // Single edit handle = the geographic anchor (bounds center).
-  const QgsRectangle b = asPicture( item )->bounds();
-  return { { toMapPos( QgsPointXY( b.center().x(), b.center().y() ), ctx ) } };
+  // Single edit handle = the geographic anchor (the callout anchor,
+  // which is what the renderer uses to position the picture).
+  return { { toMapPos( pictureAnchorItem( asPicture( item ) ), ctx ) } };
 }
 
 bool KadasPictureAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
@@ -249,8 +264,7 @@ QgsPointXY KadasPictureAnnotationController::positionFromDrawAttribs( const QgsA
 KadasEditContext KadasPictureAnnotationController::getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
 {
   const QgsAnnotationPictureItem *pic = asPicture( item );
-  const QgsRectangle b = pic->bounds();
-  const QgsPointXY anchorMap = toMapPos( QgsPointXY( b.center().x(), b.center().y() ), ctx );
+  const QgsPointXY anchorMap = toMapPos( pictureAnchorItem( pic ), ctx );
 
   // Frame body wins over the anchor handle. Rationale: when the balloon
   // is collapsed (offset 0) the anchor and the frame center share a
@@ -290,11 +304,12 @@ void KadasPictureAnnotationController::edit( QgsAnnotationItem *item, const Kada
     // wedge of the balloon callout grows out from the anchor toward the
     // new frame position.
     const QgsCoordinateTransform xform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
-    QgsPointXY anchorMap = pic->bounds().center();
+    const QgsPointXY itemAnchor = pictureAnchorItem( pic );
+    QgsPointXY anchorMap = itemAnchor;
     try
     {
       if ( xform.isValid() )
-        anchorMap = xform.transform( pic->bounds().center() );
+        anchorMap = xform.transform( itemAnchor );
     }
     catch ( const QgsCsException & )
     {
