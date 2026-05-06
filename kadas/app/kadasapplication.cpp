@@ -410,9 +410,9 @@ void KadasApplication::init()
 
   // Register plugin layers
   mKadasPluginLayerTypes.append( new KadasItemLayerType() );
-  mKadasPluginLayerTypes.append( new KadasBullseyeLayerType( mMainWindow->actionBullseye() ) );
-  // KadasGuideGridLayer is now a QgsAnnotationLayer subclass, not a plugin
-  // layer, so it does not need to be registered here.
+  // KadasBullseyeLayer and KadasGuideGridLayer are now QgsAnnotationLayer
+  // subclasses, not plugin layers, so they do not need to be registered
+  // here.
   mKadasPluginLayerTypes.append( new KadasMapGridLayerType( mMainWindow->actionMapGrid() ) );
 
   for ( QgsPluginLayerType *layerType : mKadasPluginLayerTypes )

@@ -17,24 +17,38 @@
 #ifndef KADASBULLSEYELAYER_H
 #define KADASBULLSEYELAYER_H
 
-#include <qgis/qgspluginlayer.h>
-#include <qgis/qgspluginlayerregistry.h>
-
-#include "kadas/core/kadaspluginlayer.h"
+#include <qgis/qgsannotationlayer.h>
 
 class QgsMapCanvas;
 class QgsLayerTreeView;
 
-class KadasBullseyeLayer : public KadasPluginLayer
+/**
+ * Bullseye layer: concentric range rings + bearing axes around a center
+ * point.
+ *
+ * Implemented as a `QgsAnnotationLayer` subclass:
+ *
+ * - Configuration is stored at the layer level (as a `<KadasBullseye>`
+ *   child element on the layer node, on top of the stock annotation
+ *   layer XML).
+ * - The visual is also materialized as plain `QgsAnnotationLineItem` +
+ *   `QgsAnnotationPointTextItem` items so vanilla QGIS can render the
+ *   layer natively without any Kadas code.
+ * - Inside Kadas, `createMapRenderer()` returns the existing custom
+ *   QPainter renderer so the visual stays pixel-identical to the old
+ *   plugin-layer behavior (geodesic ring sampling, axis rendering with
+ *   ~100 km segments, label placement, etc.). The static items emitted
+ *   by `regenerate()` are ignored at paint time inside Kadas.
+ */
+class KadasBullseyeLayer : public QgsAnnotationLayer
 {
     Q_OBJECT
   public:
     static QString layerType() { return "bullseye"; }
 
-    KadasBullseyeLayer( const QString &name );
+    explicit KadasBullseyeLayer( const QString &name );
     void setup( const QgsPointXY &center, const QgsCoordinateReferenceSystem &crs, int rings, double interval, Qgis::DistanceUnit intervalUnit, double axesInterval );
 
-    QString layerTypeKey() const override { return layerType(); }
     KadasBullseyeLayer *clone() const override;
     QgsMapLayerRenderer *createMapRenderer( QgsRenderContext &rendererContext ) override;
     QgsRectangle extent() const override;
@@ -53,12 +67,36 @@ class KadasBullseyeLayer : public KadasPluginLayer
     int lineWidth() const { return mBullseyeConfig.lineWidth; }
 
   public slots:
-    void setColor( const QColor &color ) { mBullseyeConfig.color = color; }
-    void setFontSize( int fontSize ) { mBullseyeConfig.fontSize = fontSize; }
-    void setLabelAxes( bool labelAxes ) { mBullseyeConfig.labelAxes = labelAxes; }
-    void setLabelQuadrants( bool labelQuadrants ) { mBullseyeConfig.labelQuadrants = labelQuadrants; }
-    void setLabelRings( bool labelRings ) { mBullseyeConfig.labelRings = labelRings; }
-    void setLineWidth( int lineWidth ) { mBullseyeConfig.lineWidth = lineWidth; }
+    void setColor( const QColor &color )
+    {
+      mBullseyeConfig.color = color;
+      regenerate();
+    }
+    void setFontSize( int fontSize )
+    {
+      mBullseyeConfig.fontSize = fontSize;
+      regenerate();
+    }
+    void setLabelAxes( bool labelAxes )
+    {
+      mBullseyeConfig.labelAxes = labelAxes;
+      regenerate();
+    }
+    void setLabelQuadrants( bool labelQuadrants )
+    {
+      mBullseyeConfig.labelQuadrants = labelQuadrants;
+      regenerate();
+    }
+    void setLabelRings( bool labelRings )
+    {
+      mBullseyeConfig.labelRings = labelRings;
+      regenerate();
+    }
+    void setLineWidth( int lineWidth )
+    {
+      mBullseyeConfig.lineWidth = lineWidth;
+      regenerate();
+    }
 
   protected:
     bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
@@ -81,23 +119,10 @@ class KadasBullseyeLayer : public KadasPluginLayer
         bool labelRings = false;
         int lineWidth = 1;
     } mBullseyeConfig;
-};
 
-class KadasBullseyeLayerType : public KadasPluginLayerType
-{
-    Q_OBJECT
-
-  public:
-    KadasBullseyeLayerType( QAction *actionBullseyeTool )
-      : KadasPluginLayerType( KadasBullseyeLayer::layerType() )
-      , mActionBullseyeTool( actionBullseyeTool )
-    {}
-    void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const override;
-    QgsPluginLayer *createLayer() override { return new KadasBullseyeLayer( "" ); }
-    QgsPluginLayer *createLayer( const QString &uri ) override SIP_FACTORY { return new KadasBullseyeLayer( "" ); }
-
-  private:
-    QAction *mActionBullseyeTool;
+    /// Rebuild the layer's annotation items (rings + axes + labels) from
+    /// the current BullseyeConfig.
+    void regenerate();
 };
 
 #endif // KADASBULLSEYELAYER_H
