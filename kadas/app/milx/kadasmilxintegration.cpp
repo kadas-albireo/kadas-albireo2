@@ -20,8 +20,10 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QPlainTextEdit>
+#include <QPointer>
 #include <QSlider>
 #include <QTabWidget>
+#include <QToolButton>
 #include <quazip/quazipfile.h>
 
 #include <qgis/qgsannotationlayer.h>
@@ -149,54 +151,112 @@ void KadasMilxIntegration::createMilx( bool active )
   if ( !layer )
     return;
 
-  // Show the MILX library picker. The map tool is only created (and the
-  // canvas activated for drawing) once the user has selected a symbol —
-  // until then there is no `mssString` on the next item, and the
-  // controller's `startPart` would refuse to start drawing.
-  // Disconnect any previous one-shot wiring first to avoid stale captures
-  // outliving the previous activation.
-  disconnect( mMilxLibrary, &KadasMilxLibrary::symbolSelected, this, nullptr );
-
-  connect( mMilxLibrary, &KadasMilxLibrary::symbolSelected, this, [this, canvas, controller, layer]( const KadasMilxSymbolDesc &desc ) {
-    disconnect( mMilxLibrary, &KadasMilxLibrary::symbolSelected, this, nullptr );
-    if ( desc.symbolXml.isEmpty() )
+  // Build the create-mode tool. The factory starts out producing items
+  // with an empty MSS string; the controller's startPart refuses to draw
+  // until a symbol is picked, so canvas clicks before selection are
+  // harmless. Selecting a symbol later re-arms the factory and seeds the
+  // current in-progress item.
+  auto pickedDesc = std::make_shared<KadasMilxSymbolDesc>();
+  KadasMapToolEditAnnotationItem *tool = new KadasMapToolEditAnnotationItem( canvas, controller, layer );
+  tool->setMultipart( false );
+  tool->setAction( mUi.mActionMilx );
+  tool->setItemFactory( [pickedDesc]() -> QgsAnnotationItem * {
+    auto *item = new KadasMilxAnnotationItem();
+    if ( !pickedDesc->symbolXml.isEmpty() )
     {
-      // User dismissed the picker without choosing — release the toolbar action.
-      if ( mUi.mActionMilx->isChecked() )
-        mUi.mActionMilx->setChecked( false );
-      return;
+      item->setMssString( pickedDesc->symbolXml );
+      item->setMilitaryName( pickedDesc->militaryName );
+      item->setSymbolType( pickedDesc->symbolType );
+      item->setMinNumPoints( pickedDesc->minNumPoints );
+      item->setHasVariablePoints( pickedDesc->hasVariablePoints );
     }
-
-    KadasMapToolEditAnnotationItem *tool = new KadasMapToolEditAnnotationItem( canvas, controller, layer );
-    tool->setMultipart( false );
-    tool->setAction( mUi.mActionMilx );
-    tool->setItemFactory( [desc]() -> QgsAnnotationItem * {
-      auto *item = new KadasMilxAnnotationItem();
-      item->setMssString( desc.symbolXml );
-      item->setMilitaryName( desc.militaryName );
-      item->setSymbolType( desc.symbolType );
-      item->setMinNumPoints( desc.minNumPoints );
-      item->setHasVariablePoints( desc.hasVariablePoints );
-      return item;
-    } );
-
-    kApp->mainWindow()->layerTreeView()->setCurrentLayer( layer );
-    kApp->mainWindow()->layerTreeView()->setLayerVisible( layer, true );
-    canvas->setMapTool( tool );
+    return item;
   } );
 
-  // Anchor the popup near the toolbar action and show it.
-  const int width = 480;
-  const int height = 320;
-  QPoint anchor = QCursor::pos();
-  if ( QWidget *toolbar = qobject_cast<QWidget *>( mUi.mActionMilx->parent() ) )
-  {
-    anchor = toolbar->mapToGlobal( QPoint( toolbar->width() / 2, toolbar->height() ) );
-  }
-  mMilxLibrary->resize( width, height );
-  mMilxLibrary->move( anchor.x() - width / 2, anchor.y() );
-  mMilxLibrary->show();
-  mMilxLibrary->focusFilter();
+  // "Symbol: [Select...]" button hosted in the editor's bottom bar (the
+  // visual position the legacy KadasMilxEditor used). Clicking it pops
+  // the library up above the button. Once a symbol is picked, the icon
+  // updates and the next canvas click starts drawing.
+  QToolButton *symbolButton = new QToolButton();
+  symbolButton->setText( tr( "Select symbol..." ) );
+  symbolButton->setToolTip( tr( "Select MSS symbol" ) );
+  symbolButton->setIconSize( QSize( 32, 32 ) );
+  symbolButton->setCheckable( true );
+  symbolButton->setFixedHeight( 35 );
+  tool->setExtraTopWidget( symbolButton );
+
+  QPointer<KadasMapToolEditAnnotationItem> toolPtr( tool );
+  QPointer<QToolButton> buttonPtr( symbolButton );
+
+  // Clean any prior one-shot wiring on the shared library. A new tool /
+  // button gets fresh connections; the old captures stop firing as soon
+  // as their tool deactivates and the QPointer goes null.
+  disconnect( mMilxLibrary, &KadasMilxLibrary::symbolSelected, this, nullptr );
+  disconnect( mMilxLibrary, &KadasMilxLibrary::visibilityChanged, this, nullptr );
+
+  connect( symbolButton, &QToolButton::clicked, this, [this, buttonPtr]( bool checked ) {
+    if ( !buttonPtr )
+      return;
+    if ( checked )
+    {
+      const int width = 320;
+      const int height = 320;
+      const QPoint anchor = buttonPtr->mapToGlobal( QPoint( buttonPtr->width() / 2, 0 ) );
+      mMilxLibrary->resize( width, height );
+      mMilxLibrary->move( anchor.x() - width / 2, anchor.y() - height );
+      mMilxLibrary->show();
+      mMilxLibrary->focusFilter();
+    }
+    else
+    {
+      mMilxLibrary->hide();
+    }
+  } );
+
+  connect( mMilxLibrary, &KadasMilxLibrary::visibilityChanged, this, [buttonPtr]( bool visible ) {
+    if ( buttonPtr && buttonPtr->isChecked() != visible )
+      buttonPtr->setChecked( visible );
+  } );
+
+  connect( mMilxLibrary, &KadasMilxLibrary::symbolSelected, this, [pickedDesc, toolPtr, buttonPtr]( const KadasMilxSymbolDesc &desc ) {
+    *pickedDesc = desc;
+    if ( buttonPtr )
+    {
+      if ( !desc.symbolXml.isEmpty() )
+      {
+        buttonPtr->setIcon( QIcon( QPixmap::fromImage( desc.icon ) ) );
+        buttonPtr->setText( QString() );
+      }
+      else
+      {
+        buttonPtr->setIcon( QIcon() );
+        buttonPtr->setText( QObject::tr( "Select symbol..." ) );
+      }
+    }
+    if ( !toolPtr )
+      return;
+    // Seed the in-progress (still-empty) item with the chosen symbol so
+    // the very next canvas click starts drawing it.
+    if ( auto *item = toolPtr->currentItem() )
+    {
+      if ( item->type() == KadasMilxAnnotationItem::itemTypeId() )
+      {
+        auto *milx = static_cast<KadasMilxAnnotationItem *>( item );
+        if ( milx->points().isEmpty() )
+        {
+          milx->setMssString( desc.symbolXml );
+          milx->setMilitaryName( desc.militaryName );
+          milx->setSymbolType( desc.symbolType );
+          milx->setMinNumPoints( desc.minNumPoints );
+          milx->setHasVariablePoints( desc.hasVariablePoints );
+        }
+      }
+    }
+  } );
+
+  kApp->mainWindow()->layerTreeView()->setCurrentLayer( layer );
+  kApp->mainWindow()->layerTreeView()->setLayerVisible( layer, true );
+  canvas->setMapTool( tool );
 }
 
 void KadasMilxIntegration::readProjectSettings()

@@ -202,6 +202,14 @@ void KadasMapToolEditAnnotationItem::activate()
   connect( closeButton, &QPushButton::clicked, this, [this] { canvas()->unsetMapTool( this ); } );
   topRow->addWidget( closeButton );
 
+  if ( mExtraTopWidget )
+  {
+    // Embed the integration-supplied widget (e.g. MilX symbol picker
+    // button) into the editor row so it is visually part of the editor,
+    // not a free-floating popup over the map.
+    topRow->insertWidget( 1, mExtraTopWidget );
+  }
+
   setupStyleEditor( outer );
 
   mHandles = new HandlesOverlay( canvas(), [this]() -> QList<KadasNode> {
