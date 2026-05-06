@@ -78,6 +78,19 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     void setItemFactory( std::function<QgsAnnotationItem *()> factory ) { mItemFactory = std::move( factory ); }
 
     /**
+     * Inserts a custom widget into the tool's bottom-bar top row, alongside
+     * the undo / redo / close buttons. Must be called before \c activate();
+     * ownership transfers to the bar created at activation. Used by per-item
+     * integrations that need a dedicated control (e.g. the MilX symbol
+     * picker button) embedded in the editor instead of floating over the
+     * map.
+     */
+    void setExtraTopWidget( QWidget *widget ) { mExtraTopWidget = widget; }
+
+    //! The annotation item the tool is currently driving (may be null).
+    QgsAnnotationItem *currentItem() const { return mItem; }
+
+    /**
      * Create-mode: drives the create state machine with an explicit point,
      * as if the user had left-clicked at \a pos. No-op in pure edit mode.
      */
@@ -108,6 +121,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     bool mMultipart = false;
     DrawState mDrawState = DrawState::Finished;
     std::function<QgsAnnotationItem *()> mItemFactory;
+    QPointer<QWidget> mExtraTopWidget;
 
     KadasEditContext mEditContext;
     QgsVector mMoveOffset;
