@@ -278,16 +278,25 @@ void KadasPointItem::readXmlPrivate( const QDomElement &element )
       mEditor = props.value( "editor" ).toString();
       mIconSize = props.value( "iconSize" ).toInt();
 
-      QStringList brushStr = props.value( "iconFill" ).toString().split( ";" );
-      if ( brushStr.size() )
+      // Legacy KadasGeometryItem serialised both `outline`/`fill` (used for
+      // line/polygon strokes) and `iconOutline`/`iconFill` (used for the
+      // inner point dot). The redlining editor wrote them with the same
+      // colours, so prefer iconOutline/iconFill (matches the dot the user
+      // saw) but fall back to outline/fill for older payloads where only
+      // the geometry-level Q_PROPERTYs were present.
+      const QString iconFillStr = props.value( "iconFill" ).toString();
+      const QString fillStr = !iconFillStr.isEmpty() ? iconFillStr : props.value( "fill" ).toString();
+      const QStringList brushStr = fillStr.split( ";" );
+      if ( !brushStr.isEmpty() && QColor::isValidColorName( brushStr[0] ) )
         mFillColor = QColor( brushStr[0] );
 
-      QStringList penStr = props.value( "iconOutline" ).toString().split( ";" );
-      if ( penStr.size() > 1 )
-      {
+      const QString iconOutlineStr = props.value( "iconOutline" ).toString();
+      const QString outlineStr = !iconOutlineStr.isEmpty() ? iconOutlineStr : props.value( "outline" ).toString();
+      const QStringList penStr = outlineStr.split( ";" );
+      if ( !penStr.isEmpty() && QColor::isValidColorName( penStr[0] ) )
         mStrokeColor = QColor( penStr[0] );
+      if ( penStr.size() > 1 )
         mStrokeWidth = penStr[1].toInt();
-      }
 
       // this must be done at the end
       const int iconType = props.value( "iconType" ).toInt( 1 );
@@ -318,10 +327,12 @@ void KadasPointItem::readXmlPrivate( const QDomElement &element )
           mShape = Qgis::MarkerShape::Circle;
           break;
       }
-      // Legacy iconType 3 (BOX), 4 (CIRCLE), 6 (TRIANGLE) were outlined-only shapes;
-      // 5 (FULL_BOX) and 7 (FULL_TRIANGLE) were filled. Preserve that distinction
-      // by clearing the fill for outlined variants (cross/x have no fill anyway).
-      if ( iconType == 3 || iconType == 4 || iconType == 6 )
+      // Legacy ICON_BOX (3) and ICON_TRIANGLE (6) painted only outline
+      // strokes (drawLine x N), so they had no fill. Preserve that by
+      // clearing the fill for those shapes. ICON_CIRCLE (4) and
+      // ICON_FULL_BOX (5) / ICON_FULL_TRIANGLE (7) used drawEllipse /
+      // drawRect / drawPolygon which fill+stroke; keep their fill.
+      if ( iconType == 3 || iconType == 6 )
       {
         mFillColor = QColor( Qt::transparent );
       }
