@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QAction>
+#include <QCursor>
 #include <QDialog>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -136,6 +137,7 @@ void KadasMilxIntegration::createMilx( bool active )
   {
     if ( canvas->mapTool() && canvas->mapTool()->action() == mUi.mActionMilx )
       canvas->unsetMapTool( canvas->mapTool() );
+    mMilxLibrary->hide();
     return;
   }
 
@@ -147,13 +149,54 @@ void KadasMilxIntegration::createMilx( bool active )
   if ( !layer )
     return;
 
-  KadasMapToolEditAnnotationItem *tool = new KadasMapToolEditAnnotationItem( canvas, controller, layer );
-  tool->setMultipart( false );
-  tool->setAction( mUi.mActionMilx );
+  // Show the MILX library picker. The map tool is only created (and the
+  // canvas activated for drawing) once the user has selected a symbol —
+  // until then there is no `mssString` on the next item, and the
+  // controller's `startPart` would refuse to start drawing.
+  // Disconnect any previous one-shot wiring first to avoid stale captures
+  // outliving the previous activation.
+  disconnect( mMilxLibrary, &KadasMilxLibrary::symbolSelected, this, nullptr );
 
-  kApp->mainWindow()->layerTreeView()->setCurrentLayer( layer );
-  kApp->mainWindow()->layerTreeView()->setLayerVisible( layer, true );
-  canvas->setMapTool( tool );
+  connect( mMilxLibrary, &KadasMilxLibrary::symbolSelected, this, [this, canvas, controller, layer]( const KadasMilxSymbolDesc &desc ) {
+    disconnect( mMilxLibrary, &KadasMilxLibrary::symbolSelected, this, nullptr );
+    if ( desc.symbolXml.isEmpty() )
+    {
+      // User dismissed the picker without choosing — release the toolbar action.
+      if ( mUi.mActionMilx->isChecked() )
+        mUi.mActionMilx->setChecked( false );
+      return;
+    }
+
+    KadasMapToolEditAnnotationItem *tool = new KadasMapToolEditAnnotationItem( canvas, controller, layer );
+    tool->setMultipart( false );
+    tool->setAction( mUi.mActionMilx );
+    tool->setItemFactory( [desc]() -> QgsAnnotationItem * {
+      auto *item = new KadasMilxAnnotationItem();
+      item->setMssString( desc.symbolXml );
+      item->setMilitaryName( desc.militaryName );
+      item->setSymbolType( desc.symbolType );
+      item->setMinNumPoints( desc.minNumPoints );
+      item->setHasVariablePoints( desc.hasVariablePoints );
+      return item;
+    } );
+
+    kApp->mainWindow()->layerTreeView()->setCurrentLayer( layer );
+    kApp->mainWindow()->layerTreeView()->setLayerVisible( layer, true );
+    canvas->setMapTool( tool );
+  } );
+
+  // Anchor the popup near the toolbar action and show it.
+  const int width = 480;
+  const int height = 320;
+  QPoint anchor = QCursor::pos();
+  if ( QWidget *toolbar = qobject_cast<QWidget *>( mUi.mActionMilx->parent() ) )
+  {
+    anchor = toolbar->mapToGlobal( QPoint( toolbar->width() / 2, toolbar->height() ) );
+  }
+  mMilxLibrary->resize( width, height );
+  mMilxLibrary->move( anchor.x() - width / 2, anchor.y() );
+  mMilxLibrary->show();
+  mMilxLibrary->focusFilter();
 }
 
 void KadasMilxIntegration::readProjectSettings()
