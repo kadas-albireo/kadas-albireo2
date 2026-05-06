@@ -49,7 +49,6 @@ your option) any later version. *
 
 
     const KadasMapItem *currentItem() const;
-    KadasMapItem *takeItem();
     const KadasMapItemEditor *currentEditor() const;
 
     void setMultipart( bool multipart );

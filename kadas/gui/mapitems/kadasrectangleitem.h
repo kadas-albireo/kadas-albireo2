@@ -79,7 +79,7 @@ class KADAS_GUI_EXPORT KadasRectangleItem : public KadasGeometryItem
       AttrY
     };
 
-    KadasMapItem *_clone() const override SIP_FACTORY { return new KadasRectangleItem( crs() ); }
+    KadasMapItem *_clone() const override SIP_FACTORY;
     QgsMultiPolygon *geometry();
     State *state() { return static_cast<State *>( mState ); }
 };

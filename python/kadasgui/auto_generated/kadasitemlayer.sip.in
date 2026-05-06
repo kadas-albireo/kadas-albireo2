@@ -123,11 +123,23 @@ class KadasItemLayer : KadasPluginLayer
       PICK_OBJECTIVE_TOOLTIP
     };
 
+    QgsAnnotationLayer *qgisAnnotationLayer( const QgsCoordinateReferenceSystem &crs ) const /Factory/;
+%Docstring
+The QGIS annotation layer will only contain items/annotations inheriting from :py:class:`QgsAnnotationItem`.
+%End
+
     static QString layerType();
     KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs );
     ~KadasItemLayer();
     virtual QString layerTypeKey() const;
     virtual bool acceptsItem( const KadasMapItem *item ) const;
+
+    void ensureDefault3DRenderer();
+%Docstring
+Lazily create and attach a default Kadas 3D renderer to this layer if it does not already have one.
+This avoids constructing a 3D renderer (and thereby pulling in QGIS::3D dependencies) for layers
+that are never used in a 3D scene. Safe to call multiple times.
+%End
 
     ItemId addItem( KadasMapItem *item /Transfer/ );
     void lowerItem( const ItemId &itemId );

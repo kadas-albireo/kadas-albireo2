@@ -42,7 +42,7 @@
 KadasMapItem *KadasPointItemInterface::createItem() const
 {
   QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasMapItem *item = new KadasPointItem( crs, KadasPointItem::IconType::ICON_CIRCLE );
+  KadasMapItem *item = new KadasPointItem( crs, Qgis::MarkerShape::Circle );
   item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
   return item;
 }
@@ -50,7 +50,7 @@ KadasMapItem *KadasPointItemInterface::createItem() const
 KadasMapItem *KadasSquareItemInterface::createItem() const
 {
   QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasMapItem *item = new KadasPointItem( crs, KadasPointItem::IconType::ICON_FULL_BOX );
+  KadasMapItem *item = new KadasPointItem( crs, Qgis::MarkerShape::Square );
   item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
   return item;
 };
@@ -58,7 +58,7 @@ KadasMapItem *KadasSquareItemInterface::createItem() const
 KadasMapItem *KadasTriangleItemInterface::createItem() const
 {
   QgsCoordinateReferenceSystem crs = kApp->mainWindow()->mapCanvas()->mapSettings().destinationCrs();
-  KadasMapItem *item = new KadasPointItem( crs, KadasPointItem::IconType::ICON_FULL_TRIANGLE );
+  KadasMapItem *item = new KadasPointItem( crs, Qgis::MarkerShape::Triangle );
   item->setEditor( KadasMapItemEditor::REDLINING_ITEM );
   return item;
 };
