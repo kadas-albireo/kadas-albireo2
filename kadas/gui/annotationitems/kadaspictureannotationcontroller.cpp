@@ -92,10 +92,14 @@ QgsAnnotationItem *KadasPictureAnnotationController::createItem() const
   item->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
   // Default offset so the picture sits visibly above its anchor; users can
   // adjust via the offset handle. Units are pixels, matching fixedSizeUnit.
-  item->setOffsetFromCallout( QSizeF( 0, -50 ) );
+  // The offset must be large enough that the balloon's wedge has room to
+  // form between the anchor point and the frame.
+  item->setOffsetFromCallout( QSizeF( 0, -120 ) );
   item->setOffsetFromCalloutUnit( Qgis::RenderUnit::Pixels );
-  // Auto-install a simple-line callout from the anchor to the picture.
-  item->setCallout( new QgsSimpleLineCallout() );
+  // Auto-install a balloon callout (cartoon speech-bubble) — the picture
+  // frame becomes the bubble body, with a wedge pointing back to the
+  // geographic anchor. Replicates the legacy KadasPictureItem look.
+  item->setCallout( new QgsBalloonCallout() );
   return item;
 }
 
