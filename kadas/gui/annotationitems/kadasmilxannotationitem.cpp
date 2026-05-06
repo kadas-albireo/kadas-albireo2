@@ -55,6 +55,27 @@ QgsRectangle KadasMilxAnnotationItem::boundingBox() const
   return bbox;
 }
 
+QgsRectangle KadasMilxAnnotationItem::boundingBox( QgsRenderContext &context ) const
+{
+  // mPoints are stored in EPSG:4326. The QgsAnnotationLayerRenderer
+  // intersects this rectangle against `context.extent()` (in destination
+  // CRS) to decide whether to render the item — without a transform the
+  // item is culled out of any non-WGS84 project. Project once into the
+  // destination CRS here.
+  if ( mPoints.isEmpty() )
+    return QgsRectangle();
+  const QgsCoordinateReferenceSystem itemCrs( QStringLiteral( "EPSG:4326" ) );
+  const QgsCoordinateTransform xform( itemCrs, context.coordinateTransform().destinationCrs(), context.transformContext() );
+  try
+  {
+    return xform.transformBoundingBox( boundingBox() );
+  }
+  catch ( const QgsCsException & )
+  {
+    return boundingBox();
+  }
+}
+
 void KadasMilxAnnotationItem::render( QgsRenderContext &context, QgsFeedback *feedback )
 {
   Q_UNUSED( feedback )
