@@ -93,7 +93,9 @@ KadasAnnotationItemContext TestKadasAnnotationShadows::makeContext()
   ms.setExtent( QgsRectangle( -1000, -1000, 1000, 1000 ) );
   ms.setOutputSize( QSize( 1000, 1000 ) );
   ms.setOutputDpi( 96 );
-  return KadasAnnotationItemContext( crs, ms );
+  static QgsAnnotationLayer sLayer( QStringLiteral( "test" ), QgsAnnotationLayer::LayerOptions( QgsCoordinateTransformContext() ) );
+  sLayer.setCrs( crs );
+  return KadasAnnotationItemContext( &sLayer, ms );
 }
 
 

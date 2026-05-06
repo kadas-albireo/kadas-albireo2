@@ -17,12 +17,11 @@
 #ifndef KADASANNOTATIONITEMCONTEXT_H
 #define KADASANNOTATIONITEMCONTEXT_H
 
+#include <qgis/qgsannotationlayer.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgsmapsettings.h>
 
 #include "kadas/gui/kadas_gui.h"
-
-class QgsMapLayer;
 
 /**
  * \ingroup gui
@@ -30,34 +29,33 @@ class QgsMapLayer;
  *        needs for map-space ↔ item-space transforms.
  *
  * A \c QgsAnnotationItem stores its geometry in the CRS of the
- * \c QgsAnnotationLayer it belongs to (or in the layer's CRS once added).
- * Map tools in turn work in the map canvas CRS.  Controllers therefore need
- * both pieces of information to project geometry between the two; this
- * lightweight struct passes them together.
+ * \c QgsAnnotationLayer it belongs to.  Map tools in turn work in the map
+ * canvas CRS.  Controllers therefore need both pieces of information to
+ * project geometry between the two; this lightweight struct passes them
+ * together.  Aligns with QGIS's own annotation tooling, where the layer is
+ * the single source of truth for the item CRS.
  */
 class KADAS_GUI_EXPORT KadasAnnotationItemContext
 {
   public:
     KadasAnnotationItemContext() = default;
-    KadasAnnotationItemContext( const QgsCoordinateReferenceSystem &itemCrs, const QgsMapSettings &mapSettings, QgsMapLayer *layer = nullptr )
-      : mItemCrs( itemCrs )
+    KadasAnnotationItemContext( QgsAnnotationLayer *layer, const QgsMapSettings &mapSettings )
+      : mLayer( layer )
       , mMapSettings( mapSettings )
-      , mLayer( layer )
     {}
 
-    //! CRS of the item (i.e. the parent annotation layer's CRS).
-    const QgsCoordinateReferenceSystem &itemCrs() const { return mItemCrs; }
+    //! Owning annotation layer.
+    QgsAnnotationLayer *layer() const { return mLayer; }
 
     //! Map canvas settings; \c destinationCrs() is the map CRS.
     const QgsMapSettings &mapSettings() const { return mMapSettings; }
 
-    //! Owning annotation layer, or \c nullptr if not known.
-    QgsMapLayer *layer() const { return mLayer; }
+    //! CRS of the item, i.e. the parent annotation layer's CRS.
+    QgsCoordinateReferenceSystem itemCrs() const { return mLayer ? mLayer->crs() : QgsCoordinateReferenceSystem(); }
 
   private:
-    QgsCoordinateReferenceSystem mItemCrs;
+    QgsAnnotationLayer *mLayer = nullptr;
     QgsMapSettings mMapSettings;
-    QgsMapLayer *mLayer = nullptr;
 };
 
 #endif // KADASANNOTATIONITEMCONTEXT_H
