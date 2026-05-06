@@ -46,6 +46,15 @@ class KadasBullseyeLayer : public QgsAnnotationLayer
   public:
     static QString layerType() { return "bullseye"; }
 
+    /// Convert a plain QgsAnnotationLayer (one carrying the
+    /// `kadas/annotation-type=bullseye` marker customProperty, e.g. as
+    /// produced by a vanilla QGIS reload of a Kadas project) into a
+    /// KadasBullseyeLayer. The new layer keeps the same name, id, CRS,
+    /// opacity, customProperties and annotation items as the source.
+    /// Caller is responsible for swapping the plain layer with the
+    /// returned subclass instance in the project.
+    static KadasBullseyeLayer *promote( QgsAnnotationLayer *plain );
+
     explicit KadasBullseyeLayer( const QString &name );
     void setup( const QgsPointXY &center, const QgsCoordinateReferenceSystem &crs, int rings, double interval, Qgis::DistanceUnit intervalUnit, double axesInterval );
 

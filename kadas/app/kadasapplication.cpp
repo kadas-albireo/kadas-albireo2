@@ -357,6 +357,7 @@ void KadasApplication::init()
   connect( QgsProject::instance(), &QgsProject::dirtySet, this, &KadasApplication::projectDirtySet );
   connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasApplication::updateWindowTitle );
   connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasApplication::restoreAttributeTables );
+  connect( QgsProject::instance(), &QgsProject::readProject, this, &KadasApplication::promoteAnnotationLayers );
   connect( QgsProject::instance(), &QgsProject::projectSaved, this, &KadasApplication::updateWindowTitle );
   // Unset any active tool before writing project to ensure that any pending edits are committed
   connect( QgsProject::instance(), &QgsProject::writeProject, this, &KadasApplication::unsetMapToolOnSave );
@@ -1041,6 +1042,58 @@ void KadasApplication::restoreAttributeTables( const QDomDocument &doc )
   {
     const QDomElement attributeTableElement = attributeTableNodes.at( i ).toElement();
     KadasAttributeTableDialog::createFromXml( attributeTableElement, mMainWindow->mapCanvas(), mMainWindow->messageBar(), mMainWindow );
+  }
+}
+
+void KadasApplication::promoteAnnotationLayers()
+{
+  // Annotation layers are always serialized as plain QgsAnnotationLayer
+  // (type="annotation"); QGIS has no factory registry for subclasses.
+  // After load, walk the project and rebuild Kadas subclass instances
+  // from the `kadas/annotation-type` customProperty marker so that the
+  // layer-tree right-click "Edit" hook and the custom QPainter
+  // renderers work as before.
+  QList<QPair<QgsAnnotationLayer *, QgsAnnotationLayer *>> swaps; // <plain, promoted>
+  const QMap<QString, QgsMapLayer *> layers = QgsProject::instance()->mapLayers();
+  for ( QgsMapLayer *layer : layers )
+  {
+    auto *plain = qobject_cast<QgsAnnotationLayer *>( layer );
+    if ( !plain )
+      continue;
+    // Skip layers that are already a Kadas subclass.
+    if ( qobject_cast<KadasBullseyeLayer *>( plain ) || qobject_cast<KadasGuideGridLayer *>( plain ) )
+      continue;
+    const QString kadasType = plain->customProperty( QStringLiteral( "kadas/annotation-type" ) ).toString();
+    QgsAnnotationLayer *promoted = nullptr;
+    if ( kadasType == QLatin1String( "bullseye" ) )
+      promoted = KadasBullseyeLayer::promote( plain );
+    else if ( kadasType == QLatin1String( "guidegrid" ) )
+      promoted = KadasGuideGridLayer::promote( plain );
+    if ( promoted )
+      swaps.append( qMakePair( plain, promoted ) );
+  }
+
+  for ( const auto &swap : swaps )
+  {
+    QgsAnnotationLayer *plain = swap.first;
+    QgsAnnotationLayer *promoted = swap.second;
+    const QString id = plain->id();
+    QgsLayerTreeLayer *node = QgsProject::instance()->layerTreeRoot()->findLayer( id );
+    QgsLayerTreeGroup *parentGroup = node ? qobject_cast<QgsLayerTreeGroup *>( node->parent() ) : nullptr;
+    const int row = ( parentGroup && node ) ? parentGroup->children().indexOf( node ) : -1;
+    const bool visible = node ? node->isVisible() : true;
+    const bool expanded = node ? node->isExpanded() : false;
+
+    // Drop the plain layer; QgsProject deletes it when not transferred back.
+    QgsProject::instance()->removeMapLayer( id );
+    promoted->setId( id ); // keep references in layer-tree, project files, etc.
+    QgsProject::instance()->addMapLayer( promoted, false );
+    if ( parentGroup )
+    {
+      QgsLayerTreeLayer *newNode = parentGroup->insertLayer( row, promoted );
+      newNode->setItemVisibilityChecked( visible );
+      newNode->setExpanded( expanded );
+    }
   }
 }
 

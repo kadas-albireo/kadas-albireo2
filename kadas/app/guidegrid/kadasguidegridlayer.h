@@ -57,6 +57,15 @@ class KadasGuideGridLayer : public QgsAnnotationLayer
 
     static QString layerType() { return "guide_grid"; }
 
+    /// Convert a plain QgsAnnotationLayer (one carrying the
+    /// `kadas/annotation-type=guidegrid` marker customProperty, e.g. as
+    /// produced by a vanilla QGIS reload of a Kadas project) into a
+    /// KadasGuideGridLayer. The new layer keeps the same name, id, CRS,
+    /// opacity, customProperties and annotation items as the source.
+    /// Caller is responsible for swapping the plain layer with the
+    /// returned subclass instance in the project.
+    static KadasGuideGridLayer *promote( QgsAnnotationLayer *plain );
+
     explicit KadasGuideGridLayer( const QString &name );
 
     void setup( const QgsRectangle &gridRect, int cols, int rows, const QgsCoordinateReferenceSystem &crs, bool colSizeLocked, bool rowSizeLocked );

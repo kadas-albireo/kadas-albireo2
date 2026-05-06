@@ -34,6 +34,7 @@
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmaplayerrenderer.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsreadwritecontext.h>
 #include <qgis/qgssymbollayerutils.h>
 #include <qgis/qgstextformat.h>
 #include <qgis/qgsunittypes.h>
@@ -224,6 +225,31 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
 KadasBullseyeLayer::KadasBullseyeLayer( const QString &name )
   : QgsAnnotationLayer( name, QgsAnnotationLayer::LayerOptions( transformContextForLayer() ) )
 {}
+
+KadasBullseyeLayer *KadasBullseyeLayer::promote( QgsAnnotationLayer *plain )
+{
+  if ( !plain )
+    return nullptr;
+
+  // Round-trip the plain layer's state through XML into a new subclass
+  // instance. Goes through readLayerXml, so customProperties + annotation
+  // items + CRS + opacity + name are preserved, and KadasBullseyeLayer's
+  // own readXml() override fills mBullseyeConfig from customProperties.
+  QDomDocument doc;
+  QDomElement layerEl = doc.createElement( QStringLiteral( "maplayer" ) );
+  doc.appendChild( layerEl );
+  QgsReadWriteContext ctx;
+  if ( !plain->writeLayerXml( layerEl, doc, ctx ) )
+    return nullptr;
+
+  auto *promoted = new KadasBullseyeLayer( plain->name() );
+  if ( !promoted->readLayerXml( layerEl, ctx ) )
+  {
+    delete promoted;
+    return nullptr;
+  }
+  return promoted;
+}
 
 void KadasBullseyeLayer::setup( const QgsPointXY &center, const QgsCoordinateReferenceSystem &crs, int rings, double interval, Qgis::DistanceUnit intervalUnit, double axesInterval )
 {
