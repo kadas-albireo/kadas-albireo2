@@ -33,6 +33,7 @@
 #include <qgis/qgsfillsymbollayer.h>
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgsmapsettings.h>
+#include <qgis/qgsrendercontext.h>
 #include <qgis/qgsmaptopixel.h>
 #include <qgis/qgsmargins.h>
 #include <qgis/qgspoint.h>
@@ -107,9 +108,19 @@ namespace
       return QRectF();
     }
     const QPointF anchorPx = ms.mapToPixel().transform( mapAnchor ).toQPointF();
-    const QSizeF off = pic->offsetFromCallout();
-    const QSizeF size = pic->fixedSize();
-    return QRectF( anchorPx.x() + off.width(), anchorPx.y() + off.height(), size.width(), size.height() );
+    // The renderer (qgsannotationrectitem.cpp ~line 99,113) converts
+    // both `fixedSize` and `offsetFromCallout` to painter units using
+    // the item's *unit* (Pixels, Millimeters, …). Migrated/legacy
+    // pictures often have these units set to Millimeters, so taking
+    // the raw values as pixels makes the hit-test rect appear in a
+    // completely different place than the visible image. Build a
+    // QgsRenderContext and run the same conversion the renderer does.
+    QgsRenderContext rc = QgsRenderContext::fromMapSettings( ms );
+    const double offW = rc.convertToPainterUnits( pic->offsetFromCallout().width(), pic->offsetFromCalloutUnit() );
+    const double offH = rc.convertToPainterUnits( pic->offsetFromCallout().height(), pic->offsetFromCalloutUnit() );
+    const double w = rc.convertToPainterUnits( pic->fixedSize().width(), pic->fixedSizeUnit() );
+    const double h = rc.convertToPainterUnits( pic->fixedSize().height(), pic->fixedSizeUnit() );
+    return QRectF( anchorPx.x() + offW, anchorPx.y() + offH, w, h );
   }
 
   /// The default offset used when placing a fresh picture: centers the
@@ -276,9 +287,9 @@ KadasEditContext KadasPictureAnnotationController::getEditContext( const QgsAnno
   // the balloon is already inflated.
   const QgsCoordinateTransform xform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
   const QRectF frameRect = frameScreenRect( pic, ctx.mapSettings(), xform );
+  const QPointF screenPos = ctx.mapSettings().mapToPixel().transform( pos ).toQPointF();
   if ( frameRect.isValid() )
   {
-    const QPointF screenPos = ctx.mapSettings().mapToPixel().transform( pos ).toQPointF();
     if ( frameRect.contains( screenPos ) )
     {
       // Returned `pos` field is the click in map coords so the edit-tool
@@ -319,8 +330,12 @@ void KadasPictureAnnotationController::edit( QgsAnnotationItem *item, const Kada
     const QPointF targetPx = ctx.mapSettings().mapToPixel().transform( newPoint ).toQPointF();
     // Top-left form: target should become the picture's CENTER, so the
     // top-left lives at target - size/2. offset = (top-left - anchor).
-    const QSizeF size = pic->fixedSize();
-    const QPointF topLeft = targetPx - QPointF( size.width() / 2.0, size.height() / 2.0 );
+    // Convert fixedSize through the item's own unit (renderer uses
+    // convertToPainterUnits) so the math is in pixels.
+    QgsRenderContext rc = QgsRenderContext::fromMapSettings( ctx.mapSettings() );
+    const double w = rc.convertToPainterUnits( pic->fixedSize().width(), pic->fixedSizeUnit() );
+    const double h = rc.convertToPainterUnits( pic->fixedSize().height(), pic->fixedSizeUnit() );
+    const QPointF topLeft = targetPx - QPointF( w / 2.0, h / 2.0 );
     const QPointF delta = topLeft - anchorPx;
     pic->setOffsetFromCallout( QSizeF( delta.x(), delta.y() ) );
     pic->setOffsetFromCalloutUnit( Qgis::RenderUnit::Pixels );
