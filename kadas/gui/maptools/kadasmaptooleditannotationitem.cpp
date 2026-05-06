@@ -207,7 +207,7 @@ void KadasMapToolEditAnnotationItem::activate()
   mHandles = new HandlesOverlay( canvas(), [this]() -> QList<KadasNode> {
     if ( !mItem || !mController || !mLayer )
       return {};
-    KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
+    KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
     return mController->nodes( mItem, ctx );
   } );
   connect( canvas(), &QgsMapCanvas::extentsChanged, this, [this] {
@@ -312,7 +312,7 @@ void KadasMapToolEditAnnotationItem::addPoint( const QgsPointXY &pos )
   if ( !mAllowCreate || !mItem || !mController || !mLayer )
     return;
 
-  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
+  KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
 
   switch ( mDrawState )
   {
@@ -362,7 +362,7 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
     return;
   }
 
-  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
+  KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
   const QgsPointXY pos = e->mapPoint();
 
   // While actively digitizing a part, skip vertex hit-testing entirely:
@@ -453,7 +453,7 @@ void KadasMapToolEditAnnotationItem::canvasDoubleClickEvent( QgsMapMouseEvent * 
 {
   if ( !mItem || !mController || !mLayer )
     return;
-  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
+  KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
   mController->onDoubleClick( mItem, ctx );
   mLayer->triggerRepaint();
 }
@@ -577,7 +577,7 @@ void KadasMapToolEditAnnotationItem::inputChanged()
   if ( !mEditContext.isValid() )
     return;
 
-  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
+  KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
   const KadasAttribValues values = collectAttributeValues();
 
   // Suppress the spurious move event triggered by adjustCursorAndExtent.
@@ -650,7 +650,7 @@ void KadasMapToolEditAnnotationItem::startPart( const QgsPointXY &pos )
 {
   if ( !mItem || !mController || !mLayer )
     return;
-  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
+  KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
   if ( !mController->startPart( mItem, pos, ctx ) )
   {
     finishPart();
@@ -698,7 +698,7 @@ QString KadasMapToolEditAnnotationItem::pickItemAt( const QgsPointXY &mapPos ) c
   // kept. Among those, prefer the smallest bbox area as a final
   // tiebreaker. If a candidate has no registered controller, fall back
   // to the bbox-only smallest-area heuristic for that candidate.
-  KadasAnnotationItemContext ctx( mLayer->crs(), canvas()->mapSettings(), mLayer );
+  KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
   QString best;
   double bestArea = std::numeric_limits<double>::infinity();
   QString fallback;

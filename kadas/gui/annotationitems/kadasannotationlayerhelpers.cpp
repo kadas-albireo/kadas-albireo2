@@ -137,7 +137,7 @@ void KadasAnnotationLayerHelpers::prepareLayerForSave( QgsAnnotationLayer *layer
   if ( !registry )
     return;
 
-  const KadasAnnotationItemContext ctx( layer->crs(), QgsMapSettings(), layer );
+  const KadasAnnotationItemContext ctx( layer, QgsMapSettings() );
 
   // Snapshot master ids/items first; addItem() during iteration would
   // mutate the underlying map.
