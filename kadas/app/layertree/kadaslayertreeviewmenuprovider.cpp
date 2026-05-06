@@ -28,6 +28,7 @@
 
 #include "kadas/core/kadaspluginlayer.h"
 #include "kadasapplication.h"
+#include "kadasbullseyelayer.h"
 #include "kadasguidegridlayer.h"
 #include "kadaslayerrefreshmanager.h"
 #include "kadaslayertreeviewmenuprovider.h"
@@ -91,6 +92,14 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
       else if ( qobject_cast<KadasGuideGridLayer *>( layer ) )
       {
         QAction *editAction = kApp->mainWindow()->actionGuideGrid();
+        if ( editAction )
+        {
+          menu->addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, [editAction] { editAction->trigger(); } );
+        }
+      }
+      else if ( qobject_cast<KadasBullseyeLayer *>( layer ) )
+      {
+        QAction *editAction = kApp->mainWindow()->actionBullseye();
         if ( editAction )
         {
           menu->addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, [editAction] { editAction->trigger(); } );
