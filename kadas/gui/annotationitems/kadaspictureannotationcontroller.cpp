@@ -66,11 +66,15 @@ namespace
 
   /**
    * Compute the picture's frame screen rectangle for the given map
-   * settings. Returns an invalid rect if the placement is not FixedSize
-   * or if the fixed size has no positive extent (during a fresh place
-   * where bounds are still degenerate the rect just collapses to a point
-   * around the anchor, which is fine — the anchor pick handles that
-   * case).
+   * settings. Returns an invalid rect if the placement is not FixedSize.
+   *
+   * IMPORTANT: QgsAnnotationRectItem interprets `offsetFromCallout` as
+   * the **top-left** of the picture relative to the anchor (see
+   * qgsannotationrectitem.cpp ~line 113:
+   *   painterBounds = QRectF( anchor + offset, fixedSize )
+   * ), NOT a center offset. The hit-test must match that geometry, or
+   * clicks on the visible picture fall through to the anchor-handle
+   * path and the user can never grab the frame body.
    */
   QRectF frameScreenRect( const QgsAnnotationPictureItem *pic, const QgsMapSettings &ms, const QgsCoordinateTransform &xform )
   {
@@ -90,8 +94,16 @@ namespace
     const QPointF anchorPx = ms.mapToPixel().transform( mapCenter ).toQPointF();
     const QSizeF off = pic->offsetFromCallout();
     const QSizeF size = pic->fixedSize();
-    const QPointF center = anchorPx + QPointF( off.width(), off.height() );
-    return QRectF( center.x() - size.width() / 2.0, center.y() - size.height() / 2.0, size.width(), size.height() );
+    return QRectF( anchorPx.x() + off.width(), anchorPx.y() + off.height(), size.width(), size.height() );
+  }
+
+  /// The default offset used when placing a fresh picture: centers the
+  /// picture rect onto its anchor (so the balloon wedge is invisible at
+  /// creation time). The legacy KadasPictureItem started in this state.
+  inline QSizeF defaultCenteredOffset( const QgsAnnotationPictureItem *pic )
+  {
+    const QSizeF size = pic->fixedSize();
+    return QSizeF( -size.width() / 2.0, -size.height() / 2.0 );
   }
 
   Qgis::PictureFormat formatFromPath( const QString &path )
@@ -138,15 +150,14 @@ QgsAnnotationItem *KadasPictureAnnotationController::createItem() const
   auto *item = new QgsAnnotationPictureItem( Qgis::PictureFormat::Unknown, QString(), QgsRectangle( 0, 0, 0, 0 ) );
   item->setZIndex( KadasAnnotationZIndex::Picture );
   item->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
+  // The picture starts centered on its anchor (offset = -size/2, top-left
+  // form). With the picture centered on the anchor the balloon wedge is
+  // invisible — the legacy KadasPictureItem look. Dragging the frame
+  // body shifts the offset off-center; once the anchor falls outside the
+  // picture rect, the wedge becomes visible.
   item->setFixedSize( QSizeF( 200, 150 ) );
   item->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
-  // The picture starts collapsed onto its anchor (offset 0) so the balloon
-  // wedge is invisible. Dragging the picture frame changes the offset
-  // (anchor stays put) which "inflates" the wedge — replicating the
-  // legacy KadasPictureItem speech-bubble UX. The anchor handle, the
-  // right-click "Reset balloon" action, and `setPosition()` all keep the
-  // offset alone or reset it explicitly.
-  item->setOffsetFromCallout( QSizeF( 0, 0 ) );
+  item->setOffsetFromCallout( QSizeF( -100, -75 ) );
   item->setOffsetFromCalloutUnit( Qgis::RenderUnit::Pixels );
   // Auto-install a balloon callout (cartoon speech-bubble) — the picture
   // frame becomes the bubble body, with a wedge pointing back to the
@@ -291,7 +302,11 @@ void KadasPictureAnnotationController::edit( QgsAnnotationItem *item, const Kada
     }
     const QPointF anchorPx = ctx.mapSettings().mapToPixel().transform( anchorMap ).toQPointF();
     const QPointF targetPx = ctx.mapSettings().mapToPixel().transform( newPoint ).toQPointF();
-    const QPointF delta = targetPx - anchorPx;
+    // Top-left form: target should become the picture's CENTER, so the
+    // top-left lives at target - size/2. offset = (top-left - anchor).
+    const QSizeF size = pic->fixedSize();
+    const QPointF topLeft = targetPx - QPointF( size.width() / 2.0, size.height() / 2.0 );
+    const QPointF delta = topLeft - anchorPx;
     pic->setOffsetFromCallout( QSizeF( delta.x(), delta.y() ) );
     pic->setOffsetFromCalloutUnit( Qgis::RenderUnit::Pixels );
     return;
@@ -364,17 +379,18 @@ void KadasPictureAnnotationController::populateContextMenu( QgsAnnotationItem *i
       layerPtr->triggerRepaint();
   } );
 
+  // Show "Reset balloon" only when the picture is actually offset off
+  // its centered-on-anchor position (i.e. the wedge is visible). The
+  // canonical "no balloon" state is offset = -size/2 (top-left form,
+  // picture centered on anchor), see createItem().
   const QSizeF off = pic->offsetFromCallout();
-  if ( off.width() == 0.0 && off.height() == 0.0 )
+  const QSizeF centered = defaultCenteredOffset( pic );
+  if ( qFuzzyCompare( off.width(), centered.width() ) && qFuzzyCompare( off.height(), centered.height() ) )
     return;
-  // The balloon is "inflated" — offer to collapse it back onto the
-  // anchor. Visually equivalent to "remove the speech bubble".
-  // Captures: the menu is modal and runs synchronously while the edit
-  // tool / annotation layer / item are guaranteed to outlive it (the
-  // tool that owns the menu also owns the lifetime of `pic`).
   QAction *resetAction = menu->addAction( QObject::tr( "Reset balloon" ) );
   QObject::connect( resetAction, &QAction::triggered, resetAction, [pic, layerPtr]() {
-    pic->setOffsetFromCallout( QSizeF( 0, 0 ) );
+    const QSizeF size = pic->fixedSize();
+    pic->setOffsetFromCallout( QSizeF( -size.width() / 2.0, -size.height() / 2.0 ) );
     if ( layerPtr )
       layerPtr->triggerRepaint();
   } );
