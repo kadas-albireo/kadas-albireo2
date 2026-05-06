@@ -53,7 +53,6 @@ class KADAS_GUI_EXPORT KadasMilxAnnotationItem : public QgsAnnotationItem
 
     QString type() const override;
     QgsRectangle boundingBox() const override;
-    QgsRectangle boundingBox( QgsRenderContext &context ) const override;
     void render( QgsRenderContext &context, QgsFeedback *feedback ) override;
     bool writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const override;
     bool readXml( const QDomElement &element, const QgsReadWriteContext &context ) override;
