@@ -257,13 +257,14 @@ KadasEditContext KadasPictureAnnotationController::getEditContext( const QgsAnno
     if ( frameRect.contains( screenPos ) )
     {
       // Returned `pos` field is the click in map coords so the edit-tool
-      // can compute mMoveOffset. The vidx part marks this as the frame
-      // body grab.
-      return KadasEditContext( QgsVertexId( 0, kPartFrame, 0 ), pos, KadasAttribDefs(), Qt::SizeAllCursor );
+      // can compute mMoveOffset. The vidx part slot marks this as the
+      // frame body grab (QgsVertexId ctor signature is (part, ring,
+      // vertex), so the discriminator must live in the first arg).
+      return KadasEditContext( QgsVertexId( kPartFrame, 0, 0 ), pos, KadasAttribDefs(), Qt::SizeAllCursor );
     }
   }
   if ( pos.sqrDist( anchorMap ) < pickTolSqr( ctx ) )
-    return KadasEditContext( QgsVertexId( 0, kPartAnchor, 0 ), anchorMap, drawAttribs() );
+    return KadasEditContext( QgsVertexId( kPartAnchor, 0, 0 ), anchorMap, drawAttribs() );
   return KadasEditContext();
 }
 
