@@ -104,6 +104,10 @@ class KadasBullseyeLayer : public QgsAnnotationLayer
 
   private:
     class Renderer;
+    /// Mirror mBullseyeConfig onto layer customProperties so the config
+    /// survives a round-trip through vanilla QGIS (which has no knowledge
+    /// of this subclass and would strip any custom child element).
+    void writeConfigToCustomProperties();
 
     struct BullseyeConfig
     {

@@ -260,9 +260,34 @@ QgsRectangle KadasBullseyeLayer::extent() const
 
 bool KadasBullseyeLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext &context )
 {
-  // Let the stock annotation layer load its own state (CRS, opacity, items).
+  // Let the stock annotation layer load its own state (CRS, opacity, items,
+  // *and* customProperties).
   QgsAnnotationLayer::readXml( layer_node, context );
 
+  // Preferred path: read config from layer customProperties. These survive a
+  // round-trip through vanilla QGIS (which has no knowledge of our subclass
+  // and would silently strip any custom child element written by writeXml).
+  if ( customProperty( QStringLiteral( "kadas/annotation-type" ) ).toString() == QLatin1String( "bullseye" ) )
+  {
+    mBullseyeConfig.center.setX( customProperty( QStringLiteral( "kadas/bullseye/x" ) ).toDouble() );
+    mBullseyeConfig.center.setY( customProperty( QStringLiteral( "kadas/bullseye/y" ) ).toDouble() );
+    mBullseyeConfig.rings = customProperty( QStringLiteral( "kadas/bullseye/rings" ) ).toInt();
+    mBullseyeConfig.axesInterval = customProperty( QStringLiteral( "kadas/bullseye/axes" ) ).toDouble();
+    mBullseyeConfig.interval = customProperty( QStringLiteral( "kadas/bullseye/interval" ) ).toDouble();
+    const QString unitStr = customProperty( QStringLiteral( "kadas/bullseye/intervalUnit" ) ).toString();
+    mBullseyeConfig.intervalUnit = unitStr.isEmpty() ? Qgis::DistanceUnit::NauticalMiles : QgsUnitTypes::decodeDistanceUnit( unitStr );
+    mBullseyeConfig.fontSize = customProperty( QStringLiteral( "kadas/bullseye/fontSize" ) ).toInt();
+    mBullseyeConfig.lineWidth = customProperty( QStringLiteral( "kadas/bullseye/lineWidth" ) ).toInt();
+    mBullseyeConfig.color = QgsSymbolLayerUtils::decodeColor( customProperty( QStringLiteral( "kadas/bullseye/color" ) ).toString() );
+    mBullseyeConfig.labelAxes = customProperty( QStringLiteral( "kadas/bullseye/labelAxes" ) ).toBool();
+    mBullseyeConfig.labelQuadrants = customProperty( QStringLiteral( "kadas/bullseye/labelQuadrants" ) ).toBool();
+    mBullseyeConfig.labelRings = customProperty( QStringLiteral( "kadas/bullseye/labelRings" ) ).toBool();
+    regenerate();
+    return true;
+  }
+
+  // Legacy fallback: pre-customProperty projects stored config as a child
+  // element on the layer node. Drop after one release of burn-in.
   const QDomElement layerEl = layer_node.toElement();
   const QDomElement cfgEl = layerEl.firstChildElement( QStringLiteral( "KadasBullseye" ) );
   if ( cfgEl.isNull() )
@@ -290,25 +315,29 @@ bool KadasBullseyeLayer::readXml( const QDomNode &layer_node, QgsReadWriteContex
 
 bool KadasBullseyeLayer::writeXml( QDomNode &layer_node, QDomDocument &doc, const QgsReadWriteContext &context ) const
 {
-  if ( !QgsAnnotationLayer::writeXml( layer_node, doc, context ) )
-    return false;
+  // Stash config on the layer's customProperties *before* the base writes
+  // them out. This is the only persistence mechanism that survives a vanilla
+  // QGIS save (which would otherwise strip any subclass-specific child
+  // element since QGIS doesn't know about KadasBullseyeLayer).
+  const_cast<KadasBullseyeLayer *>( this )->writeConfigToCustomProperties();
+  return QgsAnnotationLayer::writeXml( layer_node, doc, context );
+}
 
-  QDomElement layerEl = layer_node.toElement();
-  QDomElement cfgEl = doc.createElement( QStringLiteral( "KadasBullseye" ) );
-  cfgEl.setAttribute( "x", mBullseyeConfig.center.x() );
-  cfgEl.setAttribute( "y", mBullseyeConfig.center.y() );
-  cfgEl.setAttribute( "rings", mBullseyeConfig.rings );
-  cfgEl.setAttribute( "axes", mBullseyeConfig.axesInterval );
-  cfgEl.setAttribute( "interval", mBullseyeConfig.interval );
-  cfgEl.setAttribute( "intervalUnit", QgsUnitTypes::encodeUnit( mBullseyeConfig.intervalUnit ) );
-  cfgEl.setAttribute( "fontSize", mBullseyeConfig.fontSize );
-  cfgEl.setAttribute( "lineWidth", mBullseyeConfig.lineWidth );
-  cfgEl.setAttribute( "color", QgsSymbolLayerUtils::encodeColor( mBullseyeConfig.color ) );
-  cfgEl.setAttribute( "labelAxes", mBullseyeConfig.labelAxes ? "1" : "0" );
-  cfgEl.setAttribute( "labelQuadrants", mBullseyeConfig.labelQuadrants ? "1" : "0" );
-  cfgEl.setAttribute( "labelRings", mBullseyeConfig.labelRings ? "1" : "0" );
-  layerEl.appendChild( cfgEl );
-  return true;
+void KadasBullseyeLayer::writeConfigToCustomProperties()
+{
+  setCustomProperty( QStringLiteral( "kadas/annotation-type" ), QStringLiteral( "bullseye" ) );
+  setCustomProperty( QStringLiteral( "kadas/bullseye/x" ), mBullseyeConfig.center.x() );
+  setCustomProperty( QStringLiteral( "kadas/bullseye/y" ), mBullseyeConfig.center.y() );
+  setCustomProperty( QStringLiteral( "kadas/bullseye/rings" ), mBullseyeConfig.rings );
+  setCustomProperty( QStringLiteral( "kadas/bullseye/axes" ), mBullseyeConfig.axesInterval );
+  setCustomProperty( QStringLiteral( "kadas/bullseye/interval" ), mBullseyeConfig.interval );
+  setCustomProperty( QStringLiteral( "kadas/bullseye/intervalUnit" ), QgsUnitTypes::encodeUnit( mBullseyeConfig.intervalUnit ) );
+  setCustomProperty( QStringLiteral( "kadas/bullseye/fontSize" ), mBullseyeConfig.fontSize );
+  setCustomProperty( QStringLiteral( "kadas/bullseye/lineWidth" ), mBullseyeConfig.lineWidth );
+  setCustomProperty( QStringLiteral( "kadas/bullseye/color" ), QgsSymbolLayerUtils::encodeColor( mBullseyeConfig.color ) );
+  setCustomProperty( QStringLiteral( "kadas/bullseye/labelAxes" ), mBullseyeConfig.labelAxes );
+  setCustomProperty( QStringLiteral( "kadas/bullseye/labelQuadrants" ), mBullseyeConfig.labelQuadrants );
+  setCustomProperty( QStringLiteral( "kadas/bullseye/labelRings" ), mBullseyeConfig.labelRings );
 }
 
 void KadasBullseyeLayer::regenerate()

@@ -381,12 +381,38 @@ QList<KadasPluginLayer::IdentifyResult> KadasGuideGridLayer::identify( const Qgs
 
 bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext &context )
 {
-  // Let the stock annotation layer load its own state (CRS, opacity, items).
+  // Let the stock annotation layer load its own state (CRS, opacity, items,
+  // *and* customProperties).
   QgsAnnotationLayer::readXml( layer_node, context );
 
-  // Then overlay our config from the dedicated child element. Items are
-  // regenerated from the config to keep the on-disk and in-memory views
-  // consistent (and to be robust against partially-written files).
+  // Preferred path: read config from layer customProperties. Survives a
+  // round-trip through vanilla QGIS (which would strip any subclass-only
+  // child element written by writeXml).
+  if ( customProperty( QStringLiteral( "kadas/annotation-type" ) ).toString() == QLatin1String( "guidegrid" ) )
+  {
+    mGridConfig.gridRect.setXMinimum( customProperty( QStringLiteral( "kadas/guidegrid/xmin" ) ).toDouble() );
+    mGridConfig.gridRect.setYMinimum( customProperty( QStringLiteral( "kadas/guidegrid/ymin" ) ).toDouble() );
+    mGridConfig.gridRect.setXMaximum( customProperty( QStringLiteral( "kadas/guidegrid/xmax" ) ).toDouble() );
+    mGridConfig.gridRect.setYMaximum( customProperty( QStringLiteral( "kadas/guidegrid/ymax" ) ).toDouble() );
+    mGridConfig.cols = customProperty( QStringLiteral( "kadas/guidegrid/cols" ) ).toInt();
+    mGridConfig.rows = customProperty( QStringLiteral( "kadas/guidegrid/rows" ) ).toInt();
+    mGridConfig.colSizeLocked = customProperty( QStringLiteral( "kadas/guidegrid/colSizeLocked" ) ).toBool();
+    mGridConfig.rowSizeLocked = customProperty( QStringLiteral( "kadas/guidegrid/rowSizeLocked" ) ).toBool();
+    mGridConfig.fontSize = customProperty( QStringLiteral( "kadas/guidegrid/fontSize" ) ).toInt();
+    mGridConfig.color = QgsSymbolLayerUtils::decodeColor( customProperty( QStringLiteral( "kadas/guidegrid/color" ) ).toString() );
+    mGridConfig.lineWidth = customProperty( QStringLiteral( "kadas/guidegrid/lineWidth" ), 1 ).toInt();
+    const QString rowChar = customProperty( QStringLiteral( "kadas/guidegrid/rowChar" ) ).toString();
+    const QString colChar = customProperty( QStringLiteral( "kadas/guidegrid/colChar" ) ).toString();
+    mGridConfig.rowChar = rowChar.isEmpty() ? QChar( 'A' ) : rowChar.at( 0 );
+    mGridConfig.colChar = colChar.isEmpty() ? QChar( '1' ) : colChar.at( 0 );
+    mGridConfig.labelingPos = static_cast<LabelingPos>( customProperty( QStringLiteral( "kadas/guidegrid/labelingPos" ) ).toInt() );
+    mGridConfig.quadrantLabeling = static_cast<QuadrantLabeling>( customProperty( QStringLiteral( "kadas/guidegrid/quadrantLabeling" ) ).toInt() );
+    regenerate();
+    return true;
+  }
+
+  // Legacy fallback: pre-customProperty projects stored config as a child
+  // element on the layer node. Drop after one release of burn-in.
   const QDomElement layerEl = layer_node.toElement();
   const QDomElement cfgEl = layerEl.firstChildElement( QStringLiteral( "KadasGuideGrid" ) );
   if ( cfgEl.isNull() )
@@ -408,38 +434,37 @@ bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteConte
   mGridConfig.labelingPos = static_cast<LabelingPos>( cfgEl.attribute( "labelingPos" ).toInt() );
   mGridConfig.quadrantLabeling = static_cast<QuadrantLabeling>( cfgEl.attribute( "quadrantLabeling" ).toInt() );
 
-  // Items in the project file are authoritative for what QGIS draws; but we
-  // still rebuild from config so the in-memory state matches what a re-save
-  // would emit. (Cheap, and keeps Kadas/QGIS visually identical.)
   regenerate();
   return true;
 }
 
 bool KadasGuideGridLayer::writeXml( QDomNode &layer_node, QDomDocument &doc, const QgsReadWriteContext &context ) const
 {
-  // Let QgsAnnotationLayer serialize its standard fields (and our items).
-  if ( !QgsAnnotationLayer::writeXml( layer_node, doc, context ) )
-    return false;
+  // Stash config on the layer's customProperties *before* the base writes
+  // them out. This is the only persistence mechanism that survives a vanilla
+  // QGIS save (which strips any subclass-specific child element).
+  const_cast<KadasGuideGridLayer *>( this )->writeConfigToCustomProperties();
+  return QgsAnnotationLayer::writeXml( layer_node, doc, context );
+}
 
-  QDomElement layerEl = layer_node.toElement();
-  QDomElement cfgEl = doc.createElement( QStringLiteral( "KadasGuideGrid" ) );
-  cfgEl.setAttribute( "xmin", mGridConfig.gridRect.xMinimum() );
-  cfgEl.setAttribute( "ymin", mGridConfig.gridRect.yMinimum() );
-  cfgEl.setAttribute( "xmax", mGridConfig.gridRect.xMaximum() );
-  cfgEl.setAttribute( "ymax", mGridConfig.gridRect.yMaximum() );
-  cfgEl.setAttribute( "cols", mGridConfig.cols );
-  cfgEl.setAttribute( "rows", mGridConfig.rows );
-  cfgEl.setAttribute( "colSizeLocked", mGridConfig.colSizeLocked ? 1 : 0 );
-  cfgEl.setAttribute( "rowSizeLocked", mGridConfig.rowSizeLocked ? 1 : 0 );
-  cfgEl.setAttribute( "fontSize", mGridConfig.fontSize );
-  cfgEl.setAttribute( "color", QgsSymbolLayerUtils::encodeColor( mGridConfig.color ) );
-  cfgEl.setAttribute( "lineWidth", mGridConfig.lineWidth );
-  cfgEl.setAttribute( "colChar", QString( mGridConfig.colChar ) );
-  cfgEl.setAttribute( "rowChar", QString( mGridConfig.rowChar ) );
-  cfgEl.setAttribute( "labelingPos", static_cast<int>( mGridConfig.labelingPos ) );
-  cfgEl.setAttribute( "quadrantLabeling", static_cast<int>( mGridConfig.quadrantLabeling ) );
-  layerEl.appendChild( cfgEl );
-  return true;
+void KadasGuideGridLayer::writeConfigToCustomProperties()
+{
+  setCustomProperty( QStringLiteral( "kadas/annotation-type" ), QStringLiteral( "guidegrid" ) );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/xmin" ), mGridConfig.gridRect.xMinimum() );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/ymin" ), mGridConfig.gridRect.yMinimum() );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/xmax" ), mGridConfig.gridRect.xMaximum() );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/ymax" ), mGridConfig.gridRect.yMaximum() );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/cols" ), mGridConfig.cols );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/rows" ), mGridConfig.rows );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/colSizeLocked" ), mGridConfig.colSizeLocked );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/rowSizeLocked" ), mGridConfig.rowSizeLocked );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/fontSize" ), mGridConfig.fontSize );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/color" ), QgsSymbolLayerUtils::encodeColor( mGridConfig.color ) );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/lineWidth" ), mGridConfig.lineWidth );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/rowChar" ), QString( mGridConfig.rowChar ) );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/colChar" ), QString( mGridConfig.colChar ) );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/labelingPos" ), static_cast<int>( mGridConfig.labelingPos ) );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/quadrantLabeling" ), static_cast<int>( mGridConfig.quadrantLabeling ) );
 }
 
 void KadasGuideGridLayer::regenerate()
