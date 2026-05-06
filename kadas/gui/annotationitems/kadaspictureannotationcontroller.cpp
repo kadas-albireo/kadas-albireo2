@@ -27,12 +27,16 @@
 #include <qgis/qgscallout.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgsfillsymbol.h>
+#include <qgis/qgsfillsymbollayer.h>
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgsmaptopixel.h>
+#include <qgis/qgsmargins.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrectangle.h>
+#include <qgis/qgssymbol.h>
 
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadaspictureannotationcontroller.h"
@@ -143,8 +147,24 @@ QgsAnnotationItem *KadasPictureAnnotationController::createItem() const
   item->setOffsetFromCalloutUnit( Qgis::RenderUnit::Pixels );
   // Auto-install a balloon callout (cartoon speech-bubble) — the picture
   // frame becomes the bubble body, with a wedge pointing back to the
-  // geographic anchor. Replicates the legacy KadasPictureItem look.
-  item->setCallout( new QgsBalloonCallout() );
+  // geographic anchor. Replicates the legacy KadasPictureItem look:
+  //   * white fill with a 1px sharp-corner black border (sFramePadding=4
+  //     and sArrowWidth=6 from the legacy KadasRectangleItemBase);
+  //   * 4px margin so the bubble extends slightly beyond the picture
+  //     content like the legacy frame did;
+  //   * 0px corner radius so the bubble is a sharp rectangle (legacy
+  //     drew a polygon, not a rounded rect).
+  auto *callout = new QgsBalloonCallout();
+  auto *fillLayer = new QgsSimpleFillSymbolLayer( Qt::white, Qt::SolidPattern, Qt::black, Qt::SolidLine, 1.0 );
+  fillLayer->setStrokeWidthUnit( Qgis::RenderUnit::Pixels );
+  callout->setFillSymbol( new QgsFillSymbol( QgsSymbolLayerList() << fillLayer ) );
+  callout->setMargins( QgsMargins( 4, 4, 4, 4 ) );
+  callout->setMarginsUnit( Qgis::RenderUnit::Pixels );
+  callout->setWedgeWidth( 6 );
+  callout->setWedgeWidthUnit( Qgis::RenderUnit::Pixels );
+  callout->setCornerRadius( 0 );
+  callout->setCornerRadiusUnit( Qgis::RenderUnit::Pixels );
+  item->setCallout( callout );
   return item;
 }
 
