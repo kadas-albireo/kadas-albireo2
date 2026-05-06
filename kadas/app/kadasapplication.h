@@ -195,6 +195,12 @@ class KadasApplication : public QgsApplication
     void extentChanged();
     void saveAttributeTableDocks( QDomDocument &doc );
     void restoreAttributeTables( const QDomDocument &doc );
+    /// After load, scan plain QgsAnnotationLayer instances for the
+    /// `kadas/annotation-type` marker customProperty and replace them
+    /// with the matching Kadas subclass (KadasBullseyeLayer,
+    /// KadasGuideGridLayer) so the right-click "Edit" hook and the
+    /// custom QPainter renderers work post-reload.
+    void promoteAnnotationLayers();
 };
 
 #endif // KADASAPPLICATION_H
