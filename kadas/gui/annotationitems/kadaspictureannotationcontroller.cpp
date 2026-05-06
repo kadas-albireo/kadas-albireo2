@@ -14,16 +14,22 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QAction>
 #include <QFileInfo>
+#include <QMenu>
 #include <QObject>
+#include <QPointer>
 #include <QTextStream>
 
 #include <qgis/qgis.h>
+#include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationpictureitem.h>
 #include <qgis/qgscallout.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsgeometry.h>
+#include <qgis/qgsmapsettings.h>
+#include <qgis/qgsmaptopixel.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrectangle.h>
@@ -42,6 +48,43 @@ namespace
   {
     Q_ASSERT( item && item->type() == QLatin1String( "picture" ) );
     return static_cast<const QgsAnnotationPictureItem *>( item );
+  }
+
+  // KadasEditContext::vidx sentinels used by the picture controller to
+  // distinguish what the user grabbed: the geographic anchor handle vs
+  // the picture frame body. Stored in the part field of the QgsVertexId
+  // so that other consumers (state history) treat them as opaque labels.
+  constexpr int kPartAnchor = 0;
+  constexpr int kPartFrame = 1;
+
+  /**
+   * Compute the picture's frame screen rectangle for the given map
+   * settings. Returns an invalid rect if the placement is not FixedSize
+   * or if the fixed size has no positive extent (during a fresh place
+   * where bounds are still degenerate the rect just collapses to a point
+   * around the anchor, which is fine — the anchor pick handles that
+   * case).
+   */
+  QRectF frameScreenRect( const QgsAnnotationPictureItem *pic, const QgsMapSettings &ms, const QgsCoordinateTransform &xform )
+  {
+    if ( pic->placementMode() != Qgis::AnnotationPlacementMode::FixedSize )
+      return QRectF();
+    const QgsPointXY itemCenter = pic->bounds().center();
+    QgsPointXY mapCenter = itemCenter;
+    try
+    {
+      if ( xform.isValid() )
+        mapCenter = xform.transform( itemCenter );
+    }
+    catch ( const QgsCsException & )
+    {
+      return QRectF();
+    }
+    const QPointF anchorPx = ms.mapToPixel().transform( mapCenter ).toQPointF();
+    const QSizeF off = pic->offsetFromCallout();
+    const QSizeF size = pic->fixedSize();
+    const QPointF center = anchorPx + QPointF( off.width(), off.height() );
+    return QRectF( center.x() - size.width() / 2.0, center.y() - size.height() / 2.0, size.width(), size.height() );
   }
 
   Qgis::PictureFormat formatFromPath( const QString &path )
@@ -90,11 +133,13 @@ QgsAnnotationItem *KadasPictureAnnotationController::createItem() const
   item->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
   item->setFixedSize( QSizeF( 200, 150 ) );
   item->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
-  // Default offset so the picture sits visibly above its anchor; users can
-  // adjust via the offset handle. Units are pixels, matching fixedSizeUnit.
-  // The offset must be large enough that the balloon's wedge has room to
-  // form between the anchor point and the frame.
-  item->setOffsetFromCallout( QSizeF( 0, -120 ) );
+  // The picture starts collapsed onto its anchor (offset 0) so the balloon
+  // wedge is invisible. Dragging the picture frame changes the offset
+  // (anchor stays put) which "inflates" the wedge — replicating the
+  // legacy KadasPictureItem speech-bubble UX. The anchor handle, the
+  // right-click "Reset balloon" action, and `setPosition()` all keep the
+  // offset alone or reset it explicitly.
+  item->setOffsetFromCallout( QSizeF( 0, 0 ) );
   item->setOffsetFromCalloutUnit( Qgis::RenderUnit::Pixels );
   // Auto-install a balloon callout (cartoon speech-bubble) — the picture
   // frame becomes the bubble body, with a wedge pointing back to the
@@ -169,25 +214,71 @@ QgsPointXY KadasPictureAnnotationController::positionFromDrawAttribs( const QgsA
 
 KadasEditContext KadasPictureAnnotationController::getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
 {
-  const QgsRectangle b = asPicture( item )->bounds();
-  const QgsPointXY anchor = toMapPos( QgsPointXY( b.center().x(), b.center().y() ), ctx );
-  if ( pos.sqrDist( anchor ) < pickTolSqr( ctx ) )
-    return KadasEditContext( QgsVertexId( 0, 0, 0 ), anchor, drawAttribs() );
-  // The picture frame itself sits at a screen-space offset and would need a
-  // map-settings-aware pick test to hit-test; the whole-item move falls back
-  // to anchor-relative for now.
-  if ( toMapRect( b, ctx ).contains( pos ) )
-    return KadasEditContext( QgsVertexId(), anchor, KadasAttribDefs(), Qt::ArrowCursor );
+  const QgsAnnotationPictureItem *pic = asPicture( item );
+  const QgsRectangle b = pic->bounds();
+  const QgsPointXY anchorMap = toMapPos( QgsPointXY( b.center().x(), b.center().y() ), ctx );
+
+  // Anchor handle wins over the frame body when the click is close to
+  // both — that way a collapsed-balloon (offset 0) item still resolves
+  // to the anchor handle on the same pixel where the frame would also
+  // hit, giving the user the "move the whole assembly" gesture.
+  if ( pos.sqrDist( anchorMap ) < pickTolSqr( ctx ) )
+    return KadasEditContext( QgsVertexId( 0, kPartAnchor, 0 ), anchorMap, drawAttribs() );
+
+  // Frame body hit-test in screen space (FixedSize pictures are sized
+  // and offset in pixels; testing the bounds rect in map space would
+  // only ever match a degenerate point at the anchor).
+  const QgsCoordinateTransform xform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
+  const QRectF frameRect = frameScreenRect( pic, ctx.mapSettings(), xform );
+  if ( frameRect.isValid() )
+  {
+    const QPointF screenPos = ctx.mapSettings().mapToPixel().transform( pos ).toQPointF();
+    if ( frameRect.contains( screenPos ) )
+    {
+      // Returned `pos` field is the click in map coords so the edit-tool
+      // can compute mMoveOffset. The vidx part marks this as the frame
+      // body grab.
+      return KadasEditContext( QgsVertexId( 0, kPartFrame, 0 ), pos, KadasAttribDefs(), Qt::SizeAllCursor );
+    }
+  }
   return KadasEditContext();
 }
 
 void KadasPictureAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
-  Q_UNUSED( editContext );
-  // Both the anchor handle and the whole-item move set the new anchor.
+  QgsAnnotationPictureItem *pic = asPicture( item );
+
+  if ( editContext.vidx.isValid() && editContext.vidx.part == kPartFrame )
+  {
+    // Frame-body drag: keep the geographic anchor fixed, move the
+    // picture frame instead by adjusting the screen-space offset. The
+    // wedge of the balloon callout grows out from the anchor toward the
+    // new frame position.
+    const QgsCoordinateTransform xform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
+    QgsPointXY anchorMap = pic->bounds().center();
+    try
+    {
+      if ( xform.isValid() )
+        anchorMap = xform.transform( pic->bounds().center() );
+    }
+    catch ( const QgsCsException & )
+    {
+      return;
+    }
+    const QPointF anchorPx = ctx.mapSettings().mapToPixel().transform( anchorMap ).toQPointF();
+    const QPointF targetPx = ctx.mapSettings().mapToPixel().transform( newPoint ).toQPointF();
+    const QPointF delta = targetPx - anchorPx;
+    pic->setOffsetFromCallout( QSizeF( delta.x(), delta.y() ) );
+    pic->setOffsetFromCalloutUnit( Qgis::RenderUnit::Pixels );
+    return;
+  }
+
+  // Anchor handle drag (and any whole-item move that lands here): move
+  // the bounds + callout anchor together, leaving the offset alone so
+  // the balloon shape is preserved.
   const QgsPointXY ip = toItemPos( newPoint, ctx );
-  asPicture( item )->setBounds( QgsRectangle( ip.x(), ip.y(), ip.x(), ip.y() ) );
-  item->setCalloutAnchor( QgsGeometry( new QgsPoint( ip.x(), ip.y() ) ) );
+  pic->setBounds( QgsRectangle( ip.x(), ip.y(), ip.x(), ip.y() ) );
+  pic->setCalloutAnchor( QgsGeometry( new QgsPoint( ip.x(), ip.y() ) ) );
 }
 
 void KadasPictureAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
@@ -222,6 +313,26 @@ void KadasPictureAnnotationController::translate( QgsAnnotationItem *item, doubl
   const QgsRectangle b = asPicture( item )->bounds();
   const QgsPointXY c = b.center();
   setPosition( item, QgsPointXY( c.x() + dx, c.y() + dy ) );
+}
+
+void KadasPictureAnnotationController::populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &, const QgsPointXY &, const KadasAnnotationItemContext &ctx )
+{
+  QgsAnnotationPictureItem *pic = asPicture( item );
+  const QSizeF off = pic->offsetFromCallout();
+  if ( off.width() == 0.0 && off.height() == 0.0 )
+    return;
+  // The balloon is "inflated" — offer to collapse it back onto the
+  // anchor. Visually equivalent to "remove the speech bubble".
+  // Captures: the menu is modal and runs synchronously while the edit
+  // tool / annotation layer / item are guaranteed to outlive it (the
+  // tool that owns the menu also owns the lifetime of `pic`).
+  QPointer<QgsAnnotationLayer> layerPtr( ctx.layer() );
+  QAction *resetAction = menu->addAction( QObject::tr( "Reset balloon" ) );
+  QObject::connect( resetAction, &QAction::triggered, resetAction, [pic, layerPtr]() {
+    pic->setOffsetFromCallout( QSizeF( 0, 0 ) );
+    if ( layerPtr )
+      layerPtr->triggerRepaint();
+  } );
 }
 
 QString KadasPictureAnnotationController::asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &, QuaZip * ) const
