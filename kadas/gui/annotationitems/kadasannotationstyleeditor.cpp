@@ -15,7 +15,10 @@
  ***************************************************************************/
 
 #include <QComboBox>
+#include <QDir>
 #include <QDoubleSpinBox>
+#include <QFileDialog>
+#include <QFileInfo>
 #include <QFontComboBox>
 #include <QHBoxLayout>
 #include <QIcon>
@@ -24,6 +27,7 @@
 #include <QList>
 #include <QPainter>
 #include <QPixmap>
+#include <QPushButton>
 #include <QSignalBlocker>
 #include <QSpinBox>
 #include <cmath>
@@ -31,8 +35,10 @@
 
 #include <qgis/qgsannotationlineitem.h>
 #include <qgis/qgsannotationmarkeritem.h>
+#include <qgis/qgsannotationpictureitem.h>
 #include <qgis/qgsannotationpointtextitem.h>
 #include <qgis/qgsannotationpolygonitem.h>
+#include <qgis/qgscallout.h>
 #include <qgis/qgscolorbutton.h>
 #include <qgis/qgsfillsymbol.h>
 #include <qgis/qgsfillsymbollayer.h>
@@ -440,4 +446,160 @@ void KadasPointTextStyleEditor::applyToItem( QgsAnnotationItem *item ) const
   buf.setSizeUnit( Qgis::RenderUnit::Millimeters );
   fmt.setBuffer( buf );
   pt->setFormat( fmt );
+}
+
+
+// ----- Picture (with balloon callout) -----------------------------------
+
+namespace
+{
+  Qgis::PictureFormat pictureFormatFromPath( const QString &path )
+  {
+    const QString ext = QFileInfo( path ).suffix().toLower();
+    if ( ext == QLatin1String( "svg" ) )
+      return Qgis::PictureFormat::SVG;
+    return Qgis::PictureFormat::Raster;
+  }
+} // namespace
+
+KadasPictureStyleEditor::KadasPictureStyleEditor( QWidget *parent )
+  : KadasAnnotationStyleEditor( parent )
+{
+  auto *row = new QHBoxLayout( this );
+  row->setContentsMargins( 0, 0, 0, 0 );
+
+  mChangeImageBtn = new QPushButton( tr( "Change image…" ) );
+  mChangeImageBtn->setToolTip( tr( "Pick a new picture file (PNG, JPG, SVG, …)." ) );
+  row->addWidget( mChangeImageBtn );
+
+  row->addWidget( new QLabel( tr( "Size:" ) ) );
+  mWidthSpin = new QSpinBox();
+  mWidthSpin->setRange( 16, 2000 );
+  mWidthSpin->setSuffix( QStringLiteral( " px" ) );
+  mWidthSpin->setToolTip( tr( "Picture width in pixels" ) );
+  row->addWidget( mWidthSpin );
+  mHeightSpin = new QSpinBox();
+  mHeightSpin->setRange( 16, 2000 );
+  mHeightSpin->setSuffix( QStringLiteral( " px" ) );
+  mHeightSpin->setToolTip( tr( "Picture height in pixels" ) );
+  row->addWidget( mHeightSpin );
+
+  row->addWidget( new QLabel( tr( "Frame:" ) ) );
+  mFillColorBtn = new QgsColorButton();
+  mFillColorBtn->setAllowOpacity( true );
+  mFillColorBtn->setShowNoColor( true );
+  mFillColorBtn->setToolTip( tr( "Balloon fill color" ) );
+  row->addWidget( mFillColorBtn );
+
+  mStrokeColorBtn = new QgsColorButton();
+  mStrokeColorBtn->setAllowOpacity( true );
+  mStrokeColorBtn->setShowNoColor( true );
+  mStrokeColorBtn->setToolTip( tr( "Balloon outline color" ) );
+  row->addWidget( mStrokeColorBtn );
+
+  mStrokeWidthSpin = new QDoubleSpinBox();
+  mStrokeWidthSpin->setRange( 0.0, 10.0 );
+  mStrokeWidthSpin->setDecimals( 1 );
+  mStrokeWidthSpin->setSingleStep( 0.5 );
+  mStrokeWidthSpin->setSuffix( QStringLiteral( " px" ) );
+  mStrokeWidthSpin->setToolTip( tr( "Balloon outline width" ) );
+  row->addWidget( mStrokeWidthSpin );
+
+  row->addWidget( new QLabel( tr( "Wedge:" ) ) );
+  mWedgeWidthSpin = new QDoubleSpinBox();
+  mWedgeWidthSpin->setRange( 1.0, 60.0 );
+  mWedgeWidthSpin->setDecimals( 1 );
+  mWedgeWidthSpin->setSingleStep( 1.0 );
+  mWedgeWidthSpin->setSuffix( QStringLiteral( " px" ) );
+  mWedgeWidthSpin->setToolTip( tr( "Width of the balloon wedge base" ) );
+  row->addWidget( mWedgeWidthSpin );
+
+  connect( mChangeImageBtn, &QPushButton::clicked, this, [this]() {
+    const QString chosen
+      = QFileDialog::getOpenFileName( this, tr( "Select picture" ), mPath.isEmpty() ? QDir::homePath() : QFileInfo( mPath ).absolutePath(), tr( "Images (*.png *.jpg *.jpeg *.bmp *.gif *.tif *.tiff *.svg)" ) );
+    if ( chosen.isEmpty() )
+      return;
+    mPath = chosen;
+    emit committed();
+  } );
+  connect( mWidthSpin, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
+  connect( mHeightSpin, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
+  connect( mFillColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
+  connect( mStrokeColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
+  connect( mStrokeWidthSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
+  connect( mWedgeWidthSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
+}
+
+void KadasPictureStyleEditor::loadFromItem( const QgsAnnotationItem *item )
+{
+  const auto *pic = dynamic_cast<const QgsAnnotationPictureItem *>( item );
+  if ( !pic )
+    return;
+  const QSignalBlocker b1( mWidthSpin ), b2( mHeightSpin ), b3( mFillColorBtn );
+  const QSignalBlocker b4( mStrokeColorBtn ), b5( mStrokeWidthSpin ), b6( mWedgeWidthSpin );
+  mPath = pic->path();
+  const QSizeF size = pic->fixedSize();
+  mWidthSpin->setValue( static_cast<int>( std::round( size.width() ) ) );
+  mHeightSpin->setValue( static_cast<int>( std::round( size.height() ) ) );
+
+  // Pull fill / stroke from the balloon callout's symbol layer if present;
+  // fall back to the same defaults the controller uses (white / black /
+  // 1px / 6px wedge).
+  QColor fill = Qt::white;
+  QColor stroke = Qt::black;
+  double strokeWidth = 1.0;
+  double wedge = 6.0;
+  if ( auto *balloon = dynamic_cast<QgsBalloonCallout *>( pic->callout() ) )
+  {
+    if ( QgsFillSymbol *sym = balloon->fillSymbol() )
+    {
+      if ( sym->symbolLayerCount() > 0 )
+      {
+        if ( const auto *sl = dynamic_cast<const QgsSimpleFillSymbolLayer *>( sym->symbolLayer( 0 ) ) )
+        {
+          fill = sl->color();
+          stroke = sl->strokeColor();
+          strokeWidth = sl->strokeWidth();
+        }
+      }
+    }
+    wedge = balloon->wedgeWidth();
+  }
+  mFillColorBtn->setColor( fill );
+  mStrokeColorBtn->setColor( stroke );
+  mStrokeWidthSpin->setValue( strokeWidth );
+  mWedgeWidthSpin->setValue( wedge );
+}
+
+void KadasPictureStyleEditor::applyToItem( QgsAnnotationItem *item ) const
+{
+  auto *pic = dynamic_cast<QgsAnnotationPictureItem *>( item );
+  if ( !pic )
+    return;
+
+  // Image source — only re-set if the user actually picked a new file
+  // (mPath is updated synchronously by the file dialog).
+  if ( !mPath.isEmpty() && mPath != pic->path() )
+    pic->setPath( pictureFormatFromPath( mPath ), mPath );
+
+  pic->setFixedSize( QSizeF( mWidthSpin->value(), mHeightSpin->value() ) );
+  pic->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
+
+  // Rebuild the balloon callout's fill symbol with the current colors /
+  // stroke width. Keep the (margins, corner radius, wedge unit) the
+  // controller installed so the look stays consistent.
+  auto *balloon = dynamic_cast<QgsBalloonCallout *>( pic->callout() );
+  bool installed = false;
+  if ( !balloon )
+  {
+    balloon = new QgsBalloonCallout();
+    installed = true;
+  }
+  auto *sl = new QgsSimpleFillSymbolLayer( mFillColorBtn->color(), Qt::SolidPattern, mStrokeColorBtn->color(), Qt::SolidLine, mStrokeWidthSpin->value() );
+  sl->setStrokeWidthUnit( Qgis::RenderUnit::Pixels );
+  balloon->setFillSymbol( new QgsFillSymbol( QgsSymbolLayerList() << sl ) );
+  balloon->setWedgeWidth( mWedgeWidthSpin->value() );
+  balloon->setWedgeWidthUnit( Qgis::RenderUnit::Pixels );
+  if ( installed )
+    pic->setCallout( balloon );
 }

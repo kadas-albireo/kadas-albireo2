@@ -15,6 +15,8 @@
  ***************************************************************************/
 
 #include <QAction>
+#include <QDir>
+#include <QFileDialog>
 #include <QFileInfo>
 #include <QMenu>
 #include <QObject>
@@ -39,6 +41,7 @@
 #include <qgis/qgssymbol.h>
 
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
+#include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadaspictureannotationcontroller.h"
 
 namespace
@@ -238,16 +241,14 @@ KadasEditContext KadasPictureAnnotationController::getEditContext( const QgsAnno
   const QgsRectangle b = pic->bounds();
   const QgsPointXY anchorMap = toMapPos( QgsPointXY( b.center().x(), b.center().y() ), ctx );
 
-  // Anchor handle wins over the frame body when the click is close to
-  // both — that way a collapsed-balloon (offset 0) item still resolves
-  // to the anchor handle on the same pixel where the frame would also
-  // hit, giving the user the "move the whole assembly" gesture.
-  if ( pos.sqrDist( anchorMap ) < pickTolSqr( ctx ) )
-    return KadasEditContext( QgsVertexId( 0, kPartAnchor, 0 ), anchorMap, drawAttribs() );
-
-  // Frame body hit-test in screen space (FixedSize pictures are sized
-  // and offset in pixels; testing the bounds rect in map space would
-  // only ever match a degenerate point at the anchor).
+  // Frame body wins over the anchor handle. Rationale: when the balloon
+  // is collapsed (offset 0) the anchor and the frame center share a
+  // pixel; if the anchor handle won, dragging the picture would just
+  // translate the whole assembly and the user could never inflate the
+  // balloon. Hitting the frame body always sets the offset (anchor
+  // stays put → balloon inflates / re-shapes), and the anchor handle
+  // is reachable only when it is visually outside the frame, i.e. once
+  // the balloon is already inflated.
   const QgsCoordinateTransform xform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
   const QRectF frameRect = frameScreenRect( pic, ctx.mapSettings(), xform );
   if ( frameRect.isValid() )
@@ -261,6 +262,8 @@ KadasEditContext KadasPictureAnnotationController::getEditContext( const QgsAnno
       return KadasEditContext( QgsVertexId( 0, kPartFrame, 0 ), pos, KadasAttribDefs(), Qt::SizeAllCursor );
     }
   }
+  if ( pos.sqrDist( anchorMap ) < pickTolSqr( ctx ) )
+    return KadasEditContext( QgsVertexId( 0, kPartAnchor, 0 ), anchorMap, drawAttribs() );
   return KadasEditContext();
 }
 
@@ -335,9 +338,31 @@ void KadasPictureAnnotationController::translate( QgsAnnotationItem *item, doubl
   setPosition( item, QgsPointXY( c.x() + dx, c.y() + dy ) );
 }
 
+KadasAnnotationStyleEditor *KadasPictureAnnotationController::createStyleEditor( QWidget *parent ) const
+{
+  return new KadasPictureStyleEditor( parent );
+}
+
 void KadasPictureAnnotationController::populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &, const QgsPointXY &, const KadasAnnotationItemContext &ctx )
 {
   QgsAnnotationPictureItem *pic = asPicture( item );
+
+  // "Change image source..." — opens a file picker preseeded with the
+  // current path, applies the new file via setPath() (auto-detects
+  // raster vs SVG from the suffix), and triggers a layer repaint.
+  QPointer<QgsAnnotationLayer> layerPtr( ctx.layer() );
+  QAction *changeAction = menu->addAction( QObject::tr( "Change image source…" ) );
+  QObject::connect( changeAction, &QAction::triggered, changeAction, [pic, layerPtr]() {
+    const QString current = pic->path();
+    const QString chosen = QFileDialog::
+      getOpenFileName( nullptr, QObject::tr( "Select picture" ), current.isEmpty() ? QDir::homePath() : QFileInfo( current ).absolutePath(), QObject::tr( "Images (*.png *.jpg *.jpeg *.bmp *.gif *.tif *.tiff *.svg)" ) );
+    if ( chosen.isEmpty() )
+      return;
+    KadasPictureAnnotationController::setPath( pic, chosen );
+    if ( layerPtr )
+      layerPtr->triggerRepaint();
+  } );
+
   const QSizeF off = pic->offsetFromCallout();
   if ( off.width() == 0.0 && off.height() == 0.0 )
     return;
@@ -346,7 +371,6 @@ void KadasPictureAnnotationController::populateContextMenu( QgsAnnotationItem *i
   // Captures: the menu is modal and runs synchronously while the edit
   // tool / annotation layer / item are guaranteed to outlive it (the
   // tool that owns the menu also owns the lifetime of `pic`).
-  QPointer<QgsAnnotationLayer> layerPtr( ctx.layer() );
   QAction *resetAction = menu->addAction( QObject::tr( "Reset balloon" ) );
   QObject::connect( resetAction, &QAction::triggered, resetAction, [pic, layerPtr]() {
     pic->setOffsetFromCallout( QSizeF( 0, 0 ) );

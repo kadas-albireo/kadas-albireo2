@@ -159,6 +159,44 @@ class KadasPointTextStyleEditor : public KadasAnnotationStyleEditor
     QDoubleSpinBox *mBufferWidthSpin = nullptr;
 };
 
+
+class QPushButton;
+
+/**
+ * \brief Style editor for QgsAnnotationPictureItem with balloon callout.
+ *
+ * Exposes:
+ *  - a "Change image…" button to swap the picture source (file picker);
+ *  - balloon body fill / outline colors and outline width (mapped onto
+ *    the QgsBalloonCallout's fill symbol);
+ *  - the wedge width (in pixels);
+ *  - the picture frame size (width / height in pixels) which controls
+ *    the QgsAnnotationRectItem fixedSize.
+ *
+ * Wedge / corner radius / margins are kept at their defaults (the
+ * legacy KadasPictureItem look — sharp corners, 4px margin, 6px wedge).
+ */
+class KadasPictureStyleEditor : public KadasAnnotationStyleEditor
+{
+    Q_OBJECT
+
+  public:
+    explicit KadasPictureStyleEditor( QWidget *parent = nullptr );
+
+    void loadFromItem( const QgsAnnotationItem *item ) override;
+    void applyToItem( QgsAnnotationItem *item ) const override;
+
+  private:
+    QPushButton *mChangeImageBtn = nullptr;
+    QSpinBox *mWidthSpin = nullptr;
+    QSpinBox *mHeightSpin = nullptr;
+    QgsColorButton *mFillColorBtn = nullptr;
+    QgsColorButton *mStrokeColorBtn = nullptr;
+    QDoubleSpinBox *mStrokeWidthSpin = nullptr;
+    QDoubleSpinBox *mWedgeWidthSpin = nullptr;
+    QString mPath;
+};
+
 #endif // SIP_RUN
 
 #endif // KADASANNOTATIONSTYLEEDITOR_H
