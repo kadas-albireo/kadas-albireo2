@@ -505,6 +505,15 @@ KadasPictureStyleEditor::KadasPictureStyleEditor( QWidget *parent )
   mHeightSpin->setToolTip( tr( "Picture height" ) );
   row->addWidget( mHeightSpin );
 
+  // Lock aspect-ratio: when checked, editing one size spinbox or
+  // dragging a corner handle scales the other dimension proportionally.
+  // Stored as a session-wide preference on the controller (so corner
+  // drags from the map tool see the same flag).
+  mLockAspectBox = new QCheckBox( tr( "Lock ratio" ) );
+  mLockAspectBox->setToolTip( tr( "Preserve the picture's aspect ratio when resizing." ) );
+  mLockAspectBox->setChecked( KadasPictureAnnotationController::lockAspectRatio() );
+  row->addWidget( mLockAspectBox );
+
   // "Show callout" toggles the balloon shape entirely. When unchecked
   // the picture renders flat (no wedge, no frame), centered on the
   // anchor. The frame / stroke / wedge controls below are disabled in
@@ -590,8 +599,35 @@ KadasPictureStyleEditor::KadasPictureStyleEditor( QWidget *parent )
     mPath = attached;
     emit committed();
   } );
-  connect( mWidthSpin, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
-  connect( mHeightSpin, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
+  connect( mWidthSpin, qOverload<int>( &QSpinBox::valueChanged ), this, [this]( int w ) {
+    if ( mLockAspectBox->isChecked() && mHeightSpin->value() > 0 && w > 0 )
+    {
+      // Maintain the current aspect captured at the moment of the
+      // edit: derive the target height from the previous w/h ratio.
+      // Using the spinbox's current values ensures successive edits
+      // walk smoothly along the locked ratio.
+      const double aspect = mAspectLockRatio > 0 ? mAspectLockRatio : 1.0;
+      const int newH = std::max( 16, std::min( 2000, static_cast<int>( std::round( w / aspect ) ) ) );
+      const QSignalBlocker b( mHeightSpin );
+      mHeightSpin->setValue( newH );
+    }
+    emit committed();
+  } );
+  connect( mHeightSpin, qOverload<int>( &QSpinBox::valueChanged ), this, [this]( int h ) {
+    if ( mLockAspectBox->isChecked() && mWidthSpin->value() > 0 && h > 0 )
+    {
+      const double aspect = mAspectLockRatio > 0 ? mAspectLockRatio : 1.0;
+      const int newW = std::max( 16, std::min( 2000, static_cast<int>( std::round( h * aspect ) ) ) );
+      const QSignalBlocker b( mWidthSpin );
+      mWidthSpin->setValue( newW );
+    }
+    emit committed();
+  } );
+  connect( mLockAspectBox, &QCheckBox::toggled, this, [this]( bool on ) {
+    KadasPictureAnnotationController::setLockAspectRatio( on );
+    if ( on && mHeightSpin->value() > 0 )
+      mAspectLockRatio = static_cast<double>( mWidthSpin->value() ) / mHeightSpin->value();
+  } );
   connect( mFillColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
   connect( mStrokeColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
   connect( mStrokeWidthSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
@@ -616,6 +652,14 @@ void KadasPictureStyleEditor::loadFromItem( const QgsAnnotationItem *item )
   const QSizeF size = pic->fixedSize();
   mWidthSpin->setValue( static_cast<int>( std::round( size.width() ) ) );
   mHeightSpin->setValue( static_cast<int>( std::round( size.height() ) ) );
+  // Capture the picture's current aspect for the lock-ratio link;
+  // also restore the checkbox from the controller's session-wide flag.
+  if ( size.height() > 0 )
+    mAspectLockRatio = size.width() / size.height();
+  {
+    const QSignalBlocker b( mLockAspectBox );
+    mLockAspectBox->setChecked( KadasPictureAnnotationController::lockAspectRatio() );
+  }
 
   // Pull fill / stroke from the balloon callout's symbol layer if present;
   // fall back to the same defaults the controller uses (white / black /

@@ -60,10 +60,19 @@ namespace
 
   // KadasEditContext::vidx sentinels used by the picture controller to
   // distinguish what the user grabbed: the geographic anchor handle vs
-  // the picture frame body. Stored in the part field of the QgsVertexId
-  // so that other consumers (state history) treat them as opaque labels.
+  // the picture frame body, vs one of the four corner resize handles
+  // (whose corner index 0..3 lives in the QgsVertexId vertex slot).
+  // Stored in the part field of the QgsVertexId so other consumers
+  // (state history) treat them as opaque labels.
   constexpr int kPartAnchor = 0;
   constexpr int kPartFrame = 1;
+  constexpr int kPartCorner = 2;
+  // Corner indices match the order returned by frameCornersScreen():
+  //   0 = top-left, 1 = top-right, 2 = bottom-right, 3 = bottom-left.
+  constexpr int kCornerTL = 0;
+  constexpr int kCornerTR = 1;
+  constexpr int kCornerBR = 2;
+  constexpr int kCornerBL = 3;
 
   /**
    * Compute the picture's frame screen rectangle for the given map
@@ -158,6 +167,17 @@ namespace
       return pic->bounds().center();
     const QgsPointXY centerMap = ms.mapToPixel().toMapCoordinates( screen.center().toPoint() );
     return centerMap;
+  }
+
+  /// Returns the four corners of the picture's screen rectangle, in
+  /// order TL, TR, BR, BL (matches kCornerTL/TR/BR/BL). Empty list when
+  /// the picture is not in FixedSize mode.
+  QVector<QPointF> frameCornersScreen( const QgsAnnotationPictureItem *pic, const QgsMapSettings &ms, const QgsCoordinateTransform &xform )
+  {
+    const QRectF r = frameScreenRect( pic, ms, xform );
+    if ( !r.isValid() )
+      return {};
+    return { r.topLeft(), r.topRight(), r.bottomRight(), r.bottomLeft() };
   }
 
   Qgis::PictureFormat formatFromPath( const QString &path )
@@ -273,6 +293,24 @@ bool KadasPictureAnnotationController::isCalloutVisible( const QgsAnnotationPict
   return false;
 }
 
+namespace
+{
+  // Session-wide preference shared between the style editor checkbox
+  // and the controller's corner-resize math. Default true is the safer
+  // choice — uniform-stretch resize preserves the picture's appearance.
+  bool s_lockAspectRatio = true;
+} //namespace
+
+bool KadasPictureAnnotationController::lockAspectRatio()
+{
+  return s_lockAspectRatio;
+}
+
+void KadasPictureAnnotationController::setLockAspectRatio( bool on )
+{
+  s_lockAspectRatio = on;
+}
+
 QgsAnnotationItem *KadasPictureAnnotationController::createItem() const
 {
   // Default 200x150 pixel picture frame placed at the origin; the actual
@@ -288,9 +326,23 @@ QgsAnnotationItem *KadasPictureAnnotationController::createItem() const
 
 QList<KadasNode> KadasPictureAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
 {
-  // Single edit handle = the geographic anchor (the callout anchor,
-  // which is what the renderer uses to position the picture).
-  return { { toMapPos( pictureAnchorItem( asPicture( item ) ), ctx ) } };
+  const QgsAnnotationPictureItem *pic = asPicture( item );
+  QList<KadasNode> result;
+  // Central anchor handle: only visible when the callout is shown. With
+  // the callout hidden, the anchor coincides with (and tracks) the
+  // image center on each drag, so a separate handle there would be
+  // redundant and visually noisy.
+  if ( isCalloutVisible( pic ) )
+    result.append( { toMapPos( pictureAnchorItem( pic ), ctx ) } );
+  // Four corner resize handles. Convert the screen-space corners back
+  // to map coords; the renderer's placement formula is mirrored by
+  // frameCornersScreen() so the handles always land on the visible
+  // image's corners.
+  const QgsCoordinateTransform xform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
+  const QVector<QPointF> corners = frameCornersScreen( pic, ctx.mapSettings(), xform );
+  for ( const QPointF &c : corners )
+    result.append( { ctx.mapSettings().mapToPixel().toMapCoordinates( c.toPoint() ) } );
+  return result;
 }
 
 bool KadasPictureAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
@@ -353,7 +405,21 @@ QgsPointXY KadasPictureAnnotationController::positionFromDrawAttribs( const QgsA
 KadasEditContext KadasPictureAnnotationController::getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
 {
   const QgsAnnotationPictureItem *pic = asPicture( item );
-  const QgsPointXY anchorMap = toMapPos( pictureAnchorItem( pic ), ctx );
+  const QgsCoordinateTransform xform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
+
+  // Corner-resize handles win over both the anchor and the frame body
+  // — they sit ON the frame outline, so a frame-body test would
+  // swallow them. Diagonal cursors hint at the resize axis.
+  const QVector<QPointF> corners = frameCornersScreen( pic, ctx.mapSettings(), xform );
+  for ( int i = 0; i < corners.size(); ++i )
+  {
+    const QgsPointXY cornerMap = ctx.mapSettings().mapToPixel().toMapCoordinates( corners[i].toPoint() );
+    if ( pos.sqrDist( cornerMap ) < pickTolSqr( ctx ) )
+    {
+      const Qt::CursorShape c = ( i == kCornerTL || i == kCornerBR ) ? Qt::SizeFDiagCursor : Qt::SizeBDiagCursor;
+      return KadasEditContext( QgsVertexId( kPartCorner, 0, i ), cornerMap, KadasAttribDefs(), c );
+    }
+  }
 
   // Anchor handle wins when the click is within pick tolerance of it,
   // even when that point is also inside the frame rectangle. Otherwise
@@ -361,9 +427,11 @@ KadasEditContext KadasPictureAnnotationController::getEditContext( const QgsAnno
   // would be impossible to relocate — every click would land on the
   // much larger frame area and trigger a frame drag. Pick tolerance is
   // small (a few pixels) so the frame remains easy to grab anywhere
-  // else.
-  const QgsCoordinateTransform xform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
-  if ( pos.sqrDist( anchorMap ) < pickTolSqr( ctx ) )
+  // else. Skip this test entirely when the callout is hidden: the
+  // anchor handle is also hidden in nodes(), so it must not be
+  // grabbable either.
+  const QgsPointXY anchorMap = toMapPos( pictureAnchorItem( pic ), ctx );
+  if ( isCalloutVisible( pic ) && pos.sqrDist( anchorMap ) < pickTolSqr( ctx ) )
     return KadasEditContext( QgsVertexId( kPartAnchor, 0, 0 ), anchorMap, drawAttribs() );
   const QRectF frameRect = frameScreenRect( pic, ctx.mapSettings(), xform );
   const QPointF screenPos = ctx.mapSettings().mapToPixel().transform( pos ).toQPointF();
@@ -387,6 +455,84 @@ KadasEditContext KadasPictureAnnotationController::getEditContext( const QgsAnno
 void KadasPictureAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
   QgsAnnotationPictureItem *pic = asPicture( item );
+
+  if ( editContext.vidx.isValid() && editContext.vidx.part == kPartCorner )
+  {
+    // Corner resize: the diagonally-opposite corner stays anchored,
+    // the dragged corner follows the cursor. Math is done in pixel
+    // space (matching the renderer's painter-units pipeline) so the
+    // computed size is independent of the picture's current size unit.
+    const QgsCoordinateTransform xform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
+    const QVector<QPointF> corners = frameCornersScreen( pic, ctx.mapSettings(), xform );
+    const int idx = editContext.vidx.vertex;
+    if ( corners.size() != 4 || idx < 0 || idx > 3 )
+      return;
+    // Diagonal opposite: TL<->BR (0<->2), TR<->BL (1<->3).
+    const QPointF fixedPx = corners[( idx + 2 ) % 4];
+    const QPointF cursorPx = ctx.mapSettings().mapToPixel().transform( newPoint ).toQPointF();
+    double newW = std::abs( cursorPx.x() - fixedPx.x() );
+    double newH = std::abs( cursorPx.y() - fixedPx.y() );
+    constexpr double kMinSizePx = 16.0;
+    newW = std::max( newW, kMinSizePx );
+    newH = std::max( newH, kMinSizePx );
+
+    QgsRenderContext rc = QgsRenderContext::fromMapSettings( ctx.mapSettings() );
+    const double oldWpx = rc.convertToPainterUnits( pic->fixedSize().width(), pic->fixedSizeUnit() );
+    const double oldHpx = rc.convertToPainterUnits( pic->fixedSize().height(), pic->fixedSizeUnit() );
+    if ( lockAspectRatio() && oldWpx > 0.0 && oldHpx > 0.0 )
+    {
+      // Constrain to the picture's current aspect ratio. Pick the
+      // axis whose relative growth is larger so the corner tracks the
+      // cursor's dominant motion (other axis snaps to match).
+      const double aspect = oldWpx / oldHpx;
+      if ( newW / oldWpx > newH / oldHpx )
+        newH = newW / aspect;
+      else
+        newW = newH * aspect;
+    }
+
+    // New top-left in pixels: depends on which corner is fixed.
+    QPointF newTL;
+    newTL.setX( ( idx == kCornerTL || idx == kCornerBL ) ? fixedPx.x() - newW : fixedPx.x() );
+    newTL.setY( ( idx == kCornerTL || idx == kCornerTR ) ? fixedPx.y() - newH : fixedPx.y() );
+
+    // Convert the new size back into the picture's current size unit
+    // so we don't silently change the unit on first resize. unit-px
+    // ratio comes straight from the same convertToPainterUnits.
+    const double pxPerUnitW = rc.convertToPainterUnits( 1.0, pic->fixedSizeUnit() );
+    if ( pxPerUnitW > 0.0 )
+      pic->setFixedSize( QSizeF( newW / pxPerUnitW, newH / pxPerUnitW ) );
+
+    // Offset (top-left relative to anchor) is straightforward in px.
+    QgsPointXY anchorMap = pictureAnchorItem( pic );
+    try
+    {
+      if ( xform.isValid() )
+        anchorMap = xform.transform( anchorMap );
+    }
+    catch ( const QgsCsException & )
+    {
+      return;
+    }
+    const QPointF anchorPx = ctx.mapSettings().mapToPixel().transform( anchorMap ).toQPointF();
+    const QPointF offsetPx = newTL - anchorPx;
+    pic->setOffsetFromCallout( QSizeF( offsetPx.x(), offsetPx.y() ) );
+    pic->setOffsetFromCalloutUnit( Qgis::RenderUnit::Pixels );
+
+    // When the callout is hidden, anchor must follow the image (rule:
+    // dragging the image deletes the anchor's old position) — same
+    // invariant as a frame-body drag.
+    if ( !isCalloutVisible( pic ) )
+    {
+      const QPointF newCenterPx = newTL + QPointF( newW / 2.0, newH / 2.0 );
+      const QgsPointXY newCenterMap = ctx.mapSettings().mapToPixel().toMapCoordinates( newCenterPx.toPoint() );
+      const QgsPointXY ip = toItemPos( newCenterMap, ctx );
+      pic->setBounds( QgsRectangle( ip.x(), ip.y(), ip.x(), ip.y() ) );
+      pic->setCalloutAnchor( QgsGeometry( new QgsPoint( ip.x(), ip.y() ) ) );
+      pic->setOffsetFromCallout( QSizeF( -newW / 2.0, -newH / 2.0 ) );
+    }
+    return;
+  }
 
   if ( editContext.vidx.isValid() && editContext.vidx.part == kPartFrame )
   {

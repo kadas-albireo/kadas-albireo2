@@ -192,12 +192,17 @@ class KadasPictureStyleEditor : public KadasAnnotationStyleEditor
     QToolButton *mChangeImageBtn = nullptr;
     QSpinBox *mWidthSpin = nullptr;
     QSpinBox *mHeightSpin = nullptr;
+    QCheckBox *mLockAspectBox = nullptr;
     QCheckBox *mShowCalloutBox = nullptr;
     QgsColorButton *mFillColorBtn = nullptr;
     QgsColorButton *mStrokeColorBtn = nullptr;
     QDoubleSpinBox *mStrokeWidthSpin = nullptr;
     QDoubleSpinBox *mWedgeWidthSpin = nullptr;
     QString mPath;
+    // Aspect ratio captured when the lock was last toggled on, used by
+    // the spinbox-link logic so successive edits walk along the same
+    // ratio instead of drifting due to integer rounding.
+    double mAspectLockRatio = 0.0;
 };
 
 #endif // SIP_RUN

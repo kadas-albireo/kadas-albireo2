@@ -111,6 +111,19 @@ class KADAS_GUI_EXPORT KadasPictureAnnotationController : public KadasAnnotation
      */
     static bool isCalloutVisible( const QgsAnnotationPictureItem *pic );
 
+    /**
+     * \brief Session-wide preference: should corner-resize and the
+     * style editor's width/height spinboxes preserve the picture's
+     * aspect ratio?
+     *
+     * Stored as a static so the style editor (which owns the
+     * checkbox) and the controller (which performs corner drags from
+     * the map tool) agree without needing per-picture state. Default
+     * is \c true (the safer default — free resize stretches images).
+     */
+    static bool lockAspectRatio();
+    static void setLockAspectRatio( bool on );
+
   private:
     enum AttribIds
     {
