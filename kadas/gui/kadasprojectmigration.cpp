@@ -17,6 +17,9 @@
 #include <QApplication>
 #include <QDir>
 #include <QDomDocument>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QScreen>
 #include <QFile>
 #include <QMap>
@@ -32,8 +35,10 @@
 
 #include "kadas/core/kadas.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
+#include "kadas/gui/annotationitems/kadasmilxlayersettings.h"
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/kadasprojectmigration.h"
+#include "kadas/gui/milx/kadasmilxclient.h"
 #include "kadas/gui/mapitems/kadascircleitem.h"
 #include "kadas/gui/mapitems/kadasgpxrouteitem.h"
 #include "kadas/gui/mapitems/kadasgpxwaypointitem.h"
@@ -89,9 +94,17 @@ bool KadasProjectMigration::migrateProjectXml( const QString &basedir, QDomDocum
   if ( root.attribute( "version" ) == "2.15.2-KADAS" )
   {
     migrateKadas1xTo2x( doc, root, basedir, filesToAttach );
+    // Kadas 1.x → 2.x produces fresh annotation layers for MilX, so the
+    // legacy KadasMilxLayer rewrite below is a no-op for these projects.
     return true;
   }
-  return false;
+
+  // Kadas Albireo 2.x intermediate projects shipped with `KadasMilxLayer`
+  // plugin layers containing `KadasMilxItem` children. The plugin-layer
+  // type and item factory have since been removed in favour of
+  // `QgsAnnotationLayer` + `KadasMilxAnnotationItem`. Rewrite those
+  // blocks before QGIS opens the project so the symbols survive.
+  return migrateLegacyMilxLayers( doc, root );
 }
 
 void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &root, const QString &basedir, QStringList &filesToAttach )
@@ -464,6 +477,142 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
   }
 
   // Changes to guide grid etc?
+}
+
+bool KadasProjectMigration::migrateLegacyMilxLayers( QDomDocument &doc, QDomElement &root )
+{
+  QDomElement projectLayersEl = root.firstChildElement( "projectlayers" );
+  if ( projectLayersEl.isNull() )
+    return false;
+
+  // Snapshot direct `<maplayer>` children of `<projectlayers>`. Using
+  // `elementsByTagName` would also pick up nested `<maplayer>` blocks
+  // inside `<originalStyle>` etc., which we must not touch.
+  QList<QDomElement> milxMapLayers;
+  for ( QDomNode n = projectLayersEl.firstChild(); !n.isNull(); n = n.nextSibling() )
+  {
+    QDomElement el = n.toElement();
+    if ( el.tagName() == QLatin1String( "maplayer" ) && el.attribute( QStringLiteral( "type" ) ) == QLatin1String( "plugin" ) && el.attribute( QStringLiteral( "name" ) ) == QLatin1String( "KadasMilxLayer" ) )
+    {
+      milxMapLayers.append( el );
+    }
+  }
+  if ( milxMapLayers.isEmpty() )
+    return false;
+
+  for ( QDomElement &mapLayerEl : milxMapLayers )
+  {
+    const QString layerName = mapLayerEl.firstChildElement( "layername" ).text();
+
+    QgsAnnotationLayer::LayerOptions options( QgsProject::instance()->transformContext() );
+    auto annoLayer = std::make_unique<QgsAnnotationLayer>( layerName, options );
+    annoLayer->setCrs( QgsCoordinateReferenceSystem( "EPSG:4326" ) );
+
+    // Translate per-layer MilX symbol-settings overrides (carried as XML
+    // attributes on the legacy `<maplayer>` element) into the
+    // customProperty namespace used by KadasMilxLayerSettings.
+    if ( mapLayerEl.hasAttribute( QStringLiteral( "milx_override_symbol_settings" ) ) )
+    {
+      KadasMilxSymbolSettings settings = KadasMilxClient::globalSymbolSettings();
+      settings.symbolSize = mapLayerEl.attribute( QStringLiteral( "milx_symbol_size" ), QString::number( settings.symbolSize ) ).toInt();
+      settings.lineWidth = mapLayerEl.attribute( QStringLiteral( "milx_line_width" ), QString::number( settings.lineWidth ) ).toInt();
+      settings.workMode = static_cast<KadasMilxSymbolSettings::WorkMode>( mapLayerEl.attribute( QStringLiteral( "milx_work_mode" ), QString::number( static_cast<int>( settings.workMode ) ) ).toInt() );
+      settings.leaderLineWidth = mapLayerEl.attribute( QStringLiteral( "milx_leader_line_width" ), QString::number( settings.leaderLineWidth ) ).toInt();
+      settings.leaderLineColor = QColor( mapLayerEl.attribute( QStringLiteral( "milx_leader_line_color" ), QColor( settings.leaderLineColor ).name() ) );
+      KadasMilxLayerSettings::setLayerSettings( annoLayer.get(), settings );
+      KadasMilxLayerSettings::setOverrideEnabled( annoLayer.get(), mapLayerEl.attribute( QStringLiteral( "milx_override_symbol_settings" ) ).toInt() != 0 );
+    }
+
+    // Convert each `<MapItem name="KadasMilxItem">` JSON-in-CDATA payload
+    // into a populated `KadasMilxAnnotationItem`. MilX is fixed to
+    // EPSG:4326 in both the legacy and the new format, so no CRS
+    // transform is needed.
+    for ( QDomNode itemNode = mapLayerEl.firstChild(); !itemNode.isNull(); itemNode = itemNode.nextSibling() )
+    {
+      QDomElement itemEl = itemNode.toElement();
+      if ( itemEl.tagName() != QLatin1String( "MapItem" ) || itemEl.attribute( QStringLiteral( "name" ) ) != QLatin1String( "KadasMilxItem" ) )
+        continue;
+
+      const QJsonObject data = QJsonDocument::fromJson( itemEl.firstChild().toCDATASection().data().toLocal8Bit() ).object();
+      const QJsonObject props = data.value( QStringLiteral( "props" ) ).toObject();
+      const QString mssString = props.value( QStringLiteral( "mssString" ) ).toString();
+      if ( mssString.isEmpty() )
+        continue;
+
+      auto *anno = new KadasMilxAnnotationItem();
+      anno->setMssString( mssString );
+      anno->setMilitaryName( props.value( QStringLiteral( "militaryName" ) ).toString() );
+      anno->setSymbolType( props.value( QStringLiteral( "symbolType" ) ).toString() );
+      anno->setMinNumPoints( std::max( 1, props.value( QStringLiteral( "minNPoints" ) ).toInt( 1 ) ) );
+      anno->setHasVariablePoints( props.value( QStringLiteral( "hasVariablePoints" ) ).toBool() );
+
+      const QJsonObject state = data.value( QStringLiteral( "state" ) ).toObject();
+
+      QList<QgsPointXY> pts;
+      const QJsonArray ptsArr = state.value( QStringLiteral( "points" ) ).toArray();
+      pts.reserve( ptsArr.size() );
+      for ( const QJsonValue &v : ptsArr )
+      {
+        const QJsonArray p = v.toArray();
+        pts.append( QgsPointXY( p.at( 0 ).toDouble(), p.at( 1 ).toDouble() ) );
+      }
+      anno->setPoints( pts );
+
+      QList<int> ctrl;
+      const QJsonArray ctrlArr = state.value( QStringLiteral( "controlPoints" ) ).toArray();
+      for ( const QJsonValue &v : ctrlArr )
+        ctrl.append( v.toInt() );
+      anno->setControlPoints( ctrl );
+
+      QMap<KadasMilxAttrType, double> attrs;
+      const QJsonArray attrsArr = state.value( QStringLiteral( "attributes" ) ).toArray();
+      for ( const QJsonValue &v : attrsArr )
+      {
+        const QJsonArray a = v.toArray();
+        attrs.insert( static_cast<KadasMilxAttrType>( a.at( 0 ).toInt() ), a.at( 1 ).toDouble() );
+      }
+      anno->setAttributes( attrs );
+
+      QMap<KadasMilxAttrType, QgsPointXY> attrPts;
+      const QJsonArray attrPtsArr = state.value( QStringLiteral( "attributePoints" ) ).toArray();
+      for ( const QJsonValue &v : attrPtsArr )
+      {
+        const QJsonArray ap = v.toArray();
+        const QJsonArray pt = ap.at( 1 ).toArray();
+        attrPts.insert( static_cast<KadasMilxAttrType>( ap.at( 0 ).toInt() ), QgsPointXY( pt.at( 0 ).toDouble(), pt.at( 1 ).toDouble() ) );
+      }
+      anno->setAttributePoints( attrPts );
+
+      const QJsonArray off = state.value( QStringLiteral( "userOffset" ) ).toArray();
+      anno->setUserOffset( QPoint( off.at( 0 ).toDouble(), off.at( 1 ).toDouble() ) );
+
+      annoLayer->addItem( anno );
+    }
+
+    QDomElement newMapLayerEl = doc.createElement( "maplayer" );
+    QgsReadWriteContext context;
+    annoLayer->writeLayerXml( newMapLayerEl, doc, context );
+    // Preserve the original layer id so layer-tree-layer / layerorder
+    // references continue to resolve.
+    newMapLayerEl.appendChild( mapLayerEl.firstChildElement( "id" ).cloneNode() );
+    newMapLayerEl.appendChild( mapLayerEl.firstChildElement( "layername" ).cloneNode() );
+
+    projectLayersEl.replaceChild( newMapLayerEl, mapLayerEl );
+  }
+
+  // The layer-tree-layer entries reference the layer by id and carry
+  // `providerKey="KadasMilxLayer"` from the legacy format. The plugin
+  // provider key no longer exists; clear it so QGIS resolves the layer
+  // through the projectlayers maplayer block (now an annotation layer).
+  QDomNodeList treeLayers = root.elementsByTagName( QStringLiteral( "layer-tree-layer" ) );
+  for ( int i = 0, n = treeLayers.size(); i < n; ++i )
+  {
+    QDomElement el = treeLayers.at( i ).toElement();
+    if ( el.attribute( QStringLiteral( "providerKey" ) ) == QLatin1String( "KadasMilxLayer" ) )
+      el.setAttribute( QStringLiteral( "providerKey" ), QString() );
+  }
+
+  return true;
 }
 
 QDomElement KadasProjectMigration::replaceAnnotationLayer( QDomDocument &doc, QDomElement &root, const QString &layerId )
