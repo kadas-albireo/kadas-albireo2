@@ -232,6 +232,32 @@ void KadasPictureAnnotationController::ensureBalloon( QgsAnnotationPictureItem *
   }
 }
 
+bool KadasPictureAnnotationController::isCalloutVisible( const QgsAnnotationPictureItem *pic )
+{
+  if ( !pic )
+    return false;
+  const auto *balloon = dynamic_cast<const QgsBalloonCallout *>( pic->callout() );
+  if ( !balloon )
+    return false;
+  // "Hidden" state encoded by the style editor: transparent fill,
+  // transparent stroke and zero-width wedge. Any one being non-default
+  // means the user wants the balloon shown.
+  if ( balloon->wedgeWidth() > 0.0 )
+    return true;
+  if ( const QgsFillSymbol *sym = const_cast<QgsBalloonCallout *>( balloon )->fillSymbol() )
+  {
+    if ( sym->symbolLayerCount() > 0 )
+    {
+      if ( const auto *sl = dynamic_cast<const QgsSimpleFillSymbolLayer *>( sym->symbolLayer( 0 ) ) )
+      {
+        if ( sl->color().alpha() > 0 || sl->strokeColor().alpha() > 0 )
+          return true;
+      }
+    }
+  }
+  return false;
+}
+
 QgsAnnotationItem *KadasPictureAnnotationController::createItem() const
 {
   // Default 200x150 pixel picture frame placed at the origin; the actual
@@ -343,6 +369,18 @@ void KadasPictureAnnotationController::edit( QgsAnnotationItem *item, const Kada
 
   if ( editContext.vidx.isValid() && editContext.vidx.part == kPartFrame )
   {
+    // Callout-hidden mode: anchor lives at the picture center and
+    // moves with it. Translate bounds + calloutAnchor together; leave
+    // the offset at -size/2 so toggling the callout back on later
+    // produces the centered-on-anchor (zero-wedge) layout.
+    if ( !isCalloutVisible( pic ) )
+    {
+      const QgsPointXY ip = toItemPos( newPoint, ctx );
+      pic->setBounds( QgsRectangle( ip.x(), ip.y(), ip.x(), ip.y() ) );
+      pic->setCalloutAnchor( QgsGeometry( new QgsPoint( ip.x(), ip.y() ) ) );
+      return;
+    }
+
     // Frame-body drag: keep the geographic anchor fixed, move the
     // picture frame instead by adjusting the screen-space offset. The
     // wedge of the balloon callout grows out from the anchor toward the
