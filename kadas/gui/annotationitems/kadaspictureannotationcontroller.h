@@ -20,6 +20,7 @@
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 
 class QgsAnnotationPictureItem;
+class QgsAnnotationLayer;
 
 /**
  * \ingroup gui
@@ -97,6 +98,21 @@ class KADAS_GUI_EXPORT KadasPictureAnnotationController : public KadasAnnotation
      * a no-op and never overwrites the user's customizations.
      */
     static void ensureBalloon( QgsAnnotationPictureItem *pic );
+
+    /**
+     * \brief Returns the next zIndex to assign to a freshly created
+     * picture in \a layer so it stacks visually above all existing
+     * pictures in that layer.
+     *
+     * Pictures share the same nominal bucket
+     * (\c KadasAnnotationZIndex::Picture); within the bucket
+     * \c QgsAnnotationLayer breaks ties by item-id (UUID), which is
+     * effectively random. Assigning a strictly increasing zIndex per
+     * new picture guarantees that the most recently added one is on
+     * top, which is what users expect both visually and when
+     * click-picking through overlapping pictures.
+     */
+    static int nextPictureZIndex( const QgsAnnotationLayer *layer );
 
     /**
      * \brief Returns whether the picture's balloon callout is visible.
