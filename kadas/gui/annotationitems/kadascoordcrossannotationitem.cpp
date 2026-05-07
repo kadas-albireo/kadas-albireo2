@@ -139,6 +139,11 @@ bool KadasCoordCrossAnnotationItem::writeXml( QDomElement &element, QDomDocument
 bool KadasCoordCrossAnnotationItem::readXml( const QDomElement &element, const QgsReadWriteContext &context )
 {
   QgsAnnotationMarkerItem::readXml( element, context );
+  // The cross visual is fully drawn in render(); always force the
+  // base-class marker symbol back to fully transparent so projects
+  // saved before the marker style editor was suppressed do not show
+  // a stray dot in the centre of the cross on reload.
+  installDefaultSymbol();
   mShadowIds = KadasAnnotationShadow::decodeIds( element.attribute( KadasAnnotationShadow::shadowIdsAttribute() ) );
   return true;
 }

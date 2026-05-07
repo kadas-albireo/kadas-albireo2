@@ -703,13 +703,17 @@ QString KadasMapToolEditAnnotationItem::pickItemAt( const QgsPointXY &mapPos ) c
   // on top of a rectangle) may match both. Refine by asking each
   // candidate controller for an edit context at the click: only items
   // that actually consider themselves hit (vertex / handle / body) are
-  // kept. Among those, prefer the smallest bbox area as a final
-  // tiebreaker. If a candidate has no registered controller, fall back
-  // to the bbox-only smallest-area heuristic for that candidate.
+  // kept. Among those, prefer the highest zIndex (the item painted on
+  // top, matching the user's visual expectation when stacking
+  // pictures), with smallest bbox area as a tiebreaker for items that
+  // share a zIndex. If a candidate has no registered controller, fall
+  // back to the same z-then-area ordering on bbox-only matches.
   KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
   QString best;
+  int bestZ = std::numeric_limits<int>::min();
   double bestArea = std::numeric_limits<double>::infinity();
   QString fallback;
+  int fallbackZ = std::numeric_limits<int>::min();
   double fallbackArea = std::numeric_limits<double>::infinity();
   for ( const QString &id : hits )
   {
@@ -718,13 +722,15 @@ QString KadasMapToolEditAnnotationItem::pickItemAt( const QgsPointXY &mapPos ) c
       continue;
     const QgsRectangle bb = cand->boundingBox();
     const double area = bb.width() * bb.height();
+    const int z = cand->zIndex();
 
     KadasAnnotationItemController *cc = KadasAnnotationControllerRegistry::instance()->controllerFor( cand->type() );
     if ( !cc )
     {
       // No controller -> can't precise-test; keep as bbox-only fallback.
-      if ( area < fallbackArea )
+      if ( z > fallbackZ || ( z == fallbackZ && area < fallbackArea ) )
       {
+        fallbackZ = z;
         fallbackArea = area;
         fallback = id;
       }
@@ -733,8 +739,9 @@ QString KadasMapToolEditAnnotationItem::pickItemAt( const QgsPointXY &mapPos ) c
     const KadasEditContext ec = cc->getEditContext( cand, mapPos, ctx );
     if ( !ec.isValid() )
       continue;
-    if ( area < bestArea )
+    if ( z > bestZ || ( z == bestZ && area < bestArea ) )
     {
+      bestZ = z;
       bestArea = area;
       best = id;
     }

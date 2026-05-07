@@ -267,6 +267,27 @@ void KadasPictureAnnotationController::ensureBalloon( QgsAnnotationPictureItem *
   }
 }
 
+int KadasPictureAnnotationController::nextPictureZIndex( const QgsAnnotationLayer *layer )
+{
+  // Default to the bucketed value when there is no layer to scan.
+  if ( !layer )
+    return KadasAnnotationZIndex::Picture;
+  // Find the highest zIndex among existing picture items in the layer
+  // and return one above it. Falls back to the bucket constant when no
+  // pictures exist yet, which matches the historical behaviour for
+  // freshly created layers and keeps Z values within the Picture
+  // bucket bounds.
+  int maxZ = KadasAnnotationZIndex::Picture - 1;
+  const QMap<QString, QgsAnnotationItem *> all = layer->items();
+  for ( auto it = all.constBegin(), itEnd = all.constEnd(); it != itEnd; ++it )
+  {
+    if ( !it.value() || it.value()->type() != QLatin1String( "picture" ) )
+      continue;
+    maxZ = std::max( maxZ, it.value()->zIndex() );
+  }
+  return maxZ + 1;
+}
+
 bool KadasPictureAnnotationController::isCalloutVisible( const QgsAnnotationPictureItem *pic )
 {
   if ( !pic )
@@ -316,6 +337,8 @@ QgsAnnotationItem *KadasPictureAnnotationController::createItem() const
   // Default 200x150 pixel picture frame placed at the origin; the actual
   // anchor is set by startPart().
   auto *item = new QgsAnnotationPictureItem( Qgis::PictureFormat::Unknown, QString(), QgsRectangle( 0, 0, 0, 0 ) );
+  // zIndex is finalised by the controller's startPart() once the layer
+  // is known; default to the bucket value here.
   item->setZIndex( KadasAnnotationZIndex::Picture );
   item->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
   item->setFixedSize( QSizeF( 200, 150 ) );
@@ -353,6 +376,10 @@ bool KadasPictureAnnotationController::startPart( QgsAnnotationItem *item, const
   asPicture( item )->setBounds( QgsRectangle( ip.x(), ip.y(), ip.x(), ip.y() ) );
   // Callout anchor mirrors the bounds center (a Point geometry).
   item->setCalloutAnchor( QgsGeometry( new QgsPoint( ip.x(), ip.y() ) ) );
+  // Stack the new picture above all existing pictures in the layer so
+  // it is visually on top and is the one that gets hit by a click in
+  // the same area.
+  item->setZIndex( nextPictureZIndex( ctx.layer() ) );
   return false; // single-click placement
 }
 
