@@ -160,6 +160,7 @@ class KadasPointTextStyleEditor : public KadasAnnotationStyleEditor
 };
 
 
+class QCheckBox;
 class QPushButton;
 class QToolButton;
 
@@ -191,6 +192,7 @@ class KadasPictureStyleEditor : public KadasAnnotationStyleEditor
     QToolButton *mChangeImageBtn = nullptr;
     QSpinBox *mWidthSpin = nullptr;
     QSpinBox *mHeightSpin = nullptr;
+    QCheckBox *mShowCalloutBox = nullptr;
     QgsColorButton *mFillColorBtn = nullptr;
     QgsColorButton *mStrokeColorBtn = nullptr;
     QDoubleSpinBox *mStrokeWidthSpin = nullptr;
