@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QComboBox>
+#include <QCheckBox>
 #include <QDir>
 #include <QDoubleSpinBox>
 #include <QFileDialog>
@@ -60,6 +61,7 @@
 #include <qgis/qgstextformat.h>
 
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
+#include "kadas/gui/annotationitems/kadaspictureannotationcontroller.h"
 
 namespace
 {
@@ -505,6 +507,14 @@ KadasPictureStyleEditor::KadasPictureStyleEditor( QWidget *parent )
   mHeightSpin->setToolTip( tr( "Picture height in pixels" ) );
   row->addWidget( mHeightSpin );
 
+  // "Show callout" toggles the balloon shape entirely. When unchecked
+  // the picture renders flat (no wedge, no frame), centered on the
+  // anchor. The frame / stroke / wedge controls below are disabled in
+  // that mode since they have no visible effect.
+  mShowCalloutBox = new QCheckBox( tr( "Show callout" ) );
+  mShowCalloutBox->setToolTip( tr( "Display the picture inside a balloon shape pointing at its anchor." ) );
+  row->addWidget( mShowCalloutBox );
+
   row->addWidget( new QLabel( tr( "Frame:" ) ) );
   mFillColorBtn = new QgsColorButton();
   mFillColorBtn->setAllowOpacity( true );
@@ -588,6 +598,13 @@ KadasPictureStyleEditor::KadasPictureStyleEditor( QWidget *parent )
   connect( mStrokeColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
   connect( mStrokeWidthSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
   connect( mWedgeWidthSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
+  connect( mShowCalloutBox, &QCheckBox::toggled, this, [this]( bool on ) {
+    mFillColorBtn->setEnabled( on );
+    mStrokeColorBtn->setEnabled( on );
+    mStrokeWidthSpin->setEnabled( on );
+    mWedgeWidthSpin->setEnabled( on );
+    emit committed();
+  } );
 }
 
 void KadasPictureStyleEditor::loadFromItem( const QgsAnnotationItem *item )
@@ -629,6 +646,13 @@ void KadasPictureStyleEditor::loadFromItem( const QgsAnnotationItem *item )
   mStrokeColorBtn->setColor( stroke );
   mStrokeWidthSpin->setValue( strokeWidth );
   mWedgeWidthSpin->setValue( wedge );
+  const bool hasCallout = pic->callout() != nullptr;
+  QSignalBlocker block( mShowCalloutBox );
+  mShowCalloutBox->setChecked( hasCallout );
+  mFillColorBtn->setEnabled( hasCallout );
+  mStrokeColorBtn->setEnabled( hasCallout );
+  mStrokeWidthSpin->setEnabled( hasCallout );
+  mWedgeWidthSpin->setEnabled( hasCallout );
 }
 
 void KadasPictureStyleEditor::applyToItem( QgsAnnotationItem *item ) const
@@ -644,6 +668,28 @@ void KadasPictureStyleEditor::applyToItem( QgsAnnotationItem *item ) const
 
   pic->setFixedSize( QSizeF( mWidthSpin->value(), mHeightSpin->value() ) );
   pic->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
+
+  // Show-callout toggle: an unchecked box drops the balloon entirely
+  // (renderer's no-callout FixedSize branch centers the picture on the
+  // bounds, ignoring offsetFromCallout). On disable we also re-snap
+  // the bounds to the calloutAnchor so the picture sits where the
+  // anchor used to point — otherwise the picture would visually
+  // "snap back" to bounds.center which may differ from the anchor
+  // after a frame drag.
+  if ( !mShowCalloutBox->isChecked() )
+  {
+    if ( pic->callout() )
+    {
+      const QgsGeometry anchorGeom = pic->calloutAnchor();
+      if ( !anchorGeom.isEmpty() )
+      {
+        const QgsPointXY a( anchorGeom.asQPointF() );
+        pic->setBounds( QgsRectangle( a.x(), a.y(), a.x(), a.y() ) );
+      }
+      pic->setCallout( nullptr );
+    }
+    return;
+  }
 
   // Rebuild the balloon callout's fill symbol with the current colors /
   // stroke width. Keep the (margins, corner radius, wedge unit) the
@@ -661,5 +707,12 @@ void KadasPictureStyleEditor::applyToItem( QgsAnnotationItem *item ) const
   balloon->setWedgeWidth( mWedgeWidthSpin->value() );
   balloon->setWedgeWidthUnit( Qgis::RenderUnit::Pixels );
   if ( installed )
+  {
+    // Freshly enabling the callout: re-establish the canonical
+    // centered-on-anchor offset so the balloon reappears at a sane
+    // shape (otherwise a stale -size/2 from a different size would
+    // mis-place it).
     pic->setCallout( balloon );
+    KadasPictureAnnotationController::ensureBalloon( pic );
+  }
 }
