@@ -644,13 +644,27 @@ void KadasPictureStyleEditor::loadFromItem( const QgsAnnotationItem *item )
   mStrokeColorBtn->setColor( stroke );
   mStrokeWidthSpin->setValue( strokeWidth );
   mWedgeWidthSpin->setValue( wedge );
-  const bool hasCallout = pic->callout() != nullptr;
+  // The "Show callout" state is encoded in the symbol itself: a fully
+  // transparent fill+stroke and a zero wedge means the user has hidden
+  // the balloon (see applyToItem). When that's the case, fall back to
+  // visible defaults in the spinboxes so re-enabling produces a sane
+  // balloon instead of an invisible one.
+  const bool calloutVisible = pic->callout() && ( fill.alpha() > 0 || stroke.alpha() > 0 || wedge > 0.0 );
+  if ( !calloutVisible )
+  {
+    mFillColorBtn->setColor( Qt::white );
+    mStrokeColorBtn->setColor( Qt::black );
+    if ( strokeWidth <= 0.0 )
+      mStrokeWidthSpin->setValue( 1.0 );
+    if ( wedge <= 0.0 )
+      mWedgeWidthSpin->setValue( 6.0 );
+  }
   QSignalBlocker block( mShowCalloutBox );
-  mShowCalloutBox->setChecked( hasCallout );
-  mFillColorBtn->setEnabled( hasCallout );
-  mStrokeColorBtn->setEnabled( hasCallout );
-  mStrokeWidthSpin->setEnabled( hasCallout );
-  mWedgeWidthSpin->setEnabled( hasCallout );
+  mShowCalloutBox->setChecked( calloutVisible );
+  mFillColorBtn->setEnabled( calloutVisible );
+  mStrokeColorBtn->setEnabled( calloutVisible );
+  mStrokeWidthSpin->setEnabled( calloutVisible );
+  mWedgeWidthSpin->setEnabled( calloutVisible );
 }
 
 void KadasPictureStyleEditor::applyToItem( QgsAnnotationItem *item ) const
@@ -669,50 +683,27 @@ void KadasPictureStyleEditor::applyToItem( QgsAnnotationItem *item ) const
   // pictures in Millimeters (100mm ~ 378px at 96dpi); forcing Pixels
   // would silently shrink such images by ~3.8x on the first edit.
 
-  // Show-callout toggle: an unchecked box drops the balloon entirely
-  // (renderer's no-callout FixedSize branch centers the picture on the
-  // bounds, ignoring offsetFromCallout). On disable we also re-snap
-  // the bounds to the calloutAnchor so the picture sits where the
-  // anchor used to point — otherwise the picture would visually
-  // "snap back" to bounds.center which may differ from the anchor
-  // after a frame drag.
-  if ( !mShowCalloutBox->isChecked() )
-  {
-    if ( pic->callout() )
-    {
-      const QgsGeometry anchorGeom = pic->calloutAnchor();
-      if ( !anchorGeom.isEmpty() )
-      {
-        const QgsPointXY a( anchorGeom.asQPointF() );
-        pic->setBounds( QgsRectangle( a.x(), a.y(), a.x(), a.y() ) );
-      }
-      pic->setCallout( nullptr );
-    }
-    return;
-  }
-
-  // Rebuild the balloon callout's fill symbol with the current colors /
-  // stroke width. Keep the (margins, corner radius, wedge unit) the
-  // controller installed so the look stays consistent.
+  // Show-callout toggle: an unchecked box keeps the balloon callout
+  // installed but renders it invisible (transparent fill/stroke,
+  // zero-width wedge). The renderer then stays in the with-callout
+  // FixedSize branch so the picture is positioned at anchor+offset
+  // exactly where it was visually, instead of jumping to bounds.center
+  // as it would with `setCallout(nullptr)`.
   auto *balloon = dynamic_cast<QgsBalloonCallout *>( pic->callout() );
-  bool installed = false;
   if ( !balloon )
   {
     balloon = new QgsBalloonCallout();
-    installed = true;
-  }
-  auto *sl = new QgsSimpleFillSymbolLayer( mFillColorBtn->color(), Qt::SolidPattern, mStrokeColorBtn->color(), Qt::SolidLine, mStrokeWidthSpin->value() );
-  sl->setStrokeWidthUnit( Qgis::RenderUnit::Pixels );
-  balloon->setFillSymbol( new QgsFillSymbol( QgsSymbolLayerList() << sl ) );
-  balloon->setWedgeWidth( mWedgeWidthSpin->value() );
-  balloon->setWedgeWidthUnit( Qgis::RenderUnit::Pixels );
-  if ( installed )
-  {
-    // Freshly enabling the callout: re-establish the canonical
-    // centered-on-anchor offset so the balloon reappears at a sane
-    // shape (otherwise a stale -size/2 from a different size would
-    // mis-place it).
     pic->setCallout( balloon );
     KadasPictureAnnotationController::ensureBalloon( pic );
   }
+  const bool wantCallout = mShowCalloutBox->isChecked();
+  const QColor fill = wantCallout ? mFillColorBtn->color() : QColor( 0, 0, 0, 0 );
+  const QColor stroke = wantCallout ? mStrokeColorBtn->color() : QColor( 0, 0, 0, 0 );
+  const double strokeW = wantCallout ? mStrokeWidthSpin->value() : 0.0;
+  const double wedge = wantCallout ? mWedgeWidthSpin->value() : 0.0;
+  auto *sl = new QgsSimpleFillSymbolLayer( fill, Qt::SolidPattern, stroke, Qt::SolidLine, strokeW );
+  sl->setStrokeWidthUnit( Qgis::RenderUnit::Pixels );
+  balloon->setFillSymbol( new QgsFillSymbol( QgsSymbolLayerList() << sl ) );
+  balloon->setWedgeWidth( wedge );
+  balloon->setWedgeWidthUnit( Qgis::RenderUnit::Pixels );
 }

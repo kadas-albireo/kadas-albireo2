@@ -343,20 +343,6 @@ void KadasPictureAnnotationController::edit( QgsAnnotationItem *item, const Kada
 
   if ( editContext.vidx.isValid() && editContext.vidx.part == kPartFrame )
   {
-    // No-callout mode: there is no wedge to inflate, so a frame drag
-    // should *move* the picture instead of offsetting it from a
-    // (now invisible) anchor. Translate bounds + calloutAnchor
-    // together — this also keeps the anchor centered on the picture,
-    // which is the user-friendly behavior when re-enabling the
-    // callout later.
-    if ( !pic->callout() )
-    {
-      const QgsPointXY ip = toItemPos( newPoint, ctx );
-      pic->setBounds( QgsRectangle( ip.x(), ip.y(), ip.x(), ip.y() ) );
-      pic->setCalloutAnchor( QgsGeometry( new QgsPoint( ip.x(), ip.y() ) ) );
-      return;
-    }
-
     // Frame-body drag: keep the geographic anchor fixed, move the
     // picture frame instead by adjusting the screen-space offset. The
     // wedge of the balloon callout grows out from the anchor toward the

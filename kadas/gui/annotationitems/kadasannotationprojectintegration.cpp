@@ -178,29 +178,6 @@ namespace
   {
     return QStringLiteral( "kadas:picture-offset-unit:" ) + itemId;
   }
-  // Marker for "user explicitly turned the balloon off". Without this
-  // marker, ensureBalloonsAfterLoad would helpfully re-install a
-  // balloon on every reload and the user's choice would be lost.
-  QString noCalloutKey( const QString &itemId )
-  {
-    return QStringLiteral( "kadas:picture-no-callout:" ) + itemId;
-  }
-
-  void writePictureNoCalloutFlags()
-  {
-    for ( QgsAnnotationLayer *layer : annotationLayers() )
-    {
-      for ( const auto &pair : picturesInWithIds( layer ) )
-      {
-        const QString id = pair.first;
-        const QgsAnnotationPictureItem *pic = pair.second;
-        if ( !pic->callout() )
-          layer->setCustomProperty( noCalloutKey( id ), true );
-        else
-          layer->removeCustomProperty( noCalloutKey( id ) );
-      }
-    }
-  }
 
   void writePictureOffsetsToCustomProperties()
   {
@@ -259,17 +236,8 @@ namespace
   {
     for ( QgsAnnotationLayer *layer : annotationLayers() )
     {
-      for ( const auto &pair : picturesInWithIds( layer ) )
-      {
-        const QString id = pair.first;
-        QgsAnnotationPictureItem *pic = pair.second;
-        // Respect the user's explicit "Show callout" = off choice.
-        // Without this guard, every reload would re-install a balloon
-        // and the toggle would feel one-shot.
-        if ( layer->customProperty( noCalloutKey( id ), false ).toBool() )
-          continue;
+      for ( QgsAnnotationPictureItem *pic : picturesIn( layer ) )
         KadasPictureAnnotationController::ensureBalloon( pic );
-      }
     }
   }
 } // namespace
@@ -290,7 +258,6 @@ void KadasAnnotationProjectIntegration::prepareForSave()
   // channel because QGIS drops negative offsets at write time. See the
   // long comment above writePictureOffsetsToCustomProperties.
   writePictureOffsetsToCustomProperties();
-  writePictureNoCalloutFlags();
 }
 
 void KadasAnnotationProjectIntegration::stripAfterSave()
