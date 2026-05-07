@@ -498,13 +498,11 @@ KadasPictureStyleEditor::KadasPictureStyleEditor( QWidget *parent )
   row->addWidget( new QLabel( tr( "Size:" ) ) );
   mWidthSpin = new QSpinBox();
   mWidthSpin->setRange( 16, 2000 );
-  mWidthSpin->setSuffix( QStringLiteral( " px" ) );
-  mWidthSpin->setToolTip( tr( "Picture width in pixels" ) );
+  mWidthSpin->setToolTip( tr( "Picture width" ) );
   row->addWidget( mWidthSpin );
   mHeightSpin = new QSpinBox();
   mHeightSpin->setRange( 16, 2000 );
-  mHeightSpin->setSuffix( QStringLiteral( " px" ) );
-  mHeightSpin->setToolTip( tr( "Picture height in pixels" ) );
+  mHeightSpin->setToolTip( tr( "Picture height" ) );
   row->addWidget( mHeightSpin );
 
   // "Show callout" toggles the balloon shape entirely. When unchecked
@@ -667,7 +665,9 @@ void KadasPictureStyleEditor::applyToItem( QgsAnnotationItem *item ) const
     pic->setPath( pictureFormatFromPath( mPath ), mPath );
 
   pic->setFixedSize( QSizeF( mWidthSpin->value(), mHeightSpin->value() ) );
-  pic->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
+  // Preserve the picture's existing fixedSizeUnit. Paste-SVG creates
+  // pictures in Millimeters (100mm ~ 378px at 96dpi); forcing Pixels
+  // would silently shrink such images by ~3.8x on the first edit.
 
   // Show-callout toggle: an unchecked box drops the balloon entirely
   // (renderer's no-callout FixedSize branch centers the picture on the
