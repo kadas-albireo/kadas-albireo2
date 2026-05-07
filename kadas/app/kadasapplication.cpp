@@ -82,6 +82,7 @@
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
 #include "kadas/gui/annotationitems/kadasannotationprojectintegration.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
+#include "kadas/gui/annotationitems/kadaspictureannotationcontroller.h"
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationpictureitem.h>
 #include "kadas/gui/kadaslayerselectionwidget.h"
@@ -650,6 +651,11 @@ QPair<QString, QgsAnnotationLayer *> KadasApplication::addImageItem( const QStri
     item->setFixedSize( QSizeF( 100, 100 ) );
     item->setFixedSizeUnit( Qgis::RenderUnit::Millimeters );
   }
+  // Auto-install the balloon callout (centered-on-anchor by default,
+  // wedge invisible until the user drags the body) so the picture
+  // behaves identically whether created via the toolbar, the controller,
+  // paste, or migration. See KadasPictureAnnotationController::ensureBalloon.
+  KadasPictureAnnotationController::ensureBalloon( item );
   const QString itemId = layer->addItem( item );
   return qMakePair( itemId, layer );
 }
@@ -1494,6 +1500,7 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
       item->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
       item->setFixedSize( QSizeF( 64, 64 ) );
       item->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
+      KadasPictureAnnotationController::ensureBalloon( item );
       const QString itemId = layer->addItem( item );
       return new KadasMapToolEditAnnotationItem( canvas, layer, itemId );
     }
@@ -1514,6 +1521,7 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
       item->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
       item->setFixedSize( QSizeF( 100, 100 ) );
       item->setFixedSizeUnit( Qgis::RenderUnit::Millimeters );
+      KadasPictureAnnotationController::ensureBalloon( item );
       const QString itemId = layer->addItem( item );
       return new KadasMapToolEditAnnotationItem( canvas, layer, itemId );
     }

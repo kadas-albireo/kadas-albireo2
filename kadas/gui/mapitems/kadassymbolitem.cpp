@@ -32,6 +32,7 @@
 
 #include "kadas/core/kadascoordinateformat.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
+#include "kadas/gui/annotationitems/kadaspictureannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 #include "kadas/gui/mapitems/kadassymbolitem.h"
 
@@ -258,6 +259,7 @@ QgsAnnotationItem *KadasSymbolItem::annotationItem( const QgsCoordinateReference
   anno->setFixedSize( QSizeF( px.width() ? px.width() : 32, px.height() ? px.height() : 32 ) );
   anno->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
   anno->setZIndex( zIndex() ? zIndex() : KadasAnnotationZIndex::Picture );
+  KadasPictureAnnotationController::ensureBalloon( anno );
   return anno;
 }
 

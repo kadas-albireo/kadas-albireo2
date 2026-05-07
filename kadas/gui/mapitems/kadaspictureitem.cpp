@@ -38,6 +38,7 @@
 #include "kadas/core/kadascoordinateutils.h"
 #include "kadas/analysis/kadaslineofsight.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
+#include "kadas/gui/annotationitems/kadaspictureannotationcontroller.h"
 #include "kadas/gui/mapitems/kadaspictureitem.h"
 
 #include <qgis/qgsannotationpictureitem.h>
@@ -468,6 +469,7 @@ QgsAnnotationItem *KadasPictureItem::annotationItem( const QgsCoordinateReferenc
   anno->setFixedSize( QSizeF( px.width() ? px.width() : 200, px.height() ? px.height() : 200 ) );
   anno->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
   anno->setZIndex( zIndex() ? zIndex() : KadasAnnotationZIndex::Picture );
+  KadasPictureAnnotationController::ensureBalloon( anno );
   return anno;
 }
 
