@@ -98,6 +98,19 @@ class KADAS_GUI_EXPORT KadasPictureAnnotationController : public KadasAnnotation
      */
     static void ensureBalloon( QgsAnnotationPictureItem *pic );
 
+    /**
+     * \brief Returns whether the picture's balloon callout is visible.
+     *
+     * The "Show callout" toggle in the style editor is encoded by setting
+     * the balloon symbol to fully transparent fill+stroke and a zero
+     * wedge width — the renderer still places the picture at
+     * \c anchor+offset, but the balloon shape itself is invisible. Code
+     * that depends on whether the callout is shown (e.g. picture-drag
+     * behavior) checks this predicate rather than looking at
+     * \c pic->callout() directly.
+     */
+    static bool isCalloutVisible( const QgsAnnotationPictureItem *pic );
+
   private:
     enum AttribIds
     {
