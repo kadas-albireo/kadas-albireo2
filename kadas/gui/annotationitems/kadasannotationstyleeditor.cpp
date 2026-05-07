@@ -18,18 +18,26 @@
 #include <QDir>
 #include <QDoubleSpinBox>
 #include <QFileDialog>
+#include <QFile>
 #include <QFileInfo>
 #include <QFontComboBox>
 #include <QHBoxLayout>
 #include <QIcon>
+#include <QInputDialog>
 #include <QLabel>
 #include <QLineEdit>
 #include <QList>
+#include <QMenu>
+#include <QMessageBox>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QPainter>
 #include <QPixmap>
 #include <QPushButton>
 #include <QSignalBlocker>
 #include <QSpinBox>
+#include <QToolButton>
+#include <QUrl>
 #include <cmath>
 #include <memory>
 
@@ -46,6 +54,8 @@
 #include <qgis/qgslinesymbollayer.h>
 #include <qgis/qgsmarkersymbol.h>
 #include <qgis/qgsmarkersymbollayer.h>
+#include <qgis/qgsnetworkaccessmanager.h>
+#include <qgis/qgsproject.h>
 #include <qgis/qgssymbollayerutils.h>
 #include <qgis/qgstextformat.h>
 
@@ -468,8 +478,19 @@ KadasPictureStyleEditor::KadasPictureStyleEditor( QWidget *parent )
   auto *row = new QHBoxLayout( this );
   row->setContentsMargins( 0, 0, 0, 0 );
 
-  mChangeImageBtn = new QPushButton( tr( "Change image…" ) );
-  mChangeImageBtn->setToolTip( tr( "Pick a new picture file (PNG, JPG, SVG, …)." ) );
+  mChangeImageBtn = new QToolButton();
+  mChangeImageBtn->setText( tr( "Change image…" ) );
+  mChangeImageBtn->setToolTip( tr( "Pick a new picture from a file or fetch one from a URL." ) );
+  // Tool-button + dropdown menu so the user can pick between local file
+  // or a remote URL. InstantPopup means the entire button surface opens
+  // the menu (rather than splitting click vs arrow), which is the
+  // cleanest UX when both choices are first-class.
+  mChangeImageBtn->setPopupMode( QToolButton::InstantPopup );
+  mChangeImageBtn->setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
+  auto *menu = new QMenu( mChangeImageBtn );
+  QAction *fromFileAction = menu->addAction( tr( "From file…" ) );
+  QAction *fromUrlAction = menu->addAction( tr( "From URL…" ) );
+  mChangeImageBtn->setMenu( menu );
   row->addWidget( mChangeImageBtn );
 
   row->addWidget( new QLabel( tr( "Size:" ) ) );
@@ -514,12 +535,51 @@ KadasPictureStyleEditor::KadasPictureStyleEditor( QWidget *parent )
   mWedgeWidthSpin->setToolTip( tr( "Width of the balloon wedge base" ) );
   row->addWidget( mWedgeWidthSpin );
 
-  connect( mChangeImageBtn, &QPushButton::clicked, this, [this]() {
+  connect( fromFileAction, &QAction::triggered, this, [this]() {
     const QString chosen
       = QFileDialog::getOpenFileName( this, tr( "Select picture" ), mPath.isEmpty() ? QDir::homePath() : QFileInfo( mPath ).absolutePath(), tr( "Images (*.png *.jpg *.jpeg *.bmp *.gif *.tif *.tiff *.svg)" ) );
     if ( chosen.isEmpty() )
       return;
     mPath = chosen;
+    emit committed();
+  } );
+  connect( fromUrlAction, &QAction::triggered, this, [this]() {
+    bool ok = false;
+    const QString urlStr = QInputDialog::getText( this, tr( "Picture URL" ), tr( "Enter the URL of an image:" ), QLineEdit::Normal, QString(), &ok );
+    if ( !ok || urlStr.trimmed().isEmpty() )
+      return;
+    const QUrl url( urlStr.trimmed() );
+    if ( !url.isValid() || !( url.scheme().compare( QLatin1String( "http" ), Qt::CaseInsensitive ) == 0 || url.scheme().compare( QLatin1String( "https" ), Qt::CaseInsensitive ) == 0 ) )
+    {
+      QMessageBox::warning( this, tr( "Picture URL" ), tr( "Please enter a valid http:// or https:// URL." ) );
+      return;
+    }
+    // Blocking GET keeps the wiring simple: the user already paused the
+    // edit flow on the menu, an extra modal wait is acceptable here.
+    QNetworkRequest req( url );
+    QgsNetworkReplyContent content = QgsNetworkAccessManager::instance()->blockingGet( req );
+    if ( content.error() != QNetworkReply::NoError || content.content().isEmpty() )
+    {
+      QMessageBox::warning( this, tr( "Picture URL" ), tr( "Failed to download image: %1" ).arg( content.errorString() ) );
+      return;
+    }
+    // Save into the project archive so the picture survives a project
+    // save/reload — same lifecycle as a file picked from disk via
+    // KadasApplication::addImageItem. Picks the basename from the URL
+    // path, falling back to a generic name if the URL has no file part.
+    QString baseName = QFileInfo( url.path() ).fileName();
+    if ( baseName.isEmpty() )
+      baseName = QStringLiteral( "downloaded_image" );
+    const QString attached = QgsProject::instance()->createAttachedFile( baseName );
+    QFile out( attached );
+    if ( !out.open( QIODevice::WriteOnly ) )
+    {
+      QMessageBox::warning( this, tr( "Picture URL" ), tr( "Failed to write image to project archive." ) );
+      return;
+    }
+    out.write( content.content() );
+    out.close();
+    mPath = attached;
     emit committed();
   } );
   connect( mWidthSpin, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );

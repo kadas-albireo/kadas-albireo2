@@ -78,6 +78,26 @@ class KADAS_GUI_EXPORT KadasPictureAnnotationController : public KadasAnnotation
     //! Convenience: sets the picture's source path (auto-detects format from extension).
     static void setPath( QgsAnnotationPictureItem *item, const QString &path );
 
+    /**
+     * Idempotently installs a balloon callout on \a pic so it acts as a
+     * cartoon speech-bubble: the picture frame is the bubble body, with a
+     * wedge pointing back to the geographic anchor (bounds.center).
+     *
+     * Steps performed (each is skipped if already in place):
+     *  - install a \c QgsBalloonCallout (white fill, 1px black stroke,
+     *    4px margins, 6px wedge, 0 corner radius) when no callout exists
+     *  - set \c calloutAnchor to \c bounds().center() when empty
+     *  - set \c offsetFromCallout to \c -size/2 (centered-on-anchor,
+     *    wedge has zero length) when the offset is invalid
+     *
+     * Centralized here because every picture creation site (controller,
+     * \c KadasApplication::addImageItem, paste-from-clipboard,
+     * \c KadasPictureItem / \c KadasSymbolItem migration) needs the same
+     * callout layout. Calling this on a picture that already has one is
+     * a no-op and never overwrites the user's customizations.
+     */
+    static void ensureBalloon( QgsAnnotationPictureItem *pic );
+
   private:
     enum AttribIds
     {

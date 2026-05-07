@@ -161,6 +161,7 @@ class KadasPointTextStyleEditor : public KadasAnnotationStyleEditor
 
 
 class QPushButton;
+class QToolButton;
 
 /**
  * \brief Style editor for QgsAnnotationPictureItem with balloon callout.
@@ -187,7 +188,7 @@ class KadasPictureStyleEditor : public KadasAnnotationStyleEditor
     void applyToItem( QgsAnnotationItem *item ) const override;
 
   private:
-    QPushButton *mChangeImageBtn = nullptr;
+    QToolButton *mChangeImageBtn = nullptr;
     QSpinBox *mWidthSpin = nullptr;
     QSpinBox *mHeightSpin = nullptr;
     QgsColorButton *mFillColorBtn = nullptr;

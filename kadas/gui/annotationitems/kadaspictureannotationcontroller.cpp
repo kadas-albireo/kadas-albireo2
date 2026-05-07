@@ -116,11 +116,24 @@ namespace
     // completely different place than the visible image. Build a
     // QgsRenderContext and run the same conversion the renderer does.
     QgsRenderContext rc = QgsRenderContext::fromMapSettings( ms );
-    const double offW = rc.convertToPainterUnits( pic->offsetFromCallout().width(), pic->offsetFromCalloutUnit() );
-    const double offH = rc.convertToPainterUnits( pic->offsetFromCallout().height(), pic->offsetFromCalloutUnit() );
     const double w = rc.convertToPainterUnits( pic->fixedSize().width(), pic->fixedSizeUnit() );
     const double h = rc.convertToPainterUnits( pic->fixedSize().height(), pic->fixedSizeUnit() );
-    return QRectF( anchorPx.x() + offW, anchorPx.y() + offH, w, h );
+    // Two render branches in qgsannotationrectitem.cpp:
+    //   (A) callout + non-empty calloutAnchor:
+    //         painterBounds = QRectF(anchorPx + offset, size)
+    //   (B) otherwise:
+    //         painterBounds centered on bounds.center
+    // Pictures created without a callout (legacy paths, untouched
+    // migrations) use branch B and ignore offsetFromCallout. Mirror
+    // the same branching here so the hit-test rect always matches the
+    // visible picture.
+    if ( pic->callout() && !pic->calloutAnchor().isEmpty() )
+    {
+      const double offW = rc.convertToPainterUnits( pic->offsetFromCallout().width(), pic->offsetFromCalloutUnit() );
+      const double offH = rc.convertToPainterUnits( pic->offsetFromCallout().height(), pic->offsetFromCalloutUnit() );
+      return QRectF( anchorPx.x() + offW, anchorPx.y() + offH, w, h );
+    }
+    return QRectF( anchorPx.x() - w / 2.0, anchorPx.y() - h / 2.0, w, h );
   }
 
   /// The default offset used when placing a fresh picture: centers the
@@ -169,6 +182,56 @@ void KadasPictureAnnotationController::setPath( QgsAnnotationPictureItem *item, 
   item->setPath( formatFromPath( path ), path );
 }
 
+void KadasPictureAnnotationController::ensureBalloon( QgsAnnotationPictureItem *pic )
+{
+  if ( !pic )
+    return;
+  // 1. Install a balloon callout if none exists. Replicates the legacy
+  //    KadasPictureItem look: white fill, 1px sharp black border, 4px
+  //    margin, 6px wedge, 0 corner radius. All units in Pixels so the
+  //    bubble keeps its on-screen size regardless of map scale.
+  if ( !pic->callout() )
+  {
+    auto *callout = new QgsBalloonCallout();
+    auto *fillLayer = new QgsSimpleFillSymbolLayer( Qt::white, Qt::SolidPattern, Qt::black, Qt::SolidLine, 1.0 );
+    fillLayer->setStrokeWidthUnit( Qgis::RenderUnit::Pixels );
+    callout->setFillSymbol( new QgsFillSymbol( QgsSymbolLayerList() << fillLayer ) );
+    callout->setMargins( QgsMargins( 4, 4, 4, 4 ) );
+    callout->setMarginsUnit( Qgis::RenderUnit::Pixels );
+    callout->setWedgeWidth( 6 );
+    callout->setWedgeWidthUnit( Qgis::RenderUnit::Pixels );
+    callout->setCornerRadius( 0 );
+    callout->setCornerRadiusUnit( Qgis::RenderUnit::Pixels );
+    pic->setCallout( callout );
+  }
+  // 2. Anchor the callout at the bounds center (= the geographic point
+  //    the user originally clicked / the migrated item carried) when no
+  //    explicit anchor is set yet.
+  if ( pic->calloutAnchor().isEmpty() )
+  {
+    const QgsPointXY c = pic->bounds().center();
+    pic->setCalloutAnchor( QgsGeometry( new QgsPoint( c.x(), c.y() ) ) );
+  }
+  // 3. Initialize the offset to -size/2 so the picture frame starts
+  //    centered on the anchor and the wedge has zero visible length
+  //    (legacy "no balloon" look). Only do this when the offset is the
+  //    default-invalid sentinel — never overwrite a user-positioned
+  //    balloon. Use the picture's existing fixedSize unit so the math
+  //    is consistent with the renderer's convertToPainterUnits call.
+  //
+  //    NOTE: this offset is negative, which `QSizeF::isValid()` rejects;
+  //    QGIS guards `writeCommonProperties` with that check and will not
+  //    persist negative offsets. The save side-channel installed by
+  //    `KadasAnnotationProjectIntegration` writes the offset to a layer
+  //    customProperty so the balloon position survives a save/reload.
+  if ( !pic->offsetFromCallout().isValid() )
+  {
+    const QSizeF size = pic->fixedSize();
+    pic->setOffsetFromCallout( QSizeF( -size.width() / 2.0, -size.height() / 2.0 ) );
+    pic->setOffsetFromCalloutUnit( pic->fixedSizeUnit() );
+  }
+}
+
 QgsAnnotationItem *KadasPictureAnnotationController::createItem() const
 {
   // Default 200x150 pixel picture frame placed at the origin; the actual
@@ -176,35 +239,9 @@ QgsAnnotationItem *KadasPictureAnnotationController::createItem() const
   auto *item = new QgsAnnotationPictureItem( Qgis::PictureFormat::Unknown, QString(), QgsRectangle( 0, 0, 0, 0 ) );
   item->setZIndex( KadasAnnotationZIndex::Picture );
   item->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
-  // The picture starts centered on its anchor (offset = -size/2, top-left
-  // form). With the picture centered on the anchor the balloon wedge is
-  // invisible — the legacy KadasPictureItem look. Dragging the frame
-  // body shifts the offset off-center; once the anchor falls outside the
-  // picture rect, the wedge becomes visible.
   item->setFixedSize( QSizeF( 200, 150 ) );
   item->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
-  item->setOffsetFromCallout( QSizeF( -100, -75 ) );
-  item->setOffsetFromCalloutUnit( Qgis::RenderUnit::Pixels );
-  // Auto-install a balloon callout (cartoon speech-bubble) — the picture
-  // frame becomes the bubble body, with a wedge pointing back to the
-  // geographic anchor. Replicates the legacy KadasPictureItem look:
-  //   * white fill with a 1px sharp-corner black border (sFramePadding=4
-  //     and sArrowWidth=6 from the legacy KadasRectangleItemBase);
-  //   * 4px margin so the bubble extends slightly beyond the picture
-  //     content like the legacy frame did;
-  //   * 0px corner radius so the bubble is a sharp rectangle (legacy
-  //     drew a polygon, not a rounded rect).
-  auto *callout = new QgsBalloonCallout();
-  auto *fillLayer = new QgsSimpleFillSymbolLayer( Qt::white, Qt::SolidPattern, Qt::black, Qt::SolidLine, 1.0 );
-  fillLayer->setStrokeWidthUnit( Qgis::RenderUnit::Pixels );
-  callout->setFillSymbol( new QgsFillSymbol( QgsSymbolLayerList() << fillLayer ) );
-  callout->setMargins( QgsMargins( 4, 4, 4, 4 ) );
-  callout->setMarginsUnit( Qgis::RenderUnit::Pixels );
-  callout->setWedgeWidth( 6 );
-  callout->setWedgeWidthUnit( Qgis::RenderUnit::Pixels );
-  callout->setCornerRadius( 0 );
-  callout->setCornerRadiusUnit( Qgis::RenderUnit::Pixels );
-  item->setCallout( callout );
+  ensureBalloon( item );
   return item;
 }
 
