@@ -314,30 +314,26 @@ KadasEditContext KadasPictureAnnotationController::getEditContext( const QgsAnno
   const QgsAnnotationPictureItem *pic = asPicture( item );
   const QgsPointXY anchorMap = toMapPos( pictureAnchorItem( pic ), ctx );
 
-  // Frame body wins over the anchor handle. Rationale: when the balloon
-  // is collapsed (offset 0) the anchor and the frame center share a
-  // pixel; if the anchor handle won, dragging the picture would just
-  // translate the whole assembly and the user could never inflate the
-  // balloon. Hitting the frame body always sets the offset (anchor
-  // stays put → balloon inflates / re-shapes), and the anchor handle
-  // is reachable only when it is visually outside the frame, i.e. once
-  // the balloon is already inflated.
+  // Anchor handle wins when the click is within pick tolerance of it,
+  // even when that point is also inside the frame rectangle. Otherwise
+  // a balloon whose anchor sits over (or very near) the frame body
+  // would be impossible to relocate — every click would land on the
+  // much larger frame area and trigger a frame drag. Pick tolerance is
+  // small (a few pixels) so the frame remains easy to grab anywhere
+  // else.
   const QgsCoordinateTransform xform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
-  const QRectF frameRect = frameScreenRect( pic, ctx.mapSettings(), xform );
-  const QPointF screenPos = ctx.mapSettings().mapToPixel().transform( pos ).toQPointF();
-  if ( frameRect.isValid() )
-  {
-    if ( frameRect.contains( screenPos ) )
-    {
-      // Returned `pos` field is the click in map coords so the edit-tool
-      // can compute mMoveOffset. The vidx part slot marks this as the
-      // frame body grab (QgsVertexId ctor signature is (part, ring,
-      // vertex), so the discriminator must live in the first arg).
-      return KadasEditContext( QgsVertexId( kPartFrame, 0, 0 ), pos, KadasAttribDefs(), Qt::SizeAllCursor );
-    }
-  }
   if ( pos.sqrDist( anchorMap ) < pickTolSqr( ctx ) )
     return KadasEditContext( QgsVertexId( kPartAnchor, 0, 0 ), anchorMap, drawAttribs() );
+  const QRectF frameRect = frameScreenRect( pic, ctx.mapSettings(), xform );
+  const QPointF screenPos = ctx.mapSettings().mapToPixel().transform( pos ).toQPointF();
+  if ( frameRect.isValid() && frameRect.contains( screenPos ) )
+  {
+    // Returned `pos` field is the click in map coords so the edit-tool
+    // can compute mMoveOffset. The vidx part slot marks this as the
+    // frame body grab (QgsVertexId ctor signature is (part, ring,
+    // vertex), so the discriminator must live in the first arg).
+    return KadasEditContext( QgsVertexId( kPartFrame, 0, 0 ), pos, KadasAttribDefs(), Qt::SizeAllCursor );
+  }
   return KadasEditContext();
 }
 
