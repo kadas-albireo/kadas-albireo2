@@ -53,7 +53,6 @@
 #include <qgis/qgsfillsymbollayer.h>
 #include <qgis/qgslinesymbol.h>
 #include <qgis/qgslinesymbollayer.h>
-#include <qgis/qgsmargins.h>
 #include <qgis/qgsmarkersymbol.h>
 #include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgsnetworkaccessmanager.h>
@@ -670,40 +669,6 @@ void KadasPictureStyleEditor::applyToItem( QgsAnnotationItem *item ) const
   pic->setFixedSize( QSizeF( mWidthSpin->value(), mHeightSpin->value() ) );
   pic->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
 
-  // The balloon callout inflates the rendered rectangle by its margins
-  // (the picture itself stays at painterBounds, but the balloon shape
-  // is drawn margins-pixels outside it). So toggling the callout off
-  // visibly shrinks the on-screen footprint by 2*margin per axis.
-  // Compensate by adjusting fixedSize so the footprint stays constant
-  // across the toggle. Read the margin from the existing balloon when
-  // possible (user might have tweaked it elsewhere); fall back to the
-  // 4px default ensureBalloon installs.
-  auto marginPx = []( const QgsAnnotationPictureItem *p ) -> QPointF {
-    if ( const auto *b = dynamic_cast<const QgsBalloonCallout *>( p->callout() ) )
-    {
-      const QgsMargins m = b->margins();
-      return QPointF( m.left() + m.right(), m.top() + m.bottom() );
-    }
-    return QPointF( 8.0, 8.0 ); // 4px each side, ensureBalloon default
-  };
-
-  const bool wantCallout = mShowCalloutBox->isChecked();
-  const bool hasCallout = pic->callout() != nullptr;
-  if ( wantCallout != hasCallout )
-  {
-    const QPointF inflate = marginPx( pic );
-    QSizeF s = pic->fixedSize();
-    if ( wantCallout )
-      s = QSizeF( std::max( 1.0, s.width() - inflate.x() ), std::max( 1.0, s.height() - inflate.y() ) );
-    else
-      s = QSizeF( s.width() + inflate.x(), s.height() + inflate.y() );
-    pic->setFixedSize( s );
-    QSignalBlocker bw( mWidthSpin );
-    QSignalBlocker bh( mHeightSpin );
-    mWidthSpin->setValue( static_cast<int>( std::round( s.width() ) ) );
-    mHeightSpin->setValue( static_cast<int>( std::round( s.height() ) ) );
-  }
-
   // Show-callout toggle: an unchecked box drops the balloon entirely
   // (renderer's no-callout FixedSize branch centers the picture on the
   // bounds, ignoring offsetFromCallout). On disable we also re-snap
@@ -711,7 +676,7 @@ void KadasPictureStyleEditor::applyToItem( QgsAnnotationItem *item ) const
   // anchor used to point — otherwise the picture would visually
   // "snap back" to bounds.center which may differ from the anchor
   // after a frame drag.
-  if ( !wantCallout )
+  if ( !mShowCalloutBox->isChecked() )
   {
     if ( pic->callout() )
     {
