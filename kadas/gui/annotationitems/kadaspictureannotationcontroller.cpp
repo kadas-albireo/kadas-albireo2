@@ -145,6 +145,21 @@ namespace
     return QSizeF( -size.width() / 2.0, -size.height() / 2.0 );
   }
 
+  /// Returns the picture's visual center in map coordinates. This is
+  /// what the renderer actually shows the image centered on, taking
+  /// the offset and the picture's own size unit into account. The drag
+  /// math (and the edit-tool's mMoveOffset) is anchored on this point
+  /// rather than on `bounds.center()`/`anchor` — they only coincide
+  /// when offsetFromCallout is the default `-size/2`.
+  QgsPointXY imageCenterMap( const QgsAnnotationPictureItem *pic, const QgsMapSettings &ms, const QgsCoordinateTransform &xform )
+  {
+    const QRectF screen = frameScreenRect( pic, ms, xform );
+    if ( !screen.isValid() )
+      return pic->bounds().center();
+    const QgsPointXY centerMap = ms.mapToPixel().toMapCoordinates( screen.center().toPoint() );
+    return centerMap;
+  }
+
   Qgis::PictureFormat formatFromPath( const QString &path )
   {
     const QString ext = QFileInfo( path ).suffix().toLower();
@@ -354,11 +369,17 @@ KadasEditContext KadasPictureAnnotationController::getEditContext( const QgsAnno
   const QPointF screenPos = ctx.mapSettings().mapToPixel().transform( pos ).toQPointF();
   if ( frameRect.isValid() && frameRect.contains( screenPos ) )
   {
-    // Returned `pos` field is the click in map coords so the edit-tool
-    // can compute mMoveOffset. The vidx part slot marks this as the
-    // frame body grab (QgsVertexId ctor signature is (part, ring,
-    // vertex), so the discriminator must live in the first arg).
-    return KadasEditContext( QgsVertexId( kPartFrame, 0, 0 ), pos, KadasAttribDefs(), Qt::SizeAllCursor );
+    // Returned `pos` field is the image's *visual center* in map
+    // coords — not the click point. The edit-tool computes
+    //   mMoveOffset = clickPos - editContext.pos
+    // and on each drag passes
+    //   newPoint = mousePos - mMoveOffset = mousePos - clickPos + imageCenter
+    // i.e. newPoint always equals the desired NEW image center. That
+    // simplifies the edit() math (just set the image center to
+    // newPoint) and prevents the image from snapping under the cursor
+    // on press when offsetFromCallout is non-default.
+    const QgsPointXY centerMap = imageCenterMap( pic, ctx.mapSettings(), xform );
+    return KadasEditContext( QgsVertexId( kPartFrame, 0, 0 ), centerMap, KadasAttribDefs(), Qt::SizeAllCursor );
   }
   return KadasEditContext();
 }
@@ -369,29 +390,36 @@ void KadasPictureAnnotationController::edit( QgsAnnotationItem *item, const Kada
 
   if ( editContext.vidx.isValid() && editContext.vidx.part == kPartFrame )
   {
-    // Callout-hidden mode: anchor lives at the picture center and
-    // moves with it. Translate bounds + calloutAnchor together; leave
-    // the offset at -size/2 so toggling the callout back on later
-    // produces the centered-on-anchor (zero-wedge) layout.
+    // newPoint is the new desired image center (see getEditContext).
+    //
+    // Callout hidden: per the user-visible rule "dragging the image
+    // deletes the anchor's old position so it cannot drift". Snap
+    // bounds + anchor to the new center and reset offset to -size/2,
+    // i.e. centered-on-anchor. Toggling the callout back on later
+    // makes the wedge appear at the new image location with zero
+    // visible length.
     if ( !isCalloutVisible( pic ) )
     {
       const QgsPointXY ip = toItemPos( newPoint, ctx );
       pic->setBounds( QgsRectangle( ip.x(), ip.y(), ip.x(), ip.y() ) );
       pic->setCalloutAnchor( QgsGeometry( new QgsPoint( ip.x(), ip.y() ) ) );
+      const QSizeF size = pic->fixedSize();
+      pic->setOffsetFromCallout( QSizeF( -size.width() / 2.0, -size.height() / 2.0 ) );
+      pic->setOffsetFromCalloutUnit( pic->fixedSizeUnit() );
       return;
     }
 
-    // Frame-body drag: keep the geographic anchor fixed, move the
-    // picture frame instead by adjusting the screen-space offset. The
-    // wedge of the balloon callout grows out from the anchor toward the
-    // new frame position.
+    // Callout visible: anchor stays put, image center moves to
+    // newPoint. The renderer draws the picture top-left at
+    // anchor+offset, so to land its CENTER at newPoint we need
+    //   anchor_px + offset_px + size_px/2 == target_px
+    //   offset_px = target_px - anchor_px - size_px/2.
     const QgsCoordinateTransform xform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
-    const QgsPointXY itemAnchor = pictureAnchorItem( pic );
-    QgsPointXY anchorMap = itemAnchor;
+    QgsPointXY anchorMap = pictureAnchorItem( pic );
     try
     {
       if ( xform.isValid() )
-        anchorMap = xform.transform( itemAnchor );
+        anchorMap = xform.transform( anchorMap );
     }
     catch ( const QgsCsException & )
     {
@@ -399,16 +427,11 @@ void KadasPictureAnnotationController::edit( QgsAnnotationItem *item, const Kada
     }
     const QPointF anchorPx = ctx.mapSettings().mapToPixel().transform( anchorMap ).toQPointF();
     const QPointF targetPx = ctx.mapSettings().mapToPixel().transform( newPoint ).toQPointF();
-    // Top-left form: target should become the picture's CENTER, so the
-    // top-left lives at target - size/2. offset = (top-left - anchor).
-    // Convert fixedSize through the item's own unit (renderer uses
-    // convertToPainterUnits) so the math is in pixels.
     QgsRenderContext rc = QgsRenderContext::fromMapSettings( ctx.mapSettings() );
     const double w = rc.convertToPainterUnits( pic->fixedSize().width(), pic->fixedSizeUnit() );
     const double h = rc.convertToPainterUnits( pic->fixedSize().height(), pic->fixedSizeUnit() );
-    const QPointF topLeft = targetPx - QPointF( w / 2.0, h / 2.0 );
-    const QPointF delta = topLeft - anchorPx;
-    pic->setOffsetFromCallout( QSizeF( delta.x(), delta.y() ) );
+    const QPointF offsetPx = targetPx - anchorPx - QPointF( w / 2.0, h / 2.0 );
+    pic->setOffsetFromCallout( QSizeF( offsetPx.x(), offsetPx.y() ) );
     pic->setOffsetFromCalloutUnit( Qgis::RenderUnit::Pixels );
     return;
   }
