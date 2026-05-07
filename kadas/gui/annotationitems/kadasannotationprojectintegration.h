@@ -17,11 +17,14 @@
 #ifndef KADASANNOTATIONPROJECTINTEGRATION_H
 #define KADASANNOTATIONPROJECTINTEGRATION_H
 
+#include <QHash>
 #include <QObject>
+#include <QString>
 
 #include "kadas/gui/kadas_gui.h"
 
 class QDomDocument;
+class QgsAnnotationPictureItem;
 
 /**
  * \ingroup gui
@@ -56,6 +59,12 @@ class KADAS_GUI_EXPORT KadasAnnotationProjectIntegration : public QObject
 
   private slots:
     void onProjectRead( const QDomDocument &doc );
+
+  private:
+    // Live attachment paths captured by prepareForSave() so they can be
+    // restored by stripAfterSave() after QgsProject::write() has run with
+    // the "attachment:..." identifiers in place.
+    QHash<QgsAnnotationPictureItem *, QString> mPicturePathsBeforeSave;
 };
 
 #endif // KADASANNOTATIONPROJECTINTEGRATION_H
