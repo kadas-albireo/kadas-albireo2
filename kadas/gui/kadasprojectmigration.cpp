@@ -572,6 +572,8 @@ bool KadasProjectMigration::migrateLegacyMilxLayers( QDomDocument &doc, QDomElem
   if ( milxMapLayers.isEmpty() )
     return false;
 
+  QgsDebugMsgLevel( QStringLiteral( "Migrating %1 legacy KadasMilxLayer plugin layer(s) to QgsAnnotationLayer" ).arg( milxMapLayers.size() ), 1 );
+
   for ( QDomElement &mapLayerEl : milxMapLayers )
   {
     const QString layerName = mapLayerEl.firstChildElement( "layername" ).text();
@@ -664,10 +666,27 @@ bool KadasProjectMigration::migrateLegacyMilxLayers( QDomDocument &doc, QDomElem
     QDomElement newMapLayerEl = doc.createElement( "maplayer" );
     QgsReadWriteContext context;
     annoLayer->writeLayerXml( newMapLayerEl, doc, context );
-    // Preserve the original layer id so layer-tree-layer / layerorder
-    // references continue to resolve.
-    newMapLayerEl.appendChild( mapLayerEl.firstChildElement( "id" ).cloneNode() );
-    newMapLayerEl.appendChild( mapLayerEl.firstChildElement( "layername" ).cloneNode() );
+    // Preserve the original layer id and name so that layer-tree-layer,
+    // layerorder, custom-order and similar references continue to
+    // resolve. `writeLayerXml` already wrote freshly generated `<id>`
+    // and `<layername>` children, so replace those rather than append
+    // duplicates (QGIS picks the first match).
+    const QString originalId = mapLayerEl.firstChildElement( "id" ).text();
+    const QString originalName = mapLayerEl.firstChildElement( "layername" ).text();
+    QDomElement existingId = newMapLayerEl.firstChildElement( "id" );
+    if ( !existingId.isNull() )
+    {
+      QDomElement replacementId = doc.createElement( "id" );
+      replacementId.appendChild( doc.createTextNode( originalId ) );
+      newMapLayerEl.replaceChild( replacementId, existingId );
+    }
+    QDomElement existingName = newMapLayerEl.firstChildElement( "layername" );
+    if ( !existingName.isNull() )
+    {
+      QDomElement replacementName = doc.createElement( "layername" );
+      replacementName.appendChild( doc.createTextNode( originalName ) );
+      newMapLayerEl.replaceChild( replacementName, existingName );
+    }
 
     projectLayersEl.replaceChild( newMapLayerEl, mapLayerEl );
   }
