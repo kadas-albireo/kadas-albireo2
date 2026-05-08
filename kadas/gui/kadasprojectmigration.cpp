@@ -50,9 +50,81 @@
 #include "kadas/gui/mapitems/kadassymbolitem.h"
 #include "kadas/gui/mapitems/kadastextitem.h"
 
+#include <qgis/qgsarchive.h>
+#include <qgis/qgsziputils.h>
+
 
 QString KadasProjectMigration::migrateProject( const QString &fileName, QStringList &filesToAttach )
 {
+  // Kadas projects are typically stored as `.qgz` zip archives bundling
+  // a `.qgs` XML document and any attachments. Handle both cases:
+  //  - `.qgz`: unzip into a temp dir, mutate the embedded `.qgs`, repack
+  //    into a fresh temp `.qgz` (preserving the attachments) and return
+  //    its path.
+  //  - `.qgs`: read XML directly, mutate, write to a temp file, return
+  //    its path.
+  // If the file does not exist, fails to parse, or no migration was
+  // necessary, the original path is returned untouched.
+  if ( QgsZipUtils::isZipFile( fileName ) )
+  {
+    auto archive = std::make_unique<QgsArchive>();
+    if ( !archive->unzip( fileName ) )
+    {
+      QgsDebugMsgLevel( "Failed to unzip project archive", 2 );
+      return fileName;
+    }
+    // Find the `.qgs` document inside the archive. Bundles always have
+    // exactly one.
+    QString qgsPath;
+    const QStringList archiveFiles = archive->files();
+    for ( const QString &f : archiveFiles )
+    {
+      if ( f.endsWith( QLatin1String( ".qgs" ), Qt::CaseInsensitive ) )
+      {
+        qgsPath = f;
+        break;
+      }
+    }
+    if ( qgsPath.isEmpty() )
+      return fileName;
+
+    QFile qgsFile( qgsPath );
+    if ( !qgsFile.open( QIODevice::ReadOnly ) )
+      return fileName;
+    QDomDocument doc;
+    if ( !doc.setContent( &qgsFile ) )
+    {
+      qgsFile.close();
+      return fileName;
+    }
+    qgsFile.close();
+
+    const QString basedir = QFileInfo( fileName ).path();
+    if ( !migrateProjectXml( basedir, doc, filesToAttach ) )
+      return fileName;
+
+    // Write the mutated XML back over the unzipped `.qgs`, then repack
+    // the whole archive into a new temp `.qgz`. Keep the temp dir alive
+    // until QGIS has finished reading the archive by transferring its
+    // ownership through a static list — `QgsArchive` deletes its
+    // backing temp dir in the destructor.
+    if ( !qgsFile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
+      return fileName;
+    qgsFile.write( doc.toString().toLocal8Bit() );
+    qgsFile.close();
+
+    QTemporaryFile outFile( QDir::tempPath() + QStringLiteral( "/kadas-migrated-XXXXXX.qgz" ) );
+    outFile.setAutoRemove( false );
+    if ( !outFile.open() )
+      return fileName;
+    const QString outPath = outFile.fileName();
+    outFile.close();
+    QFile::remove( outPath ); // QgsArchive::zip refuses to overwrite an existing file
+    if ( !archive->zip( outPath ) )
+      return fileName;
+    return outPath;
+  }
+
   QFile file( fileName );
   if ( !file.open( QIODevice::ReadOnly ) )
   {
