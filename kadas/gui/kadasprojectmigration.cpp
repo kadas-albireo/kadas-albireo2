@@ -601,11 +601,27 @@ bool KadasProjectMigration::migrateLegacyMilxLayers( QDomDocument &doc, QDomElem
     // into a populated `KadasMilxAnnotationItem`. MilX is fixed to
     // EPSG:4326 in both the legacy and the new format, so no CRS
     // transform is needed.
+    int totalChildren = 0;
+    int totalMapItems = 0;
+    int totalMilxItems = 0;
     for ( QDomNode itemNode = mapLayerEl.firstChild(); !itemNode.isNull(); itemNode = itemNode.nextSibling() )
     {
       QDomElement itemEl = itemNode.toElement();
+      if ( itemEl.isNull() )
+        continue;
+      ++totalChildren;
+      if ( itemEl.tagName() == QLatin1String( "MapItem" ) )
+      {
+        ++totalMapItems;
+        QgsDebugMsgLevel( QStringLiteral( "  MapItem child: name=%1" ).arg( itemEl.attribute( QStringLiteral( "name" ) ) ), 1 );
+      }
+      else
+      {
+        QgsDebugMsgLevel( QStringLiteral( "  non-MapItem child tag=%1 name=%2" ).arg( itemEl.tagName(), itemEl.attribute( QStringLiteral( "name" ) ) ), 1 );
+      }
       if ( itemEl.tagName() != QLatin1String( "MapItem" ) || itemEl.attribute( QStringLiteral( "name" ) ) != QLatin1String( "KadasMilxItem" ) )
         continue;
+      ++totalMilxItems;
 
       const QJsonObject data = QJsonDocument::fromJson( itemEl.firstChild().toCDATASection().data().toLocal8Bit() ).object();
       const QJsonObject props = data.value( QStringLiteral( "props" ) ).toObject();
@@ -666,6 +682,7 @@ bool KadasProjectMigration::migrateLegacyMilxLayers( QDomDocument &doc, QDomElem
         1
       );
     }
+    QgsDebugMsgLevel( QStringLiteral( "Layer '%1' totals: childElements=%2 MapItem=%3 KadasMilxItem=%4" ).arg( layerName ).arg( totalChildren ).arg( totalMapItems ).arg( totalMilxItems ), 1 );
 
     QDomElement newMapLayerEl = doc.createElement( "maplayer" );
     QgsReadWriteContext context;
