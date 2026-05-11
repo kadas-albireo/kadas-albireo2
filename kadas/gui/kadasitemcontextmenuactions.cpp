@@ -19,21 +19,16 @@
 #include <QInputDialog>
 #include <QMenu>
 
-#include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgsapplication.h>
-#include <qgis/qgslinestring.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgspoint.h>
-#include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 
 #include "kadas/core/kadascoordinateformat.h"
 #include "kadas/gui/kadasclipboard.h"
 #include "kadas/gui/kadasitemcontextmenuactions.h"
-#include "kadas/gui/mapitems/kadascircleitem.h"
 #include "kadas/gui/mapitems/kadasgpxwaypointitem.h"
 #include "kadas/gui/mapitems/kadaspointitem.h"
-#include "kadas/gui/mapitems/kadaspolygonitem.h"
 #include "kadas/gui/mapitems/kadassymbolitem.h"
 
 
@@ -52,10 +47,6 @@ KadasItemContextMenuActions::KadasItemContextMenuActions( QgsMapCanvas *canvas, 
   else if ( dynamic_cast<KadasPointItem *>( mItem ) )
   {
     menu->addAction( QIcon( ":/kadas/icons/pin_red" ), tr( "Convert to pin" ), this, &KadasItemContextMenuActions::createPinFromPoint );
-  }
-  else if ( dynamic_cast<KadasCircleItem *>( mItem ) )
-  {
-    menu->addAction( QIcon( ":/kadas/icons/polygon" ), tr( "Convert to polygon" ), this, &KadasItemContextMenuActions::createPolygonFromCircle );
   }
   menu->addAction( QgsApplication::getThemeIcon( "/mActionEditCut.svg" ), tr( "Cut" ), this, &KadasItemContextMenuActions::cutItem );
   menu->addAction( QgsApplication::getThemeIcon( "/mActionEditCopy.svg" ), tr( "Copy" ), this, &KadasItemContextMenuActions::copyItem );
@@ -148,39 +139,5 @@ void KadasItemContextMenuActions::createPinFromPoint()
   KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PinsLayer )->addItem( pin );
 
   KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PinsLayer )->triggerRepaint();
-  deleteItem();
-}
-
-void KadasItemContextMenuActions::createPolygonFromCircle()
-{
-  KadasCircleItem *circleItem = dynamic_cast<KadasCircleItem *>( mItem );
-  if ( !circleItem || circleItem->constState()->centers.isEmpty() )
-  {
-    return;
-  }
-  bool ok = false;
-  int num = QInputDialog::getInt( mCanvas, tr( "Vertex Count" ), tr( "Number of polygon vertices:" ), 10, 3, 10000, 1, &ok );
-  if ( !ok )
-  {
-    return;
-  }
-  KadasPolygonItem *polygonitem = new KadasPolygonItem( circleItem->crs() );
-  KadasItemPos pos = circleItem->constState()->centers.front();
-  double r = std::sqrt( circleItem->constState()->ringpos.front().sqrDist( pos ) );
-
-  QgsLineString *ring = new QgsLineString();
-  for ( int i = 0; i < num; ++i )
-  {
-    ring->addVertex( QgsPoint( pos.x() + r * std::cos( ( 2. * i ) / num * M_PI ), pos.y() + r * std::sin( ( 2. * i ) / num * M_PI ) ) );
-  }
-  ring->addVertex( QgsPoint( pos.x() + r, pos.y() ) );
-  QgsPolygon poly;
-  poly.setExteriorRing( ring );
-
-  polygonitem->addPartFromGeometry( poly );
-  polygonitem->setOutline( circleItem->outline() );
-  polygonitem->setFill( circleItem->fill() );
-
-  mLayer->addItem( polygonitem );
   deleteItem();
 }

@@ -39,7 +39,6 @@ class KADAS_GUI_EXPORT KadasItemContextMenuActions : public QObject
     void cutItem();
     void deleteItem( bool preventAttachmentCleanup = false );
     void copyItemPosition();
-    void createPolygonFromCircle();
     void createPinFromPoint();
     void createWaypointFromPin();
 
