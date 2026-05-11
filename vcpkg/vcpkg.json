@@ -44,6 +44,7 @@
     },
     "geographiclib",
     "librsvg",
+    "pkgconf",
     "proj-chenyx06a",
     "py-psycopg2",
     "python3",
