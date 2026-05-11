@@ -16,20 +16,13 @@
 
 #include <QClipboard>
 #include <QIcon>
-#include <QInputDialog>
 #include <QMenu>
 
 #include <qgis/qgsapplication.h>
-#include <qgis/qgsmapcanvas.h>
-#include <qgis/qgspoint.h>
-#include <qgis/qgsproject.h>
 
-#include "kadas/core/kadascoordinateformat.h"
 #include "kadas/gui/kadasclipboard.h"
 #include "kadas/gui/kadasitemcontextmenuactions.h"
-#include "kadas/gui/mapitems/kadasgpxwaypointitem.h"
-#include "kadas/gui/mapitems/kadaspointitem.h"
-#include "kadas/gui/mapitems/kadassymbolitem.h"
+#include "kadas/gui/mapitems/kadasmapitem.h"
 
 
 KadasItemContextMenuActions::KadasItemContextMenuActions( QgsMapCanvas *canvas, QMenu *menu, KadasMapItem *item, KadasItemLayer *layer, KadasItemLayer::ItemId layerItemId, QObject *parent )
@@ -39,15 +32,6 @@ KadasItemContextMenuActions::KadasItemContextMenuActions( QgsMapCanvas *canvas, 
   , mLayer( layer )
   , mLayerItemId( layerItemId )
 {
-  if ( dynamic_cast<KadasPinItem *>( mItem ) )
-  {
-    menu->addAction( QIcon( ":/kadas/icons/copy_coordinates" ), tr( "Copy position" ), this, &KadasItemContextMenuActions::copyItemPosition );
-    menu->addAction( QgsApplication::getThemeIcon( "/mIconPointLayer.svg" ), tr( "Convert to waypoint" ), this, &KadasItemContextMenuActions::createWaypointFromPin );
-  }
-  else if ( dynamic_cast<KadasPointItem *>( mItem ) )
-  {
-    menu->addAction( QIcon( ":/kadas/icons/pin_red" ), tr( "Convert to pin" ), this, &KadasItemContextMenuActions::createPinFromPoint );
-  }
   menu->addAction( QgsApplication::getThemeIcon( "/mActionEditCut.svg" ), tr( "Cut" ), this, &KadasItemContextMenuActions::cutItem );
   menu->addAction( QgsApplication::getThemeIcon( "/mActionEditCopy.svg" ), tr( "Copy" ), this, &KadasItemContextMenuActions::copyItem );
   menu->addAction( QgsApplication::getThemeIcon( "/mActionDeleteSelected.svg" ), tr( "Delete" ), this, [this] { deleteItem(); } );
@@ -85,59 +69,4 @@ void KadasItemContextMenuActions::deleteItem( bool preventAttachmentCleanup )
   }
   mItem = nullptr;
   mLayer->triggerRepaint();
-}
-
-void KadasItemContextMenuActions::copyItemPosition()
-{
-  QgsCoordinateReferenceSystem mapCrs = mCanvas->mapSettings().destinationCrs();
-  QgsCoordinateTransform crst( mItem->crs(), mapCrs, QgsProject::instance() );
-  QgsPointXY mapPos = crst.transform( mItem->position() );
-
-  QString posStr = KadasCoordinateFormat::instance()->getDisplayString( mapPos, mapCrs );
-  if ( posStr.isEmpty() )
-  {
-    posStr = QString( "%1 (%2)" ).arg( mapPos.toString() ).arg( mapCrs.authid() );
-  }
-  QString text = QString( "%1\n%2" ).arg( posStr ).arg( KadasCoordinateFormat::instance()->getHeightAtPos( mapPos, mapCrs ) );
-  QApplication::clipboard()->setText( text );
-}
-
-void KadasItemContextMenuActions::createWaypointFromPin()
-{
-  KadasPinItem *pin = dynamic_cast<KadasPinItem *>( mItem );
-  if ( !pin )
-  {
-    return;
-  }
-
-  KadasGpxWaypointItem *waypoint = new KadasGpxWaypointItem();
-  waypoint->setName( pin->name() );
-  QgsCoordinateTransform crst( pin->crs(), waypoint->crs(), QgsProject::instance()->transformContext() );
-  waypoint->setPoint( QgsPoint( crst.transform( pin->position() ) ) );
-  KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::RoutesLayer )->addItem( waypoint );
-
-  KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::RoutesLayer )->triggerRepaint();
-  deleteItem();
-}
-
-void KadasItemContextMenuActions::createPinFromPoint()
-{
-  KadasPointItem *pointItem = dynamic_cast<KadasPointItem *>( mItem );
-  if ( !pointItem )
-  {
-    return;
-  }
-
-  KadasPinItem *pin = new KadasPinItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
-  pin->setEditor( "KadasSymbolAttributesEditor" );
-  if ( dynamic_cast<KadasGpxWaypointItem *>( pointItem ) )
-  {
-    pin->setName( static_cast<KadasGpxWaypointItem *>( pointItem )->name() );
-  }
-  QgsCoordinateTransform crst( pointItem->crs(), pin->crs(), QgsProject::instance()->transformContext() );
-  pin->setPosition( KadasItemPos::fromPoint( crst.transform( pointItem->position() ) ) );
-  KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PinsLayer )->addItem( pin );
-
-  KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PinsLayer )->triggerRepaint();
-  deleteItem();
 }
