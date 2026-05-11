@@ -265,8 +265,6 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
         font.setItalic( flags["italic"].toInt() != 0 );
         textItem->setFont( font );
 
-        textItem->setEditor( "KadasRedliningTextEditor" );
-
         item = textItem;
       }
       else
@@ -298,7 +296,6 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
             }
 
             pointItem = new KadasPointItem( crs, iconType );
-            pointItem->setEditor( "KadasRedliningItemEditor" );
           }
 
           pointItem->setPoint( QgsPoint( point ) );
@@ -328,7 +325,6 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
             else
             {
               geomItem = new KadasLineItem( crs );
-              geomItem->setEditor( "KadasRedliningItemEditor" );
             }
           }
           else if ( flags["shape"] == "polygon" )
@@ -337,7 +333,6 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
             geom->fromWkt( redliningItemEl.attribute( "geometry" ) );
 
             geomItem = new KadasPolygonItem( crs );
-            geomItem->setEditor( "KadasRedliningItemEditor" );
           }
           else if ( flags["shape"] == "rectangle" )
           {
@@ -345,7 +340,6 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
             geom->fromWkt( redliningItemEl.attribute( "geometry" ) );
 
             geomItem = new KadasRectangleItem( crs );
-            geomItem->setEditor( "KadasRedliningItemEditor" );
           }
           else if ( flags["shape"] == "circle" )
           {
@@ -365,7 +359,6 @@ void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &
             static_cast<QgsCurvePolygon *>( geom )->setExteriorRing( ring );
 
             geomItem = new KadasCircleItem( crs );
-            geomItem->setEditor( "KadasRedliningItemEditor" );
           }
 
           if ( geomItem && geom )

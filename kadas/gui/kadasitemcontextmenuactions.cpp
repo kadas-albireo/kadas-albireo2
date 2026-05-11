@@ -165,7 +165,6 @@ void KadasItemContextMenuActions::createPolygonFromCircle()
     return;
   }
   KadasPolygonItem *polygonitem = new KadasPolygonItem( circleItem->crs() );
-  polygonitem->setEditor( "KadasRedliningItemEditor" );
   KadasItemPos pos = circleItem->constState()->centers.front();
   double r = std::sqrt( circleItem->constState()->ringpos.front().sqrDist( pos ) );
 
