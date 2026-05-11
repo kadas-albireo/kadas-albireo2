@@ -660,7 +660,11 @@ bool KadasProjectMigration::migrateLegacyMilxLayers( QDomDocument &doc, QDomElem
       const QJsonArray off = state.value( QStringLiteral( "userOffset" ) ).toArray();
       anno->setUserOffset( QPoint( off.at( 0 ).toDouble(), off.at( 1 ).toDouble() ) );
 
-      annoLayer->addItem( anno );
+      const QString itemId = annoLayer->addItem( anno );
+      QgsDebugMsgLevel(
+        QStringLiteral( "Migrated MilX item: mss=%1 npts=%2 ctrl=%3 attrs=%4 attrPts=%5 itemId=%6" ).arg( mssString ).arg( pts.size() ).arg( ctrl.size() ).arg( attrs.size() ).arg( attrPts.size() ).arg( itemId ),
+        1
+      );
     }
 
     QDomElement newMapLayerEl = doc.createElement( "maplayer" );
