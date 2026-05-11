@@ -53,8 +53,6 @@ class KADAS_GUI_EXPORT KadasMapToolEditItemGroup : public QgsMapTool
     QLabel *mStatusLabel = nullptr;
     KadasSelectionRectItem *mSelectionRect = nullptr;
 
-    void createPinsFromPoints();
-    void createWaypointsFromPins();
     void copyItems();
     void cutItems();
     void deleteItems();
