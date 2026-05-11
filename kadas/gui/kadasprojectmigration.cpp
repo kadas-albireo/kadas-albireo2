@@ -110,7 +110,7 @@ QString KadasProjectMigration::migrateProject( const QString &fileName, QStringL
     // backing temp dir in the destructor.
     if ( !qgsFile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
       return fileName;
-    qgsFile.write( doc.toString().toLocal8Bit() );
+    qgsFile.write( doc.toString().toUtf8() );
     qgsFile.close();
 
     QTemporaryFile outFile( QDir::tempPath() + QStringLiteral( "/kadas-migrated-XXXXXX.qgz" ) );
@@ -145,7 +145,7 @@ QString KadasProjectMigration::migrateProject( const QString &fileName, QStringL
     tempFile.setAutoRemove( false );
     if ( tempFile.open() )
     {
-      tempFile.write( doc.toString().toLocal8Bit() );
+      tempFile.write( doc.toString().toUtf8() );
       tempFile.close();
       return tempFile.fileName();
     }
@@ -623,7 +623,11 @@ bool KadasProjectMigration::migrateLegacyMilxLayers( QDomDocument &doc, QDomElem
         continue;
       ++totalMilxItems;
 
-      const QJsonObject data = QJsonDocument::fromJson( itemEl.firstChild().toCDATASection().data().toLocal8Bit() ).object();
+      // JSON is UTF-8 by spec. `toLocal8Bit()` would corrupt non-ASCII
+      // payloads on Windows (CP1252) — e.g. accented `militaryName`
+      // values — making `fromJson` return a null object so the item is
+      // silently dropped during migration.
+      const QJsonObject data = QJsonDocument::fromJson( itemEl.firstChild().toCDATASection().data().toUtf8() ).object();
       const QJsonObject props = data.value( QStringLiteral( "props" ) ).toObject();
       const QString mssString = props.value( QStringLiteral( "mssString" ) ).toString();
       if ( mssString.isEmpty() )
