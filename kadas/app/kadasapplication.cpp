@@ -313,11 +313,14 @@ void KadasApplication::init()
 
   Kadas::importSslCertificates();
 
-  // Add token injector
-  QgsNetworkAccessManager::setRequestPreprocessor( injectAuthToken );
-
-  // Add network request logger
-  QgsNetworkAccessManager::instance()->setRequestPreprocessor( []( QNetworkRequest *req ) { QgsDebugMsgLevel( QString( "Network request: %1" ).arg( req->url().toString() ), 2 ); } );
+  // Combined request preprocessor: log every request and inject the ESRI auth token.
+  // Note: QgsNetworkAccessManager only stores a single preprocessor, so both behaviors
+  // must be performed in the same callback (previously the second call silently
+  // overwrote the first, disabling token injection).
+  QgsNetworkAccessManager::setRequestPreprocessor( []( QNetworkRequest *req ) {
+    QgsDebugMsgLevel( QString( "Network request: %1" ).arg( req->url().toString() ), 2 );
+    injectAuthToken( req );
+  } );
 
   // Start the network logger early, we want all requests logged!
   mNetworkLogger = new QgsNetworkLogger( QgsNetworkAccessManager::instance(), this );

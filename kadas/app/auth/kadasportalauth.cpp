@@ -20,10 +20,12 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QTimer>
+#include <QUrlQuery>
 
 #include <qgis/qgsapplication.h>
 #include <qgis/qgsauthmanager.h>
 #include <qgis/qgsauthmethod.h>
+#include <qgis/qgsfeedback.h>
 #include <qgis/qgslogger.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgssettingsentryimpl.h>
@@ -95,8 +97,23 @@ void KadasPortalAuth::setupAuthentication()
     // Authentication via token
     QgsDebugMsgLevel( QStringLiteral( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
 
-    QNetworkRequest req = QNetworkRequest( QUrl( tokenUrl ) );
-    QgsNetworkReplyContent content = QgsNetworkAccessManager::instance()->blockingGet( req );
+    const QUrl url( tokenUrl );
+    QNetworkRequest req( url );
+
+    // generateToken with client=referer requires a matching Referer header.
+    // Pull it from the URL's `referer` query parameter so the header always
+    // matches what the server expects.
+    const QUrlQuery query( url );
+    const QString referer = query.queryItemValue( QStringLiteral( "referer" ), QUrl::FullyDecoded );
+    if ( !referer.isEmpty() )
+      req.setRawHeader( QByteArrayLiteral( "Referer" ), referer.toUtf8() );
+
+    // Cap the token fetch so a misconfigured / unreachable endpoint cannot
+    // freeze startup for the full QGIS network timeout (60 s by default).
+    constexpr int tokenFetchTimeoutMs = 15000;
+    QgsFeedback feedback;
+    QTimer::singleShot( tokenFetchTimeoutMs, &feedback, [&feedback]() { feedback.cancel(); } );
+    QgsNetworkReplyContent content = QgsNetworkAccessManager::instance()->blockingGet( req, QString(), false, &feedback );
     QString token;
     if ( content.error() == QNetworkReply::NoError )
     {
