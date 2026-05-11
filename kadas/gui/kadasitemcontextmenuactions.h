@@ -38,9 +38,6 @@ class KADAS_GUI_EXPORT KadasItemContextMenuActions : public QObject
     void copyItem();
     void cutItem();
     void deleteItem( bool preventAttachmentCleanup = false );
-    void copyItemPosition();
-    void createPinFromPoint();
-    void createWaypointFromPin();
 
   private:
     QgsMapCanvas *mCanvas = nullptr;
