@@ -109,27 +109,12 @@ void KadasMilxAnnotationItem::render( QgsRenderContext &context, QgsFeedback *fe
     }
   }();
   if ( symbol.points.isEmpty() || symbol.xml.isEmpty() )
-  {
-    QgsDebugMsgLevel( QStringLiteral( "KadasMilxAnnotationItem::render: empty symbol (points=%1 xml=%2)" ).arg( symbol.points.size() ).arg( symbol.xml.size() ), 1 );
     return;
-  }
 
   if ( !KadasMilxClient::updateSymbol( computeScreenExtent( ms ), ms.outputDpi(), symbol, KadasMilxLayerSettings::resolve( context ), result, /* returnPoints */ false ) )
   {
-    QgsDebugMsgLevel( QStringLiteral( "KadasMilxAnnotationItem::render: updateSymbol failed for mss=%1 npts=%2" ).arg( mMssString ).arg( mPoints.size() ), 1 );
     return;
   }
-
-  QgsDebugMsgLevel(
-    QStringLiteral( "KadasMilxAnnotationItem::render: mss=%1 npts=%2 graphic=%3x%4 offset=%5,%6" )
-      .arg( mMssString )
-      .arg( mPoints.size() )
-      .arg( result.graphic.width() )
-      .arg( result.graphic.height() )
-      .arg( result.offset.x() )
-      .arg( result.offset.y() ),
-    1
-  );
 
   const QPoint renderPos = symbol.points.front() + result.offset + mUserOffset;
   context.painter()->drawImage( renderPos, result.graphic );
