@@ -601,27 +601,14 @@ bool KadasProjectMigration::migrateLegacyMilxLayers( QDomDocument &doc, QDomElem
     // into a populated `KadasMilxAnnotationItem`. MilX is fixed to
     // EPSG:4326 in both the legacy and the new format, so no CRS
     // transform is needed.
-    int totalChildren = 0;
-    int totalMapItems = 0;
-    int totalMilxItems = 0;
+    int migratedCount = 0;
     for ( QDomNode itemNode = mapLayerEl.firstChild(); !itemNode.isNull(); itemNode = itemNode.nextSibling() )
     {
       QDomElement itemEl = itemNode.toElement();
       if ( itemEl.isNull() )
         continue;
-      ++totalChildren;
-      if ( itemEl.tagName() == QLatin1String( "MapItem" ) )
-      {
-        ++totalMapItems;
-        QgsDebugMsgLevel( QStringLiteral( "  MapItem child: name=%1" ).arg( itemEl.attribute( QStringLiteral( "name" ) ) ), 1 );
-      }
-      else
-      {
-        QgsDebugMsgLevel( QStringLiteral( "  non-MapItem child tag=%1 name=%2" ).arg( itemEl.tagName(), itemEl.attribute( QStringLiteral( "name" ) ) ), 1 );
-      }
       if ( itemEl.tagName() != QLatin1String( "MapItem" ) || itemEl.attribute( QStringLiteral( "name" ) ) != QLatin1String( "KadasMilxItem" ) )
         continue;
-      ++totalMilxItems;
 
       // JSON is UTF-8 by spec. `toLocal8Bit()` would corrupt non-ASCII
       // payloads on Windows (CP1252) — e.g. accented `militaryName`
@@ -681,12 +668,10 @@ bool KadasProjectMigration::migrateLegacyMilxLayers( QDomDocument &doc, QDomElem
       anno->setUserOffset( QPoint( off.at( 0 ).toDouble(), off.at( 1 ).toDouble() ) );
 
       const QString itemId = annoLayer->addItem( anno );
-      QgsDebugMsgLevel(
-        QStringLiteral( "Migrated MilX item: mss=%1 npts=%2 ctrl=%3 attrs=%4 attrPts=%5 itemId=%6" ).arg( mssString ).arg( pts.size() ).arg( ctrl.size() ).arg( attrs.size() ).arg( attrPts.size() ).arg( itemId ),
-        1
-      );
+      Q_UNUSED( itemId );
+      ++migratedCount;
     }
-    QgsDebugMsgLevel( QStringLiteral( "Layer '%1' totals: childElements=%2 MapItem=%3 KadasMilxItem=%4" ).arg( layerName ).arg( totalChildren ).arg( totalMapItems ).arg( totalMilxItems ), 1 );
+    QgsDebugMsgLevel( QStringLiteral( "Migrated %1 MilX item(s) from layer '%2'" ).arg( migratedCount ).arg( layerName ), 2 );
 
     QDomElement newMapLayerEl = doc.createElement( "maplayer" );
     QgsReadWriteContext context;
