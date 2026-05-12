@@ -13,7 +13,6 @@
 %Include auto_generated/kadassearchprovider.sip
 %Include auto_generated/kadasmapiteminterface.sip
 %Include auto_generated/3d/kadasmapitemlayer3drenderer.sip
-%Include auto_generated/kadasitemcontextmenuactions.sip
 %Include auto_generated/kadasmapcanvasitemmanager.sip
 %Include auto_generated/kadascatalogbrowser.sip
 %Include auto_generated/kadasprojectmigration.sip
