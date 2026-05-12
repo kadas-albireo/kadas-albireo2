@@ -68,7 +68,6 @@
 
 #include "kadas/gui/mapitems/kadasmapitem.h"
 #include "kadas/gui/mapitems/kadassymbolitem.h"
-#include "kadas/gui/mapitemeditors/kadassymbolattributeseditor.h"
 #include "kadas/gui/maptools/kadasmaptooldeleteitems.h"
 #include "kadas/gui/maptools/kadasmaptooledititem.h"
 #include "kadas/gui/maptools/kadasmaptoolheightprofile.h"
