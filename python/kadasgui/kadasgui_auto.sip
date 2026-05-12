@@ -50,7 +50,6 @@
 %Include auto_generated/kadaslayerselectionwidget.sip
 %Include auto_generated/mapitemeditors/kadasmapitemeditor.sip
 %Include auto_generated/mapitemeditors/kadasgpxrouteeditor.sip
-%Include auto_generated/mapitemeditors/kadassymbolattributeseditor.sip
 %Include auto_generated/mapitemeditors/kadasgpxwaypointeditor.sip
 %Include auto_generated/kadasmapwidget.sip
 %Include auto_generated/mapitems/kadaspictureitem.sip
