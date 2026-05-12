@@ -438,8 +438,6 @@ void KadasApplication::init()
   // Setup layout item widgets
   QgsLayoutGuiUtils::registerGuiForKnownItemTypes( mMainWindow->mapCanvas() );
 
-  // Init KadasItemLayerRegistry
-  KadasItemLayerRegistry::init();
 
   // Init annotation-item controllers and the parallel annotation-layer registry
   KadasAnnotationItemControllers::registerBuiltins();

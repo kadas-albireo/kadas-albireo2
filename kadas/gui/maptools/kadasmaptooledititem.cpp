@@ -27,7 +27,6 @@
 #include "kadas/gui/kadasbottombar.h"
 #include "kadas/gui/kadasclipboard.h"
 #include "kadas/gui/kadasfloatinginputwidget.h"
-#include "kadas/gui/kadasitemcontextmenuactions.h"
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/mapitems/kadasmapitem.h"
@@ -172,7 +171,9 @@ void KadasMapToolEditItem::canvasPressEvent( QgsMapMouseEvent *e )
       {
         menu.addSeparator();
       }
-      KadasItemContextMenuActions actions( mCanvas, &menu, mItem, mLayer );
+      menu.addAction( QgsApplication::getThemeIcon( "/mActionEditCut.svg" ), tr( "Cut" ), this, &KadasMapToolEditItem::cutItem );
+      menu.addAction( QgsApplication::getThemeIcon( "/mActionEditCopy.svg" ), tr( "Copy" ), this, &KadasMapToolEditItem::copyItem );
+      menu.addAction( QgsApplication::getThemeIcon( "/mActionDeleteSelected.svg" ), tr( "Delete" ), this, &KadasMapToolEditItem::deleteItem );
       connect( mItem, &QObject::destroyed, this, &KadasMapToolEditItem::itemDestroyed );
       QAction *clickedAction = menu.exec( e->globalPosition().toPoint() );
       if ( mItem )

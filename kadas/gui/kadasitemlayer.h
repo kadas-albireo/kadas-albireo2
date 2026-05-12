@@ -213,31 +213,10 @@ class KADAS_GUI_EXPORT KadasItemLayerType : public KadasPluginLayerType
     void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const override;
 };
 
-class KADAS_GUI_EXPORT KadasItemLayerRegistry : public QObject
+class KADAS_GUI_EXPORT KadasItemLayerRegistry
 {
-    Q_OBJECT
   public:
-    enum class StandardLayer SIP_MONKEYPATCH_SCOPEENUM
-    {
-      PinsLayer,
-      RoutesLayer
-    };
-    static KadasItemLayer *getOrCreateItemLayer( StandardLayer layer );
-    static const QMap<KadasItemLayerRegistry::StandardLayer, QString> &standardLayerNames();
     static QList<KadasItemLayer *> getItemLayers();
-    static void init();
-
-  protected:
-    KadasItemLayerRegistry();
-
-  private:
-    static KadasItemLayerRegistry *instance();
-    QMap<StandardLayer, QString> mLayerIdMap;
-
-  private slots:
-    void clear();
-    void readFromProject( const QDomDocument &doc );
-    void writeToProject( QDomDocument &doc );
 };
 
 #endif // KADASITEMLAYER_H
