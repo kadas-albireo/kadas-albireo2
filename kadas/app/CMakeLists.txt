@@ -39,6 +39,7 @@ set(kadas_SRC
     3d/kadasskyboxrenderingsettingswidget.cpp
     auth/kadasappauthrequesthandler.cpp
     auth/kadasportalauth.cpp
+    auth/kadasportaltokenfetcher.cpp
     bullseye/kadasbullseyelayer.cpp
     bullseye/kadasmaptoolbullseye.cpp
     devtools/kadasdevelopertoolsdockwidget.cpp
@@ -100,6 +101,7 @@ set(kadas_HDR
     3d/kadasskyboxrenderingsettingswidget.h
     auth/kadasappauthrequesthandler.h
     auth/kadasportalauth.h
+    auth/kadasportaltokenfetcher.h
     bullseye/kadasbullseyelayer.h
     bullseye/kadasmaptoolbullseye.h
     devtools/kadasdevelopertoolsdockwidget.h
@@ -294,6 +296,12 @@ endif()
 if(WITH_CRASHREPORT)
   target_link_libraries(kadas ${CRASHRPT_LIBRARY})
   target_compile_definitions(kadas PRIVATE WITH_CRASHREPORT)
+endif()
+
+if(WIN32)
+  # WinHTTP is used by KadasPortalTokenFetcher to fetch the portal token using
+  # the logged-in Windows user's credentials (silent SSO).
+  target_link_libraries(kadas winhttp)
 endif()
 
 if(WITH_BINDINGS)

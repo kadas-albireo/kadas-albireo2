@@ -35,6 +35,7 @@
 
 #include "kadas/app/kadasapplication.h"
 #include "kadas/app/auth/kadasappauthrequesthandler.h"
+#include "kadas/app/auth/kadasportaltokenfetcher.h"
 
 
 const QgsSettingsEntryString *KadasPortalAuth::settingsPortalTokenUrl
@@ -94,31 +95,19 @@ void KadasPortalAuth::setupAuthentication()
   }
   else if ( !tokenUrl.isEmpty() )
   {
-    // Authentication via token
+    // Authentication via token. On Windows this transparently uses the
+    // logged-in user's credentials (NTLM/Kerberos via WinHTTP); on other
+    // platforms it falls back to QgsNetworkAccessManager.
     QgsDebugMsgLevel( QStringLiteral( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
 
-    const QUrl url( tokenUrl );
-    QNetworkRequest req( url );
-
-    // generateToken with client=referer requires a matching Referer header.
-    // Pull it from the URL's `referer` query parameter so the header always
-    // matches what the server expects.
-    const QUrlQuery query( url );
-    const QString referer = query.queryItemValue( QStringLiteral( "referer" ), QUrl::FullyDecoded );
-    if ( !referer.isEmpty() )
-      req.setRawHeader( QByteArrayLiteral( "Referer" ), referer.toUtf8() );
-
-    // Cap the token fetch so a misconfigured / unreachable endpoint cannot
-    // freeze startup for the full QGIS network timeout (60 s by default).
     constexpr int tokenFetchTimeoutMs = 15000;
-    QgsFeedback feedback;
-    QTimer::singleShot( tokenFetchTimeoutMs, &feedback, [&feedback]() { feedback.cancel(); } );
-    QgsNetworkReplyContent content = QgsNetworkAccessManager::instance()->blockingGet( req, QString(), false, &feedback );
+    const KadasPortalTokenFetchResult fetched = kadasFetchPortalTokenWithSso( QUrl( tokenUrl ), tokenFetchTimeoutMs );
+
     QString token;
-    if ( content.error() == QNetworkReply::NoError )
+    if ( fetched.ok )
     {
       QJsonParseError err;
-      QJsonDocument doc = QJsonDocument::fromJson( content.content(), &err );
+      QJsonDocument doc = QJsonDocument::fromJson( fetched.body, &err );
       if ( !doc.isNull() )
       {
         QJsonObject obj = doc.object();
@@ -144,7 +133,7 @@ void KadasPortalAuth::setupAuthentication()
     }
     else
     {
-      QgsDebugMsgLevel( QString( "error fetching token: %1" ).arg( content.errorString() ), 1 );
+      QgsDebugMsgLevel( QString( "error fetching token (HTTP %1): %2" ).arg( fetched.httpStatus ).arg( fetched.errorMessage ), 1 );
     }
   }
   else
