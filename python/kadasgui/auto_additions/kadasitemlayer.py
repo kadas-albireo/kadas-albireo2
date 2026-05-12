@@ -13,29 +13,13 @@ KadasItemLayer.PickObjective.__doc__ = """
 
 """
 # --
-# monkey patching scoped based enum
-KadasItemLayerRegistry.PinsLayer = KadasItemLayerRegistry.StandardLayer.PinsLayer
-KadasItemLayerRegistry.PinsLayer.is_monkey_patched = True
-KadasItemLayerRegistry.StandardLayer.PinsLayer.__doc__ = ""
-KadasItemLayerRegistry.RoutesLayer = KadasItemLayerRegistry.StandardLayer.RoutesLayer
-KadasItemLayerRegistry.RoutesLayer.is_monkey_patched = True
-KadasItemLayerRegistry.StandardLayer.RoutesLayer.__doc__ = ""
-KadasItemLayerRegistry.StandardLayer.__doc__ = """
-
-* ``PinsLayer``: 
-* ``RoutesLayer``: 
-
-"""
-# --
 try:
     KadasItemLayer.layerType = staticmethod(KadasItemLayer.layerType)
     KadasItemLayer.__overridden_methods__ = ['layerTypeKey', 'clone', 'createMapRenderer', 'extent', 'readXml', 'writeXml']
 except (NameError, AttributeError):
     pass
 try:
-    KadasItemLayerRegistry.getOrCreateItemLayer = staticmethod(KadasItemLayerRegistry.getOrCreateItemLayer)
     KadasItemLayerRegistry.getItemLayers = staticmethod(KadasItemLayerRegistry.getItemLayers)
-    KadasItemLayerRegistry.init = staticmethod(KadasItemLayerRegistry.init)
 except (NameError, AttributeError):
     pass
 try:

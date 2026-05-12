@@ -336,74 +336,6 @@ void KadasItemLayer::setSymbolScale( double scale )
 }
 
 
-KadasItemLayerRegistry::KadasItemLayerRegistry()
-{}
-
-void KadasItemLayerRegistry::init()
-{
-  connect( QgsProject::instance(), &QgsProject::cleared, instance(), &KadasItemLayerRegistry::clear );
-  connect( QgsProject::instance(), &QgsProject::readProject, instance(), &KadasItemLayerRegistry::readFromProject );
-  connect( QgsProject::instance(), &QgsProject::writeProject, instance(), &KadasItemLayerRegistry::writeToProject );
-}
-void KadasItemLayerRegistry::clear()
-{
-  mLayerIdMap.clear();
-}
-
-void KadasItemLayerRegistry::readFromProject( const QDomDocument &doc )
-{
-  mLayerIdMap.clear();
-  QDomElement itemsEl = doc.firstChildElement( "qgis" ).firstChildElement( "StandardItemLayers" );
-  if ( !itemsEl.isNull() )
-  {
-    QDomNodeList items = itemsEl.elementsByTagName( "StandardItemLayer" );
-    for ( int i = 0, n = items.size(); i < n; ++i )
-    {
-      QDomElement item = items.at( i ).toElement();
-      StandardLayer stdLayer = static_cast<StandardLayer>( item.attribute( "layer" ).toInt() );
-      QString layerId = item.attribute( "layerId" );
-      mLayerIdMap[stdLayer] = layerId;
-    }
-  }
-}
-
-void KadasItemLayerRegistry::writeToProject( QDomDocument &doc )
-{
-  QDomElement root = doc.firstChildElement( "qgis" );
-  QDomElement itemsEl = doc.createElement( "StandardItemLayers" );
-  for ( auto it = mLayerIdMap.begin(), itEnd = mLayerIdMap.end(); it != itEnd; ++it )
-  {
-    QDomElement itemEl = doc.createElement( "StandardItemLayer" );
-    itemEl.setAttribute( "layer", static_cast<int>( it.key() ) );
-    itemEl.setAttribute( "layerId", it.value() );
-    itemsEl.appendChild( itemEl );
-  }
-  root.appendChild( itemsEl );
-}
-
-KadasItemLayer *KadasItemLayerRegistry::getOrCreateItemLayer( StandardLayer layer )
-{
-  KadasItemLayer *itemLayer = nullptr;
-  if ( instance()->mLayerIdMap.contains( layer ) )
-  {
-    itemLayer = qobject_cast<KadasItemLayer *>( QgsProject::instance()->mapLayer( instance()->mLayerIdMap[layer] ) );
-  }
-
-  if ( !itemLayer && standardLayerNames().contains( layer ) )
-  {
-    itemLayer = new KadasItemLayer( standardLayerNames()[layer], QgsCoordinateReferenceSystem( "EPSG:3857" ) );
-    instance()->mLayerIdMap[layer] = itemLayer->id();
-    QgsProject::instance()->addMapLayer( itemLayer );
-  }
-  return itemLayer;
-}
-
-const QMap<KadasItemLayerRegistry::StandardLayer, QString> &KadasItemLayerRegistry::standardLayerNames()
-{
-  static QMap<StandardLayer, QString> names = { { StandardLayer::PinsLayer, tr( "Pins" ) }, { StandardLayer::RoutesLayer, tr( "Routes" ) } };
-  return names;
-}
-
 QList<KadasItemLayer *> KadasItemLayerRegistry::getItemLayers()
 {
   const auto mapLayers = QgsProject::instance()->mapLayers().values();
@@ -419,12 +351,6 @@ QList<KadasItemLayer *> KadasItemLayerRegistry::getItemLayers()
   }
 
   return itemLayers;
-}
-
-KadasItemLayerRegistry *KadasItemLayerRegistry::instance()
-{
-  static KadasItemLayerRegistry registry;
-  return &registry;
 }
 
 void KadasItemLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const
