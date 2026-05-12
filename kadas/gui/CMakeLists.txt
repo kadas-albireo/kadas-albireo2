@@ -12,7 +12,6 @@ set(kadas_gui_SRC
     kadasfloatinginputwidget.cpp
     kadasheightprofiledialog.cpp
     kadasattributetypes.cpp
-    kadasitemcontextmenuactions.cpp
     kadasitemlayer.cpp
     kadasitemlayermigration.cpp
     kadaslayerpropertiesdialog.cpp
@@ -116,7 +115,6 @@ set(kadas_gui_HDR
     kadasfloatinginputwidget.h
     kadasheightprofiledialog.h
     kadasattributetypes.h
-    kadasitemcontextmenuactions.h
     kadasitemlayer.h
     kadasitemlayermigration.h
     kadaslayerpropertiesdialog.h

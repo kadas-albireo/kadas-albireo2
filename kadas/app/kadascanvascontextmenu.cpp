@@ -32,7 +32,6 @@
 #include "kadas/gui/annotationitems/kadasgpxwaypointannotationitem.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 #include "kadas/gui/kadasclipboard.h"
-#include "kadas/gui/kadasitemcontextmenuactions.h"
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/mapitems/kadasselectionrectitem.h"
@@ -93,7 +92,19 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     addAction( QIcon( ":/kadas/icons/lower" ), tr( "Lower" ), this, &KadasCanvasContextMenu::lowerItem );
     addAction( QIcon( ":/kadas/icons/raise" ), tr( "Raise" ), this, &KadasCanvasContextMenu::raiseItem );
     KadasItemLayer *itemLayer = static_cast<KadasItemLayer *>( mPickResult.layer );
-    mItemActions = new KadasItemContextMenuActions( mCanvas, this, pickedItem, itemLayer, mPickResult.itemId, this );
+    const KadasItemLayer::ItemId itemId = mPickResult.itemId;
+    addAction( QgsApplication::getThemeIcon( "/mActionEditCut.svg" ), tr( "Cut" ), this, [this, itemLayer, itemId] {
+      KadasMapItem *item = itemLayer->takeItem( itemId );
+      KadasClipboard::instance()->setStoredMapItems( QList<KadasMapItem *>() << item );
+      item->preventAttachmentCleanup();
+      delete item;
+      itemLayer->triggerRepaint();
+    } );
+    addAction( QgsApplication::getThemeIcon( "/mActionEditCopy.svg" ), tr( "Copy" ), this, [pickedItem] { KadasClipboard::instance()->setStoredMapItems( QList<KadasMapItem *>() << pickedItem ); } );
+    addAction( QgsApplication::getThemeIcon( "/mActionDeleteSelected.svg" ), tr( "Delete" ), this, [itemLayer, itemId] {
+      delete itemLayer->takeItem( itemId );
+      itemLayer->triggerRepaint();
+    } );
     // Highlight the picked legacy item with a rubber band of its bounding box
     // (transformed to the canvas CRS).
     const QgsRectangle itemBbox
