@@ -37,7 +37,6 @@
 KadasGpxRouteItem::KadasGpxRouteItem( QObject *parent )
   : KadasLineItem( QgsCoordinateReferenceSystem( "EPSG:4326" ), parent )
 {
-  setEditor( KadasMapItemEditor::GPX_ROUTE );
   mLabelFont.setPointSize( 10 );
   mLabelFont.setBold( true );
 

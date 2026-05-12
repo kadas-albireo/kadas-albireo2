@@ -36,8 +36,6 @@
 #include "kadas/gui/annotationitems/kadasgpxrouteannotationitem.h"
 #include "kadas/gui/annotationitems/kadasgpxwaypointannotationitem.h"
 #include "kadas/gui/kadaslayerselectionwidget.h"
-#include "kadas/gui/mapitemeditors/kadasgpxrouteeditor.h"
-#include "kadas/gui/mapitemeditors/kadasgpxwaypointeditor.h"
 #include "kadas/gui/mapitems/kadaslineitem.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"

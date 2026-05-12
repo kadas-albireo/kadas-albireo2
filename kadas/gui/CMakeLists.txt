@@ -80,8 +80,6 @@ set(kadas_gui_SRC
     search/kadaspinsearchprovider.cpp
     search/kadasremotedatasearchprovider.cpp
     search/kadasworldlocationsearchprovider.cpp
-    mapitemeditors/kadasgpxrouteeditor.cpp
-    mapitemeditors/kadasgpxwaypointeditor.cpp
     mapitemeditors/kadasmapitemeditor.cpp
     mapitems/kadasanchoreditem.cpp
     mapitems/kadascircleitem.cpp
@@ -189,8 +187,6 @@ set(kadas_gui_HDR
     search/kadasremotedatasearchprovider.h
     search/kadasworldlocationsearchprovider.h
     kadasmapwidget.h
-    mapitemeditors/kadasgpxrouteeditor.h
-    mapitemeditors/kadasgpxwaypointeditor.h
     mapitemeditors/kadasmapitemeditor.h
     mapitems/kadasanchoreditem.h
     mapitems/kadascircleitem.h
