@@ -34,7 +34,6 @@
 KadasGpxWaypointItem::KadasGpxWaypointItem()
   : KadasPointItem( QgsCoordinateReferenceSystem( "EPSG:4326" ), Qgis::MarkerShape::Circle )
 {
-  setEditor( KadasMapItemEditor::GPX_WAYPOINT );
   mLabelFont.setPointSize( 10 );
   mLabelFont.setBold( true );
 

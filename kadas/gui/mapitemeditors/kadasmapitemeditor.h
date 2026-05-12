@@ -33,9 +33,6 @@ class KADAS_GUI_EXPORT KadasMapItemEditor : public QWidget
     Q_OBJECT
 
   public:
-    static inline const QString GPX_ROUTE = QStringLiteral( "KadasGpxRouteEditor" );
-    static inline const QString GPX_WAYPOINT = QStringLiteral( "KadasGpxWaypointEditor" );
-
     enum class EditorType SIP_MONKEYPATCH_SCOPEENUM
     {
       CreateItemEditor,
