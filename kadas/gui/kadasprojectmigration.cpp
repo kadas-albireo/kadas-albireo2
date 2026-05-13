@@ -184,8 +184,8 @@ bool KadasProjectMigration::migrateProjectXml( const QString &basedir, QDomDocum
   // Same for legacy `KadasItemLayer` plugin layers carrying redlining
   // `KadasMapItem` children: translate each MapItem into the matching
   // `QgsAnnotationItem` subclass at XML level. Layers whose items cannot
-  // all be translated by this pass are left as plugin layers and the
-  // post-load `KadasItemLayerMigration` fallback handles them.
+  // all be translated by this pass are left as plugin layers and will
+  // fail to load (the post-load migration fallback has been removed).
   changed = migrateLegacyKadasItemLayers( doc, root ) || changed;
   return changed;
 }
@@ -773,8 +773,8 @@ bool KadasProjectMigration::shouldAttach( const QString &baseDir, const QString 
 // from the item's CRS to the target layer CRS. v1 (JSON-in-CDATA) payloads
 // are deliberately not handled here: they are recognised by
 // `format_version != "2"` and cause the translator to return null, leaving
-// the whole layer untouched so the post-load `KadasItemLayerMigration`
-// fallback (which still understands v1) takes over.
+// the whole layer untouched. v1 projects will fail to load after the
+// post-load `KadasItemLayerMigration` fallback was removed.
 //
 // New item types are added one per slice. Each translator is small and
 // mechanical; failure to translate any single MapItem in a layer aborts

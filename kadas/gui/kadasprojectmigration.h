@@ -42,8 +42,8 @@ class KADAS_GUI_EXPORT KadasProjectMigration
     //! `QgsAnnotationItem` subclass. Only the v2 (XML-attribute) MapItem
     //! payload is handled here; v1 (JSON-in-CDATA) MapItems and any layer
     //! containing item types not yet covered by a translator are left
-    //! untouched and fall back to the post-load `KadasItemLayerMigration`
-    //! path. Returns true if at least one such layer was rewritten.
+    //! untouched; such layers will fail to load.
+    //! Returns true if at least one such layer was rewritten.
     static bool migrateLegacyKadasItemLayers( QDomDocument &doc, QDomElement &root );
     static QDomElement replaceAnnotationLayer( QDomDocument &doc, QDomElement &root, const QString &layerId );
     static QMap<QString, QString> deserializeLegacyRedliningFlags( const QString &flagsStr );

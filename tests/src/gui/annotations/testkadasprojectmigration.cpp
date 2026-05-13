@@ -667,8 +667,8 @@ void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesGpxWaypoin
 void TestKadasProjectMigration::migrateLegacyKadasItemLayer_leavesV1FormatAlone()
 {
   // A `KadasItemLayer` whose only `<MapItem>` is in the legacy v1
-  // (JSON-in-CDATA) format must be left as a plugin layer for the
-  // post-load `KadasItemLayerMigration` fallback to handle.
+  // (JSON-in-CDATA) format must be left as a plugin layer (the
+  // XML rewriter only handles v2; v1 projects will fail to load).
   QDomDocument doc;
   QDomElement root = doc.createElement( QStringLiteral( "qgis" ) );
   doc.appendChild( root );
