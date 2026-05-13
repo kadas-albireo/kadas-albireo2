@@ -64,8 +64,6 @@
 #include "kadas/gui/catalog/kadasvbscatalogprovider.h"
 #include "kadas/gui/catalog/kadasarcgisportalcatalogprovider.h"
 
-#include "kadas/gui/mapitems/kadasmapitem.h"
-#include "kadas/gui/mapitems/kadassymbolitem.h"
 #include "kadas/gui/maptools/kadasmaptooldeleteitems.h"
 #include "kadas/gui/maptools/kadasmaptoolheightprofile.h"
 #include "kadas/gui/maptools/kadasmaptoolhillshade.h"

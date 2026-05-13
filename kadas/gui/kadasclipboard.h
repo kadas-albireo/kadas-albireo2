@@ -25,7 +25,6 @@
 
 class QMimeData;
 class QgsPoint;
-class KadasMapItem;
 
 class KADAS_GUI_EXPORT KadasPasteHandler
 {
@@ -36,7 +35,6 @@ class KADAS_GUI_EXPORT KadasPasteHandler
 
 // Constants used to describe copy-paste MIME types
 #define KADASCLIPBOARD_FEATURESTORE_MIME "application/kadas.featurestore"
-#define KADASCLIPBOARD_ITEMSTORE_MIME "application/kadas.itemstore"
 
 class KADAS_GUI_EXPORT KadasClipboard : public QObject
 {
@@ -64,12 +62,6 @@ class KADAS_GUI_EXPORT KadasClipboard : public QObject
     // Utility function for getting features from clipboard
     const QgsFeatureStore &getStoredFeatures() const { return mFeatureStore; }
 
-    // Utility function fro storing map items in clipboard
-    void setStoredMapItems( const QList<KadasMapItem *> &items );
-
-    // Utility function for getting stored map items from clipboard
-    const QList<KadasMapItem *> &storedMapItems() const { return mItemStore; }
-
   signals:
     void dataChanged();
 
@@ -77,7 +69,6 @@ class KADAS_GUI_EXPORT KadasClipboard : public QObject
     KadasClipboard();
 
     QgsFeatureStore mFeatureStore;
-    QList<KadasMapItem *> mItemStore;
 
     void clear();
 };

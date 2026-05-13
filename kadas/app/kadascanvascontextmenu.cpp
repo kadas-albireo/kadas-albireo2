@@ -32,8 +32,6 @@
 #include "kadas/gui/annotationitems/kadasgpxwaypointannotationitem.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 #include "kadas/gui/kadasclipboard.h"
-#include "kadas/gui/kadasitemlayer.h"
-#include "kadas/gui/mapitems/kadasselectionrectitem.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptoolhillshade.h"
 #include "kadas/gui/maptools/kadasmaptoolminmax.h"
@@ -53,7 +51,7 @@ Q_GLOBAL_STATIC( RegisteredAction, sRegisteredActions )
 namespace
 {
   //! Forward an initial point to whichever create map tool is now active.
-  void seedActiveCreateToolWithPoint( QgsMapCanvas *canvas, const KadasMapPos &pos )
+  void seedActiveCreateToolWithPoint( QgsMapCanvas *canvas, const QgsPointXY &pos )
   {
     if ( auto *tool = dynamic_cast<KadasMapToolEditAnnotationItem *>( canvas->mapTool() ) )
       tool->addPoint( pos );
@@ -344,61 +342,61 @@ void KadasCanvasContextMenu::paste()
 void KadasCanvasContextMenu::drawPin()
 {
   kApp->mainWindow()->actionPin()->trigger();
-  seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), KadasMapPos::fromPoint( mMapPos ) );
+  seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), mMapPos );
 }
 
 void KadasCanvasContextMenu::drawPointMarker()
 {
   kApp->mainWindow()->redliningIntegration()->actionNewPoint()->trigger();
-  seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), KadasMapPos::fromPoint( mMapPos ) );
+  seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), mMapPos );
 }
 
 void KadasCanvasContextMenu::drawSquareMarker()
 {
   kApp->mainWindow()->redliningIntegration()->actionNewSquare()->trigger();
-  seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), KadasMapPos::fromPoint( mMapPos ) );
+  seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), mMapPos );
 }
 
 void KadasCanvasContextMenu::drawTriangleMarker()
 {
   kApp->mainWindow()->redliningIntegration()->actionNewTriangle()->trigger();
-  seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), KadasMapPos::fromPoint( mMapPos ) );
+  seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), mMapPos );
 }
 
 void KadasCanvasContextMenu::drawLine()
 {
   kApp->mainWindow()->redliningIntegration()->actionNewLine()->trigger();
-  seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), KadasMapPos::fromPoint( mMapPos ) );
+  seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), mMapPos );
 }
 
 void KadasCanvasContextMenu::drawRectangle()
 {
   kApp->mainWindow()->redliningIntegration()->actionNewRectangle()->trigger();
-  seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), KadasMapPos::fromPoint( mMapPos ) );
+  seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), mMapPos );
 }
 
 void KadasCanvasContextMenu::drawPolygon()
 {
   kApp->mainWindow()->redliningIntegration()->actionNewPolygon()->trigger();
-  seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), KadasMapPos::fromPoint( mMapPos ) );
+  seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), mMapPos );
 }
 
 void KadasCanvasContextMenu::drawCircle()
 {
   kApp->mainWindow()->redliningIntegration()->actionNewCircle()->trigger();
-  seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), KadasMapPos::fromPoint( mMapPos ) );
+  seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), mMapPos );
 }
 
 void KadasCanvasContextMenu::drawText()
 {
   kApp->mainWindow()->redliningIntegration()->actionNewText()->trigger();
-  seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), KadasMapPos::fromPoint( mMapPos ) );
+  seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), mMapPos );
 }
 
 void KadasCanvasContextMenu::drawCoordinateCross()
 {
   kApp->mainWindow()->redliningIntegration()->actionNewCoordinateCross()->trigger();
-  seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), KadasMapPos::fromPoint( mMapPos ) );
+  seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), mMapPos );
 }
 
 void KadasCanvasContextMenu::measureLine()

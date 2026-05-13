@@ -76,7 +76,6 @@
 #include "kadas/core/kadas.h"
 #include "kadas/gui/kadasattributetabledialog.h"
 #include "kadas/gui/kadasclipboard.h"
-#include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontrollers.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
 #include "kadas/gui/annotationitems/kadasannotationprojectintegration.h"
@@ -86,11 +85,6 @@
 #include <qgis/qgsannotationpictureitem.h>
 #include "kadas/gui/kadaslayerselectionwidget.h"
 #include "kadas/gui/kadasprojectmigration.h"
-#include "kadas/gui/mapitems/kadaspointitem.h"
-#include "kadas/gui/mapitems/kadaslineitem.h"
-#include "kadas/gui/mapitems/kadaspictureitem.h"
-#include "kadas/gui/mapitems/kadaspolygonitem.h"
-#include "kadas/gui/mapitems/kadassymbolitem.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptoolpan.h"
 #include "kadasapplication.h"
@@ -410,7 +404,6 @@ void KadasApplication::init()
 
 
   // Register plugin layers
-  mKadasPluginLayerTypes.append( new KadasItemLayerType() );
   // KadasBullseyeLayer and KadasGuideGridLayer are now QgsAnnotationLayer
   // subclasses, not plugin layers, so they do not need to be registered
   // here.
@@ -1402,15 +1395,7 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
   QgsMapCanvas *canvas = mMainWindow->mapCanvas();
   QgsPointXY pastePos = mapPos ? *mapPos : mMainWindow->mapCanvas()->center();
   QgsCoordinateReferenceSystem mapCrs = canvas->mapSettings().destinationCrs();
-  if ( KadasClipboard::instance()->hasFormat( KADASCLIPBOARD_ITEMSTORE_MIME ) )
-  {
-    // Legacy KadasMapItem paste flow removed together with KadasMapToolEditItem
-    // (slice 7i). There are no live producers of this clipboard format left;
-    // see KadasClipboard::setStoredMapItems (now unreachable, kept until the
-    // clipboard layer itself is purged).
-    return nullptr;
-  }
-  else if ( KadasClipboard::instance()->hasFormat( "image/svg+xml" ) )
+  if ( KadasClipboard::instance()->hasFormat( "image/svg+xml" ) )
   {
     const QMimeData *mimeData = QApplication::clipboard()->mimeData();
     QString filename = QgsProject::instance()->createAttachedFile( "pasted_image.svg" );

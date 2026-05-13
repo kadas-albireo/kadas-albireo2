@@ -31,7 +31,6 @@
 #include <qgis/qgssettings.h>
 
 #include "kadas/gui/kadasmapwidget.h"
-#include "kadas/gui/mapitems/kadasmapitem.h"
 #include "kadas/gui/maptools/kadasmaptoolpan.h"
 
 KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &title, QgsMapCanvas *masterCanvas, QWidget *parent )
