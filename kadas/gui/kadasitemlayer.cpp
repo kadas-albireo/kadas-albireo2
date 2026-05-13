@@ -222,22 +222,6 @@ bool KadasItemLayer::writeXml( QDomNode &layer_node, QDomDocument &document, con
   return true;
 }
 
-QList<KadasItemLayer *> KadasItemLayerRegistry::getItemLayers()
-{
-  const auto mapLayers = QgsProject::instance()->mapLayers().values();
-
-  QList<KadasItemLayer *> itemLayers;
-  for ( QgsMapLayer *mapLayer : mapLayers )
-  {
-    KadasItemLayer *itemLayer = qobject_cast<KadasItemLayer *>( mapLayer );
-    if ( itemLayer )
-    {
-      itemLayers.append( itemLayer );
-    }
-  }
-
-  return itemLayers;
-}
 
 void KadasItemLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const
 {

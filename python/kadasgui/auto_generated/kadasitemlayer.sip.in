@@ -133,14 +133,7 @@ that consumes it), or wrap the returned pointer in a smart pointer.
     ~KadasItemLayer();
     virtual QString layerTypeKey() const;
 
-    void ensureDefault3DRenderer();
-%Docstring
-that are never used in a 3D scene. Safe to call multiple times.
-%End
-
     ItemId addItem( KadasMapItem *item /Transfer/ );
-    void lowerItem( const ItemId &itemId );
-    void raiseItem( const ItemId &itemId );
     KadasMapItem *takeItem( const ItemId &itemId ) /Transfer/;
     const QMap<KadasItemLayer::ItemId, KadasMapItem *> &items() const;
 
@@ -154,14 +147,6 @@ that are never used in a 3D scene. Safe to call multiple times.
 
     virtual bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const;
 
-    virtual KadasItemLayer::ItemId pickItem(
-      const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY
-    ) const;
-
-
-
-    void setSymbolScale( double scale );
-    double symbolScale() const;
 
   protected:
 
@@ -178,15 +163,6 @@ class KadasItemLayerType : KadasPluginLayerType
     virtual QgsPluginLayer *createLayer( const QString &uri ) /Factory/;
     virtual void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const;
 
-};
-
-class KadasItemLayerRegistry
-{
-%TypeHeaderCode
-#include "kadas/gui/kadasitemlayer.h"
-%End
-  public:
-    static QList<KadasItemLayer *> getItemLayers();
 };
 
 /************************************************************************
