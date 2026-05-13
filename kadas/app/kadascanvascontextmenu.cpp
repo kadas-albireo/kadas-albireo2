@@ -36,7 +36,6 @@
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/mapitems/kadasselectionrectitem.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
-#include "kadas/gui/maptools/kadasmaptooledititem.h"
 #include "kadas/gui/maptools/kadasmaptoolhillshade.h"
 #include "kadas/gui/maptools/kadasmaptoolminmax.h"
 #include "kadas/gui/maptools/kadasmaptoolslope.h"
@@ -67,7 +66,6 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
   , mCanvas( canvas )
 {
   mPickResult = KadasFeaturePicker::pick( mCanvas, mapPos );
-  KadasMapItem *pickedItem = mPickResult.itemId != KadasItemLayer::ITEM_ID_NULL ? static_cast<KadasItemLayer *>( mPickResult.layer )->items()[mPickResult.itemId] : nullptr;
   QgsAnnotationItem *pickedAnnotation = ( mPickResult.annotationLayer && !mPickResult.annotationItemId.isEmpty() ) ? mPickResult.annotationLayer->item( mPickResult.annotationItemId ) : nullptr;
   Qgis::GeometryType geomType = Qgis::GeometryType::Unknown;
   if ( mPickResult.geom )
@@ -75,46 +73,13 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     geomType = QgsWkbTypes::geometryType( mPickResult.geom->wkbType() );
   }
 
-  if ( !pickedItem && !pickedAnnotation )
+  if ( !pickedAnnotation )
   {
     addAction( QgsApplication::getThemeIcon( "/mActionIdentify.svg" ), tr( "Identify" ), this, SLOT( identify() ) );
     addSeparator();
   }
 
-  if ( pickedItem )
-  {
-    addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, &KadasCanvasContextMenu::editItem );
-    addSeparator();
-    addAction( QIcon( ":/kadas/icons/lower" ), tr( "Lower" ), this, &KadasCanvasContextMenu::lowerItem );
-    addAction( QIcon( ":/kadas/icons/raise" ), tr( "Raise" ), this, &KadasCanvasContextMenu::raiseItem );
-    KadasItemLayer *itemLayer = static_cast<KadasItemLayer *>( mPickResult.layer );
-    const KadasItemLayer::ItemId itemId = mPickResult.itemId;
-    addAction( QgsApplication::getThemeIcon( "/mActionEditCut.svg" ), tr( "Cut" ), this, [this, itemLayer, itemId] {
-      KadasMapItem *item = itemLayer->takeItem( itemId );
-      KadasClipboard::instance()->setStoredMapItems( QList<KadasMapItem *>() << item );
-      item->preventAttachmentCleanup();
-      delete item;
-      itemLayer->triggerRepaint();
-    } );
-    addAction( QgsApplication::getThemeIcon( "/mActionEditCopy.svg" ), tr( "Copy" ), this, [pickedItem] { KadasClipboard::instance()->setStoredMapItems( QList<KadasMapItem *>() << pickedItem ); } );
-    addAction( QgsApplication::getThemeIcon( "/mActionDeleteSelected.svg" ), tr( "Delete" ), this, [itemLayer, itemId] {
-      delete itemLayer->takeItem( itemId );
-      itemLayer->triggerRepaint();
-    } );
-    // Highlight the picked legacy item with a rubber band of its bounding box
-    // (transformed to the canvas CRS).
-    const QgsRectangle itemBbox
-      = QgsCoordinateTransform( pickedItem->crs(), mCanvas->mapSettings().destinationCrs(), QgsProject::instance()->transformContext() ).transformBoundingBox( pickedItem->boundingBox() );
-    mSelRectBand = new QgsRubberBand( mCanvas, Qgis::GeometryType::Polygon );
-    mSelRectBand->setFillColor( QColor( 255, 0, 0, 31 ) );
-    mSelRectBand->setStrokeColor( QColor( 255, 0, 0 ) );
-    mSelRectBand->setWidth( 2 );
-    mSelRectBand->addPoint( QgsPointXY( itemBbox.xMinimum(), itemBbox.yMinimum() ), false );
-    mSelRectBand->addPoint( QgsPointXY( itemBbox.xMaximum(), itemBbox.yMinimum() ), false );
-    mSelRectBand->addPoint( QgsPointXY( itemBbox.xMaximum(), itemBbox.yMaximum() ), false );
-    mSelRectBand->addPoint( QgsPointXY( itemBbox.xMinimum(), itemBbox.yMaximum() ), true );
-  }
-  else if ( pickedAnnotation )
+  if ( pickedAnnotation )
   {
     if ( dynamic_cast<const KadasPinAnnotationItem *>( pickedAnnotation ) )
     {
@@ -369,23 +334,7 @@ void KadasCanvasContextMenu::editItem()
   if ( mPickResult.annotationLayer && !mPickResult.annotationItemId.isEmpty() )
   {
     mCanvas->setMapTool( new KadasMapToolEditAnnotationItem( mCanvas, mPickResult.annotationLayer, mPickResult.annotationItemId ) );
-    return;
   }
-  mCanvas->setMapTool( new KadasMapToolEditItem( mCanvas, mPickResult.itemId, static_cast<KadasItemLayer *>( mPickResult.layer ) ) );
-}
-
-void KadasCanvasContextMenu::raiseItem()
-{
-  if ( mPickResult.annotationLayer )
-    return; // QgsAnnotationLayer has no per-item z order yet
-  static_cast<KadasItemLayer *>( mPickResult.layer )->raiseItem( mPickResult.itemId );
-}
-
-void KadasCanvasContextMenu::lowerItem()
-{
-  if ( mPickResult.annotationLayer )
-    return;
-  static_cast<KadasItemLayer *>( mPickResult.layer )->lowerItem( mPickResult.itemId );
 }
 
 void KadasCanvasContextMenu::paste()

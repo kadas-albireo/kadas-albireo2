@@ -1,12 +1,10 @@
 %Include auto_generated/maptools/kadasmaptoolminmax.sip
-%Include auto_generated/maptools/kadasmaptooledititem.sip
 %Include auto_generated/maptools/kadasmaptooleditannotationitem.sip
 %Include auto_generated/maptools/kadasmaptoolslope.sip
 %Include auto_generated/maptools/kadasmaptooldeleteitems.sip
 %Include auto_generated/maptools/kadasmaptoolmeasure.sip
 %Include auto_generated/maptools/kadasmaptoolviewshed.sip
 %Include auto_generated/maptools/kadasmaptoolselectrect.sip
-%Include auto_generated/maptools/kadasmaptooledititemgroup.sip
 %Include auto_generated/maptools/kadasshapecapturemaptool.sip
 %Include auto_generated/maptools/kadasmaptoolpan.sip
 %Include auto_generated/maptools/kadasmaptoolhillshade.sip

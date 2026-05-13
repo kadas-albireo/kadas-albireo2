@@ -59,8 +59,6 @@ class KadasCanvasContextMenu : public QMenu
     void createWaypointFromPin();
     void createPinFromMarker();
     void editItem();
-    void raiseItem();
-    void lowerItem();
     void paste();
 
     void drawPin();
