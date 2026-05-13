@@ -66,6 +66,7 @@ set(kadas_gui_SRC
     maptools/kadasmaptoolselectrect.cpp
     maptools/kadasmaptoolslope.cpp
     maptools/kadasmaptoolviewshed.cpp
+    maptools/kadasshapecapturemaptool.cpp
     milx/kadasmilxclient.cpp
     milx/kadasmilxlayerpropertiespage.cpp
     milx/kadasmilxlibrary.cpp
@@ -171,6 +172,7 @@ set(kadas_gui_HDR
     maptools/kadasmaptoolselectrect.h
     maptools/kadasmaptoolslope.h
     maptools/kadasmaptoolviewshed.h
+    maptools/kadasshapecapturemaptool.h
     milx/kadasmilxclient.h
     milx/kadasmilxinterface.h
     milx/kadasmilxlayerpropertiespage.h
