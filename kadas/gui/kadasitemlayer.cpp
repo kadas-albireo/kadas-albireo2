@@ -14,11 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QHBoxLayout>
-#include <QLabel>
 #include <QMenu>
-#include <QSlider>
-#include <QWidgetAction>
 
 #include <qgis/qgsmaplayerrenderer.h>
 #include <qgis/qgsmapsettings.h>
@@ -116,25 +112,8 @@ KadasItemLayer::ItemId KadasItemLayer::addItem( KadasMapItem *item )
   mItemOrder.append( id );
   QgsCoordinateTransform trans( item->crs(), crs(), mTransformContext );
   mItemBounds.insert( id, trans.transformBoundingBox( item->boundingBox() ) );
-  item->setSymbolScale( mSymbolScale );
   emit repaintRequested();
   return id;
-}
-
-void KadasItemLayer::lowerItem( const ItemId &itemId )
-{
-  int pos = mItemOrder.indexOf( itemId );
-  mItemOrder.removeAt( pos );
-  mItemOrder.insert( std::max( 0, pos - 1 ), itemId );
-  emit repaintRequested();
-}
-
-void KadasItemLayer::raiseItem( const ItemId &itemId )
-{
-  int pos = mItemOrder.indexOf( itemId );
-  mItemOrder.removeAt( pos );
-  mItemOrder.insert( std::min( static_cast<int>( mItemOrder.length() ), pos + 1 ), itemId );
-  emit repaintRequested();
 }
 
 KadasMapItem *KadasItemLayer::takeItem( const ItemId &itemId )
@@ -164,7 +143,6 @@ KadasItemLayer *KadasItemLayer::clone() const
   layer->mItemBounds = mItemBounds;
   layer->mIdCounter = mIdCounter;
   layer->mFreeIds = mFreeIds;
-  layer->mSymbolScale = mSymbolScale;
   return layer.release();
 }
 
@@ -247,80 +225,6 @@ bool KadasItemLayer::writeXml( QDomNode &layer_node, QDomDocument &document, con
   return true;
 }
 
-KadasItemLayer::ItemId KadasItemLayer::pickItem( const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, KadasItemLayer::PickObjective pickObjective ) const
-{
-  for ( auto it = mItemOrder.rbegin(), itEnd = mItemOrder.rend(); it != itEnd; ++it )
-  {
-    KadasMapItem *item = mItems[*it];
-    if ( pickObjective == PickObjective::PICK_OBJECTIVE_TOOLTIP && item->tooltip().isEmpty() )
-    {
-      continue;
-    }
-    if ( item->hitTest( mapPos, mapSettings ) )
-    {
-      return *it;
-    }
-  }
-  return ITEM_ID_NULL;
-}
-
-QPair<QgsPointXY, double> KadasItemLayer::snapToVertex( const QgsPointXY &mapPos, const QgsMapSettings &settings, double tolPixels ) const
-{
-  QgsCoordinateTransform crst( crs(), settings.destinationCrs(), mTransformContext );
-  double minDist = std::numeric_limits<double>::max();
-  QgsPointXY minPos;
-  for ( auto it = mItemBounds.begin(), itEnd = mItemBounds.end(); it != itEnd; ++it )
-  {
-    QgsRectangle bbox = crst.transformBoundingBox( it.value() );
-    bbox.grow( settings.mapUnitsPerPixel() * tolPixels );
-    if ( bbox.contains( mapPos ) )
-    {
-      QPair<KadasMapPos, double> result = mItems[it.key()]->closestPoint( KadasMapPos::fromPoint( mapPos ), settings );
-      if ( result.second < minDist && result.second < tolPixels )
-      {
-        minDist = result.second;
-        minPos = result.first;
-      }
-    }
-  }
-  return qMakePair( minPos, minDist );
-}
-
-QString KadasItemLayer::asKml( const QgsRenderContext &context, QuaZip *kmzZip, const QgsRectangle &exportRect ) const
-{
-  QString outString;
-  QTextStream outStream( &outString );
-  outStream << "<Folder>" << "\n";
-  outStream << "<name>" << name() << "</name>" << "\n";
-  for ( const KadasMapItem *item : mItems )
-  {
-    if ( !exportRect.isEmpty() )
-    {
-      QgsRectangle testRect = QgsCoordinateTransform( crs(), item->crs(), mTransformContext ).transformBoundingBox( exportRect );
-      if ( !testRect.intersects( item->boundingBox() ) )
-      {
-        continue;
-      }
-    }
-    outStream << item->asKml( context, kmzZip );
-  }
-  outStream << "</Folder>" << "\n";
-  outStream.flush();
-
-  return outString;
-}
-
-void KadasItemLayer::setSymbolScale( double scale )
-{
-  mSymbolScale = scale;
-  for ( KadasMapItem *item : mItems )
-  {
-    item->setSymbolScale( scale );
-  }
-  triggerRepaint();
-}
-
-
 QList<KadasItemLayer *> KadasItemLayerRegistry::getItemLayers()
 {
   const auto mapLayers = QgsProject::instance()->mapLayers().values();
@@ -340,27 +244,6 @@ QList<KadasItemLayer *> KadasItemLayerRegistry::getItemLayers()
 
 void KadasItemLayerType::addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const
 {
-  if ( dynamic_cast<KadasItemLayer *>( layer ) )
-  {
-    KadasItemLayer *itemLayer = static_cast<KadasItemLayer *>( layer );
-
-    QWidget *transpWidget = new QWidget();
-    QHBoxLayout *transpLayout = new QHBoxLayout( transpWidget );
-
-    QLabel *transpLabel = new QLabel( tr( "Symbol scale:" ) );
-    transpLabel->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed );
-    transpLayout->addWidget( transpLabel );
-
-    QSlider *scaleSlider = new QSlider( Qt::Horizontal );
-    scaleSlider->setRange( -10, 10 );
-    scaleSlider->setValue( log10( itemLayer->symbolScale() ) * 10 );
-    scaleSlider->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
-    scaleSlider->setTracking( false );
-    connect( scaleSlider, &QSlider::valueChanged, this, [itemLayer]( double value ) { itemLayer->setSymbolScale( pow( 10., value / 10. ) ); } );
-    transpLayout->addWidget( scaleSlider );
-
-    QWidgetAction *scaleAction = new QWidgetAction( menu );
-    scaleAction->setDefaultWidget( transpWidget );
-    menu->addAction( scaleAction );
-  }
+  Q_UNUSED( menu );
+  Q_UNUSED( layer );
 }

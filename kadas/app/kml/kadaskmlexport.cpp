@@ -155,10 +155,6 @@ bool KadasKMLExport::exportToFile( const QString &filename, const QList<QgsMapLa
       writeVectorLayerFeatures( vl, outStream, rc, engine, exportRect );
       outStream << "</Folder>" << "\n";
     }
-    else if ( dynamic_cast<KadasItemLayer *>( ml ) )
-    {
-      outStream << static_cast<KadasItemLayer *>( ml )->asKml( rc, quaZip, exportRect );
-    }
     else if ( kmz && ( dynamic_cast<QgsRasterLayer *>( ml ) || dynamic_cast<KadasPluginLayer *>( ml ) ) ) // Non-vector layers only supported in KMZ
     {
       QgsRectangle layerExtent = ml->extent();

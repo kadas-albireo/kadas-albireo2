@@ -45,31 +45,7 @@ void KadasPinSearchProvider::fetchResults( const QString &string, const QgsLocat
   const QList<QgsMapLayer *> layers = mMapCanvas->layers();
   for ( QgsMapLayer *layer : layers )
   {
-    if ( KadasItemLayer *itemLayer = dynamic_cast<KadasItemLayer *>( layer ) )
-    {
-      for ( KadasMapItem *item : itemLayer->items() )
-      {
-        const KadasSymbolItem *symbolItem = dynamic_cast<KadasSymbolItem *>( item );
-        if ( !symbolItem )
-        {
-          continue;
-        }
-        if ( symbolItem->name().contains( string, Qt::CaseInsensitive ) || symbolItem->remarks().contains( string, Qt::CaseInsensitive ) )
-        {
-          QgsLocatorResult result;
-          QVariantMap resultData;
-
-          //searchResult.zoomScale = 1000;
-          result.displayString = tr( "Pin %1" ).arg( symbolItem->name() );
-          resultData[QStringLiteral( "pos" )] = QgsPointXY( symbolItem->constState()->pos );
-          resultData[QStringLiteral( "crs" )] = symbolItem->crs().authid();
-
-          result.setUserData( resultData );
-          emit resultFetched( result );
-        }
-      }
-    }
-    else if ( QgsAnnotationLayer *annoLayer = dynamic_cast<QgsAnnotationLayer *>( layer ) )
+    if ( QgsAnnotationLayer *annoLayer = dynamic_cast<QgsAnnotationLayer *>( layer ) )
     {
       const QMap<QString, QgsAnnotationItem *> items = annoLayer->items();
       for ( auto it = items.constBegin(); it != items.constEnd(); ++it )
