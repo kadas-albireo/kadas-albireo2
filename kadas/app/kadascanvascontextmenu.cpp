@@ -33,7 +33,6 @@
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 #include "kadas/gui/kadasclipboard.h"
 #include "kadas/gui/kadasitemlayer.h"
-#include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/mapitems/kadasselectionrectitem.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptoolhillshade.h"

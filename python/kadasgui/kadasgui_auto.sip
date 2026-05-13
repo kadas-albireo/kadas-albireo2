@@ -42,7 +42,6 @@
 %Include auto_generated/annotationitems/kadasannotationitemcontrollers.sip
 %Include auto_generated/annotationitems/kadasmilxlayersettings.sip
 %Include auto_generated/annotationitems/kadaslineannotationcontroller.sip
-%Include auto_generated/kadasmapcanvasitemmanager.sip
 %Include auto_generated/kadascatalogbrowser.sip
 %Include auto_generated/kadasprojectmigration.sip
 %Include auto_generated/kadascatalogprovider.sip
@@ -56,7 +55,6 @@
 %Include auto_generated/catalog/kadasarcgisportalcatalogprovider.sip
 %Include auto_generated/catalog/kadasarcgisrestcatalogprovider.sip
 %Include auto_generated/catalog/kadasgeoadminrestcatalogprovider.sip
-%Include auto_generated/kadasmapcanvasitem.sip
 %Include auto_generated/kadasfloatinginputwidget.sip
 %Include auto_generated/kadasribbonbutton.sip
 %Include auto_generated/kadasclipboard.sip

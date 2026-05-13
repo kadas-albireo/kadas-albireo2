@@ -90,7 +90,6 @@
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationpictureitem.h>
 #include "kadas/gui/kadaslayerselectionwidget.h"
-#include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/kadasitemlayermigration.h"
 #include "kadas/gui/kadasprojectmigration.h"
 #include "kadas/gui/mapitems/kadaspointitem.h"
@@ -884,8 +883,6 @@ void KadasApplication::projectClose()
 
   mMainWindow->mapWidgetManager()->clearMapWidgets();
   mMainWindow->resetMagnification();
-
-  KadasMapCanvasItemManager::clear();
 
   QgsProject::instance()->clear();
 }
