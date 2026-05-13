@@ -14,18 +14,11 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <thread>
-#include <mutex>
-
 #include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
-#include "kadas/gui/maptools/kadasmaptoolmeasure.h"
 
 Q_GLOBAL_STATIC( KadasMapItemEditor::Registry, sRegistry )
 
-std::once_flag onceFlag;
-
 KadasMapItemEditor::Registry *KadasMapItemEditor::registry()
 {
-  std::call_once( onceFlag, []() { sRegistry->insert( QStringLiteral( "KadasMeasureWidget" ), []( KadasMapItem *item, KadasMapItemEditor::EditorType ) { return new KadasMeasureWidget( item ); } ); } );
   return sRegistry;
 };
