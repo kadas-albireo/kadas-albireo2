@@ -28,6 +28,12 @@ controller tree.
   public:
     QString name;
     enum class Type
+    {
+      TypeCoordinate,
+      TypeDistance,
+      TypeAngle,
+      TypeOther
+    };
     Type type;
     double min;
     double max;

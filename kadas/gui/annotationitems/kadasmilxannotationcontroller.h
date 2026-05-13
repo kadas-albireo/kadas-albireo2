@@ -66,7 +66,9 @@ class KADAS_GUI_EXPORT KadasMilxAnnotationController : public KadasAnnotationIte
     void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx ) override;
     void onDoubleClick( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) override;
 
+#ifndef SIP_RUN
     QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = nullptr ) const override;
+#endif
 
   private:
     enum AttribIds

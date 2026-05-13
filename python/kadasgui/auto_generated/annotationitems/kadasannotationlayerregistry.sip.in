@@ -46,10 +46,6 @@ registries coexist during the migration.
 adding it to the current project on first use.
 %End
 
-    static const QMap<StandardLayer, QString> &standardLayerNames();
-%Docstring
-Returns the human-readable layer names keyed by \c StandardLayer.
-%End
 
     static void init();
 %Docstring

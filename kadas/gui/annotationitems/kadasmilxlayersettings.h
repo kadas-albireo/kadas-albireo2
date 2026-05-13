@@ -17,6 +17,8 @@
 #ifndef KADASMILXLAYERSETTINGS_H
 #define KADASMILXLAYERSETTINGS_H
 
+#define SIP_NO_FILE
+
 #include "kadas/gui/kadas_gui.h"
 #include "kadas/gui/milx/kadasmilxclient.h"
 

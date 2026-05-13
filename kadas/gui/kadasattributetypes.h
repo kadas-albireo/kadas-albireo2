@@ -41,7 +41,15 @@ class KADAS_GUI_EXPORT KadasNumericAttribute
 {
   public:
     QString name;
-    enum class Type SIP_MONKEYPATCH_SCOPEENUM_UNNEST( KadasNumericAttribute.Type, Type ) { TypeCoordinate, TypeDistance, TypeAngle, TypeOther };
+    // clang-format off
+    enum class Type SIP_MONKEYPATCH_SCOPEENUM_UNNEST( KadasNumericAttribute.Type, Type )
+    {
+      TypeCoordinate,
+      TypeDistance,
+      TypeAngle,
+      TypeOther
+    };
+    // clang-format on
     Type type = Type::TypeCoordinate;
     double min = std::numeric_limits<double>::lowest();
     double max = std::numeric_limits<double>::max();

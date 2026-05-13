@@ -22,6 +22,8 @@
 #include <QObject>
 #include <QString>
 
+#include "qgis/qgis_sip.h"
+
 #include "kadas/gui/kadas_gui.h"
 
 class QDomDocument;
@@ -59,7 +61,7 @@ class KADAS_GUI_EXPORT KadasAnnotationLayerRegistry : public QObject
     static QgsAnnotationLayer *getOrCreateAnnotationLayer( StandardLayer layer );
 
     //! Returns the human-readable layer names keyed by \c StandardLayer.
-    static const QMap<StandardLayer, QString> &standardLayerNames();
+    static const QMap<StandardLayer, QString> &standardLayerNames() SIP_SKIP;
 
     //! Connects to project signals; must be called once at app startup.
     static void init();

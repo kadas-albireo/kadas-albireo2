@@ -17,6 +17,8 @@
 #ifndef KADASITEMLAYERMIGRATION_H
 #define KADASITEMLAYERMIGRATION_H
 
+#define SIP_NO_FILE
+
 #include "kadas/gui/kadas_gui.h"
 
 class QgsProject;

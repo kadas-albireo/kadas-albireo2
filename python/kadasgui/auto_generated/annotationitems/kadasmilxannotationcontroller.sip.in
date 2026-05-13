@@ -83,8 +83,6 @@ yet supported through the annotation map tools.
     virtual void onDoubleClick( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx );
 
 
-    virtual QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = 0 ) const;
-
 
 };
 

@@ -76,8 +76,6 @@ click-to-place state machine and KML export.
     virtual void translate( QgsAnnotationItem *item, double dx, double dy );
 
 
-    virtual QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = 0 ) const;
-
 
     virtual void applyPersistedStyle( QgsAnnotationItem *item ) const;
 

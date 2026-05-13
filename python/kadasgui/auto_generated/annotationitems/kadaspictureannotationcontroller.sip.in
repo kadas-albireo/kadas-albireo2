@@ -90,8 +90,6 @@ the fixedSize handle.
     virtual void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx );
 
 
-    virtual QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = 0 ) const;
-
 
     static void setPath( QgsAnnotationPictureItem *item, const QString &path );
 %Docstring

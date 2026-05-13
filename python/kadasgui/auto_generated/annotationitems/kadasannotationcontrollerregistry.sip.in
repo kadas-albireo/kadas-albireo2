@@ -55,6 +55,9 @@ or None if none.
 Returns the registered annotation item type ids, in registration order.
 %End
 
+  private:
+    KadasAnnotationControllerRegistry();
+    KadasAnnotationControllerRegistry( const KadasAnnotationControllerRegistry & );
 };
 
 /************************************************************************
