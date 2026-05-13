@@ -43,6 +43,7 @@ class TestKadasProjectMigration : public QObject
 
     void migrateLegacyMilxLayer_preservesNonAsciiItems();
     void migrateLegacyKadasItemLayer_translatesPointItem();
+    void migrateLegacyKadasItemLayer_translatesTextItem();
     void migrateLegacyKadasItemLayer_leavesV1FormatAlone();
     void migrateLegacyKadasItemLayer_leavesUnknownItemTypeAlone();
 
@@ -227,6 +228,41 @@ void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesPointItem(
 
   const QDomNodeList items = migratedLayer.firstChildElement( QStringLiteral( "items" ) ).elementsByTagName( QStringLiteral( "item" ) );
   QCOMPARE( items.size(), 2 );
+}
+
+void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesTextItem()
+{
+  // Same shape as the Point case but the MapItem is a KadasTextItem;
+  // verifies the dispatcher routes by `name` and the
+  // QgsAnnotationPointTextItem round-trips through writeLayerXml.
+  QDomDocument doc;
+  QDomElement root = doc.createElement( QStringLiteral( "qgis" ) );
+  doc.appendChild( root );
+  QDomElement projectLayersEl = doc.createElement( QStringLiteral( "projectlayers" ) );
+  root.appendChild( projectLayersEl );
+
+  QDomElement mapLayerEl = appendKadasItemLayer( doc, projectLayersEl, QStringLiteral( "text_id" ), QStringLiteral( "Labels" ), QStringLiteral( "EPSG:3857" ) );
+
+  QDomElement itemEl = doc.createElement( QStringLiteral( "MapItem" ) );
+  itemEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasTextItem" ) );
+  itemEl.setAttribute( QStringLiteral( "crs" ), QStringLiteral( "EPSG:3857" ) );
+  itemEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
+  itemEl.setAttribute( QStringLiteral( "text" ), QStringLiteral( "Hello" ) );
+  itemEl.setAttribute( QStringLiteral( "color" ), QStringLiteral( "#000000" ) );
+  itemEl.setAttribute( QStringLiteral( "outline_color" ), QStringLiteral( "#ffffff" ) );
+  itemEl.setAttribute( QStringLiteral( "font" ), QStringLiteral( "Helvetica,12,-1,5,50,0,0,0,0,0" ) );
+  itemEl.setAttribute( QStringLiteral( "angle" ), QStringLiteral( "30" ) );
+  itemEl.setAttribute( QStringLiteral( "geometry" ), QStringLiteral( "POINT(920000.0 5800000.0)" ) );
+  mapLayerEl.appendChild( itemEl );
+
+  QStringList filesToAttach;
+  QVERIFY( KadasProjectMigration::migrateProjectXml( QString(), doc, filesToAttach ) );
+
+  const QDomElement migratedLayer = doc.documentElement().firstChildElement( QStringLiteral( "projectlayers" ) ).firstChildElement( QStringLiteral( "maplayer" ) );
+  QCOMPARE( migratedLayer.attribute( QStringLiteral( "type" ) ), QStringLiteral( "annotation" ) );
+  const QDomNodeList items = migratedLayer.firstChildElement( QStringLiteral( "items" ) ).elementsByTagName( QStringLiteral( "item" ) );
+  QCOMPARE( items.size(), 1 );
+  QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "pointtext" ) );
 }
 
 void TestKadasProjectMigration::migrateLegacyKadasItemLayer_leavesV1FormatAlone()
