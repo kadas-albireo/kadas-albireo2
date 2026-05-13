@@ -24,7 +24,6 @@
 #include <qgis/qgswkbtypes.h>
 
 #include "kadas/gui/kadas_gui.h"
-#include "kadas/gui/kadasitemlayer.h"
 
 class QgsAnnotationLayer;
 class QgsMapLayer;
@@ -33,6 +32,12 @@ class QgsMapCanvas;
 class KADAS_GUI_EXPORT KadasFeaturePicker
 {
   public:
+    enum class PickObjective SIP_MONKEYPATCH_SCOPEENUM
+    {
+      PICK_OBJECTIVE_ANY,
+      PICK_OBJECTIVE_TOOLTIP
+    };
+
     class PickResult
     {
       public:
@@ -43,7 +48,6 @@ class KADAS_GUI_EXPORT KadasFeaturePicker
           geom = other.geom ? other.geom->clone() : nullptr;
           crs = other.crs;
           feature = other.feature;
-          itemId = other.itemId;
           annotationLayer = other.annotationLayer;
           annotationItemId = other.annotationItemId;
         }
@@ -54,7 +58,6 @@ class KADAS_GUI_EXPORT KadasFeaturePicker
           geom = other.geom ? other.geom->clone() : nullptr;
           crs = other.crs;
           feature = other.feature;
-          itemId = other.itemId;
           annotationLayer = other.annotationLayer;
           annotationItemId = other.annotationItemId;
           return *this;
@@ -65,7 +68,6 @@ class KADAS_GUI_EXPORT KadasFeaturePicker
         QgsAbstractGeometry *geom = nullptr;
         QgsCoordinateReferenceSystem crs;
         QgsFeature feature;
-        KadasItemLayer::ItemId itemId = KadasItemLayer::ITEM_ID_NULL;
 
         //! When non-null, the pick hit a QgsAnnotationItem in this layer.
         QgsAnnotationLayer *annotationLayer = nullptr;
@@ -77,7 +79,7 @@ class KADAS_GUI_EXPORT KadasFeaturePicker
       const QgsMapCanvas *canvas,
       const QgsPointXY &mapPos,
       Qgis::GeometryType geomType = Qgis::GeometryType::Unknown,
-      KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY
+      KadasFeaturePicker::PickObjective pickObjective = KadasFeaturePicker::PickObjective::PICK_OBJECTIVE_ANY
     );
 
   private:
