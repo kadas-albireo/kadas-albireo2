@@ -98,8 +98,6 @@
 #include "kadas/gui/mapitems/kadaspictureitem.h"
 #include "kadas/gui/mapitems/kadaspolygonitem.h"
 #include "kadas/gui/mapitems/kadassymbolitem.h"
-#include "kadas/gui/maptools/kadasmaptooledititem.h"
-#include "kadas/gui/maptools/kadasmaptooledititemgroup.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptoolpan.h"
 #include "kadasapplication.h"
@@ -652,32 +650,6 @@ QPair<QString, QgsAnnotationLayer *> KadasApplication::addImageItem( const QStri
   KadasPictureAnnotationController::ensureBalloon( item );
   const QString itemId = layer->addItem( item );
   return qMakePair( itemId, layer );
-}
-
-KadasItemLayer *KadasApplication::selectPasteTargetItemLayer( const QList<KadasMapItem *> &items )
-{
-  QDialog dialog;
-  dialog.setWindowTitle( tr( "Select layer" ) );
-  dialog.setLayout( new QVBoxLayout() );
-  dialog.layout()->setContentsMargins( 2, 2, 2, 2 );
-  dialog.layout()->addWidget( new QLabel( tr( "Select layer to paste items to:" ) ) );
-  KadasLayerSelectionWidget *layerSelectionWidget = new KadasLayerSelectionWidget( mMainWindow->mapCanvas(), mMainWindow->layerTreeView(), [&]( QgsMapLayer *layer ) {
-    Q_UNUSED( items )
-    return dynamic_cast<KadasItemLayer *>( layer ) != nullptr;
-  } );
-  dialog.layout()->addWidget( layerSelectionWidget );
-  QDialogButtonBox *buttonBox = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel );
-  connect( buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept );
-  connect( buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject );
-  dialog.layout()->addWidget( buttonBox );
-  if ( dialog.exec() == QDialog::Accepted )
-  {
-    return dynamic_cast<KadasItemLayer *>( layerSelectionWidget->getSelectedLayer() );
-  }
-  else
-  {
-    return nullptr;
-  }
 }
 
 bool KadasApplication::projectNew( bool askToSave )
@@ -1437,45 +1409,11 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
   QgsCoordinateReferenceSystem mapCrs = canvas->mapSettings().destinationCrs();
   if ( KadasClipboard::instance()->hasFormat( KADASCLIPBOARD_ITEMSTORE_MIME ) )
   {
-    QList<KadasMapItem *> items;
-    QList<QgsPointXY> itemPos;
-    QgsPointXY center;
-    for ( const KadasMapItem *item : KadasClipboard::instance()->storedMapItems() )
-    {
-      QgsCoordinateTransform crst( item->crs(), mapCrs, QgsProject::instance() );
-      QgsPointXY pos = crst.transform( item->position() );
-      itemPos.append( pos );
-      items.append( item->clone() );
-      center += QgsVector( pos.x(), pos.y() );
-    }
-    center /= itemPos.size();
-    for ( int i = 0, n = items.size(); i < n; ++i )
-    {
-      QgsCoordinateTransform crst( mapCrs, items[i]->crs(), QgsProject::instance() );
-      if ( items[i]->useQgisAnnotations() )
-      {
-        items[i]->translate( pastePos.x() - center.x(), pastePos.y() - center.y() );
-      }
-      else
-      {
-        QgsPointXY pos = pastePos + QgsVector( itemPos[i].x() - center.x(), itemPos[i].y() - center.y() );
-        items[i]->setPosition( KadasItemPos::fromPoint( crst.transform( pos ) ) );
-      }
-    }
-    KadasItemLayer *layer = kApp->selectPasteTargetItemLayer( items );
-    if ( !layer )
-    {
-      qDeleteAll( items );
-      return nullptr;
-    }
-    else if ( items.size() == 1 )
-    {
-      return new KadasMapToolEditItem( canvas, items.front(), layer );
-    }
-    else
-    {
-      return new KadasMapToolEditItemGroup( canvas, items, layer );
-    }
+    // Legacy KadasMapItem paste flow removed together with KadasMapToolEditItem
+    // (slice 7i). There are no live producers of this clipboard format left;
+    // see KadasClipboard::setStoredMapItems (now unreachable, kept until the
+    // clipboard layer itself is purged).
+    return nullptr;
   }
   else if ( KadasClipboard::instance()->hasFormat( "image/svg+xml" ) )
   {
@@ -1548,13 +1486,7 @@ void KadasApplication::extentChanged()
 
 void KadasApplication::handleItemPicked( const KadasFeaturePicker::PickResult &result )
 {
-  if ( qobject_cast<KadasItemLayer *>( result.layer ) )
-  {
-    KadasItemLayer *layer = static_cast<KadasItemLayer *>( result.layer );
-    QgsMapTool *tool = new KadasMapToolEditItem( mMainWindow->mapCanvas(), result.itemId, layer );
-    mMainWindow->mapCanvas()->setMapTool( tool );
-  }
-  else if ( result.annotationLayer && !result.annotationItemId.isEmpty() )
+  if ( result.annotationLayer && !result.annotationItemId.isEmpty() )
   {
     QgsMapTool *tool = new KadasMapToolEditAnnotationItem( mMainWindow->mapCanvas(), result.annotationLayer, result.annotationItemId );
     mMainWindow->mapCanvas()->setMapTool( tool );

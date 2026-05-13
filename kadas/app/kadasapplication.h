@@ -83,7 +83,6 @@ class KadasApplication : public QgsApplication
     QgsVectorTileLayer *addVectorTileLayer( const QString &url, const QString &baseName, bool quiet = false, bool forceUpdateUriSources = true );
     QgsPointCloudLayer *addPointCloudLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false );
     QPair<QString, QgsAnnotationLayer *> addImageItem( const QString &filename ) const;
-    KadasItemLayer *selectPasteTargetItemLayer( const QList<KadasMapItem *> &items );
     bool askUserForDatumTransform( const QgsCoordinateReferenceSystem &sourceCrs, const QgsCoordinateReferenceSystem &destinationCrs, const QgsMapLayer *layer );
     bool checkTasksDependOnProject();
 

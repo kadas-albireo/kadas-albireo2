@@ -55,8 +55,6 @@ set(kadas_gui_SRC
     annotationitems/kadasrectangleannotationitem.cpp
     maptools/kadasmaptooldeleteitems.cpp
     maptools/kadasmaptooleditannotationitem.cpp
-    maptools/kadasmaptooledititem.cpp
-    maptools/kadasmaptooledititemgroup.cpp
     maptools/kadasmaptoolheightprofile.cpp
     maptools/kadasmaptoolhillshade.cpp
     maptools/kadasmaptoolmeasure.cpp
@@ -160,8 +158,6 @@ set(kadas_gui_HDR
     annotationitems/kadasrectangleannotationitem.h
     maptools/kadasmaptooldeleteitems.h
     maptools/kadasmaptooleditannotationitem.h
-    maptools/kadasmaptooledititem.h
-    maptools/kadasmaptooledititemgroup.h
     maptools/kadasmaptoolheightprofile.h
     maptools/kadasmaptoolhillshade.h
     maptools/kadasmaptoolmeasure.h
