@@ -797,6 +797,7 @@ bool KadasProjectMigration::shouldAttach( const QString &baseDir, const QString 
 #include <qgis/qgstextformat.h>
 
 #include "kadas/gui/annotationitems/kadasrectangleannotationitem.h"
+#include "kadas/gui/annotationitems/kadascircleannotationitem.h"
 
 namespace
 {
@@ -1119,6 +1120,88 @@ namespace
   }
 
   /**
+   * Translate one `<MapItem name="KadasCircleItem">` (v2 format) into one
+   * `KadasCircleAnnotationItem` per (center, ring-point) pair. The legacy
+   * `geodesic` flag is dropped — annotations are always rendered in CRS
+   * units.
+   */
+  QList<QgsAnnotationItem *> translateKadasCircleItem( const QDomElement &itemEl, const QgsCoordinateReferenceSystem &itemCrs, const QgsCoordinateReferenceSystem &layerCrs )
+  {
+    QList<QgsAnnotationItem *> out;
+    if ( itemEl.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) != QLatin1String( "2" ) )
+      return out;
+
+    QColor outlineColor;
+    double outlineWidth = 1.0;
+    Qt::PenStyle outlineStyle = Qt::SolidLine;
+    QColor fillColor;
+    Qt::BrushStyle fillStyle = Qt::SolidPattern;
+    parseGeometryBaseAttributes( itemEl, outlineColor, outlineWidth, outlineStyle, fillColor, fillStyle );
+
+    auto parsePoints = []( const QString &s ) {
+      QList<QgsPointXY> pts;
+      if ( s.isEmpty() )
+        return pts;
+      const QStringList pairs = s.split( QChar( ';' ), Qt::SkipEmptyParts );
+      for ( const QString &pair : pairs )
+      {
+        const QStringList xy = pair.split( QChar( ',' ) );
+        if ( xy.size() == 2 )
+          pts.append( QgsPointXY( xy[0].toDouble(), xy[1].toDouble() ) );
+      }
+      return pts;
+    };
+    const QList<QgsPointXY> centers = parsePoints( itemEl.attribute( QStringLiteral( "centers" ) ) );
+    const QList<QgsPointXY> ringpos = parsePoints( itemEl.attribute( QStringLiteral( "ringpos" ) ) );
+    if ( centers.isEmpty() || centers.size() != ringpos.size() )
+      return out;
+
+    const bool needTransform = itemCrs.isValid() && layerCrs.isValid() && itemCrs != layerCrs;
+    QgsCoordinateTransform ct;
+    if ( needTransform )
+    {
+      try
+      {
+        ct = QgsCoordinateTransform( itemCrs, layerCrs, QgsProject::instance() );
+      }
+      catch ( QgsCsException & )
+      {
+        return out;
+      }
+    }
+
+    auto makeSymbol = [&]() {
+      auto *layer = new QgsSimpleFillSymbolLayer( fillColor, fillStyle, outlineColor, outlineStyle, outlineWidth );
+      layer->setStrokeWidthUnit( Qgis::RenderUnit::Pixels );
+      return new QgsFillSymbol( QgsSymbolLayerList { layer } );
+    };
+
+    for ( int i = 0; i < centers.size(); ++i )
+    {
+      QgsPointXY c = centers[i];
+      QgsPointXY r = ringpos[i];
+      if ( needTransform )
+      {
+        try
+        {
+          c = ct.transform( c );
+          r = ct.transform( r );
+        }
+        catch ( QgsCsException & )
+        {
+          qDeleteAll( out );
+          out.clear();
+          return out;
+        }
+      }
+      auto *anno = new KadasCircleAnnotationItem( c, r );
+      anno->setSymbol( makeSymbol() );
+      out.append( anno );
+    }
+    return out;
+  }
+
+  /**
    * Dispatcher: looks at the `name` attribute of \a itemEl and forwards to
    * the matching per-type translator. Returns an empty list if no
    * translator is registered for the type yet, or if the translator
@@ -1157,9 +1240,13 @@ namespace
     {
       annos = translateKadasRectangleItem( itemEl, itemCrs, layerCrs );
     }
-    // Future slices: KadasCircleItem,
-    // KadasCircularSectorItem, KadasPictureItem, KadasSymbolItem,
-    // KadasPinItem, KadasGpxRouteItem, KadasGpxWaypointItem.
+    else if ( name == QLatin1String( "KadasCircleItem" ) )
+    {
+      annos = translateKadasCircleItem( itemEl, itemCrs, layerCrs );
+    }
+    // Future slices: KadasCircularSectorItem, KadasPictureItem,
+    // KadasSymbolItem, KadasPinItem, KadasGpxRouteItem,
+    // KadasGpxWaypointItem.
 
     if ( annos.isEmpty() )
       return annos;
