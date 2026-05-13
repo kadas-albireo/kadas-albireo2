@@ -117,17 +117,6 @@ class KadasItemLayer : KadasPluginLayer
     typedef unsigned ItemId;
     static const ItemId ITEM_ID_NULL;
 
-    enum class PickObjective
-    {
-      PICK_OBJECTIVE_ANY,
-      PICK_OBJECTIVE_TOOLTIP
-    };
-
-    QgsAnnotationLayer *qgisAnnotationLayer( const QgsCoordinateReferenceSystem &crs ) const /Factory/;
-%Docstring
-that consumes it), or wrap the returned pointer in a smart pointer.
-%End
-
     static QString layerType();
     KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs );
     ~KadasItemLayer();

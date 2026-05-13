@@ -137,21 +137,6 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     typedef unsigned ItemId;
     static constexpr ItemId ITEM_ID_NULL = 0;
 
-    enum class PickObjective SIP_MONKEYPATCH_SCOPEENUM
-    {
-      PICK_OBJECTIVE_ANY,
-      PICK_OBJECTIVE_TOOLTIP
-    };
-
-    //! Create and return a QGIS annotation layer.
-    //! In the future, Kadas would use only annotation layers.
-    //! Until the migration is complete we can dynamically create annotation layers for specific use-cases such as 3D rendering.
-    //! The QGIS annotation layer will only contain items/annotations inheriting from QgsAnnotationItem.
-    //! Ownership of the returned layer is transferred to the caller. Callers should either delete it,
-    //! reparent it to a QObject that controls its lifetime (e.g. the QgsAnnotationLayerChunkedEntity
-    //! that consumes it), or wrap the returned pointer in a smart pointer.
-    QgsAnnotationLayer *qgisAnnotationLayer( const QgsCoordinateReferenceSystem &crs ) const SIP_FACTORY;
-
     static QString layerType() { return "KadasItemLayer"; }
     KadasItemLayer( const QString &name, const QgsCoordinateReferenceSystem &crs );
     ~KadasItemLayer();
