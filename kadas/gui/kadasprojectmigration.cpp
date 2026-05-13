@@ -1256,6 +1256,59 @@ namespace
   }
 
   /**
+   * Translate one `<MapItem name="KadasSymbolItem">` (v2 format) into a
+   * `QgsAnnotationPictureItem`. Mirrors the runtime fallback in
+   * `KadasSymbolItem::annotationItem`: places a fixed-size picture at
+   * the geographic anchor, with a balloon callout installed via
+   * `KadasPictureAnnotationController::ensureBalloon`. Honours the
+   * fractional anchor (anchor_x/anchor_y) by translating it into a
+   * pixel `offsetFromCallout`.
+   */
+  QgsAnnotationPictureItem *translateKadasSymbolItem( const QDomElement &itemEl, const QgsCoordinateReferenceSystem &itemCrs, const QgsCoordinateReferenceSystem &layerCrs )
+  {
+    if ( itemEl.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) != QLatin1String( "2" ) )
+      return nullptr;
+
+    const double posX = itemEl.attribute( QStringLiteral( "pos_x" ), QStringLiteral( "0" ) ).toDouble();
+    const double posY = itemEl.attribute( QStringLiteral( "pos_y" ), QStringLiteral( "0" ) ).toDouble();
+    QgsPointXY anchor( posX, posY );
+    if ( itemCrs.isValid() && layerCrs.isValid() && itemCrs != layerCrs )
+    {
+      try
+      {
+        QgsCoordinateTransform ct( itemCrs, layerCrs, QgsProject::instance() );
+        anchor = ct.transform( anchor );
+      }
+      catch ( QgsCsException & )
+      {
+        return nullptr;
+      }
+    }
+
+    const double ax = itemEl.attribute( QStringLiteral( "anchor_x" ), QStringLiteral( "0.5" ) ).toDouble();
+    const double ay = itemEl.attribute( QStringLiteral( "anchor_y" ), QStringLiteral( "0.5" ) ).toDouble();
+    const int w = itemEl.attribute( QStringLiteral( "size_w" ), QStringLiteral( "32" ) ).toInt();
+    const int h = itemEl.attribute( QStringLiteral( "size_h" ), QStringLiteral( "32" ) ).toInt();
+    const QString filePath = itemEl.attribute( QStringLiteral( "file_path" ) );
+    const double effW = w > 0 ? w : 32;
+    const double effH = h > 0 ? h : 32;
+
+    auto *pic = new QgsAnnotationPictureItem( Qgis::PictureFormat::Unknown, QString(), QgsRectangle( anchor.x(), anchor.y(), anchor.x(), anchor.y() ) );
+    if ( !filePath.isEmpty() )
+      KadasPictureAnnotationController::setPath( pic, filePath );
+    pic->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
+    pic->setFixedSize( QSizeF( effW, effH ) );
+    pic->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
+    KadasPictureAnnotationController::ensureBalloon( pic );
+    // Place the image so its fractional anchor (ax, ay) lands on the
+    // geographic anchor: the top-left of the frame is offset by
+    // (-ax * w, -ay * h) pixels from the callout anchor.
+    pic->setOffsetFromCallout( QSizeF( -ax * effW, -ay * effH ) );
+    pic->setOffsetFromCalloutUnit( Qgis::RenderUnit::Pixels );
+    return pic;
+  }
+
+  /**
    * Dispatcher: looks at the `name` attribute of \a itemEl and forwards to
    * the matching per-type translator. Returns an empty list if no
    * translator is registered for the type yet, or if the translator
@@ -1303,9 +1356,13 @@ namespace
       if ( auto *a = translateKadasPictureItem( itemEl, itemCrs, layerCrs ) )
         annos.append( a );
     }
-    // Future slices: KadasCircularSectorItem,
-    // KadasSymbolItem, KadasPinItem, KadasGpxRouteItem,
-    // KadasGpxWaypointItem.
+    else if ( name == QLatin1String( "KadasSymbolItem" ) )
+    {
+      if ( auto *a = translateKadasSymbolItem( itemEl, itemCrs, layerCrs ) )
+        annos.append( a );
+    }
+    // Future slices: KadasCircularSectorItem, KadasPinItem,
+    // KadasGpxRouteItem, KadasGpxWaypointItem.
 
     if ( annos.isEmpty() )
       return annos;
