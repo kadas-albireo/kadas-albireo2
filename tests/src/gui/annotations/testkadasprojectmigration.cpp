@@ -42,9 +42,14 @@ class TestKadasProjectMigration : public QObject
     void initTestCase();
 
     void migrateLegacyMilxLayer_preservesNonAsciiItems();
+    void migrateLegacyKadasItemLayer_translatesPointItem();
+    void migrateLegacyKadasItemLayer_leavesV1FormatAlone();
+    void migrateLegacyKadasItemLayer_leavesUnknownItemTypeAlone();
 
   private:
     static QString milxItemCdata( const QString &militaryName, double lon, double lat );
+    static QDomElement appendKadasItemLayer( QDomDocument &doc, QDomElement &projectLayersEl, const QString &layerId, const QString &layerName, const QString &authid );
+    static void appendV2PointMapItem( QDomDocument &doc, QDomElement &mapLayerEl, double x, double y, const QString &authid, const QString &tooltip = QString() );
 };
 
 
@@ -145,6 +150,139 @@ void TestKadasProjectMigration::migrateLegacyMilxLayer_preservesNonAsciiItems()
   QVERIFY( !itemsEl.isNull() );
   const QDomNodeList items = itemsEl.elementsByTagName( QStringLiteral( "item" ) );
   QCOMPARE( items.size(), 2 );
+}
+
+QDomElement TestKadasProjectMigration::appendKadasItemLayer( QDomDocument &doc, QDomElement &projectLayersEl, const QString &layerId, const QString &layerName, const QString &authid )
+{
+  QDomElement mapLayerEl = doc.createElement( QStringLiteral( "maplayer" ) );
+  mapLayerEl.setAttribute( QStringLiteral( "type" ), QStringLiteral( "plugin" ) );
+  mapLayerEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasItemLayer" ) );
+  mapLayerEl.setAttribute( QStringLiteral( "title" ), layerName );
+  projectLayersEl.appendChild( mapLayerEl );
+
+  QDomElement srsEl = doc.createElement( QStringLiteral( "srs" ) );
+  QDomElement srsInner = doc.createElement( QStringLiteral( "spatialrefsys" ) );
+  QDomElement authidEl = doc.createElement( QStringLiteral( "authid" ) );
+  authidEl.appendChild( doc.createTextNode( authid ) );
+  srsInner.appendChild( authidEl );
+  srsEl.appendChild( srsInner );
+  mapLayerEl.appendChild( srsEl );
+
+  QDomElement idEl = doc.createElement( QStringLiteral( "id" ) );
+  idEl.appendChild( doc.createTextNode( layerId ) );
+  mapLayerEl.appendChild( idEl );
+
+  QDomElement nameEl = doc.createElement( QStringLiteral( "layername" ) );
+  nameEl.appendChild( doc.createTextNode( layerName ) );
+  mapLayerEl.appendChild( nameEl );
+
+  return mapLayerEl;
+}
+
+void TestKadasProjectMigration::appendV2PointMapItem( QDomDocument &doc, QDomElement &mapLayerEl, double x, double y, const QString &authid, const QString &tooltip )
+{
+  QDomElement itemEl = doc.createElement( QStringLiteral( "MapItem" ) );
+  itemEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasPointItem" ) );
+  itemEl.setAttribute( QStringLiteral( "crs" ), authid );
+  itemEl.setAttribute( QStringLiteral( "editor" ), QStringLiteral( "KadasRedliningEditor" ) );
+  itemEl.setAttribute( QStringLiteral( "draw_status" ), QStringLiteral( "Finished" ) );
+  itemEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
+  itemEl.setAttribute( QStringLiteral( "z_index" ), QStringLiteral( "42" ) );
+  itemEl.setAttribute( QStringLiteral( "symbol_scale" ), QStringLiteral( "1" ) );
+  if ( !tooltip.isEmpty() )
+    itemEl.setAttribute( QStringLiteral( "tooltip" ), tooltip );
+  itemEl.setAttribute( QStringLiteral( "shape" ), QStringLiteral( "Circle" ) );
+  itemEl.setAttribute( QStringLiteral( "size" ), QStringLiteral( "6" ) );
+  itemEl.setAttribute( QStringLiteral( "stroke_color" ), QStringLiteral( "#ff0000" ) );
+  itemEl.setAttribute( QStringLiteral( "stroke_width" ), QStringLiteral( "2" ) );
+  itemEl.setAttribute( QStringLiteral( "fill_color" ), QStringLiteral( "#ffff00" ) );
+  itemEl.setAttribute( QStringLiteral( "geometry" ), QStringLiteral( "POINT(%1 %2)" ).arg( x, 0, 'f', 6 ).arg( y, 0, 'f', 6 ) );
+  mapLayerEl.appendChild( itemEl );
+}
+
+void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesPointItem()
+{
+  // Single legacy `KadasItemLayer` carrying two v2 `KadasPointItem`
+  // entries. After migration the layer must become a stock annotation
+  // layer with two `<item>` children, the original layer id and name
+  // preserved, and the tooltip stored as a custom property.
+  QDomDocument doc;
+  QDomElement root = doc.createElement( QStringLiteral( "qgis" ) );
+  doc.appendChild( root );
+  QDomElement projectLayersEl = doc.createElement( QStringLiteral( "projectlayers" ) );
+  root.appendChild( projectLayersEl );
+
+  QDomElement mapLayerEl = appendKadasItemLayer( doc, projectLayersEl, QStringLiteral( "redlining_id" ), QStringLiteral( "Redlining" ), QStringLiteral( "EPSG:3857" ) );
+  appendV2PointMapItem( doc, mapLayerEl, 920000.0, 5800000.0, QStringLiteral( "EPSG:3857" ), QStringLiteral( "first" ) );
+  appendV2PointMapItem( doc, mapLayerEl, 925000.0, 5810000.0, QStringLiteral( "EPSG:3857" ) );
+
+  QStringList filesToAttach;
+  QVERIFY( KadasProjectMigration::migrateProjectXml( QString(), doc, filesToAttach ) );
+
+  const QDomElement migratedLayer = doc.documentElement().firstChildElement( QStringLiteral( "projectlayers" ) ).firstChildElement( QStringLiteral( "maplayer" ) );
+  QVERIFY( !migratedLayer.isNull() );
+  QCOMPARE( migratedLayer.attribute( QStringLiteral( "type" ) ), QStringLiteral( "annotation" ) );
+  QCOMPARE( migratedLayer.firstChildElement( QStringLiteral( "id" ) ).text(), QStringLiteral( "redlining_id" ) );
+  QCOMPARE( migratedLayer.firstChildElement( QStringLiteral( "layername" ) ).text(), QStringLiteral( "Redlining" ) );
+
+  const QDomNodeList items = migratedLayer.firstChildElement( QStringLiteral( "items" ) ).elementsByTagName( QStringLiteral( "item" ) );
+  QCOMPARE( items.size(), 2 );
+}
+
+void TestKadasProjectMigration::migrateLegacyKadasItemLayer_leavesV1FormatAlone()
+{
+  // A `KadasItemLayer` whose only `<MapItem>` is in the legacy v1
+  // (JSON-in-CDATA) format must be left as a plugin layer for the
+  // post-load `KadasItemLayerMigration` fallback to handle.
+  QDomDocument doc;
+  QDomElement root = doc.createElement( QStringLiteral( "qgis" ) );
+  doc.appendChild( root );
+  QDomElement projectLayersEl = doc.createElement( QStringLiteral( "projectlayers" ) );
+  root.appendChild( projectLayersEl );
+
+  QDomElement mapLayerEl = appendKadasItemLayer( doc, projectLayersEl, QStringLiteral( "v1_id" ), QStringLiteral( "V1" ), QStringLiteral( "EPSG:3857" ) );
+  QDomElement itemEl = doc.createElement( QStringLiteral( "MapItem" ) );
+  itemEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasPointItem" ) );
+  itemEl.setAttribute( QStringLiteral( "crs" ), QStringLiteral( "EPSG:3857" ) );
+  // No format_version attribute → v1 by default.
+  itemEl.appendChild( doc.createCDATASection( QStringLiteral( "{\"props\":{},\"state\":{}}" ) ) );
+  mapLayerEl.appendChild( itemEl );
+
+  QStringList filesToAttach;
+  // Return value is false when nothing was rewritten — but the function
+  // is allowed to be called regardless; what matters is the layer block
+  // is untouched.
+  KadasProjectMigration::migrateProjectXml( QString(), doc, filesToAttach );
+
+  const QDomElement preserved = doc.documentElement().firstChildElement( QStringLiteral( "projectlayers" ) ).firstChildElement( QStringLiteral( "maplayer" ) );
+  QCOMPARE( preserved.attribute( QStringLiteral( "type" ) ), QStringLiteral( "plugin" ) );
+  QCOMPARE( preserved.attribute( QStringLiteral( "name" ) ), QStringLiteral( "KadasItemLayer" ) );
+}
+
+void TestKadasProjectMigration::migrateLegacyKadasItemLayer_leavesUnknownItemTypeAlone()
+{
+  // A layer mixing a translatable Point item with a not-yet-translatable
+  // item type (e.g. KadasLineItem before slice 7r lands) must be left
+  // untouched: all-or-nothing keeps the post-load fallback authoritative.
+  QDomDocument doc;
+  QDomElement root = doc.createElement( QStringLiteral( "qgis" ) );
+  doc.appendChild( root );
+  QDomElement projectLayersEl = doc.createElement( QStringLiteral( "projectlayers" ) );
+  root.appendChild( projectLayersEl );
+
+  QDomElement mapLayerEl = appendKadasItemLayer( doc, projectLayersEl, QStringLiteral( "mixed_id" ), QStringLiteral( "Mixed" ), QStringLiteral( "EPSG:3857" ) );
+  appendV2PointMapItem( doc, mapLayerEl, 0, 0, QStringLiteral( "EPSG:3857" ) );
+  QDomElement lineEl = doc.createElement( QStringLiteral( "MapItem" ) );
+  lineEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasLineItem" ) );
+  lineEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
+  mapLayerEl.appendChild( lineEl );
+
+  QStringList filesToAttach;
+  KadasProjectMigration::migrateProjectXml( QString(), doc, filesToAttach );
+
+  const QDomElement preserved = doc.documentElement().firstChildElement( QStringLiteral( "projectlayers" ) ).firstChildElement( QStringLiteral( "maplayer" ) );
+  QCOMPARE( preserved.attribute( QStringLiteral( "type" ) ), QStringLiteral( "plugin" ) );
+  QCOMPARE( preserved.attribute( QStringLiteral( "name" ) ), QStringLiteral( "KadasItemLayer" ) );
 }
 
 

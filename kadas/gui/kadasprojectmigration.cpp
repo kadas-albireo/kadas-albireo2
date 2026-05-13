@@ -34,6 +34,7 @@
 #include <qgis/qgssymbollayerutils.h>
 
 #include "kadas/core/kadas.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
 #include "kadas/gui/annotationitems/kadasmilxlayersettings.h"
 #include "kadas/gui/kadasitemlayer.h"
@@ -176,7 +177,14 @@ bool KadasProjectMigration::migrateProjectXml( const QString &basedir, QDomDocum
   // type and item factory have since been removed in favour of
   // `QgsAnnotationLayer` + `KadasMilxAnnotationItem`. Rewrite those
   // blocks before QGIS opens the project so the symbols survive.
-  return migrateLegacyMilxLayers( doc, root );
+  bool changed = migrateLegacyMilxLayers( doc, root );
+  // Same for legacy `KadasItemLayer` plugin layers carrying redlining
+  // `KadasMapItem` children: translate each MapItem into the matching
+  // `QgsAnnotationItem` subclass at XML level. Layers whose items cannot
+  // all be translated by this pass are left as plugin layers and the
+  // post-load `KadasItemLayerMigration` fallback handles them.
+  changed = migrateLegacyKadasItemLayers( doc, root ) || changed;
+  return changed;
 }
 
 void KadasProjectMigration::migrateKadas1xTo2x( QDomDocument &doc, QDomElement &root, const QString &basedir, QStringList &filesToAttach )
@@ -749,4 +757,212 @@ bool KadasProjectMigration::shouldAttach( const QString &baseDir, const QString 
   QFile file( QDir( baseDir ).absoluteFilePath( filePath ) );
   // Attach files relative to base dir smaller than 10 MB
   return QFileInfo( filePath ).isRelative() && file.exists() && file.size() < 10 * 1024 * 1024;
+}
+
+
+// ------------------------------------------------------------------------
+//   Legacy KadasItemLayer → QgsAnnotationLayer XML rewriter
+// ------------------------------------------------------------------------
+//
+// Per-type translators read the v2 (XML-attribute) `<MapItem>` payload
+// produced by `KadasMapItem::writeXml` and return a freshly constructed
+// `QgsAnnotationItem` of the matching subclass, with geometry transformed
+// from the item's CRS to the target layer CRS. v1 (JSON-in-CDATA) payloads
+// are deliberately not handled here: they are recognised by
+// `format_version != "2"` and cause the translator to return null, leaving
+// the whole layer untouched so the post-load `KadasItemLayerMigration`
+// fallback (which still understands v1) takes over.
+//
+// New item types are added one per slice. Each translator is small and
+// mechanical; failure to translate any single MapItem in a layer aborts
+// the rewrite for that layer.
+
+#include <qgis/qgsannotationmarkeritem.h>
+#include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgsmarkersymbol.h>
+#include <qgis/qgsmarkersymbollayer.h>
+#include <qgis/qgsreadwritecontext.h>
+
+namespace
+{
+  /**
+   * Translate one `<MapItem name="KadasPointItem">` (v2 format) into a
+   * fresh `QgsAnnotationMarkerItem`. Returns nullptr for v1 payloads or
+   * any unrecoverable parse error.
+   */
+  QgsAnnotationMarkerItem *translateKadasPointItem( const QDomElement &itemEl, const QgsCoordinateReferenceSystem &itemCrs, const QgsCoordinateReferenceSystem &layerCrs )
+  {
+    if ( itemEl.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) != QLatin1String( "2" ) )
+      return nullptr;
+
+    const Qgis::MarkerShape shape = qgsEnumKeyToValue( itemEl.attribute( QStringLiteral( "shape" ), qgsEnumValueToKey( Qgis::MarkerShape::Circle ) ), Qgis::MarkerShape::Circle );
+    const int size = itemEl.attribute( QStringLiteral( "size" ), QStringLiteral( "4" ) ).toInt();
+    const QColor strokeColor( itemEl.attribute( QStringLiteral( "stroke_color" ), QColor( Qt::red ).name() ) );
+    const int strokeWidth = itemEl.attribute( QStringLiteral( "stroke_width" ), QStringLiteral( "1" ) ).toInt();
+    const QColor fillColor( itemEl.attribute( QStringLiteral( "fill_color" ), QColor( Qt::white ).name() ) );
+
+    const QgsGeometry geom = QgsGeometry::fromWkt( itemEl.attribute( QStringLiteral( "geometry" ) ) );
+    if ( geom.isNull() || geom.type() != Qgis::GeometryType::Point )
+      return nullptr;
+    QgsPointXY pt = geom.asPoint();
+    if ( itemCrs.isValid() && layerCrs.isValid() && itemCrs != layerCrs )
+    {
+      try
+      {
+        QgsCoordinateTransform ct( itemCrs, layerCrs, QgsProject::instance() );
+        pt = ct.transform( pt );
+      }
+      catch ( QgsCsException & )
+      {
+        return nullptr;
+      }
+    }
+
+    auto *symbolLayer = new QgsSimpleMarkerSymbolLayer();
+    symbolLayer->setSizeUnit( Qgis::RenderUnit::Points );
+    symbolLayer->setShape( shape );
+    symbolLayer->setSize( size );
+    symbolLayer->setStrokeWidth( strokeWidth );
+    symbolLayer->setStrokeWidthUnit( Qgis::RenderUnit::Points );
+    symbolLayer->setStrokeColor( strokeColor );
+    symbolLayer->setColor( fillColor );
+
+    auto *anno = new QgsAnnotationMarkerItem( QgsPoint( pt ) );
+    anno->setSymbol( new QgsMarkerSymbol( QgsSymbolLayerList { symbolLayer } ) );
+    return anno;
+  }
+
+  /**
+   * Dispatcher: looks at the `name` attribute of \a itemEl and forwards to
+   * the matching per-type translator. Returns nullptr if no translator is
+   * registered for the type yet, or if the translator itself failed.
+   *
+   * Common item-level attributes (z_index) are applied here so per-type
+   * translators don't repeat the boilerplate.
+   */
+  QgsAnnotationItem *translateMapItem( const QDomElement &itemEl, const QgsCoordinateReferenceSystem &layerCrs )
+  {
+    const QString name = itemEl.attribute( QStringLiteral( "name" ) );
+    const QgsCoordinateReferenceSystem itemCrs( itemEl.attribute( QStringLiteral( "crs" ) ) );
+
+    QgsAnnotationItem *anno = nullptr;
+    if ( name == QLatin1String( "KadasPointItem" ) )
+      anno = translateKadasPointItem( itemEl, itemCrs, layerCrs );
+    // Future slices: KadasTextItem, KadasLineItem, KadasPolygonItem,
+    // KadasRectangleItem, KadasCircleItem, KadasCircularSectorItem,
+    // KadasPictureItem, KadasSymbolItem, KadasPinItem, KadasGpxRouteItem,
+    // KadasGpxWaypointItem.
+
+    if ( !anno )
+      return nullptr;
+
+    bool ok = false;
+    const int z = itemEl.attribute( QStringLiteral( "z_index" ), QStringLiteral( "0" ) ).toInt( &ok );
+    if ( ok )
+      anno->setZIndex( z );
+
+    return anno;
+  }
+} // namespace
+
+bool KadasProjectMigration::migrateLegacyKadasItemLayers( QDomDocument &doc, QDomElement &root )
+{
+  QDomElement projectLayersEl = root.firstChildElement( QStringLiteral( "projectlayers" ) );
+  if ( projectLayersEl.isNull() )
+    return false;
+
+  // Snapshot direct children only — nested `<maplayer>` blocks inside
+  // `<originalStyle>` etc. must not be touched.
+  QList<QDomElement> itemMapLayers;
+  for ( QDomNode n = projectLayersEl.firstChild(); !n.isNull(); n = n.nextSibling() )
+  {
+    QDomElement el = n.toElement();
+    if ( el.tagName() == QLatin1String( "maplayer" ) && el.attribute( QStringLiteral( "type" ) ) == QLatin1String( "plugin" ) && el.attribute( QStringLiteral( "name" ) ) == QLatin1String( "KadasItemLayer" ) )
+    {
+      itemMapLayers.append( el );
+    }
+  }
+  if ( itemMapLayers.isEmpty() )
+    return false;
+
+  bool anyRewritten = false;
+
+  for ( QDomElement &mapLayerEl : itemMapLayers )
+  {
+    const QString originalId = mapLayerEl.firstChildElement( QStringLiteral( "id" ) ).text();
+    const QString originalName = mapLayerEl.firstChildElement( QStringLiteral( "layername" ) ).text();
+    const QString originalTitle = mapLayerEl.attribute( QStringLiteral( "title" ), originalName );
+    const QString srsAuthid = mapLayerEl.firstChildElement( QStringLiteral( "srs" ) ).firstChildElement( QStringLiteral( "spatialrefsys" ) ).firstChildElement( QStringLiteral( "authid" ) ).text();
+    QgsCoordinateReferenceSystem layerCrs( srsAuthid );
+    if ( !layerCrs.isValid() )
+      layerCrs = QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:3857" ) );
+
+    // First pass: translate every MapItem into a QgsAnnotationItem. If any
+    // single translation fails, abandon this layer (post-load fallback
+    // will handle it as a legacy KadasItemLayer).
+    QList<QgsAnnotationItem *> translated;
+    QStringList tooltips;
+    bool allOk = true;
+    for ( QDomNode itemNode = mapLayerEl.firstChild(); !itemNode.isNull(); itemNode = itemNode.nextSibling() )
+    {
+      QDomElement itemEl = itemNode.toElement();
+      if ( itemEl.isNull() || itemEl.tagName() != QLatin1String( "MapItem" ) )
+        continue;
+
+      QgsAnnotationItem *anno = translateMapItem( itemEl, layerCrs );
+      if ( !anno )
+      {
+        QgsDebugMsgLevel( QStringLiteral( "KadasItemLayer XML rewrite skipped for layer '%1': item type '%2' not translatable yet" ).arg( originalName, itemEl.attribute( QStringLiteral( "name" ) ) ), 1 );
+        allOk = false;
+        break;
+      }
+      translated.append( anno );
+      tooltips.append( itemEl.attribute( QStringLiteral( "tooltip" ) ) );
+    }
+
+    if ( !allOk )
+    {
+      qDeleteAll( translated );
+      continue;
+    }
+
+    // Build a temporary QgsAnnotationLayer, populate, and let QGIS write
+    // its own XML. Splicing the result back preserves the original layer
+    // id and layername so layer-tree-layer references continue to resolve.
+    QgsAnnotationLayer::LayerOptions options( QgsProject::instance()->transformContext() );
+    auto annoLayer = std::make_unique<QgsAnnotationLayer>( originalName, options );
+    annoLayer->setCrs( layerCrs );
+    for ( int i = 0; i < translated.size(); ++i )
+    {
+      const QString newId = annoLayer->addItem( translated[i] );
+      if ( !tooltips[i].isEmpty() )
+        KadasAnnotationLayerHelpers::setTooltip( annoLayer.get(), newId, tooltips[i] );
+    }
+
+    QDomElement newMapLayerEl = doc.createElement( QStringLiteral( "maplayer" ) );
+    QgsReadWriteContext context;
+    annoLayer->writeLayerXml( newMapLayerEl, doc, context );
+
+    // Restore original id and layername (writeLayerXml emits freshly
+    // generated ones).
+    QDomElement existingId = newMapLayerEl.firstChildElement( QStringLiteral( "id" ) );
+    if ( !existingId.isNull() )
+    {
+      QDomElement replacementId = doc.createElement( QStringLiteral( "id" ) );
+      replacementId.appendChild( doc.createTextNode( originalId ) );
+      newMapLayerEl.replaceChild( replacementId, existingId );
+    }
+    QDomElement existingName = newMapLayerEl.firstChildElement( QStringLiteral( "layername" ) );
+    if ( !existingName.isNull() )
+    {
+      QDomElement replacementName = doc.createElement( QStringLiteral( "layername" ) );
+      replacementName.appendChild( doc.createTextNode( originalName ) );
+      newMapLayerEl.replaceChild( replacementName, existingName );
+    }
+
+    projectLayersEl.replaceChild( newMapLayerEl, mapLayerEl );
+    anyRewritten = true;
+  }
+
+  return anyRewritten;
 }
