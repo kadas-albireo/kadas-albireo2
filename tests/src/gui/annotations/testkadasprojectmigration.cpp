@@ -51,6 +51,7 @@ class TestKadasProjectMigration : public QObject
     void migrateLegacyKadasItemLayer_translatesRectangleItem();
     void migrateLegacyKadasItemLayer_translatesCircleItem();
     void migrateLegacyKadasItemLayer_translatesPictureItem();
+    void migrateLegacyKadasItemLayer_translatesSymbolItem();
     void migrateLegacyKadasItemLayer_leavesV1FormatAlone();
     void migrateLegacyKadasItemLayer_leavesUnknownItemTypeAlone();
 
@@ -471,6 +472,41 @@ void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesPictureIte
   QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "picture" ) );
 }
 
+void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesSymbolItem()
+{
+  // KadasSymbolItem (v2 format) carries one symbol and translates to a
+  // single QgsAnnotationPictureItem (type=picture).
+  QDomDocument doc;
+  QDomElement root = doc.createElement( QStringLiteral( "qgis" ) );
+  doc.appendChild( root );
+  QDomElement projectLayersEl = doc.createElement( QStringLiteral( "projectlayers" ) );
+  root.appendChild( projectLayersEl );
+
+  QDomElement mapLayerEl = appendKadasItemLayer( doc, projectLayersEl, QStringLiteral( "sym_id" ), QStringLiteral( "Symbols" ), QStringLiteral( "EPSG:3857" ) );
+
+  QDomElement itemEl = doc.createElement( QStringLiteral( "MapItem" ) );
+  itemEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasSymbolItem" ) );
+  itemEl.setAttribute( QStringLiteral( "crs" ), QStringLiteral( "EPSG:3857" ) );
+  itemEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
+  itemEl.setAttribute( QStringLiteral( "pos_x" ), QStringLiteral( "500" ) );
+  itemEl.setAttribute( QStringLiteral( "pos_y" ), QStringLiteral( "600" ) );
+  itemEl.setAttribute( QStringLiteral( "anchor_x" ), QStringLiteral( "0.5" ) );
+  itemEl.setAttribute( QStringLiteral( "anchor_y" ), QStringLiteral( "0.5" ) );
+  itemEl.setAttribute( QStringLiteral( "size_w" ), QStringLiteral( "32" ) );
+  itemEl.setAttribute( QStringLiteral( "size_h" ), QStringLiteral( "32" ) );
+  itemEl.setAttribute( QStringLiteral( "file_path" ), QStringLiteral( ":/kadas/icons/pin_red" ) );
+  mapLayerEl.appendChild( itemEl );
+
+  QStringList filesToAttach;
+  QVERIFY( KadasProjectMigration::migrateProjectXml( QString(), doc, filesToAttach ) );
+
+  const QDomElement migratedLayer = doc.documentElement().firstChildElement( QStringLiteral( "projectlayers" ) ).firstChildElement( QStringLiteral( "maplayer" ) );
+  QCOMPARE( migratedLayer.attribute( QStringLiteral( "type" ) ), QStringLiteral( "annotation" ) );
+  const QDomNodeList items = migratedLayer.firstChildElement( QStringLiteral( "items" ) ).elementsByTagName( QStringLiteral( "item" ) );
+  QCOMPARE( items.size(), 1 );
+  QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "picture" ) );
+}
+
 void TestKadasProjectMigration::migrateLegacyKadasItemLayer_leavesV1FormatAlone()
 {
   // A `KadasItemLayer` whose only `<MapItem>` is in the legacy v1
@@ -515,7 +551,7 @@ void TestKadasProjectMigration::migrateLegacyKadasItemLayer_leavesUnknownItemTyp
   QDomElement mapLayerEl = appendKadasItemLayer( doc, projectLayersEl, QStringLiteral( "mixed_id" ), QStringLiteral( "Mixed" ), QStringLiteral( "EPSG:3857" ) );
   appendV2PointMapItem( doc, mapLayerEl, 0, 0, QStringLiteral( "EPSG:3857" ) );
   QDomElement lineEl = doc.createElement( QStringLiteral( "MapItem" ) );
-  lineEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasSymbolItem" ) );
+  lineEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasCircularSectorItem" ) );
   lineEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
   mapLayerEl.appendChild( lineEl );
 
