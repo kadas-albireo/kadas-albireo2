@@ -54,6 +54,8 @@ class TestKadasProjectMigration : public QObject
     void migrateLegacyKadasItemLayer_translatesSymbolItem();
     void migrateLegacyKadasItemLayer_translatesPinItem();
     void migrateLegacyKadasItemLayer_translatesCircularSectorItem();
+    void migrateLegacyKadasItemLayer_translatesGpxRouteItem();
+    void migrateLegacyKadasItemLayer_translatesGpxWaypointItem();
     void migrateLegacyKadasItemLayer_leavesV1FormatAlone();
     void migrateLegacyKadasItemLayer_leavesUnknownItemTypeAlone();
 
@@ -588,6 +590,80 @@ void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesCircularSe
   QCOMPARE( items.at( 1 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "polygon" ) );
 }
 
+void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesGpxRouteItem()
+{
+  // KadasGpxRouteItem extends KadasLineItem with gpx_name/gpx_number
+  // and label_font/label_color. Translates to KadasGpxRouteAnnotationItem
+  // (type=kadas:gpxroute), one per MultiLineString part.
+  QDomDocument doc;
+  QDomElement root = doc.createElement( QStringLiteral( "qgis" ) );
+  doc.appendChild( root );
+  QDomElement projectLayersEl = doc.createElement( QStringLiteral( "projectlayers" ) );
+  root.appendChild( projectLayersEl );
+
+  QDomElement mapLayerEl = appendKadasItemLayer( doc, projectLayersEl, QStringLiteral( "route_id" ), QStringLiteral( "Routes" ), QStringLiteral( "EPSG:3857" ) );
+
+  QDomElement itemEl = doc.createElement( QStringLiteral( "MapItem" ) );
+  itemEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasGpxRouteItem" ) );
+  itemEl.setAttribute( QStringLiteral( "crs" ), QStringLiteral( "EPSG:3857" ) );
+  itemEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
+  itemEl.setAttribute( QStringLiteral( "outline_color" ), QStringLiteral( "#ff0000" ) );
+  itemEl.setAttribute( QStringLiteral( "outline_width" ), QStringLiteral( "2" ) );
+  itemEl.setAttribute( QStringLiteral( "outline_style" ), QString::number( static_cast<int>( Qt::SolidLine ) ) );
+  itemEl.setAttribute( QStringLiteral( "fill_color" ), QStringLiteral( "#00000000" ) );
+  itemEl.setAttribute( QStringLiteral( "fill_style" ), QString::number( static_cast<int>( Qt::SolidPattern ) ) );
+  itemEl.setAttribute( QStringLiteral( "geometry" ), QStringLiteral( "MultiLineString ((0 0, 1 1, 2 0), (10 10, 11 11))" ) );
+  itemEl.setAttribute( QStringLiteral( "gpx_name" ), QStringLiteral( "Route A" ) );
+  itemEl.setAttribute( QStringLiteral( "gpx_number" ), QStringLiteral( "42" ) );
+  mapLayerEl.appendChild( itemEl );
+
+  QStringList filesToAttach;
+  QVERIFY( KadasProjectMigration::migrateProjectXml( QString(), doc, filesToAttach ) );
+
+  const QDomElement migratedLayer = doc.documentElement().firstChildElement( QStringLiteral( "projectlayers" ) ).firstChildElement( QStringLiteral( "maplayer" ) );
+  QCOMPARE( migratedLayer.attribute( QStringLiteral( "type" ) ), QStringLiteral( "annotation" ) );
+  const QDomNodeList items = migratedLayer.firstChildElement( QStringLiteral( "items" ) ).elementsByTagName( QStringLiteral( "item" ) );
+  QCOMPARE( items.size(), 2 );
+  QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "kadas:gpxroute" ) );
+  QCOMPARE( items.at( 1 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "kadas:gpxroute" ) );
+}
+
+void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesGpxWaypointItem()
+{
+  // KadasGpxWaypointItem extends KadasPointItem with gpx_name and
+  // label_font/label_color. Translates to KadasGpxWaypointAnnotationItem
+  // (type=kadas:gpxwaypoint).
+  QDomDocument doc;
+  QDomElement root = doc.createElement( QStringLiteral( "qgis" ) );
+  doc.appendChild( root );
+  QDomElement projectLayersEl = doc.createElement( QStringLiteral( "projectlayers" ) );
+  root.appendChild( projectLayersEl );
+
+  QDomElement mapLayerEl = appendKadasItemLayer( doc, projectLayersEl, QStringLiteral( "wp_id" ), QStringLiteral( "Waypoints" ), QStringLiteral( "EPSG:3857" ) );
+
+  QDomElement itemEl = doc.createElement( QStringLiteral( "MapItem" ) );
+  itemEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasGpxWaypointItem" ) );
+  itemEl.setAttribute( QStringLiteral( "crs" ), QStringLiteral( "EPSG:3857" ) );
+  itemEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
+  itemEl.setAttribute( QStringLiteral( "shape" ), QStringLiteral( "Circle" ) );
+  itemEl.setAttribute( QStringLiteral( "size" ), QStringLiteral( "6" ) );
+  itemEl.setAttribute( QStringLiteral( "stroke_color" ), QStringLiteral( "#ff0000" ) );
+  itemEl.setAttribute( QStringLiteral( "stroke_width" ), QStringLiteral( "2" ) );
+  itemEl.setAttribute( QStringLiteral( "fill_color" ), QStringLiteral( "#ffff00" ) );
+  itemEl.setAttribute( QStringLiteral( "geometry" ), QStringLiteral( "POINT(500 600)" ) );
+  itemEl.setAttribute( QStringLiteral( "gpx_name" ), QStringLiteral( "WP A" ) );
+  mapLayerEl.appendChild( itemEl );
+
+  QStringList filesToAttach;
+  QVERIFY( KadasProjectMigration::migrateProjectXml( QString(), doc, filesToAttach ) );
+
+  const QDomElement migratedLayer = doc.documentElement().firstChildElement( QStringLiteral( "projectlayers" ) ).firstChildElement( QStringLiteral( "maplayer" ) );
+  QCOMPARE( migratedLayer.attribute( QStringLiteral( "type" ) ), QStringLiteral( "annotation" ) );
+  const QDomNodeList items = migratedLayer.firstChildElement( QStringLiteral( "items" ) ).elementsByTagName( QStringLiteral( "item" ) );
+  QCOMPARE( items.size(), 1 );
+  QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "kadas:gpxwaypoint" ) );
+}
+
 void TestKadasProjectMigration::migrateLegacyKadasItemLayer_leavesV1FormatAlone()
 {
   // A `KadasItemLayer` whose only `<MapItem>` is in the legacy v1
@@ -632,7 +708,7 @@ void TestKadasProjectMigration::migrateLegacyKadasItemLayer_leavesUnknownItemTyp
   QDomElement mapLayerEl = appendKadasItemLayer( doc, projectLayersEl, QStringLiteral( "mixed_id" ), QStringLiteral( "Mixed" ), QStringLiteral( "EPSG:3857" ) );
   appendV2PointMapItem( doc, mapLayerEl, 0, 0, QStringLiteral( "EPSG:3857" ) );
   QDomElement lineEl = doc.createElement( QStringLiteral( "MapItem" ) );
-  lineEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasGpxWaypointItem" ) );
+  lineEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasUnknownFutureItem" ) );
   lineEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
   mapLayerEl.appendChild( lineEl );
 

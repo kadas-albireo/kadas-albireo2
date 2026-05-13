@@ -804,6 +804,8 @@ bool KadasProjectMigration::shouldAttach( const QString &baseDir, const QString 
 #include "kadas/gui/annotationitems/kadascircleannotationitem.h"
 #include "kadas/gui/annotationitems/kadaspictureannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
+#include "kadas/gui/annotationitems/kadasgpxrouteannotationitem.h"
+#include "kadas/gui/annotationitems/kadasgpxwaypointannotationitem.h"
 
 namespace
 {
@@ -1462,6 +1464,76 @@ namespace
   }
 
   /**
+   * Translate one `<MapItem name="KadasGpxRouteItem">` (v2 format) into
+   * one `KadasGpxRouteAnnotationItem` per part of the underlying
+   * MultiLineString. Carries gpx_name/gpx_number and label_font/color.
+   */
+  QList<QgsAnnotationItem *> translateKadasGpxRouteItem( const QDomElement &itemEl, const QgsCoordinateReferenceSystem &itemCrs, const QgsCoordinateReferenceSystem &layerCrs )
+  {
+    QList<QgsAnnotationItem *> out;
+    // Reuse the line translator: GpxRoute is just a KadasLineItem with
+    // extra label metadata. The shared logic handles geometry parsing,
+    // CRS transform, and per-part fanning.
+    const QList<QgsAnnotationItem *> baseAnnos = translateKadasLineItem( itemEl, itemCrs, layerCrs );
+    if ( baseAnnos.isEmpty() )
+      return out;
+    const QString gpxName = itemEl.attribute( QStringLiteral( "gpx_name" ) );
+    const QString gpxNumber = itemEl.attribute( QStringLiteral( "gpx_number" ) );
+    const QString fontStr = itemEl.attribute( QStringLiteral( "label_font" ) );
+    const QString colorStr = itemEl.attribute( QStringLiteral( "label_color" ) );
+    QFont labelFont;
+    if ( !fontStr.isEmpty() )
+      labelFont.fromString( fontStr );
+    const QColor labelColor = colorStr.isEmpty() ? QColor() : QColor( colorStr );
+
+    for ( QgsAnnotationItem *base : baseAnnos )
+    {
+      // The line translator returns QgsAnnotationLineItem; promote to
+      // KadasGpxRouteAnnotationItem by cloning the geometry + symbol.
+      auto *lineAnno = static_cast<QgsAnnotationLineItem *>( base );
+      auto *route = new KadasGpxRouteAnnotationItem( static_cast<QgsCurve *>( lineAnno->geometry()->clone() ) );
+      if ( lineAnno->symbol() )
+        route->setSymbol( lineAnno->symbol()->clone() );
+      route->setName( gpxName );
+      route->setNumber( gpxNumber );
+      route->setLabelFont( labelFont );
+      if ( labelColor.isValid() )
+        route->setLabelColor( labelColor );
+      delete lineAnno;
+      out.append( route );
+    }
+    return out;
+  }
+
+  /**
+   * Translate one `<MapItem name="KadasGpxWaypointItem">` (v2 format)
+   * into a `KadasGpxWaypointAnnotationItem`. Carries gpx_name and
+   * label_font/color.
+   */
+  KadasGpxWaypointAnnotationItem *translateKadasGpxWaypointItem( const QDomElement &itemEl, const QgsCoordinateReferenceSystem &itemCrs, const QgsCoordinateReferenceSystem &layerCrs )
+  {
+    // Reuse the point translator: GpxWaypoint is just a KadasPointItem
+    // with extra label metadata.
+    QgsAnnotationMarkerItem *baseAnno = translateKadasPointItem( itemEl, itemCrs, layerCrs );
+    if ( !baseAnno )
+      return nullptr;
+    auto *wp = new KadasGpxWaypointAnnotationItem( QgsPoint( baseAnno->geometry() ) );
+    delete baseAnno;
+    wp->setName( itemEl.attribute( QStringLiteral( "gpx_name" ) ) );
+    const QString fontStr = itemEl.attribute( QStringLiteral( "label_font" ) );
+    if ( !fontStr.isEmpty() )
+    {
+      QFont labelFont;
+      labelFont.fromString( fontStr );
+      wp->setLabelFont( labelFont );
+    }
+    const QString colorStr = itemEl.attribute( QStringLiteral( "label_color" ) );
+    if ( !colorStr.isEmpty() )
+      wp->setLabelColor( QColor( colorStr ) );
+    return wp;
+  }
+
+  /**
    * Dispatcher: looks at the `name` attribute of \a itemEl and forwards to
    * the matching per-type translator. Returns an empty list if no
    * translator is registered for the type yet, or if the translator
@@ -1523,7 +1595,15 @@ namespace
     {
       annos = translateKadasCircularSectorItem( itemEl, itemCrs, layerCrs );
     }
-    // Future slices: KadasGpxRouteItem, KadasGpxWaypointItem.
+    else if ( name == QLatin1String( "KadasGpxRouteItem" ) )
+    {
+      annos = translateKadasGpxRouteItem( itemEl, itemCrs, layerCrs );
+    }
+    else if ( name == QLatin1String( "KadasGpxWaypointItem" ) )
+    {
+      if ( auto *a = translateKadasGpxWaypointItem( itemEl, itemCrs, layerCrs ) )
+        annos.append( a );
+    }
 
     if ( annos.isEmpty() )
       return annos;
