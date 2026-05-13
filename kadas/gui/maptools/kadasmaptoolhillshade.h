@@ -17,24 +17,11 @@
 #ifndef KADASMAPTOOLHILLSHADE_H
 #define KADASMAPTOOLHILLSHADE_H
 
+#include <qgis/qgsmaptoolextent.h>
+
 #include "kadas/gui/kadas_gui.h"
-#include "kadas/gui/kadasmapiteminterface.h"
-#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
-class KADAS_GUI_EXPORT KadasMapToolHillshadeItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasMapToolHillshadeItemInterface( QgsMapCanvas *mapCanvas )
-      : KadasMapItemInterface()
-      , mCanvas( mapCanvas )
-    {}
-    KadasMapItem *createItem() const override;
-
-  private:
-    QgsMapCanvas *mCanvas = nullptr;
-};
-
-class KADAS_GUI_EXPORT KadasMapToolHillshade : public KadasMapToolCreateItem
+class KADAS_GUI_EXPORT KadasMapToolHillshade : public QgsMapToolExtent
 {
     Q_OBJECT
   public:
@@ -42,7 +29,7 @@ class KADAS_GUI_EXPORT KadasMapToolHillshade : public KadasMapToolCreateItem
     void compute( const QgsRectangle &extent, const QgsCoordinateReferenceSystem &crs );
 
   private slots:
-    void drawFinished();
+    void onExtentDrawn( const QgsRectangle &extent );
 };
 
 #endif // KADASMAPTOOLHILLSHADE_H

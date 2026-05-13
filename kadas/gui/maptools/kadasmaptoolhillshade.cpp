@@ -30,48 +30,29 @@
 
 #include "kadas/analysis/kadashillshadefilter.h"
 #include "kadas/core/kadas.h"
-#include "kadas/gui/mapitems/kadasrectangleitem.h"
 #include "kadas/gui/maptools/kadasmaptoolhillshade.h"
 
 
-KadasMapItem *KadasMapToolHillshadeItemInterface::createItem() const
-{
-  KadasRectangleItem *item = new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
-  return item;
-}
-
-
 KadasMapToolHillshade::KadasMapToolHillshade( QgsMapCanvas *mapCanvas )
-  : KadasMapToolCreateItem( mapCanvas, std::move( std::make_unique<KadasMapToolHillshadeItemInterface>( KadasMapToolHillshadeItemInterface( mapCanvas ) ) ) )
+  : QgsMapToolExtent( mapCanvas )
 {
   setCursor( Qt::ArrowCursor );
-  setUndoRedoVisible( false );
-  setToolLabel( tr( "Compute hillshade" ) );
-  connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolHillshade::drawFinished );
+  connect( this, &QgsMapToolExtent::extentChanged, this, &KadasMapToolHillshade::onExtentDrawn );
 }
 
-void KadasMapToolHillshade::drawFinished()
+void KadasMapToolHillshade::onExtentDrawn( const QgsRectangle &extent )
 {
-  const KadasRectangleItem *rectItem = dynamic_cast<const KadasRectangleItem *>( currentItem() );
-  if ( !rectItem )
-  {
-    return;
-  }
-  const QgsPointXY &p1 = rectItem->constState()->p1.front();
-  const QgsPointXY &p2 = rectItem->constState()->p2.front();
-  QgsRectangle rect( p1, p2 );
+  QgsRectangle rect = extent;
   rect.normalize();
   if ( rect.isEmpty() )
   {
-    clear();
+    clearRubberBand();
     return;
   }
 
-  QgsCoordinateReferenceSystem rectCrs = canvas()->mapSettings().destinationCrs();
+  compute( rect, canvas()->mapSettings().destinationCrs() );
 
-  compute( rect, rectCrs );
-
-  clear();
+  clearRubberBand();
 }
 
 void KadasMapToolHillshade::compute( const QgsRectangle &extent, const QgsCoordinateReferenceSystem &crs )
