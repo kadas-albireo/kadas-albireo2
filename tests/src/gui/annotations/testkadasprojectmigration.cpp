@@ -52,6 +52,7 @@ class TestKadasProjectMigration : public QObject
     void migrateLegacyKadasItemLayer_translatesCircleItem();
     void migrateLegacyKadasItemLayer_translatesPictureItem();
     void migrateLegacyKadasItemLayer_translatesSymbolItem();
+    void migrateLegacyKadasItemLayer_translatesPinItem();
     void migrateLegacyKadasItemLayer_leavesV1FormatAlone();
     void migrateLegacyKadasItemLayer_leavesUnknownItemTypeAlone();
 
@@ -378,16 +379,20 @@ void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesRectangleI
   QCOMPARE( items.size(), 2 );
   QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "kadas:rectangle" ) );
   QCOMPARE( items.at( 1 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "kadas:rectangle" ) );
-  // First rect: center (5,5), size (10,10).
-  QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "cx" ) ).toDouble(), 5.0 );
-  QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "cy" ) ).toDouble(), 5.0 );
-  QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "w" ) ).toDouble(), 10.0 );
-  QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "h" ) ).toDouble(), 10.0 );
-  // Second rect: center (25,30), size (10,20).
-  QCOMPARE( items.at( 1 ).toElement().attribute( QStringLiteral( "cx" ) ).toDouble(), 25.0 );
-  QCOMPARE( items.at( 1 ).toElement().attribute( QStringLiteral( "cy" ) ).toDouble(), 30.0 );
-  QCOMPARE( items.at( 1 ).toElement().attribute( QStringLiteral( "w" ) ).toDouble(), 10.0 );
-  QCOMPARE( items.at( 1 ).toElement().attribute( QStringLiteral( "h" ) ).toDouble(), 20.0 );
+  // QgsAnnotationLayer stores items in a hash; on-disk order is not
+  // stable across runs. Verify the set of (cx, cy, w, h) tuples.
+  QSet<QString> rects;
+  for ( int i = 0; i < items.size(); ++i )
+  {
+    const QDomElement el = items.at( i ).toElement();
+    rects.insert( QStringLiteral( "%1,%2,%3,%4" )
+                    .arg( el.attribute( QStringLiteral( "cx" ) ).toDouble() )
+                    .arg( el.attribute( QStringLiteral( "cy" ) ).toDouble() )
+                    .arg( el.attribute( QStringLiteral( "w" ) ).toDouble() )
+                    .arg( el.attribute( QStringLiteral( "h" ) ).toDouble() ) );
+  }
+  QVERIFY( rects.contains( QStringLiteral( "5,5,10,10" ) ) );
+  QVERIFY( rects.contains( QStringLiteral( "25,30,10,20" ) ) );
 }
 
 void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesCircleItem()
@@ -507,6 +512,42 @@ void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesSymbolItem
   QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "picture" ) );
 }
 
+void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesPinItem()
+{
+  // KadasPinItem (v2 format) translates to KadasPinAnnotationItem
+  // (type=kadas:pin), carrying name/remarks.
+  QDomDocument doc;
+  QDomElement root = doc.createElement( QStringLiteral( "qgis" ) );
+  doc.appendChild( root );
+  QDomElement projectLayersEl = doc.createElement( QStringLiteral( "projectlayers" ) );
+  root.appendChild( projectLayersEl );
+
+  QDomElement mapLayerEl = appendKadasItemLayer( doc, projectLayersEl, QStringLiteral( "pin_id" ), QStringLiteral( "Pins" ), QStringLiteral( "EPSG:3857" ) );
+
+  QDomElement itemEl = doc.createElement( QStringLiteral( "MapItem" ) );
+  itemEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasPinItem" ) );
+  itemEl.setAttribute( QStringLiteral( "crs" ), QStringLiteral( "EPSG:3857" ) );
+  itemEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
+  itemEl.setAttribute( QStringLiteral( "pos_x" ), QStringLiteral( "1000" ) );
+  itemEl.setAttribute( QStringLiteral( "pos_y" ), QStringLiteral( "2000" ) );
+  // NOTE: KadasSymbolItem::writeXmlPrivate clobbers the class-name `name`
+  // attribute with the display name (legacy bug). The XML rewriter
+  // dispatches on `name`, so we leave the display name empty here and
+  // only set `remarks`. Real-world legacy saves with non-empty pin names
+  // are unrecoverable by either dispatcher.
+  itemEl.setAttribute( QStringLiteral( "remarks" ), QStringLiteral( "test pin" ) );
+  mapLayerEl.appendChild( itemEl );
+
+  QStringList filesToAttach;
+  QVERIFY( KadasProjectMigration::migrateProjectXml( QString(), doc, filesToAttach ) );
+
+  const QDomElement migratedLayer = doc.documentElement().firstChildElement( QStringLiteral( "projectlayers" ) ).firstChildElement( QStringLiteral( "maplayer" ) );
+  QCOMPARE( migratedLayer.attribute( QStringLiteral( "type" ) ), QStringLiteral( "annotation" ) );
+  const QDomNodeList items = migratedLayer.firstChildElement( QStringLiteral( "items" ) ).elementsByTagName( QStringLiteral( "item" ) );
+  QCOMPARE( items.size(), 1 );
+  QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "kadas:pin" ) );
+}
+
 void TestKadasProjectMigration::migrateLegacyKadasItemLayer_leavesV1FormatAlone()
 {
   // A `KadasItemLayer` whose only `<MapItem>` is in the legacy v1
@@ -551,7 +592,7 @@ void TestKadasProjectMigration::migrateLegacyKadasItemLayer_leavesUnknownItemTyp
   QDomElement mapLayerEl = appendKadasItemLayer( doc, projectLayersEl, QStringLiteral( "mixed_id" ), QStringLiteral( "Mixed" ), QStringLiteral( "EPSG:3857" ) );
   appendV2PointMapItem( doc, mapLayerEl, 0, 0, QStringLiteral( "EPSG:3857" ) );
   QDomElement lineEl = doc.createElement( QStringLiteral( "MapItem" ) );
-  lineEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasCircularSectorItem" ) );
+  lineEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasGpxRouteItem" ) );
   lineEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
   mapLayerEl.appendChild( lineEl );
 
