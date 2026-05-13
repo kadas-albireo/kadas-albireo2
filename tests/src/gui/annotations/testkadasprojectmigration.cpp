@@ -15,6 +15,8 @@
  ***************************************************************************/
 
 #include <QDomDocument>
+#include <QPair>
+#include <QSet>
 #include <QStandardPaths>
 #include <QStringList>
 #include <QtTest/QTest>
@@ -47,6 +49,7 @@ class TestKadasProjectMigration : public QObject
     void migrateLegacyKadasItemLayer_translatesLineItem();
     void migrateLegacyKadasItemLayer_translatesPolygonItem();
     void migrateLegacyKadasItemLayer_translatesRectangleItem();
+    void migrateLegacyKadasItemLayer_translatesCircleItem();
     void migrateLegacyKadasItemLayer_leavesV1FormatAlone();
     void migrateLegacyKadasItemLayer_leavesUnknownItemTypeAlone();
 
@@ -385,6 +388,52 @@ void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesRectangleI
   QCOMPARE( items.at( 1 ).toElement().attribute( QStringLiteral( "h" ) ).toDouble(), 20.0 );
 }
 
+void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesCircleItem()
+{
+  // KadasCircleItem stores N (center, ringPoint) pairs; each pair fans
+  // into one KadasCircleAnnotationItem (type=kadas:circle).
+  QDomDocument doc;
+  QDomElement root = doc.createElement( QStringLiteral( "qgis" ) );
+  doc.appendChild( root );
+  QDomElement projectLayersEl = doc.createElement( QStringLiteral( "projectlayers" ) );
+  root.appendChild( projectLayersEl );
+
+  QDomElement mapLayerEl = appendKadasItemLayer( doc, projectLayersEl, QStringLiteral( "circle_id" ), QStringLiteral( "Circles" ), QStringLiteral( "EPSG:3857" ) );
+
+  QDomElement itemEl = doc.createElement( QStringLiteral( "MapItem" ) );
+  itemEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasCircleItem" ) );
+  itemEl.setAttribute( QStringLiteral( "crs" ), QStringLiteral( "EPSG:3857" ) );
+  itemEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
+  itemEl.setAttribute( QStringLiteral( "outline_color" ), QStringLiteral( "#000000" ) );
+  itemEl.setAttribute( QStringLiteral( "outline_width" ), QStringLiteral( "1" ) );
+  itemEl.setAttribute( QStringLiteral( "outline_style" ), QString::number( static_cast<int>( Qt::SolidLine ) ) );
+  itemEl.setAttribute( QStringLiteral( "fill_color" ), QStringLiteral( "#80ff8800" ) );
+  itemEl.setAttribute( QStringLiteral( "fill_style" ), QString::number( static_cast<int>( Qt::SolidPattern ) ) );
+  itemEl.setAttribute( QStringLiteral( "centers" ), QStringLiteral( "0,0;100,100" ) );
+  itemEl.setAttribute( QStringLiteral( "ringpos" ), QStringLiteral( "10,0;105,100" ) );
+  mapLayerEl.appendChild( itemEl );
+
+  QStringList filesToAttach;
+  QVERIFY( KadasProjectMigration::migrateProjectXml( QString(), doc, filesToAttach ) );
+
+  const QDomElement migratedLayer = doc.documentElement().firstChildElement( QStringLiteral( "projectlayers" ) ).firstChildElement( QStringLiteral( "maplayer" ) );
+  QCOMPARE( migratedLayer.attribute( QStringLiteral( "type" ) ), QStringLiteral( "annotation" ) );
+  const QDomNodeList items = migratedLayer.firstChildElement( QStringLiteral( "items" ) ).elementsByTagName( QStringLiteral( "item" ) );
+  QCOMPARE( items.size(), 2 );
+  QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "kadas:circle" ) );
+  QCOMPARE( items.at( 1 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "kadas:circle" ) );
+  // QgsAnnotationLayer stores items in a hash; the on-disk order is not
+  // stable across runs. Verify the set of centers instead.
+  QSet<QPair<double, double>> centers;
+  for ( int i = 0; i < items.size(); ++i )
+  {
+    const QDomElement el = items.at( i ).toElement();
+    centers.insert( qMakePair( el.attribute( QStringLiteral( "cx" ) ).toDouble(), el.attribute( QStringLiteral( "cy" ) ).toDouble() ) );
+  }
+  QVERIFY( centers.contains( qMakePair( 0.0, 0.0 ) ) );
+  QVERIFY( centers.contains( qMakePair( 100.0, 100.0 ) ) );
+}
+
 void TestKadasProjectMigration::migrateLegacyKadasItemLayer_leavesV1FormatAlone()
 {
   // A `KadasItemLayer` whose only `<MapItem>` is in the legacy v1
@@ -429,7 +478,7 @@ void TestKadasProjectMigration::migrateLegacyKadasItemLayer_leavesUnknownItemTyp
   QDomElement mapLayerEl = appendKadasItemLayer( doc, projectLayersEl, QStringLiteral( "mixed_id" ), QStringLiteral( "Mixed" ), QStringLiteral( "EPSG:3857" ) );
   appendV2PointMapItem( doc, mapLayerEl, 0, 0, QStringLiteral( "EPSG:3857" ) );
   QDomElement lineEl = doc.createElement( QStringLiteral( "MapItem" ) );
-  lineEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasCircleItem" ) );
+  lineEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasPictureItem" ) );
   lineEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
   mapLayerEl.appendChild( lineEl );
 
