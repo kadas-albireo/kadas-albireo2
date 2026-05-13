@@ -214,7 +214,6 @@ KadasCanvasContextMenu::~KadasCanvasContextMenu()
   }
 
   delete mGeomSel;
-  delete mSelRect;
   delete mSelRectBand;
 }
 

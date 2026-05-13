@@ -24,7 +24,6 @@
 #include "kadas/gui/kadasfeaturepicker.h"
 
 class QgsGeometryRubberBand;
-class KadasSelectionRectItem;
 class QgsRubberBand;
 
 
@@ -90,7 +89,6 @@ class KadasCanvasContextMenu : public QMenu
     QgsMapCanvas *mCanvas = nullptr;
     KadasFeaturePicker::PickResult mPickResult;
     QgsGeometryRubberBand *mGeomSel = nullptr;
-    KadasSelectionRectItem *mSelRect = nullptr;
     QgsRubberBand *mSelRectBand = nullptr;
 };
 
