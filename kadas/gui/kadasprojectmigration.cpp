@@ -780,8 +780,10 @@ bool KadasProjectMigration::shouldAttach( const QString &baseDir, const QString 
 // mechanical; failure to translate any single MapItem in a layer aborts
 // the rewrite for that layer.
 
+#include <qgis/qgis.h>
 #include <qgis/qgsannotationlineitem.h>
 #include <qgis/qgsannotationmarkeritem.h>
+#include <qgis/qgsannotationpictureitem.h>
 #include <qgis/qgsannotationpointtextitem.h>
 #include <qgis/qgsannotationpolygonitem.h>
 #include <qgis/qgscoordinatetransform.h>
@@ -798,6 +800,7 @@ bool KadasProjectMigration::shouldAttach( const QString &baseDir, const QString 
 
 #include "kadas/gui/annotationitems/kadasrectangleannotationitem.h"
 #include "kadas/gui/annotationitems/kadascircleannotationitem.h"
+#include "kadas/gui/annotationitems/kadaspictureannotationcontroller.h"
 
 namespace
 {
@@ -1202,6 +1205,57 @@ namespace
   }
 
   /**
+   * Translate one `<MapItem name="KadasPictureItem">` (v2 format) into a
+   * single `QgsAnnotationPictureItem` (type id `picture`). Carries the
+   * geographic anchor (\c pos_x/pos_y), pixel offset from anchor
+   * (\c offset_x/offset_y), pixel size (\c size_w/size_h), the frame
+   * toggle, and the file path. Installs the standard balloon callout so
+   * the picture looks the same as a freshly drawn one.
+   */
+  QgsAnnotationPictureItem *translateKadasPictureItem( const QDomElement &itemEl, const QgsCoordinateReferenceSystem &itemCrs, const QgsCoordinateReferenceSystem &layerCrs )
+  {
+    if ( itemEl.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) != QLatin1String( "2" ) )
+      return nullptr;
+
+    const double posX = itemEl.attribute( QStringLiteral( "pos_x" ), QStringLiteral( "0" ) ).toDouble();
+    const double posY = itemEl.attribute( QStringLiteral( "pos_y" ), QStringLiteral( "0" ) ).toDouble();
+    QgsPointXY anchor( posX, posY );
+    if ( itemCrs.isValid() && layerCrs.isValid() && itemCrs != layerCrs )
+    {
+      try
+      {
+        QgsCoordinateTransform ct( itemCrs, layerCrs, QgsProject::instance() );
+        anchor = ct.transform( anchor );
+      }
+      catch ( QgsCsException & )
+      {
+        return nullptr;
+      }
+    }
+
+    const double offsetX = itemEl.attribute( QStringLiteral( "offset_x" ), QStringLiteral( "0" ) ).toDouble();
+    const double offsetY = itemEl.attribute( QStringLiteral( "offset_y" ), QStringLiteral( "50" ) ).toDouble();
+    const int w = itemEl.attribute( QStringLiteral( "size_w" ), QStringLiteral( "200" ) ).toInt();
+    const int h = itemEl.attribute( QStringLiteral( "size_h" ), QStringLiteral( "150" ) ).toInt();
+    const bool frame = itemEl.attribute( QStringLiteral( "frame" ), QStringLiteral( "1" ) ) == QLatin1String( "1" );
+    const QString filePath = itemEl.attribute( QStringLiteral( "file_path" ) );
+
+    auto *pic = new QgsAnnotationPictureItem( Qgis::PictureFormat::Unknown, QString(), QgsRectangle( anchor.x(), anchor.y(), anchor.x(), anchor.y() ) );
+    if ( !filePath.isEmpty() )
+      KadasPictureAnnotationController::setPath( pic, filePath );
+    pic->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
+    pic->setFixedSize( QSizeF( w > 0 ? w : 200, h > 0 ? h : 150 ) );
+    pic->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
+    pic->setFrameEnabled( frame );
+    KadasPictureAnnotationController::ensureBalloon( pic );
+    // Override the centered default that ensureBalloon installs with the
+    // user's saved offset (in pixels, same convention as the legacy item).
+    pic->setOffsetFromCallout( QSizeF( offsetX, offsetY ) );
+    pic->setOffsetFromCalloutUnit( Qgis::RenderUnit::Pixels );
+    return pic;
+  }
+
+  /**
    * Dispatcher: looks at the `name` attribute of \a itemEl and forwards to
    * the matching per-type translator. Returns an empty list if no
    * translator is registered for the type yet, or if the translator
@@ -1244,7 +1298,12 @@ namespace
     {
       annos = translateKadasCircleItem( itemEl, itemCrs, layerCrs );
     }
-    // Future slices: KadasCircularSectorItem, KadasPictureItem,
+    else if ( name == QLatin1String( "KadasPictureItem" ) )
+    {
+      if ( auto *a = translateKadasPictureItem( itemEl, itemCrs, layerCrs ) )
+        annos.append( a );
+    }
+    // Future slices: KadasCircularSectorItem,
     // KadasSymbolItem, KadasPinItem, KadasGpxRouteItem,
     // KadasGpxWaypointItem.
 
