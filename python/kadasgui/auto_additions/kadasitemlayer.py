@@ -15,12 +15,7 @@ KadasItemLayer.PickObjective.__doc__ = """
 # --
 try:
     KadasItemLayer.layerType = staticmethod(KadasItemLayer.layerType)
-    KadasItemLayer.__virtual_methods__ = ['pickItem']
     KadasItemLayer.__overridden_methods__ = ['layerTypeKey', 'clone', 'createMapRenderer', 'extent', 'readXml', 'writeXml']
-except (NameError, AttributeError):
-    pass
-try:
-    KadasItemLayerRegistry.getItemLayers = staticmethod(KadasItemLayerRegistry.getItemLayers)
 except (NameError, AttributeError):
     pass
 try:

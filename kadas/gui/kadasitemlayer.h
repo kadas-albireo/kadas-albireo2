@@ -190,10 +190,4 @@ class KADAS_GUI_EXPORT KadasItemLayerType : public KadasPluginLayerType
     void addLayerTreeMenuActions( QMenu *menu, QgsPluginLayer *layer ) const override;
 };
 
-class KADAS_GUI_EXPORT KadasItemLayerRegistry
-{
-  public:
-    static QList<KadasItemLayer *> getItemLayers();
-};
-
 #endif // KADASITEMLAYER_H

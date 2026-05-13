@@ -7,7 +7,9 @@ import shutil
 import sqlite3
 import uuid
 
-from kadas.kadasgui import KadasItemLayerRegistry, KadasMapRect
+from kadas.kadasgui import (  # noqa: F401  # kept for future extent-clipping port to QgsAnnotationLayer
+    KadasMapRect,
+)
 from lxml import etree as ET
 from qgis.core import Qgis, QgsMapLayer, QgsPathResolver, QgsProject
 from qgis.PyQt.QtCore import QEventLoop, Qt, QTemporaryDir
@@ -303,27 +305,20 @@ class KadasGpkgExport(KadasGpkgExportBase):
                 )
 
     def __flagRedliningItemsOutsideExtent(self, extent, crs):
-        """Flag redlining items outside export extent"""
+        """Flag redlining items outside export extent.
 
-        rectExportExtent = KadasMapRect(
-            extent.xMinimum(), extent.yMinimum(), extent.xMaximum(), extent.yMaximum()
-        )
-        mapSettings = self.iface.mapCanvas().mapSettings()
-
-        for layer in KadasItemLayerRegistry.getItemLayers():
-            for item in layer.items().values():
-                if not item.intersects(rectExportExtent, mapSettings):
-                    # Flag redlining item
-                    item.setProperty(self.PROPERTY_ITEM_TO_BE_REMOVED, True)
+        TODO: port to QgsAnnotationLayer. Legacy KadasItemLayer instances no
+        longer exist at runtime (the post-load migration converts them to
+        QgsAnnotationLayer before plugins can see them), so this is a no-op.
+        """
+        return
 
     def __removeRedliningItemsFlag(self):
-        """Remove redlining items flag"""
+        """Remove redlining items flag.
 
-        for layer in KadasItemLayerRegistry.getItemLayers():
-            for item in layer.items().values():
-                if self.PROPERTY_ITEM_TO_BE_REMOVED in item.dynamicPropertyNames():
-                    # Un-Flag redlining item
-                    item.setProperty(self.PROPERTY_ITEM_TO_BE_REMOVED, None)
+        TODO: port to QgsAnnotationLayer (paired with __flagRedliningItemsOutsideExtent).
+        """
+        return
 
     def __removeFlaggedRedlining(self, doc):
         """Remove redlining items outside export extent"""
