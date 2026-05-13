@@ -801,6 +801,7 @@ bool KadasProjectMigration::shouldAttach( const QString &baseDir, const QString 
 #include "kadas/gui/annotationitems/kadasrectangleannotationitem.h"
 #include "kadas/gui/annotationitems/kadascircleannotationitem.h"
 #include "kadas/gui/annotationitems/kadaspictureannotationcontroller.h"
+#include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 
 namespace
 {
@@ -1309,6 +1310,38 @@ namespace
   }
 
   /**
+   * Translate one `<MapItem name="KadasPinItem">` (v2 format) into a
+   * `KadasPinAnnotationItem`. Carries name/remarks; size/anchor are
+   * dropped (pins have a canonical icon).
+   */
+  KadasPinAnnotationItem *translateKadasPinItem( const QDomElement &itemEl, const QgsCoordinateReferenceSystem &itemCrs, const QgsCoordinateReferenceSystem &layerCrs )
+  {
+    if ( itemEl.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) != QLatin1String( "2" ) )
+      return nullptr;
+
+    const double posX = itemEl.attribute( QStringLiteral( "pos_x" ), QStringLiteral( "0" ) ).toDouble();
+    const double posY = itemEl.attribute( QStringLiteral( "pos_y" ), QStringLiteral( "0" ) ).toDouble();
+    QgsPointXY p( posX, posY );
+    if ( itemCrs.isValid() && layerCrs.isValid() && itemCrs != layerCrs )
+    {
+      try
+      {
+        QgsCoordinateTransform ct( itemCrs, layerCrs, QgsProject::instance() );
+        p = ct.transform( p );
+      }
+      catch ( QgsCsException & )
+      {
+        return nullptr;
+      }
+    }
+
+    auto *anno = new KadasPinAnnotationItem( QgsPoint( p ) );
+    anno->setName( itemEl.attribute( QStringLiteral( "name" ) ) );
+    anno->setRemarks( itemEl.attribute( QStringLiteral( "remarks" ) ) );
+    return anno;
+  }
+
+  /**
    * Dispatcher: looks at the `name` attribute of \a itemEl and forwards to
    * the matching per-type translator. Returns an empty list if no
    * translator is registered for the type yet, or if the translator
@@ -1361,8 +1394,13 @@ namespace
       if ( auto *a = translateKadasSymbolItem( itemEl, itemCrs, layerCrs ) )
         annos.append( a );
     }
-    // Future slices: KadasCircularSectorItem, KadasPinItem,
-    // KadasGpxRouteItem, KadasGpxWaypointItem.
+    else if ( name == QLatin1String( "KadasPinItem" ) )
+    {
+      if ( auto *a = translateKadasPinItem( itemEl, itemCrs, layerCrs ) )
+        annos.append( a );
+    }
+    // Future slices: KadasCircularSectorItem, KadasGpxRouteItem,
+    // KadasGpxWaypointItem.
 
     if ( annos.isEmpty() )
       return annos;
