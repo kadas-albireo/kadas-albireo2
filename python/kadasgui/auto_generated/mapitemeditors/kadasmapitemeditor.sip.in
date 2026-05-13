@@ -30,9 +30,6 @@ your option) any later version. *
 #include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
 %End
   public:
-    static const QString GPX_ROUTE;
-    static const QString GPX_WAYPOINT;
-
     enum class EditorType
     {
       CreateItemEditor,
