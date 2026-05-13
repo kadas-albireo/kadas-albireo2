@@ -21,8 +21,6 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrendercontext.h>
 #include <qgis/qgssettings.h>
-#include <qgis/qgsannotationlayer.h>
-#include <qgis/qgsannotationitem.h>
 
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/mapitems/kadasmapitem.h"
@@ -74,26 +72,6 @@ KadasItemLayer::~KadasItemLayer()
 {
   qDeleteAll( mItems );
   mItems.clear();
-}
-
-QgsAnnotationLayer *KadasItemLayer::qgisAnnotationLayer( const QgsCoordinateReferenceSystem &crs ) const
-{
-  QgsAnnotationLayer::LayerOptions lo( QgsProject::instance()->transformContext() );
-  QgsAnnotationLayer *al = new QgsAnnotationLayer( name(), lo );
-  al->setCrs( crs );
-
-  QList<QgsAnnotationItem *> items;
-
-  for ( ItemId id : std::as_const( mItemOrder ) )
-  {
-    items << mItems[id]->annotationItem( crs );
-  }
-  std::stable_sort( items.begin(), items.end(), []( QgsAnnotationItem *a, QgsAnnotationItem *b ) { return a->zIndex() < b->zIndex(); } );
-
-  for ( QgsAnnotationItem *item : std::as_const( items ) )
-    al->addItem( item );
-
-  return al;
 }
 
 KadasItemLayer::ItemId KadasItemLayer::addItem( KadasMapItem *item )
