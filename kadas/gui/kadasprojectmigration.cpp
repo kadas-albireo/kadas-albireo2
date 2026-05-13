@@ -23,6 +23,9 @@
 #include <QScreen>
 #include <QFile>
 #include <QMap>
+#include <QSizeF>
+
+#include <cmath>
 
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgscircularstring.h>
@@ -793,6 +796,8 @@ bool KadasProjectMigration::shouldAttach( const QString &baseDir, const QString 
 #include <qgis/qgsreadwritecontext.h>
 #include <qgis/qgstextformat.h>
 
+#include "kadas/gui/annotationitems/kadasrectangleannotationitem.h"
+
 namespace
 {
   /**
@@ -1031,6 +1036,89 @@ namespace
   }
 
   /**
+   * Translate one `<MapItem name="KadasRectangleItem">` (v2 format) into
+   * one `KadasRectangleAnnotationItem` per (p1, p2) pair. The legacy item
+   * stores axis-aligned diagonals; rotation is always zero.
+   */
+  QList<QgsAnnotationItem *> translateKadasRectangleItem( const QDomElement &itemEl, const QgsCoordinateReferenceSystem &itemCrs, const QgsCoordinateReferenceSystem &layerCrs )
+  {
+    QList<QgsAnnotationItem *> out;
+    if ( itemEl.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) != QLatin1String( "2" ) )
+      return out;
+
+    QColor outlineColor;
+    double outlineWidth = 1.0;
+    Qt::PenStyle outlineStyle = Qt::SolidLine;
+    QColor fillColor;
+    Qt::BrushStyle fillStyle = Qt::SolidPattern;
+    parseGeometryBaseAttributes( itemEl, outlineColor, outlineWidth, outlineStyle, fillColor, fillStyle );
+
+    auto parsePoints = []( const QString &s ) {
+      QList<QgsPointXY> pts;
+      if ( s.isEmpty() )
+        return pts;
+      const QStringList pairs = s.split( QChar( ';' ), Qt::SkipEmptyParts );
+      for ( const QString &pair : pairs )
+      {
+        const QStringList xy = pair.split( QChar( ',' ) );
+        if ( xy.size() == 2 )
+          pts.append( QgsPointXY( xy[0].toDouble(), xy[1].toDouble() ) );
+      }
+      return pts;
+    };
+    const QList<QgsPointXY> p1List = parsePoints( itemEl.attribute( QStringLiteral( "p1" ) ) );
+    const QList<QgsPointXY> p2List = parsePoints( itemEl.attribute( QStringLiteral( "p2" ) ) );
+    if ( p1List.isEmpty() || p1List.size() != p2List.size() )
+      return out;
+
+    const bool needTransform = itemCrs.isValid() && layerCrs.isValid() && itemCrs != layerCrs;
+    QgsCoordinateTransform ct;
+    if ( needTransform )
+    {
+      try
+      {
+        ct = QgsCoordinateTransform( itemCrs, layerCrs, QgsProject::instance() );
+      }
+      catch ( QgsCsException & )
+      {
+        return out;
+      }
+    }
+
+    auto makeSymbol = [&]() {
+      auto *layer = new QgsSimpleFillSymbolLayer( fillColor, fillStyle, outlineColor, outlineStyle, outlineWidth );
+      layer->setStrokeWidthUnit( Qgis::RenderUnit::Pixels );
+      return new QgsFillSymbol( QgsSymbolLayerList { layer } );
+    };
+
+    for ( int i = 0; i < p1List.size(); ++i )
+    {
+      QgsPointXY p1 = p1List[i];
+      QgsPointXY p2 = p2List[i];
+      if ( needTransform )
+      {
+        try
+        {
+          p1 = ct.transform( p1 );
+          p2 = ct.transform( p2 );
+        }
+        catch ( QgsCsException & )
+        {
+          qDeleteAll( out );
+          out.clear();
+          return out;
+        }
+      }
+      const QgsPointXY center( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) );
+      const QSizeF size( std::abs( p2.x() - p1.x() ), std::abs( p2.y() - p1.y() ) );
+      auto *anno = new KadasRectangleAnnotationItem( center, size, 0.0 );
+      anno->setSymbol( makeSymbol() );
+      out.append( anno );
+    }
+    return out;
+  }
+
+  /**
    * Dispatcher: looks at the `name` attribute of \a itemEl and forwards to
    * the matching per-type translator. Returns an empty list if no
    * translator is registered for the type yet, or if the translator
@@ -1065,7 +1153,11 @@ namespace
     {
       annos = translateKadasPolygonItem( itemEl, itemCrs, layerCrs );
     }
-    // Future slices: KadasRectangleItem, KadasCircleItem,
+    else if ( name == QLatin1String( "KadasRectangleItem" ) )
+    {
+      annos = translateKadasRectangleItem( itemEl, itemCrs, layerCrs );
+    }
+    // Future slices: KadasCircleItem,
     // KadasCircularSectorItem, KadasPictureItem, KadasSymbolItem,
     // KadasPinItem, KadasGpxRouteItem, KadasGpxWaypointItem.
 
