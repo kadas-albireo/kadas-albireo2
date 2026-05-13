@@ -19,10 +19,11 @@
 
 #include <QString>
 
+#include <qgis/qgscoordinatereferencesystem.h>
+
 #include "kadas/gui/kadas_gui.h"
 
 class QgsAnnotationLayer;
-class QgsCoordinateReferenceSystem;
 
 /**
  * \ingroup gui

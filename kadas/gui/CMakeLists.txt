@@ -12,7 +12,6 @@ set(kadas_gui_SRC
     kadasfloatinginputwidget.cpp
     kadasheightprofiledialog.cpp
     kadasattributetypes.cpp
-    kadasitemlayer.cpp
     kadaslayerpropertiesdialog.cpp
     kadaslayerselectionwidget.cpp
     kadasmapitemtooltip.cpp
@@ -74,23 +73,6 @@ set(kadas_gui_SRC
     search/kadaspinsearchprovider.cpp
     search/kadasremotedatasearchprovider.cpp
     search/kadasworldlocationsearchprovider.cpp
-    mapitemeditors/kadasmapitemeditor.cpp
-    mapitems/kadasanchoreditem.cpp
-    mapitems/kadascircleitem.cpp
-    mapitems/kadascircularsectoritem.cpp
-    mapitems/kadasgeometryitem.cpp
-    mapitems/kadasgpxrouteitem.cpp
-    mapitems/kadasgpxwaypointitem.cpp
-    mapitems/kadaslineitem.cpp
-    mapitems/kadasmapitem.cpp
-    mapitems/kadaspictureitem.cpp
-    mapitems/kadaspointitem.cpp
-    mapitems/kadaspolygonitem.cpp
-    mapitems/kadasrectangleitem.cpp
-    mapitems/kadasrectangleitembase.cpp
-    mapitems/kadasselectionrectitem.cpp
-    mapitems/kadassymbolitem.cpp
-    mapitems/kadastextitem.cpp
 )
 
 set(kadas_gui_HDR
@@ -106,10 +88,8 @@ set(kadas_gui_HDR
     kadasfloatinginputwidget.h
     kadasheightprofiledialog.h
     kadasattributetypes.h
-    kadasitemlayer.h
     kadaslayerpropertiesdialog.h
     kadaslayerselectionwidget.h
-    kadasmapiteminterface.h
     kadasmapitemtooltip.h
     kadasplugininterface.h
     kadasprojectmigration.h
@@ -175,23 +155,6 @@ set(kadas_gui_HDR
     search/kadasremotedatasearchprovider.h
     search/kadasworldlocationsearchprovider.h
     kadasmapwidget.h
-    mapitemeditors/kadasmapitemeditor.h
-    mapitems/kadasanchoreditem.h
-    mapitems/kadascircleitem.h
-    mapitems/kadascircularsectoritem.h
-    mapitems/kadasgeometryitem.h
-    mapitems/kadasgpxrouteitem.h
-    mapitems/kadasgpxwaypointitem.h
-    mapitems/kadaslineitem.h
-    mapitems/kadasmapitem.h
-    mapitems/kadaspictureitem.h
-    mapitems/kadaspointitem.h
-    mapitems/kadaspolygonitem.h
-    mapitems/kadasrectangleitem.h
-    mapitems/kadasrectangleitembase.h
-    mapitems/kadasselectionrectitem.h
-    mapitems/kadassymbolitem.h
-    mapitems/kadastextitem.h
 )
 
 file(GLOB kadas_gui_UI ui/*.ui)

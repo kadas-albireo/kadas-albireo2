@@ -50,7 +50,6 @@
 #include "kadas/core/kadas.h"
 #include "kadas/gui/kadasclipboard.h"
 #include "kadas/gui/kadascoordinatedisplayer.h"
-#include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
