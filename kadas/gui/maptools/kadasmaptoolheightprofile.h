@@ -17,38 +17,25 @@
 #ifndef KADASMAPTOOLHEIGHTPROFILE_H
 #define KADASMAPTOOLHEIGHTPROFILE_H
 
-#include <qgis/qgsmaptool.h>
+#include <QList>
+
+#include <qgis/qgscoordinatereferencesystem.h>
+#include <qgis/qgspointxy.h>
 
 #include "kadas/gui/kadas_gui.h"
-#include "kadas/gui/kadasmapiteminterface.h"
+#include "kadas/gui/maptools/kadasshapecapturemaptool.h"
 
-#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
-
-class QgsCoordinateReferenceSystem;
+class QgsAbstractGeometry;
 class QgsGeometry;
 class QgsRubberBand;
 class KadasHeightProfileDialog;
 
-class KADAS_GUI_EXPORT KadasMapToolHeightProfileItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasMapToolHeightProfileItemInterface( QgsMapCanvas *mapCanvas )
-      : KadasMapItemInterface()
-      , mCanvas( mapCanvas )
-    {}
-    KadasMapItem *createItem() const override;
-
-  private:
-    QgsMapCanvas *mCanvas = nullptr;
-};
-
-class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public KadasMapToolCreateItem
+class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public KadasShapeCaptureMapTool
 {
     Q_OBJECT
   public:
     KadasMapToolHeightProfile( QgsMapCanvas *canvas );
 
-    void canvasPressEvent( QgsMapMouseEvent *e ) override;
     void canvasMoveEvent( QgsMapMouseEvent *e ) override;
     void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
     void keyReleaseEvent( QKeyEvent *e ) override;
@@ -61,14 +48,16 @@ class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public KadasMapToolCreateItem
   public slots:
     void pickLine();
 
+  private slots:
+    void onShapeCaptured( const QgsGeometry &geom, const QgsCoordinateReferenceSystem &crs );
+    void onCleared();
+
   private:
     QgsRubberBand *mPosMarker = nullptr;
     KadasHeightProfileDialog *mDialog = nullptr;
     bool mPicking = false;
-
-  private slots:
-    void drawCleared();
-    void drawFinished();
+    QList<QgsPointXY> mCapturedPoints;
+    QgsCoordinateReferenceSystem mCapturedCrs;
 };
 
 #endif // KADASMAPTOOLHEIGHTPROFILE_H

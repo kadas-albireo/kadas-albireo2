@@ -72,6 +72,15 @@ class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
     QgsPointXY circleCenter() const { return mAnchor; }
     double circleRadius() const { return mCircleRadius; }
 
+    //! True while the user is actively capturing (mid-drag for rect/circle, mid-vertex-stream for poly).
+    bool isCapturing() const { return mDragging || mCapturing; }
+
+    /**
+     * Replaces the displayed polyline/polygon preview with the given vertices in canvas CRS.
+     * Used by callers that seed the tool from an externally picked feature. Does not emit shapeCaptured().
+     */
+    void setCapturedPolyline( const QVector<QgsPointXY> &vertices );
+
     //! Builds a closed polygon ring approximating a circle. Coordinates are in the same CRS as \a center.
     static QgsGeometry circlePolygon( const QgsPointXY &center, double radius, int segments = 64 );
 

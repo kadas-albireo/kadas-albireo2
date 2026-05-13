@@ -67,6 +67,16 @@ void KadasShapeCaptureMapTool::setCircleRadius( double radius )
   updateCircleRubberBand();
 }
 
+void KadasShapeCaptureMapTool::setCapturedPolyline( const QVector<QgsPointXY> &vertices )
+{
+  if ( mShape != Shape::Polyline && mShape != Shape::Polygon )
+    return;
+  mVertices = vertices;
+  mCapturing = false;
+  mDragging = false;
+  updatePolyRubberBand( QgsPointXY(), false );
+}
+
 void KadasShapeCaptureMapTool::canvasPressEvent( QgsMapMouseEvent *e )
 {
   if ( e->button() != Qt::LeftButton )
