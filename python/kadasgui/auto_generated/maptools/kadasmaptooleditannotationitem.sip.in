@@ -67,11 +67,6 @@ Create-mode: when true, finalized parts accumulate on the same item;
 default false.
 %End
 
-    void setItemFactory( std::function<QgsAnnotationItem *()> factory );
-%Docstring
-Create-mode: overrides the controller's
-:py:func:`~KadasMapToolEditAnnotationItem.createItem` factory.
-%End
 
     void setExtraTopWidget( QWidget *widget );
 %Docstring

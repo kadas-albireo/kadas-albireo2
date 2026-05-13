@@ -75,7 +75,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     void setMultipart( bool multipart ) { mMultipart = multipart; }
 
     //! Create-mode: overrides the controller's createItem() factory.
-    void setItemFactory( std::function<QgsAnnotationItem *()> factory ) { mItemFactory = std::move( factory ); }
+    void setItemFactory( std::function<QgsAnnotationItem *()> factory ) SIP_SKIP { mItemFactory = std::move( factory ); }
 
     /**
      * Inserts a custom widget into the tool's bottom-bar top row, alongside
