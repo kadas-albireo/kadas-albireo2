@@ -777,11 +777,19 @@ bool KadasProjectMigration::shouldAttach( const QString &baseDir, const QString 
 // mechanical; failure to translate any single MapItem in a layer aborts
 // the rewrite for that layer.
 
+#include <qgis/qgsannotationlineitem.h>
 #include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgsannotationpointtextitem.h>
+#include <qgis/qgsannotationpolygonitem.h>
 #include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgsfillsymbol.h>
+#include <qgis/qgsfillsymbollayer.h>
+#include <qgis/qgslinesymbol.h>
+#include <qgis/qgslinesymbollayer.h>
 #include <qgis/qgsmarkersymbol.h>
 #include <qgis/qgsmarkersymbollayer.h>
+#include <qgis/qgsmultilinestring.h>
+#include <qgis/qgsmultipolygon.h>
 #include <qgis/qgsreadwritecontext.h>
 #include <qgis/qgstextformat.h>
 
@@ -895,36 +903,184 @@ namespace
   }
 
   /**
+   * Read the common geometry-base attributes (outline_color/width/style,
+   * fill_color/style) written by `KadasGeometryItem::writeGeometryBaseAttributes`.
+   * Returns true if at least the outline color parsed successfully.
+   */
+  void parseGeometryBaseAttributes( const QDomElement &itemEl, QColor &outlineColor, double &outlineWidth, Qt::PenStyle &outlineStyle, QColor &fillColor, Qt::BrushStyle &fillStyle )
+  {
+    outlineColor = QColor( itemEl.attribute( QStringLiteral( "outline_color" ), QColor( Qt::red ).name() ) );
+    outlineWidth = itemEl.attribute( QStringLiteral( "outline_width" ), QStringLiteral( "1" ) ).toDouble();
+    outlineStyle = static_cast<Qt::PenStyle>( itemEl.attribute( QStringLiteral( "outline_style" ), QString::number( static_cast<int>( Qt::SolidLine ) ) ).toInt() );
+    fillColor = QColor( itemEl.attribute( QStringLiteral( "fill_color" ), QColor( Qt::transparent ).name( QColor::HexArgb ) ) );
+    fillStyle = static_cast<Qt::BrushStyle>( itemEl.attribute( QStringLiteral( "fill_style" ), QString::number( static_cast<int>( Qt::SolidPattern ) ) ).toInt() );
+  }
+
+  /**
+   * Translate one `<MapItem name="KadasLineItem">` (v2 format) into one
+   * `QgsAnnotationLineItem` per part of the underlying MultiLineString.
+   */
+  QList<QgsAnnotationItem *> translateKadasLineItem( const QDomElement &itemEl, const QgsCoordinateReferenceSystem &itemCrs, const QgsCoordinateReferenceSystem &layerCrs )
+  {
+    QList<QgsAnnotationItem *> out;
+    if ( itemEl.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) != QLatin1String( "2" ) )
+      return out;
+
+    QColor outlineColor;
+    double outlineWidth = 1.0;
+    Qt::PenStyle outlineStyle = Qt::SolidLine;
+    QColor fillColor;
+    Qt::BrushStyle fillStyle = Qt::SolidPattern;
+    parseGeometryBaseAttributes( itemEl, outlineColor, outlineWidth, outlineStyle, fillColor, fillStyle );
+
+    QgsGeometry geom = QgsGeometry::fromWkt( itemEl.attribute( QStringLiteral( "geometry" ) ) );
+    if ( geom.isNull() )
+      return out;
+    if ( itemCrs.isValid() && layerCrs.isValid() && itemCrs != layerCrs )
+    {
+      try
+      {
+        QgsCoordinateTransform ct( itemCrs, layerCrs, QgsProject::instance() );
+        geom.transform( ct );
+      }
+      catch ( QgsCsException & )
+      {
+        return out;
+      }
+    }
+
+    const QgsAbstractGeometry *ag = geom.constGet();
+    const QgsMultiLineString *mls = dynamic_cast<const QgsMultiLineString *>( ag );
+    auto makeSymbol = [&]() {
+      auto *layer = new QgsSimpleLineSymbolLayer( outlineColor, outlineWidth, outlineStyle );
+      layer->setWidthUnit( Qgis::RenderUnit::Pixels );
+      return new QgsLineSymbol( QgsSymbolLayerList { layer } );
+    };
+    auto addPart = [&]( const QgsLineString *ls ) {
+      auto *anno = new QgsAnnotationLineItem( ls->clone() );
+      anno->setSymbol( makeSymbol() );
+      out.append( anno );
+    };
+    if ( mls )
+    {
+      for ( int i = 0, n = mls->numGeometries(); i < n; ++i )
+        addPart( static_cast<const QgsLineString *>( mls->geometryN( i ) ) );
+    }
+    else if ( const auto *ls = dynamic_cast<const QgsLineString *>( ag ) )
+    {
+      addPart( ls );
+    }
+    return out;
+  }
+
+  /**
+   * Translate one `<MapItem name="KadasPolygonItem">` (v2 format) into one
+   * `QgsAnnotationPolygonItem` per part of the underlying MultiPolygon.
+   */
+  QList<QgsAnnotationItem *> translateKadasPolygonItem( const QDomElement &itemEl, const QgsCoordinateReferenceSystem &itemCrs, const QgsCoordinateReferenceSystem &layerCrs )
+  {
+    QList<QgsAnnotationItem *> out;
+    if ( itemEl.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) != QLatin1String( "2" ) )
+      return out;
+
+    QColor outlineColor;
+    double outlineWidth = 1.0;
+    Qt::PenStyle outlineStyle = Qt::SolidLine;
+    QColor fillColor;
+    Qt::BrushStyle fillStyle = Qt::SolidPattern;
+    parseGeometryBaseAttributes( itemEl, outlineColor, outlineWidth, outlineStyle, fillColor, fillStyle );
+
+    QgsGeometry geom = QgsGeometry::fromWkt( itemEl.attribute( QStringLiteral( "geometry" ) ) );
+    if ( geom.isNull() )
+      return out;
+    if ( itemCrs.isValid() && layerCrs.isValid() && itemCrs != layerCrs )
+    {
+      try
+      {
+        QgsCoordinateTransform ct( itemCrs, layerCrs, QgsProject::instance() );
+        geom.transform( ct );
+      }
+      catch ( QgsCsException & )
+      {
+        return out;
+      }
+    }
+
+    auto makeSymbol = [&]() {
+      auto *layer = new QgsSimpleFillSymbolLayer( fillColor, fillStyle, outlineColor, outlineStyle, outlineWidth );
+      layer->setStrokeWidthUnit( Qgis::RenderUnit::Pixels );
+      return new QgsFillSymbol( QgsSymbolLayerList { layer } );
+    };
+    auto addPart = [&]( const QgsAbstractGeometry *part ) {
+      auto *poly = static_cast<QgsCurvePolygon *>( part->clone() );
+      auto *anno = new QgsAnnotationPolygonItem( poly );
+      anno->setSymbol( makeSymbol() );
+      out.append( anno );
+    };
+    const QgsAbstractGeometry *ag = geom.constGet();
+    if ( const QgsMultiPolygon *mp = dynamic_cast<const QgsMultiPolygon *>( ag ) )
+    {
+      for ( int i = 0, n = mp->numGeometries(); i < n; ++i )
+        addPart( mp->geometryN( i ) );
+    }
+    else if ( const auto *cp = dynamic_cast<const QgsCurvePolygon *>( ag ) )
+    {
+      addPart( cp );
+    }
+    return out;
+  }
+
+  /**
    * Dispatcher: looks at the `name` attribute of \a itemEl and forwards to
-   * the matching per-type translator. Returns nullptr if no translator is
-   * registered for the type yet, or if the translator itself failed.
+   * the matching per-type translator. Returns an empty list if no
+   * translator is registered for the type yet, or if the translator
+   * itself failed.
    *
    * Common item-level attributes (z_index) are applied here so per-type
-   * translators don't repeat the boilerplate.
+   * translators don't repeat the boilerplate. Items that fan one MapItem
+   * into multiple annotations (Line, Polygon, ...) all share the parent's
+   * z_index.
    */
-  QgsAnnotationItem *translateMapItem( const QDomElement &itemEl, const QgsCoordinateReferenceSystem &layerCrs )
+  QList<QgsAnnotationItem *> translateMapItem( const QDomElement &itemEl, const QgsCoordinateReferenceSystem &layerCrs )
   {
     const QString name = itemEl.attribute( QStringLiteral( "name" ) );
     const QgsCoordinateReferenceSystem itemCrs( itemEl.attribute( QStringLiteral( "crs" ) ) );
 
-    QgsAnnotationItem *anno = nullptr;
+    QList<QgsAnnotationItem *> annos;
     if ( name == QLatin1String( "KadasPointItem" ) )
-      anno = translateKadasPointItem( itemEl, itemCrs, layerCrs );
+    {
+      if ( auto *a = translateKadasPointItem( itemEl, itemCrs, layerCrs ) )
+        annos.append( a );
+    }
     else if ( name == QLatin1String( "KadasTextItem" ) )
-      anno = translateKadasTextItem( itemEl, itemCrs, layerCrs );
-    // Future slices: KadasLineItem, KadasPolygonItem, KadasRectangleItem,
-    // KadasCircleItem, KadasCircularSectorItem, KadasPictureItem,
-    // KadasSymbolItem, KadasPinItem, KadasGpxRouteItem, KadasGpxWaypointItem.
+    {
+      if ( auto *a = translateKadasTextItem( itemEl, itemCrs, layerCrs ) )
+        annos.append( a );
+    }
+    else if ( name == QLatin1String( "KadasLineItem" ) )
+    {
+      annos = translateKadasLineItem( itemEl, itemCrs, layerCrs );
+    }
+    else if ( name == QLatin1String( "KadasPolygonItem" ) )
+    {
+      annos = translateKadasPolygonItem( itemEl, itemCrs, layerCrs );
+    }
+    // Future slices: KadasRectangleItem, KadasCircleItem,
+    // KadasCircularSectorItem, KadasPictureItem, KadasSymbolItem,
+    // KadasPinItem, KadasGpxRouteItem, KadasGpxWaypointItem.
 
-    if ( !anno )
-      return nullptr;
+    if ( annos.isEmpty() )
+      return annos;
 
     bool ok = false;
     const int z = itemEl.attribute( QStringLiteral( "z_index" ), QStringLiteral( "0" ) ).toInt( &ok );
     if ( ok )
-      anno->setZIndex( z );
+    {
+      for ( QgsAnnotationItem *a : annos )
+        a->setZIndex( z );
+    }
 
-    return anno;
+    return annos;
   }
 } // namespace
 
@@ -972,15 +1128,19 @@ bool KadasProjectMigration::migrateLegacyKadasItemLayers( QDomDocument &doc, QDo
       if ( itemEl.isNull() || itemEl.tagName() != QLatin1String( "MapItem" ) )
         continue;
 
-      QgsAnnotationItem *anno = translateMapItem( itemEl, layerCrs );
-      if ( !anno )
+      QList<QgsAnnotationItem *> annos = translateMapItem( itemEl, layerCrs );
+      if ( annos.isEmpty() )
       {
         QgsDebugMsgLevel( QStringLiteral( "KadasItemLayer XML rewrite skipped for layer '%1': item type '%2' not translatable yet" ).arg( originalName, itemEl.attribute( QStringLiteral( "name" ) ) ), 1 );
         allOk = false;
         break;
       }
-      translated.append( anno );
-      tooltips.append( itemEl.attribute( QStringLiteral( "tooltip" ) ) );
+      const QString tooltip = itemEl.attribute( QStringLiteral( "tooltip" ) );
+      for ( QgsAnnotationItem *a : annos )
+      {
+        translated.append( a );
+        tooltips.append( tooltip );
+      }
     }
 
     if ( !allOk )

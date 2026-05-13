@@ -44,6 +44,8 @@ class TestKadasProjectMigration : public QObject
     void migrateLegacyMilxLayer_preservesNonAsciiItems();
     void migrateLegacyKadasItemLayer_translatesPointItem();
     void migrateLegacyKadasItemLayer_translatesTextItem();
+    void migrateLegacyKadasItemLayer_translatesLineItem();
+    void migrateLegacyKadasItemLayer_translatesPolygonItem();
     void migrateLegacyKadasItemLayer_leavesV1FormatAlone();
     void migrateLegacyKadasItemLayer_leavesUnknownItemTypeAlone();
 
@@ -265,6 +267,76 @@ void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesTextItem()
   QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "pointtext" ) );
 }
 
+void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesLineItem()
+{
+  // KadasLineItem fans a MultiLineString into one QgsAnnotationLineItem
+  // per part; here a 2-part input yields 2 annotation items.
+  QDomDocument doc;
+  QDomElement root = doc.createElement( QStringLiteral( "qgis" ) );
+  doc.appendChild( root );
+  QDomElement projectLayersEl = doc.createElement( QStringLiteral( "projectlayers" ) );
+  root.appendChild( projectLayersEl );
+
+  QDomElement mapLayerEl = appendKadasItemLayer( doc, projectLayersEl, QStringLiteral( "line_id" ), QStringLiteral( "Lines" ), QStringLiteral( "EPSG:3857" ) );
+
+  QDomElement itemEl = doc.createElement( QStringLiteral( "MapItem" ) );
+  itemEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasLineItem" ) );
+  itemEl.setAttribute( QStringLiteral( "crs" ), QStringLiteral( "EPSG:3857" ) );
+  itemEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
+  itemEl.setAttribute( QStringLiteral( "outline_color" ), QStringLiteral( "#ff0000" ) );
+  itemEl.setAttribute( QStringLiteral( "outline_width" ), QStringLiteral( "2" ) );
+  itemEl.setAttribute( QStringLiteral( "outline_style" ), QString::number( static_cast<int>( Qt::SolidLine ) ) );
+  itemEl.setAttribute( QStringLiteral( "fill_color" ), QStringLiteral( "#00000000" ) );
+  itemEl.setAttribute( QStringLiteral( "fill_style" ), QString::number( static_cast<int>( Qt::SolidPattern ) ) );
+  itemEl.setAttribute( QStringLiteral( "geometry" ), QStringLiteral( "MultiLineString ((0 0, 1 1, 2 0), (10 10, 11 11))" ) );
+  mapLayerEl.appendChild( itemEl );
+
+  QStringList filesToAttach;
+  QVERIFY( KadasProjectMigration::migrateProjectXml( QString(), doc, filesToAttach ) );
+
+  const QDomElement migratedLayer = doc.documentElement().firstChildElement( QStringLiteral( "projectlayers" ) ).firstChildElement( QStringLiteral( "maplayer" ) );
+  QCOMPARE( migratedLayer.attribute( QStringLiteral( "type" ) ), QStringLiteral( "annotation" ) );
+  const QDomNodeList items = migratedLayer.firstChildElement( QStringLiteral( "items" ) ).elementsByTagName( QStringLiteral( "item" ) );
+  QCOMPARE( items.size(), 2 );
+  QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "linestring" ) );
+  QCOMPARE( items.at( 1 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "linestring" ) );
+}
+
+void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesPolygonItem()
+{
+  // KadasPolygonItem fans a MultiPolygon into one QgsAnnotationPolygonItem
+  // per part.
+  QDomDocument doc;
+  QDomElement root = doc.createElement( QStringLiteral( "qgis" ) );
+  doc.appendChild( root );
+  QDomElement projectLayersEl = doc.createElement( QStringLiteral( "projectlayers" ) );
+  root.appendChild( projectLayersEl );
+
+  QDomElement mapLayerEl = appendKadasItemLayer( doc, projectLayersEl, QStringLiteral( "poly_id" ), QStringLiteral( "Polygons" ), QStringLiteral( "EPSG:3857" ) );
+
+  QDomElement itemEl = doc.createElement( QStringLiteral( "MapItem" ) );
+  itemEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasPolygonItem" ) );
+  itemEl.setAttribute( QStringLiteral( "crs" ), QStringLiteral( "EPSG:3857" ) );
+  itemEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
+  itemEl.setAttribute( QStringLiteral( "outline_color" ), QStringLiteral( "#000000" ) );
+  itemEl.setAttribute( QStringLiteral( "outline_width" ), QStringLiteral( "1" ) );
+  itemEl.setAttribute( QStringLiteral( "outline_style" ), QString::number( static_cast<int>( Qt::SolidLine ) ) );
+  itemEl.setAttribute( QStringLiteral( "fill_color" ), QStringLiteral( "#80ff00ff" ) );
+  itemEl.setAttribute( QStringLiteral( "fill_style" ), QString::number( static_cast<int>( Qt::SolidPattern ) ) );
+  itemEl.setAttribute( QStringLiteral( "geometry" ), QStringLiteral( "MultiPolygon (((0 0, 10 0, 10 10, 0 10, 0 0)), ((20 20, 30 20, 30 30, 20 30, 20 20)))" ) );
+  mapLayerEl.appendChild( itemEl );
+
+  QStringList filesToAttach;
+  QVERIFY( KadasProjectMigration::migrateProjectXml( QString(), doc, filesToAttach ) );
+
+  const QDomElement migratedLayer = doc.documentElement().firstChildElement( QStringLiteral( "projectlayers" ) ).firstChildElement( QStringLiteral( "maplayer" ) );
+  QCOMPARE( migratedLayer.attribute( QStringLiteral( "type" ) ), QStringLiteral( "annotation" ) );
+  const QDomNodeList items = migratedLayer.firstChildElement( QStringLiteral( "items" ) ).elementsByTagName( QStringLiteral( "item" ) );
+  QCOMPARE( items.size(), 2 );
+  QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "polygon" ) );
+  QCOMPARE( items.at( 1 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "polygon" ) );
+}
+
 void TestKadasProjectMigration::migrateLegacyKadasItemLayer_leavesV1FormatAlone()
 {
   // A `KadasItemLayer` whose only `<MapItem>` is in the legacy v1
@@ -309,7 +381,7 @@ void TestKadasProjectMigration::migrateLegacyKadasItemLayer_leavesUnknownItemTyp
   QDomElement mapLayerEl = appendKadasItemLayer( doc, projectLayersEl, QStringLiteral( "mixed_id" ), QStringLiteral( "Mixed" ), QStringLiteral( "EPSG:3857" ) );
   appendV2PointMapItem( doc, mapLayerEl, 0, 0, QStringLiteral( "EPSG:3857" ) );
   QDomElement lineEl = doc.createElement( QStringLiteral( "MapItem" ) );
-  lineEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasLineItem" ) );
+  lineEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasCircleItem" ) );
   lineEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
   mapLayerEl.appendChild( lineEl );
 
