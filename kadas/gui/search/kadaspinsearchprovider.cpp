@@ -22,10 +22,7 @@
 #include <qgis/qgsmapcanvas.h>
 
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
-#include "kadas/gui/kadasitemlayer.h"
-#include "kadas/gui/mapitems/kadassymbolitem.h"
 #include "kadas/gui/search/kadaspinsearchprovider.h"
-
 
 KadasPinSearchProvider::KadasPinSearchProvider( QgsMapCanvas *mapCanvas )
   : QgsLocatorFilter()

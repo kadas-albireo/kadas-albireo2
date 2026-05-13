@@ -27,7 +27,6 @@
 #include "kadas/core/kadasstatehistory.h"
 #include "kadas/gui/kadas_gui.h"
 #include "kadas/gui/kadasattributetypes.h"
-#include "kadas/gui/mapitems/kadasmapitem.h"
 
 class KadasAnnotationItemController;
 class KadasAnnotationStyleEditor;

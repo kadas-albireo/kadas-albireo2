@@ -30,7 +30,6 @@ class KADAS_GUI_EXPORT KadasProjectMigration
     static bool migrateProjectXml( const QString &basedir, QDomDocument &doc, QStringList &filesToAttach );
 
   private:
-    static void migrateKadas1xTo2x( QDomDocument &doc, QDomElement &root, const QString &basedir, QStringList &filesToAttach );
     //! Rewrites legacy `<maplayer name="KadasMilxLayer" type="plugin">` blocks
     //! and their `<MapItem name="KadasMilxItem">` children into a
     //! `QgsAnnotationLayer` populated with `KadasMilxAnnotationItem` entries.

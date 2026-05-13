@@ -24,7 +24,6 @@
 #include "kadas/gui/kadas_gui.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontext.h"
 #include "kadas/gui/kadasattributetypes.h"
-#include "kadas/gui/mapitems/kadasmapitem.h"
 
 class QMenu;
 class QWidget;
