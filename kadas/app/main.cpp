@@ -152,6 +152,7 @@ int main( int argc, char *argv[] )
   app->init();
   if ( openNetworkLogger )
   {
+    app->setNetworkLoggingEnabled( true );
     app->showNetworkLogger();
   }
   int status = app->exec();
