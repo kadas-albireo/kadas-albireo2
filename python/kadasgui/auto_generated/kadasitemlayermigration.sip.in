@@ -1,0 +1,56 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadasitemlayermigration.h                                  *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+class KadasItemLayerMigration
+{
+%Docstring(signature="appended")
+Post-load migration from legacy \c KadasItemLayer (a plugin layer
+holding \c KadasMapItem subclasses) to the current \c
+:py:class:`QgsAnnotationLayer` + \c :py:class:`QgsAnnotationItem` stack.
+
+The XML-level \c KadasProjectMigration handles only the Kadas 1.x → 2.x
+upgrade and still emits \c KadasItemLayer plugin layers. This class runs
+after \c :py:func:`QgsProject.read()` and walks every loaded \c
+KadasItemLayer: for each layer where every item exposes an \c
+:py:func:`~annotationItem` override, the items are translated into a
+fresh \c :py:class:`QgsAnnotationLayer` (same name, CRS, and
+visibility), and the legacy layer is removed from the project.
+
+Layers whose items cannot all be translated are left untouched and a
+warning is emitted — they will continue to use the legacy renderer until
+the missing item types acquire an \c :py:func:`~annotationItem`
+override.
+
+The project is marked dirty after a successful migration so the user is
+prompted to save in the new format.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/kadasitemlayermigration.h"
+%End
+  public:
+    static int migrateProject( QgsProject *project );
+%Docstring
+Walks ``project`` and migrates every fully-translatable \c
+KadasItemLayer to a \c :py:class:`QgsAnnotationLayer`. Returns the
+number of layers that were migrated.
+%End
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadasitemlayermigration.h                                  *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

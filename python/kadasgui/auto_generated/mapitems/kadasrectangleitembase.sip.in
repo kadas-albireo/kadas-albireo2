@@ -110,6 +110,7 @@ your option) any later version. *
     virtual State *createEmptyState() const /Factory/;
 
 
+
 };
 
 /************************************************************************

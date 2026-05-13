@@ -42,6 +42,9 @@ your option) any later version. *
         QgsCoordinateReferenceSystem crs;
         QgsFeature feature;
         KadasItemLayer::ItemId itemId;
+
+        QgsAnnotationLayer *annotationLayer;
+        QString annotationItemId;
     };
 
     static PickResult pick(

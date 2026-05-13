@@ -1,0 +1,71 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadascoordcrossannotationitem.h            *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+class KadasCoordCrossAnnotationItem : QgsAnnotationMarkerItem
+{
+%Docstring(signature="appended")
+Kadas-internal "coordinate cross" annotation item.
+
+Renders a black-on-white cross at a point with the X/Y coordinates of
+its position labelled in kilometres. Subclasses \c
+:py:class:`QgsAnnotationMarkerItem` with a transparent marker symbol so
+the underlying marker paint does not draw anything; the cross and labels
+are drawn by the overridden \c :py:func:`~render`.
+
+Coordinates are rounded to the nearest kilometre by the controller on
+placement. The annotation layer is expected to use a metric CRS
+(EPSG:3857 in standard Kadas layouts).
+
+Type id: \c "kadas:coordcross".
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadascoordcrossannotationitem.h"
+%End
+  public:
+    KadasCoordCrossAnnotationItem( const QgsPoint &point = QgsPoint() );
+
+    static QString itemTypeId();
+
+    virtual QString type() const;
+
+    virtual void render( QgsRenderContext &context, QgsFeedback *feedback );
+
+    virtual QgsRectangle boundingBox() const;
+
+    virtual QgsRectangle boundingBox( QgsRenderContext &context ) const;
+
+    virtual KadasCoordCrossAnnotationItem *clone() const;
+
+    virtual bool writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const;
+
+    virtual bool readXml( const QDomElement &element, const QgsReadWriteContext &context );
+
+
+    static KadasCoordCrossAnnotationItem *create();
+
+    const QStringList &shadowIds() const;
+%Docstring
+See \c KadasAnnotationShadow.
+%End
+    void setShadowIds( const QStringList &ids );
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadascoordcrossannotationitem.h            *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

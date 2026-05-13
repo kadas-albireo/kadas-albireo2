@@ -1,0 +1,113 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/maptools/kadasshapecapturemaptool.h                        *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+
+class KadasShapeCaptureMapTool : QgsMapTool
+{
+%Docstring(signature="appended")
+Lightweight shape-capture map tool.
+
+Captures one of: rectangle, circle (center + radius), polyline, polygon.
+Rendering relies on :py:class:`QgsRubberBand`. On completion, emits
+:py:func:`~shapeCaptured` with the resulting geometry in the canvas
+destination CRS.
+
+The rubber band stays visible after capture until :py:func:`~clear` is
+called or a new capture starts; this allows callers (e.g. viewshed) to
+keep showing the captured shape while a configuration dialog is open and
+to update it via :py:func:`~setCircleRadius` /
+:py:func:`~setCapturedGeometry`.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/maptools/kadasshapecapturemaptool.h"
+%End
+  public:
+    enum class Shape
+    {
+      Rectangle,
+      Circle,
+      Polyline,
+      Polygon,
+    };
+
+    KadasShapeCaptureMapTool( QgsMapCanvas *canvas, Shape shape );
+    ~KadasShapeCaptureMapTool();
+
+    void setShape( Shape shape );
+    Shape shape() const;
+
+    void clear();
+%Docstring
+Removes any rubber band and resets capture state.
+%End
+
+    void setCircleRadius( double radius );
+%Docstring
+Replaces the displayed circle preview (Circle mode only). New radius is
+in canvas map units.
+%End
+
+    QgsPointXY circleCenter() const;
+%Docstring
+Center of the last captured circle (Circle mode), or last anchor point.
+%End
+    double circleRadius() const;
+
+    bool isCapturing() const;
+%Docstring
+True while the user is actively capturing (mid-drag for rect/circle,
+mid-vertex-stream for poly).
+%End
+
+    void setCapturedPolyline( const QVector<QgsPointXY> &vertices );
+%Docstring
+Replaces the displayed polyline/polygon preview with the given vertices
+in canvas CRS. Used by callers that seed the tool from an externally
+picked feature. Does not emit
+:py:func:`~KadasShapeCaptureMapTool.shapeCaptured`.
+%End
+
+    static QgsGeometry circlePolygon( const QgsPointXY &center, double radius, int segments = 64 );
+%Docstring
+Builds a closed polygon ring approximating a circle. Coordinates are in
+the same CRS as ``center``.
+%End
+
+    virtual void canvasPressEvent( QgsMapMouseEvent *e );
+
+    virtual void canvasMoveEvent( QgsMapMouseEvent *e );
+
+    virtual void canvasReleaseEvent( QgsMapMouseEvent *e );
+
+    virtual void canvasDoubleClickEvent( QgsMapMouseEvent *e );
+
+    virtual void keyPressEvent( QKeyEvent *e );
+
+    virtual void deactivate();
+
+
+  signals:
+    void shapeCaptured( const QgsGeometry &geometry, const QgsCoordinateReferenceSystem &crs );
+    void cleared();
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/maptools/kadasshapecapturemaptool.h                        *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

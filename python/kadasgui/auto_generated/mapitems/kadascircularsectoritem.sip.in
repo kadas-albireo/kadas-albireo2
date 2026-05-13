@@ -29,6 +29,8 @@ your option) any later version. *
   public:
     KadasCircularSectorItem( const QgsCoordinateReferenceSystem &crs );
 
+    virtual bool useQgisAnnotations() const;
+
     virtual QString itemName() const;
 
     virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const;
@@ -93,7 +95,6 @@ your option) any later version. *
         QList<double> stopAngles;
         virtual void assign( const KadasMapItem::State *other );
         virtual State *clone() const /Factory/;
-
         virtual bool deserialize( const QJsonObject &json );
 
     };
@@ -106,6 +107,11 @@ your option) any later version. *
     virtual void recomputeDerived();
 
     virtual void measureGeometry();
+
+
+    virtual void writeXmlPrivate( QDomElement &element ) const;
+
+    virtual void readXmlPrivate( const QDomElement &element );
 
 
 };

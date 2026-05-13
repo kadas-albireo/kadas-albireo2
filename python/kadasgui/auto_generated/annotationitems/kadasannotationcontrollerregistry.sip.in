@@ -1,0 +1,66 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationcontrollerregistry.h        *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+class KadasAnnotationControllerRegistry
+{
+%Docstring(signature="appended")
+Process-wide registry mapping :py:class:`QgsAnnotationItem` type ids to
+their Kadas controller.
+
+Map tools, editors and KML export look up the controller for a given \c
+:py:class:`QgsAnnotationItem` via \c
+controllerFor(item->:py:func:`~type`) and delegate interactive behavior
+(draw / edit / snap / tooltip / KML) to it.
+
+Registration happens at application startup, typically from \c
+KadasApplication.init().
+
+The registry owns the registered controllers; they are deleted when the
+registry is destroyed (or when overwritten).
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
+%End
+  public:
+    static KadasAnnotationControllerRegistry *instance();
+%Docstring
+Returns the process-wide registry instance.
+%End
+
+    ~KadasAnnotationControllerRegistry();
+
+    void addController( KadasAnnotationItemController *controller );
+%Docstring
+Replacing an existing registration deletes the previous one.
+%End
+
+    KadasAnnotationItemController *controllerFor( const QString &typeId ) const;
+%Docstring
+or None if none.
+%End
+
+    QStringList registeredTypes() const;
+%Docstring
+Returns the registered annotation item type ids, in registration order.
+%End
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationcontrollerregistry.h        *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

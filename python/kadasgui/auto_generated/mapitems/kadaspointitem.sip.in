@@ -86,12 +86,12 @@ your option) any later version. *
 
 class KadasPointItem : KadasAbstractPointItem
 {
-
 %TypeHeaderCode
 #include "kadas/gui/mapitems/kadaspointitem.h"
 %End
   public:
     KadasPointItem( const QgsCoordinateReferenceSystem &crs, Qgis::MarkerShape icon = Qgis::MarkerShape::Circle );
+    ~KadasPointItem();
 
     virtual QgsAnnotationMarkerItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const /Factory/;
 

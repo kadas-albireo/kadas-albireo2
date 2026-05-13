@@ -1,0 +1,60 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationprojectintegration.h        *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+class KadasAnnotationProjectIntegration : QObject
+{
+%Docstring(signature="appended")
+Wires the save-time shadow mechanism into the active
+:py:class:`QgsProject`.
+
+On construction this object connects to \c
+:py:class:`QgsProject`.readProject so any Kadas-shadow items left over
+in a project file (e.g. one saved by an older Kadas session that wasn't
+cleaned up) are stripped after load, leaving the in-memory layer
+pristine.
+
+The save half of the lifecycle is driven explicitly by callers: \c
+KadasApplication.projectSave() is expected to call \c
+:py:func:`~prepareForSave` immediately before \c
+:py:func:`QgsProject.write()` and \c :py:func:`~stripAfterSave`
+immediately after, so the on-disk project contains the QGIS-compat
+shadows but the running session does not.
+
+Single instance owned by \c KadasApplication.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadasannotationprojectintegration.h"
+%End
+  public:
+    explicit KadasAnnotationProjectIntegration( QObject *parent = 0 );
+
+    void prepareForSave();
+%Docstring
+calls \c KadasAnnotationLayerHelpers.prepareLayerForSave on each.
+%End
+
+    void stripAfterSave();
+%Docstring
+calls \c KadasAnnotationLayerHelpers.stripShadowsFromLayer on each.
+%End
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationprojectintegration.h        *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

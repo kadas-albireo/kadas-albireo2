@@ -83,6 +83,7 @@ your option) any later version. *
 
     const QgsAbstractGeometry *geometry() const;
 
+
   signals:
     void geometryChanged();
 

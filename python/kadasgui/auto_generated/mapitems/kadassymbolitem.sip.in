@@ -31,6 +31,8 @@ your option) any later version. *
     ~KadasSymbolItem();
     void setup( const QString &path, double anchorX, double anchorY, int width = 0, int height = 0 );
 
+    virtual bool useQgisAnnotations() const;
+
     virtual QString itemName() const;
 
     void setFilePath( const QString &path );
@@ -51,6 +53,16 @@ your option) any later version. *
     virtual void setState( const KadasMapItem::State *state );
 
 
+    virtual QgsAnnotationItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const /Factory/;
+
+
+  protected:
+    virtual KadasMapItem *_clone() const /Factory/;
+
+    virtual void writeXmlPrivate( QDomElement &element ) const;
+
+    virtual void readXmlPrivate( const QDomElement &element );
+
 };
 
 
@@ -61,6 +73,9 @@ class KadasPinItem : KadasSymbolItem
 %End
   public:
     KadasPinItem( const QgsCoordinateReferenceSystem &crs );
+
+    virtual QgsAnnotationItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const /Factory/;
+
 
 };
 

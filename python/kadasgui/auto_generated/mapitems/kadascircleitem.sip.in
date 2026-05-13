@@ -29,6 +29,8 @@ your option) any later version. *
   public:
     KadasCircleItem( const QgsCoordinateReferenceSystem &crs, bool geodesic = false );
 
+    virtual bool useQgisAnnotations() const;
+
     bool geodesic() const;
     void setGeodesic( bool geodesic );
 
@@ -80,13 +82,15 @@ your option) any later version. *
 
     const QgsMultiSurface *geometry() const;
 
+    virtual QList<QgsAnnotationItem *> annotationItems( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const /Factory/;
+
+
     struct State : KadasMapItem::State
     {
         QList<KadasItemPos> centers;
         QList<KadasItemPos> ringpos;
         virtual void assign( const KadasMapItem::State *other );
         virtual State *clone() const /Factory/;
-
         virtual bool deserialize( const QJsonObject &json );
 
     };
@@ -99,6 +103,11 @@ your option) any later version. *
     virtual void recomputeDerived();
 
     virtual void measureGeometry();
+
+
+    virtual void writeXmlPrivate( QDomElement &element ) const;
+
+    virtual void readXmlPrivate( const QDomElement &element );
 
 
 };

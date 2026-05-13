@@ -26,6 +26,6 @@ KadasLineItem.MeasurementMode.__doc__ = """
 """
 # --
 try:
-    KadasLineItem.__overridden_methods__ = ['itemName', 'nodes', 'startPart', 'setCurrentPoint', 'setCurrentAttributes', 'continuePart', 'endPart', 'drawAttribs', 'drawAttribsFromPosition', 'positionFromDrawAttribs', 'getEditContext', 'edit', 'populateContextMenu', 'editAttribsFromPosition', 'positionFromEditAttribs', 'position', 'setPosition', 'geometryType', 'addPartFromGeometry', 'assign', 'clone', 'deserialize', '_clone', 'createEmptyState', 'recomputeDerived', 'measureGeometry']
+    KadasLineItem.__overridden_methods__ = ['useQgisAnnotations', 'itemName', 'nodes', 'startPart', 'setCurrentPoint', 'setCurrentAttributes', 'continuePart', 'endPart', 'drawAttribs', 'drawAttribsFromPosition', 'positionFromDrawAttribs', 'getEditContext', 'edit', 'populateContextMenu', 'editAttribsFromPosition', 'positionFromEditAttribs', 'position', 'setPosition', 'geometryType', 'addPartFromGeometry', 'annotationItems', 'assign', 'clone', 'deserialize', '_clone', 'createEmptyState', 'recomputeDerived', 'measureGeometry', 'writeXmlPrivate', 'readXmlPrivate']
 except (NameError, AttributeError):
     pass

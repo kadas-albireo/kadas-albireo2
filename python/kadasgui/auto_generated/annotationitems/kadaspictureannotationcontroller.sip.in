@@ -1,0 +1,171 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadaspictureannotationcontroller.h         *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+class KadasPictureAnnotationController : KadasAnnotationItemController
+{
+%Docstring(signature="appended")
+Controller for stock \c :py:class:`QgsAnnotationPictureItem` (type id \c
+"picture").
+
+Drop-in replacement for \c KadasPictureItem. The geographic anchor lives
+as the center of the item's \c :py:func:`~bounds` (the item is
+configured with \c :py:class:`Qgis`.AnnotationPlacementMode.FixedSize at
+item creation time) and the picture's offset from that anchor is stored
+as the base \c :py:func:`QgsAnnotationItem.offsetFromCallout()`. A
+simple-line callout is auto-installed at item creation so the leader
+line from the anchor to the picture is rendered for free by the parent
+layer.
+
+Single-click placement: the click sets the anchor (bounds center). The
+picture defaults to a 200x150 px frame, which the user can resize via
+the fixedSize handle.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadaspictureannotationcontroller.h"
+%End
+  public:
+    KadasPictureAnnotationController();
+
+    virtual QString itemType() const;
+
+    virtual QString itemName() const;
+
+    virtual QgsAnnotationItem *createItem() const;
+
+
+    virtual QList<KadasNode> nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const;
+
+
+    virtual bool startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx );
+
+    virtual bool startPart( QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx );
+
+    virtual void setCurrentPoint( QgsAnnotationItem *item, const QgsPointXY &p, const KadasAnnotationItemContext &ctx );
+
+    virtual void setCurrentAttributes( QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx );
+
+    virtual bool continuePart( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx );
+
+    virtual void endPart( QgsAnnotationItem *item );
+
+
+    virtual KadasAttribDefs drawAttribs() const;
+
+    virtual KadasAttribValues drawAttribsFromPosition( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const;
+
+    virtual QgsPointXY positionFromDrawAttribs( const QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const;
+
+
+    virtual KadasEditContext getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const;
+
+    virtual void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx );
+
+    virtual void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx );
+
+    virtual KadasAttribValues editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const;
+
+    virtual QgsPointXY positionFromEditAttribs( const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const;
+
+
+    virtual QgsPointXY position( const QgsAnnotationItem *item ) const;
+
+    virtual void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos );
+
+    virtual void translate( QgsAnnotationItem *item, double dx, double dy );
+
+
+    virtual KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = 0 ) const;
+
+
+    virtual void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx );
+
+
+    virtual QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = 0 ) const;
+
+
+    static void setPath( QgsAnnotationPictureItem *item, const QString &path );
+%Docstring
+Convenience: sets the picture's source path (auto-detects format from
+extension).
+%End
+
+    static void ensureBalloon( QgsAnnotationPictureItem *pic );
+%Docstring
+Idempotently installs a balloon callout on ``pic`` so it acts as a
+cartoon speech-bubble: the picture frame is the bubble body, with a
+wedge pointing back to the geographic anchor (bounds.center).
+
+Steps performed (each is skipped if already in place): - install a \c
+:py:class:`QgsBalloonCallout` (white fill, 1px black stroke, 4px
+margins, 6px wedge, 0 corner radius) when no callout exists - set \c
+calloutAnchor to \c
+:py:func:`~KadasPictureAnnotationController.bounds`.center() when empty
+- set \c offsetFromCallout to \c -size/2 (centered-on-anchor, wedge has
+zero length) when the offset is invalid
+
+Centralized here because every picture creation site (controller, \c
+KadasApplication.addImageItem, paste-from-clipboard, \c KadasPictureItem
+/ \c KadasSymbolItem migration) needs the same callout layout. Calling
+this on a picture that already has one is a no-op and never overwrites
+the user's customizations.
+%End
+
+    static int nextPictureZIndex( const QgsAnnotationLayer *layer );
+%Docstring
+Returns the next zIndex to assign to a freshly created picture in
+``layer`` so it stacks visually above all existing pictures in that
+layer.
+
+Pictures share the same nominal bucket (\c
+KadasAnnotationZIndex.Picture); within the bucket \c
+:py:class:`QgsAnnotationLayer` breaks ties by item-id (UUID), which is
+effectively random. Assigning a strictly increasing zIndex per new
+picture guarantees that the most recently added one is on top, which is
+what users expect both visually and when click-picking through
+overlapping pictures.
+%End
+
+    static bool isCalloutVisible( const QgsAnnotationPictureItem *pic );
+%Docstring
+Returns whether the picture's balloon callout is visible.
+
+The "Show callout" toggle in the style editor is encoded by setting the
+balloon symbol to fully transparent fill+stroke and a zero wedge width —
+the renderer still places the picture at \c anchor+offset, but the
+balloon shape itself is invisible. Code that depends on whether the
+callout is shown (e.g. picture-drag behavior) checks this predicate
+rather than looking at \c
+pic->:py:func:`~KadasPictureAnnotationController.callout` directly.
+%End
+
+    static bool lockAspectRatio();
+%Docstring
+Session-wide preference: should corner-resize and the style editor's
+width/height spinboxes preserve the picture's aspect ratio?
+
+Stored as a static so the style editor (which owns the checkbox) and the
+controller (which performs corner drags from the map tool) agree without
+needing per-picture state. Default is \c true (the safer default — free
+resize stretches images).
+%End
+    static void setLockAspectRatio( bool on );
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadaspictureannotationcontroller.h         *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
