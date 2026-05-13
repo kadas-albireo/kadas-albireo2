@@ -33,6 +33,7 @@ your option) any later version. *
     static KadasMapPos fromPoint( const QgsPointXY &pos );
 
     KadasMapPos( double x = 0., double y = 0. );
+    KadasMapPos( const QgsPointXY &p );
     double x() const;
     double y() const;
     operator QgsPointXY() const;
@@ -72,6 +73,8 @@ class KadasItemPos
     static KadasItemPos fromPoint( const QgsPointXY &pos );
 
     KadasItemPos( double x = 0., double y = 0 );
+
+    KadasItemPos( const QgsPointXY &p );
 
 
     double x() const;
@@ -212,7 +215,21 @@ class KadasMapItem : QObject /Abstract/
 
     virtual QgsAnnotationItem *annotationItem( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const /Factory/;
 %Docstring
-Returns the :py:class:`QgsAnnotationItem` in the given crs (if not specified, no transformation occurs)
+Returns the :py:class:`QgsAnnotationItem` in the given crs (if not
+specified, no transformation occurs)
+%End
+
+    virtual QList<QgsAnnotationItem *> annotationItems( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const /Factory/;
+%Docstring
+Returns one :py:class:`QgsAnnotationItem` per geometry part in the given
+``crs``.
+
+The default implementation wraps :py:func:`~KadasMapItem.annotationItem`
+in a single-element list (empty when the override is missing).
+Multi-part subclasses (lines/polygons) override this to emit one
+annotation per part, since
+:py:class:`QgsAnnotationLineItem`/:py:class:`QgsAnnotationPolygonItem`
+hold a single curve.
 %End
 
     virtual QString itemName() const = 0;
@@ -246,9 +263,7 @@ Bounding box in geographic coordinates */
     virtual QList<KadasMapItem::Node> nodes( const QgsMapSettings &settings ) const = 0;
 
     virtual bool intersects( const QgsRectangle &rect, const QgsMapSettings &settings, bool contains = false ) const = 0;
-%Docstring
-Hit test, rect in item crs */
-%End
+
     virtual bool hitTest( const KadasMapPos &pos, const QgsMapSettings &settings ) const;
 
     virtual QPair<KadasMapPos, double> closestPoint( const KadasMapPos &pos, const QgsMapSettings &settings ) const;
@@ -294,7 +309,6 @@ z-index */
 symbol scale */
 %End
     double symbolScale() const;
-
 
     void setTooltip( const QString &tooltip );
 %Docstring

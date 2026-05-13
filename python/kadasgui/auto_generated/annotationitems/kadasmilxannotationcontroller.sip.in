@@ -1,0 +1,97 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasmilxannotationcontroller.h            *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+class KadasMilxAnnotationController : KadasAnnotationItemController
+{
+%Docstring(signature="appended")
+Controller for \c KadasMilxAnnotationItem (type id \c "kadas:milx").
+
+Stub implementation. The legacy \c KadasMilxItem driving libmss IPC (\c
+KadasMilxClient) is being ported in slices 35+; for now this controller
+only provides identity and a factory so the type registers cleanly with
+\c KadasAnnotationControllerRegistry. All draw/edit hooks are no-ops
+that return sensible empty defaults — drawing new MILX symbols is not
+yet supported through the annotation map tools.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadasmilxannotationcontroller.h"
+%End
+  public:
+    KadasMilxAnnotationController();
+
+    virtual QString itemType() const;
+
+    virtual QString itemName() const;
+
+    virtual QgsAnnotationItem *createItem() const;
+
+
+    virtual QList<KadasNode> nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const;
+
+
+    virtual bool startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx );
+
+    virtual bool startPart( QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx );
+
+    virtual void setCurrentPoint( QgsAnnotationItem *item, const QgsPointXY &p, const KadasAnnotationItemContext &ctx );
+
+    virtual void setCurrentAttributes( QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx );
+
+    virtual bool continuePart( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx );
+
+    virtual void endPart( QgsAnnotationItem *item );
+
+
+    virtual KadasAttribDefs drawAttribs() const;
+
+    virtual KadasAttribValues drawAttribsFromPosition( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const;
+
+    virtual QgsPointXY positionFromDrawAttribs( const QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const;
+
+
+    virtual KadasEditContext getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const;
+
+    virtual void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx );
+
+    virtual void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx );
+
+    virtual KadasAttribValues editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const;
+
+    virtual QgsPointXY positionFromEditAttribs( const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const;
+
+
+    virtual QgsPointXY position( const QgsAnnotationItem *item ) const;
+
+    virtual void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos );
+
+    virtual void translate( QgsAnnotationItem *item, double dx, double dy );
+
+
+    virtual bool hitTest( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const;
+
+    virtual void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx );
+
+    virtual void onDoubleClick( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx );
+
+
+    virtual QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = 0 ) const;
+
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasmilxannotationcontroller.h            *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

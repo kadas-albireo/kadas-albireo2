@@ -54,8 +54,15 @@ try:
     KadasMapItem.anchorNodeRenderer = staticmethod(KadasMapItem.anchorNodeRenderer)
     KadasMapItem.outputDpiScale = staticmethod(KadasMapItem.outputDpiScale)
     KadasMapItem.getTextRenderScale = staticmethod(KadasMapItem.getTextRenderScale)
+    KadasMapItem.__virtual_methods__ = ['useQgisAnnotations', 'annotationItem', 'annotationItems', 'exportName', 'margin', 'hitTest', 'closestPoint', 'setState', 'clear', 'populateContextMenu', 'onDoubleClick', 'position', 'setPosition', 'translate', 'createEmptyState', 'writeXmlPrivate', 'readXmlPrivate']
+    KadasMapItem.__abstract_methods__ = ['itemName', 'boundingBox', 'nodes', 'intersects', 'render', 'startPart', 'setCurrentPoint', 'setCurrentAttributes', 'continuePart', 'endPart', 'drawAttribs', 'drawAttribsFromPosition', 'positionFromDrawAttribs', 'getEditContext', 'edit', 'editAttribsFromPosition', 'positionFromEditAttribs']
     KadasMapItem.__signal_arguments__ = {'zIndexChanged': ['index: int']}
-except AttributeError:
+except (NameError, AttributeError):
+    pass
+try:
+    KadasMapItem.State.__virtual_methods__ = ['deserialize']
+    KadasMapItem.State.__abstract_methods__ = ['assign', 'clone']
+except (NameError, AttributeError):
     pass
 try:
     KadasMapItem.Margin.__doc__ = """Margin in screen units */"""

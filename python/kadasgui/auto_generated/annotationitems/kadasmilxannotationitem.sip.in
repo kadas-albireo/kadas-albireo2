@@ -1,0 +1,192 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasmilxannotationitem.h                  *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+class KadasMilxAnnotationItem : QgsAnnotationItem
+{
+%Docstring(signature="appended")
+Kadas MilX (military symbology) annotation item.
+
+Skeleton placeholder for the Phase 6 MilX port. Holds an MSS string and
+a list of WGS84 points; rendering, hit-testing and edit logic will be
+filled in by subsequent slices and ultimately delegate to \c
+KadasMilxClient.
+
+Type id: \c "kadas:milx".
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
+%End
+  public:
+    KadasMilxAnnotationItem();
+
+    static QString itemTypeId();
+
+    virtual QString type() const;
+
+    virtual QgsRectangle boundingBox() const;
+
+    virtual Qgis::AnnotationItemFlags flags() const;
+
+    virtual void render( QgsRenderContext &context, QgsFeedback *feedback );
+
+    virtual bool writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const;
+
+    virtual bool readXml( const QDomElement &element, const QgsReadWriteContext &context );
+
+    virtual KadasMilxAnnotationItem *clone() const;
+
+
+    static KadasMilxAnnotationItem *create();
+
+    void writeMilx( QDomDocument &doc, QDomElement &itemElement, int symbolSize ) const;
+%Docstring
+Write this item as a `<MilXGraphic>` DOM element matching the legacy
+MilXly schema. ``symbolSize`` is the layer's effective symbol size in
+pixels (used to convert the screen-space user offset to a factor
+relative to the symbol).
+%End
+
+    static KadasMilxAnnotationItem *fromMilx( const QDomElement &itemElement, const QgsCoordinateTransform &crst, int symbolSize );
+%Docstring
+Construct a \c KadasMilxAnnotationItem from a `<MilXGraphic>` DOM
+element. ``crst`` projects the source CRS coordinates to EPSG:4326 (this
+item's storage CRS); ``symbolSize`` is the effective layer symbol size
+for offset reconstruction. Caller takes ownership.
+%End
+
+    static int exportLayerToMilxly( QgsAnnotationLayer *annoLayer, QDomElement &milxLayerEl, int dpi );
+%Docstring
+Serialize all `kadas:milx` items in ``annoLayer`` into ``milxLayerEl``
+as a complete `<MilXLayer>` block (Name / LayerType / GraphicList
+CoordSystemType / SymbolSize / DisplayBW). ``dpi`` is used to convert
+the layer's effective symbol size from pixels to mm for the schema.
+Returns the number of items emitted.
+%End
+
+    static bool importLayerFromMilxly( QgsAnnotationLayer *annoLayer, const QDomElement &milxLayerEl, int dpi, const QgsCoordinateTransformContext &transformContext, QString &errorMsg );
+%Docstring
+Populate ``annoLayer`` with `kadas:milx` items parsed from
+``milxLayerEl`` (a `<MilXLayer>` block). ``dpi`` is used to convert the
+schema's mm symbol size back to pixels for offset reconstruction.
+Returns true on success; sets ``errorMsg`` on failure.
+%End
+
+    QString mssString() const;
+%Docstring
+MSS (Military Symbology Standard) symbol string.
+%End
+    void setMssString( const QString &mssString );
+
+    QString militaryName() const;
+%Docstring
+Human-readable military name of the symbol.
+%End
+    void setMilitaryName( const QString &militaryName );
+
+    QString symbolType() const;
+%Docstring
+Symbol type (single-point / multi-point classification used by libmss).
+%End
+    void setSymbolType( const QString &symbolType );
+
+    int minNumPoints() const;
+%Docstring
+Minimum number of control points required by the symbol.
+%End
+    void setMinNumPoints( int minNumPoints );
+
+    bool hasVariablePoints() const;
+%Docstring
+Whether the symbol accepts a variable number of points beyond the
+minimum.
+%End
+    void setHasVariablePoints( bool hasVariablePoints );
+
+    QList<QgsPointXY> points() const;
+%Docstring
+Control points, stored in EPSG:4326 (lon, lat). MilX is always WGS84.
+%End
+    void setPoints( const QList<QgsPointXY> &points );
+
+    QList<int> controlPoints() const;
+%Docstring
+(rendered as red ctrl-point handles, omitted from geometry export).
+%End
+    void setControlPoints( const QList<int> &cp );
+
+    QMap<KadasMilxAttrType, double> attributes() const;
+%Docstring
+/ degrees, keyed by \c KadasMilxAttrType.
+%End
+    void setAttributes( const QMap<KadasMilxAttrType, double> &a );
+
+    QMap<KadasMilxAttrType, QgsPointXY> attributePoints() const;
+%Docstring
+Per-attribute control points reported by libmss, in EPSG:4326.
+%End
+    void setAttributePoints( const QMap<KadasMilxAttrType, QgsPointXY> &p );
+
+    QPoint userOffset() const;
+%Docstring
+User-applied screen-space offset (drag of the symbol graphic).
+%End
+    void setUserOffset( const QPoint &offset );
+
+    int pressedPoints() const;
+%Docstring
+a finalized item is created; updated by the controller draw state
+machine.
+%End
+    void setPressedPoints( int n );
+
+    enum class DrawStatus
+    {
+      Empty,
+      Drawing,
+      Finished
+    };
+    DrawStatus drawStatus() const;
+    void setDrawStatus( DrawStatus s );
+
+
+    KadasMilxClient::NPointSymbol toSymbol( const QgsMapSettings &mapSettings, bool colored = true ) const;
+%Docstring
+the \c finalized flag.
+%End
+
+    void applySymbolResult( const QgsMapSettings &mapSettings, const KadasMilxClient::NPointSymbolGraphic &result );
+%Docstring
+EPSG:4326 through ``mapSettings``.
+%End
+
+    static QRect computeScreenExtent( const QgsMapSettings &mapSettings );
+%Docstring
+(helper for libmss IPC, which works in device pixels).
+%End
+
+    bool isMultiPoint() const;
+%Docstring
+libmss IPC is needed for vertex moves vs a direct geometry update.
+%End
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasmilxannotationitem.h                  *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

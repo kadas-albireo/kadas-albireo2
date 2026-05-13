@@ -1,0 +1,97 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadaslineannotationcontroller.h            *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+class KadasLineAnnotationController : KadasAnnotationItemController
+{
+%Docstring(signature="appended")
+Controller for stock \c :py:class:`QgsAnnotationLineItem` (type id \c
+"linestring").
+
+Drives a click-by-click draw state machine on a single \c
+:py:class:`QgsLineString`. Multi-part strokes, geodesic lines and
+measurement modes (previously exposed by \c KadasLineItem) are not yet
+supported and will return as a Kadas-internal annotation-item subclass.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadaslineannotationcontroller.h"
+%End
+  public:
+    KadasLineAnnotationController();
+
+    virtual QString itemType() const;
+
+    virtual QString itemName() const;
+
+    virtual QgsAnnotationItem *createItem() const;
+
+
+    virtual QList<KadasNode> nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const;
+
+
+    virtual bool startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx );
+
+    virtual bool startPart( QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx );
+
+    virtual void setCurrentPoint( QgsAnnotationItem *item, const QgsPointXY &p, const KadasAnnotationItemContext &ctx );
+
+    virtual void setCurrentAttributes( QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx );
+
+    virtual bool continuePart( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx );
+
+    virtual void endPart( QgsAnnotationItem *item );
+
+
+    virtual KadasAttribDefs drawAttribs() const;
+
+    virtual KadasAttribValues drawAttribsFromPosition( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const;
+
+    virtual QgsPointXY positionFromDrawAttribs( const QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const;
+
+
+    virtual KadasEditContext getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const;
+
+    virtual void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx );
+
+    virtual void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx );
+
+    virtual KadasAttribValues editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const;
+
+    virtual QgsPointXY positionFromEditAttribs( const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const;
+
+
+    virtual QgsPointXY position( const QgsAnnotationItem *item ) const;
+
+    virtual void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos );
+
+    virtual void translate( QgsAnnotationItem *item, double dx, double dy );
+
+
+    virtual QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = 0 ) const;
+
+
+    virtual void applyPersistedStyle( QgsAnnotationItem *item ) const;
+
+    virtual void persistStyle( const QgsAnnotationItem *item ) const;
+
+    virtual KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = 0 ) const;
+
+
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadaslineannotationcontroller.h            *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

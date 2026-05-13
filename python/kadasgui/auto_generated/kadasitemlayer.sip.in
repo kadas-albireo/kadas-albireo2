@@ -125,7 +125,7 @@ class KadasItemLayer : KadasPluginLayer
 
     QgsAnnotationLayer *qgisAnnotationLayer( const QgsCoordinateReferenceSystem &crs ) const /Factory/;
 %Docstring
-The QGIS annotation layer will only contain items/annotations inheriting from :py:class:`QgsAnnotationItem`.
+that consumes it), or wrap the returned pointer in a smart pointer.
 %End
 
     static QString layerType();
@@ -135,8 +135,6 @@ The QGIS annotation layer will only contain items/annotations inheriting from :p
 
     void ensureDefault3DRenderer();
 %Docstring
-Lazily create and attach a default Kadas 3D renderer to this layer if it does not already have one.
-This avoids constructing a 3D renderer (and thereby pulling in QGIS::3D dependencies) for layers
 that are never used in a 3D scene. Safe to call multiple times.
 %End
 

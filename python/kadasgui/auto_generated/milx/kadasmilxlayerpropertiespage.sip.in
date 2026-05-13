@@ -54,7 +54,6 @@ class KadasMilxLayerPropertiesPageFactory : QObject, QgsMapLayerConfigWidgetFact
     virtual bool supportLayerPropertiesDialog() const;
     virtual bool supportsLayer( QgsMapLayer *layer ) const;
 
-
 };
 
 /************************************************************************

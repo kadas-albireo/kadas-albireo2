@@ -1,0 +1,65 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadascoordcrossannotationcontroller.h      *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+class KadasCoordCrossAnnotationController : KadasMarkerAnnotationController
+{
+%Docstring(signature="appended")
+Controller for \c KadasCoordCrossAnnotationItem (type id \c
+"kadas:coordcross").
+
+The coordinate cross is a single-point item whose position is rounded to
+the nearest kilometre on placement. Otherwise it follows the same
+placement / edit workflow as a generic marker, so this controller
+inherits from \c KadasMarkerAnnotationController and only overrides \c
+itemType / \c itemName / \c createItem and the position setters that
+need to apply the rounding.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadascoordcrossannotationcontroller.h"
+%End
+  public:
+    KadasCoordCrossAnnotationController();
+
+    virtual QString itemType() const;
+
+    virtual QString itemName() const;
+
+    virtual QgsAnnotationItem *createItem() const;
+
+
+    virtual bool startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx );
+
+    virtual void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos );
+
+    virtual void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx );
+
+
+    virtual QList<QgsAnnotationItem *> generateShadows( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const;
+
+    virtual QStringList shadowIds( const QgsAnnotationItem *item ) const;
+
+    virtual void setShadowIds( QgsAnnotationItem *item, const QStringList &ids ) const;
+
+
+    virtual KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = 0 ) const;
+%Docstring
+and is suppressed.
+%End
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadascoordcrossannotationcontroller.h      *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

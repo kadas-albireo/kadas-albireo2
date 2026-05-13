@@ -1,0 +1,38 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationzindex.h                    *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+namespace KadasAnnotationZIndex
+{
+  const int Polygon;
+  const int Rectangle;
+  const int Circle;
+
+  const int Line;
+  const int GpxRoute;
+
+  const int Picture;
+
+  const int Marker;
+  const int Pin;
+  const int CoordCross;
+  const int GpxWaypoint;
+  const int Milx;
+
+  const int PointText;
+} // namespace KadasAnnotationZIndex
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationzindex.h                    *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

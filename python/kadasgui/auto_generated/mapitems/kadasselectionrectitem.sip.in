@@ -33,6 +33,8 @@ your option) any later version. *
 
     virtual QString itemName() const;
 
+    virtual bool useQgisAnnotations() const;
+
     virtual QgsRectangle boundingBox() const;
 
     virtual Margin margin() const;
@@ -47,7 +49,6 @@ your option) any later version. *
     {
         virtual void assign( const KadasMapItem::State *other );
         virtual State *clone() const /Factory/;
-
     };
 
     virtual bool startPart( const KadasMapPos &firstPoint, const QgsMapSettings &mapSettings );

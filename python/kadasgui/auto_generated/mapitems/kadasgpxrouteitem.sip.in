@@ -49,8 +49,17 @@ your option) any later version. *
     virtual void render( QgsRenderContext &context ) const;
 
 
+    virtual QList<QgsAnnotationItem *> annotationItems( const QgsCoordinateReferenceSystem &crs = QgsCoordinateReferenceSystem() ) const /Factory/;
+
+
   protected:
     virtual KadasMapItem *_clone() const /Factory/;
+
+
+    virtual void writeXmlPrivate( QDomElement &element ) const;
+
+    virtual void readXmlPrivate( const QDomElement &element );
+
 
 };
 
