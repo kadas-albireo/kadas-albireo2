@@ -44,7 +44,7 @@ void KadasMapItemTooltip::updateForPos( const QPoint &canvasPos )
   QString annotationTooltip;
 
   KadasFeaturePicker::PickResult result
-    = KadasFeaturePicker::pick( mCanvas, mCanvas->getCoordinateTransform()->toMapCoordinates( canvasPos ), Qgis::GeometryType::Unknown, KadasItemLayer::PickObjective::PICK_OBJECTIVE_TOOLTIP );
+    = KadasFeaturePicker::pick( mCanvas, mCanvas->getCoordinateTransform()->toMapCoordinates( canvasPos ), Qgis::GeometryType::Unknown, KadasFeaturePicker::PickObjective::PICK_OBJECTIVE_TOOLTIP );
   if ( result.annotationLayer && !result.annotationItemId.isEmpty() )
   {
     annotationTooltip = KadasAnnotationLayerHelpers::tooltip( result.annotationLayer, result.annotationItemId );

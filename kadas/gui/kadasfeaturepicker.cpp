@@ -26,11 +26,10 @@
 #include <qgis/qgssettings.h>
 #include <qgis/qgsvectorlayer.h>
 
-#include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/kadasfeaturepicker.h"
 #include "kadas/gui/mapitems/kadasgeometryitem.h"
 
-KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *canvas, const QgsPointXY &mapPos, Qgis::GeometryType geomType, KadasItemLayer::PickObjective pickObjective )
+KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *canvas, const QgsPointXY &mapPos, Qgis::GeometryType geomType, KadasFeaturePicker::PickObjective pickObjective )
 {
   PickResult pickResult;
 
@@ -40,7 +39,7 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *can
     {
       pickResult = pickAnnotationLayer( static_cast<QgsAnnotationLayer *>( layer ), canvas, mapPos );
     }
-    else if ( qobject_cast<QgsVectorLayer *>( layer ) && pickObjective != KadasItemLayer::PickObjective::PICK_OBJECTIVE_TOOLTIP )
+    else if ( qobject_cast<QgsVectorLayer *>( layer ) && pickObjective != KadasFeaturePicker::PickObjective::PICK_OBJECTIVE_TOOLTIP )
     {
       pickResult = pickVectorLayer( static_cast<QgsVectorLayer *>( layer ), canvas, mapPos, geomType );
     }

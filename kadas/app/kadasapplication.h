@@ -23,6 +23,8 @@
 #include <qgis/qgis.h>
 #include <qgis/qgsapplication.h>
 #include <qgis/qgslayertreeregistrybridge.h>
+#include <qgis/qgspluginlayer.h>
+#include <qgis/qgspluginlayerregistry.h>
 
 #include "kadas/gui/kadasfeaturepicker.h"
 
