@@ -53,7 +53,6 @@ set(kadas_gui_SRC
     annotationitems/kadaspolygonannotationcontroller.cpp
     annotationitems/kadasrectangleannotationcontroller.cpp
     annotationitems/kadasrectangleannotationitem.cpp
-    maptools/kadasmaptoolcreateitem.cpp
     maptools/kadasmaptooldeleteitems.cpp
     maptools/kadasmaptooleditannotationitem.cpp
     maptools/kadasmaptooledititem.cpp
@@ -159,7 +158,6 @@ set(kadas_gui_HDR
     annotationitems/kadaspolygonannotationcontroller.h
     annotationitems/kadasrectangleannotationcontroller.h
     annotationitems/kadasrectangleannotationitem.h
-    maptools/kadasmaptoolcreateitem.h
     maptools/kadasmaptooldeleteitems.h
     maptools/kadasmaptooleditannotationitem.h
     maptools/kadasmaptooledititem.h

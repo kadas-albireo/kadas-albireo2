@@ -1,6 +1,5 @@
 %Include auto_generated/maptools/kadasmaptoolminmax.sip
 %Include auto_generated/maptools/kadasmaptooledititem.sip
-%Include auto_generated/maptools/kadasmaptoolcreateitem.sip
 %Include auto_generated/maptools/kadasmaptooleditannotationitem.sip
 %Include auto_generated/maptools/kadasmaptoolslope.sip
 %Include auto_generated/maptools/kadasmaptooldeleteitems.sip

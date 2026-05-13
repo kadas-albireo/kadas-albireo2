@@ -14,6 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QLabel>
 #include <QMenu>
 #include <QPushButton>
 
@@ -31,7 +32,6 @@
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/mapitems/kadasmapitem.h"
 #include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
-#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 #include "kadas/gui/maptools/kadasmaptooledititem.h"
 #include "kadas/gui/maptools/kadasmaptooledititemgroup.h"
 
@@ -181,16 +181,7 @@ void KadasMapToolEditItem::canvasPressEvent( QgsMapMouseEvent *e )
         disconnect( mItem, &QObject::destroyed, this, &KadasMapToolEditItem::itemDestroyed );
       }
 
-      if ( clickedAction )
-      {
-        if ( clickedAction->data() == static_cast<int>( KadasMapItem::ContextMenuActions::EditSwitchToDrawingTool ) )
-        {
-          KadasMapCanvasItemManager::removeItem( mItem );
-          KadasMapItem *item = mItem;
-          mItem = nullptr;
-          canvas()->setMapTool( new KadasMapToolCreateItem( canvas(), item, mLayer ) );
-        }
-      }
+      // EditSwitchToDrawingTool branch removed together with KadasMapToolCreateItem (slice 7h).
     }
     else
     {

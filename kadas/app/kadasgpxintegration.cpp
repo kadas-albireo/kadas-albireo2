@@ -38,7 +38,6 @@
 #include "kadas/gui/kadaslayerselectionwidget.h"
 #include "kadas/gui/mapitems/kadaslineitem.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
-#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
 #include "kadasapplication.h"
 #include "kadasgpxintegration.h"
