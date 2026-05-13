@@ -21,7 +21,7 @@
 #include "kadas/gui/kadasmapiteminterface.h"
 #include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
-class KadasSymbolItem;
+class QgsRubberBand;
 
 
 class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasMapToolCreateItem
@@ -51,13 +51,16 @@ class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasMapToolCreateItem
   private:
     FilterType mFilterType = FilterType::FilterRect;
     QComboBox *mFilterTypeCombo = nullptr;
-    QPointer<KadasSymbolItem> mPinMin;
-    QPointer<KadasSymbolItem> mPinMax;
+    QgsRubberBand *mPinMinBand = nullptr;
+    QgsRubberBand *mPinMaxBand = nullptr;
+    QgsPointXY mPinMinPos;
+    QgsPointXY mPinMaxPos;
+    bool mPinsValid = false;
     bool mPickFeature = false;
     QAction *mActionViewshed = nullptr;
     QAction *mActionProfile = nullptr;
 
-    void showContextMenu( KadasMapItem *item ) const;
+    void showContextMenu( const QgsPointXY &mapPos ) const;
 };
 
 

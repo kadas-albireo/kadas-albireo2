@@ -30,6 +30,7 @@
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrasterlayer.h>
+#include <qgis/qgsrubberband.h>
 #include <qgis/qgssettings.h>
 
 #include "kadas/core/kadas.h"
@@ -40,10 +41,8 @@
 #include "kadas/gui/mapitems/kadascircleitem.h"
 #include "kadas/gui/mapitems/kadaspolygonitem.h"
 #include "kadas/gui/mapitems/kadasrectangleitem.h"
-#include "kadas/gui/mapitems/kadassymbolitem.h"
 #include "kadas/gui/maptools/kadasmaptoolminmax.h"
 #include "kadas/gui/kadasfeaturepicker.h"
-#include "kadas/gui/kadasmapcanvasitemmanager.h"
 
 
 KadasMapItem *KadasMapToolMinMaxItemInterface::createItem() const
@@ -100,16 +99,8 @@ KadasMapToolMinMax::KadasMapToolMinMax( QgsMapCanvas *mapCanvas, QAction *action
 
 KadasMapToolMinMax::~KadasMapToolMinMax()
 {
-  if ( mPinMin )
-  {
-    KadasMapCanvasItemManager::removeItem( mPinMin );
-    delete mPinMin.data();
-  }
-  if ( mPinMax )
-  {
-    KadasMapCanvasItemManager::removeItem( mPinMax );
-    delete mPinMax.data();
-  }
+  delete mPinMinBand;
+  delete mPinMaxBand;
 }
 
 void KadasMapToolMinMax::setFilterType( FilterType filterType )
@@ -250,21 +241,29 @@ void KadasMapToolMinMax::drawFinished()
   QgsPointXY pMin( xMin, yMin );
   QgsPointXY pMax( xMax, yMax );
 
-  if ( !mPinMin )
+  // SVG natural size: 55x43. tri_up anchored at top-center -> drawOffset (-W/2, 0)
+  // so the icon hangs below the geographic point. tri_down anchored at
+  // bottom-center -> drawOffset (-W/2, -H) so it floats above.
+  if ( !mPinMinBand )
   {
-    mPinMin = new KadasSymbolItem( mCanvas->mapSettings().destinationCrs() );
-    mPinMin->setup( ":/kadas/icons/tri_up", 0.5, 0 );
-    KadasMapCanvasItemManager::addItem( mPinMin );
+    mPinMinBand = new QgsRubberBand( mCanvas, Qgis::GeometryType::Point );
+    mPinMinBand->setIcon( QgsRubberBand::ICON_SVG );
+    mPinMinBand->setSvgIcon( QStringLiteral( ":/kadas/icons/tri_up" ), QPoint( -27, 0 ) );
   }
-  mPinMin->setPosition( KadasItemPos::fromPoint( pMin ) );
+  mPinMinBand->reset( Qgis::GeometryType::Point );
+  mPinMinBand->addPoint( pMin, true );
+  mPinMinPos = pMin;
 
-  if ( !mPinMax )
+  if ( !mPinMaxBand )
   {
-    mPinMax = new KadasSymbolItem( mCanvas->mapSettings().destinationCrs() );
-    mPinMax->setup( ":/kadas/icons/tri_down", 0.5, 1.0 );
-    KadasMapCanvasItemManager::addItem( mPinMax );
+    mPinMaxBand = new QgsRubberBand( mCanvas, Qgis::GeometryType::Point );
+    mPinMaxBand->setIcon( QgsRubberBand::ICON_SVG );
+    mPinMaxBand->setSvgIcon( QStringLiteral( ":/kadas/icons/tri_down" ), QPoint( -27, -43 ) );
   }
-  mPinMax->setPosition( KadasItemPos::fromPoint( pMax ) );
+  mPinMaxBand->reset( Qgis::GeometryType::Point );
+  mPinMaxBand->addPoint( pMax, true );
+  mPinMaxPos = pMax;
+  mPinsValid = true;
 
   clear();
 }
@@ -281,26 +280,36 @@ void KadasMapToolMinMax::canvasPressEvent( QgsMapMouseEvent *e )
   {
     return;
   }
-  if ( currentItem() && currentItem()->drawStatus() != KadasMapItem::DrawStatus::Drawing && mPinMin && mPinMax )
+  if ( currentItem() && currentItem()->drawStatus() != KadasMapItem::DrawStatus::Drawing && mPinsValid )
   {
-    QgsPointXY mapPos = toMapCoordinates( e->pos() );
-    if ( mPinMax->hitTest( KadasMapPos::fromPoint( mapPos ), mCanvas->mapSettings() ) )
+    // Hit test in canvas pixel space against the SVG marker bounding box.
+    // The tri_up / tri_down SVGs are 55x43; pick a generous half-extent.
+    const QgsMapToPixel &m2p = mCanvas->mapSettings().mapToPixel();
+    const QPointF clickPx( e->pos().x(), e->pos().y() );
+    const QPointF maxPx = m2p.transform( QgsPointXY( mPinMaxPos ) ).toQPointF();
+    const QPointF minPx = m2p.transform( QgsPointXY( mPinMinPos ) ).toQPointF();
+    constexpr double tolHX = 28.0; // half SVG width + slack
+    constexpr double tolH = 45.0;  // SVG height + slack
+    auto inBox = [&]( const QPointF &px, double yOffset ) {
+      // yOffset: -tolH for tri_down (above pos), 0..tolH for tri_up (below pos).
+      return std::abs( clickPx.x() - px.x() ) <= tolHX && ( clickPx.y() - px.y() ) >= yOffset && ( clickPx.y() - px.y() ) <= yOffset + tolH;
+    };
+    if ( inBox( maxPx, -tolH ) )
     {
-      showContextMenu( mPinMax );
+      showContextMenu( mPinMaxPos );
       return;
     }
-    else if ( mPinMin->hitTest( KadasMapPos::fromPoint( mapPos ), mCanvas->mapSettings() ) )
+    else if ( inBox( minPx, 0 ) )
     {
-      showContextMenu( mPinMin );
+      showContextMenu( mPinMinPos );
       return;
     }
   }
   KadasMapToolCreateItem::canvasPressEvent( e );
 }
 
-void KadasMapToolMinMax::showContextMenu( KadasMapItem *item ) const
+void KadasMapToolMinMax::showContextMenu( const QgsPointXY &mapPos ) const
 {
-  QgsPointXY mapPos = item->position();
   QMenu menu;
   menu.addAction( QIcon( ":/kadas/icons/copy_coordinates" ), tr( "Copy coordinates" ), [this, mapPos] {
     const QgsCoordinateReferenceSystem &mapCrs = mCanvas->mapSettings().destinationCrs();
@@ -333,9 +342,7 @@ void KadasMapToolMinMax::showContextMenu( KadasMapItem *item ) const
     layer->addItem( pin );
     layer->triggerRepaint();
   } );
-  item->setSelected( true );
   menu.exec( mCanvas->mapToGlobal( toCanvasCoordinates( mapPos ) ) );
-  item->setSelected( false );
 }
 
 void KadasMapToolMinMax::canvasMoveEvent( QgsMapMouseEvent *e )
