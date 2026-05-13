@@ -24,6 +24,7 @@
 #include <QMessageBox>
 #include <QProgressDialog>
 
+#include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmultisurface.h>
 #include <qgis/qgspalettedrasterrenderer.h>
@@ -35,10 +36,10 @@
 #include "kadas/core/kadas.h"
 #include "kadas/core/kadascoordinateformat.h"
 #include "kadas/analysis/kadasviewshedfilter.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
+#include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 #include "kadas/gui/mapitems/kadascircularsectoritem.h"
-#include "kadas/gui/mapitems/kadassymbolitem.h"
 #include "kadas/gui/maptools/kadasmaptoolviewshed.h"
-#include "kadas/gui/kadasmapcanvasitemmanager.h"
 
 
 KadasViewshedDialog::KadasViewshedDialog( double radius, QWidget *parent )
@@ -288,24 +289,32 @@ void KadasMapToolViewshed::drawFinished()
     layer->setOpacity( 30 );
     QgsProject::instance()->addMapLayer( layer );
 
-    KadasSymbolItem *pin = new KadasSymbolItem( canvasCrs );
-    pin->setup( ":/kadas/icons/pin_red", 0.5, 1.0 );
-    pin->associateToLayer( layer );
-    pin->setPosition( KadasItemPos::fromPoint( center ) );
-
-    pin->setTooltip(
-      tr( "<b>Observer position</b>: %1<br />" ).arg( KadasCoordinateFormat::instance()->getDisplayString( pin->position(), pin->crs() ) )
-      + tr( "<b>Observer height</b>: %1 %2 %3<br />" )
-          .arg( viewshedDialog.observerHeight() )
-          .arg( QgsUnitTypes::toString( KadasCoordinateFormat::instance()->getHeightDisplayUnit() ) )
-          .arg( viewshedDialog.observerHeightRelativeToGround() ? tr( "above ground" ) : tr( "above sea level" ) )
-      + tr( "<b>Observer vertical angle range</b>: %1° to %2°<br />" ).arg( viewshedDialog.observerMinVertAngle() ).arg( viewshedDialog.observerMaxVertAngle() )
-      + tr( "<b>Target height</b>: %1 %2 %3" )
-          .arg( viewshedDialog.targetHeight() )
-          .arg( QgsUnitTypes::toString( KadasCoordinateFormat::instance()->getHeightDisplayUnit() ) )
-          .arg( viewshedDialog.targetHeightRelativeToGround() ? tr( "above ground" ) : tr( "above sea level" ) )
-    );
-    KadasMapCanvasItemManager::addItem( pin );
+    QgsAnnotationLayer *pinsLayer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::PinsLayer );
+    if ( pinsLayer )
+    {
+      const QgsPointXY layerPos = QgsCoordinateTransform( canvasCrs, pinsLayer->crs(), QgsProject::instance()->transformContext() ).transform( center );
+      auto *pin = new KadasPinAnnotationItem( QgsPoint( layerPos.x(), layerPos.y() ) );
+      pin->setName( tr( "Observer position" ) );
+      pin->setRemarks(
+        tr( "<b>Observer position</b>: %1<br />" ).arg( KadasCoordinateFormat::instance()->getDisplayString( center, canvasCrs ) )
+        + tr( "<b>Observer height</b>: %1 %2 %3<br />" )
+            .arg( viewshedDialog.observerHeight() )
+            .arg( QgsUnitTypes::toString( KadasCoordinateFormat::instance()->getHeightDisplayUnit() ) )
+            .arg( viewshedDialog.observerHeightRelativeToGround() ? tr( "above ground" ) : tr( "above sea level" ) )
+        + tr( "<b>Observer vertical angle range</b>: %1° to %2°<br />" ).arg( viewshedDialog.observerMinVertAngle() ).arg( viewshedDialog.observerMaxVertAngle() )
+        + tr( "<b>Target height</b>: %1 %2 %3" )
+            .arg( viewshedDialog.targetHeight() )
+            .arg( QgsUnitTypes::toString( KadasCoordinateFormat::instance()->getHeightDisplayUnit() ) )
+            .arg( viewshedDialog.targetHeightRelativeToGround() ? tr( "above ground" ) : tr( "above sea level" ) )
+      );
+      const QString pinId = pinsLayer->addItem( pin );
+      // Tie pin lifetime to the viewshed raster: when the raster is removed, drop the pin too.
+      QObject::connect( layer, &QObject::destroyed, pinsLayer, [pinsLayer, pinId]() {
+        pinsLayer->removeItem( pinId );
+        pinsLayer->triggerRepaint();
+      } );
+      pinsLayer->triggerRepaint();
+    }
   }
   else if ( !errMsg.isEmpty() )
   {
