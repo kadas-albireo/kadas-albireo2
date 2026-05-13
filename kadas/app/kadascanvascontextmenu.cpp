@@ -36,7 +36,6 @@
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/mapitems/kadasselectionrectitem.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
-#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 #include "kadas/gui/maptools/kadasmaptooledititem.h"
 #include "kadas/gui/maptools/kadasmaptoolhillshade.h"
 #include "kadas/gui/maptools/kadasmaptoolminmax.h"
@@ -55,13 +54,10 @@ Q_GLOBAL_STATIC( RegisteredAction, sRegisteredActions )
 
 namespace
 {
-  //! Forward an initial point to whichever create map tool is now active
-  //! (legacy KadasMapToolCreateItem or new KadasMapToolEditAnnotationItem in create-mode).
+  //! Forward an initial point to whichever create map tool is now active.
   void seedActiveCreateToolWithPoint( QgsMapCanvas *canvas, const KadasMapPos &pos )
   {
-    if ( auto *tool = dynamic_cast<KadasMapToolCreateItem *>( canvas->mapTool() ) )
-      tool->addPoint( pos );
-    else if ( auto *tool = dynamic_cast<KadasMapToolEditAnnotationItem *>( canvas->mapTool() ) )
+    if ( auto *tool = dynamic_cast<KadasMapToolEditAnnotationItem *>( canvas->mapTool() ) )
       tool->addPoint( pos );
   }
 } // namespace
@@ -459,74 +455,24 @@ void KadasCanvasContextMenu::drawCoordinateCross()
 
 void KadasCanvasContextMenu::measureLine()
 {
+  // Picked-feature seeding is no longer wired through the new measure tool;
+  // the user gets an empty measure line tool the same way the toolbar action does.
   kApp->mainWindow()->actionMeasureLine()->trigger();
-
-  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
-  if ( !tool )
-    return;
-
-  if ( mPickResult.geom )
-  {
-    tool->addPartFromGeometry( *mPickResult.geom, mPickResult.crs );
-  }
-  else
-  {
-    tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
-  }
 }
 
 void KadasCanvasContextMenu::measurePolygon()
 {
   kApp->mainWindow()->actionMeasureArea()->trigger();
-
-  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
-  if ( !tool )
-    return;
-
-  if ( mPickResult.geom )
-  {
-    tool->addPartFromGeometry( *mPickResult.geom, mPickResult.crs );
-  }
-  else
-  {
-    tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
-  }
 }
 
 void KadasCanvasContextMenu::measureCircle()
 {
   kApp->mainWindow()->actionMeasureCircle()->trigger();
-
-  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
-  if ( !tool )
-    return;
-
-  if ( mPickResult.geom )
-  {
-    tool->addPartFromGeometry( *mPickResult.geom, mPickResult.crs );
-  }
-  else
-  {
-    tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
-  }
 }
 
 void KadasCanvasContextMenu::measureHeightProfile()
 {
   kApp->mainWindow()->actionMeasureHeightProfile()->trigger();
-
-  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
-  if ( !tool )
-    return;
-
-  if ( mPickResult.geom )
-  {
-    static_cast<KadasMapToolCreateItem *>( tool )->addPartFromGeometry( *mPickResult.geom, mPickResult.crs );
-  }
-  else
-  {
-    tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
-  }
 }
 
 void KadasCanvasContextMenu::measureMinMax()
