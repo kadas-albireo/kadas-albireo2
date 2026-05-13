@@ -107,7 +107,6 @@ KadasItemLayer::ItemId KadasItemLayer::addItem( KadasMapItem *item )
   {
     id = ++mIdCounter;
   }
-  item->setOwnerLayer( this );
   mItems.insert( id, item );
   mItemOrder.append( id );
   QgsCoordinateTransform trans( item->crs(), crs(), mTransformContext );
@@ -121,7 +120,6 @@ KadasMapItem *KadasItemLayer::takeItem( const ItemId &itemId )
   KadasMapItem *item = mItems.take( itemId );
   if ( item )
   {
-    item->setOwnerLayer( nullptr );
     mFreeIds.append( itemId );
     mItemBounds.remove( itemId );
     mItemOrder.removeOne( itemId );
@@ -199,7 +197,6 @@ bool KadasItemLayer::readXml( const QDomNode &layer_node, QgsReadWriteContext &c
     KadasMapItem *item = KadasMapItem::fromXml( itemEls.at( i ).toElement() );
     if ( item )
     {
-      item->setOwnerLayer( this );
       mItems.insert( ++mIdCounter, item );
       mItemOrder.append( mIdCounter );
       QgsCoordinateTransform trans( item->crs(), crs(), mTransformContext );

@@ -286,12 +286,6 @@ Associate to layer */
 %End
     QgsMapLayer *associatedLayer() const;
 
-    void setOwnerLayer( KadasItemLayer *layer );
-%Docstring
-Owner layer */
-%End
-    KadasItemLayer *ownerLayer() const;
-
     void setSelected( bool selected );
 %Docstring
 Selected state */
