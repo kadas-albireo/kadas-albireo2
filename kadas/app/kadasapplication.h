@@ -121,6 +121,7 @@ class KadasApplication : public QgsApplication
     void displayMessage( const QString &message, Qgis::MessageLevel level = Qgis::Info );
     void showPythonConsole();
     void showNetworkLogger();
+    void setNetworkLoggingEnabled( bool enabled );
     void unsetMapTool();
 
     void initAfterExec();
