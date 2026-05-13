@@ -57,8 +57,6 @@
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
-#include "kadas/gui/kadasmapcanvasitem.h"
-#include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/kadasprojecttemplateselectiondialog.h"
 
 #include "kadas/gui/catalog/kadasarcgisrestcatalogprovider.h"
@@ -255,9 +253,6 @@ void KadasMainWindow::init()
   mLayerTreeView->setModel( model );
   mLayerTreeView->setMenuProvider( new KadasLayerTreeViewMenuProvider( mLayerTreeView ) );
   connect( mLayerTreeView, &QAbstractItemView::doubleClicked, this, &KadasMainWindow::layerTreeViewDoubleClicked );
-
-  connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemAdded, this, &KadasMainWindow::addMapCanvasItem );
-  connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemWillBeRemoved, this, &KadasMainWindow::removeMapCanvasItem );
 
   QgsSnappingConfig snappingConfig;
   snappingConfig.setMode( Qgis::SnappingMode::AllLayers );
@@ -1374,23 +1369,6 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
   }
   // Reset insertion point
   QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( mLayerTreeView->layerTreeModel()->rootGroup(), 0 ) );
-}
-
-void KadasMainWindow::addMapCanvasItem( const KadasMapItem *item )
-{
-  KadasMapCanvasItem *canvasItem = new KadasMapCanvasItem( item, mMapCanvas );
-  Q_UNUSED( canvasItem ); //item is already added automatically to canvas scene
-}
-
-void KadasMainWindow::removeMapCanvasItem( const KadasMapItem *item )
-{
-  for ( QGraphicsItem *canvasItem : mMapCanvas->items() )
-  {
-    if ( dynamic_cast<KadasMapCanvasItem *>( canvasItem ) && static_cast<KadasMapCanvasItem *>( canvasItem )->mapItem() == item )
-    {
-      delete canvasItem;
-    }
-  }
 }
 
 void KadasMainWindow::checkLayerProjection( QgsMapLayer *layer )

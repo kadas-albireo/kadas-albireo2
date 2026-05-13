@@ -16,8 +16,6 @@ set(kadas_gui_SRC
     kadasitemlayermigration.cpp
     kadaslayerpropertiesdialog.cpp
     kadaslayerselectionwidget.cpp
-    kadasmapcanvasitem.cpp
-    kadasmapcanvasitemmanager.cpp
     kadasmapitemtooltip.cpp
     kadasmapwidget.cpp
     kadasprojectmigration.cpp
@@ -114,8 +112,6 @@ set(kadas_gui_HDR
     kadasitemlayermigration.h
     kadaslayerpropertiesdialog.h
     kadaslayerselectionwidget.h
-    kadasmapcanvasitem.h
-    kadasmapcanvasitemmanager.h
     kadasmapiteminterface.h
     kadasmapitemtooltip.h
     kadasplugininterface.h

@@ -2,7 +2,7 @@ import math
 import os
 
 from kadas.kadascore import KadasCoordinateUtils
-from kadas.kadasgui import KadasBottomBar, KadasItemPos, KadasMapCanvasItemManager, KadasSymbolItem
+from kadas.kadasgui import KadasBottomBar, KadasItemPos, KadasSymbolItem
 from qgis.core import QgsCoordinateFormatter, QgsCoordinateReferenceSystem
 from qgis.PyQt.QtCore import QDateTime, QEventLoop, Qt, pyqtSignal
 from qgis.PyQt.QtGui import QIcon, QPixmap
@@ -62,13 +62,13 @@ class EphemToolWidget(KadasBottomBar):
         self.sunAzIcon = KadasSymbolItem(QgsCoordinateReferenceSystem("EPSG:4326"))
         self.sunAzIcon.setup(os.path.join(os.path.dirname(__file__), "icons/az_sun.svg"), 0.5, 1.0)
         self.sunAzIcon.setVisible(False)
-        KadasMapCanvasItemManager.addItem(self.sunAzIcon)
+        # TODO: port to QgsAnnotationLayer.
 
         self.moonAzIcon = KadasSymbolItem(QgsCoordinateReferenceSystem("EPSG:4326"))
         self.moonAzIcon.setup(
             os.path.join(os.path.dirname(__file__), "icons/az_moon.svg"), 0.5, 1.0
         )
-        KadasMapCanvasItemManager.addItem(self.moonAzIcon)
+        # TODO: port moonAzIcon overlay to QgsAnnotationLayer.
         self.moonAzIcon.setVisible(False)
 
         self.ephemRecomputeTask = EphemComputeTask(self)
@@ -85,9 +85,8 @@ class EphemToolWidget(KadasBottomBar):
             self.ephemRecomputeTask.wait()
             QApplication.restoreOverrideCursor()
 
-        KadasMapCanvasItemManager.removeItem(self.sunAzIcon)
+        # TODO: port to QgsAnnotationLayer.
         self.sunAzIcon = None
-        KadasMapCanvasItemManager.removeItem(self.moonAzIcon)
         self.moonAzIcon = None
 
     def recompute(self):

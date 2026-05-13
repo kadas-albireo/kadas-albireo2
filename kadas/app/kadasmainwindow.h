@@ -37,7 +37,6 @@ class KadasGpxIntegration;
 class KadasHelpViewer;
 class KadasKmlIntegration;
 class KadasMilxIntegration;
-class KadasMapItem;
 class KadasMapWidgetManager;
 class KadasProjectTemplateSelectionDialog;
 class KadasPluginManager;
@@ -123,8 +122,6 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
 
   private slots:
     void addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers );
-    void addMapCanvasItem( const KadasMapItem *item );
-    void removeMapCanvasItem( const KadasMapItem *item );
     void checkLayerProjection( QgsMapLayer *layer );
     void checkLayerTemporalCapabilities( QgsMapLayer *layer );
     void checkWMSLayerIgnoreReportedExtents( QgsMapLayer *layer );
