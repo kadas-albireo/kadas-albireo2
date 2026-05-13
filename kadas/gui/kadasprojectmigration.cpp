@@ -786,6 +786,8 @@ bool KadasProjectMigration::shouldAttach( const QString &baseDir, const QString 
 #include <qgis/qgsannotationpictureitem.h>
 #include <qgis/qgsannotationpointtextitem.h>
 #include <qgis/qgsannotationpolygonitem.h>
+#include <qgis/qgscircularstring.h>
+#include <qgis/qgscompoundcurve.h>
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsfillsymbol.h>
 #include <qgis/qgsfillsymbollayer.h>
@@ -1342,6 +1344,124 @@ namespace
   }
 
   /**
+   * Translate one `<MapItem name="KadasCircularSectorItem">` (v2 format)
+   * into one `QgsAnnotationPolygonItem` per (center, radius, startAngle,
+   * stopAngle) tuple. The sector outline is built from a `QgsCircularString`
+   * arc plus two radii (or a full circle when the angle range covers 2π),
+   * matching the legacy `recomputeDerived` formula.
+   */
+  QList<QgsAnnotationItem *> translateKadasCircularSectorItem( const QDomElement &itemEl, const QgsCoordinateReferenceSystem &itemCrs, const QgsCoordinateReferenceSystem &layerCrs )
+  {
+    QList<QgsAnnotationItem *> out;
+    if ( itemEl.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) != QLatin1String( "2" ) )
+      return out;
+
+    QColor outlineColor;
+    double outlineWidth = 1.0;
+    Qt::PenStyle outlineStyle = Qt::SolidLine;
+    QColor fillColor;
+    Qt::BrushStyle fillStyle = Qt::SolidPattern;
+    parseGeometryBaseAttributes( itemEl, outlineColor, outlineWidth, outlineStyle, fillColor, fillStyle );
+
+    auto parsePoints = []( const QString &s ) {
+      QList<QgsPointXY> pts;
+      if ( s.isEmpty() )
+        return pts;
+      for ( const QString &pair : s.split( QChar( ';' ), Qt::SkipEmptyParts ) )
+      {
+        const QStringList xy = pair.split( QChar( ',' ) );
+        if ( xy.size() == 2 )
+          pts.append( QgsPointXY( xy[0].toDouble(), xy[1].toDouble() ) );
+      }
+      return pts;
+    };
+    auto parseDoubles = []( const QString &s ) {
+      QList<double> out;
+      if ( s.isEmpty() )
+        return out;
+      for ( const QString &v : s.split( QChar( ';' ), Qt::SkipEmptyParts ) )
+        out.append( v.toDouble() );
+      return out;
+    };
+    const QList<QgsPointXY> centers = parsePoints( itemEl.attribute( QStringLiteral( "centers" ) ) );
+    const QList<double> radii = parseDoubles( itemEl.attribute( QStringLiteral( "radii" ) ) );
+    const QList<double> startAngles = parseDoubles( itemEl.attribute( QStringLiteral( "start_angles" ) ) );
+    const QList<double> stopAngles = parseDoubles( itemEl.attribute( QStringLiteral( "stop_angles" ) ) );
+    if ( centers.isEmpty() || centers.size() != radii.size() || centers.size() != startAngles.size() || centers.size() != stopAngles.size() )
+      return out;
+
+    const bool needTransform = itemCrs.isValid() && layerCrs.isValid() && itemCrs != layerCrs;
+    QgsCoordinateTransform ct;
+    if ( needTransform )
+    {
+      try
+      {
+        ct = QgsCoordinateTransform( itemCrs, layerCrs, QgsProject::instance() );
+      }
+      catch ( QgsCsException & )
+      {
+        return out;
+      }
+    }
+
+    auto makeSymbol = [&]() {
+      auto *layer = new QgsSimpleFillSymbolLayer( fillColor, fillStyle, outlineColor, outlineStyle, outlineWidth );
+      layer->setStrokeWidthUnit( Qgis::RenderUnit::Pixels );
+      return new QgsFillSymbol( QgsSymbolLayerList { layer } );
+    };
+
+    for ( int i = 0; i < centers.size(); ++i )
+    {
+      QgsPointXY center = centers[i];
+      const double radius = radii[i];
+      const double startAngle = startAngles[i];
+      const double stopAngle = stopAngles[i];
+      if ( needTransform )
+      {
+        try
+        {
+          center = ct.transform( center );
+        }
+        catch ( QgsCsException & )
+        {
+          qDeleteAll( out );
+          out.clear();
+          return out;
+        }
+      }
+      auto *exterior = new QgsCompoundCurve();
+      if ( stopAngle - startAngle < 2 * M_PI - std::numeric_limits<float>::epsilon() )
+      {
+        const double alphaMid = 0.5 * ( startAngle + 2 * M_PI + stopAngle );
+        QgsPoint pStart( center.x() + radius * std::cos( startAngle ), center.y() + radius * std::sin( startAngle ) );
+        QgsPoint pMid( center.x() + radius * std::cos( alphaMid ), center.y() + radius * std::sin( alphaMid ) );
+        QgsPoint pEnd( center.x() + radius * std::cos( stopAngle ), center.y() + radius * std::sin( stopAngle ) );
+        exterior->addCurve( new QgsCircularString( pStart, pMid, pEnd ) );
+        exterior->addCurve( new QgsLineString( QgsPointSequence() << pEnd << QgsPoint( center ) << pStart ) );
+      }
+      else
+      {
+        auto *arc = new QgsCircularString();
+        arc->setPoints(
+          QgsPointSequence()
+          << QgsPoint( center.x(), center.y() + radius )
+          << QgsPoint( center.x() + radius, center.y() )
+          << QgsPoint( center.x(), center.y() - radius )
+          << QgsPoint( center.x() - radius, center.y() )
+          << QgsPoint( center.x(), center.y() + radius )
+        );
+        exterior->addCurve( arc );
+      }
+      auto *poly = new QgsCurvePolygon();
+      poly->setExteriorRing( exterior );
+      auto *anno = new QgsAnnotationPolygonItem( poly );
+      anno->setSymbol( makeSymbol() );
+      out.append( anno );
+    }
+    return out;
+  }
+
+  /**
    * Dispatcher: looks at the `name` attribute of \a itemEl and forwards to
    * the matching per-type translator. Returns an empty list if no
    * translator is registered for the type yet, or if the translator
@@ -1399,8 +1519,11 @@ namespace
       if ( auto *a = translateKadasPinItem( itemEl, itemCrs, layerCrs ) )
         annos.append( a );
     }
-    // Future slices: KadasCircularSectorItem, KadasGpxRouteItem,
-    // KadasGpxWaypointItem.
+    else if ( name == QLatin1String( "KadasCircularSectorItem" ) )
+    {
+      annos = translateKadasCircularSectorItem( itemEl, itemCrs, layerCrs );
+    }
+    // Future slices: KadasGpxRouteItem, KadasGpxWaypointItem.
 
     if ( annos.isEmpty() )
       return annos;
