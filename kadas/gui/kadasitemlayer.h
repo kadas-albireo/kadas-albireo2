@@ -158,8 +158,6 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     QString layerTypeKey() const override { return layerType(); }
 
     ItemId addItem( KadasMapItem *item SIP_TRANSFER );
-    void lowerItem( const ItemId &itemId );
-    void raiseItem( const ItemId &itemId );
     KadasMapItem *takeItem( const ItemId &itemId ) SIP_TRANSFER;
     const QMap<KadasItemLayer::ItemId, KadasMapItem *> &items() const { return mItems; }
 
@@ -168,21 +166,6 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     QgsRectangle extent() const override;
     bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
     bool writeXml( QDomNode &layer_node, QDomDocument &document, const QgsReadWriteContext &context ) const override;
-    virtual KadasItemLayer::ItemId pickItem(
-      const KadasMapPos &mapPos, const QgsMapSettings &mapSettings, KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY
-    ) const;
-
-#ifndef SIP_RUN
-    // TODO: SIP
-    QPair<QgsPointXY, double> snapToVertex( const QgsPointXY &pos, const QgsMapSettings &settings, double tolPixels ) const;
-#endif
-
-#ifndef SIP_RUN
-    virtual QString asKml( const QgsRenderContext &context, QuaZip *kmzZip = nullptr, const QgsRectangle &exportRect = QgsRectangle() ) const;
-#endif
-
-    void setSymbolScale( double scale );
-    double symbolScale() const { return mSymbolScale; }
 
   protected:
     class Renderer;
@@ -192,7 +175,6 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     QMap<ItemId, QgsRectangle> mItemBounds;
     ItemId mIdCounter = 0;
     QVector<ItemId> mFreeIds;
-    double mSymbolScale = 1.0;
 };
 
 class KADAS_GUI_EXPORT KadasItemLayerType : public KadasPluginLayerType

@@ -36,11 +36,7 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *can
 
   for ( QgsMapLayer *layer : canvas->layers() )
   {
-    if ( qobject_cast<KadasItemLayer *>( layer ) )
-    {
-      pickResult = pickItemLayer( static_cast<KadasItemLayer *>( layer ), canvas, KadasMapPos::fromPoint( mapPos ), pickObjective );
-    }
-    else if ( qobject_cast<QgsAnnotationLayer *>( layer ) )
+    if ( qobject_cast<QgsAnnotationLayer *>( layer ) )
     {
       pickResult = pickAnnotationLayer( static_cast<QgsAnnotationLayer *>( layer ), canvas, mapPos );
     }
@@ -51,23 +47,6 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *can
     if ( !pickResult.isEmpty() )
     {
       break;
-    }
-  }
-  return pickResult;
-}
-
-KadasFeaturePicker::PickResult KadasFeaturePicker::pickItemLayer( KadasItemLayer *layer, const QgsMapCanvas *canvas, const KadasMapPos &mapPos, KadasItemLayer::PickObjective pickObjective )
-{
-  PickResult pickResult;
-  pickResult.itemId = layer->pickItem( mapPos, canvas->mapSettings(), pickObjective );
-  if ( pickResult.itemId != KadasItemLayer::ITEM_ID_NULL )
-  {
-    pickResult.layer = layer;
-    KadasMapItem *item = layer->items()[pickResult.itemId];
-    pickResult.crs = item->crs();
-    if ( dynamic_cast<KadasGeometryItem *>( item ) )
-    {
-      pickResult.geom = static_cast<KadasGeometryItem *>( item )->geometry()->clone();
     }
   }
   return pickResult;
