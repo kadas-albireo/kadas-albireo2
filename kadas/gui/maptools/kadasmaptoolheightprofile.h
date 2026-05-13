@@ -26,8 +26,8 @@
 
 class QgsCoordinateReferenceSystem;
 class QgsGeometry;
+class QgsRubberBand;
 class KadasHeightProfileDialog;
-class KadasPointItem;
 
 class KADAS_GUI_EXPORT KadasMapToolHeightProfileItemInterface : public KadasMapItemInterface
 {
@@ -62,7 +62,7 @@ class KADAS_GUI_EXPORT KadasMapToolHeightProfile : public KadasMapToolCreateItem
     void pickLine();
 
   private:
-    KadasPointItem *mPosMarker = nullptr;
+    QgsRubberBand *mPosMarker = nullptr;
     KadasHeightProfileDialog *mDialog = nullptr;
     bool mPicking = false;
 

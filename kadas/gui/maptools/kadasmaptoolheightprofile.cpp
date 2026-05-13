@@ -17,12 +17,11 @@
 #include <qgis/qgsgeometryutils.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapmouseevent.h>
+#include <qgis/qgsrubberband.h>
 #include <qgis/qgssettings.h>
 
-#include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/kadasfeaturepicker.h"
 #include "kadas/gui/kadasheightprofiledialog.h"
-#include "kadas/gui/mapitems/kadaspointitem.h"
 #include "kadas/gui/mapitems/kadaslineitem.h"
 #include "kadas/gui/maptools/kadasmaptoolheightprofile.h"
 
@@ -40,11 +39,12 @@ KadasMapToolHeightProfile::KadasMapToolHeightProfile( QgsMapCanvas *canvas )
   setSelectItems( false );
   setToolLabel( tr( "Measure height profile" ) );
 
-  mPosMarker = new KadasPointItem( canvas->mapSettings().destinationCrs(), Qgis::MarkerShape::Circle );
+  mPosMarker = new QgsRubberBand( canvas, Qgis::GeometryType::Point );
   mPosMarker->setColor( Qt::blue );
   mPosMarker->setStrokeColor( Qt::blue );
-  mPosMarker->setZIndex( 100 );
-  KadasMapCanvasItemManager::instance()->addItem( mPosMarker );
+  mPosMarker->setFillColor( Qt::blue );
+  mPosMarker->setIcon( QgsRubberBand::ICON_CIRCLE );
+  mPosMarker->setIconSize( 8 );
 
 
   mDialog = new KadasHeightProfileDialog( this, 0, Qt::WindowStaysOnTopHint );
@@ -91,7 +91,8 @@ void KadasMapToolHeightProfile::setMarkerPos( double distance )
       double k = distance / segDist;
       double x = points[i].x() + ( points[i + 1].x() - points[i].x() ) * k;
       double y = points[i].y() + ( points[i + 1].y() - points[i].y() ) * k;
-      mPosMarker->setPoint( QgsPoint( x, y ) );
+      mPosMarker->reset( Qgis::GeometryType::Point );
+      mPosMarker->addPoint( QgsPointXY( x, y ), true );
       return;
     }
     else
@@ -99,7 +100,8 @@ void KadasMapToolHeightProfile::setMarkerPos( double distance )
       distance -= segDist;
     }
   }
-  mPosMarker->setPoint( points.last() );
+  mPosMarker->reset( Qgis::GeometryType::Point );
+  mPosMarker->addPoint( points.last(), true );
 }
 
 void KadasMapToolHeightProfile::pickLine()
@@ -144,7 +146,8 @@ void KadasMapToolHeightProfile::canvasMoveEvent( QgsMapMouseEvent *e )
       }
       if ( std::sqrt( minDist ) / mCanvas->mapSettings().mapUnitsPerPixel() < 30. )
       {
-        mPosMarker->setPoint( minPos );
+        mPosMarker->reset( Qgis::GeometryType::Point );
+        mPosMarker->addPoint( minPos, true );
         mDialog->setMarkerPos( minIdx, minPos, mCanvas->mapSettings().destinationCrs() );
       }
     }
@@ -185,7 +188,7 @@ void KadasMapToolHeightProfile::keyReleaseEvent( QKeyEvent *e )
 
 void KadasMapToolHeightProfile::drawCleared()
 {
-  mPosMarker->clear();
+  mPosMarker->reset( Qgis::GeometryType::Point );
   mDialog->clear();
 }
 
@@ -203,8 +206,8 @@ void KadasMapToolHeightProfile::drawFinished()
       }
       mDialog->setPoints( points, lineItem->crs() );
       QgsPoint markerPos( points[0] );
-      mPosMarker->clear();
-      mPosMarker->setPoint( markerPos );
+      mPosMarker->reset( Qgis::GeometryType::Point );
+      mPosMarker->addPoint( markerPos, true );
     }
   }
 }
