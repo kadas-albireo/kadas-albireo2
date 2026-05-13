@@ -778,10 +778,12 @@ bool KadasProjectMigration::shouldAttach( const QString &baseDir, const QString 
 // the rewrite for that layer.
 
 #include <qgis/qgsannotationmarkeritem.h>
+#include <qgis/qgsannotationpointtextitem.h>
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsmarkersymbol.h>
 #include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgsreadwritecontext.h>
+#include <qgis/qgstextformat.h>
 
 namespace
 {
@@ -833,6 +835,66 @@ namespace
   }
 
   /**
+   * Translate one `<MapItem name="KadasTextItem">` (v2 format) into a
+   * fresh `QgsAnnotationPointTextItem`. Returns nullptr for v1 payloads
+   * or any unrecoverable parse error.
+   */
+  QgsAnnotationPointTextItem *translateKadasTextItem( const QDomElement &itemEl, const QgsCoordinateReferenceSystem &itemCrs, const QgsCoordinateReferenceSystem &layerCrs )
+  {
+    if ( itemEl.attribute( QStringLiteral( "format_version" ), QStringLiteral( "1" ) ) != QLatin1String( "2" ) )
+      return nullptr;
+
+    const QString text = itemEl.attribute( QStringLiteral( "text" ) );
+    const QColor color( itemEl.attribute( QStringLiteral( "color" ) ) );
+    const QColor outlineColor( itemEl.attribute( QStringLiteral( "outline_color" ) ) );
+    const QString fontStr = itemEl.attribute( QStringLiteral( "font" ) );
+    const double angle = itemEl.attribute( QStringLiteral( "angle" ), QStringLiteral( "0" ) ).toDouble();
+
+    const QgsGeometry geom = QgsGeometry::fromWkt( itemEl.attribute( QStringLiteral( "geometry" ) ) );
+    if ( geom.isNull() || geom.type() != Qgis::GeometryType::Point )
+      return nullptr;
+    QgsPointXY pt = geom.asPoint();
+    if ( itemCrs.isValid() && layerCrs.isValid() && itemCrs != layerCrs )
+    {
+      try
+      {
+        QgsCoordinateTransform ct( itemCrs, layerCrs, QgsProject::instance() );
+        pt = ct.transform( pt );
+      }
+      catch ( QgsCsException & )
+      {
+        return nullptr;
+      }
+    }
+
+    QFont font;
+    if ( !fontStr.isEmpty() )
+      font.fromString( fontStr );
+
+    QgsTextFormat fmt;
+    fmt.setFont( font );
+    if ( font.pointSize() > 0 )
+      fmt.setSize( font.pointSize() );
+    fmt.setSizeUnit( Qgis::RenderUnit::Points );
+    if ( color.isValid() )
+      fmt.setColor( color );
+    if ( outlineColor.isValid() )
+    {
+      QgsTextBufferSettings buffer;
+      buffer.setEnabled( true );
+      buffer.setColor( outlineColor );
+      buffer.setOpacity( outlineColor.alpha() / 255.0 );
+      buffer.setSize( 1 );
+      fmt.setBuffer( buffer );
+    }
+
+    auto *anno = new QgsAnnotationPointTextItem( text, QgsPoint( pt ) );
+    anno->setFormat( fmt );
+    anno->setAngle( angle );
+    return anno;
+  }
+
+  /**
    * Dispatcher: looks at the `name` attribute of \a itemEl and forwards to
    * the matching per-type translator. Returns nullptr if no translator is
    * registered for the type yet, or if the translator itself failed.
@@ -848,10 +910,11 @@ namespace
     QgsAnnotationItem *anno = nullptr;
     if ( name == QLatin1String( "KadasPointItem" ) )
       anno = translateKadasPointItem( itemEl, itemCrs, layerCrs );
-    // Future slices: KadasTextItem, KadasLineItem, KadasPolygonItem,
-    // KadasRectangleItem, KadasCircleItem, KadasCircularSectorItem,
-    // KadasPictureItem, KadasSymbolItem, KadasPinItem, KadasGpxRouteItem,
-    // KadasGpxWaypointItem.
+    else if ( name == QLatin1String( "KadasTextItem" ) )
+      anno = translateKadasTextItem( itemEl, itemCrs, layerCrs );
+    // Future slices: KadasLineItem, KadasPolygonItem, KadasRectangleItem,
+    // KadasCircleItem, KadasCircularSectorItem, KadasPictureItem,
+    // KadasSymbolItem, KadasPinItem, KadasGpxRouteItem, KadasGpxWaypointItem.
 
     if ( !anno )
       return nullptr;
