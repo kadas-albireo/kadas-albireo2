@@ -23,7 +23,6 @@ set(kadas_gui_SRC
     kadasribbonbutton.cpp
     kadasrichtexteditor.cpp
     kadastextbrowser.cpp
-    3d/kadasmapitemlayer3drenderer.cpp
     annotationitems/kadasannotationcontrollerregistry.cpp
     annotationitems/kadasannotationitemcontroller.cpp
     annotationitems/kadasannotationitemcontrollers.cpp
@@ -121,7 +120,6 @@ set(kadas_gui_HDR
     kadasrichtexteditor.h
     kadassearchprovider.h
     kadastextbrowser.h
-    3d/kadasmapitemlayer3drenderer.h
     annotationitems/kadasannotationcontrollerregistry.h
     annotationitems/kadasannotationitemcontext.h
     annotationitems/kadasannotationitemcontroller.h

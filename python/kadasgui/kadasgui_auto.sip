@@ -11,7 +11,6 @@
 %Include auto_generated/maptools/kadasmaptoolheightprofile.sip
 %Include auto_generated/kadassearchprovider.sip
 %Include auto_generated/kadasmapiteminterface.sip
-%Include auto_generated/3d/kadasmapitemlayer3drenderer.sip
 %Include auto_generated/annotationitems/kadaspolygonannotationcontroller.sip
 %Include auto_generated/annotationitems/kadasgpxrouteannotationcontroller.sip
 %Include auto_generated/annotationitems/kadasrectangleannotationitem.sip

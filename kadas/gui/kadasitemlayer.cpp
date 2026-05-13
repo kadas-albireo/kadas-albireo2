@@ -30,7 +30,6 @@
 
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/mapitems/kadasmapitem.h"
-#include "kadas/gui/3d/kadasmapitemlayer3drenderer.h"
 
 
 class KadasItemLayer::Renderer : public QgsMapLayerRenderer
@@ -73,20 +72,6 @@ KadasItemLayer::KadasItemLayer( const QString &name, const QgsCoordinateReferenc
 {
   setCrs( crs );
   mValid = true;
-}
-
-void KadasItemLayer::ensureDefault3DRenderer()
-{
-  if ( renderer3D() )
-    return;
-
-  std::unique_ptr<KadasMapItemLayer3DRenderer> r = std::make_unique<KadasMapItemLayer3DRenderer>();
-  r->setLayer( this );
-  QgsTextFormat format = r->textFormat();
-  format.setColor( QColor( Qt::yellow ) );
-  r->setTextFormat( format );
-  r->setCalloutLineColor( QColor( Qt::yellow ) );
-  setRenderer3D( r.release() );
 }
 
 KadasItemLayer::~KadasItemLayer()

@@ -157,11 +157,6 @@ class KADAS_GUI_EXPORT KadasItemLayer : public KadasPluginLayer
     ~KadasItemLayer();
     QString layerTypeKey() const override { return layerType(); }
 
-    //! Lazily create and attach a default Kadas 3D renderer to this layer if it does not already have one.
-    //! This avoids constructing a 3D renderer (and thereby pulling in QGIS::3D dependencies) for layers
-    //! that are never used in a 3D scene. Safe to call multiple times.
-    void ensureDefault3DRenderer();
-
     ItemId addItem( KadasMapItem *item SIP_TRANSFER );
     void lowerItem( const ItemId &itemId );
     void raiseItem( const ItemId &itemId );
