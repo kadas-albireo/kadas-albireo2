@@ -533,7 +533,7 @@ void KadasCanvasContextMenu::measureMinMax()
 {
   kApp->mainWindow()->actionMeasureMinMax()->trigger();
 
-  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
+  KadasMapToolMinMax *tool = dynamic_cast<KadasMapToolMinMax *>( kApp->mainWindow()->mapCanvas()->mapTool() );
   if ( !tool )
     return;
 
@@ -542,17 +542,13 @@ void KadasCanvasContextMenu::measureMinMax()
     QgsAbstractGeometry *geom = dynamic_cast<QgsGeometryCollection *>( mPickResult.geom ) ? static_cast<QgsGeometryCollection *>( mPickResult.geom )->geometryN( 0 ) : mPickResult.geom;
     if ( QgsWkbTypes::flatType( geom->wkbType() ) == Qgis::WkbType::CurvePolygon )
     {
-      static_cast<KadasMapToolMinMax *>( tool )->setFilterType( KadasMapToolMinMax::FilterType::FilterCircle );
+      tool->setFilterType( KadasMapToolMinMax::FilterType::FilterCircle );
     }
     else
     {
-      static_cast<KadasMapToolMinMax *>( tool )->setFilterType( KadasMapToolMinMax::FilterType::FilterPoly );
+      tool->setFilterType( KadasMapToolMinMax::FilterType::FilterPoly );
     }
-    tool->addPartFromGeometry( *geom, mPickResult.crs );
-  }
-  else
-  {
-    tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
+    tool->runMinMax( QgsGeometry( geom->clone() ), mPickResult.crs );
   }
 }
 
@@ -582,13 +578,10 @@ void KadasCanvasContextMenu::terrainHillshade()
 
 void KadasCanvasContextMenu::terrainViewshed()
 {
+  // Triggering the action activates the viewshed tool. The user then clicks to
+  // place the observer center; auto-seeding the click position is no longer
+  // supported since the tool migrated off KadasMapToolCreateItem.
   kApp->mainWindow()->actionTerrainViewshed()->trigger();
-
-  KadasMapToolCreateItem *tool = dynamic_cast<KadasMapToolCreateItem *>( kApp->mainWindow()->mapCanvas()->mapTool() );
-  if ( !tool )
-    return;
-
-  tool->addPoint( KadasMapPos::fromPoint( mMapPos ) );
 }
 
 void KadasCanvasContextMenu::print()
