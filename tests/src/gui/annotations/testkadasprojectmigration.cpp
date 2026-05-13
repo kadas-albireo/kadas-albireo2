@@ -46,6 +46,7 @@ class TestKadasProjectMigration : public QObject
     void migrateLegacyKadasItemLayer_translatesTextItem();
     void migrateLegacyKadasItemLayer_translatesLineItem();
     void migrateLegacyKadasItemLayer_translatesPolygonItem();
+    void migrateLegacyKadasItemLayer_translatesRectangleItem();
     void migrateLegacyKadasItemLayer_leavesV1FormatAlone();
     void migrateLegacyKadasItemLayer_leavesUnknownItemTypeAlone();
 
@@ -335,6 +336,53 @@ void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesPolygonIte
   QCOMPARE( items.size(), 2 );
   QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "polygon" ) );
   QCOMPARE( items.at( 1 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "polygon" ) );
+}
+
+void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesRectangleItem()
+{
+  // KadasRectangleItem stores N (p1, p2) diagonal pairs; each pair fans
+  // into one KadasRectangleAnnotationItem.
+  QDomDocument doc;
+  QDomElement root = doc.createElement( QStringLiteral( "qgis" ) );
+  doc.appendChild( root );
+  QDomElement projectLayersEl = doc.createElement( QStringLiteral( "projectlayers" ) );
+  root.appendChild( projectLayersEl );
+
+  QDomElement mapLayerEl = appendKadasItemLayer( doc, projectLayersEl, QStringLiteral( "rect_id" ), QStringLiteral( "Rects" ), QStringLiteral( "EPSG:3857" ) );
+
+  QDomElement itemEl = doc.createElement( QStringLiteral( "MapItem" ) );
+  itemEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasRectangleItem" ) );
+  itemEl.setAttribute( QStringLiteral( "crs" ), QStringLiteral( "EPSG:3857" ) );
+  itemEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
+  itemEl.setAttribute( QStringLiteral( "outline_color" ), QStringLiteral( "#000000" ) );
+  itemEl.setAttribute( QStringLiteral( "outline_width" ), QStringLiteral( "1" ) );
+  itemEl.setAttribute( QStringLiteral( "outline_style" ), QString::number( static_cast<int>( Qt::SolidLine ) ) );
+  itemEl.setAttribute( QStringLiteral( "fill_color" ), QStringLiteral( "#80ffff00" ) );
+  itemEl.setAttribute( QStringLiteral( "fill_style" ), QString::number( static_cast<int>( Qt::SolidPattern ) ) );
+  // Two rectangles: (0,0)-(10,10) and (20,20)-(30,40).
+  itemEl.setAttribute( QStringLiteral( "p1" ), QStringLiteral( "0,0;20,20" ) );
+  itemEl.setAttribute( QStringLiteral( "p2" ), QStringLiteral( "10,10;30,40" ) );
+  mapLayerEl.appendChild( itemEl );
+
+  QStringList filesToAttach;
+  QVERIFY( KadasProjectMigration::migrateProjectXml( QString(), doc, filesToAttach ) );
+
+  const QDomElement migratedLayer = doc.documentElement().firstChildElement( QStringLiteral( "projectlayers" ) ).firstChildElement( QStringLiteral( "maplayer" ) );
+  QCOMPARE( migratedLayer.attribute( QStringLiteral( "type" ) ), QStringLiteral( "annotation" ) );
+  const QDomNodeList items = migratedLayer.firstChildElement( QStringLiteral( "items" ) ).elementsByTagName( QStringLiteral( "item" ) );
+  QCOMPARE( items.size(), 2 );
+  QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "kadas:rectangle" ) );
+  QCOMPARE( items.at( 1 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "kadas:rectangle" ) );
+  // First rect: center (5,5), size (10,10).
+  QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "cx" ) ).toDouble(), 5.0 );
+  QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "cy" ) ).toDouble(), 5.0 );
+  QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "w" ) ).toDouble(), 10.0 );
+  QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "h" ) ).toDouble(), 10.0 );
+  // Second rect: center (25,30), size (10,20).
+  QCOMPARE( items.at( 1 ).toElement().attribute( QStringLiteral( "cx" ) ).toDouble(), 25.0 );
+  QCOMPARE( items.at( 1 ).toElement().attribute( QStringLiteral( "cy" ) ).toDouble(), 30.0 );
+  QCOMPARE( items.at( 1 ).toElement().attribute( QStringLiteral( "w" ) ).toDouble(), 10.0 );
+  QCOMPARE( items.at( 1 ).toElement().attribute( QStringLiteral( "h" ) ).toDouble(), 20.0 );
 }
 
 void TestKadasProjectMigration::migrateLegacyKadasItemLayer_leavesV1FormatAlone()
