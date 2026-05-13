@@ -72,6 +72,9 @@ class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
     QgsPointXY circleCenter() const { return mAnchor; }
     double circleRadius() const { return mCircleRadius; }
 
+    //! Builds a closed polygon ring approximating a circle. Coordinates are in the same CRS as \a center.
+    static QgsGeometry circlePolygon( const QgsPointXY &center, double radius, int segments = 64 );
+
     void canvasPressEvent( QgsMapMouseEvent *e ) override;
     void canvasMoveEvent( QgsMapMouseEvent *e ) override;
     void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
@@ -106,8 +109,6 @@ class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
     QgsGeometry buildCircleGeometry() const;
     QgsGeometry buildPolylineGeometry() const;
     QgsGeometry buildPolygonGeometry() const;
-
-    static QgsGeometry circlePolygon( const QgsPointXY &center, double radius, int segments = 64 );
 };
 
 #endif // KADASSHAPECAPTUREMAPTOOL_H
