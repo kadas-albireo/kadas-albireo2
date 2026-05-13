@@ -111,10 +111,14 @@ void KadasPortalAuth::setupAuthentication()
           QgsDebugMsgLevel( QString( "ESRI Token found" ), 1 );
           if ( settingsTokenCreateCookies->value() )
           {
-            // If we create the cookies directly,
-            // it does not work in the same event loop
-            // so we need to delay it a bit
-            QTimer::singleShot( 1, this, [this, token]() { createCookies( token ); } );
+            // Populate the cookie jar synchronously: the catalog browser starts
+            // issuing requests as soon as the main window is constructed, and a
+            // deferred singleShot would let those first requests go out without
+            // the agstoken cookie. The earlier delay was a workaround for being
+            // called from inside a QNAM reply slot, which no longer applies
+            // because blockingGet() above has already returned by the time we
+            // get here.
+            createCookies( token );
           }
           if ( settingsTokenUseEsriAuth->value() )
             createEsriAuth( token );
