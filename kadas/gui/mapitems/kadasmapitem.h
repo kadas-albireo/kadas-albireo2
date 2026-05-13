@@ -32,7 +32,6 @@
 
 class QMenu;
 class QuaZip;
-class KadasItemLayer;
 class KadasMapItem;
 
 class QgsAnnotationItem;
@@ -332,10 +331,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     void associateToLayer( QgsMapLayer *layer );
     QgsMapLayer *associatedLayer() const { return mAssociatedLayer; }
 
-    /* Owner layer */
-    void setOwnerLayer( KadasItemLayer *layer );
-    KadasItemLayer *ownerLayer() const { return mOwnerLayer; }
-
     /* Selected state */
     void setSelected( bool selected );
     bool selected() const { return mSelected; }
@@ -495,7 +490,6 @@ class KADAS_GUI_EXPORT KadasMapItem : public QObject SIP_ABSTRACT
     bool mVisible = true;
     double mSymbolScale = 1.0;
     QgsMapLayer *mAssociatedLayer = nullptr;
-    KadasItemLayer *mOwnerLayer = nullptr;
     DrawStatus mDrawStatus = DrawStatus::Empty;
 
 
