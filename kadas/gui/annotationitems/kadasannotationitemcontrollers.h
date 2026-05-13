@@ -17,6 +17,8 @@
 #ifndef KADASANNOTATIONITEMCONTROLLERS_H
 #define KADASANNOTATIONITEMCONTROLLERS_H
 
+#define SIP_NO_FILE
+
 #include "kadas/gui/kadas_gui.h"
 
 namespace KadasAnnotationItemControllers

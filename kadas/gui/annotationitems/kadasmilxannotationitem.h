@@ -126,12 +126,14 @@ class KADAS_GUI_EXPORT KadasMilxAnnotationItem : public QgsAnnotationItem
 
     //! Symbol attribute values (width/length/radius/attitude) in WGS84 metres
     //! / degrees, keyed by \c KadasMilxAttrType.
+#ifndef SIP_RUN
     QMap<KadasMilxAttrType, double> attributes() const { return mAttributes; }
     void setAttributes( const QMap<KadasMilxAttrType, double> &a ) { mAttributes = a; }
 
     //! Per-attribute control points reported by libmss, in EPSG:4326.
     QMap<KadasMilxAttrType, QgsPointXY> attributePoints() const { return mAttributePoints; }
     void setAttributePoints( const QMap<KadasMilxAttrType, QgsPointXY> &p ) { mAttributePoints = p; }
+#endif
 
     //! User-applied screen-space offset (drag of the symbol graphic).
     QPoint userOffset() const { return mUserOffset; }
@@ -156,12 +158,14 @@ class KADAS_GUI_EXPORT KadasMilxAnnotationItem : public QgsAnnotationItem
     //! Builds the libmss \c NPointSymbol describing this item in the given
     //! map's screen-space coordinates. Uses the current draw status to set
     //! the \c finalized flag.
+#ifndef SIP_RUN
     KadasMilxClient::NPointSymbol toSymbol( const QgsMapSettings &mapSettings, bool colored = true ) const;
 
     //! Replaces this item's points / controlPoints / attributes / attributePoints
     //! from a libmss result graphic by un-projecting screen coordinates back to
     //! EPSG:4326 through \a mapSettings.
     void applySymbolResult( const QgsMapSettings &mapSettings, const KadasMilxClient::NPointSymbolGraphic &result );
+#endif
 
     //! Computes the on-screen extent of \a mapSettings' visible map extent
     //! (helper for libmss IPC, which works in device pixels).

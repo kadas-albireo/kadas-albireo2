@@ -75,8 +75,6 @@ Multi-part and geodesic mode are not supported in v1.
     virtual void translate( QgsAnnotationItem *item, double dx, double dy );
 
 
-    virtual QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = 0 ) const;
-
 
     virtual KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = 0 ) const;
 

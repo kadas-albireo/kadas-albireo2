@@ -17,6 +17,8 @@
 #ifndef KADASANNOTATIONSHADOW_H
 #define KADASANNOTATIONSHADOW_H
 
+#define SIP_NO_FILE
+
 #include <QDomElement>
 #include <QString>
 #include <QStringList>

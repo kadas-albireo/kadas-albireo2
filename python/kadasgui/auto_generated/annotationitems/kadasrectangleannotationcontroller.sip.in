@@ -79,8 +79,6 @@ vertex index 4. A whole-item move is offered when no handle is hit.
     virtual void translate( QgsAnnotationItem *item, double dx, double dy );
 
 
-    virtual QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = 0 ) const;
-
 
     virtual KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = 0 ) const;
 

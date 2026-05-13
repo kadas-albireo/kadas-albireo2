@@ -59,7 +59,9 @@ class KADAS_GUI_EXPORT KadasPolygonAnnotationController : public KadasAnnotation
     void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos ) override;
     void translate( QgsAnnotationItem *item, double dx, double dy ) override;
 
+#ifndef SIP_RUN
     QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = nullptr ) const override;
+#endif
 
     void applyPersistedStyle( QgsAnnotationItem *item ) const override;
     void persistStyle( const QgsAnnotationItem *item ) const override;

@@ -35,7 +35,7 @@ KadasTextItem::KadasTextItem( const QgsCoordinateReferenceSystem &crs, QgsAnnota
   : KadasAbstractPointItem( crs )
   , mQgsItem( qgsItem )
 {
-  connect( this, &KadasMapItem::zIndexChanged, this, [=]( int index ) { mQgsItem->setZIndex( index ); } );
+  connect( this, &KadasMapItem::zIndexChanged, this, [=, this]( int index ) { mQgsItem->setZIndex( index ); } );
 }
 
 KadasTextItem::~KadasTextItem()

@@ -87,6 +87,9 @@ class KADAS_GUI_EXPORT KadasAnnotationLayerHelpers
 
   private:
     KadasAnnotationLayerHelpers() = delete;
+#ifdef SIP_RUN
+    KadasAnnotationLayerHelpers();
+#endif
 };
 
 #endif // KADASANNOTATIONLAYERHELPERS_H

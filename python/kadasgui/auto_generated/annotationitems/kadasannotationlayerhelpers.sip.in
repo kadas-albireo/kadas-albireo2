@@ -82,6 +82,8 @@ after \c :py:func:`QgsProject.read()` (to drop any shadows that survived
 the round-trip when the project was saved by a previous Kadas session).
 %End
 
+  private:
+    KadasAnnotationLayerHelpers();
 };
 
 /************************************************************************

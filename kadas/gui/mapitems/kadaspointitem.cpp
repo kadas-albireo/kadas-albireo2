@@ -163,7 +163,7 @@ KadasPointItem::KadasPointItem( const QgsCoordinateReferenceSystem &crs, Qgis::M
   , mQgsItem( qgsItem )
   , mShape( icon )
 {
-  connect( this, &KadasMapItem::zIndexChanged, this, [=]( int index ) { mQgsItem->setZIndex( index ); } );
+  connect( this, &KadasMapItem::zIndexChanged, this, [=, this]( int index ) { mQgsItem->setZIndex( index ); } );
 }
 
 KadasPointItem::~KadasPointItem()

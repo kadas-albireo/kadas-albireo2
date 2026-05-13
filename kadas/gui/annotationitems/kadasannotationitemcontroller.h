@@ -116,12 +116,23 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     // ----- Hit testing ----------------------------------------------------
 
     virtual bool hitTest( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const;
+#ifndef SIP_RUN
     virtual QPair<QgsPointXY, double> closestPoint( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const;
+#endif
     virtual bool intersects( const QgsAnnotationItem *item, const QgsRectangle &mapRect, const KadasAnnotationItemContext &ctx, bool contains = false ) const;
 
     // ----- KML export ----------------------------------------------------
 
-    virtual QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = nullptr ) const = 0;
+#ifndef SIP_RUN
+    virtual QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = nullptr ) const
+    {
+      Q_UNUSED( item );
+      Q_UNUSED( itemCrs );
+      Q_UNUSED( renderContext );
+      Q_UNUSED( kmzZip );
+      return QString();
+    }
+#endif
 
     // ----- Persisted last-used style --------------------------------------
     //

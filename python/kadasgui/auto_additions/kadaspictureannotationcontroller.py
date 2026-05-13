@@ -6,6 +6,6 @@ try:
     KadasPictureAnnotationController.isCalloutVisible = staticmethod(KadasPictureAnnotationController.isCalloutVisible)
     KadasPictureAnnotationController.lockAspectRatio = staticmethod(KadasPictureAnnotationController.lockAspectRatio)
     KadasPictureAnnotationController.setLockAspectRatio = staticmethod(KadasPictureAnnotationController.setLockAspectRatio)
-    KadasPictureAnnotationController.__overridden_methods__ = ['itemType', 'itemName', 'createItem', 'nodes', 'startPart', 'setCurrentPoint', 'setCurrentAttributes', 'continuePart', 'endPart', 'drawAttribs', 'drawAttribsFromPosition', 'positionFromDrawAttribs', 'getEditContext', 'edit', 'editAttribsFromPosition', 'positionFromEditAttribs', 'position', 'setPosition', 'translate', 'createStyleEditor', 'populateContextMenu', 'asKml']
+    KadasPictureAnnotationController.__overridden_methods__ = ['itemType', 'itemName', 'createItem', 'nodes', 'startPart', 'setCurrentPoint', 'setCurrentAttributes', 'continuePart', 'endPart', 'drawAttribs', 'drawAttribsFromPosition', 'positionFromDrawAttribs', 'getEditContext', 'edit', 'editAttribsFromPosition', 'positionFromEditAttribs', 'position', 'setPosition', 'translate', 'createStyleEditor', 'populateContextMenu']
 except (NameError, AttributeError):
     pass

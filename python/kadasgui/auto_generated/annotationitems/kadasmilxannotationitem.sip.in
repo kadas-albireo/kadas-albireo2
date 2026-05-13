@@ -126,17 +126,6 @@ Control points, stored in EPSG:4326 (lon, lat). MilX is always WGS84.
 %End
     void setControlPoints( const QList<int> &cp );
 
-    QMap<KadasMilxAttrType, double> attributes() const;
-%Docstring
-/ degrees, keyed by \c KadasMilxAttrType.
-%End
-    void setAttributes( const QMap<KadasMilxAttrType, double> &a );
-
-    QMap<KadasMilxAttrType, QgsPointXY> attributePoints() const;
-%Docstring
-Per-attribute control points reported by libmss, in EPSG:4326.
-%End
-    void setAttributePoints( const QMap<KadasMilxAttrType, QgsPointXY> &p );
 
     QPoint userOffset() const;
 %Docstring
@@ -161,15 +150,6 @@ machine.
     void setDrawStatus( DrawStatus s );
 
 
-    KadasMilxClient::NPointSymbol toSymbol( const QgsMapSettings &mapSettings, bool colored = true ) const;
-%Docstring
-the \c finalized flag.
-%End
-
-    void applySymbolResult( const QgsMapSettings &mapSettings, const KadasMilxClient::NPointSymbolGraphic &result );
-%Docstring
-EPSG:4326 through ``mapSettings``.
-%End
 
     static QRect computeScreenExtent( const QgsMapSettings &mapSettings );
 %Docstring

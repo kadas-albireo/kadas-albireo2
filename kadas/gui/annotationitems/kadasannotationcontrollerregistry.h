@@ -63,6 +63,10 @@ class KADAS_GUI_EXPORT KadasAnnotationControllerRegistry
     KadasAnnotationControllerRegistry() = default;
     KadasAnnotationControllerRegistry( const KadasAnnotationControllerRegistry & ) = delete;
     KadasAnnotationControllerRegistry &operator=( const KadasAnnotationControllerRegistry & ) = delete;
+#ifdef SIP_RUN
+    KadasAnnotationControllerRegistry();
+    KadasAnnotationControllerRegistry( const KadasAnnotationControllerRegistry & );
+#endif
 
     QHash<QString, KadasAnnotationItemController *> mControllers;
     QStringList mOrder;

@@ -74,7 +74,9 @@ class KADAS_GUI_EXPORT KadasPictureAnnotationController : public KadasAnnotation
 
     void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx ) override;
 
+#ifndef SIP_RUN
     QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = nullptr ) const override;
+#endif
 
     //! Convenience: sets the picture's source path (auto-detects format from extension).
     static void setPath( QgsAnnotationPictureItem *item, const QString &path );
