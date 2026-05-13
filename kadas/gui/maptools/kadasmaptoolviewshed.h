@@ -20,8 +20,7 @@
 #include <QDialog>
 
 #include "kadas/gui/kadas_gui.h"
-#include "kadas/gui/kadasmapiteminterface.h"
-#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
+#include "kadas/gui/maptools/kadasshapecapturemaptool.h"
 
 class QCheckBox;
 class QComboBox;
@@ -65,27 +64,14 @@ class KADAS_GUI_EXPORT KadasViewshedDialog : public QDialog
     void adjustMinAngle();
 };
 
-class KADAS_GUI_EXPORT KadasMapToolViewshedItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasMapToolViewshedItemInterface( QgsMapCanvas *mapCanvas )
-      : KadasMapItemInterface()
-      , mCanvas( mapCanvas )
-    {}
-    KadasMapItem *createItem() const override;
-
-  private:
-    QgsMapCanvas *mCanvas = nullptr;
-};
-
-class KADAS_GUI_EXPORT KadasMapToolViewshed : public KadasMapToolCreateItem
+class KADAS_GUI_EXPORT KadasMapToolViewshed : public KadasShapeCaptureMapTool
 {
     Q_OBJECT
   public:
     KadasMapToolViewshed( QgsMapCanvas *mapCanvas );
 
   private slots:
-    void drawFinished();
+    void onShapeCaptured( const QgsGeometry &geometry, const QgsCoordinateReferenceSystem &crs );
     void adjustRadius( double newRadius );
 };
 
