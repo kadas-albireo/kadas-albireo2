@@ -60,8 +60,7 @@
 #endif
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
-#include "kadas/gui/kadasmapcanvasitemmanager.h"
-#include "kadas/gui/mapitems/kadaslineitem.h"
+#include <qgis/qgsrubberband.h>
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationpictureitem.h>
 #include "kadas/gui/maptools/kadasmaptoolheightprofile.h"
@@ -803,16 +802,15 @@ void KadasHeightProfileDialog::updateLineOfSight()
     curve->attach( mPlot );
     mLinesOfSight.append( curve );
 
-    KadasLineItem *line = new KadasLineItem( mTool->canvas()->mapSettings().destinationCrs() );
+    QgsRubberBand *line = new QgsRubberBand( mTool->canvas(), Qgis::GeometryType::Line );
     double lambda1 = losSamples.front().x() / mNSamples;
     double lambda2 = losSamples.back().x() / mNSamples;
     QgsPoint p1( mPoints[0] + ( mPoints[1] - mPoints[0] ) * lambda1 );
     QgsPoint p2( mPoints[0] + ( mPoints[1] - mPoints[0] ) * lambda2 );
-    QgsLineString geom( QgsPointSequence() << p1 << p2 );
-    line->addPartFromGeometry( geom );
-    line->setOutline( QPen( colors[iColor], 5 ) );
-    line->setZIndex( 10 );
-    KadasMapCanvasItemManager::instance()->addItem( line );
+    line->addPoint( QgsPointXY( p1.x(), p1.y() ), false );
+    line->addPoint( QgsPointXY( p2.x(), p2.y() ), true );
+    line->setColor( colors[iColor] );
+    line->setWidth( 5 );
     mLinesOfSightRB.append( line );
 
     iColor = ( iColor + 1 ) % 2;

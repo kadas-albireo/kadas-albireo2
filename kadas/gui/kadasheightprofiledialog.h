@@ -38,7 +38,7 @@ class QwtPlotCurve;
 class QwtPlotMarker;
 class QwtPlotPicker;
 
-class KadasLineItem;
+class QgsRubberBand;
 class KadasMapToolHeightProfile;
 
 
@@ -99,7 +99,7 @@ class KADAS_GUI_EXPORT KadasHeightProfileDialog : public QDialog
     double mNoDataValue = 0.;
     QVector<QwtPlotCurve *> mPlotCurves;
     QVector<QwtPlotCurve *> mLinesOfSight;
-    QVector<KadasLineItem *> mLinesOfSightRB;
+    QVector<QgsRubberBand *> mLinesOfSightRB;
     QwtPlotMarker *mPlotMarker = nullptr;
     QwtPlotPicker *mPlotPicker = nullptr;
     QwtPlotMarker *mLineOfSightMarker = nullptr;
