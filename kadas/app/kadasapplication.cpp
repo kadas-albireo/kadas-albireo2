@@ -85,7 +85,6 @@
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationpictureitem.h>
 #include "kadas/gui/kadaslayerselectionwidget.h"
-#include "kadas/gui/kadasitemlayermigration.h"
 #include "kadas/gui/kadasprojectmigration.h"
 #include "kadas/gui/mapitems/kadaspointitem.h"
 #include "kadas/gui/mapitems/kadaslineitem.h"
@@ -778,10 +777,6 @@ bool KadasApplication::projectOpen( const QString &projectFile )
 
   if ( success )
   {
-    const int migratedLayers = KadasItemLayerMigration::migrateProject( QgsProject::instance() );
-    if ( migratedLayers > 0 )
-      QgsProject::instance()->setDirty( true );
-
     emit projectRead();
 
     if ( migratedFileName != openFileName )
