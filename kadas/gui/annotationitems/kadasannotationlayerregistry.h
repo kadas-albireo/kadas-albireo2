@@ -31,16 +31,22 @@ class QgsAnnotationLayer;
 
 /**
  * \ingroup gui
- * \brief Process-wide registry of the well-known Kadas \c QgsAnnotationLayer
- *        instances (Redlining, Symbols, Pictures, Pins, Routes) and their
- *        ids inside the current \c QgsProject.
+ * \brief Process-wide registry of the well-known singleton Kadas
+ *        \c QgsAnnotationLayer instances inside the current \c QgsProject.
  *
- * Mirrors the legacy \c KadasItemLayerRegistry but produces vanilla
- * \c QgsAnnotationLayer instances.  The mapping of \c StandardLayer to
- * project layer id is persisted in the project XML under the dedicated
- * \c StandardAnnotationLayers element, so it does not collide with the
- * legacy \c StandardItemLayers element while both registries coexist
- * during the migration.
+ * Each \c StandardLayer enum value names a *role* (Redlining, Symbols,
+ * Pictures, Pins, Routes, MSS) that the application auto-creates the
+ * first time a tool needs a destination layer for that role.  There is
+ * at most one layer per role per project; subsequent lookups return the
+ * existing instance.  The mapping from role to project layer id is
+ * persisted under a dedicated \c StandardAnnotationLayers element in the
+ * project XML.
+ *
+ * Configurable / parametric annotation layers (bullseye, guidegrid)
+ * are deliberately out of scope: each instance carries its own
+ * configuration and a project can hold many of them, so they cannot be
+ * keyed by a fixed role.  Those are handled by \c KadasAnnotationLayer
+ * + its promotion registry instead.
  */
 class KADAS_GUI_EXPORT KadasAnnotationLayerRegistry : public QObject
 {
