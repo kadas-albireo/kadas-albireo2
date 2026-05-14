@@ -35,4 +35,3 @@ macro(add_kadas_test TESTSRC)
 endmacro()
 
 add_subdirectory(gui)
-add_subdirectory(qt_portal_probe)
