@@ -79,7 +79,6 @@
 #include "kadas/gui/annotationitems/kadasannotationitemcontrollers.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
 #include "kadas/gui/annotationitems/kadasannotationprojectintegration.h"
-#include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadaspictureannotationcontroller.h"
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationpictureitem.h>
@@ -185,7 +184,7 @@ KadasApplication::~KadasApplication()
   delete mMainWindow;
   delete mProjectTempDir;
 
-  for ( QgsPluginLayerType *layerType : mKadasPluginLayerTypes )
+  for ( QgsPluginLayerType *layerType : std::as_const( mKadasPluginLayerTypes ) )
   {
     pluginLayerRegistry()->removePluginLayerType( layerType->name() );
   }
@@ -241,27 +240,26 @@ void KadasApplication::init()
 
   QgsCoordinateTransform::setCustomMissingRequiredGridHandler(
     [=, this]( const QgsCoordinateReferenceSystem &sourceCrs, const QgsCoordinateReferenceSystem &destinationCrs, const QgsDatumTransform::GridDetails &grid ) {
-      mMainWindow->messageBar()
-        ->pushWarning( tr( "Transform unavailable" ), tr( "Transform between %1 and %2 requires missing grid %3." ).arg( sourceCrs.authid() ).arg( destinationCrs.authid() ).arg( grid.shortName ) );
+      mMainWindow->messageBar()->pushWarning( tr( "Transform unavailable" ), tr( "Transform between %1 and %2 requires missing grid %3." ).arg( sourceCrs.authid(), destinationCrs.authid(), grid.shortName ) );
     }
   );
 
   QgsCoordinateTransform::setCustomMissingPreferredGridHandler(
     [=,
      this]( const QgsCoordinateReferenceSystem &sourceCrs, const QgsCoordinateReferenceSystem &destinationCrs, const QgsDatumTransform::TransformDetails & /*preferredOperation*/, const QgsDatumTransform::TransformDetails & /*availableOperation*/ ) {
-      mMainWindow->messageBar()->pushWarning( tr( "Preferred transform unavailable" ), tr( "Preferred transform between %1 and %2 unavailable." ).arg( sourceCrs.authid() ).arg( destinationCrs.authid() ) );
+      mMainWindow->messageBar()->pushWarning( tr( "Preferred transform unavailable" ), tr( "Preferred transform between %1 and %2 unavailable." ).arg( sourceCrs.authid(), destinationCrs.authid() ) );
     }
   );
 
   QgsCoordinateTransform::setCustomCoordinateOperationCreationErrorHandler(
     [=, this]( const QgsCoordinateReferenceSystem &sourceCrs, const QgsCoordinateReferenceSystem &destinationCrs, const QString &error ) {
-      mMainWindow->messageBar()->pushWarning( tr( "Transform unavailable" ), tr( "Transform between %1 and %2 unavailable: %3." ).arg( sourceCrs.authid() ).arg( destinationCrs.authid() ).arg( error ) );
+      mMainWindow->messageBar()->pushWarning( tr( "Transform unavailable" ), tr( "Transform between %1 and %2 unavailable: %3." ).arg( sourceCrs.authid(), destinationCrs.authid(), error ) );
     }
   );
 
   QgsCoordinateTransform::setCustomMissingGridUsedByContextHandler(
     [=, this]( const QgsCoordinateReferenceSystem &sourceCrs, const QgsCoordinateReferenceSystem &destinationCrs, const QgsDatumTransform::TransformDetails & /*desired*/ ) {
-      mMainWindow->messageBar()->pushWarning( tr( "Transform unavailable" ), tr( "Transform between %1 and %2 unavailable." ).arg( sourceCrs.authid() ).arg( destinationCrs.authid() ) );
+      mMainWindow->messageBar()->pushWarning( tr( "Transform unavailable" ), tr( "Transform between %1 and %2 unavailable." ).arg( sourceCrs.authid(), destinationCrs.authid() ) );
     }
   );
 
@@ -413,7 +411,7 @@ void KadasApplication::init()
   // here.
   mKadasPluginLayerTypes.append( new KadasMapGridLayerType( mMainWindow->actionMapGrid() ) );
 
-  for ( QgsPluginLayerType *layerType : mKadasPluginLayerTypes )
+  for ( QgsPluginLayerType *layerType : std::as_const( mKadasPluginLayerTypes ) )
   {
     pluginLayerRegistry()->addPluginLayerType( layerType );
   }
@@ -472,9 +470,10 @@ void KadasApplication::loadStartupProject()
 
   // Open startup project
   QgsProject::instance()->setDirty( false );
-  if ( arguments().size() >= 2 && QFile::exists( arguments()[1] ) )
+  const QStringList args = arguments();
+  if ( args.size() >= 2 && QFile::exists( args.at( 1 ) ) )
   {
-    projectOpen( arguments()[1] );
+    projectOpen( args.at( 1 ) );
     QgsProject::instance()->setDirty( false );
   }
   else
@@ -1490,7 +1489,8 @@ QString KadasApplication::migrateDatasource( const QString &path ) const
       if ( itId != itUrl.value().end() )
       {
         QUrlQuery newParams( itId.value().first );
-        for ( auto keyVal : newParams.queryItems() )
+        const auto wmsKeyVals = newParams.queryItems();
+        for ( const auto &keyVal : wmsKeyVals )
         {
           query.removeAllQueryItems( keyVal.first );
           query.addQueryItem( keyVal.first, keyVal.second );
@@ -1512,7 +1512,8 @@ QString KadasApplication::migrateDatasource( const QString &path ) const
     if ( it != dataSourceMap.ams.end() )
     {
       QUrlQuery newParams( it.value() );
-      for ( auto keyVal : newParams.queryItems() )
+      const auto amsKeyVals = newParams.queryItems();
+      for ( const auto &keyVal : amsKeyVals )
       {
         uri.removeParam( keyVal.first );
         uri.setParam( keyVal.first, keyVal.second );
@@ -1544,15 +1545,16 @@ KadasApplication::DataSourceMigrations KadasApplication::dataSourceMigrationMap(
   if ( migrationsFile.open( QIODevice::ReadOnly ) )
   {
     QJsonDocument doc = QJsonDocument::fromJson( migrationsFile.readAll() );
+    const QJsonObject root = doc.object();
 
-    QJsonArray fileEntries = doc.object()["files"].toArray();
+    QJsonArray fileEntries = root.value( "files" ).toArray();
     for ( int i = 0, n = fileEntries.size(); i < n; ++i )
     {
       QJsonObject entry = fileEntries.at( i ).toObject();
       dataSourceMigrations.files.insert( entry.value( "old" ).toString(), entry.value( "new" ).toString() );
     }
 
-    QJsonArray wmsEntries = doc.object()["wms"].toArray();
+    QJsonArray wmsEntries = root.value( "wms" ).toArray();
     for ( int i = 0, n = wmsEntries.size(); i < n; ++i )
     {
       QJsonObject entry = wmsEntries.at( i ).toObject();
@@ -1568,14 +1570,14 @@ KadasApplication::DataSourceMigrations KadasApplication::dataSourceMigrationMap(
       it.value()[old_ident] = qMakePair( new_params, del_params );
     }
 
-    QJsonArray amsEntries = doc.object()["ams"].toArray();
+    QJsonArray amsEntries = root.value( "ams" ).toArray();
     for ( int i = 0, n = amsEntries.size(); i < n; ++i )
     {
       QJsonObject entry = amsEntries.at( i ).toObject();
       dataSourceMigrations.ams.insert( entry.value( "old_url" ).toString(), entry.value( "new_params" ).toString() );
     }
 
-    QJsonArray stringEntries = doc.object()["strings"].toArray();
+    QJsonArray stringEntries = root.value( "strings" ).toArray();
     for ( int i = 0, n = stringEntries.size(); i < n; ++i )
     {
       QJsonObject entry = stringEntries.at( i ).toObject();
@@ -1653,10 +1655,10 @@ void KadasApplication::injectAuthToken( QNetworkRequest *request )
   }
   QgsDebugMsgLevel( QString( "injectAuthToken: got url %1" ).arg( url.url() ), 2 );
   // Extract the token from the esri_auth cookie, if such cookie exists in the pool
-  QList<QNetworkCookie> cookies = nam->cookieJar()->cookiesForUrl( request->url() );
+  const QList<QNetworkCookie> cookies = nam->cookieJar()->cookiesForUrl( request->url() );
   for ( const QNetworkCookie &cookie : cookies )
   {
-    QgsDebugMsgLevel( QString( "injectAuthToken: got cookie %1 for url %2" ).arg( QString::fromUtf8( cookie.toRawForm() ) ).arg( url.url() ), 2 );
+    QgsDebugMsgLevel( QString( "injectAuthToken: got cookie %1 for url %2" ).arg( QString::fromUtf8( cookie.toRawForm() ), url.url() ), 2 );
     QByteArray data = QUrl::fromPercentEncoding( cookie.toRawForm() ).toLocal8Bit();
     if ( data.startsWith( "agstoken=" ) )
     {
@@ -1678,9 +1680,10 @@ int KadasApplication::computeLayerGroupInsertionOffset( QgsLayerTreeGroup *group
 {
   // Set insertion point above the topmost raster or vector layer or group
   int pos = 0;
-  for ( int i = 0, n = group->children().size(); i < n; ++i )
+  const QList<QgsLayerTreeNode *> children = group->children();
+  for ( int i = 0, n = children.size(); i < n; ++i )
   {
-    QgsLayerTreeNode *node = group->children()[i];
+    QgsLayerTreeNode *node = children[i];
     if ( node->nodeType() == QgsLayerTreeNode::NodeLayer )
     {
       QgsLayerTreeLayer *layerNode = static_cast<QgsLayerTreeLayer *>( node );
