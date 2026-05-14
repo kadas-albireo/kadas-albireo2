@@ -131,8 +131,7 @@ KadasCoordCrossAnnotationItem *KadasCoordCrossAnnotationItem::clone() const
 bool KadasCoordCrossAnnotationItem::writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const
 {
   QgsAnnotationMarkerItem::writeXml( element, document, context );
-  if ( !mShadowIds.isEmpty() )
-    element.setAttribute( KadasAnnotationShadow::shadowIdsAttribute(), KadasAnnotationShadow::encodeIds( mShadowIds ) );
+  mShadow.writeXml( element );
   return true;
 }
 
@@ -144,7 +143,7 @@ bool KadasCoordCrossAnnotationItem::readXml( const QDomElement &element, const Q
   // saved before the marker style editor was suppressed do not show
   // a stray dot in the centre of the cross on reload.
   installDefaultSymbol();
-  mShadowIds = KadasAnnotationShadow::decodeIds( element.attribute( KadasAnnotationShadow::shadowIdsAttribute() ) );
+  mShadow.readXml( element );
   return true;
 }
 

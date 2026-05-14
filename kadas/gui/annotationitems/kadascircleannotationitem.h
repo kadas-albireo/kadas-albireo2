@@ -22,6 +22,7 @@
 
 #include <QStringList>
 
+#include "kadas/gui/annotationitems/kadasannotationshadow.h"
 #include "kadas/gui/kadas_gui.h"
 
 /**
@@ -66,8 +67,8 @@ class KADAS_GUI_EXPORT KadasCircleAnnotationItem : public QgsAnnotationPolygonIt
 
     //! UUIDs of save-time QGIS-compat shadow items linked to this master.
     //! See \c KadasAnnotationShadow.
-    const QStringList &shadowIds() const { return mShadowIds; }
-    void setShadowIds( const QStringList &ids ) { mShadowIds = ids; }
+    const QStringList &shadowIds() const { return mShadow.ids(); }
+    void setShadowIds( const QStringList &ids ) { mShadow.setIds( ids ); }
     void setCircle( const QgsPointXY &center, const QgsPointXY &ringPoint );
 
     //! Returns the (planar) radius in CRS units.
@@ -76,7 +77,7 @@ class KADAS_GUI_EXPORT KadasCircleAnnotationItem : public QgsAnnotationPolygonIt
   private:
     QgsPointXY mCenter;
     QgsPointXY mRingPoint;
-    QStringList mShadowIds;
+    KadasAnnotationShadow mShadow;
 
     void rebuildGeometry();
 };

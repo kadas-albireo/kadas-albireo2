@@ -27,7 +27,7 @@
 
 /**
  * \ingroup gui
- * \brief Helpers for QGIS-compat "shadow" annotation items.
+ * \brief Linkage to QGIS-compat "shadow" annotation items.
  *
  * Kadas-specific annotation items (rectangle, circle, pin, coord-cross)
  * keep their \c kadas:* type id and round-trip through QGIS-aware
@@ -37,31 +37,40 @@
  * only in saved XML; they are added to the layer right before save and
  * stripped right after save and right after load.
  *
- * Linkage: each master item stores the list of UUIDs of its shadows in a
- * \c kadasShadowIds XML attribute. The helpers below centralize the XML
- * attribute name and serialization format.
+ * Each master item owns one of these value objects to track the UUIDs of
+ * its emitted shadows. The list is persisted as a comma-separated value
+ * under the \c kadasShadowIds XML attribute.
  */
-namespace KadasAnnotationShadow
+class KadasAnnotationShadow
 {
-  //! XML attribute name on a master item element listing comma-separated shadow UUIDs.
-  inline QString shadowIdsAttribute()
-  {
-    return QStringLiteral( "kadasShadowIds" );
-  }
+  public:
+    //! Returns the shadow UUIDs tracked by this object.
+    const QStringList &ids() const { return mIds; }
 
-  //! Encodes a list of shadow ids into the value used in the \c kadasShadowIds attribute.
-  inline QString encodeIds( const QStringList &ids )
-  {
-    return ids.join( QLatin1Char( ',' ) );
-  }
+    //! Replaces the tracked shadow UUIDs.
+    void setIds( const QStringList &ids ) { mIds = ids; }
 
-  //! Decodes a comma-separated shadow id list. Empty string yields an empty list.
-  inline QStringList decodeIds( const QString &value )
-  {
-    if ( value.isEmpty() )
-      return QStringList();
-    return value.split( QLatin1Char( ',' ), Qt::SkipEmptyParts );
-  }
-} // namespace KadasAnnotationShadow
+    //! \c true when no shadows are tracked.
+    bool isEmpty() const { return mIds.isEmpty(); }
+
+    //! Writes the \c kadasShadowIds attribute on \a element when non-empty.
+    void writeXml( QDomElement &element ) const
+    {
+      if ( !mIds.isEmpty() )
+        element.setAttribute( attributeName(), mIds.join( QLatin1Char( ',' ) ) );
+    }
+
+    //! Reads the \c kadasShadowIds attribute from \a element. Missing attribute yields an empty list.
+    void readXml( const QDomElement &element )
+    {
+      const QString value = element.attribute( attributeName() );
+      mIds = value.isEmpty() ? QStringList() : value.split( QLatin1Char( ',' ), Qt::SkipEmptyParts );
+    }
+
+  private:
+    static QString attributeName() { return QStringLiteral( "kadasShadowIds" ); }
+
+    QStringList mIds;
+};
 
 #endif // KADASANNOTATIONSHADOW_H
