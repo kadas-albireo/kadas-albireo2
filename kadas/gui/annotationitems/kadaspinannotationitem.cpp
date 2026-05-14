@@ -59,8 +59,7 @@ bool KadasPinAnnotationItem::writeXml( QDomElement &element, QDomDocument &docum
   QgsAnnotationMarkerItem::writeXml( element, document, context );
   element.setAttribute( QStringLiteral( "kadasName" ), mName );
   element.setAttribute( QStringLiteral( "kadasRemarks" ), mRemarks );
-  if ( !mShadowIds.isEmpty() )
-    element.setAttribute( KadasAnnotationShadow::shadowIdsAttribute(), KadasAnnotationShadow::encodeIds( mShadowIds ) );
+  mShadow.writeXml( element );
   return true;
 }
 
@@ -69,7 +68,7 @@ bool KadasPinAnnotationItem::readXml( const QDomElement &element, const QgsReadW
   QgsAnnotationMarkerItem::readXml( element, context );
   mName = element.attribute( QStringLiteral( "kadasName" ) );
   mRemarks = element.attribute( QStringLiteral( "kadasRemarks" ) );
-  mShadowIds = KadasAnnotationShadow::decodeIds( element.attribute( KadasAnnotationShadow::shadowIdsAttribute() ) );
+  mShadow.readXml( element );
   return true;
 }
 
