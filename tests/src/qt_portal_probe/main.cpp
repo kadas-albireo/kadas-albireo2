@@ -77,11 +77,13 @@ int main( int argc, char **argv )
   QCommandLineOption passOpt( "pass", "Provide a password.", "pass" );
   QCommandLineOption timeoutOpt( "timeout", "Timeout in seconds (default 10).", "secs", "10" );
   QCommandLineOption verboseOpt( "verbose", "Enable qt.network.* logging." );
+  QCommandLineOption http1Opt( "http1", "Force HTTP/1.1 (disable HTTP/2)." );
   p.addOption( sysProxyOpt );
   p.addOption( userOpt );
   p.addOption( passOpt );
   p.addOption( timeoutOpt );
   p.addOption( verboseOpt );
+  p.addOption( http1Opt );
   p.addHelpOption();
   p.process( app );
 
@@ -147,6 +149,11 @@ int main( int argc, char **argv )
   QNetworkRequest req( url );
   req.setAttribute( QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy );
   req.setRawHeader( "User-Agent", "qt-portal-probe/1.0" );
+  if ( p.isSet( http1Opt ) )
+  {
+    req.setAttribute( QNetworkRequest::Http2AllowedAttribute, false );
+    out << ">>> Forcing HTTP/1.1 (Http2AllowedAttribute = false)" << Qt::endl << Qt::endl;
+  }
 
   const qint64 t0 = QDateTime::currentMSecsSinceEpoch();
   QNetworkReply *reply = nam.get( req );
