@@ -43,17 +43,6 @@
 #include <bullseye/kadasmaptoolbullseye.h>
 
 
-namespace
-{
-  QgsCoordinateTransformContext transformContextForLayer()
-  {
-    if ( QgsProject::instance() )
-      return QgsProject::instance()->transformContext();
-    return QgsCoordinateTransformContext();
-  }
-} // namespace
-
-
 class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
 {
   public:
@@ -223,7 +212,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
 };
 
 KadasBullseyeLayer::KadasBullseyeLayer( const QString &name )
-  : QgsAnnotationLayer( name, QgsAnnotationLayer::LayerOptions( transformContextForLayer() ) )
+  : QgsAnnotationLayer( name, QgsAnnotationLayer::LayerOptions( QgsProject::instance()->transformContext() ) )
 {}
 
 KadasBullseyeLayer *KadasBullseyeLayer::promote( QgsAnnotationLayer *plain )
