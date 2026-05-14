@@ -19,7 +19,6 @@
 #include <QJsonObject>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-#include <QTimer>
 #include <QUrlQuery>
 
 #include <qgis/qgsapplication.h>
@@ -35,7 +34,6 @@
 
 #include "kadas/app/kadasapplication.h"
 #include "kadas/app/auth/kadasappauthrequesthandler.h"
-#include "kadas/app/auth/kadasportaltokenfetcher.h"
 
 
 const QgsSettingsEntryString *KadasPortalAuth::settingsPortalTokenUrl
@@ -95,19 +93,21 @@ void KadasPortalAuth::setupAuthentication()
   }
   else if ( !tokenUrl.isEmpty() )
   {
-    // Authentication via token. On Windows this transparently uses the
-    // logged-in user's credentials (NTLM/Kerberos via WinHTTP); on other
-    // platforms it falls back to QgsNetworkAccessManager.
+    // Authentication via token. On Windows, Qt's QNetworkAccessManager handles
+    // Negotiate/NTLM transparently via SSPI when speaking HTTP/1.1 (HTTP/2 is
+    // globally disabled via KadasApplication::settingsDisableHttp2 to work
+    // around QTBUG-143926), so the logged-in Windows user's credentials are
+    // used silently without prompting.
     QgsDebugMsgLevel( QStringLiteral( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
 
-    constexpr int tokenFetchTimeoutMs = 15000;
-    const KadasPortalTokenFetchResult fetched = kadasFetchPortalTokenWithSso( QUrl( tokenUrl ), tokenFetchTimeoutMs );
+    QNetworkRequest req = QNetworkRequest( QUrl( tokenUrl ) );
+    QgsNetworkReplyContent content = QgsNetworkAccessManager::instance()->blockingGet( req );
 
     QString token;
-    if ( fetched.ok )
+    if ( content.error() == QNetworkReply::NoError )
     {
       QJsonParseError err;
-      QJsonDocument doc = QJsonDocument::fromJson( fetched.body, &err );
+      QJsonDocument doc = QJsonDocument::fromJson( content.content(), &err );
       if ( !doc.isNull() )
       {
         QJsonObject obj = doc.object();
@@ -122,7 +122,7 @@ void KadasPortalAuth::setupAuthentication()
             // deferred singleShot would let those first requests go out without
             // the agstoken cookie. The earlier delay was a workaround for being
             // called from inside a QNAM reply slot, which no longer applies now
-            // that the token is fetched via a dedicated helper.
+            // that the token is fetched via a dedicated blocking call.
             createCookies( token );
           }
           if ( settingsTokenUseEsriAuth->value() )
@@ -136,7 +136,7 @@ void KadasPortalAuth::setupAuthentication()
     }
     else
     {
-      QgsDebugMsgLevel( QString( "error fetching token (HTTP %1): %2" ).arg( fetched.httpStatus ).arg( fetched.errorMessage ), 1 );
+      QgsDebugMsgLevel( QString( "error fetching token: %1" ).arg( content.errorString() ), 1 );
     }
   }
   else
