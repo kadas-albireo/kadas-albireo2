@@ -294,35 +294,8 @@ class KadasGuideGridRenderer : public QgsMapLayerRenderer
 
 
 KadasGuideGridLayer::KadasGuideGridLayer( const QString &name )
-  : QgsAnnotationLayer( name, QgsAnnotationLayer::LayerOptions( QgsProject::instance()->transformContext() ) )
-{
-  // QgsAnnotationLayer is always valid by construction.
-}
-
-KadasGuideGridLayer *KadasGuideGridLayer::promote( QgsAnnotationLayer *plain )
-{
-  if ( !plain )
-    return nullptr;
-
-  // Round-trip the plain layer's state through XML into a new subclass
-  // instance. Goes through readLayerXml, so customProperties + annotation
-  // items + CRS + opacity + name are preserved, and KadasGuideGridLayer's
-  // own readXml() override fills mGridConfig from customProperties.
-  QDomDocument doc;
-  QDomElement layerEl = doc.createElement( QStringLiteral( "maplayer" ) );
-  doc.appendChild( layerEl );
-  QgsReadWriteContext ctx;
-  if ( !plain->writeLayerXml( layerEl, doc, ctx ) )
-    return nullptr;
-
-  auto *promoted = new KadasGuideGridLayer( plain->name() );
-  if ( !promoted->readLayerXml( layerEl, ctx ) )
-  {
-    delete promoted;
-    return nullptr;
-  }
-  return promoted;
-}
+  : KadasAnnotationLayer( name )
+{}
 
 void KadasGuideGridLayer::setup( const QgsRectangle &gridRect, int cols, int rows, const QgsCoordinateReferenceSystem &crs, bool colSizeLocked, bool rowSizeLocked )
 {

@@ -4,6 +4,7 @@ set(kadas_SRC
     main.cpp
     kadasapplayerhandling.cpp
     kadasapplication.cpp
+    kadasannotationlayer.cpp
     kadasbookmarksmenu.cpp
     kadascanvascontextmenu.cpp
     kadasfeedback.cpp
@@ -66,6 +67,7 @@ set(kadas_SRC
 set(kadas_HDR
     kadasapplayerhandling.h
     kadasapplication.h
+    kadasannotationlayer.h
     kadasbookmarksmenu.h
     kadascanvascontextmenu.h
     kadasfeedback.h
