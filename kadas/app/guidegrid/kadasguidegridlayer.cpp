@@ -55,13 +55,6 @@ namespace
     } while ( offset > 0 );
     return label;
   }
-
-  QgsCoordinateTransformContext transformContextForLayer()
-  {
-    if ( QgsProject::instance() )
-      return QgsProject::instance()->transformContext();
-    return QgsCoordinateTransformContext();
-  }
 } // namespace
 
 
@@ -301,7 +294,7 @@ class KadasGuideGridRenderer : public QgsMapLayerRenderer
 
 
 KadasGuideGridLayer::KadasGuideGridLayer( const QString &name )
-  : QgsAnnotationLayer( name, QgsAnnotationLayer::LayerOptions( transformContextForLayer() ) )
+  : QgsAnnotationLayer( name, QgsAnnotationLayer::LayerOptions( QgsProject::instance()->transformContext() ) )
 {
   // QgsAnnotationLayer is always valid by construction.
 }
