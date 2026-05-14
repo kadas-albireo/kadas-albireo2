@@ -17,9 +17,9 @@
 #ifndef KADASGUIDEGRIDLAYER_H
 #define KADASGUIDEGRIDLAYER_H
 
-#include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsrectangle.h>
 
+#include "kadas/app/kadasannotationlayer.h"
 #include "kadas/core/kadaspluginlayer.h"
 
 /**
@@ -39,7 +39,7 @@
  *   paint time inside Kadas (they only exist to feed the QGIS render
  *   pipeline when the project is opened in vanilla QGIS).
  */
-class KadasGuideGridLayer : public QgsAnnotationLayer
+class KadasGuideGridLayer : public KadasAnnotationLayer
 {
     Q_OBJECT
   public:
@@ -56,15 +56,6 @@ class KadasGuideGridLayer : public QgsAnnotationLayer
     };
 
     static QString layerType() { return "guide_grid"; }
-
-    /// Convert a plain QgsAnnotationLayer (one carrying the
-    /// `kadas/annotation-type=guidegrid` marker customProperty, e.g. as
-    /// produced by a vanilla QGIS reload of a Kadas project) into a
-    /// KadasGuideGridLayer. The new layer keeps the same name, id, CRS,
-    /// opacity, customProperties and annotation items as the source.
-    /// Caller is responsible for swapping the plain layer with the
-    /// returned subclass instance in the project.
-    static KadasGuideGridLayer *promote( QgsAnnotationLayer *plain );
 
     explicit KadasGuideGridLayer( const QString &name );
 
@@ -149,7 +140,7 @@ class KadasGuideGridLayer : public QgsAnnotationLayer
     } mGridConfig;
 
     /// Rebuild the layer's annotation items (lines + labels) from the current GridConfig.
-    void regenerate();
+    void regenerate() override;
 };
 
 #endif // KADASGUIDEGRIDLAYER_H

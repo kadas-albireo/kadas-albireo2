@@ -17,7 +17,7 @@
 #ifndef KADASBULLSEYELAYER_H
 #define KADASBULLSEYELAYER_H
 
-#include <qgis/qgsannotationlayer.h>
+#include "kadas/app/kadasannotationlayer.h"
 
 class QgsMapCanvas;
 class QgsLayerTreeView;
@@ -40,20 +40,11 @@ class QgsLayerTreeView;
  *   ~100 km segments, label placement, etc.). The static items emitted
  *   by `regenerate()` are ignored at paint time inside Kadas.
  */
-class KadasBullseyeLayer : public QgsAnnotationLayer
+class KadasBullseyeLayer : public KadasAnnotationLayer
 {
     Q_OBJECT
   public:
     static QString layerType() { return "bullseye"; }
-
-    /// Convert a plain QgsAnnotationLayer (one carrying the
-    /// `kadas/annotation-type=bullseye` marker customProperty, e.g. as
-    /// produced by a vanilla QGIS reload of a Kadas project) into a
-    /// KadasBullseyeLayer. The new layer keeps the same name, id, CRS,
-    /// opacity, customProperties and annotation items as the source.
-    /// Caller is responsible for swapping the plain layer with the
-    /// returned subclass instance in the project.
-    static KadasBullseyeLayer *promote( QgsAnnotationLayer *plain );
 
     explicit KadasBullseyeLayer( const QString &name );
     void setup( const QgsPointXY &center, const QgsCoordinateReferenceSystem &crs, int rings, double interval, Qgis::DistanceUnit intervalUnit, double axesInterval );
@@ -135,7 +126,7 @@ class KadasBullseyeLayer : public QgsAnnotationLayer
 
     /// Rebuild the layer's annotation items (rings + axes + labels) from
     /// the current BullseyeConfig.
-    void regenerate();
+    void regenerate() override;
 };
 
 #endif // KADASBULLSEYELAYER_H
