@@ -20,125 +20,99 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
+#include <qgis/qgsannotationitem.h>
+#include <qgis/qgsannotationlayer.h>
+#include <qgis/qgsfeedback.h>
 #include <qgis/qgsmapcanvas.h>
+#include <qgis/qgsrendercontext.h>
 
-#include "kadas/gui/kadasitemlayer.h"
-#include "kadas/gui/kadasmapcanvasitem.h"
-#include "kadas/gui/mapitems/kadasrectangleitem.h"
 #include "kadas/gui/maptools/kadasmaptooldeleteitems.h"
 
 
-KadasMapItem *KadasMapToolDeleteItemsInterface::createItem() const
-{
-  KadasRectangleItem *item = new KadasRectangleItem( mCanvas->mapSettings().destinationCrs() );
-  item->setFill( Qt::NoBrush );
-  item->setOutline( QPen( Qt::black, 2, Qt::DashLine ) );
-  return item;
-}
-
-
 KadasMapToolDeleteItems::KadasMapToolDeleteItems( QgsMapCanvas *mapCanvas )
-  : KadasMapToolCreateItem( mapCanvas, std::move( std::make_unique<KadasMapToolDeleteItemsInterface>( KadasMapToolDeleteItemsInterface( mapCanvas ) ) ) )
+  : QgsMapToolExtent( mapCanvas )
 {
-  connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolDeleteItems::drawFinished );
-
-  setToolLabel( tr( "Delete map items" ) );
-  setUndoRedoVisible( false );
+  connect( this, &QgsMapToolExtent::extentChanged, this, &KadasMapToolDeleteItems::onExtentDrawn );
 }
 
-void KadasMapToolDeleteItems::drawFinished()
+void KadasMapToolDeleteItems::onExtentDrawn( const QgsRectangle &extent )
 {
-  const KadasRectangleItem *item = dynamic_cast<const KadasRectangleItem *>( currentItem() );
-  if ( !item || item->constState()->p1.isEmpty() || item->constState()->p2.isEmpty() )
+  QgsRectangle rect = extent;
+  rect.normalize();
+  if ( !rect.isEmpty() )
   {
-    return;
-  }
-  QgsRectangle filterRect( item->constState()->p1.front(), item->constState()->p2.front() );
-  filterRect.normalize();
-  if ( !filterRect.isEmpty() )
-  {
-    KadasMapRect rect( filterRect.xMinimum(), filterRect.yMinimum(), filterRect.xMaximum(), filterRect.yMaximum() );
     deleteItems( rect );
   }
-  clear();
+  clearRubberBand();
 }
 
 void KadasMapToolDeleteItems::activate()
 {
-  KadasMapToolCreateItem::activate();
+  QgsMapToolExtent::activate();
   emit messageEmitted( tr( "Drag a rectangle around the items to delete" ) );
 }
 
-void KadasMapToolDeleteItems::deleteItems( const KadasMapRect &filterRect )
+void KadasMapToolDeleteItems::deleteItems( const QgsRectangle &filterRect )
 {
-  QMap<KadasItemLayer *, QList<KadasItemLayer::ItemId>> delItems;
-  QList<KadasMapItem *> mapItems;
-  QList<KadasMapCanvasItem *> mapCanvasItems;
+  QgsRenderContext rc = QgsRenderContext::fromMapSettings( canvas()->mapSettings() );
+  QMap<QgsAnnotationLayer *, QStringList> delItems;
 
   for ( QgsMapLayer *layer : canvas()->layers() )
   {
-    KadasItemLayer *itemLayer = dynamic_cast<KadasItemLayer *>( layer );
-    if ( !itemLayer )
+    QgsAnnotationLayer *annoLayer = qobject_cast<QgsAnnotationLayer *>( layer );
+    if ( !annoLayer )
     {
       continue;
     }
-    for ( auto it = itemLayer->items().begin(), itEnd = itemLayer->items().end(); it != itEnd; ++it )
+    const QgsRectangle layerBounds = canvas()->mapSettings().mapToLayerCoordinates( annoLayer, filterRect );
+    QgsFeedback feedback;
+    const QStringList hits = annoLayer->itemsInBounds( layerBounds, rc, &feedback );
+    if ( !hits.isEmpty() )
     {
-      KadasMapItem *item = it.value();
-      if ( item->intersects( filterRect, canvas()->mapSettings(), true ) )
-      {
-        delItems[itemLayer].append( it.key() );
-        item->setSelected( true );
-        mapItems.append( item );
-        mapCanvasItems.append( new KadasMapCanvasItem( item, canvas() ) );
-      }
+      delItems.insert( annoLayer, hits );
     }
   }
 
-  if ( !delItems.isEmpty() )
+  if ( delItems.isEmpty() )
   {
-    QMap<KadasItemLayer *, QCheckBox *> checkboxes;
-    QDialog confirmDialog;
-    confirmDialog.setWindowTitle( tr( "Delete items" ) );
-    confirmDialog.setLayout( new QVBoxLayout() );
-    confirmDialog.layout()->addWidget( new QLabel( tr( "Do you want to delete the following items?" ) ) );
-    for ( auto it = delItems.begin(), itEnd = delItems.end(); it != itEnd; ++it )
-    {
-      QCheckBox *checkbox = new QCheckBox( tr( "%1 item(s) from layer %2" ).arg( it.value().size() ).arg( it.key()->name() ) );
-      checkbox->setChecked( true );
-      confirmDialog.layout()->addWidget( checkbox );
-      checkboxes.insert( it.key(), checkbox );
-    }
-    confirmDialog.layout()->addItem( new QSpacerItem( 1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding ) );
-    QDialogButtonBox *bbox = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal );
-    connect( bbox, &QDialogButtonBox::accepted, &confirmDialog, &QDialog::accept );
-    connect( bbox, &QDialogButtonBox::rejected, &confirmDialog, &QDialog::reject );
-    confirmDialog.layout()->addWidget( bbox );
-
-    int response = confirmDialog.exec();
-    qDeleteAll( mapCanvasItems );
-    if ( response == QDialog::Accepted )
-    {
-      for ( auto it = checkboxes.begin(), itEnd = checkboxes.end(); it != itEnd; ++it )
-      {
-        if ( it.value()->isChecked() )
-        {
-          KadasItemLayer *layer = it.key();
-          for ( const KadasItemLayer::ItemId &itemId : delItems[layer] )
-          {
-            delete layer->takeItem( itemId );
-          }
-          layer->triggerRepaint( true );
-        }
-      }
-      canvas()->refresh();
-    }
-    else
-    {
-      for ( KadasMapItem *item : mapItems )
-      {
-        item->setSelected( false );
-      }
-    }
+    return;
   }
+
+  QMap<QgsAnnotationLayer *, QCheckBox *> checkboxes;
+  QDialog confirmDialog;
+  confirmDialog.setWindowTitle( tr( "Delete items" ) );
+  confirmDialog.setLayout( new QVBoxLayout() );
+  confirmDialog.layout()->addWidget( new QLabel( tr( "Do you want to delete the following items?" ) ) );
+  for ( auto it = delItems.begin(), itEnd = delItems.end(); it != itEnd; ++it )
+  {
+    QCheckBox *checkbox = new QCheckBox( tr( "%1 item(s) from layer %2" ).arg( it.value().size() ).arg( it.key()->name() ) );
+    checkbox->setChecked( true );
+    confirmDialog.layout()->addWidget( checkbox );
+    checkboxes.insert( it.key(), checkbox );
+  }
+  confirmDialog.layout()->addItem( new QSpacerItem( 1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding ) );
+  QDialogButtonBox *bbox = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal );
+  connect( bbox, &QDialogButtonBox::accepted, &confirmDialog, &QDialog::accept );
+  connect( bbox, &QDialogButtonBox::rejected, &confirmDialog, &QDialog::reject );
+  confirmDialog.layout()->addWidget( bbox );
+
+  if ( confirmDialog.exec() != QDialog::Accepted )
+  {
+    return;
+  }
+
+  for ( auto it = checkboxes.begin(), itEnd = checkboxes.end(); it != itEnd; ++it )
+  {
+    if ( !it.value()->isChecked() )
+    {
+      continue;
+    }
+    QgsAnnotationLayer *layer = it.key();
+    for ( const QString &itemId : delItems[layer] )
+    {
+      layer->removeItem( itemId );
+    }
+    layer->triggerRepaint();
+  }
+  canvas()->refresh();
 }

@@ -150,8 +150,7 @@ void KadasMapToolPan::canvasReleaseEvent( QgsMapMouseEvent *e )
       else if ( e->modifiers() == Qt::ControlModifier )
       {
         QgsRectangle filterRect = mExtentRubberBand->rect();
-        KadasMapRect rect( filterRect.xMinimum(), filterRect.yMinimum(), filterRect.xMaximum(), filterRect.yMaximum() );
-        KadasMapToolDeleteItems( canvas() ).deleteItems( rect );
+        KadasMapToolDeleteItems( canvas() ).deleteItems( filterRect );
       }
 
       delete mExtentRubberBand;

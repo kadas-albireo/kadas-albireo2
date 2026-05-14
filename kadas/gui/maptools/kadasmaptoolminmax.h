@@ -17,19 +17,24 @@
 #ifndef KADASMAPTOOLMINMAX_H
 #define KADASMAPTOOLMINMAX_H
 
+#include <qgis/qgspointxy.h>
+
 #include "kadas/gui/kadas_gui.h"
-#include "kadas/gui/kadasmapiteminterface.h"
-#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
+#include "kadas/gui/maptools/kadasshapecapturemaptool.h"
 
-class KadasSymbolItem;
+class QAction;
+class QComboBox;
+class QgsRubberBand;
+
+class KadasBottomBar;
 
 
-class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasMapToolCreateItem
+class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasShapeCaptureMapTool
 {
     Q_OBJECT
   public:
     KadasMapToolMinMax( QgsMapCanvas *mapCanvas, QAction *actionViewshed, QAction *actionProfile );
-    ~KadasMapToolMinMax();
+    ~KadasMapToolMinMax() override;
 
     enum class FilterType
     {
@@ -40,40 +45,33 @@ class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasMapToolCreateItem
     Q_ENUM( FilterType )
 
     void setFilterType( FilterType filterType );
+    //! Runs the min/max computation against an externally-supplied geometry (e.g. picked from a feature).
+    void runMinMax( const QgsGeometry &geometry, const QgsCoordinateReferenceSystem &crs );
+
+    void activate() override;
+    void deactivate() override;
     void canvasPressEvent( QgsMapMouseEvent *e ) override;
-    void canvasMoveEvent( QgsMapMouseEvent *e ) override;
     void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
 
   private slots:
     void requestPick();
-    void drawFinished();
+    void onShapeCaptured( const QgsGeometry &geometry, const QgsCoordinateReferenceSystem &crs );
 
   private:
     FilterType mFilterType = FilterType::FilterRect;
     QComboBox *mFilterTypeCombo = nullptr;
-    QPointer<KadasSymbolItem> mPinMin;
-    QPointer<KadasSymbolItem> mPinMax;
+    KadasBottomBar *mBottomBar = nullptr;
+    QgsRubberBand *mPinMinBand = nullptr;
+    QgsRubberBand *mPinMaxBand = nullptr;
+    QgsPointXY mPinMinPos;
+    QgsPointXY mPinMaxPos;
+    bool mPinsValid = false;
     bool mPickFeature = false;
     QAction *mActionViewshed = nullptr;
     QAction *mActionProfile = nullptr;
 
-    void showContextMenu( KadasMapItem *item ) const;
-};
-
-
-class KADAS_GUI_EXPORT KadasMapToolMinMaxItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasMapToolMinMaxItemInterface( QgsMapCanvas *mapCanvas )
-      : KadasMapItemInterface()
-      , mCanvas( mapCanvas )
-    {}
-    KadasMapItem *createItem() const override;
-    void setFilterType( KadasMapToolMinMax::FilterType filterType );
-
-  private:
-    QgsMapCanvas *mCanvas = nullptr;
-    KadasMapToolMinMax::FilterType mFilterType = KadasMapToolMinMax::FilterType::FilterRect;
+    static KadasShapeCaptureMapTool::Shape shapeFor( FilterType t );
+    void showContextMenu( const QgsPointXY &mapPos ) const;
 };
 
 

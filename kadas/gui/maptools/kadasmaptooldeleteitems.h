@@ -17,34 +17,20 @@
 #ifndef KADASMAPTOOLDELETEITEMS_H
 #define KADASMAPTOOLDELETEITEMS_H
 
+#include <qgis/qgsmaptoolextent.h>
+
 #include "kadas/gui/kadas_gui.h"
-#include "kadas/gui/kadasmapiteminterface.h"
-#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
 
-class KADAS_GUI_EXPORT KadasMapToolDeleteItemsInterface : public KadasMapItemInterface
-{
-  public:
-    KadasMapToolDeleteItemsInterface( QgsMapCanvas *mapCanvas )
-      : KadasMapItemInterface()
-      , mCanvas( mapCanvas )
-    {}
-    KadasMapItem *createItem() const override;
-
-  private:
-    QgsMapCanvas *mCanvas = nullptr;
-};
-
-
-class KADAS_GUI_EXPORT KadasMapToolDeleteItems : public KadasMapToolCreateItem
+class KADAS_GUI_EXPORT KadasMapToolDeleteItems : public QgsMapToolExtent
 {
     Q_OBJECT
   public:
     KadasMapToolDeleteItems( QgsMapCanvas *mapCanvas );
     void activate() override;
-    void deleteItems( const KadasMapRect &filterRect );
+    void deleteItems( const QgsRectangle &filterRect );
 
   private slots:
-    void drawFinished();
+    void onExtentDrawn( const QgsRectangle &extent );
 };
 
 #endif // KADASMAPTOOLDELETEITEMS_H

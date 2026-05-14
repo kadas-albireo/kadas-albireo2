@@ -17,79 +17,18 @@
 #ifndef KADASREDLININGINTEGRATION_H
 #define KADASREDLININGINTEGRATION_H
 
-#include <functional>
-
 #include <QObject>
-
-#include "kadas/gui/kadasmapiteminterface.h"
+#include <QPointer>
 
 
 class QAction;
 class QToolButton;
 
+class QgsAnnotationLayer;
 class QgsMapCanvas;
 class QgsMapLayer;
 
-class KadasItemLayer;
-class KadasMapItem;
 class KadasMainWindow;
-
-
-class KadasPointItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasPointItemInterface() = default;
-    KadasMapItem *createItem() const override;
-};
-
-class KadasSquareItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasSquareItemInterface() = default;
-    KadasMapItem *createItem() const override;
-};
-class KadasTriangleItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasTriangleItemInterface() = default;
-    KadasMapItem *createItem() const override;
-};
-class KadasLineItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasLineItemInterface() = default;
-    KadasMapItem *createItem() const override;
-};
-class KadasRectangleItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasRectangleItemInterface() = default;
-    KadasMapItem *createItem() const override;
-};
-class KadasPolygonItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasPolygonItemInterface() = default;
-    KadasMapItem *createItem() const override;
-};
-class KadasCircleItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasCircleItemInterface() = default;
-    KadasMapItem *createItem() const override;
-};
-class KadasTextItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasTextItemInterface() = default;
-    KadasMapItem *createItem() const override;
-};
-class KadasCoordCrossItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasCoordCrossItemInterface() = default;
-    KadasMapItem *createItem() const override;
-};
 
 
 class KadasRedliningIntegration : public QObject
@@ -97,7 +36,10 @@ class KadasRedliningIntegration : public QObject
     Q_OBJECT
   public:
     KadasRedliningIntegration( QToolButton *buttonNewObject, QObject *parent );
-    KadasItemLayer *getOrCreateLayer();
+
+    //! Returns (creating if needed) the redlining QgsAnnotationLayer used
+    //! by the redlining toolbar actions.
+    QgsAnnotationLayer *getOrCreateAnnotationLayer();
 
     QAction *actionNewPoint() const { return mActionNewPoint; }
     QAction *actionNewSquare() const { return mActionNewSquare; }
@@ -110,6 +52,20 @@ class KadasRedliningIntegration : public QObject
     QAction *actionNewCoordinateCross() const { return mActionNewCoordCross; }
 
   private:
+    //! The set of annotation-item kinds the redlining toolbar can create.
+    enum class AnnotationVariant
+    {
+      MarkerCircle,
+      MarkerSquare,
+      MarkerTriangle,
+      Line,
+      Rectangle,
+      Polygon,
+      Circle,
+      Text,
+      CoordCross,
+    };
+
     QToolButton *mButtonNewObject = nullptr;
 
     QAction *mActionNewPoint = nullptr;
@@ -122,14 +78,13 @@ class KadasRedliningIntegration : public QObject
     QAction *mActionNewText = nullptr;
     QAction *mActionNewCoordCross = nullptr;
 
-    QPointer<KadasItemLayer> mLastLayer;
+    QPointer<QgsAnnotationLayer> mLastAnnotationLayer;
 
-    void toggleCreateItem( bool active, std::unique_ptr<KadasMapItemInterface> interface );
+    void toggleAnnotation( bool active, AnnotationVariant variant );
 
   private slots:
     void activateNewButtonObject();
     void deactivateNewButtonObject();
-    void updateLastLayer( QgsMapLayer *layer );
 };
 
 #endif // KADASREDLININGINTEGRATION_H

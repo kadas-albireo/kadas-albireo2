@@ -1,0 +1,67 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationstyleeditor.h               *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+class KadasAnnotationStyleEditor : QWidget
+{
+%Docstring(signature="appended")
+Per-type style editor widget for a stock :py:class:`QgsAnnotationItem`.
+
+Concrete subclasses build the type-specific styling row (e.g. shape size
+/ fill / stroke for markers, font / size / color / buffer for point
+text) and translate between item state and widget state. The map tool
+that hosts the bottom bar simply asks the controller for an editor and
+connects to its two signals.
+
+Two signals separate live preview from committed edits: - \c
+:py:func:`~previewChanged` fires for every interim change (e.g. a
+keystroke in the text field). The host should re-apply state to the item
+and refresh the layer, but should not push a new history entry. - \c
+:py:func:`~committed` fires when a discrete edit is finalized. The host
+should apply, refresh, push history, and persist the style.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
+%End
+  public:
+
+    virtual void loadFromItem( const QgsAnnotationItem *item ) = 0;
+%Docstring
+Populates the widgets from ``item``'s current state.
+%End
+
+    virtual void applyToItem( QgsAnnotationItem *item ) const = 0;
+%Docstring
+Writes the widgets' state back into ``item``.
+%End
+
+  signals:
+    void previewChanged();
+%Docstring
+Emitted continuously while the user is interacting (live preview).
+%End
+    void committed();
+%Docstring
+Emitted when a discrete edit is finalized (push history + persist).
+%End
+};
+
+
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationstyleeditor.h               *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

@@ -42,19 +42,7 @@ your option) any later version. *
 
 };
 
-class KadasMapToolViewshedItemInterface : KadasMapItemInterface
-{
-%TypeHeaderCode
-#include "kadas/gui/maptools/kadasmaptoolviewshed.h"
-%End
-  public:
-    KadasMapToolViewshedItemInterface( QgsMapCanvas *mapCanvas );
-    virtual KadasMapItem *createItem() const;
-
-
-};
-
-class KadasMapToolViewshed : KadasMapToolCreateItem
+class KadasMapToolViewshed : KadasShapeCaptureMapTool
 {
 %TypeHeaderCode
 #include "kadas/gui/maptools/kadasmaptoolviewshed.h"

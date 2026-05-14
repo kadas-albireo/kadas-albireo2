@@ -1,0 +1,86 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadascircleannotationitem.h                *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+class KadasCircleAnnotationItem : QgsAnnotationPolygonItem
+{
+%Docstring(signature="appended")
+Kadas-internal circle annotation item.
+
+Subclasses \c :py:class:`QgsAnnotationPolygonItem` so the rendered
+geometry is a \c :py:class:`QgsCurvePolygon` whose exterior ring is a \c
+:py:class:`QgsCompoundCurve` made of two \c
+:py:class:`QgsCircularString` arcs (top + bottom semicircle). The
+geometry is therefore an exact circle — no segmentation. Rendering,
+callouts, fill symbology and node-based editing are inherited from the
+parent class.
+
+Canonical state is \c center plus \c ringPoint (a point on the
+circumference); both are stored in the parent layer's CRS, and any
+mutation rebuilds the curve polygon from these parameters. \c writeXml
+stamps \c cx/cy/rx/ry alongside the parent's WKT serialization, but \c
+readXml reads only the canonical params and rebuilds the geometry, so
+the two representations cannot drift.
+
+Type id: \c "kadas:circle".
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadascircleannotationitem.h"
+%End
+  public:
+    KadasCircleAnnotationItem( const QgsPointXY &center = QgsPointXY(), const QgsPointXY &ringPoint = QgsPointXY() );
+
+    static QString itemTypeId();
+
+    virtual QString type() const;
+
+    virtual bool writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const;
+
+    virtual bool readXml( const QDomElement &element, const QgsReadWriteContext &context );
+
+    virtual KadasCircleAnnotationItem *clone() const;
+
+
+    static KadasCircleAnnotationItem *create();
+
+    QgsPointXY center() const;
+    QgsPointXY ringPoint() const;
+%Docstring
+Returns a point on the circumference; the radius is the distance to \c
+:py:func:`~KadasCircleAnnotationItem.center`.
+%End
+
+    void setCenter( const QgsPointXY &center );
+    void setRingPoint( const QgsPointXY &ringPoint );
+
+    const QStringList &shadowIds() const;
+%Docstring
+See \c KadasAnnotationShadow.
+%End
+    void setShadowIds( const QStringList &ids );
+    void setCircle( const QgsPointXY &center, const QgsPointXY &ringPoint );
+
+    double radius() const;
+%Docstring
+Returns the (planar) radius in CRS units.
+%End
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadascircleannotationitem.h                *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

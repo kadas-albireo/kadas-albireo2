@@ -15,6 +15,9 @@
  ***************************************************************************/
 
 #include <qgis/qgis.h>
+#include <qgis/qgsannotationitem.h>
+#include <qgis/qgsannotationlayer.h>
+#include <qgis/qgsfeedback.h>
 #include <qgis/qgsrenderer.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgspallabeling.h>
@@ -23,22 +26,19 @@
 #include <qgis/qgssettings.h>
 #include <qgis/qgsvectorlayer.h>
 
-#include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/kadasfeaturepicker.h"
-#include "kadas/gui/mapitems/kadasgeometryitem.h"
-#include "kadas/gui/milx/kadasmilxitem.h"
 
-KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *canvas, const QgsPointXY &mapPos, Qgis::GeometryType geomType, KadasItemLayer::PickObjective pickObjective )
+KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *canvas, const QgsPointXY &mapPos, Qgis::GeometryType geomType, KadasFeaturePicker::PickObjective pickObjective )
 {
   PickResult pickResult;
 
   for ( QgsMapLayer *layer : canvas->layers() )
   {
-    if ( qobject_cast<KadasItemLayer *>( layer ) )
+    if ( qobject_cast<QgsAnnotationLayer *>( layer ) )
     {
-      pickResult = pickItemLayer( static_cast<KadasItemLayer *>( layer ), canvas, KadasMapPos::fromPoint( mapPos ), pickObjective );
+      pickResult = pickAnnotationLayer( static_cast<QgsAnnotationLayer *>( layer ), canvas, mapPos );
     }
-    else if ( qobject_cast<QgsVectorLayer *>( layer ) && pickObjective != KadasItemLayer::PickObjective::PICK_OBJECTIVE_TOOLTIP )
+    else if ( qobject_cast<QgsVectorLayer *>( layer ) && pickObjective != KadasFeaturePicker::PickObjective::PICK_OBJECTIVE_TOOLTIP )
     {
       pickResult = pickVectorLayer( static_cast<QgsVectorLayer *>( layer ), canvas, mapPos, geomType );
     }
@@ -50,30 +50,28 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *can
   return pickResult;
 }
 
-KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, Qgis::GeometryType geomType )
-{
-  Q_UNUSED( canvasPos );
-  return pick( canvas, mapPos, geomType );
-}
-
-KadasFeaturePicker::PickResult KadasFeaturePicker::pickItemLayer( KadasItemLayer *layer, const QgsMapCanvas *canvas, const KadasMapPos &mapPos, KadasItemLayer::PickObjective pickObjective )
+KadasFeaturePicker::PickResult KadasFeaturePicker::pickAnnotationLayer( QgsAnnotationLayer *layer, const QgsMapCanvas *canvas, const QgsPointXY &mapPos )
 {
   PickResult pickResult;
-  pickResult.itemId = layer->pickItem( mapPos, canvas->mapSettings(), pickObjective );
-  if ( pickResult.itemId != KadasItemLayer::ITEM_ID_NULL )
+
+  QgsRenderContext renderContext = QgsRenderContext::fromMapSettings( canvas->mapSettings() );
+  double radiusmm = QgsSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
+  radiusmm = radiusmm > 0 ? radiusmm : Qgis::DEFAULT_SEARCH_RADIUS_MM;
+  const double radiusmu = radiusmm * renderContext.scaleFactor() * renderContext.mapToPixel().mapUnitsPerPixel();
+
+  const QgsRectangle mapBounds( mapPos.x() - radiusmu, mapPos.y() - radiusmu, mapPos.x() + radiusmu, mapPos.y() + radiusmu );
+  const QgsRectangle layerBounds = canvas->mapSettings().mapToLayerCoordinates( layer, mapBounds );
+
+  QgsFeedback feedback;
+  const QStringList hits = layer->itemsInBounds( layerBounds, renderContext, &feedback );
+  if ( hits.isEmpty() )
   {
-    pickResult.layer = layer;
-    KadasMapItem *item = layer->items()[pickResult.itemId];
-    pickResult.crs = item->crs();
-    if ( dynamic_cast<KadasGeometryItem *>( item ) )
-    {
-      pickResult.geom = static_cast<KadasGeometryItem *>( item )->geometry()->clone();
-    }
-    else if ( dynamic_cast<KadasMilxItem *>( item ) )
-    {
-      pickResult.geom = static_cast<KadasMilxItem *>( item )->toGeometry();
-    }
+    return pickResult;
   }
+
+  pickResult.annotationLayer = layer;
+  pickResult.annotationItemId = hits.first();
+  pickResult.crs = layer->crs();
   return pickResult;
 }
 
@@ -83,7 +81,7 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickVectorLayer( QgsVectorLay
   double radiusmm = QgsSettings().value( "/Map/searchRadiusMM", Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
   radiusmm = radiusmm > 0 ? radiusmm : Qgis::DEFAULT_SEARCH_RADIUS_MM;
   double radiusmu = radiusmm * renderContext.scaleFactor() * renderContext.mapToPixel().mapUnitsPerPixel();
-  KadasMapRect filterRect;
+  QgsRectangle filterRect;
   filterRect.setXMinimum( mapPos.x() - radiusmu );
   filterRect.setXMaximum( mapPos.x() + radiusmu );
   filterRect.setYMinimum( mapPos.y() - radiusmu );
