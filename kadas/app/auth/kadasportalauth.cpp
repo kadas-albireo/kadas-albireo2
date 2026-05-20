@@ -120,10 +120,7 @@ void KadasPortalAuth::setupAuthentication()
             // Populate the cookie jar synchronously: the catalog browser starts
             // issuing requests as soon as the main window is constructed, and a
             // deferred singleShot would let those first requests go out without
-            // the agstoken cookie. The earlier delay was a workaround for being
-            // called from inside a QNAM reply slot, which no longer applies
-            // because blockingGet() above has already returned by the time we
-            // get here.
+            // the agstoken cookie.
             createCookies( token );
           }
           if ( settingsTokenUseEsriAuth->value() )
