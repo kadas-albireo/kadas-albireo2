@@ -23,6 +23,7 @@ KadasPhongMaterialWidget::KadasPhongMaterialWidget( QWidget *parent, bool hasOpa
   , mHasOpacity( hasOpacity )
 {
   setupUi( this );
+  mPreviewWidget->hide();
   mOpacityWidget->setVisible( mHasOpacity );
   mLblOpacity->setVisible( mHasOpacity );
   spinShininess->setClearValue( 0, tr( "None" ) );
@@ -174,6 +175,12 @@ void KadasPhongMaterialWidget::setHasOpacity( const bool opacity )
   {
     disconnect( mOpacityWidget, &QgsOpacityWidget::opacityChanged, this, &KadasPhongMaterialWidget::changed );
   }
+}
+
+void KadasPhongMaterialWidget::setPreviewVisible( bool visible )
+{
+  Q_UNUSED( visible )
+  // Kadas does not show the material preview widget.
 }
 
 void KadasPhongMaterialWidget::updateWidgetState()

@@ -42,6 +42,9 @@ class KadasPhongMaterialWidget : public QgsMaterialSettingsWidget, private Ui::P
     bool hasOpacity() const { return mHasOpacity; }
     void setHasOpacity( const bool opacity );
 
+  public slots:
+    void setPreviewVisible( bool visible ) final;
+
   private slots:
 
     void updateWidgetState();
