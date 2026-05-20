@@ -1727,6 +1727,7 @@ void KadasApplication::preprocessNetworkRequest( QNetworkRequest *request )
   // authenticationRequired retry loop never fires and the reply never emits
   // finished. Forcing HTTP/1.1 restores the Qt 5 behaviour (transparent
   // SSPI/SSO on Windows). Drop this once QTBUG-146829 is fixed in our Qt build.
+  // https://qt-project.atlassian.net/browse/QTBUG-146829
   if ( settingsDisableHttp2->value() )
   {
     request->setAttribute( QNetworkRequest::Http2AllowedAttribute, false );
