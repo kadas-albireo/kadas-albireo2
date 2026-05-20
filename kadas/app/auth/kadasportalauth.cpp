@@ -19,11 +19,12 @@
 #include <QJsonObject>
 #include <QNetworkRequest>
 #include <QNetworkReply>
-#include <QTimer>
+#include <QUrlQuery>
 
 #include <qgis/qgsapplication.h>
 #include <qgis/qgsauthmanager.h>
 #include <qgis/qgsauthmethod.h>
+#include <qgis/qgsfeedback.h>
 #include <qgis/qgslogger.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgssettingsentryimpl.h>
@@ -92,11 +93,16 @@ void KadasPortalAuth::setupAuthentication()
   }
   else if ( !tokenUrl.isEmpty() )
   {
-    // Authentication via token
+    // Authentication via token. On Windows, Qt's QNetworkAccessManager handles
+    // Negotiate/NTLM transparently via SSPI when speaking HTTP/1.1 (HTTP/2 is
+    // globally disabled via KadasApplication::settingsDisableHttp2 to work
+    // around QTBUG-146829), so the logged-in Windows user's credentials are
+    // used silently without prompting.
     QgsDebugMsgLevel( QStringLiteral( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
 
     QNetworkRequest req = QNetworkRequest( QUrl( tokenUrl ) );
     QgsNetworkReplyContent content = QgsNetworkAccessManager::instance()->blockingGet( req );
+
     QString token;
     if ( content.error() == QNetworkReply::NoError )
     {

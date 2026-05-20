@@ -56,6 +56,8 @@
 #include <qgis/qgsproviderutils.h>
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgsrasterlayerproperties.h>
+#include <qgis/qgssettingsentryimpl.h>
+#include <qgis/qgssettingstreenode.h>
 #include <qgis/qgssublayersdialog.h>
 #include <qgis/qgstaskmanager.h>
 #include <qgis/qgsvectorlayer.h>
@@ -69,6 +71,7 @@
 #include "kadas/app/devtools/kadasdevelopertoolsdockwidget.h"
 #include "kadas/app/auth/kadasportalauth.h"
 #include "kadas/core/kadas.h"
+#include "kadas/core/kadassettingstree.h"
 #include "kadas/gui/kadasattributetabledialog.h"
 #include "kadas/gui/kadasclipboard.h"
 #include "kadas/gui/kadasitemlayer.h"
@@ -156,6 +159,20 @@ static void setupVectorLayer( const QString &vectorLayerPath, const QStringList 
     }
   }
 }
+
+
+const QgsSettingsEntryBool *KadasApplication::settingsDisableHttp2 = new QgsSettingsEntryBool(
+  QStringLiteral( "disable-http2" ),
+  KadasSettingsTree::sTreeKadas,
+  true,
+  QStringLiteral(
+    "Force HTTP/1.1 on all outgoing requests (workaround for QTBUG-146829: QNAM does not fall back from HTTP/2 to HTTP/1.1 to perform the Negotiate/NTLM handshake, so requests to IWA-protected "
+    "endpoints hang). Drop the default once that bug is fixed in our Qt build."
+  )
+);
+
+const QgsSettingsEntryBool *KadasApplication::settingsInjectAuthToken
+  = new QgsSettingsEntryBool( QStringLiteral( "inject-auth-token" ), KadasSettingsTree::sTreeKadas, false, QStringLiteral( "Inject the ESRI portal token (extracted from the agstoken cookie) into outgoing requests." ) );
 
 
 KadasApplication *KadasApplication::instance()
@@ -313,11 +330,10 @@ void KadasApplication::init()
 
   Kadas::importSslCertificates();
 
-  // Add token injector
-  QgsNetworkAccessManager::setRequestPreprocessor( injectAuthToken );
-
-  // Add network request logger
-  QgsNetworkAccessManager::instance()->setRequestPreprocessor( []( QNetworkRequest *req ) { QgsDebugMsgLevel( QString( "Network request: %1" ).arg( req->url().toString() ), 2 ); } );
+  QgsNetworkAccessManager::setRequestPreprocessor( []( QNetworkRequest *req ) {
+    QgsDebugMsgLevel( QString( "Network request: %1" ).arg( req->url().toString() ), 2 );
+    preprocessNetworkRequest( req );
+  } );
 
   // Start the network logger early, we want all requests logged!
   mNetworkLogger = new QgsNetworkLogger( QgsNetworkAccessManager::instance(), this );
@@ -1684,6 +1700,11 @@ void KadasApplication::showNetworkLogger()
   }
 }
 
+void KadasApplication::setNetworkLoggingEnabled( bool enabled )
+{
+  mNetworkLogger->enableLogging( enabled );
+}
+
 QgsMessageOutput *KadasApplication::messageOutputViewer()
 {
   if ( QThread::currentThread() == kApp->thread() )
@@ -1697,9 +1718,21 @@ QgsMessageOutput *KadasApplication::messageOutputViewer()
 }
 
 
-void KadasApplication::injectAuthToken( QNetworkRequest *request )
+void KadasApplication::preprocessNetworkRequest( QNetworkRequest *request )
 {
-  if ( QgsSettings().value( "/kadas/injectAuthToken", false ).toBool() == false )
+  // HTTP/2 workaround for QTBUG-146829 ("QNAM must fall back to HTTP/1 (from
+  // HTTP/2) to perform NTLM handshake", split off from QTBUG-143926): QNAM
+  // hangs on IWA/Negotiate-protected endpoints when the server negotiates
+  // HTTP/2 via ALPN — the 401 challenge is received but the
+  // authenticationRequired retry loop never fires and the reply never emits
+  // finished. Forcing HTTP/1.1 restores the Qt 5 behaviour (transparent
+  // SSPI/SSO on Windows). Drop this once QTBUG-146829 is fixed in our Qt build.
+  if ( settingsDisableHttp2->value() )
+  {
+    request->setAttribute( QNetworkRequest::Http2AllowedAttribute, false );
+  }
+
+  if ( !settingsInjectAuthToken->value() )
   {
     return;
   }
@@ -1711,12 +1744,12 @@ void KadasApplication::injectAuthToken( QNetworkRequest *request )
   {
     return;
   }
-  QgsDebugMsgLevel( QString( "injectAuthToken: got url %1" ).arg( url.url() ), 2 );
+  QgsDebugMsgLevel( QString( "preprocessNetworkRequest: got url %1" ).arg( url.url() ), 2 );
   // Extract the token from the esri_auth cookie, if such cookie exists in the pool
   QList<QNetworkCookie> cookies = nam->cookieJar()->cookiesForUrl( request->url() );
   for ( const QNetworkCookie &cookie : cookies )
   {
-    QgsDebugMsgLevel( QString( "injectAuthToken: got cookie %1 for url %2" ).arg( QString::fromUtf8( cookie.toRawForm() ) ).arg( url.url() ), 2 );
+    QgsDebugMsgLevel( QString( "preprocessNetworkRequest: got cookie %1 for url %2" ).arg( QString::fromUtf8( cookie.toRawForm() ) ).arg( url.url() ), 2 );
     QByteArray data = QUrl::fromPercentEncoding( cookie.toRawForm() ).toLocal8Bit();
     if ( data.startsWith( "agstoken=" ) )
     {
@@ -1727,7 +1760,7 @@ void KadasApplication::injectAuthToken( QNetworkRequest *request )
         query.addQueryItem( "token", tokenMatch.captured( 1 ) );
         url.setQuery( query );
         request->setUrl( url );
-        QgsDebugMsgLevel( QString( "injectAuthToken: url altered to %1" ).arg( url.toString() ), 2 );
+        QgsDebugMsgLevel( QString( "preprocessNetworkRequest: url altered to %1" ).arg( url.toString() ), 2 );
         break;
       }
     }
