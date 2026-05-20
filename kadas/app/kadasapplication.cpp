@@ -1684,6 +1684,11 @@ void KadasApplication::showNetworkLogger()
   }
 }
 
+void KadasApplication::setNetworkLoggingEnabled( bool enabled )
+{
+  mNetworkLogger->enableLogging( enabled );
+}
+
 QgsMessageOutput *KadasApplication::messageOutputViewer()
 {
   if ( QThread::currentThread() == kApp->thread() )
