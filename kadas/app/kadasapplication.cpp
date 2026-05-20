@@ -164,10 +164,11 @@ static void setupVectorLayer( const QString &vectorLayerPath, const QStringList 
 const QgsSettingsEntryBool *KadasApplication::settingsDisableHttp2 = new QgsSettingsEntryBool(
   QStringLiteral( "disable-http2" ),
   KadasSettingsTree::sTreeKadas,
-  true,
+  false,
   QStringLiteral(
-    "Force HTTP/1.1 on all outgoing requests (workaround for QTBUG-146829: QNAM does not fall back from HTTP/2 to HTTP/1.1 to perform the Negotiate/NTLM handshake, so requests to IWA-protected "
-    "endpoints hang). Drop the default once that bug is fixed in our Qt build."
+    "Global override: force HTTP/1.1 on ALL outgoing requests. By default only the portal token URL (which is the only call that performs an IWA/Negotiate handshake; downstream traffic is "
+    "authenticated via the agstoken cookie and the EsriToken auth config) is forced to HTTP/1.1 as a workaround for QTBUG-146829. Enable this global flag if a deployment exposes additional "
+    "IWA-protected endpoints that hang on HTTP/2. Drop the workaround entirely once QTBUG-146829 is fixed in our Qt build."
   )
 );
 
@@ -1726,10 +1727,31 @@ void KadasApplication::preprocessNetworkRequest( QNetworkRequest *request )
   // HTTP/2 via ALPN — the 401 challenge is received but the
   // authenticationRequired retry loop never fires and the reply never emits
   // finished. Forcing HTTP/1.1 restores the Qt 5 behaviour (transparent
-  // SSPI/SSO on Windows). Drop this once QTBUG-146829 is fixed in our Qt build.
+  // SSPI/SSO on Windows).
+  //
+  // Scope: the portal token URL is the only request that performs the
+  // Negotiate handshake; downstream calls are authenticated via the agstoken
+  // cookie (see KadasPortalAuth::createCookies) or the EsriToken auth config
+  // (see KadasPortalAuth::createEsriAuth) and stay on HTTP/2. The global
+  // settingsDisableHttp2 flag is kept as an escape hatch for deployments that
+  // expose additional IWA-protected endpoints. Drop this once QTBUG-146829 is
+  // fixed in our Qt build.
   if ( settingsDisableHttp2->value() )
   {
     request->setAttribute( QNetworkRequest::Http2AllowedAttribute, false );
+  }
+  else
+  {
+    const QString tokenUrlStr = KadasPortalAuth::settingsPortalTokenUrl->value();
+    if ( !tokenUrlStr.isEmpty() )
+    {
+      const QUrl tokenUrl( tokenUrlStr );
+      const QUrl reqUrl = request->url();
+      if ( reqUrl.host().compare( tokenUrl.host(), Qt::CaseInsensitive ) == 0 && reqUrl.path() == tokenUrl.path() )
+      {
+        request->setAttribute( QNetworkRequest::Http2AllowedAttribute, false );
+      }
+    }
   }
 
   if ( !settingsInjectAuthToken->value() )
