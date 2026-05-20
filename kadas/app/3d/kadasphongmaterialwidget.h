@@ -37,7 +37,7 @@ class KadasPhongMaterialWidget : public QgsMaterialSettingsWidget, private Ui::P
 
     void setTechnique( Qgis::MaterialRenderingTechnique technique ) final;
     void setSettings( const QgsAbstractMaterialSettings *settings, QgsVectorLayer *layer ) final;
-    QgsAbstractMaterialSettings *settings() override;
+    std::unique_ptr<QgsAbstractMaterialSettings> settings() override;
 
     bool hasOpacity() const { return mHasOpacity; }
     void setHasOpacity( const bool opacity );
