@@ -56,14 +56,15 @@ from qgis.PyQt.QtWidgets import (
 )
 from qgis.PyQt.QtXml import QDomDocument
 
+from . import SETTINGS_NODE as _node
 from .CartoucheDialog import CartoucheDialog
 from .PrintLayoutManager import PrintLayoutManager
 
 Ui_PrintDialog, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "ui", "printdialog.ui"))
 
-LAST_FORMAT = QgsSettingsEntryString("lastformat", "print", "PDF")
-LAST_SCALE = QgsSettingsEntryDouble("lastscale", "print", 0)
-LAST_LAYOUT_SIZE = QgsSettingsEntryString("lastlayoutsize", "print", "")
+LAST_FORMAT = QgsSettingsEntryString("lastformat", _node, "PDF")
+LAST_SCALE = QgsSettingsEntryDouble("lastscale", _node, 0)
+LAST_LAYOUT_SIZE = QgsSettingsEntryString("lastlayoutsize", _node, "")
 
 
 class PrintTool(KadasMapToolSelectRect):
