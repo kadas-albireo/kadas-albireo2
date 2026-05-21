@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.27.0)
 
-set(VCPKG_TAG b42b19a62b63514ed9fa2a81e07ce75e613c83c0)
+set(VCPKG_TAG 6fad4fa784ab2506e35144a7c3d64738976445ea)
 
 # Check that VCPKG_TAG matches the vcpkg.json baseline
 file(READ "${CMAKE_SOURCE_DIR}/vcpkg/vcpkg.json" JSON_CONTENT)
