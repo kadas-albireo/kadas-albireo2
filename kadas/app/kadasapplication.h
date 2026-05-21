@@ -36,6 +36,7 @@ class QgsMapLayerConfigWidgetFactory;
 class QgsMapTool;
 class QgsMessageOutput;
 class QgsNetworkLogger;
+class QgsSettingsEntryBool;
 class QgsPointCloudLayer;
 class QgsPrintLayout;
 class QgsRasterLayer;
@@ -166,7 +167,14 @@ class KadasApplication : public QgsApplication
     void mergeChildSettingsGroups( QgsSettings &settings, QgsSettings &newSettings );
 
     static QgsMessageOutput *messageOutputViewer();
-    static void injectAuthToken( QNetworkRequest *request );
+
+    //! Applies app-wide tweaks to outgoing network requests (HTTP/2 disable, ESRI token injection, ...).
+    static void preprocessNetworkRequest( QNetworkRequest *request );
+
+    //! When true, force HTTP/1.1 on all outgoing requests (workaround for QTBUG-143926).
+    static const QgsSettingsEntryBool *settingsDisableHttp2;
+    //! When true, inject the ESRI portal token (extracted from the agstoken cookie) into outgoing requests.
+    static const QgsSettingsEntryBool *settingsInjectAuthToken;
 
 
   private slots:
