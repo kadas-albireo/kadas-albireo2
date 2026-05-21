@@ -24,6 +24,8 @@ from qgis.core import (
     QgsProject,
     QgsReadWriteContext,
     QgsRectangle,
+    QgsSettingsEntryDouble,
+    QgsSettingsEntryString,
     QgsUnitTypes,
 )
 from qgis.gui import QgsScaleComboBox
@@ -59,6 +61,10 @@ from .PrintLayoutManager import PrintLayoutManager
 
 Ui_PrintDialog, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "ui", "printdialog.ui"))
 
+LAST_FORMAT = QgsSettingsEntryString("lastformat", "print", "PDF")
+LAST_SCALE = QgsSettingsEntryDouble("lastscale", "print", 0)
+LAST_LAYOUT_SIZE = QgsSettingsEntryString("lastlayoutsize", "print", "")
+
 
 class PrintTool(KadasMapToolSelectRect):
 
@@ -93,8 +99,7 @@ class PrintTool(KadasMapToolSelectRect):
         self.dialogui.comboBox_printlayouts.model().setParent(proxy)
         self.dialogui.comboBox_printlayouts.setModel(proxy)
 
-        settings = QSettings()
-        last_format = settings.value("/print/lastformat", "PDF")
+        last_format = LAST_FORMAT.value()
         self.dialogui.comboBox_fileformat.addItem("PDF", self.tr("PDF Document (*.pdf);;"))
         self.dialogui.comboBox_fileformat.addItem(
             "GeoPDF", self.tr("GeoPDF Document (*.geopdf);;")
@@ -232,8 +237,7 @@ class PrintTool(KadasMapToolSelectRect):
                 bestScale = scale
             wmtsScales.append(QgsScaleComboBox.toString(scale))
 
-        settings = QSettings()
-        last_scale = settings.value("/print/lastscale", bestScale)
+        last_scale = LAST_SCALE.value() if LAST_SCALE.value() != 0 else bestScale
 
         self.dialogui.comboBox_scale.updateScales(wmtsScales)
         self.dialogui.comboBox_scale.blockSignals(True)
@@ -275,12 +279,9 @@ class PrintTool(KadasMapToolSelectRect):
         self.dialogui.groupBox_grid.setChecked(self.mapitem.grid().enabled())
 
     def close(self):
-        settings = QSettings()
-        settings.setValue("/print/lastformat", self.dialogui.comboBox_fileformat.currentText())
-        settings.setValue("/print/lastscale", self.dialogui.comboBox_scale.scale())
-        settings.setValue(
-            "/print/lastlayoutsize", self.dialogui.comboBox_printlayouts.currentText()
-        )
+        LAST_FORMAT.setValue(self.dialogui.comboBox_fileformat.currentText())
+        LAST_SCALE.setValue(self.dialogui.comboBox_scale.scale())
+        LAST_LAYOUT_SIZE.setValue(self.dialogui.comboBox_printlayouts.currentText())
         self.iface.mapCanvas().unsetMapTool(self)
 
     def activate(self):
@@ -527,8 +528,7 @@ class PrintTool(KadasMapToolSelectRect):
         self.dialogui.comboBox_printlayouts.blockSignals(False)
         if self.dialogui.comboBox_printlayouts.count() > 0:
             self.__setUiEnabled(True)
-            settings = QSettings()
-            last_layout_size = settings.value("/print/lastlayoutsize", prev)
+            last_layout_size = LAST_LAYOUT_SIZE.value() if LAST_LAYOUT_SIZE.value() else prev
             index = self.dialogui.comboBox_printlayouts.findText(last_layout_size)
             if index == -1:
                 index = 0
