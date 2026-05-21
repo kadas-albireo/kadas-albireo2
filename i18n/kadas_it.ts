@@ -635,22 +635,22 @@
         <translation>Impossibile caricare il supporto Python</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1829"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1834"/>
         <source>Select Transformation for %1</source>
         <translation>Seleziona trasformazione per %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1849"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1854"/>
         <source> • %1</source>
         <translation> • %1</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1858"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1863"/>
         <source>Active Tasks</source>
         <translation>Attività attive</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplication.cpp" line="1859"/>
+        <location filename="../kadas/app/kadasapplication.cpp" line="1864"/>
         <source>The following tasks are currently running which depend on layers in this project:
 
 %1
