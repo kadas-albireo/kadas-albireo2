@@ -31,6 +31,7 @@ vcpkg_from_github(
   mac_install_images.patch
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
+  bigobj-vectorlayer.patch # https://github.com/qgis/QGIS/pull/66271
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
