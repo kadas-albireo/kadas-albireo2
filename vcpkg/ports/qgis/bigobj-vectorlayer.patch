@@ -1,0 +1,11 @@
+diff --git a/src/core/CMakeLists.txt b/src/core/CMakeLists.txt
+--- a/src/core/CMakeLists.txt
++++ b/src/core/CMakeLists.txt
+@@ -2340,6 +2340,7 @@ if(MSVC)
+       proj/qgscoordinatereferencesystem.cpp
+       textrenderer/qgsfontmanager.cpp
+       qgsapplication.cpp
++      vector/qgsvectorlayer.cpp
+       PROPERTIES COMPILE_FLAGS "/bigobj"
+   )
+ elseif(EMSCRIPTEN)
