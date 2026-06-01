@@ -238,7 +238,7 @@ class PrintTool(KadasMapToolSelectRect):
                 bestScale = scale
             wmtsScales.append(QgsScaleComboBox.toString(scale))
 
-        last_scale = LAST_SCALE.value() if LAST_SCALE.value() != 0 else bestScale
+        last_scale = LAST_SCALE.valueWithDefaultOverride(bestScale)
 
         self.dialogui.comboBox_scale.updateScales(wmtsScales)
         self.dialogui.comboBox_scale.blockSignals(True)
@@ -529,7 +529,7 @@ class PrintTool(KadasMapToolSelectRect):
         self.dialogui.comboBox_printlayouts.blockSignals(False)
         if self.dialogui.comboBox_printlayouts.count() > 0:
             self.__setUiEnabled(True)
-            last_layout_size = LAST_LAYOUT_SIZE.value() if LAST_LAYOUT_SIZE.value() else prev
+            last_layout_size = LAST_LAYOUT_SIZE.valueWithDefaultOverride(prev)
             index = self.dialogui.comboBox_printlayouts.findText(last_layout_size)
             if index == -1:
                 index = 0
