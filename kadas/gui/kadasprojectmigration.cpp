@@ -35,6 +35,7 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgssymbollayerutils.h>
+#include <qgis/qgsunittypes.h>
 
 #include "kadas/core/kadas.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
@@ -398,10 +399,9 @@ bool KadasProjectMigration::shouldAttach( const QString &baseDir, const QString 
 // produced by `KadasMapItem::writeXml` and return a freshly constructed
 // `QgsAnnotationItem` of the matching subclass, with geometry transformed
 // from the item's CRS to the target layer CRS. v1 (JSON-in-CDATA) payloads
-// are deliberately not handled here: they are recognised by
-// `format_version != "2"` and cause the translator to return null, leaving
-// the whole layer untouched. v1 projects will fail to load after the
-// post-load `KadasItemLayerMigration` fallback was removed.
+// produced by released kadas (3.x and earlier) are handled by rewriting
+// each `<MapItem>` in-place to the v2 attribute layout via
+// `convertV1MapItemToV2` before dispatching to the translator.
 //
 // New item types are added one per slice. Each translator is small and
 // mechanical; failure to translate any single MapItem in a layer aborts
@@ -418,6 +418,7 @@ bool KadasProjectMigration::shouldAttach( const QString &baseDir, const QString 
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsfillsymbol.h>
 #include <qgis/qgsfillsymbollayer.h>
+#include <qgis/qgscallout.h>
 #include <qgis/qgslinesymbol.h>
 #include <qgis/qgslinesymbollayer.h>
 #include <qgis/qgsmarkersymbol.h>
@@ -429,6 +430,7 @@ bool KadasProjectMigration::shouldAttach( const QString &baseDir, const QString 
 
 #include "kadas/gui/annotationitems/kadasrectangleannotationitem.h"
 #include "kadas/gui/annotationitems/kadascircleannotationitem.h"
+#include "kadas/gui/annotationitems/kadascoordcrossannotationitem.h"
 #include "kadas/gui/annotationitems/kadaspictureannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 #include "kadas/gui/annotationitems/kadasgpxrouteannotationitem.h"
@@ -436,6 +438,436 @@ bool KadasProjectMigration::shouldAttach( const QString &baseDir, const QString 
 
 namespace
 {
+  // ---------------------------------------------------------------------
+  //   v1 (JSON-CDATA) → v2 (typed XML attributes) conversion
+  // ---------------------------------------------------------------------
+  //
+  // Released kadas (3.x and earlier) wrote each `<MapItem>` as a JSON
+  // payload inside a CDATA child rather than as typed XML attributes.
+  // Phase 6 (slices 103–122) flipped every `KadasMapItem` subclass to
+  // the typed-XML format consumed by the v2 translators below. Once the
+  // post-load `KadasItemLayerMigration` fallback was deleted in Phase 7,
+  // legacy `.qgz` projects on disk had no way back. The helpers below
+  // translate the JSON `props` / `state` shape produced by the deleted
+  // `KadasMapItem::serialize()` family into v2 attributes in-place, so
+  // the existing `translateKadas*Item` chain handles them unchanged.
+
+  // Parse a string of the form "#aarrggbb;width;penStyle" written by
+  // legacy `KadasGeometryItem` for outline pens.
+  void parseV1Pen( const QString &s, QColor &color, int &width, int &penStyle )
+  {
+    const QStringList parts = s.split( QChar( ';' ) );
+    if ( !parts.isEmpty() && QColor::isValidColorName( parts.at( 0 ) ) )
+      color = QColor( parts.at( 0 ) );
+    if ( parts.size() > 1 )
+      width = parts.at( 1 ).toInt();
+    if ( parts.size() > 2 )
+      penStyle = parts.at( 2 ).toInt();
+  }
+
+  // Parse a string of the form "#aarrggbb;style" written by legacy
+  // `KadasGeometryItem` for fill brushes.
+  void parseV1Brush( const QString &s, QColor &color, int &brushStyle )
+  {
+    const QStringList parts = s.split( QChar( ';' ) );
+    if ( !parts.isEmpty() && QColor::isValidColorName( parts.at( 0 ) ) )
+      color = QColor( parts.at( 0 ) );
+    if ( parts.size() > 1 )
+      brushStyle = parts.at( 1 ).toInt();
+  }
+
+  // Read a [x, y] pair from a QJsonValue holding an array. Returns false
+  // if the value is not a 2-element array.
+  bool readJsonPoint( const QJsonValue &v, double &x, double &y )
+  {
+    if ( !v.isArray() )
+      return false;
+    const QJsonArray a = v.toArray();
+    if ( a.size() < 2 )
+      return false;
+    x = a.at( 0 ).toDouble();
+    y = a.at( 1 ).toDouble();
+    return true;
+  }
+
+  // Format a list of points as the legacy "x,y;x,y;..." string used by
+  // the v2 p1/p2/centers/ringpos attributes.
+  QString formatPointList( const QList<QgsPointXY> &pts )
+  {
+    QStringList out;
+    out.reserve( pts.size() );
+    for ( const QgsPointXY &p : pts )
+      out << QStringLiteral( "%1,%2" ).arg( p.x(), 0, 'g', 17 ).arg( p.y(), 0, 'g', 17 );
+    return out.join( QChar( ';' ) );
+  }
+
+  /**
+   * Rewrite \a itemEl (a `<MapItem>` element holding a v1 JSON-CDATA
+   * payload) in-place to the v2 attribute layout consumed by the
+   * `translateKadas*Item` helpers below. Removes the CDATA child on
+   * success and sets `format_version="2"`. Returns false (and leaves the
+   * element unchanged) for unrecognised types or malformed JSON.
+   */
+  bool convertV1MapItemToV2( QDomElement &itemEl )
+  {
+    // Already v2 — nothing to do.
+    if ( itemEl.attribute( QStringLiteral( "format_version" ) ) == QLatin1String( "2" ) )
+      return true;
+
+    // Locate the CDATA child carrying the JSON payload.
+    QDomNode cdataNode;
+    for ( QDomNode n = itemEl.firstChild(); !n.isNull(); n = n.nextSibling() )
+    {
+      if ( n.isCDATASection() )
+      {
+        cdataNode = n;
+        break;
+      }
+    }
+    if ( cdataNode.isNull() )
+      return false;
+
+    const QByteArray cdata = cdataNode.toCDATASection().data().toUtf8();
+    QJsonParseError perr;
+    const QJsonDocument jd = QJsonDocument::fromJson( cdata, &perr );
+    if ( perr.error != QJsonParseError::NoError || !jd.isObject() )
+      return false;
+
+    const QJsonObject root = jd.object();
+    const QJsonObject props = root.value( QStringLiteral( "props" ) ).toObject();
+    const QJsonObject state = root.value( QStringLiteral( "state" ) ).toObject();
+    const QString name = itemEl.attribute( QStringLiteral( "name" ) );
+
+    auto setAttr = [&]( const char *k, const QString &v ) { itemEl.setAttribute( QLatin1String( k ), v ); };
+
+    // Common props that map 1:1 onto v2 attributes.
+    if ( props.contains( QStringLiteral( "tooltip" ) ) )
+      setAttr( "tooltip", props.value( QStringLiteral( "tooltip" ) ).toString() );
+    if ( props.contains( QStringLiteral( "zIndex" ) ) )
+      setAttr( "z_index", QString::number( props.value( QStringLiteral( "zIndex" ) ).toInt() ) );
+
+    // Fan out the v1 outline/fill props into the v2 geometry-base attrs
+    // (used by Line/Polygon/Rectangle/Circle/CircularSector translators).
+    auto applyGeometryBase = [&]() {
+      QColor outlineColor( Qt::red );
+      int outlineWidth = 1;
+      int outlinePenStyle = static_cast<int>( Qt::SolidLine );
+      QColor fillColor( Qt::transparent );
+      int fillBrushStyle = static_cast<int>( Qt::SolidPattern );
+      if ( props.contains( QStringLiteral( "outline" ) ) )
+        parseV1Pen( props.value( QStringLiteral( "outline" ) ).toString(), outlineColor, outlineWidth, outlinePenStyle );
+      if ( props.contains( QStringLiteral( "fill" ) ) )
+        parseV1Brush( props.value( QStringLiteral( "fill" ) ).toString(), fillColor, fillBrushStyle );
+      setAttr( "outline_color", outlineColor.name( QColor::HexArgb ) );
+      setAttr( "outline_width", QString::number( outlineWidth ) );
+      setAttr( "outline_style", QString::number( outlinePenStyle ) );
+      setAttr( "fill_color", fillColor.name( QColor::HexArgb ) );
+      setAttr( "fill_style", QString::number( fillBrushStyle ) );
+    };
+
+    auto pointWkt = []( double x, double y ) { return QStringLiteral( "POINT(%1 %2)" ).arg( x, 0, 'g', 17 ).arg( y, 0, 'g', 17 ); };
+
+    if ( name == QLatin1String( "KadasPointItem" ) )
+    {
+      const QJsonArray points = state.value( QStringLiteral( "points" ) ).toArray();
+      if ( points.isEmpty() )
+        return false;
+      const QJsonArray pt = points.at( 0 ).toArray();
+      if ( pt.size() < 2 )
+        return false;
+      setAttr( "geometry", pointWkt( pt.at( 0 ).toDouble(), pt.at( 1 ).toDouble() ) );
+
+      // Map legacy iconType → Qgis::MarkerShape (verbatim from the
+      // deleted KadasPointItem::deserialize switch).
+      const int iconType = props.value( QStringLiteral( "iconType" ) ).toInt( 1 );
+      Qgis::MarkerShape shape = Qgis::MarkerShape::Circle;
+      switch ( iconType )
+      {
+        case 1:
+          shape = Qgis::MarkerShape::Cross;
+          break;
+        case 2:
+          shape = Qgis::MarkerShape::Cross2;
+          break;
+        case 3:
+          shape = Qgis::MarkerShape::Square;
+          break;
+        case 4:
+          shape = Qgis::MarkerShape::Circle;
+          break;
+        case 5:
+          shape = Qgis::MarkerShape::Square;
+          break;
+        case 6:
+          shape = Qgis::MarkerShape::Triangle;
+          break;
+        case 7:
+          shape = Qgis::MarkerShape::Triangle;
+          break;
+        default:
+          break;
+      }
+      setAttr( "shape", qgsEnumValueToKey( shape ) );
+      if ( props.contains( QStringLiteral( "iconSize" ) ) )
+        setAttr( "size", QString::number( props.value( QStringLiteral( "iconSize" ) ).toInt() ) );
+
+      // Prefer iconOutline/iconFill, fall back to outline/fill (older
+      // payloads stored only the geometry-level keys).
+      QColor strokeColor( Qt::red );
+      int strokeWidth = 1;
+      int penStyle = static_cast<int>( Qt::SolidLine );
+      const QString iconOutline = props.value( QStringLiteral( "iconOutline" ) ).toString();
+      parseV1Pen( !iconOutline.isEmpty() ? iconOutline : props.value( QStringLiteral( "outline" ) ).toString(), strokeColor, strokeWidth, penStyle );
+      setAttr( "stroke_color", strokeColor.name( QColor::HexArgb ) );
+      setAttr( "stroke_width", QString::number( strokeWidth ) );
+
+      QColor markerFill( Qt::white );
+      int brushStyle = static_cast<int>( Qt::SolidPattern );
+      const QString iconFill = props.value( QStringLiteral( "iconFill" ) ).toString();
+      parseV1Brush( !iconFill.isEmpty() ? iconFill : props.value( QStringLiteral( "fill" ) ).toString(), markerFill, brushStyle );
+      // Legacy ICON_BOX (3) and ICON_TRIANGLE (6) painted lines only —
+      // drop the fill for those variants to match the released look.
+      if ( iconType == 3 || iconType == 6 )
+        markerFill = QColor( Qt::transparent );
+      setAttr( "fill_color", markerFill.name( QColor::HexArgb ) );
+    }
+    else if ( name == QLatin1String( "KadasTextItem" ) )
+    {
+      double x = 0, y = 0;
+      if ( !readJsonPoint( state.value( QStringLiteral( "pos" ) ), x, y ) )
+        return false;
+      setAttr( "geometry", pointWkt( x, y ) );
+      setAttr( "text", props.value( QStringLiteral( "text" ) ).toString() );
+      if ( props.contains( QStringLiteral( "fillColor" ) ) )
+        setAttr( "color", props.value( QStringLiteral( "fillColor" ) ).toString() );
+      if ( props.contains( QStringLiteral( "outlineColor" ) ) )
+        setAttr( "outline_color", props.value( QStringLiteral( "outlineColor" ) ).toString() );
+      if ( props.contains( QStringLiteral( "font" ) ) )
+        setAttr( "font", props.value( QStringLiteral( "font" ) ).toString() );
+      setAttr( "angle", QString::number( state.value( QStringLiteral( "angle" ) ).toDouble() ) );
+    }
+    else if ( name == QLatin1String( "KadasLineItem" ) || name == QLatin1String( "KadasGpxRouteItem" ) )
+    {
+      // state.points = [ [ [x,y], … ], … ] — list of parts.
+      const QJsonArray parts = state.value( QStringLiteral( "points" ) ).toArray();
+      if ( parts.isEmpty() )
+        return false;
+      QStringList partWkts;
+      for ( const QJsonValue &partV : parts )
+      {
+        const QJsonArray pts = partV.toArray();
+        if ( pts.size() < 2 )
+          continue;
+        QStringList coords;
+        for ( const QJsonValue &p : pts )
+        {
+          const QJsonArray xy = p.toArray();
+          if ( xy.size() < 2 )
+            continue;
+          coords << QStringLiteral( "%1 %2" ).arg( xy.at( 0 ).toDouble(), 0, 'g', 17 ).arg( xy.at( 1 ).toDouble(), 0, 'g', 17 );
+        }
+        if ( coords.size() >= 2 )
+          partWkts << QStringLiteral( "(%1)" ).arg( coords.join( QStringLiteral( ", " ) ) );
+      }
+      if ( partWkts.isEmpty() )
+        return false;
+      setAttr( "geometry", QStringLiteral( "MULTILINESTRING(%1)" ).arg( partWkts.join( QStringLiteral( ", " ) ) ) );
+      applyGeometryBase();
+      if ( name == QLatin1String( "KadasGpxRouteItem" ) )
+      {
+        if ( props.contains( QStringLiteral( "name" ) ) )
+          setAttr( "gpx_name", props.value( QStringLiteral( "name" ) ).toString() );
+        if ( props.contains( QStringLiteral( "number" ) ) )
+          setAttr( "gpx_number", QString::number( props.value( QStringLiteral( "number" ) ).toInt() ) );
+      }
+    }
+    else if ( name == QLatin1String( "KadasPolygonItem" ) )
+    {
+      // state.points = [ [ [x,y], … ], … ] — list of exterior rings.
+      // The legacy item never stored interior rings, so emit one
+      // single-ring polygon part per ring.
+      const QJsonArray rings = state.value( QStringLiteral( "points" ) ).toArray();
+      if ( rings.isEmpty() )
+        return false;
+      QStringList polyWkts;
+      for ( const QJsonValue &ringV : rings )
+      {
+        const QJsonArray pts = ringV.toArray();
+        if ( pts.size() < 3 )
+          continue;
+        QStringList coords;
+        for ( const QJsonValue &p : pts )
+        {
+          const QJsonArray xy = p.toArray();
+          if ( xy.size() < 2 )
+            continue;
+          coords << QStringLiteral( "%1 %2" ).arg( xy.at( 0 ).toDouble(), 0, 'g', 17 ).arg( xy.at( 1 ).toDouble(), 0, 'g', 17 );
+        }
+        if ( coords.size() < 3 )
+          continue;
+        if ( coords.first() != coords.last() )
+          coords << coords.first();
+        polyWkts << QStringLiteral( "((%1))" ).arg( coords.join( QStringLiteral( ", " ) ) );
+      }
+      if ( polyWkts.isEmpty() )
+        return false;
+      setAttr( "geometry", QStringLiteral( "MULTIPOLYGON(%1)" ).arg( polyWkts.join( QStringLiteral( ", " ) ) ) );
+      applyGeometryBase();
+    }
+    else if ( name == QLatin1String( "KadasRectangleItem" ) )
+    {
+      const QJsonArray p1arr = state.value( QStringLiteral( "p1" ) ).toArray();
+      const QJsonArray p2arr = state.value( QStringLiteral( "p2" ) ).toArray();
+      if ( p1arr.isEmpty() || p1arr.size() != p2arr.size() )
+        return false;
+      QList<QgsPointXY> p1List, p2List;
+      for ( int i = 0; i < p1arr.size(); ++i )
+      {
+        const QJsonArray a = p1arr.at( i ).toArray();
+        const QJsonArray b = p2arr.at( i ).toArray();
+        if ( a.size() < 2 || b.size() < 2 )
+          return false;
+        p1List << QgsPointXY( a.at( 0 ).toDouble(), a.at( 1 ).toDouble() );
+        p2List << QgsPointXY( b.at( 0 ).toDouble(), b.at( 1 ).toDouble() );
+      }
+      setAttr( "p1", formatPointList( p1List ) );
+      setAttr( "p2", formatPointList( p2List ) );
+      applyGeometryBase();
+    }
+    else if ( name == QLatin1String( "KadasCircleItem" ) )
+    {
+      const QJsonArray ca = state.value( QStringLiteral( "centers" ) ).toArray();
+      const QJsonArray ra = state.value( QStringLiteral( "ringpos" ) ).toArray();
+      if ( ca.isEmpty() || ca.size() != ra.size() )
+        return false;
+      QList<QgsPointXY> centers, ringpos;
+      for ( int i = 0; i < ca.size(); ++i )
+      {
+        const QJsonArray a = ca.at( i ).toArray();
+        const QJsonArray b = ra.at( i ).toArray();
+        if ( a.size() < 2 || b.size() < 2 )
+          return false;
+        centers << QgsPointXY( a.at( 0 ).toDouble(), a.at( 1 ).toDouble() );
+        ringpos << QgsPointXY( b.at( 0 ).toDouble(), b.at( 1 ).toDouble() );
+      }
+      setAttr( "centers", formatPointList( centers ) );
+      setAttr( "ringpos", formatPointList( ringpos ) );
+      applyGeometryBase();
+    }
+    else if ( name == QLatin1String( "KadasPictureItem" ) )
+    {
+      double x = 0, y = 0;
+      if ( !readJsonPoint( state.value( QStringLiteral( "pos" ) ), x, y ) )
+        return false;
+      setAttr( "pos_x", QString::number( x, 'g', 17 ) );
+      setAttr( "pos_y", QString::number( y, 'g', 17 ) );
+      setAttr( "offset_x", QString::number( state.value( QStringLiteral( "offsetX" ) ).toDouble() ) );
+      setAttr( "offset_y", QString::number( state.value( QStringLiteral( "offsetY" ) ).toDouble() ) );
+      const QJsonArray sz = state.value( QStringLiteral( "size" ) ).toArray();
+      if ( sz.size() >= 2 )
+      {
+        setAttr( "size_w", QString::number( sz.at( 0 ).toInt() ) );
+        setAttr( "size_h", QString::number( sz.at( 1 ).toInt() ) );
+      }
+      setAttr( "frame", state.value( QStringLiteral( "frame" ) ).toBool( true ) ? QStringLiteral( "1" ) : QStringLiteral( "0" ) );
+      if ( props.contains( QStringLiteral( "filePath" ) ) )
+      {
+        QString fp = props.value( QStringLiteral( "filePath" ) ).toString();
+        // Legacy stored archive attachments as `attachment:<name>`,
+        // but QgsProject::resolveAttachmentIdentifier only accepts the
+        // canonical `attachment:///<name>` form. Normalize on the fly
+        // so the post-load resolver in KadasAnnotationProjectIntegration
+        // can locate the file inside the migrated `.qgz`.
+        if ( fp.startsWith( QLatin1String( "attachment:" ) ) && !fp.startsWith( QLatin1String( "attachment:///" ) ) )
+          fp = QStringLiteral( "attachment:///" ) + fp.mid( 11 );
+        setAttr( "file_path", fp );
+      }
+    }
+    else if ( name == QLatin1String( "KadasSymbolItem" ) )
+    {
+      double x = 0, y = 0;
+      if ( !readJsonPoint( state.value( QStringLiteral( "pos" ) ), x, y ) )
+        return false;
+      setAttr( "pos_x", QString::number( x, 'g', 17 ) );
+      setAttr( "pos_y", QString::number( y, 'g', 17 ) );
+      if ( props.contains( QStringLiteral( "anchorX" ) ) )
+        setAttr( "anchor_x", QString::number( props.value( QStringLiteral( "anchorX" ) ).toDouble() ) );
+      if ( props.contains( QStringLiteral( "anchorY" ) ) )
+        setAttr( "anchor_y", QString::number( props.value( QStringLiteral( "anchorY" ) ).toDouble() ) );
+      const QJsonArray sz = state.value( QStringLiteral( "size" ) ).toArray();
+      if ( sz.size() >= 2 )
+      {
+        setAttr( "size_w", QString::number( sz.at( 0 ).toInt() ) );
+        setAttr( "size_h", QString::number( sz.at( 1 ).toInt() ) );
+      }
+      if ( props.contains( QStringLiteral( "filePath" ) ) )
+      {
+        QString fp = props.value( QStringLiteral( "filePath" ) ).toString();
+        if ( fp.startsWith( QLatin1String( "attachment:" ) ) && !fp.startsWith( QLatin1String( "attachment:///" ) ) )
+          fp = QStringLiteral( "attachment:///" ) + fp.mid( 11 );
+        setAttr( "file_path", fp );
+      }
+    }
+    else if ( name == QLatin1String( "KadasPinItem" ) )
+    {
+      double x = 0, y = 0;
+      if ( !readJsonPoint( state.value( QStringLiteral( "pos" ) ), x, y ) )
+        return false;
+      setAttr( "pos_x", QString::number( x, 'g', 17 ) );
+      setAttr( "pos_y", QString::number( y, 'g', 17 ) );
+      // The v2 KadasPinItem writer clobbered the class-name `name`
+      // attribute with the display name (legacy bug; see the
+      // translatesPinItem unit test). Route the v1 user name to a
+      // distinct `pin_name` attribute so the dispatcher's `name`-based
+      // type lookup still works; `translateKadasPinItem` prefers
+      // `pin_name` over `name`.
+      if ( props.contains( QStringLiteral( "name" ) ) )
+        setAttr( "pin_name", props.value( QStringLiteral( "name" ) ).toString() );
+      if ( props.contains( QStringLiteral( "remarks" ) ) )
+        setAttr( "remarks", props.value( QStringLiteral( "remarks" ) ).toString() );
+    }
+    else if ( name == QLatin1String( "KadasGpxWaypointItem" ) )
+    {
+      double x = 0, y = 0;
+      if ( !readJsonPoint( state.value( QStringLiteral( "pos" ) ), x, y ) )
+      {
+        // Older payloads stored a "points" list rather than "pos".
+        const QJsonArray points = state.value( QStringLiteral( "points" ) ).toArray();
+        if ( points.isEmpty() )
+          return false;
+        const QJsonArray pt = points.at( 0 ).toArray();
+        if ( pt.size() < 2 )
+          return false;
+        x = pt.at( 0 ).toDouble();
+        y = pt.at( 1 ).toDouble();
+      }
+      setAttr( "geometry", pointWkt( x, y ) );
+      setAttr( "shape", qgsEnumValueToKey( Qgis::MarkerShape::Circle ) );
+      if ( props.contains( QStringLiteral( "name" ) ) )
+        setAttr( "gpx_name", props.value( QStringLiteral( "name" ) ).toString() );
+    }
+    else if ( name == QLatin1String( "KadasCoordinateCrossItem" ) )
+    {
+      // Legacy CoordinateCross stored x/y directly on the state. Keep
+      // the original element name; the dispatcher routes to a dedicated
+      // translator that builds a real KadasCoordCrossAnnotationItem
+      // (full-screen cross + km labels) instead of a tiny "+" marker.
+      const double x = state.value( QStringLiteral( "x" ) ).toDouble();
+      const double y = state.value( QStringLiteral( "y" ) ).toDouble();
+      setAttr( "geometry", pointWkt( x, y ) );
+    }
+    else
+    {
+      // Unknown legacy type — leave the element untouched and let the
+      // dispatcher abort the layer.
+      return false;
+    }
+
+    itemEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
+    itemEl.removeChild( cdataNode );
+    return true;
+  }
+
   /**
    * Translate one `<MapItem name="KadasPointItem">` (v2 format) into a
    * fresh `QgsAnnotationMarkerItem`. Returns nullptr for v1 payloads or
@@ -475,12 +907,44 @@ namespace
     symbolLayer->setSize( size );
     symbolLayer->setStrokeWidth( strokeWidth );
     symbolLayer->setStrokeWidthUnit( Qgis::RenderUnit::Points );
-    symbolLayer->setStrokeColor( strokeColor );
+    // Order matters: QgsSimpleMarkerSymbolLayer::setColor() delegates to
+    // setStrokeColor() for shapes that aren't filled (Cross, Cross2,
+    // ...), so call setColor() BEFORE setStrokeColor() to ensure the
+    // user's stroke colour wins for line-only shapes.
     symbolLayer->setColor( fillColor );
+    symbolLayer->setStrokeColor( strokeColor );
 
     auto *anno = new QgsAnnotationMarkerItem( QgsPoint( pt ) );
     anno->setSymbol( new QgsMarkerSymbol( QgsSymbolLayerList { symbolLayer } ) );
     return anno;
+  }
+
+  /**
+   * Translate one `<MapItem name="KadasCoordinateCrossItem">` (v1
+   * legacy, rewritten in-place to v2 with just a `geometry` attribute)
+   * into a `KadasCoordCrossAnnotationItem`. The legacy item drew a
+   * full-screen perpendicular cross with km labels — replicated here
+   * by the dedicated annotation type.
+   */
+  KadasCoordCrossAnnotationItem *translateKadasCoordinateCrossItem( const QDomElement &itemEl, const QgsCoordinateReferenceSystem &itemCrs, const QgsCoordinateReferenceSystem &layerCrs )
+  {
+    const QgsGeometry geom = QgsGeometry::fromWkt( itemEl.attribute( QStringLiteral( "geometry" ) ) );
+    if ( geom.isNull() || geom.type() != Qgis::GeometryType::Point )
+      return nullptr;
+    QgsPointXY pt = geom.asPoint();
+    if ( itemCrs.isValid() && layerCrs.isValid() && itemCrs != layerCrs )
+    {
+      try
+      {
+        QgsCoordinateTransform ct( itemCrs, layerCrs, QgsProject::instance() );
+        pt = ct.transform( pt );
+      }
+      catch ( QgsCsException & )
+      {
+        return nullptr;
+      }
+    }
+    return new KadasCoordCrossAnnotationItem( QgsPoint( pt ) );
   }
 
   /**
@@ -872,17 +1336,46 @@ namespace
     const bool frame = itemEl.attribute( QStringLiteral( "frame" ), QStringLiteral( "1" ) ) == QLatin1String( "1" );
     const QString filePath = itemEl.attribute( QStringLiteral( "file_path" ) );
 
-    auto *pic = new QgsAnnotationPictureItem( Qgis::PictureFormat::Unknown, QString(), QgsRectangle( anchor.x(), anchor.y(), anchor.x(), anchor.y() ) );
-    if ( !filePath.isEmpty() )
-      KadasPictureAnnotationController::setPath( pic, filePath );
+    // Legacy attachments use opaque hash names without standard image
+    // extensions (e.g. "foo.fEdEXR"), so formatFromPath() falls back to
+    // Unknown which the renderer skips. Force Raster for non-SVG paths
+    // so the picture renders; SVGs are still detected by extension.
+    const Qgis::PictureFormat fmt = filePath.endsWith( QLatin1String( ".svg" ), Qt::CaseInsensitive ) ? Qgis::PictureFormat::SVG : Qgis::PictureFormat::Raster;
+    auto *pic = new QgsAnnotationPictureItem( fmt, filePath, QgsRectangle( anchor.x(), anchor.y(), anchor.x(), anchor.y() ) );
     pic->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
     pic->setFixedSize( QSizeF( w > 0 ? w : 200, h > 0 ? h : 150 ) );
     pic->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
-    pic->setFrameEnabled( frame );
+    // Legacy KadasPictureItem: `frame` toggled the *bubble callout*
+    // (balloon around the image) — not the QGIS "frame border". Map
+    // it onto callout visibility: install the canonical balloon when
+    // frame=true, install a hidden balloon (transparent fill/stroke,
+    // zero wedge) when frame=false. The annotation's own setFrameEnabled
+    // (border) is left at its default.
     KadasPictureAnnotationController::ensureBalloon( pic );
+    if ( !frame )
+    {
+      if ( auto *balloon = dynamic_cast<QgsBalloonCallout *>( pic->callout() ) )
+      {
+        auto *sl = new QgsSimpleFillSymbolLayer( QColor( 0, 0, 0, 0 ), Qt::SolidPattern, QColor( 0, 0, 0, 0 ), Qt::SolidLine, 0.0 );
+        sl->setStrokeWidthUnit( Qgis::RenderUnit::Pixels );
+        balloon->setFillSymbol( new QgsFillSymbol( QgsSymbolLayerList() << sl ) );
+        balloon->setWedgeWidth( 0 );
+        balloon->setWedgeWidthUnit( Qgis::RenderUnit::Pixels );
+      }
+    }
     // Override the centered default that ensureBalloon installs with the
-    // user's saved offset (in pixels, same convention as the legacy item).
-    pic->setOffsetFromCallout( QSizeF( offsetX, offsetY ) );
+    // user's saved offset. Coordinate-system conversion:
+    //   - Legacy KadasPictureItem stored the offset of the picture's
+    //     CENTER from the anchor, in map-Y-up pixel coords.
+    //   - QGIS QgsAnnotationRectItem (FixedSize + callout anchor) uses
+    //     the offset of the picture's TOP-LEFT from the anchor, in
+    //     screen-Y-down pixel coords.
+    //   Convert: new_x = legacy_x - w/2;  new_y = -legacy_y - h/2.
+    const double effW = w > 0 ? w : 200;
+    const double effH = h > 0 ? h : 150;
+    const double newOffX = offsetX - effW / 2.0;
+    const double newOffY = -offsetY - effH / 2.0;
+    pic->setOffsetFromCallout( QSizeF( newOffX, newOffY ) );
     pic->setOffsetFromCalloutUnit( Qgis::RenderUnit::Pixels );
     return pic;
   }
@@ -925,9 +1418,8 @@ namespace
     const double effW = w > 0 ? w : 32;
     const double effH = h > 0 ? h : 32;
 
-    auto *pic = new QgsAnnotationPictureItem( Qgis::PictureFormat::Unknown, QString(), QgsRectangle( anchor.x(), anchor.y(), anchor.x(), anchor.y() ) );
-    if ( !filePath.isEmpty() )
-      KadasPictureAnnotationController::setPath( pic, filePath );
+    const Qgis::PictureFormat fmt = filePath.endsWith( QLatin1String( ".svg" ), Qt::CaseInsensitive ) ? Qgis::PictureFormat::SVG : Qgis::PictureFormat::Raster;
+    auto *pic = new QgsAnnotationPictureItem( fmt, filePath, QgsRectangle( anchor.x(), anchor.y(), anchor.x(), anchor.y() ) );
     pic->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
     pic->setFixedSize( QSizeF( effW, effH ) );
     pic->setFixedSizeUnit( Qgis::RenderUnit::Pixels );
@@ -967,7 +1459,12 @@ namespace
     }
 
     auto *anno = new KadasPinAnnotationItem( QgsPoint( p ) );
-    anno->setName( itemEl.attribute( QStringLiteral( "name" ) ) );
+    // `pin_name` is the v1-migration-specific attribute; falls back to
+    // `name` for projects saved by the v2 writer (which clobbered the
+    // class-name `name` with the display name — see slice notes in
+    // testkadasprojectmigration.cpp).
+    const QString pinName = itemEl.hasAttribute( QStringLiteral( "pin_name" ) ) ? itemEl.attribute( QStringLiteral( "pin_name" ) ) : itemEl.attribute( QStringLiteral( "name" ) );
+    anno->setName( pinName );
     anno->setRemarks( itemEl.attribute( QStringLiteral( "remarks" ) ) );
     return anno;
   }
@@ -1182,6 +1679,11 @@ namespace
       if ( auto *a = translateKadasPointItem( itemEl, itemCrs, layerCrs ) )
         annos.append( a );
     }
+    else if ( name == QLatin1String( "KadasCoordinateCrossItem" ) )
+    {
+      if ( auto *a = translateKadasCoordinateCrossItem( itemEl, itemCrs, layerCrs ) )
+        annos.append( a );
+    }
     else if ( name == QLatin1String( "KadasTextItem" ) )
     {
       if ( auto *a = translateKadasTextItem( itemEl, itemCrs, layerCrs ) )
@@ -1291,6 +1793,10 @@ bool KadasProjectMigration::migrateLegacyKadasItemLayers( QDomDocument &doc, QDo
       if ( itemEl.isNull() || itemEl.tagName() != QLatin1String( "MapItem" ) )
         continue;
 
+      // Rewrite legacy v1 (JSON-CDATA) payloads to the v2 attribute
+      // layout in place; v2 elements pass through unchanged.
+      convertV1MapItemToV2( itemEl );
+
       QList<QgsAnnotationItem *> annos = translateMapItem( itemEl, layerCrs );
       if ( annos.isEmpty() )
       {
@@ -1323,6 +1829,24 @@ bool KadasProjectMigration::migrateLegacyKadasItemLayers( QDomDocument &doc, QDo
       const QString newId = annoLayer->addItem( translated[i] );
       if ( !tooltips[i].isEmpty() )
         KadasAnnotationLayerHelpers::setTooltip( annoLayer.get(), newId, tooltips[i] );
+
+      // QgsAnnotationItem::writeCommonProperties drops offsetFromCallout
+      // values where QSizeF::isValid() is false (any negative dimension).
+      // Picture items frequently use negative offsets (legacy convention
+      // for "image to the left of the anchor") so we'd lose the placement
+      // on serialization. Mirror what
+      // KadasAnnotationProjectIntegration::prepareForSave() does on save:
+      // shadow the offset into the layer's customProperty so the load
+      // path's readPictureOffsetsFromCustomProperties() can restore it.
+      if ( auto *pic = dynamic_cast<QgsAnnotationPictureItem *>( translated[i] ) )
+      {
+        const QSizeF off = pic->offsetFromCallout();
+        if ( off.width() != 0 || off.height() != 0 )
+        {
+          annoLayer->setCustomProperty( QStringLiteral( "kadas:picture-offset:" ) + newId, QgsSymbolLayerUtils::encodeSize( off ) );
+          annoLayer->setCustomProperty( QStringLiteral( "kadas:picture-offset-unit:" ) + newId, QgsUnitTypes::encodeUnit( pic->offsetFromCalloutUnit() ) );
+        }
+      }
     }
 
     QDomElement newMapLayerEl = doc.createElement( QStringLiteral( "maplayer" ) );

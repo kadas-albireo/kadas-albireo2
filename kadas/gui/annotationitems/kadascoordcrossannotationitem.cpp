@@ -94,9 +94,14 @@ void KadasCoordCrossAnnotationItem::render( QgsRenderContext &context, QgsFeedba
       double mapCoord;
       double angle;
   };
+  // Labels reflect the coordinate visible on the map at the cross
+  // position — i.e. the destination (map render) CRS coords. Using the
+  // raw layer-CRS geometry would print arbitrary numbers whenever the
+  // annotation layer CRS differs from the project CRS (e.g. a Swiss
+  // CH1903+ cross migrated into a Web-Mercator layer).
   const QList<LabelData> labels = {
-    { screenPos.x() - crossSize, screenPos.y() - 12, geometry().y(), 0 },
-    { screenPos.x() - 12, screenPos.y() + crossSize, geometry().x(), -90 },
+    { screenPos.x() - crossSize, screenPos.y() - 12, mapPos.y(), 0 },
+    { screenPos.x() - 12, screenPos.y() + crossSize, mapPos.x(), -90 },
   };
 
   QFont font = painter->font();
