@@ -21,6 +21,8 @@
 #include <qgis/qgsannotationlineitem.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgsdistancearea.h>
+#include <qgis/qgsgeometryutils_base.h>
 #include <qgis/qgslinestring.h>
 #include <qgis/qgslinesymbol.h>
 #include <qgis/qgslinesymbollayer.h>
@@ -197,12 +199,33 @@ KadasEditContext KadasLineAnnotationController::getEditContext( const QgsAnnotat
       return KadasEditContext( QgsVertexId( 0, 0, i ), mp, drawAttribs() );
     }
   }
-  // Fall back: bbox hit → whole-geometry move handle anchored at the first vertex.
-  if ( toMapRect( asLine( item )->boundingBox(), ctx ).contains( pos ) && n > 0 )
+  // Fall back: a hit on (or close to) any segment selects the whole line
+  // for translation. The handle is anchored at the first vertex so the
+  // edit() body-move branch can compute the drag offset.
+  // NOTE: a bbox-contains check would be wrong here — a diagonal line
+  // has a large bounding box that covers vast empty space, so any click
+  // inside that bbox would (incorrectly) pick the line, even if it's
+  // far from the actual stroke. We instead require the click to fall
+  // within pickTolSqr of one of the segments.
+  if ( n >= 2 )
   {
-    const QgsPoint p0 = curve->vertexAt( QgsVertexId( 0, 0, 0 ) );
-    const QgsPointXY refPos = toMapPos( QgsPointXY( p0.x(), p0.y() ), ctx );
-    return KadasEditContext( QgsVertexId(), refPos, KadasAttribDefs(), Qt::ArrowCursor );
+    const double tolSqr = pickTolSqr( ctx );
+    for ( int i = 1; i < n; ++i )
+    {
+      const QgsPoint a = curve->vertexAt( QgsVertexId( 0, 0, i - 1 ) );
+      const QgsPoint b = curve->vertexAt( QgsVertexId( 0, 0, i ) );
+      const QgsPointXY am = toMapPos( QgsPointXY( a.x(), a.y() ), ctx );
+      const QgsPointXY bm = toMapPos( QgsPointXY( b.x(), b.y() ), ctx );
+      double dx = 0;
+      double dy = 0;
+      const double d2 = QgsGeometryUtilsBase::sqrDistToLine( pos.x(), pos.y(), am.x(), am.y(), bm.x(), bm.y(), dx, dy, 4 * std::numeric_limits<double>::epsilon() );
+      if ( d2 < tolSqr )
+      {
+        const QgsPoint p0 = curve->vertexAt( QgsVertexId( 0, 0, 0 ) );
+        const QgsPointXY refPos = toMapPos( QgsPointXY( p0.x(), p0.y() ), ctx );
+        return KadasEditContext( QgsVertexId(), refPos, KadasAttribDefs(), Qt::ArrowCursor );
+      }
+    }
   }
   return KadasEditContext();
 }
@@ -313,6 +336,45 @@ QString KadasLineAnnotationController::asKml( const QgsAnnotationItem *item, con
   outStream << "</Placemark>\n";
   outStream.flush();
   return outString;
+}
+
+QList<KadasAnnotationMeasurementLabel> KadasLineAnnotationController::measurementLabels( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
+{
+  QList<KadasAnnotationMeasurementLabel> labels;
+  const QgsCurve *curve = asLine( item )->geometry();
+  if ( !curve )
+    return labels;
+  const int n = curve->numPoints();
+  if ( n < 2 )
+    return labels;
+
+  // Measurement uses the project ellipsoid in the item CRS, then transforms
+  // anchor points into the map CRS for on-canvas placement (legacy
+  // behavior of KadasLineItem::measureGeometry).
+  QgsDistanceArea da;
+  da.setSourceCrs( ctx.itemCrs(), ctx.mapSettings().transformContext() );
+  da.setEllipsoid( QgsProject::instance()->ellipsoid() );
+
+  double total = 0.0;
+  for ( int i = 1; i < n; ++i )
+  {
+    const QgsPoint a = curve->vertexAt( QgsVertexId( 0, 0, i - 1 ) );
+    const QgsPoint b = curve->vertexAt( QgsVertexId( 0, 0, i ) );
+    const QgsPointXY ai( a.x(), a.y() );
+    const QgsPointXY bi( b.x(), b.y() );
+    if ( ai == bi )
+      continue; // skip rubber-band trailing duplicate
+
+    const double seg = da.measureLine( ai, bi );
+    total += seg;
+
+    const QgsPointXY midItem( 0.5 * ( a.x() + b.x() ), 0.5 * ( a.y() + b.y() ) );
+    labels.append( { toMapPos( midItem, ctx ), formatLengthMeters( seg ), true } );
+  }
+
+  const QgsPoint last = curve->vertexAt( QgsVertexId( 0, 0, n - 1 ) );
+  labels.append( { toMapPos( QgsPointXY( last.x(), last.y() ), ctx ), QObject::tr( "Tot.: %1" ).arg( formatLengthMeters( total ) ), false } );
+  return labels;
 }
 
 void KadasLineAnnotationController::applyPersistedStyle( QgsAnnotationItem *item ) const

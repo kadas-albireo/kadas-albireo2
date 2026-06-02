@@ -54,10 +54,12 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
 {
   public:
     using NodesProvider = std::function<QList<KadasNode>()>;
+    using LabelsProvider = std::function<QList<KadasAnnotationMeasurementLabel>()>;
 
-    HandlesOverlay( QgsMapCanvas *canvas, NodesProvider provider )
+    HandlesOverlay( QgsMapCanvas *canvas, NodesProvider nodesProvider, LabelsProvider labelsProvider )
       : QgsMapCanvasItem( canvas )
-      , mProvider( std::move( provider ) )
+      , mNodesProvider( std::move( nodesProvider ) )
+      , mLabelsProvider( std::move( labelsProvider ) )
     {
       setZValue( std::numeric_limits<double>::max() );
       updateRect();
@@ -72,9 +74,16 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
 
     void paint( QPainter *painter ) override
     {
-      if ( !mProvider )
+      paintMeasurementLabels( painter );
+      paintHandles( painter );
+    }
+
+  private:
+    void paintHandles( QPainter *painter )
+    {
+      if ( !mNodesProvider )
         return;
-      const QList<KadasNode> nodes = mProvider();
+      const QList<KadasNode> nodes = mNodesProvider();
       painter->save();
       painter->setRenderHint( QPainter::Antialiasing, false );
       painter->setBrush( QBrush( Qt::white ) );
@@ -97,8 +106,51 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
       painter->restore();
     }
 
-  private:
-    NodesProvider mProvider;
+    // Paints the on-canvas measurement labels (segment lengths, polygon area)
+    // emitted by the controller. Restored from Kadas 2.3 KadasGeometryItem.
+    void paintMeasurementLabels( QPainter *painter )
+    {
+      if ( !mLabelsProvider )
+        return;
+      const QList<KadasAnnotationMeasurementLabel> labels = mLabelsProvider();
+      if ( labels.isEmpty() )
+        return;
+
+      const QgsSettings settings;
+      const int red = settings.value( QStringLiteral( "/Qgis/default_measure_color_red" ), 255 ).toInt();
+      const int green = settings.value( QStringLiteral( "/Qgis/default_measure_color_green" ), 0 ).toInt();
+      const int blue = settings.value( QStringLiteral( "/Qgis/default_measure_color_blue" ), 0 ).toInt();
+      const QColor textColor( red, green, blue );
+      const QColor backgroundColor( 255, 255, 255, 192 );
+      constexpr int offsetBelow = 20; // pixels, when label is anchored to a vertex (e.g. line total)
+      constexpr int padding = 3;
+
+      QFont font = painter->font();
+      font.setPointSizeF( 9.0 );
+      font.setBold( true );
+
+      painter->save();
+      painter->setFont( font );
+      const QFontMetrics metrics( font );
+
+      for ( const KadasAnnotationMeasurementLabel &label : labels )
+      {
+        const QStringList lines = label.text.split( '\n' );
+        int width = 0;
+        for ( const QString &l : lines )
+          width = std::max( width, metrics.horizontalAdvance( l ) );
+        const int height = metrics.height() * lines.size();
+        const QPointF screen = toCanvasCoordinates( label.mapPos );
+        QRectF rect( screen.x() - 0.5 * ( width + 2 * padding ), screen.y() + ( label.centered ? 0 : offsetBelow ) - 0.5 * ( height + 2 * padding ), width + 2 * padding, height + 2 * padding );
+        painter->fillRect( rect, backgroundColor );
+        painter->setPen( textColor );
+        painter->drawText( rect, Qt::AlignCenter, label.text );
+      }
+      painter->restore();
+    }
+
+    NodesProvider mNodesProvider;
+    LabelsProvider mLabelsProvider;
 };
 
 
@@ -212,12 +264,21 @@ void KadasMapToolEditAnnotationItem::activate()
 
   setupStyleEditor( outer );
 
-  mHandles = new HandlesOverlay( canvas(), [this]() -> QList<KadasNode> {
-    if ( !mItem || !mController || !mLayer )
-      return {};
-    KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
-    return mController->nodes( mItem, ctx );
-  } );
+  mHandles = new HandlesOverlay(
+    canvas(),
+    [this]() -> QList<KadasNode> {
+      if ( !mItem || !mController || !mLayer )
+        return {};
+      KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
+      return mController->nodes( mItem, ctx );
+    },
+    [this]() -> QList<KadasAnnotationMeasurementLabel> {
+      if ( !mItem || !mController || !mLayer )
+        return {};
+      KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
+      return mController->measurementLabels( mItem, ctx );
+    }
+  );
   connect( canvas(), &QgsMapCanvas::extentsChanged, this, [this] {
     if ( mHandles )
     {

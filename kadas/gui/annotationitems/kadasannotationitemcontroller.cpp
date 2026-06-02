@@ -20,6 +20,8 @@
 #include <qgis/qgsannotationitem.h>
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsrectangle.h>
+#include <qgis/qgssettings.h>
+#include <qgis/qgsunittypes.h>
 
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 
@@ -86,4 +88,22 @@ double KadasAnnotationItemController::pickTolSqr( const KadasAnnotationItemConte
 {
   const double mupp = ctx.mapSettings().mapUnitsPerPixel();
   return 25 * mupp * mupp;
+}
+
+// ----- Measurement formatting helpers --------------------------------------
+
+QString KadasAnnotationItemController::formatLengthMeters( double meters )
+{
+  const int decimals = QgsSettings().value( QStringLiteral( "/kadas/measure_decimals" ), "2" ).toInt();
+  return QgsUnitTypes::formatDistance( meters, decimals, Qgis::DistanceUnit::Meters );
+}
+
+QString KadasAnnotationItemController::formatAreaSquareMeters( double sqMeters )
+{
+  const int decimals = QgsSettings().value( QStringLiteral( "/kadas/measure_decimals" ), "2" ).toInt();
+  // Mirror KadasMapToolMeasure: prefer km² for very large areas to keep the
+  // on-canvas label compact.
+  if ( sqMeters >= 1000000.0 )
+    return QStringLiteral( "%1 km²" ).arg( sqMeters / 1000000.0, 0, 'f', decimals );
+  return QStringLiteral( "%1 m²" ).arg( sqMeters, 0, 'f', decimals );
 }

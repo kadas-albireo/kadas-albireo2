@@ -37,6 +37,28 @@ class QgsSettingsEntryInteger;
 class QuaZip;
 class KadasAnnotationStyleEditor;
 
+#ifndef SIP_RUN
+/**
+ * \ingroup gui
+ * \brief A single on-canvas measurement label (e.g. segment length, total
+ *        area) emitted by an annotation item controller.
+ *
+ * Restored from the Kadas 2.3 \c KadasGeometryItem on-canvas measurement
+ * labels: lines emit one label per segment plus a total at the trailing
+ * vertex; polygons emit a single area label at the centroid.
+ *
+ * \a mapPos is in the map canvas CRS. \a centered controls whether the
+ * label is drawn centered on \a mapPos (segment midpoints, polygon
+ * centroid) or offset below it (line totals at the trailing vertex).
+ */
+struct KadasAnnotationMeasurementLabel
+{
+    QgsPointXY mapPos;
+    QString text;
+    bool centered = true;
+};
+#endif
+
 /**
  * \ingroup gui
  * \brief Per-type controller for QgsAnnotationItem instances managed by Kadas.
@@ -119,6 +141,21 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     virtual QPair<QgsPointXY, double> closestPoint( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const;
 #endif
     virtual bool intersects( const QgsAnnotationItem *item, const QgsRectangle &mapRect, const KadasAnnotationItemContext &ctx, bool contains = false ) const;
+
+    // ----- On-canvas measurement labels ------------------------------------
+    //
+    // Restored from Kadas 2.3 (legacy KadasGeometryItem). The edit/create
+    // map tool overlays these labels on the canvas while the item is being
+    // traced or while it is selected for editing. Default: empty list.
+    // Concrete controllers (line, polygon, ...) override.
+#ifndef SIP_RUN
+    virtual QList<KadasAnnotationMeasurementLabel> measurementLabels( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
+    {
+      Q_UNUSED( item );
+      Q_UNUSED( ctx );
+      return {};
+    }
+#endif
 
     // ----- KML export ----------------------------------------------------
 
@@ -208,6 +245,14 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     static QgsRectangle toItemRect( const QgsRectangle &mapRect, const KadasAnnotationItemContext &ctx );
     static QgsRectangle toMapRect( const QgsRectangle &itemRect, const KadasAnnotationItemContext &ctx );
     static double pickTolSqr( const KadasAnnotationItemContext &ctx );
+
+#ifndef SIP_RUN
+    // Formatting helpers for measurementLabels() overrides. Honor the
+    // shared "/kadas/measure_decimals" setting (same one KadasMapToolMeasure
+    // uses).
+    static QString formatLengthMeters( double meters );
+    static QString formatAreaSquareMeters( double sqMeters );
+#endif
 };
 
 #endif // KADASANNOTATIONITEMCONTROLLER_H

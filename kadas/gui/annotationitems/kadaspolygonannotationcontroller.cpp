@@ -22,8 +22,10 @@
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgscurvepolygon.h>
+#include <qgis/qgsdistancearea.h>
 #include <qgis/qgsfillsymbol.h>
 #include <qgis/qgsfillsymbollayer.h>
+#include <qgis/qgsgeometry.h>
 #include <qgis/qgslinestring.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgspointxy.h>
@@ -222,11 +224,21 @@ KadasEditContext KadasPolygonAnnotationController::getEditContext( const QgsAnno
       return KadasEditContext( QgsVertexId( 0, 0, i ), mp, drawAttribs() );
     }
   }
-  if ( toMapRect( asPolygon( item )->boundingBox(), ctx ).contains( pos ) && last > 0 )
+  // Fall back: a click inside the polygon body selects it for whole-
+  // geometry translation. Use actual polygon containment, NOT bbox
+  // containment — a U-shaped polygon's bbox includes the empty area
+  // between its arms, where the user shouldn't pick it.
+  if ( last > 0 )
   {
-    const QgsPoint p0 = ring->vertexAt( QgsVertexId( 0, 0, 0 ) );
-    const QgsPointXY refPos = toMapPos( QgsPointXY( p0.x(), p0.y() ), ctx );
-    return KadasEditContext( QgsVertexId(), refPos, KadasAttribDefs(), Qt::ArrowCursor );
+    const QgsPointXY itemPos = toItemPos( pos, ctx );
+    std::unique_ptr<QgsCurvePolygon> clone( poly->clone() );
+    const QgsGeometry probe( clone.release() );
+    if ( probe.contains( &itemPos ) )
+    {
+      const QgsPoint p0 = ring->vertexAt( QgsVertexId( 0, 0, 0 ) );
+      const QgsPointXY refPos = toMapPos( QgsPointXY( p0.x(), p0.y() ), ctx );
+      return KadasEditContext( QgsVertexId(), refPos, KadasAttribDefs(), Qt::ArrowCursor );
+    }
   }
   return KadasEditContext();
 }
@@ -344,6 +356,27 @@ QString KadasPolygonAnnotationController::asKml( const QgsAnnotationItem *item, 
   outStream << "</Placemark>\n";
   outStream.flush();
   return outString;
+}
+
+QList<KadasAnnotationMeasurementLabel> KadasPolygonAnnotationController::measurementLabels( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
+{
+  QList<KadasAnnotationMeasurementLabel> labels;
+  const QgsCurvePolygon *poly = asPolygon( item )->geometry();
+  if ( !poly || !poly->exteriorRing() || poly->exteriorRing()->numPoints() < 3 )
+    return labels;
+
+  // Use project ellipsoid for ellipsoidal area; mirrors KadasPolygonItem::measureGeometry.
+  QgsDistanceArea da;
+  da.setSourceCrs( ctx.itemCrs(), ctx.mapSettings().transformContext() );
+  da.setEllipsoid( QgsProject::instance()->ellipsoid() );
+
+  std::unique_ptr<QgsCurvePolygon> clone( poly->clone() );
+  const QgsGeometry geom( clone.release() );
+  const double area = da.measureArea( geom );
+  const QgsPointXY centroidItem = geom.centroid().asPoint();
+
+  labels.append( { toMapPos( centroidItem, ctx ), formatAreaSquareMeters( area ), true } );
+  return labels;
 }
 
 void KadasPolygonAnnotationController::applyPersistedStyle( QgsAnnotationItem *item ) const

@@ -20,21 +20,28 @@
 #include <QStandardPaths>
 #include <QtTest/QTest>
 
+#include <qgis/qgsannotationlineitem.h>
 #include <qgis/qgsannotationmarkeritem.h>
+#include <qgis/qgsannotationpolygonitem.h>
 #include <qgis/qgsapplication.h>
 #include <qgis/qgscoordinatereferencesystem.h>
+#include <qgis/qgslinestring.h>
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgsmarkersymbol.h>
 #include <qgis/qgsmarkersymbollayer.h>
+#include <qgis/qgspoint.h>
 #include <qgis/qgspointxy.h>
+#include <qgis/qgspolygon.h>
 #include <qgis/qgsrectangle.h>
 
 #include <kadas/gui/kadasattributetypes.h>
 #include <kadas/gui/annotationitems/kadasannotationitemcontext.h>
 #include <kadas/gui/annotationitems/kadascircleannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadascircleannotationitem.h>
+#include <kadas/gui/annotationitems/kadaslineannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadasmarkerannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadaspinannotationitem.h>
+#include <kadas/gui/annotationitems/kadaspolygonannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadasrectangleannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadasrectangleannotationitem.h>
 
@@ -70,6 +77,16 @@ class TestKadasAnnotationControllers : public QObject
 
     // KadasPinAnnotationItem ---------------------------------------------
     void pin_defaultIconPath_resolvesInQrc();
+
+    // KadasLineAnnotationController --------------------------------------
+    void line_getEditContext_hitsOnSegmentNotInBoundingBox();
+    void line_getEditContext_hitsVertex();
+
+    // KadasPolygonAnnotationController -----------------------------------
+    void polygon_getEditContext_hitsBodyNotBoundingBox();
+
+    // Multi-type hit isolation -------------------------------------------
+    void hitTest_multipleTypesSelectsByGeometryNotBbox();
 
   private:
     static KadasAnnotationItemContext makeContext();
@@ -288,6 +305,167 @@ void TestKadasAnnotationControllers::pin_defaultIconPath_resolvesInQrc()
   const QString relative = path.mid( QStringLiteral( ":/kadas/" ).size() );
   const QString diskPath = QStringLiteral( "%1/kadas/resources/%2.svg" ).arg( CMAKE_SOURCE_DIR, relative );
   QVERIFY2( QFile::exists( diskPath ), qPrintable( QStringLiteral( "pin SVG file missing: %1" ).arg( diskPath ) ) );
+}
+
+
+// ----- Line -------------------------------------------------------------
+
+namespace
+{
+  // Build a QgsAnnotationLineItem with the given polyline (in item CRS,
+  // which equals map CRS in makeContext()).
+  std::unique_ptr<QgsAnnotationLineItem> makeLine( const QVector<QgsPointXY> &pts )
+  {
+    auto *ls = new QgsLineString();
+    for ( const QgsPointXY &p : pts )
+      ls->addVertex( QgsPoint( p.x(), p.y() ) );
+    return std::make_unique<QgsAnnotationLineItem>( ls );
+  }
+
+  std::unique_ptr<QgsAnnotationPolygonItem> makePolygon( const QVector<QgsPointXY> &ringPts )
+  {
+    auto *ring = new QgsLineString();
+    for ( const QgsPointXY &p : ringPts )
+      ring->addVertex( QgsPoint( p.x(), p.y() ) );
+    auto *poly = new QgsPolygon();
+    poly->setExteriorRing( ring );
+    return std::make_unique<QgsAnnotationPolygonItem>( poly );
+  }
+} //namespace
+
+void TestKadasAnnotationControllers::line_getEditContext_hitsOnSegmentNotInBoundingBox()
+{
+  // Regression: a long diagonal line's bounding box covers vast empty
+  // space. Selection must use distance-to-segment, not bbox containment,
+  // otherwise any click in the bbox falsely picks the line.
+  KadasLineAnnotationController controller;
+  const auto ctx = makeContext();
+
+  // Diagonal from (0, 0) to (1000, 1000).
+  auto item = makeLine( { QgsPointXY( 0, 0 ), QgsPointXY( 1000, 1000 ) } );
+
+  // Click ON the segment, near its midpoint: hit.
+  KadasEditContext ec = controller.getEditContext( item.get(), QgsPointXY( 500, 500 ), ctx );
+  QVERIFY2( ec.isValid(), "click on segment must hit" );
+
+  // Click in the bbox but far from the diagonal (top-left corner of
+  // bbox, no segment passes nearby): must miss.
+  ec = controller.getEditContext( item.get(), QgsPointXY( 50, 950 ), ctx );
+  QVERIFY2( !ec.isValid(), "click in bbox far from segment must miss" );
+
+  // Sanity: click well outside bbox: miss.
+  ec = controller.getEditContext( item.get(), QgsPointXY( -500, -500 ), ctx );
+  QVERIFY( !ec.isValid() );
+}
+
+void TestKadasAnnotationControllers::line_getEditContext_hitsVertex()
+{
+  KadasLineAnnotationController controller;
+  const auto ctx = makeContext();
+  auto item = makeLine( { QgsPointXY( 0, 0 ), QgsPointXY( 100, 0 ), QgsPointXY( 100, 100 ) } );
+
+  // On a vertex: hit (as a vertex edit, not body move).
+  KadasEditContext ec = controller.getEditContext( item.get(), QgsPointXY( 100, 0 ), ctx );
+  QVERIFY( ec.isValid() );
+  QVERIFY( ec.vidx.isValid() );
+}
+
+
+// ----- Polygon ----------------------------------------------------------
+
+void TestKadasAnnotationControllers::polygon_getEditContext_hitsBodyNotBoundingBox()
+{
+  // Regression: a U-shaped polygon's bounding box includes the empty
+  // area between its arms. The controller must use real geometry
+  // containment, not bbox containment.
+  KadasPolygonAnnotationController controller;
+  const auto ctx = makeContext();
+
+  // U shape (open at the top): outer ring traces a thick "U".
+  //   *--*    *--*
+  //   |  |    |  |
+  //   |  *----*  |
+  //   |          |
+  //   *----------*
+  auto item = makePolygon( {
+    QgsPointXY( 0, 0 ),
+    QgsPointXY( 100, 0 ),
+    QgsPointXY( 100, 80 ),
+    QgsPointXY( 70, 80 ),
+    QgsPointXY( 70, 30 ),
+    QgsPointXY( 30, 30 ),
+    QgsPointXY( 30, 80 ),
+    QgsPointXY( 0, 80 ),
+    QgsPointXY( 0, 0 ),
+  } );
+
+  // Click in the gap between arms (50, 60): inside bbox, NOT inside U.
+  KadasEditContext ec = controller.getEditContext( item.get(), QgsPointXY( 50, 60 ), ctx );
+  QVERIFY2( !ec.isValid(), "click in U's empty gap must miss" );
+
+  // Click in solid body of left arm: hit.
+  ec = controller.getEditContext( item.get(), QgsPointXY( 15, 50 ), ctx );
+  QVERIFY2( ec.isValid(), "click inside left arm of U must hit body" );
+
+  // Click in solid base of U: hit.
+  ec = controller.getEditContext( item.get(), QgsPointXY( 50, 15 ), ctx );
+  QVERIFY( ec.isValid() );
+}
+
+
+// ----- Multi-type isolation --------------------------------------------
+
+void TestKadasAnnotationControllers::hitTest_multipleTypesSelectsByGeometryNotBbox()
+{
+  // Stage: a long diagonal line whose bbox covers a marker placed in
+  // the empty corner. The picker (via getEditContext) must only hit the
+  // line when the click is actually near a segment, so a click on the
+  // marker's point selects the marker — not the line.
+  KadasLineAnnotationController lineCtrl;
+  KadasMarkerAnnotationController markerCtrl;
+  KadasPolygonAnnotationController polyCtrl;
+  const auto ctx = makeContext();
+
+  auto line = makeLine( { QgsPointXY( 0, 0 ), QgsPointXY( 800, 800 ) } );
+
+  std::unique_ptr<QgsAnnotationItem> markerItem( markerCtrl.createItem() );
+  markerCtrl.startPart( markerItem.get(), QgsPointXY( 50, 700 ), ctx );
+
+  // U-shaped polygon with a gap centered around (500, 60).
+  auto poly = makePolygon( {
+    QgsPointXY( 400, 0 ),
+    QgsPointXY( 600, 0 ),
+    QgsPointXY( 600, 100 ),
+    QgsPointXY( 540, 100 ),
+    QgsPointXY( 540, 30 ),
+    QgsPointXY( 460, 30 ),
+    QgsPointXY( 460, 100 ),
+    QgsPointXY( 400, 100 ),
+    QgsPointXY( 400, 0 ),
+  } );
+
+  // 1) Click on the marker (in the line's bbox, far from the diagonal):
+  //    only marker hits.
+  const QgsPointXY pMarker( 50, 700 );
+  QVERIFY2( markerCtrl.getEditContext( markerItem.get(), pMarker, ctx ).isValid(), "marker should hit at its point" );
+  QVERIFY2( !lineCtrl.getEditContext( line.get(), pMarker, ctx ).isValid(), "line must NOT hit at marker (was the regression)" );
+
+  // 2) Click in the U's empty gap (also inside line bbox, far from line):
+  //    nothing should hit.
+  const QgsPointXY pGap( 500, 60 );
+  QVERIFY2( !polyCtrl.getEditContext( poly.get(), pGap, ctx ).isValid(), "polygon must NOT hit in U gap" );
+  QVERIFY2( !lineCtrl.getEditContext( line.get(), pGap, ctx ).isValid(), "line must NOT hit in U gap" );
+
+  // 3) Click ON the diagonal: only the line hits.
+  const QgsPointXY pLine( 400, 400 );
+  QVERIFY2( lineCtrl.getEditContext( line.get(), pLine, ctx ).isValid(), "line should hit on segment" );
+  QVERIFY2( !markerCtrl.getEditContext( markerItem.get(), pLine, ctx ).isValid(), "marker should not hit far from its point" );
+  QVERIFY2( !polyCtrl.getEditContext( poly.get(), pLine, ctx ).isValid(), "polygon should not hit far from its body" );
+
+  // 4) Click in solid polygon arm: only polygon hits.
+  const QgsPointXY pPoly( 420, 50 );
+  QVERIFY2( polyCtrl.getEditContext( poly.get(), pPoly, ctx ).isValid(), "polygon should hit in solid body" );
+  QVERIFY2( !lineCtrl.getEditContext( line.get(), pPoly, ctx ).isValid(), "line must NOT hit in polygon body (off-diagonal)" );
 }
 
 
