@@ -31,6 +31,7 @@ vcpkg_from_github(
   mac_install_images.patch
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
+  invert_label_elevation_widget.patch # elevation widget in QGIS is on the left while on kadas it's on the right, this patch inverts the positions of the labels
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
