@@ -260,6 +260,7 @@ void KadasLayerTreeViewMenuProvider::setLayerUseAsHeightmap( bool enabled )
   if ( layer )
   {
     QgsProject::instance()->writeEntry( "Heightmap", "layer", enabled ? layer->id() : "" );
+    kApp->mainWindow()->setElevationControllerRangeFromHeightmap();
   }
 }
 

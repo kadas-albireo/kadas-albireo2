@@ -46,6 +46,7 @@
 #include <qgis/qgssourceselectproviderregistry.h>
 #include <qgis/qgssourceselectprovider.h>
 #include <qgis/qgsvectortilelayer.h>
+#include <qgis/qgselevationcontrollerwidget.h>
 
 #include "kadas/core/kadas.h"
 #include "kadas/gui/kadasclipboard.h"
@@ -54,6 +55,7 @@
 #include "kadas/gui/kadasmapcanvasitem.h"
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/kadasprojecttemplateselectiondialog.h"
+#include "kadas/gui/kadasmapwidget.h"
 
 #include "kadas/gui/catalog/kadasarcgisrestcatalogprovider.h"
 #include "kadas/gui/catalog/kadasgeoadminrestcatalogprovider.h"
@@ -313,6 +315,14 @@ void KadasMainWindow::init()
   mPluginManager = new KadasPluginManager( mapCanvas(), mActionPluginManager );
   mPluginManager->hide();
 
+  mElevationController = new QgsElevationControllerWidget();
+  mElevationController->setRangeLimits( QgsDoubleRange( 0, 5000 ) );
+
+  connect( mElevationController, &QgsElevationControllerWidget::rangeChanged, this, &KadasMainWindow::setCanvasZRange );
+  mElevationControllerFrame->layout()->addWidget( mElevationController );
+  //mMapCanvas->addOverlayWidget( mElevationController, Qt::Edge::LeftEdge );
+
+
   configureButtons();
 
   restoreFavoriteButton( mFavoriteButton1 );
@@ -452,6 +462,8 @@ void KadasMainWindow::updateWidgetPositions()
   mZoomInOutFrame->move( mMapCanvas->width() - distanceToRightBorder - mZoomInOutFrame->width(), distanceToTop );
 
   mHomeButton->move( mMapCanvas->width() - distanceToRightBorder - mHomeButton->height(), distanceToTop + 90 );
+
+  mElevationControllerFrame->move( mMapCanvas->width() - distanceToRightBorder - mElevationControllerFrame->width(), distanceToTop + 150 );
 
   // Resize mLayersWidget and reposition mLayerTreeViewButton
   int distanceToTopBottom = 40;
@@ -1550,6 +1562,55 @@ void KadasMainWindow::addRemotePicture()
   }
 }
 
+void KadasMainWindow::setElevationControllerRangeFromHeightmap()
+{
+  QString layerid = QgsProject::instance()->readEntry( "Heightmap", "layer" );
+  QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerid );
+  if ( !layer || layer->type() != Qgis::LayerType::Raster )
+  {
+    delete mElevationController;
+    mElevationController = nullptr;
+
+    // Delete for all map widgets
+    for ( KadasMapWidget *mapWidget : mMapWidgetManager->mapWidgets() )
+    {
+      mapWidget->removeElevationController();
+    }
+
+    return;
+  }
+
+
+  if ( !mElevationController )
+  {
+    mElevationController = new QgsElevationControllerWidget( this );
+    connect( mElevationController, &QgsElevationControllerWidget::rangeChanged, this, &KadasMainWindow::setCanvasZRange );
+    mElevationControllerFrame->layout()->addWidget( mElevationController );
+  }
+
+  for ( KadasMapWidget *mapWidget : mMapWidgetManager->mapWidgets() )
+  {
+    mapWidget->setElevationController();
+  }
+
+  QgsRasterLayer *rl = qobject_cast< QgsRasterLayer * >( layer );
+  QgsRasterBandStats stats = rl->dataProvider()->bandStatistics( 1, Qgis::RasterBandStatistic::Min | Qgis::RasterBandStatistic::Max );
+
+  mElevationController->setRangeLimits( QgsDoubleRange( stats.minimumValue, stats.maximumValue ) );
+  mElevationController->setRange( QgsDoubleRange( stats.minimumValue, stats.maximumValue ) );
+
+  // set range for all map widgets
+  for ( KadasMapWidget *mapWidget : mMapWidgetManager->mapWidgets() )
+  {
+    if ( !mapWidget->elevationController() )
+    {
+      continue;
+    }
+    mapWidget->elevationController()->setRangeLimits( QgsDoubleRange( stats.minimumValue, stats.maximumValue ) );
+    mapWidget->elevationController()->setRange( QgsDoubleRange( stats.minimumValue, stats.maximumValue ) );
+  }
+}
+
 void KadasMainWindow::addCustomDropHandler( QgsCustomDropHandler *handler )
 {
   mCustomDropHandlers.append( handler );
@@ -1662,4 +1723,12 @@ void KadasMainWindow::toggleIgnoreDpiScale()
 {
   QMessageBox::information( this, tr( "Font scaling setting changed" ), tr( "The font scaling change will be applied at the next program launch." ) );
   QgsSettings().setValue( "/kadas/ignore_dpi_scale", mCheckboxIgnoreSystemScaling->isChecked() );
+}
+
+void KadasMainWindow::setCanvasZRange( const QgsDoubleRange &range )
+{
+  if ( mMapCanvas )
+  {
+    mMapCanvas->setZRange( range );
+  }
 }

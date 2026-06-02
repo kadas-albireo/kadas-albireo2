@@ -29,6 +29,7 @@
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
+#include <qgis/qgselevationcontrollerwidget.h>
 
 #include "kadas/gui/kadasmapcanvasitem.h"
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
@@ -164,6 +165,26 @@ void KadasMapWidget::setMapExtent( const QgsRectangle &extent )
 {
   mMapCanvas->setExtent( extent );
   mMapCanvas->refresh();
+}
+
+void KadasMapWidget::setElevationController()
+{
+  if ( !mElevationController )
+  {
+    mElevationController = new QgsElevationControllerWidget( this );
+    connect( mElevationController, &QgsElevationControllerWidget::rangeChanged, mMapCanvas, &QgsMapCanvas::setZRange );
+    mMapCanvas->addOverlayWidget( mElevationController, Qt::Edge::RightEdge );
+  }
+}
+
+void KadasMapWidget::removeElevationController()
+{
+  if ( mElevationController )
+  {
+    delete mElevationController;
+    mElevationController = nullptr;
+    return;
+  }
 }
 
 bool KadasMapWidget::getLocked() const
