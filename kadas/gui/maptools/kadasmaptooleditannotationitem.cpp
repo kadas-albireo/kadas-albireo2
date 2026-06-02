@@ -341,9 +341,9 @@ void KadasMapToolEditAnnotationItem::canvasPressEvent( QgsMapMouseEvent *e )
     }
     // Otherwise, if the click hits an annotation, show a z-order menu;
     // a click on empty canvas closes the tool.
-    const QString hit = pickItemAt( e->mapPoint() );
+    const PickedItem hit = pickItemAt( e->mapPoint() );
     if ( !hit.isEmpty() )
-      showContextMenu( hit, e->globalPosition().toPoint() );
+      showContextMenu( hit.layer, hit.itemId, e->globalPosition().toPoint() );
     else
       canvas()->unsetMapTool( this );
     return;
@@ -357,15 +357,16 @@ void KadasMapToolEditAnnotationItem::canvasPressEvent( QgsMapMouseEvent *e )
   if ( mEditContext.isValid() )
     return;
 
-  // Outside of a digitizing part, a click on a different item on the same
-  // layer switches the tool to editing that item, instead of starting a
-  // brand new one (or doing nothing in pure edit mode).
+  // Outside of a digitizing part, a click on a different item switches
+  // the tool to editing that item, instead of starting a brand new one
+  // (or doing nothing in pure edit mode). The picker considers items on
+  // any visible annotation layer, not only the currently active one.
   if ( mDrawState != DrawState::InProgress )
   {
-    const QString hit = pickItemAt( e->mapPoint() );
-    if ( !hit.isEmpty() && hit != mItemId )
+    const PickedItem hit = pickItemAt( e->mapPoint() );
+    if ( !hit.isEmpty() && !( hit.layer == mLayer.data() && hit.itemId == mItemId ) )
     {
-      switchToItem( hit );
+      switchToItem( hit.layer, hit.itemId );
       return;
     }
   }
@@ -743,93 +744,117 @@ void KadasMapToolEditAnnotationItem::finishPart()
   emit partFinished();
 }
 
-QString KadasMapToolEditAnnotationItem::pickItemAt( const QgsPointXY &mapPos ) const
+KadasMapToolEditAnnotationItem::PickedItem KadasMapToolEditAnnotationItem::pickItemAt( const QgsPointXY &mapPos ) const
 {
-  if ( !mLayer || !canvas() )
-    return QString();
+  PickedItem result;
+  if ( !canvas() )
+    return result;
   QgsRenderContext rc = QgsRenderContext::fromMapSettings( canvas()->mapSettings() );
   double radiusmm = QgsSettings().value( QStringLiteral( "/Map/searchRadiusMM" ), Qgis::DEFAULT_SEARCH_RADIUS_MM ).toDouble();
   if ( radiusmm <= 0 )
     radiusmm = Qgis::DEFAULT_SEARCH_RADIUS_MM;
   const double radiusmu = radiusmm * rc.scaleFactor() * rc.mapToPixel().mapUnitsPerPixel();
   const QgsRectangle mapBounds( mapPos.x() - radiusmu, mapPos.y() - radiusmu, mapPos.x() + radiusmu, mapPos.y() + radiusmu );
-  const QgsRectangle layerBounds = canvas()->mapSettings().mapToLayerCoordinates( mLayer.data(), mapBounds );
-  QgsFeedback feedback;
-  const QStringList hits = mLayer->itemsInBounds( layerBounds, rc, &feedback );
-  if ( hits.isEmpty() )
-    return QString();
 
-  // QgsAnnotationLayer::itemsInBounds is a bounding-box test, so a click
-  // on a small item that sits inside a larger item's bbox (e.g. a marker
-  // on top of a rectangle) may match both. Refine by asking each
-  // candidate controller for an edit context at the click: only items
-  // that actually consider themselves hit (vertex / handle / body) are
-  // kept. Among those, prefer the highest zIndex (the item painted on
-  // top, matching the user's visual expectation when stacking
-  // pictures), with smallest bbox area as a tiebreaker for items that
-  // share a zIndex. If a candidate has no registered controller, fall
-  // back to the same z-then-area ordering on bbox-only matches.
-  KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
+  // Walk all visible annotation layers so a click can pick items from
+  // any of them (Pictures / Routes / Pins / Symbols / Mss / Redlining
+  // ...). QgsAnnotationLayer::itemsInBounds is a bounding-box test, so
+  // we refine each candidate with the controller's getEditContext()
+  // (vertex / handle / actual body containment). Among real hits we
+  // prefer the highest zIndex, with smallest bbox area as tiebreaker.
+  // If no candidate has a registered controller — or none reports a hit
+  // — fall back to the same z-then-area ordering on bbox-only matches
+  // so identify-style flows still resolve something.
+  QgsAnnotationLayer *bestLayer = nullptr;
   QString best;
   int bestZ = std::numeric_limits<int>::min();
   double bestArea = std::numeric_limits<double>::infinity();
+  QgsAnnotationLayer *fallbackLayer = nullptr;
   QString fallback;
   int fallbackZ = std::numeric_limits<int>::min();
   double fallbackArea = std::numeric_limits<double>::infinity();
-  for ( const QString &id : hits )
-  {
-    QgsAnnotationItem *cand = mLayer->item( id );
-    if ( !cand )
-      continue;
-    const QgsRectangle bb = cand->boundingBox();
-    const double area = bb.width() * bb.height();
-    const int z = cand->zIndex();
 
-    KadasAnnotationItemController *cc = KadasAnnotationControllerRegistry::instance()->controllerFor( cand->type() );
-    if ( !cc )
+  const auto layers = canvas()->layers();
+  for ( QgsMapLayer *ml : layers )
+  {
+    QgsAnnotationLayer *al = qobject_cast<QgsAnnotationLayer *>( ml );
+    if ( !al )
+      continue;
+    const QgsRectangle layerBounds = canvas()->mapSettings().mapToLayerCoordinates( al, mapBounds );
+    QgsFeedback feedback;
+    const QStringList hits = al->itemsInBounds( layerBounds, rc, &feedback );
+    if ( hits.isEmpty() )
+      continue;
+    KadasAnnotationItemContext ctx( al, canvas()->mapSettings() );
+    for ( const QString &id : hits )
     {
-      // No controller -> can't precise-test; keep as bbox-only fallback.
-      if ( z > fallbackZ || ( z == fallbackZ && area < fallbackArea ) )
+      QgsAnnotationItem *cand = al->item( id );
+      if ( !cand )
+        continue;
+      const QgsRectangle bb = cand->boundingBox();
+      const double area = bb.width() * bb.height();
+      const int z = cand->zIndex();
+
+      KadasAnnotationItemController *cc = KadasAnnotationControllerRegistry::instance()->controllerFor( cand->type() );
+      if ( !cc )
       {
-        fallbackZ = z;
-        fallbackArea = area;
-        fallback = id;
+        if ( z > fallbackZ || ( z == fallbackZ && area < fallbackArea ) )
+        {
+          fallbackZ = z;
+          fallbackArea = area;
+          fallback = id;
+          fallbackLayer = al;
+        }
+        continue;
       }
-      continue;
-    }
-    const KadasEditContext ec = cc->getEditContext( cand, mapPos, ctx );
-    if ( !ec.isValid() )
-      continue;
-    if ( z > bestZ || ( z == bestZ && area < bestArea ) )
-    {
-      bestZ = z;
-      bestArea = area;
-      best = id;
+      const KadasEditContext ec = cc->getEditContext( cand, mapPos, ctx );
+      if ( !ec.isValid() )
+        continue;
+      if ( z > bestZ || ( z == bestZ && area < bestArea ) )
+      {
+        bestZ = z;
+        bestArea = area;
+        best = id;
+        bestLayer = al;
+      }
     }
   }
-  return best.isEmpty() ? fallback : best;
+
+  if ( !best.isEmpty() )
+  {
+    result.layer = bestLayer;
+    result.itemId = best;
+  }
+  else if ( !fallback.isEmpty() )
+  {
+    result.layer = fallbackLayer;
+    result.itemId = fallback;
+  }
+  return result;
 }
 
-void KadasMapToolEditAnnotationItem::switchToItem( const QString &itemId )
+void KadasMapToolEditAnnotationItem::switchToItem( QgsAnnotationLayer *layer, const QString &itemId )
 {
-  if ( !canvas() || !mLayer || itemId.isEmpty() )
+  if ( !canvas() || !layer || itemId.isEmpty() )
     return;
   // Replace the active tool with a fresh edit-mode tool bound to the
-  // clicked item. The current tool is destroyed by setMapTool().
-  canvas()->setMapTool( new KadasMapToolEditAnnotationItem( canvas(), mLayer.data(), itemId ) );
+  // clicked item (on its own layer, which may differ from the layer the
+  // current tool was created with). The current tool is destroyed by
+  // setMapTool().
+  canvas()->setMapTool( new KadasMapToolEditAnnotationItem( canvas(), layer, itemId ) );
 }
 
-void KadasMapToolEditAnnotationItem::showContextMenu( const QString &itemId, const QPoint &globalPos )
+void KadasMapToolEditAnnotationItem::showContextMenu( QgsAnnotationLayer *layer, const QString &itemId, const QPoint &globalPos )
 {
-  if ( !mLayer )
+  if ( !layer )
     return;
-  QgsAnnotationItem *target = mLayer->item( itemId );
+  QgsAnnotationItem *target = layer->item( itemId );
   if ( !target )
     return;
 
   // Collect z-indices of all items on this layer to compute neighbor swaps
   // and front/back extremes.
-  const QMap<QString, QgsAnnotationItem *> all = mLayer->items();
+  const QMap<QString, QgsAnnotationItem *> all = layer->items();
   QList<int> zs;
   zs.reserve( all.size() );
   for ( auto it = all.constBegin(), itEnd = all.constEnd(); it != itEnd; ++it )
@@ -892,9 +917,9 @@ void KadasMapToolEditAnnotationItem::showContextMenu( const QString &itemId, con
     return;
 
   target->setZIndex( newZ );
-  mLayer->triggerRepaint();
+  layer->triggerRepaint();
   // If the right-clicked item is the one currently being edited, keep
   // history in sync.
-  if ( itemId == mItemId )
+  if ( layer == mLayer.data() && itemId == mItemId )
     pushState();
 }

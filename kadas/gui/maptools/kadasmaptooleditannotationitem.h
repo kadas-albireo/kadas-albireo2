@@ -151,15 +151,25 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     void startPart( const QgsPointXY &pos );
     void finishPart();
 
-    // Returns the id of an annotation item on mLayer hit by a click at
-    // \a mapPos, or an empty string if none.
-    QString pickItemAt( const QgsPointXY &mapPos ) const;
-    // Switches the tool to edit \a itemId on the current layer, rebuilding
-    // the styling row to match the new item's geometry kind.
-    void switchToItem( const QString &itemId );
-    // Pops up a context menu for \a itemId at the given global screen
-    // position with bring-to-front / send-to-back / forward / backward.
-    void showContextMenu( const QString &itemId, const QPoint &globalPos );
+    // Result of picking an annotation item on the canvas. The picker
+    // walks ALL visible annotation layers so the edit tool can switch to
+    // items that belong to a different layer than the one currently
+    // being edited (e.g. user is in redlining-create mode but clicks on
+    // a Routes-layer item from the open project).
+    struct PickedItem
+    {
+        QgsAnnotationLayer *layer = nullptr;
+        QString itemId;
+        bool isEmpty() const { return !layer || itemId.isEmpty(); }
+    };
+    PickedItem pickItemAt( const QgsPointXY &mapPos ) const;
+    // Switches the tool to edit \a itemId on \a layer, rebuilding the
+    // styling row to match the new item's geometry kind.
+    void switchToItem( QgsAnnotationLayer *layer, const QString &itemId );
+    // Pops up a context menu for \a itemId on \a layer at the given
+    // global screen position with bring-to-front / send-to-back /
+    // forward / backward.
+    void showContextMenu( QgsAnnotationLayer *layer, const QString &itemId, const QPoint &globalPos );
 
   private slots:
     void stateChanged( KadasStateHistory::ChangeType, KadasStateHistory::State *state, KadasStateHistory::State *prevState );
