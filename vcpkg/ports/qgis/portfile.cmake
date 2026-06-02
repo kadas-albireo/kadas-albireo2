@@ -1,9 +1,9 @@
 string(REPLACE "." "_" TAG ${VERSION})
 
 # set(QGIS_REF final-${TAG})
-set(QGIS_REF 94bfab5842ac14d80ca9de7e206e678783481ab8)
+set(QGIS_REF 3532bc2a987237b8bc5f3599bbf935bf715351f3)
 set(QGIS_SHA512
-    56d061cc42cdd631f4c9edaaf76b22219f3cdd4d403b18c036e599eb414005863a6e997685d566aad97b224139c32e2f7e94a03144ad4b4609afd97892b15ce4
+    12392a18ab8ce939421e7d20aaa6f0042facd1f94660490fc983065ae6783e07a373510068beeadd03273056e6c1c0b738d7b49325ed06c5de7838f7ee6f96de
 )
 
 vcpkg_from_github(
@@ -32,6 +32,7 @@ vcpkg_from_github(
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
   invert_label_elevation_widget.patch # elevation widget in QGIS is on the left while on kadas it's on the right, this patch inverts the positions of the labels
+  bigobj-vectorlayer.patch # https://github.com/qgis/QGIS/pull/66271
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)

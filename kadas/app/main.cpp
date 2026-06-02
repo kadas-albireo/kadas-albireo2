@@ -16,6 +16,7 @@
 
 #include <csignal>
 #include <fstream>
+#include <QCommandLineParser>
 #include <QDir>
 #include <QFileInfo>
 #include <QSettings>
@@ -124,6 +125,17 @@ int main( int argc, char *argv[] )
 
   KadasApplication *app = new KadasApplication( argc, argv );
 
+  // Parse Kadas-specific command line options. We do this after constructing
+  // QApplication so that QCommandLineParser sees the post-Qt argv (Qt strips
+  // its own -platform / -style / -stylesheet etc.).
+  QCommandLineParser parser;
+  parser.setApplicationDescription( QStringLiteral( "KADAS Albireo" ) );
+  QCommandLineOption networkLoggerOption( QStringList() << QStringLiteral( "network-logger" ), QStringLiteral( "Open the network logger panel at startup." ) );
+  parser.addOption( networkLoggerOption );
+  // Tolerate unknown options instead of aborting (Qt may still inject some).
+  parser.parse( QApplication::arguments() );
+  const bool openNetworkLogger = parser.isSet( networkLoggerOption );
+
 #ifdef __MINGW32__
   QString gdalDataDir = QDir( QString( "%1/../share/gdal" ).arg( QApplication::applicationDirPath() ) ).absolutePath();
   qputenv( "GDAL_DATA", gdalDataDir.toLocal8Bit() );
@@ -138,6 +150,11 @@ int main( int argc, char *argv[] )
   QDir::setCurrent( QApplication::applicationDirPath() );
 
   app->init();
+  if ( openNetworkLogger )
+  {
+    app->setNetworkLoggingEnabled( true );
+    app->showNetworkLogger();
+  }
   int status = app->exec();
 
   // Delete wcs cache on close

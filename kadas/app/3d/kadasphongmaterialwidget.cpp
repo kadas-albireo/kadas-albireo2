@@ -23,6 +23,7 @@ KadasPhongMaterialWidget::KadasPhongMaterialWidget( QWidget *parent, bool hasOpa
   , mHasOpacity( hasOpacity )
 {
   setupUi( this );
+  mPreviewWidget->hide();
   mOpacityWidget->setVisible( mHasOpacity );
   mLblOpacity->setVisible( mHasOpacity );
   spinShininess->setClearValue( 0, tr( "None" ) );
@@ -133,7 +134,7 @@ void KadasPhongMaterialWidget::setSettings( const QgsAbstractMaterialSettings *s
   updateWidgetState();
 }
 
-QgsAbstractMaterialSettings *KadasPhongMaterialWidget::settings()
+std::unique_ptr<QgsAbstractMaterialSettings> KadasPhongMaterialWidget::settings()
 {
   std::unique_ptr<QgsPhongMaterialSettings> m = std::make_unique<QgsPhongMaterialSettings>();
   m->setDiffuse( btnDiffuse->color() );
@@ -153,7 +154,7 @@ QgsAbstractMaterialSettings *KadasPhongMaterialWidget::settings()
   mPropertyCollection.setProperty( QgsAbstractMaterialSettings::Property::Specular, mSpecularDataDefinedButton->toProperty() );
   m->setDataDefinedProperties( mPropertyCollection );
 
-  return m.release();
+  return m;
 }
 
 void KadasPhongMaterialWidget::setHasOpacity( const bool opacity )
@@ -174,6 +175,12 @@ void KadasPhongMaterialWidget::setHasOpacity( const bool opacity )
   {
     disconnect( mOpacityWidget, &QgsOpacityWidget::opacityChanged, this, &KadasPhongMaterialWidget::changed );
   }
+}
+
+void KadasPhongMaterialWidget::setPreviewVisible( bool visible )
+{
+  Q_UNUSED( visible )
+  // Kadas does not show the material preview widget.
 }
 
 void KadasPhongMaterialWidget::updateWidgetState()

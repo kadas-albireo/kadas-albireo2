@@ -19,6 +19,8 @@
 #include <QLineEdit>
 #include "qgs3dmapsettings.h"
 #include "qgis.h"
+#include "qgs3d.h"
+#include "qgssettingsentryenumflag.h"
 
 KadasShadowRenderingSettingsWidget::KadasShadowRenderingSettingsWidget( QWidget *parent )
   : QWidget( parent )
@@ -27,7 +29,6 @@ KadasShadowRenderingSettingsWidget::KadasShadowRenderingSettingsWidget( QWidget 
 
   shadowRenderinMaximumDistanceSpinBox->setClearValue( 1500.00 );
   shadowBiasSpinBox->setClearValue( 0.000010 );
-  shadowMapResolutionSpinBox->setClearValue( 2048 );
 }
 
 void KadasShadowRenderingSettingsWidget::setShadowSettings( const QgsShadowSettings &shadowSettings )
@@ -35,7 +36,6 @@ void KadasShadowRenderingSettingsWidget::setShadowSettings( const QgsShadowSetti
   usedDirectionalLightComboBox->setCurrentIndex( shadowSettings.selectedDirectionalLight() );
   shadowRenderinMaximumDistanceSpinBox->setValue( shadowSettings.maximumShadowRenderingDistance() );
   shadowBiasSpinBox->setValue( shadowSettings.shadowBias() );
-  shadowMapResolutionSpinBox->setValue( shadowSettings.shadowMapResolution() );
 }
 
 QgsShadowSettings KadasShadowRenderingSettingsWidget::toShadowSettings()
@@ -44,7 +44,7 @@ QgsShadowSettings KadasShadowRenderingSettingsWidget::toShadowSettings()
   settings.setSelectedDirectionalLight( usedDirectionalLightComboBox->currentIndex() );
   settings.setMaximumShadowRenderingDistance( shadowRenderinMaximumDistanceSpinBox->value() );
   settings.setShadowBias( shadowBiasSpinBox->value() );
-  settings.setShadowMapResolution( shadowMapResolutionSpinBox->value() );
+  settings.setShadowQuality( Qgs3D::settingShadowQuality->value() );
   return settings;
 }
 

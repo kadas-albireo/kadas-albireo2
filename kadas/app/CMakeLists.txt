@@ -43,6 +43,7 @@ set(kadas_SRC
     bullseye/kadasmaptoolbullseye.cpp
     devtools/kadasdevelopertoolsdockwidget.cpp
     external/qgis/app/qgslayertreeviewindicatorprovider.cpp
+    external/qgis/app/3d/qgsmaterialpreviewwidget.cpp
     guidegrid/kadasguidegridlayer.cpp
     guidegrid/kadasmaptoolguidegrid.cpp
     iamauth/kadasiamauth.cpp
@@ -104,6 +105,8 @@ set(kadas_HDR
     bullseye/kadasmaptoolbullseye.h
     devtools/kadasdevelopertoolsdockwidget.h
     external/qgis/app/qgslayertreeviewindicatorprovider.h
+    external/qgis/app/3d/qgsmaterial3dhandler.h
+    external/qgis/app/3d/qgsmaterialpreviewwidget.h
     guidegrid/kadasguidegridlayer.h
     guidegrid/kadasmaptoolguidegrid.h
     iamauth/kadasiamauth.h
@@ -250,6 +253,7 @@ target_include_directories(
          ${CMAKE_SOURCE_DIR}/kadas/app/auth
          ${CMAKE_SOURCE_DIR}/kadas/app/bullseye
          ${CMAKE_SOURCE_DIR}/kadas/app/external/qgis
+         ${CMAKE_SOURCE_DIR}/kadas/app/external/qgis/app/3d
          ${CMAKE_SOURCE_DIR}/kadas/app/guidegrid
          ${CMAKE_SOURCE_DIR}/kadas/app/iamauth
          ${CMAKE_SOURCE_DIR}/kadas/app/kml
