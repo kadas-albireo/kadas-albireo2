@@ -315,12 +315,7 @@ void KadasMainWindow::init()
   mPluginManager = new KadasPluginManager( mapCanvas(), mActionPluginManager );
   mPluginManager->hide();
 
-  mElevationController = new QgsElevationControllerWidget();
-  mElevationController->setRangeLimits( QgsDoubleRange( 0, 5000 ) );
-
-  connect( mElevationController, &QgsElevationControllerWidget::rangeChanged, this, &KadasMainWindow::setCanvasZRange );
-  mElevationControllerFrame->layout()->addWidget( mElevationController );
-  //mMapCanvas->addOverlayWidget( mElevationController, Qt::Edge::LeftEdge );
+  setElevationControllerRangeFromHeightmap();
 
 
   configureButtons();
@@ -1564,18 +1559,17 @@ void KadasMainWindow::addRemotePicture()
 
 void KadasMainWindow::setElevationControllerRangeFromHeightmap()
 {
+  for ( KadasMapWidget *mapWidget : mMapWidgetManager->mapWidgets() )
+  {
+    mapWidget->setElevationController();
+  }
+
   QString layerid = QgsProject::instance()->readEntry( "Heightmap", "layer" );
   QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerid );
   if ( !layer || layer->type() != Qgis::LayerType::Raster )
   {
     delete mElevationController;
     mElevationController = nullptr;
-
-    // Delete for all map widgets
-    for ( KadasMapWidget *mapWidget : mMapWidgetManager->mapWidgets() )
-    {
-      mapWidget->removeElevationController();
-    }
 
     return;
   }
@@ -1588,27 +1582,12 @@ void KadasMainWindow::setElevationControllerRangeFromHeightmap()
     mElevationControllerFrame->layout()->addWidget( mElevationController );
   }
 
-  for ( KadasMapWidget *mapWidget : mMapWidgetManager->mapWidgets() )
-  {
-    mapWidget->setElevationController();
-  }
 
   QgsRasterLayer *rl = qobject_cast< QgsRasterLayer * >( layer );
   QgsRasterBandStats stats = rl->dataProvider()->bandStatistics( 1, Qgis::RasterBandStatistic::Min | Qgis::RasterBandStatistic::Max );
 
   mElevationController->setRangeLimits( QgsDoubleRange( stats.minimumValue, stats.maximumValue ) );
   mElevationController->setRange( QgsDoubleRange( stats.minimumValue, stats.maximumValue ) );
-
-  // set range for all map widgets
-  for ( KadasMapWidget *mapWidget : mMapWidgetManager->mapWidgets() )
-  {
-    if ( !mapWidget->elevationController() )
-    {
-      continue;
-    }
-    mapWidget->elevationController()->setRangeLimits( QgsDoubleRange( stats.minimumValue, stats.maximumValue ) );
-    mapWidget->elevationController()->setRange( QgsDoubleRange( stats.minimumValue, stats.maximumValue ) );
-  }
 }
 
 void KadasMainWindow::addCustomDropHandler( QgsCustomDropHandler *handler )

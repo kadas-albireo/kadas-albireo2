@@ -30,6 +30,8 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 #include <qgis/qgselevationcontrollerwidget.h>
+#include <qgis/qgsrasterlayer.h>
+
 
 #include "kadas/gui/kadasmapcanvasitem.h"
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
@@ -169,12 +171,26 @@ void KadasMapWidget::setMapExtent( const QgsRectangle &extent )
 
 void KadasMapWidget::setElevationController()
 {
+  QString layerid = QgsProject::instance()->readEntry( "Heightmap", "layer" );
+  QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerid );
+  if ( !layer || layer->type() != Qgis::LayerType::Raster )
+  {
+    removeElevationController();
+    return;
+  }
+
   if ( !mElevationController )
   {
     mElevationController = new QgsElevationControllerWidget( this );
     connect( mElevationController, &QgsElevationControllerWidget::rangeChanged, mMapCanvas, &QgsMapCanvas::setZRange );
     mMapCanvas->addOverlayWidget( mElevationController, Qt::Edge::RightEdge );
   }
+
+  QgsRasterLayer *rl = qobject_cast< QgsRasterLayer * >( layer );
+  QgsRasterBandStats stats = rl->dataProvider()->bandStatistics( 1, Qgis::RasterBandStatistic::Min | Qgis::RasterBandStatistic::Max );
+
+  mElevationController->setRangeLimits( QgsDoubleRange( stats.minimumValue, stats.maximumValue ) );
+  mElevationController->setRange( QgsDoubleRange( stats.minimumValue, stats.maximumValue ) );
 }
 
 void KadasMapWidget::removeElevationController()
