@@ -1,0 +1,463 @@
+From df0639b10bca2bb12a231f4dfc9d7f24738d4dd3 Mon Sep 17 00:00:00 2001
+From: Damiano Lombardi <damiano@opengis.ch>
+Date: Wed, 3 Jun 2026 07:51:23 +0200
+Subject: [PATCH] Arcgis rest layer symbology support rotation variables
+
+---
+ .../core/auto_additions/qgsarcgisrestutils.py |   2 +
+ .../arcgis/qgsarcgisrestutils.sip.in          |  21 ++
+ .../providers/arcgis/qgsarcgisrestutils.cpp   |  87 ++++++-
+ .../providers/arcgis/qgsarcgisrestutils.h     |  18 ++
+ tests/src/core/testqgsarcgisrestutils.cpp     | 221 ++++++++++++++++++
+ 5 files changed, 348 insertions(+), 1 deletion(-)
+
+diff --git a/python/PyQt6/core/auto_additions/qgsarcgisrestutils.py b/python/PyQt6/core/auto_additions/qgsarcgisrestutils.py
+index e38b6e7239e..476d1bb47b4 100644
+--- a/python/PyQt6/core/auto_additions/qgsarcgisrestutils.py
++++ b/python/PyQt6/core/auto_additions/qgsarcgisrestutils.py
+@@ -27,6 +27,8 @@ try:
+     QgsArcGisRestUtils.convertSpatialReference = staticmethod(QgsArcGisRestUtils.convertSpatialReference)
+     QgsArcGisRestUtils.convertSymbol = staticmethod(QgsArcGisRestUtils.convertSymbol)
+     QgsArcGisRestUtils.convertRenderer = staticmethod(QgsArcGisRestUtils.convertRenderer)
++    QgsArcGisRestUtils.applyVisualVariables = staticmethod(QgsArcGisRestUtils.applyVisualVariables)
++    QgsArcGisRestUtils.applyVisualVariablesToRenderer = staticmethod(QgsArcGisRestUtils.applyVisualVariablesToRenderer)
+     QgsArcGisRestUtils.convertLabeling = staticmethod(QgsArcGisRestUtils.convertLabeling)
+     QgsArcGisRestUtils.convertLabelingExpression = staticmethod(QgsArcGisRestUtils.convertLabelingExpression)
+     QgsArcGisRestUtils.convertColor = staticmethod(QgsArcGisRestUtils.convertColor)
+diff --git a/python/PyQt6/core/auto_generated/providers/arcgis/qgsarcgisrestutils.sip.in b/python/PyQt6/core/auto_generated/providers/arcgis/qgsarcgisrestutils.sip.in
+index f6f98acc4da..b6312291dff 100644
+--- a/python/PyQt6/core/auto_generated/providers/arcgis/qgsarcgisrestutils.sip.in
++++ b/python/PyQt6/core/auto_generated/providers/arcgis/qgsarcgisrestutils.sip.in
+@@ -120,6 +120,27 @@ Converts renderer JSON ``data`` to an equivalent
+ :py:class:`QgsFeatureRenderer`.
+ 
+ Caller takes ownership of the returned renderer.
++%End
++
++    static void applyVisualVariables( const QVariantMap &rendererData, QgsSymbol *symbol );
++%Docstring
++Applies visual variables from renderer JSON ``data`` to a ``symbol``.
++
++Currently only rotation visual variables (\c rotationInfo) are
++supported.
++
++.. versionadded:: 4.2
++%End
++
++    static void applyVisualVariablesToRenderer( const QVariantMap &rendererData, QgsFeatureRenderer *renderer );
++%Docstring
++Applies visual variables from renderer JSON ``data`` to all symbols in a
++``renderer``.
++
++Currently only rotation visual variables (\c rotationInfo) are
++supported.
++
++.. versionadded:: 4.2
+ %End
+ 
+     static std::unique_ptr< QgsAbstractVectorLayerLabeling > convertLabeling( const QVariantList &data );
+diff --git a/src/core/providers/arcgis/qgsarcgisrestutils.cpp b/src/core/providers/arcgis/qgsarcgisrestutils.cpp
+index c74cd3ec9d9..bd810bb919f 100644
+--- a/src/core/providers/arcgis/qgsarcgisrestutils.cpp
++++ b/src/core/providers/arcgis/qgsarcgisrestutils.cpp
+@@ -762,6 +762,74 @@ std::unique_ptr<QgsAbstractVectorLayerLabeling > QgsArcGisRestUtils::convertLabe
+   return std::make_unique< QgsRuleBasedLabeling >( root );
+ }
+ 
++void QgsArcGisRestUtils::applyVisualVariables( const QVariantMap &rendererData, QgsSymbol *symbol )
++{
++  if ( !symbol )
++    return;
++
++  const QVariantList visualVariablesData = rendererData.value( u"visualVariables"_s ).toList();
++  for ( const QVariant &visualVariable : visualVariablesData )
++  {
++    const QVariantMap visualVariableData = visualVariable.toMap();
++    const QString variableType = visualVariableData.value( u"type"_s ).toString();
++
++    if ( variableType == "rotationInfo"_L1 )
++    {
++      const QString field = visualVariableData.value( u"field"_s ).toString();
++      if ( field.isEmpty() )
++      {
++        // Check if it was a valueExpression that we don't support yet
++        if ( !visualVariableData.value( u"valueExpression"_s ).toString().isEmpty() )
++          QgsDebugError( u"ESRI rotationInfo valueExpression is not yet supported"_s );
++        continue;
++      }
++
++      const QString rotationType = visualVariableData.value( u"rotationType"_s ).toString();
++
++      QgsProperty angleProperty;
++      if ( rotationType == "arithmetic"_L1 )
++      {
++        // ArcGIS arithmetic: 0° = East, counter-clockwise
++        // QGIS: 0° = North, clockwise
++        // Conversion: QGIS_angle = 90 - ArcGIS_angle
++        angleProperty = QgsProperty::fromExpression( u"90 - \"%1\""_s.arg( field ) );
++      }
++      else
++      {
++        if ( rotationType != "geographic"_L1 )
++          QgsDebugError( u"ESRI rotationInfo rotationType '%1' is not supported, defaulting to 'geographic'"_s.arg( rotationType ) );
++
++        // ArcGIS geographic: 0° = North, clockwise (same as QGIS)
++        angleProperty = QgsProperty::fromField( field );
++      }
++
++      // Apply rotation to all symbol layers
++      for ( int layer = 0; layer < symbol->symbolLayerCount(); ++layer )
++      {
++        symbol->symbolLayer( layer )->setDataDefinedProperty( QgsSymbolLayer::Property::Angle, angleProperty );
++      }
++    }
++    else
++    {
++      QgsDebugError( u"ESRI visualVariable type %1 is not currently supported"_s.arg( variableType ) );
++    }
++  }
++}
++
++void QgsArcGisRestUtils::applyVisualVariablesToRenderer( const QVariantMap &rendererData, QgsFeatureRenderer *renderer )
++{
++  if ( !renderer )
++    return;
++
++  // Apply visual variables to all symbols in the renderer
++  QgsRenderContext context;
++  const QgsSymbolList symbols = renderer->symbols( context );
++  for ( QgsSymbol *symbol : symbols )
++  {
++    applyVisualVariables( rendererData, symbol );
++  }
++}
++
+ std::unique_ptr< QgsFeatureRenderer > QgsArcGisRestUtils::convertRenderer( const QVariantMap &rendererData )
+ {
+   const QString type = rendererData.value( u"type"_s ).toString();
+@@ -770,7 +838,11 @@ std::unique_ptr< QgsFeatureRenderer > QgsArcGisRestUtils::convertRenderer( const
+     const QVariantMap symbolProps = rendererData.value( u"symbol"_s ).toMap();
+     std::unique_ptr< QgsSymbol > symbol( convertSymbol( symbolProps ) );
+     if ( symbol )
++    {
++      // Apply visual variables (e.g., rotation) to the symbol
++      applyVisualVariables( rendererData, symbol.get() );
+       return std::make_unique< QgsSingleSymbolRenderer >( symbol.release() );
++    }
+     else
+       return nullptr;
+   }
+@@ -820,7 +892,12 @@ std::unique_ptr< QgsFeatureRenderer > QgsArcGisRestUtils::convertRenderer( const
+     if ( categoryList.empty() )
+       return nullptr;
+ 
+-    return std::make_unique< QgsCategorizedSymbolRenderer >( attribute, categoryList );
++    auto renderer = std::make_unique< QgsCategorizedSymbolRenderer >( attribute, categoryList );
++
++    // Apply visual variables (e.g., rotation) to all category symbols
++    applyVisualVariablesToRenderer( rendererData, renderer.get() );
++
++    return renderer;
+   }
+   else if ( type == "classBreaks"_L1 )
+   {
+@@ -898,6 +975,11 @@ std::unique_ptr< QgsFeatureRenderer > QgsArcGisRestUtils::convertRenderer( const
+ 
+         return std::make_unique< QgsSingleSymbolRenderer >( symbol.release() );
+       }
++      else if ( variableType == "rotationInfo"_L1 )
++      {
++        // Rotation will be handled below after the renderer is created
++        continue;
++      }
+       else
+       {
+         QgsDebugError( u"ESRI visualVariable type %1 is not currently supported"_s.arg( variableType ) );
+@@ -968,6 +1050,9 @@ std::unique_ptr< QgsFeatureRenderer > QgsArcGisRestUtils::convertRenderer( const
+       graduatedRenderer->addClass( range );
+     }
+ 
++    // Apply visual variables (e.g., rotation) to all class symbols
++    applyVisualVariablesToRenderer( rendererData, graduatedRenderer.get() );
++
+     return graduatedRenderer;
+   }
+   else if ( type == "heatmap"_L1 )
+diff --git a/src/core/providers/arcgis/qgsarcgisrestutils.h b/src/core/providers/arcgis/qgsarcgisrestutils.h
+index 0cc583c112f..b1b76d7d50b 100644
+--- a/src/core/providers/arcgis/qgsarcgisrestutils.h
++++ b/src/core/providers/arcgis/qgsarcgisrestutils.h
+@@ -159,6 +159,24 @@ class CORE_EXPORT QgsArcGisRestUtils
+      */
+     static std::unique_ptr< QgsFeatureRenderer > convertRenderer( const QVariantMap &rendererData );
+ 
++    /**
++     * Applies visual variables from renderer JSON \a data to a \a symbol.
++     *
++     * Currently only rotation visual variables (\c rotationInfo) are supported.
++     *
++     * \since QGIS 4.2
++     */
++    static void applyVisualVariables( const QVariantMap &rendererData, QgsSymbol *symbol );
++
++    /**
++     * Applies visual variables from renderer JSON \a data to all symbols in a \a renderer.
++     *
++     * Currently only rotation visual variables (\c rotationInfo) are supported.
++     *
++     * \since QGIS 4.2
++     */
++    static void applyVisualVariablesToRenderer( const QVariantMap &rendererData, QgsFeatureRenderer *renderer );
++
+     /**
+      * Converts labeling JSON \a data to an equivalent QGIS vector labeling.
+      *
+diff --git a/tests/src/core/testqgsarcgisrestutils.cpp b/tests/src/core/testqgsarcgisrestutils.cpp
+index 54c5c293c78..6e4a7976d29 100644
+--- a/tests/src/core/testqgsarcgisrestutils.cpp
++++ b/tests/src/core/testqgsarcgisrestutils.cpp
+@@ -21,6 +21,7 @@
+ #include "qgscategorizedsymbolrenderer.h"
+ #include "qgsfillsymbol.h"
+ #include "qgsfillsymbollayer.h"
++#include "qgsgraduatedsymbolrenderer.h"
+ #include "qgslinesymbol.h"
+ #include "qgslinesymbollayer.h"
+ #include "qgslogger.h"
+@@ -64,6 +65,13 @@ class TestQgsArcGisRestUtils : public QObject
+     void testParsePictureFillSymbol();
+     void testParseRendererSimple();
+     void testParseRendererCategorized();
++    void testVisualVariableRotationGeographic();
++    void testVisualVariableRotationArithmetic();
++    void testVisualVariableRotationDefaultsToGeographic();
++    void testVisualVariableRotationValueExpressionSkipped();
++    void testVisualVariableRotationSimpleRenderer();
++    void testVisualVariableRotationCategorizedRenderer();
++    void testVisualVariableRotationGraduatedRenderer();
+     void testParseLabeling();
+     void testParseCompoundCurve();
+     void testParsePolyline();
+@@ -605,6 +613,219 @@ void TestQgsArcGisRestUtils::testParseRendererCategorized()
+   QVERIFY( catRenderer->categories().at( 1 ).symbol() );
+ }
+ 
++void TestQgsArcGisRestUtils::testVisualVariableRotationGeographic()
++{
++  // Geographic rotation: 0° = North, clockwise — maps directly to a field property
++  QgsMarkerSymbol symbol;
++  const QVariantMap rendererData = jsonStringToMap(
++    "{"
++    "\"visualVariables\": ["
++    "{"
++    "\"type\": \"rotationInfo\","
++    "\"field\": \"WIND_DIR\","
++    "\"rotationType\": \"geographic\""
++    "}"
++    "]"
++    "}"
++  );
++  QgsArcGisRestUtils::applyVisualVariables( rendererData, &symbol );
++  const QgsProperty prop = symbol.symbolLayer( 0 )->dataDefinedProperties().property( QgsSymbolLayer::Property::Angle );
++  QVERIFY( prop.isActive() );
++  QCOMPARE( prop.propertyType(), Qgis::PropertyType::Field );
++  QCOMPARE( prop.field(), u"WIND_DIR"_s );
++}
++
++void TestQgsArcGisRestUtils::testVisualVariableRotationArithmetic()
++{
++  // Arithmetic rotation: 0° = East, CCW — must be converted via "90 - field"
++  QgsMarkerSymbol symbol;
++  const QVariantMap rendererData = jsonStringToMap(
++    "{"
++    "\"visualVariables\": ["
++    "{"
++    "\"type\": \"rotationInfo\","
++    "\"field\": \"ROTATION\","
++    "\"rotationType\": \"arithmetic\""
++    "}"
++    "]"
++    "}"
++  );
++  QgsArcGisRestUtils::applyVisualVariables( rendererData, &symbol );
++  const QgsProperty prop = symbol.symbolLayer( 0 )->dataDefinedProperties().property( QgsSymbolLayer::Property::Angle );
++  QVERIFY( prop.isActive() );
++  QCOMPARE( prop.propertyType(), Qgis::PropertyType::Expression );
++  QCOMPARE( prop.expressionString(), u"90 - \"ROTATION\""_s );
++}
++
++void TestQgsArcGisRestUtils::testVisualVariableRotationDefaultsToGeographic()
++{
++  // When rotationType is absent the implementation defaults to geographic
++  QgsMarkerSymbol symbol;
++  const QVariantMap rendererData = jsonStringToMap(
++    "{"
++    "\"visualVariables\": ["
++    "{"
++    "\"type\": \"rotationInfo\","
++    "\"field\": \"BEARING\""
++    "}"
++    "]"
++    "}"
++  );
++  QgsArcGisRestUtils::applyVisualVariables( rendererData, &symbol );
++  const QgsProperty prop = symbol.symbolLayer( 0 )->dataDefinedProperties().property( QgsSymbolLayer::Property::Angle );
++  QVERIFY( prop.isActive() );
++  QCOMPARE( prop.propertyType(), Qgis::PropertyType::Field );
++  QCOMPARE( prop.field(), u"BEARING"_s );
++}
++
++void TestQgsArcGisRestUtils::testVisualVariableRotationValueExpressionSkipped()
++{
++  // valueExpression (Arcade) is not supported yet — no rotation should be applied
++  QgsMarkerSymbol symbol;
++  const QVariantMap rendererData = jsonStringToMap(
++    "{"
++    "\"visualVariables\": ["
++    "{"
++    "\"type\": \"rotationInfo\","
++    "\"valueExpression\": \"$feature.ANGLE * 2\","
++    "\"rotationType\": \"geographic\""
++    "}"
++    "]"
++    "}"
++  );
++  QgsArcGisRestUtils::applyVisualVariables( rendererData, &symbol );
++  const QgsProperty prop = symbol.symbolLayer( 0 )->dataDefinedProperties().property( QgsSymbolLayer::Property::Angle );
++  QVERIFY( !prop.isActive() );
++}
++
++void TestQgsArcGisRestUtils::testVisualVariableRotationSimpleRenderer()
++{
++  // Rotation visual variable is applied to the symbol of a simple renderer
++  const QVariantMap map = jsonStringToMap(
++    "{"
++    "\"type\": \"simple\","
++    "\"symbol\": {"
++    "\"color\": [0,0,128,128],"
++    "\"size\": 15,"
++    "\"angle\": 0,"
++    "\"xoffset\": 0,"
++    "\"yoffset\": 0,"
++    "\"type\": \"esriSMS\","
++    "\"style\": \"esriSMSCircle\","
++    "\"outline\": {\"color\":[0,0,128,255],\"width\":1,\"type\":\"esriSLS\",\"style\":\"esriSLSSolid\"}"
++    "},"
++    "\"visualVariables\": ["
++    "{"
++    "\"type\": \"rotationInfo\","
++    "\"field\": \"HEADING\","
++    "\"rotationType\": \"geographic\""
++    "}"
++    "]"
++    "}"
++  );
++  const std::unique_ptr<QgsFeatureRenderer> renderer( QgsArcGisRestUtils::convertRenderer( map ) );
++  QgsSingleSymbolRenderer *ssRenderer = dynamic_cast<QgsSingleSymbolRenderer *>( renderer.get() );
++  QVERIFY( ssRenderer );
++  QVERIFY( ssRenderer->symbol() );
++  const QgsProperty prop = ssRenderer->symbol()->symbolLayer( 0 )->dataDefinedProperties().property( QgsSymbolLayer::Property::Angle );
++  QVERIFY( prop.isActive() );
++  QCOMPARE( prop.propertyType(), Qgis::PropertyType::Field );
++  QCOMPARE( prop.field(), u"HEADING"_s );
++}
++
++void TestQgsArcGisRestUtils::testVisualVariableRotationCategorizedRenderer()
++{
++  // Rotation visual variable is applied to all category symbols of a uniqueValue renderer
++  const QVariantMap map = jsonStringToMap(
++    "{"
++    "\"type\": \"uniqueValue\","
++    "\"field1\": \"COUNTRY\","
++    "\"uniqueValueInfos\": ["
++    "{"
++    "\"value\": \"US\","
++    "\"symbol\": "
++    "{\"color\":[253,127,111,255],\"size\":12,\"angle\":0,\"xoffset\":0,\"yoffset\":0,\"type\":\"esriSMS\",\"style\":\"esriSMSCircle\",\"outline\":{\"color\":[26,26,26,255],\"width\":0.75,\"type\":"
++    "\"esriSLS\",\"style\":\"esriSLSSolid\"}},"
++    "\"label\": \"United States\""
++    "},"
++    "{"
++    "\"value\": \"Canada\","
++    "\"symbol\": "
++    "{\"color\":[126,176,213,255],\"size\":12,\"angle\":0,\"xoffset\":0,\"yoffset\":0,\"type\":\"esriSMS\",\"style\":\"esriSMSCircle\",\"outline\":{\"color\":[26,26,26,255],\"width\":0.75,\"type\":"
++    "\"esriSLS\",\"style\":\"esriSLSSolid\"}},"
++    "\"label\": \"Canada\""
++    "}"
++    "],"
++    "\"visualVariables\": ["
++    "{"
++    "\"type\": \"rotationInfo\","
++    "\"field\": \"WIND_DIR\","
++    "\"rotationType\": \"arithmetic\""
++    "}"
++    "]"
++    "}"
++  );
++  const std::unique_ptr<QgsFeatureRenderer> renderer( QgsArcGisRestUtils::convertRenderer( map ) );
++  QgsCategorizedSymbolRenderer *catRenderer = dynamic_cast<QgsCategorizedSymbolRenderer *>( renderer.get() );
++  QVERIFY( catRenderer );
++  QCOMPARE( catRenderer->categories().count(), 2 );
++  for ( const QgsRendererCategory &category : catRenderer->categories() )
++  {
++    QVERIFY( category.symbol() );
++    const QgsProperty prop = category.symbol()->symbolLayer( 0 )->dataDefinedProperties().property( QgsSymbolLayer::Property::Angle );
++    QVERIFY( prop.isActive() );
++    QCOMPARE( prop.propertyType(), Qgis::PropertyType::Expression );
++    QCOMPARE( prop.expressionString(), u"90 - \"WIND_DIR\""_s );
++  }
++}
++
++void TestQgsArcGisRestUtils::testVisualVariableRotationGraduatedRenderer()
++{
++  // Rotation visual variable is applied to all class symbols of a classBreaks renderer
++  const QVariantMap map = jsonStringToMap(
++    "{"
++    "\"type\": \"classBreaks\","
++    "\"field\": \"POPULATION\","
++    "\"minValue\": 0,"
++    "\"classBreakInfos\": ["
++    "{"
++    "\"classMaxValue\": 1000,"
++    "\"symbol\": "
++    "{\"color\":[255,0,0,255],\"size\":8,\"angle\":0,\"xoffset\":0,\"yoffset\":0,\"type\":\"esriSMS\",\"style\":\"esriSMSCircle\",\"outline\":{\"color\":[0,0,0,255],\"width\":1,\"type\":\"esriSLS\","
++    "\"style\":\"esriSLSSolid\"}},"
++    "\"label\": \"< 1000\""
++    "},"
++    "{"
++    "\"classMaxValue\": 5000,"
++    "\"symbol\": "
++    "{\"color\":[0,255,0,255],\"size\":14,\"angle\":0,\"xoffset\":0,\"yoffset\":0,\"type\":\"esriSMS\",\"style\":\"esriSMSCircle\",\"outline\":{\"color\":[0,0,0,255],\"width\":1,\"type\":\"esriSLS\","
++    "\"style\":\"esriSLSSolid\"}},"
++    "\"label\": \"1000 - 5000\""
++    "}"
++    "],"
++    "\"visualVariables\": ["
++    "{"
++    "\"type\": \"rotationInfo\","
++    "\"field\": \"HEADING\","
++    "\"rotationType\": \"geographic\""
++    "}"
++    "]"
++    "}"
++  );
++  const std::unique_ptr<QgsFeatureRenderer> renderer( QgsArcGisRestUtils::convertRenderer( map ) );
++  QgsGraduatedSymbolRenderer *gradRenderer = dynamic_cast<QgsGraduatedSymbolRenderer *>( renderer.get() );
++  QVERIFY( gradRenderer );
++  QVERIFY( gradRenderer->ranges().count() >= 2 );
++  for ( const QgsRendererRange &range : gradRenderer->ranges() )
++  {
++    QVERIFY( range.symbol() );
++    const QgsProperty prop = range.symbol()->symbolLayer( 0 )->dataDefinedProperties().property( QgsSymbolLayer::Property::Angle );
++    QVERIFY( prop.isActive() );
++    QCOMPARE( prop.propertyType(), Qgis::PropertyType::Field );
++    QCOMPARE( prop.field(), u"HEADING"_s );
++  }
++}
++
+ void TestQgsArcGisRestUtils::testParseLabeling()
+ {
+   const QVariantMap map = jsonStringToMap(
+-- 
+2.54.0
+
