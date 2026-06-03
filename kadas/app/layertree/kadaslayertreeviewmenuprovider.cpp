@@ -69,7 +69,6 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
     {
       QgsMapLayer *layer = QgsLayerTree::toLayer( node )->layer();
 
-
       if ( qobject_cast<QgsVectorLayer *>( layer ) || qobject_cast<QgsRasterLayer *>( layer ) || qobject_cast<KadasPluginLayer *>( layer ) )
       {
         menu->addAction( actionLayerTransparency( menu ) );
@@ -90,12 +89,18 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
       }
       menu->addAction( actions->actionZoomToLayers( kApp->mainWindow()->mapCanvas(), menu ) );
 
+      menu->addAction( actionLockLayer( menu ) );
+
       KadasMapSwipeMapTool::addContextMenuAction( layer, KadasApplication::instance()->mainWindow()->mapCanvas(), menu, this );
 
       QAction *renameAction = actions->actionRenameGroupOrLayer( menu );
       renameAction->setIcon( QIcon( ":/kadas/icons/rename" ) );
       menu->addAction( renameAction );
-      menu->addAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), this, &KadasLayerTreeViewMenuProvider::removeLayerTreeItems );
+
+      QAction *removeAction = new QAction( QgsApplication::getThemeIcon( "/mActionRemoveLayer.svg" ), tr( "&Remove" ), this );
+      connect( removeAction, &QAction::triggered, this, &KadasLayerTreeViewMenuProvider::removeLayerTreeItems );
+      removeAction->setEnabled( layer->flags().testFlag( QgsMapLayer::Removable ) );
+      menu->addAction( removeAction );
 
       if ( layer->type() == Qgis::LayerType::Raster && ( layer->providerType() == "gdal" || layer->providerType() == "wcs" ) )
       {
@@ -206,6 +211,31 @@ QAction *KadasLayerTreeViewMenuProvider::actionLayerUseAsHeightmap( QMenu *paren
   return heightmapAction;
 }
 
+QAction *KadasLayerTreeViewMenuProvider::actionLockLayer( QMenu *parent )
+{
+  QgsMapLayer *layer = mView->currentLayer();
+  if ( !layer )
+  {
+    return nullptr;
+  }
+  bool isLocked = true;
+  isLocked = isLocked && !( layer->flags() & QgsMapLayer::Removable );
+  QgsVectorLayer *vl = qobject_cast<QgsVectorLayer *>( layer );
+  if ( vl )
+  {
+    isLocked = isLocked && vl->readOnly();
+  }
+
+  QAction *lockAction = new QAction( tr( "Lock Layer" ), parent );
+  lockAction->setCheckable( true );
+
+  lockAction->setChecked( isLocked );
+  lockAction->setText( isLocked ? tr( "Unlock Layer" ) : tr( "Lock Layer" ) );
+
+  connect( lockAction, &QAction::toggled, this, &KadasLayerTreeViewMenuProvider::setLayerLock );
+  return lockAction;
+}
+
 void KadasLayerTreeViewMenuProvider::removeLayerTreeItems()
 {
   // look for layers recursively so we catch also those that are within selected groups
@@ -260,6 +290,28 @@ void KadasLayerTreeViewMenuProvider::setLayerUseAsHeightmap( bool enabled )
   if ( layer )
   {
     QgsProject::instance()->writeEntry( "Heightmap", "layer", enabled ? layer->id() : "" );
+  }
+}
+
+void KadasLayerTreeViewMenuProvider::setLayerLock( bool enabled )
+{
+  QgsMapLayer *layer = mView->currentLayer();
+  if ( layer )
+  {
+    if ( enabled )
+    {
+      layer->setFlags( layer->flags() & ~QgsMapLayer::Removable );
+    }
+    else
+    {
+      layer->setFlags( layer->flags() | QgsMapLayer::Removable );
+    }
+  }
+
+  QgsVectorLayer *vl = qobject_cast<QgsVectorLayer *>( layer );
+  if ( vl )
+  {
+    vl->setReadOnly( enabled );
   }
 }
 
