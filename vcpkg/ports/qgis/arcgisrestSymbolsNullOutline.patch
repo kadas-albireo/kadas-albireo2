@@ -1,7 +1,7 @@
-From 17ccc2e6cde6e6d20b53aadb9441d4f77e92bbbe Mon Sep 17 00:00:00 2001
+From f9ad496a49238b014eaa64ecb093f5e64e860cee Mon Sep 17 00:00:00 2001
 From: Damiano Lombardi <damiano@opengis.ch>
 Date: Fri, 8 May 2026 11:36:59 +0200
-Subject: [PATCH] Hanle null outline for some arcgis symbols
+Subject: [PATCH 1/2] Handle null outline for some arcgis symbols
 
 ---
  .../converters/qgssymbolconverteresrirest.cpp | 57 ++++++++----
@@ -220,5 +220,49 @@ index 54c5c293c78..dc8e7d546f9 100644
  {
    const QVariantMap map = jsonStringToMap(
 -- 
-2.53.0
+2.54.0
+
+
+From 6ad51d209dbbdc0567c537f8411d5d3c41dad9c0 Mon Sep 17 00:00:00 2001
+From: Damiano Lombardi <damiano@opengis.ch>
+Date: Fri, 5 Jun 2026 09:29:38 +0200
+Subject: [PATCH 2/2] Use QgsVariantUtils::isNull
+
+---
+ .../symbology/converters/qgssymbolconverteresrirest.cpp     | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/core/symbology/converters/qgssymbolconverteresrirest.cpp b/src/core/symbology/converters/qgssymbolconverteresrirest.cpp
+index 4e371981508..dd0ea6dc870 100644
+--- a/src/core/symbology/converters/qgssymbolconverteresrirest.cpp
++++ b/src/core/symbology/converters/qgssymbolconverteresrirest.cpp
+@@ -129,7 +129,7 @@ std::unique_ptr<QgsFillSymbol> QgsSymbolConverterEsriRest::parseEsriFillSymbolJs
+ 
+   // Check if outline is null - ArcGIS services may return "outline": null
+   const QVariant outlineVariant = symbolData.value( u"outline"_s );
+-  if ( !outlineVariant.isNull() )
++  if ( !QgsVariantUtils::isNull( outlineVariant ) )
+   {
+     const QVariantMap outlineData = outlineVariant.toMap();
+     lineColor = convertColor( outlineData.value( u"color"_s ) );
+@@ -181,7 +181,7 @@ std::unique_ptr<QgsFillSymbol> QgsSymbolConverterEsriRest::parseEsriPictureFillS
+ 
+   // Check if outline is null - ArcGIS services may return "outline": null
+   const QVariant outlineVariant = symbolData.value( u"outline"_s );
+-  if ( !outlineVariant.isNull() )
++  if ( !QgsVariantUtils::isNull( outlineVariant ) )
+   {
+     const QVariantMap outlineData = outlineVariant.toMap();
+     const QColor lineColor = convertColor( outlineData.value( u"color"_s ) );
+@@ -238,7 +238,7 @@ std::unique_ptr<QgsMarkerSymbol> QgsSymbolConverterEsriRest::parseEsriMarkerSymb
+ 
+   // Check if outline is null - ArcGIS services may return "outline": null
+   const QVariant outlineVariant = symbolData.value( u"outline"_s );
+-  if ( !outlineVariant.isNull() )
++  if ( !QgsVariantUtils::isNull( outlineVariant ) )
+   {
+     const QVariantMap outlineData = outlineVariant.toMap();
+     lineColor = convertColor( outlineData.value( u"color"_s ) );
+-- 
+2.54.0
 
