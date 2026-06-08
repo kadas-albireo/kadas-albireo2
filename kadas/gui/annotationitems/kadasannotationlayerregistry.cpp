@@ -32,6 +32,7 @@ void KadasAnnotationLayerRegistry::init()
   connect( QgsProject::instance(), &QgsProject::cleared, instance(), &KadasAnnotationLayerRegistry::clear );
   connect( QgsProject::instance(), &QgsProject::readProject, instance(), &KadasAnnotationLayerRegistry::readFromProject );
   connect( QgsProject::instance(), &QgsProject::writeProject, instance(), &KadasAnnotationLayerRegistry::writeToProject );
+  connect( QgsProject::instance(), &QgsProject::crsChanged, instance(), &KadasAnnotationLayerRegistry::onProjectCrsChanged );
 }
 
 void KadasAnnotationLayerRegistry::clear()
@@ -122,4 +123,29 @@ KadasAnnotationLayerRegistry *KadasAnnotationLayerRegistry::instance()
 {
   static KadasAnnotationLayerRegistry registry;
   return &registry;
+}
+
+void KadasAnnotationLayerRegistry::onProjectCrsChanged()
+{
+  const QgsCoordinateReferenceSystem newCrs = QgsProject::instance()->crs();
+  if ( !newCrs.isValid() )
+    return;
+  for ( auto it = mLayerIdMap.constBegin(), itEnd = mLayerIdMap.constEnd(); it != itEnd; ++it )
+  {
+    // MSS content is always WGS84 (libmss IPC convention).
+    if ( it.key() == StandardLayer::MssLayer )
+      continue;
+    QgsAnnotationLayer *annoLayer = qobject_cast<QgsAnnotationLayer *>( QgsProject::instance()->mapLayer( it.value() ) );
+    if ( !annoLayer )
+      continue;
+    if ( annoLayer->crs() == newCrs )
+      continue;
+    // Only retarget layers that don't yet hold any user-drawn item:
+    // changing the CRS on a non-empty layer would silently re-interpret
+    // every stored coordinate as being in the new CRS and shift/skew
+    // existing items.
+    if ( !annoLayer->isEmpty() )
+      continue;
+    annoLayer->setCrs( newCrs );
+  }
 }

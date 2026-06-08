@@ -83,6 +83,14 @@ class KADAS_GUI_EXPORT KadasAnnotationLayerRegistry : public QObject
     void clear();
     void readFromProject( const QDomDocument &doc );
     void writeToProject( QDomDocument &doc );
+    //! Slot bound to \c QgsProject::crsChanged. For each tracked standard
+    //! annotation layer that is still empty (no items), retargets its CRS
+    //! to the new project CRS so freshly drawn axis-aligned items
+    //! (rectangles, circles) stay un-skewed. MSS is excluded
+    //! (libmss IPC requires WGS84) and non-empty layers are left
+    //! untouched (mutating their CRS would re-interpret existing
+    //! coordinates and shift / skew already-drawn items).
+    void onProjectCrsChanged();
 };
 
 #endif // KADASANNOTATIONLAYERREGISTRY_H
