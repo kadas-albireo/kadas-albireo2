@@ -24,6 +24,7 @@
 #include <qgis/qgswkbtypes.h>
 
 #include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/kadasattributetypes.h"
 
 class QgsAnnotationLayer;
 class QgsMapLayer;
@@ -37,6 +38,34 @@ class KADAS_GUI_EXPORT KadasFeaturePicker
       PICK_OBJECTIVE_ANY,
       PICK_OBJECTIVE_TOOLTIP
     };
+
+#ifndef SIP_RUN
+    /**
+     * Annotation candidate descriptor used to rank overlapping picks.
+     * \see rankAnnotationCandidates
+     */
+    struct AnnotationPickCandidate
+    {
+        QgsAnnotationLayer *layer = nullptr;
+        QString itemId;
+        KadasEditContext::HitPrecision precision = KadasEditContext::HitPrecision::Body;
+        int zIndex = 0;
+        double bboxArea = 0;
+    };
+
+    /**
+     * Returns the index of the best candidate in \a candidates, or -1 if
+     * the list is empty.
+     *
+     * Ranking (in order): higher \c precision wins, then higher \c zIndex
+     * wins, then smaller \c bboxArea wins. The first rule ensures that a
+     * click that geometrically falls on a vertex / handle / edge of a
+     * low-z item is preferred over a click that merely lands inside the
+     * body of a higher-z item (e.g. a long line crossing a large
+     * polygon).
+     */
+    static int rankAnnotationCandidates( const QList<AnnotationPickCandidate> &candidates );
+#endif
 
     class PickResult
     {

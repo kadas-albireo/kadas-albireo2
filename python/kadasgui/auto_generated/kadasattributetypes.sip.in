@@ -60,15 +60,32 @@ struct KadasEditContext
 %TypeHeaderCode
 #include "kadas/gui/kadasattributetypes.h"
 %End
+    enum class HitPrecision
+    {
+      Body,
+      Precise,
+    };
+
     KadasEditContext();
 
     KadasEditContext( const QgsVertexId &_vidx, const QgsPointXY &_pos = QgsPointXY(), const KadasAttribDefs &_attributes = KadasAttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor );
+%Docstring
+Constructs an edit context.
+
+``_vidx``, when valid, denotes a vertex / handle hit and the resulting
+\c precision is automatically \c HitPrecision.Precise. A
+default-constructed ``_vidx`` denotes a whole-item body hit and the
+resulting \c precision is \c HitPrecision.Body — callers with a tighter
+geometric hit (e.g. line stroke) should explicitly upgrade \c precision
+after construction.
+%End
 
     bool mValid;
     QgsVertexId vidx;
     QgsPointXY pos;
     KadasAttribDefs attributes;
     Qt::CursorShape cursor;
+    HitPrecision precision;
     bool isValid() const;
     bool operator!=( const KadasEditContext &other ) const;
 };

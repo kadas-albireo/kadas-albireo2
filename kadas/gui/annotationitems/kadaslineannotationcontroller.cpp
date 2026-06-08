@@ -223,7 +223,15 @@ KadasEditContext KadasLineAnnotationController::getEditContext( const QgsAnnotat
       {
         const QgsPoint p0 = curve->vertexAt( QgsVertexId( 0, 0, 0 ) );
         const QgsPointXY refPos = toMapPos( QgsPointXY( p0.x(), p0.y() ), ctx );
-        return KadasEditContext( QgsVertexId(), refPos, KadasAttribDefs(), Qt::ArrowCursor );
+        // A click that lands on the actual line stroke is a geometrically
+        // precise hit, NOT a loose body containment — even though we use
+        // the whole-line-move semantics (ArrowCursor + invalid vidx) for
+        // the subsequent drag. Flag it as Precise so the canvas picker
+        // prefers this line over a higher-z polygon whose body merely
+        // contains the click.
+        KadasEditContext ec( QgsVertexId(), refPos, KadasAttribDefs(), Qt::ArrowCursor );
+        ec.precision = KadasEditContext::HitPrecision::Precise;
+        return ec;
       }
     }
   }

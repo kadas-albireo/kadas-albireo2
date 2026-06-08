@@ -77,53 +77,73 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickAnnotationLayer( QgsAnnot
   // QgsAnnotationLayer::itemsInBounds is a bounding-box test only, so
   // long diagonal lines / U-shaped polygons would falsely capture clicks
   // anywhere inside their AABB. Refine by asking each candidate's
-  // controller for an edit context at the click position: a candidate is
-  // a real hit only if its controller reports a valid context (vertex,
-  // handle, or actual body containment). Among real hits, prefer the
-  // highest zIndex, then smallest bbox area. If no candidate has a
-  // controller (or none reports a hit), fall back to the previous
-  // bbox-only behavior so identify/tooltip still resolve something.
+  // controller for an edit context at the click position and rank the
+  // valid hits using rankAnnotationCandidates (precision → z → area).
+  // A controller that reports no hit means "genuinely missed" — skip
+  // such candidates entirely (otherwise a right-click in empty space
+  // inside an item's AABB would falsely pick it). Only items WITHOUT a
+  // registered controller fall back to a bbox-only candidate so
+  // identify/tooltip still resolve something for unknown item types.
   KadasAnnotationItemContext ctx( layer, canvas->mapSettings() );
-  QString best;
-  int bestZ = std::numeric_limits<int>::min();
-  double bestArea = std::numeric_limits<double>::infinity();
-  QString fallback;
-  int fallbackZ = std::numeric_limits<int>::min();
-  double fallbackArea = std::numeric_limits<double>::infinity();
+  QList<AnnotationPickCandidate> precise;
+  QList<AnnotationPickCandidate> fallback;
   for ( const QString &id : hits )
   {
     QgsAnnotationItem *cand = layer->item( id );
     if ( !cand )
       continue;
     const QgsRectangle bb = cand->boundingBox();
-    const double area = bb.width() * bb.height();
-    const int z = cand->zIndex();
-
-    if ( z > fallbackZ || ( z == fallbackZ && area < fallbackArea ) )
-    {
-      fallbackZ = z;
-      fallbackArea = area;
-      fallback = id;
-    }
+    AnnotationPickCandidate c;
+    c.layer = layer;
+    c.itemId = id;
+    c.zIndex = cand->zIndex();
+    c.bboxArea = bb.width() * bb.height();
 
     KadasAnnotationItemController *cc = KadasAnnotationControllerRegistry::instance()->controllerFor( cand->type() );
-    if ( !cc )
-      continue;
-    const KadasEditContext ec = cc->getEditContext( cand, mapPos, ctx );
-    if ( !ec.isValid() )
-      continue;
-    if ( z > bestZ || ( z == bestZ && area < bestArea ) )
+    if ( cc )
     {
-      bestZ = z;
-      bestArea = area;
-      best = id;
+      const KadasEditContext ec = cc->getEditContext( cand, mapPos, ctx );
+      if ( !ec.isValid() )
+        continue;
+      c.precision = ec.precision;
+      precise.append( c );
+    }
+    else
+    {
+      // No controller for this item type: bbox-only fallback.
+      c.precision = KadasEditContext::HitPrecision::Body;
+      fallback.append( c );
     }
   }
 
-  pickResult.annotationLayer = layer;
-  pickResult.annotationItemId = best.isEmpty() ? fallback : best;
+  const QList<AnnotationPickCandidate> &list = !precise.isEmpty() ? precise : fallback;
+  const int bestIdx = rankAnnotationCandidates( list );
+  if ( bestIdx < 0 )
+    return pickResult;
+
+  pickResult.annotationLayer = list[bestIdx].layer;
+  pickResult.annotationItemId = list[bestIdx].itemId;
   pickResult.crs = layer->crs();
   return pickResult;
+}
+
+int KadasFeaturePicker::rankAnnotationCandidates( const QList<AnnotationPickCandidate> &candidates )
+{
+  if ( candidates.isEmpty() )
+    return -1;
+  int bestIdx = 0;
+  for ( int i = 1; i < candidates.size(); ++i )
+  {
+    const AnnotationPickCandidate &c = candidates.at( i );
+    const AnnotationPickCandidate &b = candidates.at( bestIdx );
+    // Precision (Precise > Body) is the primary key, then highest z,
+    // then smallest bbox area.
+    if ( c.precision > b.precision || ( c.precision == b.precision && c.zIndex > b.zIndex ) || ( c.precision == b.precision && c.zIndex == b.zIndex && c.bboxArea < b.bboxArea ) )
+    {
+      bestIdx = i;
+    }
+  }
+  return bestIdx;
 }
 
 KadasFeaturePicker::PickResult KadasFeaturePicker::pickVectorLayer( QgsVectorLayer *vlayer, const QgsMapCanvas *canvas, const QgsPointXY &mapPos, Qgis::GeometryType geomType )

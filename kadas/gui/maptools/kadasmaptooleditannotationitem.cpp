@@ -39,6 +39,7 @@
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/kadasbottombar.h"
+#include "kadas/gui/kadasfeaturepicker.h"
 #include "kadas/gui/kadasfloatinginputwidget.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 
@@ -760,19 +761,18 @@ KadasMapToolEditAnnotationItem::PickedItem KadasMapToolEditAnnotationItem::pickI
   // any of them (Pictures / Routes / Pins / Symbols / Mss / Redlining
   // ...). QgsAnnotationLayer::itemsInBounds is a bounding-box test, so
   // we refine each candidate with the controller's getEditContext()
-  // (vertex / handle / actual body containment). Among real hits we
-  // prefer the highest zIndex, with smallest bbox area as tiebreaker.
-  // If no candidate has a registered controller — or none reports a hit
-  // — fall back to the same z-then-area ordering on bbox-only matches
-  // so identify-style flows still resolve something.
-  QgsAnnotationLayer *bestLayer = nullptr;
-  QString best;
-  int bestZ = std::numeric_limits<int>::min();
-  double bestArea = std::numeric_limits<double>::infinity();
-  QgsAnnotationLayer *fallbackLayer = nullptr;
-  QString fallback;
-  int fallbackZ = std::numeric_limits<int>::min();
-  double fallbackArea = std::numeric_limits<double>::infinity();
+  // (vertex / handle / edge / actual body containment). Candidates are
+  // ranked by KadasFeaturePicker::rankAnnotationCandidates: precise
+  // hits (vertex / handle / stroke edge) outrank loose body / bbox
+  // hits regardless of z, with z-then-area as tiebreaker inside each
+  // precision tier. A controller that reports no hit means "genuinely
+  // missed" — skip such candidates entirely (otherwise a right-click in
+  // empty space inside an item's AABB would falsely show the context
+  // menu). Only items WITHOUT a registered controller go into the
+  // bbox-only fallback so identify-style flows still resolve something
+  // for unknown item types.
+  QList<KadasFeaturePicker::AnnotationPickCandidate> precise;
+  QList<KadasFeaturePicker::AnnotationPickCandidate> fallback;
 
   const auto layers = canvas()->layers();
   for ( QgsMapLayer *ml : layers )
@@ -792,43 +792,36 @@ KadasMapToolEditAnnotationItem::PickedItem KadasMapToolEditAnnotationItem::pickI
       if ( !cand )
         continue;
       const QgsRectangle bb = cand->boundingBox();
-      const double area = bb.width() * bb.height();
-      const int z = cand->zIndex();
+      KadasFeaturePicker::AnnotationPickCandidate c;
+      c.layer = al;
+      c.itemId = id;
+      c.zIndex = cand->zIndex();
+      c.bboxArea = bb.width() * bb.height();
 
       KadasAnnotationItemController *cc = KadasAnnotationControllerRegistry::instance()->controllerFor( cand->type() );
-      if ( !cc )
+      if ( cc )
       {
-        if ( z > fallbackZ || ( z == fallbackZ && area < fallbackArea ) )
-        {
-          fallbackZ = z;
-          fallbackArea = area;
-          fallback = id;
-          fallbackLayer = al;
-        }
-        continue;
+        const KadasEditContext ec = cc->getEditContext( cand, mapPos, ctx );
+        if ( !ec.isValid() )
+          continue;
+        c.precision = ec.precision;
+        precise.append( c );
       }
-      const KadasEditContext ec = cc->getEditContext( cand, mapPos, ctx );
-      if ( !ec.isValid() )
-        continue;
-      if ( z > bestZ || ( z == bestZ && area < bestArea ) )
+      else
       {
-        bestZ = z;
-        bestArea = area;
-        best = id;
-        bestLayer = al;
+        // No controller for this item type: bbox-only fallback.
+        c.precision = KadasEditContext::HitPrecision::Body;
+        fallback.append( c );
       }
     }
   }
 
-  if ( !best.isEmpty() )
+  const QList<KadasFeaturePicker::AnnotationPickCandidate> &list = !precise.isEmpty() ? precise : fallback;
+  const int bestIdx = KadasFeaturePicker::rankAnnotationCandidates( list );
+  if ( bestIdx >= 0 )
   {
-    result.layer = bestLayer;
-    result.itemId = best;
-  }
-  else if ( !fallback.isEmpty() )
-  {
-    result.layer = fallbackLayer;
-    result.itemId = fallback;
+    result.layer = list[bestIdx].layer;
+    result.itemId = list[bestIdx].itemId;
   }
   return result;
 }

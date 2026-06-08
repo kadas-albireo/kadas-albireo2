@@ -35,6 +35,7 @@
 #include <qgis/qgsrectangle.h>
 
 #include <kadas/gui/kadasattributetypes.h>
+#include <kadas/gui/kadasfeaturepicker.h>
 #include <kadas/gui/annotationitems/kadasannotationitemcontext.h>
 #include <kadas/gui/annotationitems/kadascircleannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadascircleannotationitem.h>
@@ -87,6 +88,11 @@ class TestKadasAnnotationControllers : public QObject
 
     // Multi-type hit isolation -------------------------------------------
     void hitTest_multipleTypesSelectsByGeometryNotBbox();
+
+    // Selection ranking --------------------------------------------------
+    void selection_lineEdgeHitIsPrecise();
+    void selection_polygonBodyHitIsBody();
+    void selection_rankerPrefersPrecisionOverZIndex();
 
   private:
     static KadasAnnotationItemContext makeContext();
@@ -466,6 +472,115 @@ void TestKadasAnnotationControllers::hitTest_multipleTypesSelectsByGeometryNotBb
   const QgsPointXY pPoly( 420, 50 );
   QVERIFY2( polyCtrl.getEditContext( poly.get(), pPoly, ctx ).isValid(), "polygon should hit in solid body" );
   QVERIFY2( !lineCtrl.getEditContext( line.get(), pPoly, ctx ).isValid(), "line must NOT hit in polygon body (off-diagonal)" );
+}
+
+
+// ----- Selection ranking ------------------------------------------------
+
+void TestKadasAnnotationControllers::selection_lineEdgeHitIsPrecise()
+{
+  // Regression: a click that falls on a line's stroke is a geometrically
+  // precise hit. The KadasLineAnnotationController returns an edit
+  // context with an invalid vidx (the subsequent drag uses whole-line
+  // move semantics), so the default precision derivation from vidx
+  // alone would mistakenly tag it as Body. The controller must
+  // explicitly upgrade it to Precise so the canvas picker outranks a
+  // higher-z polygon whose body merely contains the same click.
+  KadasLineAnnotationController lineCtrl;
+  const auto ctx = makeContext();
+  auto line = makeLine( { QgsPointXY( 0, 0 ), QgsPointXY( 100, 0 ) } );
+
+  // On a vertex: precise (covers the default vidx-derived path).
+  KadasEditContext ecVertex = lineCtrl.getEditContext( line.get(), QgsPointXY( 0, 0 ), ctx );
+  QVERIFY( ecVertex.isValid() );
+  QVERIFY( ecVertex.vidx.isValid() );
+  QCOMPARE( ecVertex.precision, KadasEditContext::HitPrecision::Precise );
+
+  // On the segment between vertices: also precise (covers the explicit
+  // upgrade in the edge-hit branch).
+  KadasEditContext ecEdge = lineCtrl.getEditContext( line.get(), QgsPointXY( 50, 0 ), ctx );
+  QVERIFY( ecEdge.isValid() );
+  QVERIFY( !ecEdge.vidx.isValid() ); // whole-line drag, no vertex
+  QCOMPARE( ecEdge.precision, KadasEditContext::HitPrecision::Precise );
+}
+
+void TestKadasAnnotationControllers::selection_polygonBodyHitIsBody()
+{
+  // The polygon containment hit is geometrically loose: the click is
+  // anywhere inside the filled body. The edit context returned by
+  // KadasPolygonAnnotationController has an invalid vidx so the
+  // default-derived precision must be Body.
+  KadasPolygonAnnotationController polyCtrl;
+  const auto ctx = makeContext();
+  auto poly = makePolygon( {
+    QgsPointXY( 0, 0 ),
+    QgsPointXY( 100, 0 ),
+    QgsPointXY( 100, 100 ),
+    QgsPointXY( 0, 100 ),
+    QgsPointXY( 0, 0 ),
+  } );
+
+  KadasEditContext ec = polyCtrl.getEditContext( poly.get(), QgsPointXY( 50, 50 ), ctx );
+  QVERIFY( ec.isValid() );
+  QVERIFY( !ec.vidx.isValid() );
+  QCOMPARE( ec.precision, KadasEditContext::HitPrecision::Body );
+}
+
+void TestKadasAnnotationControllers::selection_rankerPrefersPrecisionOverZIndex()
+{
+  // End-to-end regression for KadasFeaturePicker::rankAnnotationCandidates:
+  // a low-z line whose edge is hit by the click must outrank a high-z
+  // polygon whose body merely contains the same click. Without the
+  // precision tier, the high-z polygon would have won.
+  KadasFeaturePicker::AnnotationPickCandidate lineCand;
+  lineCand.itemId = QStringLiteral( "line" );
+  lineCand.precision = KadasEditContext::HitPrecision::Precise;
+  lineCand.zIndex = 1;
+  lineCand.bboxArea = 1000000.0;
+
+  KadasFeaturePicker::AnnotationPickCandidate polyCand;
+  polyCand.itemId = QStringLiteral( "poly" );
+  polyCand.precision = KadasEditContext::HitPrecision::Body;
+  polyCand.zIndex = 99;      // way higher
+  polyCand.bboxArea = 100.0; // way smaller
+
+  // Order must not matter.
+  {
+    const QList<KadasFeaturePicker::AnnotationPickCandidate> list { lineCand, polyCand };
+    const int best = KadasFeaturePicker::rankAnnotationCandidates( list );
+    QCOMPARE( best, 0 );
+    QCOMPARE( list.at( best ).itemId, QStringLiteral( "line" ) );
+  }
+  {
+    const QList<KadasFeaturePicker::AnnotationPickCandidate> list { polyCand, lineCand };
+    const int best = KadasFeaturePicker::rankAnnotationCandidates( list );
+    QCOMPARE( best, 1 );
+    QCOMPARE( list.at( best ).itemId, QStringLiteral( "line" ) );
+  }
+
+  // Within the same precision tier the existing z-then-area tiebreakers
+  // must still apply.
+  KadasFeaturePicker::AnnotationPickCandidate a;
+  a.itemId = QStringLiteral( "a" );
+  a.precision = KadasEditContext::HitPrecision::Body;
+  a.zIndex = 1;
+  a.bboxArea = 10.0;
+  KadasFeaturePicker::AnnotationPickCandidate b;
+  b.itemId = QStringLiteral( "b" );
+  b.precision = KadasEditContext::HitPrecision::Body;
+  b.zIndex = 2; // higher z wins over a
+  b.bboxArea = 100.0;
+  KadasFeaturePicker::AnnotationPickCandidate c;
+  c.itemId = QStringLiteral( "c" );
+  c.precision = KadasEditContext::HitPrecision::Body;
+  c.zIndex = 2;      // tie with b on z
+  c.bboxArea = 50.0; // smaller area wins
+  const QList<KadasFeaturePicker::AnnotationPickCandidate> tie { a, b, c };
+  const int bestIdx = KadasFeaturePicker::rankAnnotationCandidates( tie );
+  QCOMPARE( tie.at( bestIdx ).itemId, QStringLiteral( "c" ) );
+
+  // Empty list returns -1.
+  QCOMPARE( KadasFeaturePicker::rankAnnotationCandidates( {} ), -1 );
 }
 
 

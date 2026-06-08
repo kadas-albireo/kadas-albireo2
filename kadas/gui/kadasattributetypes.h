@@ -82,14 +82,41 @@ struct KADAS_GUI_EXPORT KadasNode
  */
 struct KADAS_GUI_EXPORT KadasEditContext
 {
+    /**
+     * Geometric precision of a hit returned by
+     * \c KadasAnnotationItemController::getEditContext().
+     *
+     * Used by the canvas pickers (\c KadasFeaturePicker and the edit map
+     * tool) to disambiguate overlapping annotations: a precise hit on
+     * vertex / handle / edge always wins over a loose body-containment
+     * hit on another item, regardless of z-index. Within the same
+     * precision tier the existing z-then-area tiebreakers apply.
+     */
+    enum class HitPrecision
+    {
+      Body = 0,    //!< Loose hit: click is inside the item's filled body / bounding box / containment area.
+      Precise = 1, //!< Tight hit: click is on a vertex, handle, or stroke / outline.
+    };
+
     KadasEditContext() = default;
 
+    /**
+     * Constructs an edit context.
+     *
+     * \a _vidx, when valid, denotes a vertex / handle hit and the
+     * resulting \c precision is automatically \c HitPrecision::Precise.
+     * A default-constructed \a _vidx denotes a whole-item body hit and
+     * the resulting \c precision is \c HitPrecision::Body — callers
+     * with a tighter geometric hit (e.g. line stroke) should explicitly
+     * upgrade \c precision after construction.
+     */
     KadasEditContext( const QgsVertexId &_vidx, const QgsPointXY &_pos = QgsPointXY(), const KadasAttribDefs &_attributes = KadasAttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor )
       : mValid( true )
       , vidx( _vidx )
       , pos( _pos )
       , attributes( _attributes )
       , cursor( _cursor )
+      , precision( _vidx.isValid() ? HitPrecision::Precise : HitPrecision::Body )
     {}
 
     bool mValid = false;
@@ -97,6 +124,7 @@ struct KADAS_GUI_EXPORT KadasEditContext
     QgsPointXY pos;
     KadasAttribDefs attributes;
     Qt::CursorShape cursor = Qt::CrossCursor;
+    HitPrecision precision = HitPrecision::Body;
     bool isValid() const { return mValid; }
     bool operator!=( const KadasEditContext &other ) const { return vidx != other.vidx || mValid != other.mValid; }
 };
