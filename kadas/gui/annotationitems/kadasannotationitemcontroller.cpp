@@ -17,9 +17,15 @@
 #include <cmath>
 #include <limits>
 
+#include <QGuiApplication>
+#include <QPaintDevice>
+#include <QPainter>
+#include <QScreen>
+
 #include <qgis/qgsannotationitem.h>
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsrectangle.h>
+#include <qgis/qgsrendercontext.h>
 #include <qgis/qgssettings.h>
 #include <qgis/qgsunittypes.h>
 
@@ -106,4 +112,16 @@ QString KadasAnnotationItemController::formatAreaSquareMeters( double sqMeters )
   if ( sqMeters >= 1000000.0 )
     return QStringLiteral( "%1 km²" ).arg( sqMeters / 1000000.0, 0, 'f', decimals );
   return QStringLiteral( "%1 m²" ).arg( sqMeters, 0, 'f', decimals );
+}
+
+double KadasAnnotationItemController::outputDpiScale( const QgsRenderContext &context )
+{
+  // Mirrors KadasMapItem::outputDpiScale() from the Kadas 2.3 base class:
+  // ratio of the render device's DPI to the primary screen DPI. ≈1.0 on
+  // screen; scales up only on high-DPI export devices.
+  const QScreen *screen = QGuiApplication::primaryScreen();
+  const double screenDpi = screen ? screen->logicalDotsPerInchX() : 96.0;
+  if ( !context.painter() || !context.painter()->device() || screenDpi <= 0.0 )
+    return 1.0;
+  return static_cast<double>( context.painter()->device()->logicalDpiX() ) / screenDpi;
 }

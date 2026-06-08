@@ -23,6 +23,7 @@
 #include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgsrendercontext.h>
 
+#include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasannotationshadow.h"
 #include "kadas/gui/annotationitems/kadascoordcrossannotationitem.h"
@@ -64,7 +65,7 @@ QgsRectangle KadasCoordCrossAnnotationItem::boundingBox( QgsRenderContext &conte
   // so the canvas chunk loader rasters the labels correctly when the cross
   // sits near a tile edge.
   const double mupp = context.mapToPixel().mapUnitsPerPixel();
-  const double crossMu = sCrossSizePx * context.scaleFactor() * mupp;
+  const double crossMu = sCrossSizePx * KadasAnnotationItemController::outputDpiScale( context ) * mupp;
   const QgsPointXY p = geometry();
   return QgsRectangle( p.x() - crossMu, p.y() - crossMu, p.x() + crossMu, p.y() + crossMu );
 }
@@ -75,7 +76,7 @@ void KadasCoordCrossAnnotationItem::render( QgsRenderContext &context, QgsFeedba
   // to update any cached state.
   QgsAnnotationMarkerItem::render( context, feedback );
 
-  const double crossSize = sCrossSizePx * context.scaleFactor();
+  const double crossSize = sCrossSizePx * KadasAnnotationItemController::outputDpiScale( context );
   const QgsPointXY mapPos = context.coordinateTransform().transform( geometry() );
   const QPointF screenPos = context.mapToPixel().transform( mapPos ).toQPointF();
 
@@ -105,7 +106,7 @@ void KadasCoordCrossAnnotationItem::render( QgsRenderContext &context, QgsFeedba
   };
 
   QFont font = painter->font();
-  font.setPixelSize( sFontSizePx * context.scaleFactor() );
+  font.setPixelSize( sFontSizePx * KadasAnnotationItemController::outputDpiScale( context ) );
 
   for ( const LabelData &label : labels )
   {

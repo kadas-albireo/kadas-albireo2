@@ -237,6 +237,28 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
       Q_UNUSED( ids );
     }
 
+#ifndef SIP_RUN
+    /**
+     * Ratio of the render device's DPI to the user's primary screen DPI.
+     *
+     * Use this when scaling pixel-defined visual sizes (cross arms, label
+     * fonts in points) inside an item's \c render() override so the
+     * on-screen size stays constant across zoom levels and only scales up
+     * for high-DPI export devices. On screen the value is ≈1.0; on a
+     * 300 dpi print export it is ≈3.1.
+     *
+     * Mirrors the legacy \c KadasMapItem::outputDpiScale() helper from
+     * Kadas 2.3. Prefer this over \c QgsRenderContext::scaleFactor()
+     * which returns pixels-per-millimetre (~3.78 at 96 dpi) and would
+     * make pixel-defined visuals visibly larger than their legacy size.
+     *
+     * Public so annotation \c QgsAnnotationItem subclasses (which do not
+     * inherit from this controller class) can use it directly from their
+     * \c render() override.
+     */
+    static double outputDpiScale( const QgsRenderContext &context );
+#endif
+
   protected:
     // ----- Transform helpers (mirror KadasMapItem's) ---------------------
 

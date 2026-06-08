@@ -28,6 +28,7 @@
 #include <qgis/qgsrendercontext.h>
 #include <qgis/qgssymbollayerutils.h>
 
+#include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasgpxrouteannotationitem.h"
 
@@ -68,7 +69,7 @@ void KadasGpxRouteAnnotationItem::render( QgsRenderContext &context, QgsFeedback
     return;
 
   QFont font = mLabelFont;
-  font.setPointSizeF( font.pointSizeF() * context.scaleFactor() );
+  font.setPointSizeF( font.pointSizeF() * KadasAnnotationItemController::outputDpiScale( context ) );
   QFontMetrics metrics( font );
   const QSize labelSize = metrics.size( 0, mName );
 

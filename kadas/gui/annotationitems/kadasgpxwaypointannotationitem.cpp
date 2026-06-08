@@ -26,6 +26,7 @@
 #include <qgis/qgstextformat.h>
 #include <qgis/qgstextrenderer.h>
 
+#include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasgpxwaypointannotationitem.h"
 
@@ -88,7 +89,7 @@ void KadasGpxWaypointAnnotationItem::render( QgsRenderContext &context, QgsFeedb
   // Offset the label up-and-right of the marker by roughly the marker size.
   const double markerSize = symbol() ? context.convertToPainterUnits( symbol()->size(), Qgis::RenderUnit::Millimeters ) : 10.0;
   QFont font = mLabelFont;
-  font.setPointSizeF( font.pointSizeF() * context.scaleFactor() );
+  font.setPointSizeF( font.pointSizeF() * KadasAnnotationItemController::outputDpiScale( context ) );
   QFontMetrics metrics( font );
   const QPointF labelPos = screenPos + QPointF( 0.5 * markerSize + metrics.horizontalAdvance( mName ) / 2.0, -0.5 * markerSize );
 
