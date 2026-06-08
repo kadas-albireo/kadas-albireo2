@@ -41,6 +41,7 @@
 #include <kadas/gui/annotationitems/kadascircleannotationitem.h>
 #include <kadas/gui/annotationitems/kadaslineannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadasmarkerannotationcontroller.h>
+#include <kadas/gui/annotationitems/kadaspinannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadaspinannotationitem.h>
 #include <kadas/gui/annotationitems/kadaspolygonannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadasrectangleannotationcontroller.h>
@@ -66,6 +67,8 @@ class TestKadasAnnotationControllers : public QObject
     void marker_applyPersistedStyle_preservesShape();
     void marker_applyPersistedStyle_rejectsTransparentFill();
     void marker_getEditContext_hitsWithinTolerance();
+    void marker_getEditContext_hitsAnchorOffsetSymbolBody();
+    void pin_getEditContext_hitsBodyAndTip();
 
     // KadasRectangleAnnotationController ---------------------------------
     void rectangle_nodes_returnFourCornersPlusRotation();
@@ -200,6 +203,93 @@ void TestKadasAnnotationControllers::marker_getEditContext_hitsWithinTolerance()
   // Far away: miss.
   ec = controller.getEditContext( item.get(), QgsPointXY( 500, 500 ), ctx );
   QVERIFY( !ec.isValid() );
+}
+
+void TestKadasAnnotationControllers::marker_getEditContext_hitsAnchorOffsetSymbolBody()
+{
+  // Regression: pins use an SVG anchored at their bottom tip, so the
+  // visible body extends well above the geographic anchor. Hit-testing
+  // a fixed circular tolerance around the anchor (the legacy behavior)
+  // would miss most of the visible icon and pins were unselectable.
+  // The controller must hit-test against the rendered symbol footprint.
+  KadasMarkerAnnotationController controller;
+  const auto ctx = makeContext();
+
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  controller.startPart( item.get(), QgsPointXY( 100, 200 ), ctx );
+  auto *marker = static_cast<QgsAnnotationMarkerItem *>( item.get() );
+
+  // Build a tall, bottom-anchored simple marker that mimics a pin:
+  //  - 20 mm at 96 DPI ≈ 75 px tall
+  //  - anchored at the bottom so the body is rendered ABOVE the anchor.
+  // makeContext() uses 2 m/px so the symbol body extends ≈ 150 m above
+  // the anchor in map coordinates.
+  auto *sl = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Square );
+  sl->setSize( 20.0 );
+  sl->setVerticalAnchorPoint( Qgis::VerticalAnchorPoint::Bottom );
+  sl->setColor( QColor( 255, 0, 0 ) );
+  marker->setSymbol( new QgsMarkerSymbol( QgsSymbolLayerList() << sl ) );
+
+  // Click 60 m ABOVE the anchor — well above the legacy ~10 m circular
+  // tolerance, but inside the bottom-anchored symbol's body.
+  KadasEditContext ec = controller.getEditContext( item.get(), QgsPointXY( 100, 260 ), ctx );
+  QVERIFY2( ec.isValid(), "click on bottom-anchored marker body must hit" );
+
+  // Right on the anchor still hits.
+  ec = controller.getEditContext( item.get(), QgsPointXY( 100, 200 ), ctx );
+  QVERIFY( ec.isValid() );
+
+  // 100 m BELOW the anchor — outside the bottom-anchored symbol body.
+  ec = controller.getEditContext( item.get(), QgsPointXY( 100, 100 ), ctx );
+  QVERIFY2( !ec.isValid(), "click below bottom-anchored marker must miss" );
+}
+
+
+// ----- Pin (probe + behavioral test) ------------------------------------
+
+void TestKadasAnnotationControllers::pin_getEditContext_hitsBodyAndTip()
+{
+  // Regression for the Kadas pin (bottom-anchored SVG marker): clicks on
+  // the visible body must register as hits. The body extends UPWARD from
+  // the geographic anchor (anchor = tip), so clicks above the anchor in
+  // map y (i.e. larger map-y at this CRS) hit, clicks well below miss.
+  //
+  // QgsSvgMarkerSymbolLayer::bounds() over-shifts the symbol footprint by
+  // a scaleFactor-dependent amount; the controller normalizes the anchor
+  // and re-applies it itself. Without that workaround pins were
+  // unselectable.
+  KadasPinAnnotationController controller;
+  const auto ctx = makeContext();
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  controller.startPart( item.get(), QgsPointXY( 0, 0 ), ctx );
+
+  // Pin renders ≈ 24 mm tall at 96 dpi = ≈ 91 px ≈ 182 m in this CRS
+  // (mupp = 2). With Bottom anchor the body spans map-y [0, 182] above
+  // the anchor, and map-x ≈ [-90, 90].
+
+  // Hit: 100 m above the anchor — squarely in the body.
+  KadasEditContext ec = controller.getEditContext( item.get(), QgsPointXY( 0, 100 ), ctx );
+  QVERIFY2( ec.isValid(), "click on pin body must hit" );
+
+  // Hit: 50 m above and offset 40 m to the side — still inside the body.
+  ec = controller.getEditContext( item.get(), QgsPointXY( 40, 50 ), ctx );
+  QVERIFY2( ec.isValid(), "click on offset pin body must hit" );
+
+  // Hit: right at the geographic anchor (tip) — bottom edge of bounds.
+  ec = controller.getEditContext( item.get(), QgsPointXY( 0, 0 ), ctx );
+  QVERIFY2( ec.isValid(), "click on pin tip must hit" );
+
+  // Miss: well below the anchor (south of the tip), outside the body.
+  ec = controller.getEditContext( item.get(), QgsPointXY( 0, -100 ), ctx );
+  QVERIFY2( !ec.isValid(), "click below pin tip must miss" );
+
+  // Miss: well above the body (north of the head).
+  ec = controller.getEditContext( item.get(), QgsPointXY( 0, 400 ), ctx );
+  QVERIFY2( !ec.isValid(), "click far above pin head must miss" );
+
+  // Miss: far to the side.
+  ec = controller.getEditContext( item.get(), QgsPointXY( 300, 50 ), ctx );
+  QVERIFY2( !ec.isValid(), "click far to the side of pin must miss" );
 }
 
 

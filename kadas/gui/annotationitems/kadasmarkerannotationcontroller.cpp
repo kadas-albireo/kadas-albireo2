@@ -156,6 +156,35 @@ KadasEditContext KadasMarkerAnnotationController::getEditContext( const QgsAnnot
 {
   const QgsPointXY geom = asMarker( item )->geometry();
   const QgsPointXY testPos = toMapPos( geom, ctx );
+
+  // Hit-test against the actual rendered symbol footprint, not just the
+  // geographic anchor: SVG markers (notably the Kadas pin) are anchored
+  // at their bottom tip, so the visible body extends well above the
+  // anchor. A fixed pickTolSqr around the anchor would miss most of the
+  // icon and the user couldn't select pins by clicking their body.
+  if ( const QgsMarkerSymbol *symRaw = asMarker( item )->symbol() )
+  {
+    // QgsMarkerSymbol::bounds() requires startRender/stopRender, which
+    // are non-const. Clone so we don't mutate the rendered symbol.
+    std::unique_ptr<QgsMarkerSymbol> sym( symRaw->clone() );
+    QgsRenderContext rc = QgsRenderContext::fromMapSettings( ctx.mapSettings() );
+    const QPointF anchorPx = ctx.mapSettings().mapToPixel().transform( testPos ).toQPointF();
+    const QPointF clickPx = ctx.mapSettings().mapToPixel().transform( pos ).toQPointF();
+    sym->startRender( rc );
+    QRectF symBoundsPx = sym->bounds( anchorPx, rc );
+    sym->stopRender( rc );
+
+    // Pad by a few pixels so the user can grab the icon edge.
+    constexpr qreal tolPx = 4.0;
+    symBoundsPx.adjust( -tolPx, -tolPx, tolPx, tolPx );
+    if ( symBoundsPx.contains( clickPx ) )
+    {
+      return KadasEditContext( QgsVertexId( 0, 0, 0 ), testPos, drawAttribs() );
+    }
+  }
+
+  // Fallback for items without a symbol (defensive): legacy fixed-tolerance
+  // circular hit around the anchor.
   if ( pos.sqrDist( testPos ) < pickTolSqr( ctx ) )
   {
     return KadasEditContext( QgsVertexId( 0, 0, 0 ), testPos, drawAttribs() );
