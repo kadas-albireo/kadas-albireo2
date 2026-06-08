@@ -80,10 +80,25 @@ QgsAnnotationLayer *KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( St
   {
     QgsAnnotationLayer::LayerOptions options( QgsProject::instance()->transformContext() );
     annoLayer = new QgsAnnotationLayer( standardLayerNames()[layer], options );
-    // MilX/MSS content is always WGS84 (libmss IPC convention); other
-    // standard layers default to web-mercator.
-    const QString crsAuthid = ( layer == StandardLayer::MssLayer ) ? QStringLiteral( "EPSG:4326" ) : QStringLiteral( "EPSG:3857" );
-    annoLayer->setCrs( QgsCoordinateReferenceSystem( crsAuthid ) );
+    // MilX/MSS content is always WGS84 (libmss IPC convention). Other
+    // standard layers default to the current project CRS so that
+    // axis-aligned items (rectangles, circles) drawn in the map's
+    // drawing frame are stored axis-aligned in the layer too — no
+    // per-vertex projection skew. If the project CRS later changes,
+    // the items keep their stored geometry and the controllers fall
+    // back to per-vertex transforms (see KadasRectangleAnnotationItem).
+    QgsCoordinateReferenceSystem layerCrs;
+    if ( layer == StandardLayer::MssLayer )
+    {
+      layerCrs = QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) );
+    }
+    else
+    {
+      layerCrs = QgsProject::instance()->crs();
+      if ( !layerCrs.isValid() )
+        layerCrs = QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:3857" ) );
+    }
+    annoLayer->setCrs( layerCrs );
     QgsProject::instance()->addMapLayer( annoLayer );
     instance()->mLayerIdMap[layer] = annoLayer->id();
   }

@@ -75,13 +75,15 @@ QList<KadasNode> KadasRectangleAnnotationController::nodes( const QgsAnnotationI
 
 bool KadasRectangleAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
 {
-  const QgsPointXY ip = toItemPos( firstPoint, ctx );
-  // Remember the click anchor for the duration of the draw; setCurrentPoint
-  // grows the rectangle from this anchor toward the cursor.
-  mDrawAnchor = ip;
+  // Work entirely in MAP CRS so the rectangle is true-rectangular on the
+  // map regardless of the layer's CRS. The first click anchor is therefore
+  // remembered in map space.
+  mDrawAnchor = firstPoint;
   mDrawAnchorValid = true;
   // Center starts at the click; size is zero. Angle stays at 0 during draw.
-  asRect( item )->setBox( QgsPointXY( ip.x(), ip.y() ), QSizeF( 0, 0 ), 0.0 );
+  // Stash drawCrs (= map CRS) and layerCrs so the item can per-vertex
+  // project corners back to layer CRS for storage.
+  asRect( item )->setBox( toItemPos( firstPoint, ctx ), QSizeF( 0, 0 ), 0.0, ctx.mapSettings().destinationCrs(), ctx.itemCrs() );
   return true;
 }
 
@@ -93,13 +95,12 @@ bool KadasRectangleAnnotationController::startPart( QgsAnnotationItem *item, con
 void KadasRectangleAnnotationController::setCurrentPoint( QgsAnnotationItem *item, const QgsPointXY &p, const KadasAnnotationItemContext &ctx )
 {
   KadasRectangleAnnotationItem *rect = asRect( item );
-  const QgsPointXY cur = toItemPos( p, ctx );
-  const QgsPointXY anchor = mDrawAnchorValid ? mDrawAnchor : rect->center();
-
-  const double w = std::abs( cur.x() - anchor.x() );
-  const double h = std::abs( cur.y() - anchor.y() );
-  const QgsPointXY newCenter( 0.5 * ( anchor.x() + cur.x() ), 0.5 * ( anchor.y() + cur.y() ) );
-  rect->setBox( newCenter, QSizeF( w, h ), 0.0 );
+  // Build the box axis-aligned in MAP CRS (the user's drawing frame).
+  const QgsPointXY anchorMap = mDrawAnchorValid ? mDrawAnchor : toMapPos( rect->center(), ctx );
+  const double w = std::abs( p.x() - anchorMap.x() );
+  const double h = std::abs( p.y() - anchorMap.y() );
+  const QgsPointXY centerMap( 0.5 * ( anchorMap.x() + p.x() ), 0.5 * ( anchorMap.y() + p.y() ) );
+  rect->setBox( toItemPos( centerMap, ctx ), QSizeF( w, h ), 0.0, ctx.mapSettings().destinationCrs(), ctx.itemCrs() );
 }
 
 void KadasRectangleAnnotationController::setCurrentAttributes( QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
@@ -190,64 +191,69 @@ KadasEditContext KadasRectangleAnnotationController::getEditContext( const QgsAn
 void KadasRectangleAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
   KadasRectangleAnnotationItem *rect = asRect( item );
-  const QgsPointXY newIp = toItemPos( newPoint, ctx );
 
   const int v = editContext.vidx.vertex;
 
+  // All edit math is performed in MAP CRS so the rectangle remains true
+  // rectangular on the map (the user's drawing frame). Results are written
+  // back via setBox(...) with drawCrs=mapCrs / layerCrs=itemCrs so the item
+  // refreshes its per-vertex projection bookkeeping.
+  const QgsCoordinateReferenceSystem mapCrs = ctx.mapSettings().destinationCrs();
+  const QgsCoordinateReferenceSystem layerCrs = ctx.itemCrs();
+  const QgsPointXY centerMap = toMapPos( rect->center(), ctx );
+
   if ( v == RotationHandleVertex )
   {
-    // Compute new angle from center -> newPoint vector, with the local +Y
-    // axis (top edge midpoint direction) being the reference. The rotation
-    // handle is offset from the top, so its un-rotated direction is +Y.
-    const double dx = newIp.x() - rect->center().x();
-    const double dy = newIp.y() - rect->center().y();
-    // atan2(dx, dy) measures the CCW angle of the vector from the +Y axis.
+    // Compute new angle (in map frame) from center -> newPoint vector.
+    // The rotation handle is offset along +Y in the local map frame, so
+    // atan2(dx, dy) yields the CCW rotation from the +Y axis.
+    const double dx = newPoint.x() - centerMap.x();
+    const double dy = newPoint.y() - centerMap.y();
     const double angleRad = std::atan2( dx, dy );
-    rect->setAngle( -angleRad * 180.0 / M_PI );
+    rect->setBox( rect->center(), rect->size(), -angleRad * 180.0 / M_PI, mapCrs, layerCrs );
     return;
   }
 
   if ( v >= 0 && v < 4 )
   {
     // Resize: the opposite corner stays fixed; the dragged corner moves to
-    // the cursor. We work in the rectangle's local (un-rotated) frame so
-    // resizing remains correct under rotation.
+    // the cursor. We work in the rectangle's local (un-rotated) MAP frame
+    // so resizing remains correct under rotation and across CRS pairs.
     const auto cs = rect->corners();
-    const QgsPointXY anchor = cs[( v + 2 ) % 4];
+    const QgsPointXY anchorMap = toMapPos( cs[( v + 2 ) % 4], ctx );
 
     const double a = rect->angle() * M_PI / 180.0;
     const double cosA = std::cos( a );
     const double sinA = std::sin( a );
 
     auto toLocal = [&]( const QgsPointXY &p ) {
-      const double dx = p.x() - rect->center().x();
-      const double dy = p.y() - rect->center().y();
+      const double dx = p.x() - centerMap.x();
+      const double dy = p.y() - centerMap.y();
       // Inverse rotation: rotate by -angle.
       return QPointF( cosA * dx + sinA * dy, -sinA * dx + cosA * dy );
     };
 
-    const QPointF anchorLocal = toLocal( anchor );
-    const QPointF cursorLocal = toLocal( QgsPointXY( newIp.x(), newIp.y() ) );
+    const QPointF anchorLocal = toLocal( anchorMap );
+    const QPointF cursorLocal = toLocal( newPoint );
 
     const double localCx = 0.5 * ( anchorLocal.x() + cursorLocal.x() );
     const double localCy = 0.5 * ( anchorLocal.y() + cursorLocal.y() );
 
-    // Map the new local center back to world coords.
-    const double worldCx = rect->center().x() + cosA * localCx - sinA * localCy;
-    const double worldCy = rect->center().y() + sinA * localCx + cosA * localCy;
+    // Map the new local center back to map coords, then to layer CRS.
+    const double newMapCx = centerMap.x() + cosA * localCx - sinA * localCy;
+    const double newMapCy = centerMap.y() + sinA * localCx + cosA * localCy;
+    const QgsPointXY newCenterLayer = toItemPos( QgsPointXY( newMapCx, newMapCy ), ctx );
 
     const QSizeF newSize( std::abs( cursorLocal.x() - anchorLocal.x() ), std::abs( cursorLocal.y() - anchorLocal.y() ) );
-    rect->setBox( QgsPointXY( worldCx, worldCy ), newSize, rect->angle() );
+    rect->setBox( newCenterLayer, newSize, rect->angle(), mapCrs, layerCrs );
     return;
   }
 
   // Whole-item move via map-space delta on the center.
-  const QgsPointXY oldCenterMap = toMapPos( rect->center(), ctx );
-  const double dxMap = newPoint.x() - oldCenterMap.x();
-  const double dyMap = newPoint.y() - oldCenterMap.y();
-  const QgsPointXY newCenterMap( oldCenterMap.x() + dxMap, oldCenterMap.y() + dyMap );
-  const QgsPointXY newCenterIp = toItemPos( newCenterMap, ctx );
-  rect->setCenter( QgsPointXY( newCenterIp.x(), newCenterIp.y() ) );
+  const double dxMap = newPoint.x() - centerMap.x();
+  const double dyMap = newPoint.y() - centerMap.y();
+  const QgsPointXY newCenterMap( centerMap.x() + dxMap, centerMap.y() + dyMap );
+  rect->setBox( toItemPos( newCenterMap, ctx ), rect->size(), rect->angle(), mapCrs, layerCrs );
 }
 
 void KadasRectangleAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )

@@ -25,7 +25,18 @@ the polygon back is therefore always exact.
 
 Type id: \c "kadas:rectangle".
 
-Coordinates and size are in the parent layer's CRS.
+\c center is always stored in the parent layer's CRS. \c size and \c
+angle are expressed in the "drawing CRS" (\c drawCrs), which is the map
+canvas CRS at the time the rectangle was drawn or last edited. When \c
+drawCrs differs from the layer CRS, the polygon corners are produced by
+laying the box out axis-aligned in \c drawCrs around the projected
+center, then transforming each corner per-vertex back to the layer CRS.
+This guarantees the rendered shape is a true rectangle on a map
+displayed in \c drawCrs even when the layer CRS differs.
+
+If \c drawCrs is invalid (legacy items / programmatic creation without a
+context) the box is laid out axis-aligned directly in the layer CRS,
+preserving the earlier behavior.
 %End
 
 %TypeHeaderCode
@@ -55,10 +66,24 @@ Angle in degrees, counter-clockwise around \c
 :py:func:`~KadasRectangleAnnotationItem.center`.
 %End
 
+    QgsCoordinateReferenceSystem drawCrs() const;
+%Docstring
+items laid out axis-aligned in the layer CRS.
+%End
+
+    QgsCoordinateReferenceSystem layerCrs() const;
+%Docstring
+items.
+%End
+
     void setBox( const QgsPointXY &center, const QSizeF &size, double angleDegrees );
 %Docstring
-Sets all rectangle parameters at once and regenerates the polygon
-geometry.
+Legacy overload; lays the box out axis-aligned in the layer CRS.
+%End
+
+    void setBox( const QgsPointXY &center, const QSizeF &size, double angleDegrees, const QgsCoordinateReferenceSystem &drawCrs, const QgsCoordinateReferenceSystem &layerCrs );
+%Docstring
+rectangle on a map shown in \c drawCrs even when \c layerCrs differs.
 %End
 
     void setCenter( const QgsPointXY &center );

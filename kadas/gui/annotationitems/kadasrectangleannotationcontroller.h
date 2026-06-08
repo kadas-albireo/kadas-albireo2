@@ -86,7 +86,7 @@ class KADAS_GUI_EXPORT KadasRectangleAnnotationController : public KadasAnnotati
     // Transient draw-anchor: the position of the first click. Reset on every
     // startPart() and consulted by setCurrentPoint() to grow the rectangle
     // from the click toward the cursor regardless of which quadrant the
-    // cursor traverses. Item-CRS coordinates.
+    // cursor traverses. Map-CRS coordinates (the user's drawing frame).
     QgsPointXY mDrawAnchor;
     bool mDrawAnchorValid = false;
 };
