@@ -25,6 +25,7 @@
 #include <QMessageBox>
 #include <QSplashScreen>
 #include <QStatusBar>
+#include <QStyleHints>
 #include <QRegularExpression>
 #include <QUrlQuery>
 #include <quazip/quazipfile.h>
@@ -284,6 +285,7 @@ void KadasApplication::init()
   if ( styleSheet.open( QIODevice::ReadOnly ) )
   {
     setStyleSheet( QString::fromLocal8Bit( styleSheet.readAll() ) );
+    styleHints()->setColorScheme( Qt::ColorScheme::Light ); // Force kadas to use light theme regardless of OS system theme
   }
 
   // Create / migrate settings
