@@ -23,7 +23,9 @@
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsannotationpolygonitem.h>
 #include <qgis/qgscurvepolygon.h>
+#include <qgis/qgsdistancearea.h>
 #include <qgis/qgsfillsymbol.h>
+#include <qgis/qgsgeometry.h>
 #include <qgis/qgsproject.h>
 
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
@@ -269,6 +271,37 @@ QString KadasCircleAnnotationController::asKml( const QgsAnnotationItem *item, c
 KadasAnnotationStyleEditor *KadasCircleAnnotationController::createStyleEditor( QWidget *parent ) const
 {
   return new KadasPolygonStyleEditor( parent );
+}
+
+QList<KadasAnnotationMeasurementLabel> KadasCircleAnnotationController::measurementLabels( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
+{
+  QList<KadasAnnotationMeasurementLabel> labels;
+  const KadasCircleAnnotationItem *circle = asCircle( item );
+  if ( circle->radius() <= 0 )
+    return labels;
+
+  QgsDistanceArea da;
+  da.setSourceCrs( ctx.itemCrs(), ctx.mapSettings().transformContext() );
+  da.setEllipsoid( QgsProject::instance()->ellipsoid() );
+
+  const double radiusM = da.measureLine( circle->center(), circle->ringPoint() );
+
+  double areaM2 = 0.0;
+  if ( const QgsAbstractGeometry *g = circle->geometry() )
+  {
+    const QgsGeometry geom( g->clone() );
+    areaM2 = da.measureArea( geom );
+  }
+
+  // Radius label at the midpoint of the center↔ring segment.
+  const QgsPointXY centerMap = toMapPos( circle->center(), ctx );
+  const QgsPointXY ringMap = toMapPos( circle->ringPoint(), ctx );
+  const QgsPointXY midMap( 0.5 * ( centerMap.x() + ringMap.x() ), 0.5 * ( centerMap.y() + ringMap.y() ) );
+  labels.append( { midMap, QObject::tr( "r: %1" ).arg( formatLengthMeters( radiusM ) ), true } );
+
+  // Area label at the center.
+  labels.append( { centerMap, formatAreaSquareMeters( areaM2 ), true } );
+  return labels;
 }
 
 QList<QgsAnnotationItem *> KadasCircleAnnotationController::generateShadows( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const

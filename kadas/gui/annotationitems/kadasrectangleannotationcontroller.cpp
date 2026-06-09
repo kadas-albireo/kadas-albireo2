@@ -23,7 +23,9 @@
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsannotationpolygonitem.h>
 #include <qgis/qgscurvepolygon.h>
+#include <qgis/qgsdistancearea.h>
 #include <qgis/qgsfillsymbol.h>
+#include <qgis/qgsgeometry.h>
 #include <qgis/qgsproject.h>
 
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
@@ -321,6 +323,42 @@ QString KadasRectangleAnnotationController::asKml( const QgsAnnotationItem *item
 KadasAnnotationStyleEditor *KadasRectangleAnnotationController::createStyleEditor( QWidget *parent ) const
 {
   return new KadasPolygonStyleEditor( parent );
+}
+
+QList<KadasAnnotationMeasurementLabel> KadasRectangleAnnotationController::measurementLabels( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
+{
+  QList<KadasAnnotationMeasurementLabel> labels;
+  const KadasRectangleAnnotationItem *rect = asRect( item );
+  if ( rect->size().isEmpty() )
+    return labels;
+
+  const QVector<QgsPointXY> corners = rect->corners();
+  if ( corners.size() != 4 )
+    return labels;
+
+  QgsDistanceArea da;
+  da.setSourceCrs( ctx.itemCrs(), ctx.mapSettings().transformContext() );
+  da.setEllipsoid( QgsProject::instance()->ellipsoid() );
+
+  // One length label at the midpoint of each of the 4 edges.
+  for ( int i = 0; i < 4; ++i )
+  {
+    const QgsPointXY &a = corners[i];
+    const QgsPointXY &b = corners[( i + 1 ) % 4];
+    const double seg = da.measureLine( a, b );
+    const QgsPointXY midItem( 0.5 * ( a.x() + b.x() ), 0.5 * ( a.y() + b.y() ) );
+    labels.append( { toMapPos( midItem, ctx ), formatLengthMeters( seg ), true } );
+  }
+
+  // Area label at the center.
+  double areaM2 = 0.0;
+  if ( const QgsAbstractGeometry *g = rect->geometry() )
+  {
+    const QgsGeometry geom( g->clone() );
+    areaM2 = da.measureArea( geom );
+  }
+  labels.append( { toMapPos( rect->center(), ctx ), formatAreaSquareMeters( areaM2 ), true } );
+  return labels;
 }
 
 QList<QgsAnnotationItem *> KadasRectangleAnnotationController::generateShadows( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
