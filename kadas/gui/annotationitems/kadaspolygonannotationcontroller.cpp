@@ -370,6 +370,22 @@ QList<KadasAnnotationMeasurementLabel> KadasPolygonAnnotationController::measure
   da.setSourceCrs( ctx.itemCrs(), ctx.mapSettings().transformContext() );
   da.setEllipsoid( QgsProject::instance()->ellipsoid() );
 
+  // One length label per exterior-ring edge (matches line/rectangle).
+  const QgsCurve *ring = poly->exteriorRing();
+  const int n = ring->numPoints();
+  for ( int i = 1; i < n; ++i )
+  {
+    const QgsPoint a = ring->vertexAt( QgsVertexId( 0, 0, i - 1 ) );
+    const QgsPoint b = ring->vertexAt( QgsVertexId( 0, 0, i ) );
+    const QgsPointXY ai( a.x(), a.y() );
+    const QgsPointXY bi( b.x(), b.y() );
+    if ( ai == bi )
+      continue; // skip rubber-band trailing duplicate / closing edge of degenerate ring
+    const double seg = da.measureLine( ai, bi );
+    const QgsPointXY midItem( 0.5 * ( a.x() + b.x() ), 0.5 * ( a.y() + b.y() ) );
+    labels.append( { toMapPos( midItem, ctx ), formatLengthMeters( seg ), true } );
+  }
+
   std::unique_ptr<QgsCurvePolygon> clone( poly->clone() );
   const QgsGeometry geom( clone.release() );
   const double area = da.measureArea( geom );

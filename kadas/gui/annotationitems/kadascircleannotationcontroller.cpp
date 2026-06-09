@@ -297,7 +297,7 @@ QList<KadasAnnotationMeasurementLabel> KadasCircleAnnotationController::measurem
   const QgsPointXY centerMap = toMapPos( circle->center(), ctx );
   const QgsPointXY ringMap = toMapPos( circle->ringPoint(), ctx );
   const QgsPointXY midMap( 0.5 * ( centerMap.x() + ringMap.x() ), 0.5 * ( centerMap.y() + ringMap.y() ) );
-  labels.append( { midMap, QObject::tr( "r: %1" ).arg( formatLengthMeters( radiusM ) ), true } );
+  labels.append( { midMap, formatLengthMeters( radiusM ), true } );
 
   // Area label at the center.
   labels.append( { centerMap, formatAreaSquareMeters( areaM2 ), true } );

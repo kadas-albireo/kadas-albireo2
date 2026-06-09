@@ -350,14 +350,16 @@ QList<KadasAnnotationMeasurementLabel> KadasRectangleAnnotationController::measu
     labels.append( { toMapPos( midItem, ctx ), formatLengthMeters( seg ), true } );
   }
 
-  // Area label at the center.
+  // Area label at the centroid of the polygon geometry (matches polygon controller).
   double areaM2 = 0.0;
+  QgsPointXY centroidItem = rect->center();
   if ( const QgsAbstractGeometry *g = rect->geometry() )
   {
     const QgsGeometry geom( g->clone() );
     areaM2 = da.measureArea( geom );
+    centroidItem = geom.centroid().asPoint();
   }
-  labels.append( { toMapPos( rect->center(), ctx ), formatAreaSquareMeters( areaM2 ), true } );
+  labels.append( { toMapPos( centroidItem, ctx ), formatAreaSquareMeters( areaM2 ), true } );
   return labels;
 }
 
