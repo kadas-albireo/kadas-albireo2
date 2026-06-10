@@ -236,6 +236,7 @@ target_link_libraries(
   Qt6::Sql
   Qt6::OpenGL
   Qt6::PrintSupport
+  Qt6::Svg
   QuaZip::QuaZip
   ${AXCONTAINER_LIBRARY}
   QGIS::Core

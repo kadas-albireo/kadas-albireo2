@@ -14,16 +14,69 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QPainter>
+#include <QSvgRenderer>
+
 #include <qgis/qgsapplication.h>
 #include <qgis/qgsgpsconnectionregistry.h>
 #include <qgis/qgsgpsdetector.h>
 #include <qgis/qgsmapcanvas.h>
+#include <qgis/qgsmapcanvasitem.h>
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsproject.h>
-#include <qgis/qgsrubberband.h>
 
 #include "kadasgpsintegration.h"
 #include "kadasmainwindow.h"
+
+//! Transient canvas overlay showing the GPS position as a rotatable arrow
+class KadasGpsMarker : public QgsMapCanvasItem
+{
+  public:
+    explicit KadasGpsMarker( QgsMapCanvas *canvas )
+      : QgsMapCanvasItem( canvas )
+      , mSvg( QStringLiteral( ":/kadas/icons/gpsarrow" ) )
+    {
+      setZValue( 200 );
+    }
+
+    void setGpsPosition( const QgsPointXY &mapPos, double direction )
+    {
+      mMapPos = mapPos;
+      if ( !std::isnan( direction ) )
+        mDirection = direction;
+      updatePosition();
+    }
+
+    void updatePosition() override
+    {
+      prepareGeometryChange();
+      setPos( toCanvasCoordinates( mMapPos ) );
+      update();
+    }
+
+    QRectF boundingRect() const override
+    {
+      // half diagonal of the rotated icon
+      const double r = SIZE * M_SQRT1_2;
+      return QRectF( -r, -r, 2 * r, 2 * r );
+    }
+
+    void paint( QPainter *painter ) override
+    {
+      painter->save();
+      painter->setRenderHint( QPainter::Antialiasing );
+      painter->setRenderHint( QPainter::SmoothPixmapTransform );
+      painter->rotate( mDirection );
+      mSvg.render( painter, QRectF( -SIZE / 2., -SIZE / 2., SIZE, SIZE ) );
+      painter->restore();
+    }
+
+  private:
+    static constexpr double SIZE = 92;
+    QSvgRenderer mSvg;
+    QgsPointXY mMapPos;
+    double mDirection = 0;
+};
 
 KadasGpsIntegration::KadasGpsIntegration( KadasMainWindow *mainWindow, QToolButton *gpsToolButton, QAction *actionEnableGps, QAction *actionMoveWithGps )
   : QObject( mainWindow )
@@ -161,11 +214,9 @@ void KadasGpsIntegration::gpsStateChanged( const QgsGpsInformation &info )
   // Update marker
   if ( !mMarker )
   {
-    mMarker = new QgsRubberBand( mMainWindow->mapCanvas(), Qgis::GeometryType::Point );
-    mMarker->setIcon( QgsRubberBand::ICON_SVG );
-    mMarker->setSvgIcon( ":/kadas/icons/gpsarrow", QPoint( -46, -46 ) );
+    mMarker = new KadasGpsMarker( mMainWindow->mapCanvas() );
   }
-  // Reproject WGS84 position to canvas CRS for the rubber band
+  // Reproject WGS84 position to canvas CRS
   const QgsCoordinateTransform t( QgsCoordinateReferenceSystem( "EPSG:4326" ), mMainWindow->mapCanvas()->mapSettings().destinationCrs(), QgsProject::instance()->transformContext() );
   QgsPointXY canvasPos;
   try
@@ -176,12 +227,7 @@ void KadasGpsIntegration::gpsStateChanged( const QgsGpsInformation &info )
   {
     canvasPos = position;
   }
-  mMarker->reset( Qgis::GeometryType::Point );
-  mMarker->addPoint( canvasPos );
-  // NOTE: rotation lost in port from KadasSymbolItem (info.direction); QgsRubberBand
-  // does not currently support icon rotation. Re-add via a transient
-  // QgsAnnotationLayer + QgsAnnotationMarkerItem (SVG marker symbol with angle)
-  // if heading display is needed.
+  mMarker->setGpsPosition( canvasPos, info.direction );
 }
 
 void KadasGpsIntegration::updateGpsFixIcon()
