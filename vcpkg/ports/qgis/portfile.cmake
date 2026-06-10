@@ -1,9 +1,9 @@
 string(REPLACE "." "_" TAG ${VERSION})
 
 # set(QGIS_REF final-${TAG})
-set(QGIS_REF 3532bc2a987237b8bc5f3599bbf935bf715351f3)
+set(QGIS_REF 7a8d78b0a6e382474300d0d64d6d08f2dfcc8460)
 set(QGIS_SHA512
-    12392a18ab8ce939421e7d20aaa6f0042facd1f94660490fc983065ae6783e07a373510068beeadd03273056e6c1c0b738d7b49325ed06c5de7838f7ee6f96de
+    7765d655cd3761e5a1f2a9db183b1e54dca204730955e32481818a56d645fed3a2680ac7746b9019d8576d5a3cc20fccc40347630f47765b421d36715f524141
 )
 
 vcpkg_from_github(
@@ -32,7 +32,6 @@ vcpkg_from_github(
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
   bigobj-vectorlayer.patch # https://github.com/qgis/QGIS/pull/66271
-  svg-marker-bounds-anchor.patch # https://github.com/qgis/QGIS/compare/master...3nids:QGIS:fix-svg-marker-bounds-anchor
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
