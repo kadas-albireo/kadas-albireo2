@@ -46,6 +46,8 @@
 #include <qgis/qgssourceselectproviderregistry.h>
 #include <qgis/qgssourceselectprovider.h>
 #include <qgis/qgsvectortilelayer.h>
+#include <qgis/qgselevationcontrollerwidget.h>
+#include <qgis/qgsrasterlayerelevationproperties.h>
 
 #include "kadas/core/kadas.h"
 #include "kadas/gui/kadasclipboard.h"
@@ -54,6 +56,7 @@
 #include "kadas/gui/kadasmapcanvasitem.h"
 #include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/kadasprojecttemplateselectiondialog.h"
+#include "kadas/gui/kadasmapwidget.h"
 
 #include "kadas/gui/catalog/kadasarcgisrestcatalogprovider.h"
 #include "kadas/gui/catalog/kadasgeoadminrestcatalogprovider.h"
@@ -257,6 +260,7 @@ void KadasMainWindow::init()
 
   mLayerTreeView->setModel( model );
   mLayerTreeView->setMenuProvider( new KadasLayerTreeViewMenuProvider( mLayerTreeView ) );
+  //connect( QgsProject::instance(), &QgsProject::layersRemoved, this, &KadasLayerSelectionWidget::repopulateLayers );
   connect( mLayerTreeView, &QAbstractItemView::doubleClicked, this, &KadasMainWindow::layerTreeViewDoubleClicked );
 
   connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemAdded, this, &KadasMainWindow::addMapCanvasItem );
@@ -313,6 +317,9 @@ void KadasMainWindow::init()
   mPluginManager = new KadasPluginManager( mapCanvas(), mActionPluginManager );
   mPluginManager->hide();
 
+  setElevationControllerRangeFromHeightmap();
+
+
   configureButtons();
 
   restoreFavoriteButton( mFavoriteButton1 );
@@ -343,6 +350,7 @@ void KadasMainWindow::init()
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerProjection );
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerTemporalCapabilities );
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkWMSLayerIgnoreReportedExtents );
+  connect( QgsProject::instance(), &QgsProject::layersRemoved, this, &KadasMainWindow::removeElevationControllers );
   connect( mLayerTreeViewButton, &QPushButton::clicked, this, &KadasMainWindow::toggleLayerTree );
   connect( mRibbonbarButton, &QPushButton::clicked, this, &KadasMainWindow::toggleFullscreen );
   connect( mRibbonWidget, &QTabWidget::tabBarClicked, this, &KadasMainWindow::endFullscreen );
@@ -452,6 +460,8 @@ void KadasMainWindow::updateWidgetPositions()
   mZoomInOutFrame->move( mMapCanvas->width() - distanceToRightBorder - mZoomInOutFrame->width(), distanceToTop );
 
   mHomeButton->move( mMapCanvas->width() - distanceToRightBorder - mHomeButton->height(), distanceToTop + 90 );
+
+  mElevationControllerFrame->move( mMapCanvas->width() - distanceToRightBorder - mElevationControllerFrame->width(), distanceToTop + 150 );
 
   // Resize mLayersWidget and reposition mLayerTreeViewButton
   int distanceToTopBottom = 40;
@@ -1550,6 +1560,68 @@ void KadasMainWindow::addRemotePicture()
   }
 }
 
+void KadasMainWindow::setElevationControllerRangeFromHeightmap()
+{
+  for ( KadasMapWidget *mapWidget : mMapWidgetManager->mapWidgets() )
+  {
+    mapWidget->setElevationController();
+  }
+
+  QString layerid = QgsProject::instance()->readEntry( "Heightmap", "layer" );
+  QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerid );
+  if ( !layer || layer->type() != Qgis::LayerType::Raster )
+  {
+    delete mElevationController;
+    mElevationController = nullptr;
+
+    return;
+  }
+
+
+  if ( !mElevationController )
+  {
+    mElevationController = new QgsElevationControllerWidget( this );
+    connect( mElevationController, &QgsElevationControllerWidget::rangeChanged, this, &KadasMainWindow::setCanvasZRange );
+    mElevationControllerFrame->layout()->addWidget( mElevationController );
+  }
+
+
+  QgsRasterLayer *rl = qobject_cast< QgsRasterLayer * >( layer );
+  QgsRasterBandStats stats = rl->dataProvider()->bandStatistics( 1, Qgis::RasterBandStatistic::Min | Qgis::RasterBandStatistic::Max );
+
+  mElevationController->setRangeLimits( QgsDoubleRange( stats.minimumValue, stats.maximumValue ) );
+  mElevationController->setRange( QgsDoubleRange( stats.minimumValue, stats.maximumValue ) );
+}
+
+void KadasMainWindow::removeElevationControllers()
+{
+  bool toRemove = false;
+  QgsLayerTree *rootNode = QgsProject::instance()->layerTreeRoot();
+  for ( QgsMapLayer *layer : rootNode->layerOrder() )
+  {
+    QgsRasterLayer *rasterLayer = qobject_cast<QgsRasterLayer *>( layer );
+    if ( rasterLayer )
+    {
+      if ( rasterLayer->elevationProperties()->hasElevation() )
+      {
+        toRemove = true;
+        break;
+      }
+    }
+  }
+
+
+  if ( mElevationController )
+  {
+    delete mElevationController;
+    mElevationController = nullptr;
+  }
+  for ( KadasMapWidget *mapWidget : mMapWidgetManager->mapWidgets() )
+  {
+    mapWidget->removeElevationController();
+  }
+}
+
 void KadasMainWindow::addCustomDropHandler( QgsCustomDropHandler *handler )
 {
   mCustomDropHandlers.append( handler );
@@ -1662,4 +1734,12 @@ void KadasMainWindow::toggleIgnoreDpiScale()
 {
   QMessageBox::information( this, tr( "Font scaling setting changed" ), tr( "The font scaling change will be applied at the next program launch." ) );
   QgsSettings().setValue( "/kadas/ignore_dpi_scale", mCheckboxIgnoreSystemScaling->isChecked() );
+}
+
+void KadasMainWindow::setCanvasZRange( const QgsDoubleRange &range )
+{
+  if ( mMapCanvas )
+  {
+    mMapCanvas->setZRange( range );
+  }
 }

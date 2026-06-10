@@ -795,6 +795,7 @@ bool KadasApplication::projectOpen( const QString &projectFile )
 
   mMainWindow->layerTreeMapCanvasBridge()->setCanvasLayers();
   mMainWindow->layerTreeMapCanvasBridge()->setAutoSetupOnFirstLayer( autoSetupOnFirstLayer );
+  mMainWindow->setElevationControllerRangeFromHeightmap();
   mMainWindow->mapCanvas()->freeze( false );
   mMainWindow->mapCanvas()->refresh();
   QApplication::restoreOverrideCursor();

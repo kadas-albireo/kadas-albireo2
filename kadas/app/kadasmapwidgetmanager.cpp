@@ -99,6 +99,10 @@ KadasMapWidget *KadasMapWidgetManager::addMapWidget( const QString &id )
       initialLayers.append( layerTreeLayer->layer()->id() );
     }
   }
+
+  // Set Elevation controller from heightmap
+  mapWidget->setElevationController();
+
   if ( addArea == Qt::RightDockWidgetArea )
   {
     mapWidget->widget()->resize( mapWidget->widget()->width(), initialSize.height() );
