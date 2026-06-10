@@ -22,6 +22,7 @@
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgspointxy.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsrendercontext.h>
 #include <qgis/qgssettingsentryimpl.h>
 #include <qgis/qgstextformat.h>
 
@@ -128,6 +129,22 @@ KadasEditContext KadasPointTextAnnotationController::getEditContext( const QgsAn
 {
   const QgsPointXY testPos = toMapPos( QgsPointXY( asText( item )->point() ), ctx );
   if ( pos.sqrDist( testPos ) < pickTolSqr( ctx ) )
+  {
+    return KadasEditContext( QgsVertexId( 0, 0, 0 ), testPos, drawAttribs() );
+  }
+
+  // Hit-test against the rendered glyph box, not just the anchor point:
+  // depending on alignment the visible text extends well away from the
+  // anchor, and a fixed pickTolSqr around the anchor would miss most of
+  // it (same rationale as the marker controller's symbol-footprint
+  // test). boundingBox( QgsRenderContext& ) accounts for font size,
+  // alignment and rotation; it is expressed in layer CRS, so transform
+  // the click accordingly.
+  QgsRenderContext rc = QgsRenderContext::fromMapSettings( ctx.mapSettings() );
+  QgsRectangle bbox = item->boundingBox( rc );
+  // Pad by a few pixels so the user can grab the text edge.
+  bbox.grow( 4 * ctx.mapSettings().mapUnitsPerPixel() );
+  if ( bbox.contains( toItemPos( pos, ctx ) ) )
   {
     return KadasEditContext( QgsVertexId( 0, 0, 0 ), testPos, drawAttribs() );
   }
