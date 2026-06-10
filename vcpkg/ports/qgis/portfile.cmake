@@ -24,7 +24,6 @@ vcpkg_from_github(
   libxml2.patch
   crssync.patch
   mesh.patch
-  sipcxx17.patch
   qgis-debug.patch
   3dfrustumfix.patch
   3dchunkloaderconcurrency.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1278
