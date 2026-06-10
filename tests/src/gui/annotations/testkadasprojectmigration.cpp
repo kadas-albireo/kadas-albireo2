@@ -19,6 +19,7 @@
 #include <QSet>
 #include <QStandardPaths>
 #include <QStringList>
+#include <QTextStream>
 #include <QtTest/QTest>
 
 #include <qgis/qgsapplication.h>
@@ -58,6 +59,7 @@ class TestKadasProjectMigration : public QObject
     void migrateLegacyKadasItemLayer_translatesGpxWaypointItem();
     void migrateLegacyKadasItemLayer_leavesV1FormatAlone();
     void migrateLegacyKadasItemLayer_leavesUnknownItemTypeAlone();
+    void migrateLegacyPluginGridLayers_translatesBullseyeAndGuideGrid();
 
   private:
     static QString milxItemCdata( const QString &militaryName, double lon, double lat );
@@ -718,6 +720,125 @@ void TestKadasProjectMigration::migrateLegacyKadasItemLayer_leavesUnknownItemTyp
   const QDomElement preserved = doc.documentElement().firstChildElement( QStringLiteral( "projectlayers" ) ).firstChildElement( QStringLiteral( "maplayer" ) );
   QCOMPARE( preserved.attribute( QStringLiteral( "type" ) ), QStringLiteral( "plugin" ) );
   QCOMPARE( preserved.attribute( QStringLiteral( "name" ) ), QStringLiteral( "KadasItemLayer" ) );
+}
+
+void TestKadasProjectMigration::migrateLegacyPluginGridLayers_translatesBullseyeAndGuideGrid()
+{
+  // Legacy bullseye / guide-grid plugin layers (config carried as XML
+  // attributes on the `<maplayer>` element) must be rewritten into
+  // QgsAnnotationLayer blocks carrying the `kadas/annotation-type`
+  // customProperty marker + per-type config keys, so the post-load
+  // promotion pass can rebuild the Kadas subclasses. The plugin layer
+  // types no longer exist; without this rewrite both layers are dropped
+  // as unknown plugin layers at load.
+  QDomDocument doc;
+  QDomElement root = doc.createElement( QStringLiteral( "qgis" ) );
+  doc.appendChild( root );
+  QDomElement projectLayersEl = doc.createElement( QStringLiteral( "projectlayers" ) );
+  root.appendChild( projectLayersEl );
+
+  const auto appendIdAndName = [&doc]( QDomElement &el, const QString &id, const QString &name ) {
+    QDomElement idEl = doc.createElement( QStringLiteral( "id" ) );
+    idEl.appendChild( doc.createTextNode( id ) );
+    el.appendChild( idEl );
+    QDomElement nameEl = doc.createElement( QStringLiteral( "layername" ) );
+    nameEl.appendChild( doc.createTextNode( name ) );
+    el.appendChild( nameEl );
+  };
+
+  // Bullseye — attribute layout mirrors a real Kadas 2.x project save.
+  QDomElement bullseyeEl = doc.createElement( QStringLiteral( "maplayer" ) );
+  bullseyeEl.setAttribute( QStringLiteral( "type" ), QStringLiteral( "plugin" ) );
+  bullseyeEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "bullseye" ) );
+  bullseyeEl.setAttribute( QStringLiteral( "crs" ), QStringLiteral( "EPSG:2056" ) );
+  bullseyeEl.setAttribute( QStringLiteral( "x" ), QStringLiteral( "3122810.86789" ) );
+  bullseyeEl.setAttribute( QStringLiteral( "y" ), QStringLiteral( "1144589.83167" ) );
+  bullseyeEl.setAttribute( QStringLiteral( "rings" ), QStringLiteral( "3" ) );
+  bullseyeEl.setAttribute( QStringLiteral( "axes" ), QStringLiteral( "45" ) );
+  bullseyeEl.setAttribute( QStringLiteral( "interval" ), QStringLiteral( "28.45" ) );
+  bullseyeEl.setAttribute( QStringLiteral( "intervalUnit" ), QStringLiteral( "nautical miles" ) );
+  bullseyeEl.setAttribute( QStringLiteral( "fontSize" ), QStringLiteral( "21" ) );
+  bullseyeEl.setAttribute( QStringLiteral( "lineWidth" ), QStringLiteral( "7" ) );
+  bullseyeEl.setAttribute( QStringLiteral( "color" ), QStringLiteral( "253,191,111,255" ) );
+  bullseyeEl.setAttribute( QStringLiteral( "labelAxes" ), QStringLiteral( "1" ) );
+  bullseyeEl.setAttribute( QStringLiteral( "labelQuadrants" ), QStringLiteral( "1" ) );
+  bullseyeEl.setAttribute( QStringLiteral( "labelRings" ), QStringLiteral( "1" ) );
+  bullseyeEl.setAttribute( QStringLiteral( "transparency" ), QStringLiteral( "0" ) );
+  appendIdAndName( bullseyeEl, QStringLiteral( "Bullseye_layer_id" ), QStringLiteral( "Bullseye" ) );
+  projectLayersEl.appendChild( bullseyeEl );
+
+  // Guide grid.
+  QDomElement gridEl = doc.createElement( QStringLiteral( "maplayer" ) );
+  gridEl.setAttribute( QStringLiteral( "type" ), QStringLiteral( "plugin" ) );
+  gridEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "guide_grid" ) );
+  gridEl.setAttribute( QStringLiteral( "crs" ), QStringLiteral( "EPSG:2056" ) );
+  gridEl.setAttribute( QStringLiteral( "xmin" ), QStringLiteral( "2364310.87" ) );
+  gridEl.setAttribute( QStringLiteral( "ymin" ), QStringLiteral( "899839.79" ) );
+  gridEl.setAttribute( QStringLiteral( "xmax" ), QStringLiteral( "2870310.93" ) );
+  gridEl.setAttribute( QStringLiteral( "ymax" ), QStringLiteral( "1405839.85" ) );
+  gridEl.setAttribute( QStringLiteral( "cols" ), QStringLiteral( "6" ) );
+  gridEl.setAttribute( QStringLiteral( "rows" ), QStringLiteral( "10" ) );
+  gridEl.setAttribute( QStringLiteral( "colChar" ), QStringLiteral( "A" ) );
+  gridEl.setAttribute( QStringLiteral( "rowChar" ), QStringLiteral( "1" ) );
+  gridEl.setAttribute( QStringLiteral( "fontSize" ), QStringLiteral( "34" ) );
+  gridEl.setAttribute( QStringLiteral( "lineWidth" ), QStringLiteral( "5" ) );
+  gridEl.setAttribute( QStringLiteral( "color" ), QStringLiteral( "51,160,44,255" ) );
+  gridEl.setAttribute( QStringLiteral( "quadrantLabeling" ), QStringLiteral( "0" ) );
+  gridEl.setAttribute( QStringLiteral( "labelingPos" ), QStringLiteral( "0" ) );
+  gridEl.setAttribute( QStringLiteral( "colSizeLocked" ), QStringLiteral( "0" ) );
+  gridEl.setAttribute( QStringLiteral( "rowSizeLocked" ), QStringLiteral( "0" ) );
+  appendIdAndName( gridEl, QStringLiteral( "GuideGrid_layer_id" ), QStringLiteral( "Grille de conduite" ) );
+  projectLayersEl.appendChild( gridEl );
+
+  // Layer-tree entries carrying the defunct plugin providerKey.
+  QDomElement treeRoot = doc.createElement( QStringLiteral( "layer-tree-group" ) );
+  root.appendChild( treeRoot );
+  const auto appendTreeLayer = [&doc, &treeRoot]( const QString &id, const QString &providerKey ) {
+    QDomElement treeLayer = doc.createElement( QStringLiteral( "layer-tree-layer" ) );
+    treeLayer.setAttribute( QStringLiteral( "id" ), id );
+    treeLayer.setAttribute( QStringLiteral( "providerKey" ), providerKey );
+    treeRoot.appendChild( treeLayer );
+  };
+  appendTreeLayer( QStringLiteral( "Bullseye_layer_id" ), QStringLiteral( "bullseye" ) );
+  appendTreeLayer( QStringLiteral( "GuideGrid_layer_id" ), QStringLiteral( "guide_grid" ) );
+
+  QStringList filesToAttach;
+  QVERIFY( KadasProjectMigration::migrateProjectXml( QString(), doc, filesToAttach ) );
+
+  const QDomElement migratedProjectLayers = doc.documentElement().firstChildElement( QStringLiteral( "projectlayers" ) );
+  int annotationLayers = 0;
+  for ( QDomElement el = migratedProjectLayers.firstChildElement( QStringLiteral( "maplayer" ) ); !el.isNull(); el = el.nextSiblingElement( QStringLiteral( "maplayer" ) ) )
+  {
+    QCOMPARE( el.attribute( QStringLiteral( "type" ) ), QStringLiteral( "annotation" ) );
+    ++annotationLayers;
+
+    const QString id = el.firstChildElement( QStringLiteral( "id" ) ).text();
+    QString xml;
+    QTextStream stream( &xml );
+    el.save( stream, 0 );
+    if ( id == QLatin1String( "Bullseye_layer_id" ) )
+    {
+      QCOMPARE( el.firstChildElement( QStringLiteral( "layername" ) ).text(), QStringLiteral( "Bullseye" ) );
+      QVERIFY( xml.contains( QStringLiteral( "kadas/annotation-type" ) ) );
+      QVERIFY( xml.contains( QStringLiteral( "kadas/bullseye/rings" ) ) );
+      QVERIFY( xml.contains( QStringLiteral( "nautical miles" ) ) );
+      QVERIFY( xml.contains( QStringLiteral( "253,191,111,255" ) ) );
+    }
+    else
+    {
+      QCOMPARE( id, QStringLiteral( "GuideGrid_layer_id" ) );
+      QCOMPARE( el.firstChildElement( QStringLiteral( "layername" ) ).text(), QStringLiteral( "Grille de conduite" ) );
+      QVERIFY( xml.contains( QStringLiteral( "kadas/guidegrid/cols" ) ) );
+      QVERIFY( xml.contains( QStringLiteral( "51,160,44,255" ) ) );
+    }
+  }
+  QCOMPARE( annotationLayers, 2 );
+
+  // providerKey must be cleared so QGIS resolves the layers through the
+  // (now annotation) maplayer blocks.
+  const QDomNodeList treeLayers = doc.documentElement().elementsByTagName( QStringLiteral( "layer-tree-layer" ) );
+  for ( int i = 0; i < treeLayers.size(); ++i )
+    QVERIFY( treeLayers.at( i ).toElement().attribute( QStringLiteral( "providerKey" ) ).isEmpty() );
 }
 
 

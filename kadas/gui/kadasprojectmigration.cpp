@@ -179,6 +179,12 @@ bool KadasProjectMigration::migrateProjectXml( const QString &basedir, QDomDocum
   // all be translated by this pass are left as plugin layers and will
   // fail to load (the post-load migration fallback has been removed).
   changed = migrateLegacyKadasItemLayers( doc, root ) || changed;
+  // Legacy bullseye / guide-grid plugin layers: the plugin layer types
+  // were dropped when both became QgsAnnotationLayer subclasses; rewrite
+  // the plugin blocks into annotation-layer blocks carrying the
+  // `kadas/...` customProperties so the post-load promotion pass can
+  // rebuild the Kadas subclasses.
+  changed = migrateLegacyPluginGridLayers( doc, root ) || changed;
   return changed;
 }
 
@@ -341,6 +347,126 @@ bool KadasProjectMigration::migrateLegacyMilxLayers( QDomDocument &doc, QDomElem
   {
     QDomElement el = treeLayers.at( i ).toElement();
     if ( el.attribute( QStringLiteral( "providerKey" ) ) == QLatin1String( "KadasMilxLayer" ) )
+      el.setAttribute( QStringLiteral( "providerKey" ), QString() );
+  }
+
+  return true;
+}
+
+bool KadasProjectMigration::migrateLegacyPluginGridLayers( QDomDocument &doc, QDomElement &root )
+{
+  QDomElement projectLayersEl = root.firstChildElement( "projectlayers" );
+  if ( projectLayersEl.isNull() )
+    return false;
+
+  // Snapshot direct `<maplayer>` children of `<projectlayers>` (see
+  // migrateLegacyMilxLayers for why elementsByTagName must not be used).
+  QList<QDomElement> gridMapLayers;
+  for ( QDomNode n = projectLayersEl.firstChild(); !n.isNull(); n = n.nextSibling() )
+  {
+    QDomElement el = n.toElement();
+    if ( el.tagName() != QLatin1String( "maplayer" ) || el.attribute( QStringLiteral( "type" ) ) != QLatin1String( "plugin" ) )
+      continue;
+    const QString pluginType = el.attribute( QStringLiteral( "name" ) );
+    if ( pluginType == QLatin1String( "bullseye" ) || pluginType == QLatin1String( "guide_grid" ) )
+      gridMapLayers.append( el );
+  }
+  if ( gridMapLayers.isEmpty() )
+    return false;
+
+  QgsDebugMsgLevel( QStringLiteral( "Migrating %1 legacy bullseye/guide_grid plugin layer(s) to QgsAnnotationLayer" ).arg( gridMapLayers.size() ), 1 );
+
+  for ( QDomElement &mapLayerEl : gridMapLayers )
+  {
+    const QString pluginType = mapLayerEl.attribute( QStringLiteral( "name" ) );
+    const QString layerName = mapLayerEl.firstChildElement( "layername" ).text();
+
+    QgsAnnotationLayer::LayerOptions options( QgsProject::instance()->transformContext() );
+    auto annoLayer = std::make_unique<QgsAnnotationLayer>( layerName, options );
+
+    QgsCoordinateReferenceSystem crs;
+    const QDomElement srsEl = mapLayerEl.firstChildElement( QStringLiteral( "srs" ) );
+    if ( !srsEl.isNull() )
+      crs.readXml( srsEl );
+    if ( !crs.isValid() )
+      crs = QgsCoordinateReferenceSystem( mapLayerEl.attribute( QStringLiteral( "crs" ) ) );
+    annoLayer->setCrs( crs );
+    annoLayer->setOpacity( 1. - mapLayerEl.attribute( QStringLiteral( "transparency" ), QStringLiteral( "0" ) ).toDouble() / 100. );
+
+    // Translate the legacy config (carried as XML attributes on the
+    // `<maplayer>` element) into the customProperty namespace read by
+    // KadasBullseyeLayer / KadasGuideGridLayer after promotion.
+    if ( pluginType == QLatin1String( "bullseye" ) )
+    {
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/annotation-type" ), QStringLiteral( "bullseye" ) );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/bullseye/x" ), mapLayerEl.attribute( QStringLiteral( "x" ) ).toDouble() );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/bullseye/y" ), mapLayerEl.attribute( QStringLiteral( "y" ) ).toDouble() );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/bullseye/rings" ), mapLayerEl.attribute( QStringLiteral( "rings" ) ).toInt() );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/bullseye/axes" ), mapLayerEl.attribute( QStringLiteral( "axes" ) ).toDouble() );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/bullseye/interval" ), mapLayerEl.attribute( QStringLiteral( "interval" ) ).toDouble() );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/bullseye/intervalUnit" ), mapLayerEl.attribute( QStringLiteral( "intervalUnit" ), QStringLiteral( "nautical miles" ) ) );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/bullseye/fontSize" ), mapLayerEl.attribute( QStringLiteral( "fontSize" ), QStringLiteral( "10" ) ).toInt() );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/bullseye/lineWidth" ), mapLayerEl.attribute( QStringLiteral( "lineWidth" ), QStringLiteral( "1" ) ).toInt() );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/bullseye/color" ), mapLayerEl.attribute( QStringLiteral( "color" ), QStringLiteral( "0,0,255,255" ) ) );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/bullseye/labelAxes" ), mapLayerEl.attribute( QStringLiteral( "labelAxes" ) ) == QLatin1String( "1" ) );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/bullseye/labelQuadrants" ), mapLayerEl.attribute( QStringLiteral( "labelQuadrants" ) ) == QLatin1String( "1" ) );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/bullseye/labelRings" ), mapLayerEl.attribute( QStringLiteral( "labelRings" ) ) == QLatin1String( "1" ) );
+    }
+    else // guide_grid
+    {
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/annotation-type" ), QStringLiteral( "guidegrid" ) );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/guidegrid/xmin" ), mapLayerEl.attribute( QStringLiteral( "xmin" ) ).toDouble() );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/guidegrid/ymin" ), mapLayerEl.attribute( QStringLiteral( "ymin" ) ).toDouble() );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/guidegrid/xmax" ), mapLayerEl.attribute( QStringLiteral( "xmax" ) ).toDouble() );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/guidegrid/ymax" ), mapLayerEl.attribute( QStringLiteral( "ymax" ) ).toDouble() );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/guidegrid/cols" ), mapLayerEl.attribute( QStringLiteral( "cols" ) ).toInt() );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/guidegrid/rows" ), mapLayerEl.attribute( QStringLiteral( "rows" ) ).toInt() );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/guidegrid/colSizeLocked" ), mapLayerEl.attribute( QStringLiteral( "colSizeLocked" ) ) == QLatin1String( "1" ) );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/guidegrid/rowSizeLocked" ), mapLayerEl.attribute( QStringLiteral( "rowSizeLocked" ) ) == QLatin1String( "1" ) );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/guidegrid/fontSize" ), mapLayerEl.attribute( QStringLiteral( "fontSize" ), QStringLiteral( "30" ) ).toInt() );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/guidegrid/color" ), mapLayerEl.attribute( QStringLiteral( "color" ), QStringLiteral( "255,0,0,255" ) ) );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/guidegrid/lineWidth" ), mapLayerEl.attribute( QStringLiteral( "lineWidth" ), QStringLiteral( "1" ) ).toInt() );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/guidegrid/rowChar" ), mapLayerEl.attribute( QStringLiteral( "rowChar" ), QStringLiteral( "A" ) ) );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/guidegrid/colChar" ), mapLayerEl.attribute( QStringLiteral( "colChar" ), QStringLiteral( "1" ) ) );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/guidegrid/labelingPos" ), mapLayerEl.attribute( QStringLiteral( "labelingPos" ), QStringLiteral( "0" ) ).toInt() );
+      annoLayer->setCustomProperty( QStringLiteral( "kadas/guidegrid/quadrantLabeling" ), mapLayerEl.attribute( QStringLiteral( "quadrantLabeling" ), QStringLiteral( "0" ) ).toInt() );
+    }
+
+    QDomElement newMapLayerEl = doc.createElement( "maplayer" );
+    QgsReadWriteContext context;
+    annoLayer->writeLayerXml( newMapLayerEl, doc, context );
+
+    // Preserve the original layer id and name so layer-tree-layer,
+    // layerorder and similar references continue to resolve (see
+    // migrateLegacyMilxLayers).
+    const QString originalId = mapLayerEl.firstChildElement( "id" ).text();
+    QDomElement existingId = newMapLayerEl.firstChildElement( "id" );
+    if ( !existingId.isNull() )
+    {
+      QDomElement replacementId = doc.createElement( "id" );
+      replacementId.appendChild( doc.createTextNode( originalId ) );
+      newMapLayerEl.replaceChild( replacementId, existingId );
+    }
+    QDomElement existingName = newMapLayerEl.firstChildElement( "layername" );
+    if ( !existingName.isNull() )
+    {
+      QDomElement replacementName = doc.createElement( "layername" );
+      replacementName.appendChild( doc.createTextNode( layerName ) );
+      newMapLayerEl.replaceChild( replacementName, existingName );
+    }
+
+    projectLayersEl.replaceChild( newMapLayerEl, mapLayerEl );
+  }
+
+  // Clear the now-defunct plugin providerKey on the matching
+  // layer-tree-layer entries so QGIS resolves the layers through the
+  // projectlayers maplayer blocks (now annotation layers).
+  QDomNodeList treeLayers = root.elementsByTagName( QStringLiteral( "layer-tree-layer" ) );
+  for ( int i = 0, n = treeLayers.size(); i < n; ++i )
+  {
+    QDomElement el = treeLayers.at( i ).toElement();
+    const QString providerKey = el.attribute( QStringLiteral( "providerKey" ) );
+    if ( providerKey == QLatin1String( "bullseye" ) || providerKey == QLatin1String( "guide_grid" ) )
       el.setAttribute( QStringLiteral( "providerKey" ), QString() );
   }
 

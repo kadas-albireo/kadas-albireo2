@@ -35,6 +35,14 @@ class KADAS_GUI_EXPORT KadasProjectMigration
     //! `QgsAnnotationLayer` populated with `KadasMilxAnnotationItem` entries.
     //! Returns true if at least one such layer was rewritten.
     static bool migrateLegacyMilxLayers( QDomDocument &doc, QDomElement &root );
+    //! Rewrites legacy `<maplayer name="bullseye"|"guide_grid" type="plugin">`
+    //! blocks into plain `QgsAnnotationLayer` blocks carrying the
+    //! `kadas/annotation-type` customProperty marker plus the per-type
+    //! config keys; the post-load promotion pass
+    //! (KadasAnnotationLayer::promoteAll) then swaps in the matching
+    //! KadasBullseyeLayer / KadasGuideGridLayer subclass instance.
+    //! Returns true if at least one such layer was rewritten.
+    static bool migrateLegacyPluginGridLayers( QDomDocument &doc, QDomElement &root );
     //! Rewrites legacy `<maplayer name="KadasItemLayer" type="plugin">`
     //! blocks into `QgsAnnotationLayer` blocks by translating each
     //! `<MapItem name="Kadas...Item">` child into the corresponding
