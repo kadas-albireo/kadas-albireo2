@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <cmath>
+#include <limits>
 
 #include <QKeyEvent>
 
@@ -50,6 +51,9 @@ void KadasShapeCaptureMapTool::clear()
   mCapturing = false;
   mVertices.clear();
   mCircleRadius = 0.0;
+  mSectorStage = SectorStage::None;
+  mSectorStartAngle = 0.0;
+  mSectorStopAngle = 0.0;
   emit cleared();
 }
 
@@ -61,10 +65,16 @@ void KadasShapeCaptureMapTool::deactivate()
 
 void KadasShapeCaptureMapTool::setCircleRadius( double radius )
 {
-  if ( mShape != Shape::Circle )
-    return;
-  mCircleRadius = radius;
-  updateCircleRubberBand();
+  if ( mShape == Shape::Circle )
+  {
+    mCircleRadius = radius;
+    updateCircleRubberBand();
+  }
+  else if ( mShape == Shape::Sector )
+  {
+    mCircleRadius = radius;
+    updateSectorRubberBand();
+  }
 }
 
 void KadasShapeCaptureMapTool::setCapturedPolyline( const QVector<QgsPointXY> &vertices )
@@ -101,6 +111,37 @@ void KadasShapeCaptureMapTool::canvasPressEvent( QgsMapMouseEvent *e )
       mDragging = true;
       break;
 
+    case Shape::Sector:
+      switch ( mSectorStage )
+      {
+        case SectorStage::None:
+          // First click: place the center
+          resetRubberBand();
+          mAnchor = toMapCoordinates( e->pos() );
+          mCircleRadius = 0.0;
+          mSectorStartAngle = 0.0;
+          mSectorStopAngle = 2 * M_PI;
+          mSectorStage = SectorStage::HaveCenter;
+          break;
+
+        case SectorStage::HaveCenter:
+          // Second click: fix radius + start angle, begin sweeping
+          mSectorStage = SectorStage::HaveRadius;
+          break;
+
+        case SectorStage::HaveRadius:
+        {
+          // Third click: finish the sector
+          mSectorStage = SectorStage::None;
+          updateSectorRubberBand();
+          const QgsGeometry geom = buildSectorGeometry();
+          if ( !geom.isEmpty() )
+            emit shapeCaptured( geom, canvas()->mapSettings().destinationCrs() );
+          break;
+        }
+      }
+      break;
+
     case Shape::Polyline:
     case Shape::Polygon:
       if ( !mCapturing )
@@ -132,6 +173,36 @@ void KadasShapeCaptureMapTool::canvasMoveEvent( QgsMapMouseEvent *e )
       mCircleRadius = std::sqrt( mCurrent.sqrDist( mAnchor ) );
       updateCircleRubberBand();
       break;
+
+    case Shape::Sector:
+    {
+      const QgsPointXY p = toMapCoordinates( e->pos() );
+      if ( mSectorStage == SectorStage::HaveCenter )
+      {
+        // Radius + start angle follow the cursor; full circle until the sweep starts
+        mCircleRadius = std::sqrt( p.sqrDist( mAnchor ) );
+        mSectorStartAngle = std::atan2( p.y() - mAnchor.y(), p.x() - mAnchor.x() );
+        if ( mSectorStartAngle < 0 )
+          mSectorStartAngle += 2 * M_PI;
+        mSectorStopAngle = mSectorStartAngle + 2 * M_PI;
+        updateSectorRubberBand();
+      }
+      else if ( mSectorStage == SectorStage::HaveRadius )
+      {
+        mSectorStopAngle = std::atan2( p.y() - mAnchor.y(), p.x() - mAnchor.x() );
+        while ( mSectorStopAngle <= mSectorStartAngle )
+          mSectorStopAngle += 2 * M_PI;
+
+        // Snap to full circle when the sweep end is within pick tolerance of its start
+        const QgsPointXY pStart( mAnchor.x() + mCircleRadius * std::cos( mSectorStartAngle ), mAnchor.y() + mCircleRadius * std::sin( mSectorStartAngle ) );
+        const QgsPointXY pEnd( mAnchor.x() + mCircleRadius * std::cos( mSectorStopAngle ), mAnchor.y() + mCircleRadius * std::sin( mSectorStopAngle ) );
+        const double tol = searchRadiusMU( canvas() );
+        if ( pStart.sqrDist( pEnd ) < tol * tol )
+          mSectorStopAngle = mSectorStartAngle + 2 * M_PI;
+        updateSectorRubberBand();
+      }
+      break;
+    }
 
     case Shape::Polyline:
     case Shape::Polygon:
@@ -175,9 +246,10 @@ void KadasShapeCaptureMapTool::canvasReleaseEvent( QgsMapMouseEvent *e )
       break;
     }
 
+    case Shape::Sector:
     case Shape::Polyline:
     case Shape::Polygon:
-      // Vertex addition is handled in press; release does nothing extra.
+      // Sector advances on press; vertex addition is handled in press; release does nothing extra.
       break;
   }
 }
@@ -259,6 +331,18 @@ void KadasShapeCaptureMapTool::updateCircleRubberBand()
   mRubberBand->setToGeometry( buildCircleGeometry(), nullptr );
 }
 
+void KadasShapeCaptureMapTool::updateSectorRubberBand()
+{
+  if ( !mRubberBand )
+  {
+    mRubberBand = new QgsRubberBand( canvas(), Qgis::GeometryType::Polygon );
+    mRubberBand->setStrokeColor( QColor( 227, 22, 28, 255 ) );
+    mRubberBand->setFillColor( QColor( 227, 22, 28, 63 ) );
+    mRubberBand->setWidth( 2 );
+  }
+  mRubberBand->setToGeometry( buildSectorGeometry(), nullptr );
+}
+
 void KadasShapeCaptureMapTool::updatePolyRubberBand( const QgsPointXY &cursor, bool hasCursor )
 {
   const Qgis::GeometryType bandType = ( mShape == Shape::Polygon ) ? Qgis::GeometryType::Polygon : Qgis::GeometryType::Line;
@@ -297,6 +381,13 @@ QgsGeometry KadasShapeCaptureMapTool::buildCircleGeometry() const
   return circlePolygon( mAnchor, mCircleRadius );
 }
 
+QgsGeometry KadasShapeCaptureMapTool::buildSectorGeometry() const
+{
+  if ( mCircleRadius <= 0 )
+    return QgsGeometry();
+  return sectorPolygon( mAnchor, mCircleRadius, mSectorStartAngle, mSectorStopAngle );
+}
+
 QgsGeometry KadasShapeCaptureMapTool::buildPolylineGeometry() const
 {
   if ( mVertices.size() < 2 )
@@ -321,5 +412,24 @@ QgsGeometry KadasShapeCaptureMapTool::circlePolygon( const QgsPointXY &center, d
     ring.append( QgsPointXY( center.x() + radius * std::cos( a ), center.y() + radius * std::sin( a ) ) );
   }
   ring.append( ring.first() );
+  return QgsGeometry::fromPolygonXY( QVector<QVector<QgsPointXY>>() << ring );
+}
+
+QgsGeometry KadasShapeCaptureMapTool::sectorPolygon( const QgsPointXY &center, double radius, double startAngle, double stopAngle, int segments )
+{
+  const double sweep = stopAngle - startAngle;
+  if ( sweep >= 2 * M_PI - std::numeric_limits<float>::epsilon() )
+    return circlePolygon( center, radius, segments );
+
+  const int arcSegments = std::max( 2, static_cast<int>( std::ceil( segments * sweep / ( 2 * M_PI ) ) ) );
+  QVector<QgsPointXY> ring;
+  ring.reserve( arcSegments + 3 );
+  ring.append( center );
+  for ( int i = 0; i <= arcSegments; ++i )
+  {
+    const double a = startAngle + sweep * static_cast<double>( i ) / static_cast<double>( arcSegments );
+    ring.append( QgsPointXY( center.x() + radius * std::cos( a ), center.y() + radius * std::sin( a ) ) );
+  }
+  ring.append( center );
   return QgsGeometry::fromPolygonXY( QVector<QVector<QgsPointXY>>() << ring );
 }

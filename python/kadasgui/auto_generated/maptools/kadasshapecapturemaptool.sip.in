@@ -18,8 +18,9 @@ class KadasShapeCaptureMapTool : QgsMapTool
 %Docstring(signature="appended")
 Lightweight shape-capture map tool.
 
-Captures one of: rectangle, circle (center + radius), polyline, polygon.
-Rendering relies on :py:class:`QgsRubberBand`. On completion, emits
+Captures one of: rectangle, circle (center + radius), circular sector
+(center + radius + sweep), polyline, polygon. Rendering relies on
+:py:class:`QgsRubberBand`. On completion, emits
 :py:func:`~shapeCaptured` with the resulting geometry in the canvas
 destination CRS.
 
@@ -38,6 +39,7 @@ to update it via :py:func:`~setCircleRadius` /
     {
       Rectangle,
       Circle,
+      Sector,
       Polyline,
       Polygon,
     };
@@ -55,15 +57,26 @@ Removes any rubber band and resets capture state.
 
     void setCircleRadius( double radius );
 %Docstring
-Replaces the displayed circle preview (Circle mode only). New radius is
-in canvas map units.
+Replaces the displayed circle / sector preview (Circle and Sector
+modes). New radius is in canvas map units.
 %End
 
     QgsPointXY circleCenter() const;
 %Docstring
-Center of the last captured circle (Circle mode), or last anchor point.
+Center of the last captured circle / sector, or last anchor point.
 %End
     double circleRadius() const;
+
+    double sectorStartAngle() const;
+%Docstring
+Start angle of the last captured sector, in radians CCW from east
+(Sector mode).
+%End
+    double sectorStopAngle() const;
+%Docstring
+Stop angle of the last captured sector, in radians; stopAngle -
+startAngle >= 2*pi means full circle.
+%End
 
     bool isCapturing() const;
 %Docstring
@@ -83,6 +96,13 @@ picked feature. Does not emit
 %Docstring
 Builds a closed polygon ring approximating a circle. Coordinates are in
 the same CRS as ``center``.
+%End
+
+    static QgsGeometry sectorPolygon( const QgsPointXY &center, double radius, double startAngle, double stopAngle, int segments = 64 );
+%Docstring
+Builds a pie-slice polygon (center, arc from ``startAngle`` to
+``stopAngle`` in radians CCW from east). A sweep of 2*pi or more yields
+a full circle. Coordinates are in the same CRS as ``center``.
 %End
 
     virtual void canvasPressEvent( QgsMapMouseEvent *e );

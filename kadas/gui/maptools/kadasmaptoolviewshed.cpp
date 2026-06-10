@@ -184,7 +184,7 @@ void KadasViewshedDialog::adjustMinAngle()
 ///////////////////////////////////////////////////////////////////////////////
 
 KadasMapToolViewshed::KadasMapToolViewshed( QgsMapCanvas *mapCanvas )
-  : KadasShapeCaptureMapTool( mapCanvas, KadasShapeCaptureMapTool::Shape::Circle )
+  : KadasShapeCaptureMapTool( mapCanvas, KadasShapeCaptureMapTool::Shape::Sector )
 {
   setCursor( Qt::ArrowCursor );
   connect( this, &KadasShapeCaptureMapTool::shapeCaptured, this, &KadasMapToolViewshed::onShapeCaptured );
@@ -228,7 +228,8 @@ void KadasMapToolViewshed::onShapeCaptured( const QgsGeometry &geometry, const Q
   QString outputFileName = QString( "viewshed_%1,%2.tif" ).arg( center.x() ).arg( center.y() );
   QString outputFile = QgsProject::instance()->createAttachedFile( outputFileName );
 
-  QgsPolygonXY poly = circlePolygon( center, curRadiusMapUnits ).asPolygon();
+  // Limit the computation to the captured sector (full circle if no sweep was drawn)
+  QgsPolygonXY poly = sectorPolygon( center, curRadiusMapUnits, sectorStartAngle(), sectorStopAngle() ).asPolygon();
   QVector<QgsPointXY> filterRegion;
   if ( !poly.isEmpty() )
   {
