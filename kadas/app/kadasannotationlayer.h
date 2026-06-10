@@ -72,7 +72,14 @@ class KadasAnnotationLayer : public QgsAnnotationLayer
     virtual void regenerate() = 0;
 
   protected:
-    explicit KadasAnnotationLayer( const QString &name );
+    /**
+     * \param name layer name
+     * \param kadasType the \c kadas/annotation-type customProperty marker
+     *        value, set immediately so that freshly created (never saved)
+     *        layers are detectable as parametric by gui-side code (which
+     *        cannot qobject_cast against app-layer classes).
+     */
+    KadasAnnotationLayer( const QString &name, const QString &kadasType );
 
   private:
     static QHash<QString, Factory> &registry();

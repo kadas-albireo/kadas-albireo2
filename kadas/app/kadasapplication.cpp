@@ -111,6 +111,8 @@
 #include "kadasguidegridlayer.h"
 #include "kadasannotationlayer.h"
 #include "kadasmapgridlayer.h"
+#include "bullseye/kadasmaptoolbullseye.h"
+#include "guidegrid/kadasmaptoolguidegrid.h"
 
 
 static QStringList splitSubLayerDef( const QString &subLayerDef )
@@ -1413,9 +1415,36 @@ void KadasApplication::extentChanged()
   mMainWindow->layerTreeView()->layerTreeModel()->setLegendMapViewData( mapCanvas->mapUnitsPerPixel(), static_cast<int>( std::round( mapCanvas->mapSettings().outputDpi() ) ), mapCanvas->scale() );
 }
 
+void KadasApplication::editParametricAnnotationLayer( QgsAnnotationLayer *layer )
+{
+  QgsMapTool *tool = nullptr;
+  if ( dynamic_cast<KadasBullseyeLayer *>( layer ) )
+  {
+    tool = new KadasMapToolBullseye( mMainWindow->mapCanvas(), mMainWindow->layerTreeView(), layer );
+  }
+  else if ( dynamic_cast<KadasGuideGridLayer *>( layer ) )
+  {
+    tool = new KadasMapToolGuideGrid( mMainWindow->mapCanvas(), mMainWindow->layerTreeView(), layer );
+  }
+  if ( tool )
+  {
+    mMainWindow->mapCanvas()->setMapTool( tool );
+  }
+}
+
 void KadasApplication::handleItemPicked( const KadasFeaturePicker::PickResult &result )
 {
-  if ( result.annotationLayer && !result.annotationItemId.isEmpty() )
+  if ( !result.annotationLayer )
+  {
+    return;
+  }
+  if ( result.annotationItemId.isEmpty() )
+  {
+    // Layer-level pick: parametric layer (bullseye / guide grid), edited
+    // atomically via its dedicated config tool.
+    editParametricAnnotationLayer( result.annotationLayer );
+  }
+  else
   {
     QgsMapTool *tool = new KadasMapToolEditAnnotationItem( mMainWindow->mapCanvas(), result.annotationLayer, result.annotationItemId );
     mMainWindow->mapCanvas()->setMapTool( tool );

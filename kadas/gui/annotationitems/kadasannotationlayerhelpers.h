@@ -45,6 +45,21 @@ class QgsAnnotationLayer;
 class KADAS_GUI_EXPORT KadasAnnotationLayerHelpers
 {
   public:
+    /**
+     * Returns TRUE if \a layer is a parametric Kadas annotation layer
+     * (bullseye, guide grid, ...), i.e. carries the
+     * <tt>kadas/annotation-type</tt> customProperty marker. Such layers own
+     * exactly one logical object whose items are auto-generated from a
+     * configuration; hit testing and editing must treat the layer
+     * atomically (via its dedicated edit tool) instead of exposing the
+     * generated child items individually.
+     *
+     * The check uses the customProperty marker rather than a qobject_cast
+     * because the concrete subclasses live in the app layer, which gui
+     * code must not depend on.
+     */
+    static bool isParametricLayer( const QgsAnnotationLayer *layer );
+
     //! Returns the tooltip stored for \a itemId on \a layer, or an empty
     //! string if none is set.
     static QString tooltip( const QgsAnnotationLayer *layer, const QString &itemId );

@@ -62,6 +62,11 @@ namespace
 } // namespace
 
 
+bool KadasAnnotationLayerHelpers::isParametricLayer( const QgsAnnotationLayer *layer )
+{
+  return layer && !layer->customProperty( QStringLiteral( "kadas/annotation-type" ) ).toString().isEmpty();
+}
+
 QString KadasAnnotationLayerHelpers::tooltip( const QgsAnnotationLayer *layer, const QString &itemId )
 {
   if ( !layer || itemId.isEmpty() )

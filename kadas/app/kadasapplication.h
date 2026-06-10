@@ -117,6 +117,13 @@ class KadasApplication : public QgsApplication
 
     QgsMapTool *paste( QgsPointXY *mapPos = nullptr );
 
+    /**
+     * Activates the dedicated config tool (bullseye / guide grid widget)
+     * for the parametric annotation \a layer. No-op if \a layer is not a
+     * known parametric layer type.
+     */
+    void editParametricAnnotationLayer( QgsAnnotationLayer *layer );
+
     int computeLayerGroupInsertionOffset( QgsLayerTreeGroup *group ) const;
 
     QgsLayerTreeRegistryBridge::InsertionPoint layerTreeInsertionPoint() const;

@@ -212,7 +212,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
 };
 
 KadasBullseyeLayer::KadasBullseyeLayer( const QString &name )
-  : KadasAnnotationLayer( name )
+  : KadasAnnotationLayer( name, QStringLiteral( "bullseye" ) )
 {}
 
 void KadasBullseyeLayer::setup( const QgsPointXY &center, const QgsCoordinateReferenceSystem &crs, int rings, double interval, Qgis::DistanceUnit intervalUnit, double axesInterval )
@@ -298,6 +298,10 @@ bool KadasBullseyeLayer::readXml( const QDomNode &layer_node, QgsReadWriteContex
   mBullseyeConfig.labelAxes = cfgEl.attribute( "labelAxes" ) == "1";
   mBullseyeConfig.labelQuadrants = cfgEl.attribute( "labelQuadrants" ) == "1";
   mBullseyeConfig.labelRings = cfgEl.attribute( "labelRings" ) == "1";
+
+  // Base readXml replaced all customProperties from the (legacy, marker-less)
+  // XML; re-assert the parametric marker set by the constructor.
+  setCustomProperty( QStringLiteral( "kadas/annotation-type" ), QStringLiteral( "bullseye" ) );
 
   regenerate();
   return true;

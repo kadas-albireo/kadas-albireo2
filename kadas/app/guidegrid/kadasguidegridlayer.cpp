@@ -294,7 +294,7 @@ class KadasGuideGridRenderer : public QgsMapLayerRenderer
 
 
 KadasGuideGridLayer::KadasGuideGridLayer( const QString &name )
-  : KadasAnnotationLayer( name )
+  : KadasAnnotationLayer( name, QStringLiteral( "guidegrid" ) )
 {}
 
 void KadasGuideGridLayer::setup( const QgsRectangle &gridRect, int cols, int rows, const QgsCoordinateReferenceSystem &crs, bool colSizeLocked, bool rowSizeLocked )
@@ -425,6 +425,10 @@ bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteConte
   mGridConfig.colChar = !cfgEl.attribute( "colChar" ).isEmpty() ? cfgEl.attribute( "colChar" ).at( 0 ) : '1';
   mGridConfig.labelingPos = static_cast<LabelingPos>( cfgEl.attribute( "labelingPos" ).toInt() );
   mGridConfig.quadrantLabeling = static_cast<QuadrantLabeling>( cfgEl.attribute( "quadrantLabeling" ).toInt() );
+
+  // Base readXml replaced all customProperties from the (legacy, marker-less)
+  // XML; re-assert the parametric marker set by the constructor.
+  setCustomProperty( QStringLiteral( "kadas/annotation-type" ), QStringLiteral( "guidegrid" ) );
 
   regenerate();
   return true;

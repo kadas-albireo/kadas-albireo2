@@ -37,6 +37,7 @@
 #include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontext.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/kadasbottombar.h"
 #include "kadas/gui/kadasfeaturepicker.h"
@@ -779,6 +780,10 @@ KadasMapToolEditAnnotationItem::PickedItem KadasMapToolEditAnnotationItem::pickI
   {
     QgsAnnotationLayer *al = qobject_cast<QgsAnnotationLayer *>( ml );
     if ( !al )
+      continue;
+    // Parametric layers (bullseye, guide grid, ...) are edited atomically
+    // via their dedicated config tool, never item by item.
+    if ( KadasAnnotationLayerHelpers::isParametricLayer( al ) )
       continue;
     const QgsRectangle layerBounds = canvas()->mapSettings().mapToLayerCoordinates( al, mapBounds );
     QgsFeedback feedback;

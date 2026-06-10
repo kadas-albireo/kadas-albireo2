@@ -26,6 +26,7 @@
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsrendercontext.h>
 
+#include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
 #include "kadas/gui/maptools/kadasmaptooldeleteitems.h"
 
 
@@ -61,6 +62,12 @@ void KadasMapToolDeleteItems::deleteItems( const QgsRectangle &filterRect )
   {
     QgsAnnotationLayer *annoLayer = qobject_cast<QgsAnnotationLayer *>( layer );
     if ( !annoLayer )
+    {
+      continue;
+    }
+    // Parametric layers (bullseye, guide grid, ...) regenerate their items
+    // from a configuration; deleting individual items makes no sense.
+    if ( KadasAnnotationLayerHelpers::isParametricLayer( annoLayer ) )
     {
       continue;
     }

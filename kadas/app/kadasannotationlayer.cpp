@@ -30,9 +30,11 @@
 #include <qgis/qgsreadwritecontext.h>
 
 
-KadasAnnotationLayer::KadasAnnotationLayer( const QString &name )
+KadasAnnotationLayer::KadasAnnotationLayer( const QString &name, const QString &kadasType )
   : QgsAnnotationLayer( name, QgsAnnotationLayer::LayerOptions( QgsProject::instance()->transformContext() ) )
-{}
+{
+  setCustomProperty( QStringLiteral( "kadas/annotation-type" ), kadasType );
+}
 
 QHash<QString, KadasAnnotationLayer::Factory> &KadasAnnotationLayer::registry()
 {

@@ -95,6 +95,13 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     addSeparator();
     addAction( QgsApplication::getThemeIcon( "/mActionDeleteSelected.svg" ), tr( "Delete" ), this, &KadasCanvasContextMenu::deleteAnnotationItem );
   }
+  else if ( mPickResult.annotationLayer )
+  {
+    // Layer-level pick on a parametric annotation layer (bullseye / guide
+    // grid): edited atomically via its dedicated config tool.
+    addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, &KadasCanvasContextMenu::editItem );
+    addSeparator();
+  }
   else if ( mPickResult.feature.isValid() && mPickResult.layer )
   {
     addAction( QgsApplication::getThemeIcon( "/mActionEditCopy.svg" ), tr( "Copy" ), this, &KadasCanvasContextMenu::copyFeature );
@@ -327,7 +334,15 @@ void KadasCanvasContextMenu::createPinFromMarker()
 
 void KadasCanvasContextMenu::editItem()
 {
-  if ( mPickResult.annotationLayer && !mPickResult.annotationItemId.isEmpty() )
+  if ( !mPickResult.annotationLayer )
+  {
+    return;
+  }
+  if ( mPickResult.annotationItemId.isEmpty() )
+  {
+    kApp->editParametricAnnotationLayer( mPickResult.annotationLayer );
+  }
+  else
   {
     mCanvas->setMapTool( new KadasMapToolEditAnnotationItem( mCanvas, mPickResult.annotationLayer, mPickResult.annotationItemId ) );
   }

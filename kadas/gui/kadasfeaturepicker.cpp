@@ -30,6 +30,7 @@
 #include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontext.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
 
 #include <limits>
 
@@ -122,7 +123,16 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickAnnotationLayer( QgsAnnot
     return pickResult;
 
   pickResult.annotationLayer = list[bestIdx].layer;
-  pickResult.annotationItemId = list[bestIdx].itemId;
+  // Parametric layers (bullseye, guide grid, ...) own exactly one logical
+  // object whose items are auto-generated from a configuration. The
+  // per-item refinement above still decides WHETHER the click hit the
+  // object (ring / grid line / label), but the pick is reported at layer
+  // level (empty item id) so consumers treat the layer atomically instead
+  // of exposing the generated child items individually.
+  if ( !KadasAnnotationLayerHelpers::isParametricLayer( list[bestIdx].layer ) )
+  {
+    pickResult.annotationItemId = list[bestIdx].itemId;
+  }
   pickResult.crs = layer->crs();
   return pickResult;
 }
