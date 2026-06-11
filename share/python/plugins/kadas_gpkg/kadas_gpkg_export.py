@@ -1,17 +1,20 @@
 # -*- coding: utf-8 -*-
 
-import json
 import mimetypes
 import os
 import shutil
 import sqlite3
 import uuid
 
-from kadas.kadasgui import (  # noqa: F401  # kept for future extent-clipping port to QgsAnnotationLayer
-    KadasMapRect,
-)
 from lxml import etree as ET
-from qgis.core import Qgis, QgsMapLayer, QgsPathResolver, QgsProject
+from qgis.core import (
+    Qgis,
+    QgsAnnotationLayer,
+    QgsCoordinateTransform,
+    QgsMapLayer,
+    QgsPathResolver,
+    QgsProject,
+)
 from qgis.PyQt.QtCore import QEventLoop, Qt, QTemporaryDir
 from qgis.PyQt.QtWidgets import QApplication, QDialog, QMessageBox, QProgressDialog
 
@@ -19,14 +22,64 @@ from .kadas_gpkg_export_base import KadasGpkgExportBase
 from .kadas_gpkg_export_dialog import KadasGpkgExportDialog
 
 
-class KadasGpkgExport(KadasGpkgExportBase):
-    PROPERTY_ITEM_TO_BE_REMOVED = "flagToBeRemoved"
+def collect_annotation_items_outside_extent(project, extent, crs):
+    """Returns {layer_id: set(item_ids)} for annotation items entirely outside the export extent.
 
+    The extent is given in ``crs`` and transformed into each annotation
+    layer's CRS before comparing against the items' bounding boxes. Layers
+    whose CRS cannot be transformed are skipped (no clipping).
+    """
+    result = {}
+    for layer_id, layer in project.mapLayers().items():
+        if not isinstance(layer, QgsAnnotationLayer):
+            continue
+        try:
+            ct = QgsCoordinateTransform(crs, layer.crs(), project)
+            layer_extent = ct.transformBoundingBox(extent)
+        except Exception:
+            continue
+        outside = {
+            item_id
+            for item_id, item in layer.items().items()
+            if not item.boundingBox().intersects(layer_extent)
+        }
+        if outside:
+            result[layer_id] = outside
+    return result
+
+
+def strip_annotation_items(doc, items_to_remove):
+    """Removes <item> elements with matching ids from annotation maplayers in the project XML.
+
+    ``items_to_remove`` is a {layer_id: set(item_ids)} mapping as returned by
+    collect_annotation_items_outside_extent().
+    """
+    if not items_to_remove:
+        return
+    for mapLayerEl in doc.iterfind("projectlayers/maplayer"):
+        if mapLayerEl.attrib.get("type") != "annotation":
+            continue
+        idEl = mapLayerEl.find("id")
+        if idEl is None:
+            continue
+        item_ids = items_to_remove.get(idEl.text)
+        if not item_ids:
+            continue
+        itemsEl = mapLayerEl.find("items")
+        if itemsEl is None:
+            continue
+        for itemEl in list(itemsEl.iterfind("item")):
+            if itemEl.attrib.get("id") in item_ids:
+                itemsEl.remove(itemEl)
+
+
+class KadasGpkgExport(KadasGpkgExportBase):
     def __init__(self, iface):
         KadasGpkgExportBase.__init__(self)
         self.iface = iface
 
         self.kadasGpkgExportDialog = None
+        self.__annotation_items_outside_extent = {}
 
     def run(self):
         # Check dialog already open
@@ -305,41 +358,18 @@ class KadasGpkgExport(KadasGpkgExportBase):
                 )
 
     def __flagRedliningItemsOutsideExtent(self, extent, crs):
-        """Flag redlining items outside export extent.
-
-        TODO: port to QgsAnnotationLayer. Legacy KadasItemLayer instances no
-        longer exist at runtime (the post-load migration converts them to
-        QgsAnnotationLayer before plugins can see them), so this is a no-op.
-        """
-        return
+        """Collect annotation items outside the export extent"""
+        self.__annotation_items_outside_extent = collect_annotation_items_outside_extent(
+            QgsProject.instance(), extent, crs
+        )
 
     def __removeRedliningItemsFlag(self):
-        """Remove redlining items flag.
-
-        TODO: port to QgsAnnotationLayer (paired with __flagRedliningItemsOutsideExtent).
-        """
-        return
+        """Reset the collected annotation items"""
+        self.__annotation_items_outside_extent = {}
 
     def __removeFlaggedRedlining(self, doc):
-        """Remove redlining items outside export extent"""
-
-        for mapItemEl in doc.iterfind("projectlayers/maplayer/MapItem"):
-
-            nameAttribute = mapItemEl.attrib.get("name", str())
-            if not nameAttribute.startswith("Kadas"):
-                return
-
-            cdata = json.loads(mapItemEl.text)
-
-            props = cdata.get("props", None)
-            if props is None:
-                continue
-
-            flagToBeRemoved = props.get(self.PROPERTY_ITEM_TO_BE_REMOVED, None)
-            if flagToBeRemoved is True:
-                # Remove redlining item
-                mapItemEl.getparent().remove(mapItemEl)
-                continue
+        """Remove annotation items outside export extent from the project XML"""
+        strip_annotation_items(doc, self.__annotation_items_outside_extent)
 
     def __removeUnselectedProjectLayers(self, doc):
         """Remove redlining/annotation layers not selected for export"""
