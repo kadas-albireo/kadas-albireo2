@@ -69,6 +69,13 @@ class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
     //! Removes any rubber band and resets capture state.
     void clear();
 
+    /**
+     * When enabled, polyline/polygon previews are drawn as densified geodesic (great circle)
+     * segments instead of straight Cartesian segments. Only affects the displayed rubber band;
+     * previewGeometry() and shapeCaptured() still report the raw vertices.
+     */
+    void setGeodesicPreview( bool enabled ) { mGeodesicPreview = enabled; }
+
     //! Replaces the displayed circle / sector preview (Circle and Sector modes). New radius is in canvas map units.
     void setCircleRadius( double radius );
 
@@ -146,6 +153,7 @@ class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
     bool mCapturing = false;
     QgsPointXY mPolyCursor;
     bool mPolyHasCursor = false;
+    bool mGeodesicPreview = false;
 
     // Numeric attribute input (floating x/y/r/α1/α2 box, enabled via /kadas/showNumericInput)
     enum NumericAttr
@@ -168,6 +176,7 @@ class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
     void acceptNumericInput();
 
     void resetRubberBand();
+    QVector<QgsPointXY> geodesicDisplayPoints( const QVector<QgsPointXY> &points ) const;
     void updateRectRubberBand();
     void updateCircleRubberBand();
     void updateSectorRubberBand();

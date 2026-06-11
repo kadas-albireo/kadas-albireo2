@@ -19,8 +19,10 @@
 
 #include <QKeyEvent>
 
+#include <qgis/qgsdistancearea.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapmouseevent.h>
+#include <qgis/qgsproject.h>
 #include <qgis/qgsrubberband.h>
 #include <qgis/qgssettings.h>
 
@@ -658,15 +660,46 @@ void KadasShapeCaptureMapTool::updatePolyRubberBand( const QgsPointXY &cursor, b
     mRubberBand->setFillColor( QColor( 227, 22, 28, 63 ) );
     mRubberBand->setWidth( 2 );
   }
-  mRubberBand->reset( bandType );
-  for ( const QgsPointXY &v : mVertices )
-    mRubberBand->addPoint( v, false );
+  QVector<QgsPointXY> displayPoints = mVertices;
   if ( hasCursor )
-    mRubberBand->addPoint( cursor, true );
-  else
-    mRubberBand->updatePosition();
+    displayPoints.append( cursor );
+  if ( mGeodesicPreview && displayPoints.size() >= 2 )
+    displayPoints = geodesicDisplayPoints( displayPoints );
+
+  mRubberBand->reset( bandType );
+  for ( const QgsPointXY &v : displayPoints )
+    mRubberBand->addPoint( v, false );
+  mRubberBand->updatePosition();
   mRubberBand->update();
   emit previewChanged();
+}
+
+QVector<QgsPointXY> KadasShapeCaptureMapTool::geodesicDisplayPoints( const QVector<QgsPointXY> &points ) const
+{
+  QgsDistanceArea da;
+  da.setSourceCrs( canvas()->mapSettings().destinationCrs(), QgsProject::instance()->transformContext() );
+  da.setEllipsoid( QStringLiteral( "WGS84" ) );
+  if ( !da.willUseEllipsoid() )
+    return points;
+
+  constexpr double interval = 100000; // 100km segments
+  QVector<QgsPointXY> out;
+  out.append( points.first() );
+  for ( int i = 0, n = points.size(); i < n - 1; ++i )
+  {
+    const QVector<QVector<QgsPointXY>> segments = da.geodesicLine( points[i], points[i + 1], interval, false );
+    if ( segments.isEmpty() || segments.first().size() < 2 )
+    {
+      out.append( points[i + 1] );
+      continue;
+    }
+    for ( const QVector<QgsPointXY> &segment : segments )
+    {
+      for ( int j = 1, m = segment.size(); j < m; ++j )
+        out.append( segment[j] );
+    }
+  }
+  return out;
 }
 
 QgsGeometry KadasShapeCaptureMapTool::previewGeometry() const

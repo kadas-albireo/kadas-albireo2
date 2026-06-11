@@ -55,6 +55,16 @@ to update it via :py:func:`~setCircleRadius` /
 Removes any rubber band and resets capture state.
 %End
 
+    void setGeodesicPreview( bool enabled );
+%Docstring
+When enabled, polyline/polygon previews are drawn as densified geodesic
+(great circle) segments instead of straight Cartesian segments. Only
+affects the displayed rubber band;
+:py:func:`~KadasShapeCaptureMapTool.previewGeometry` and
+:py:func:`~KadasShapeCaptureMapTool.shapeCaptured` still report the raw
+vertices.
+%End
+
     void setCircleRadius( double radius );
 %Docstring
 Replaces the displayed circle / sector preview (Circle and Sector

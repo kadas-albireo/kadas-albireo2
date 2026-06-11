@@ -148,6 +148,11 @@ KadasMapToolMeasure::KadasMapToolMeasure( QgsMapCanvas *canvas, MeasureMode meas
   , mMeasureMode( measureMode )
 {
   setCursor( Qt::ArrowCursor );
+  if ( measureMode == MeasureMode::MeasureLine )
+  {
+    // Draw long line segments as densified great circles, as the measurements are geodesic
+    setGeodesicPreview( true );
+  }
   connect( this, &KadasShapeCaptureMapTool::shapeCaptured, this, &KadasMapToolMeasure::onShapeCaptured );
   connect( this, &KadasShapeCaptureMapTool::previewChanged, this, &KadasMapToolMeasure::recomputeReadout );
   connect( this, &KadasShapeCaptureMapTool::cleared, this, &KadasMapToolMeasure::recomputeReadout );
