@@ -90,6 +90,13 @@ class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
      */
     void setCapturedPolyline( const QVector<QgsPointXY> &vertices );
 
+    /**
+     * Geometry of the shape currently displayed by the rubber band, in canvas CRS.
+     * While capturing a polyline/polygon, this includes the floating cursor vertex.
+     * Returns an empty geometry if nothing is displayed yet.
+     */
+    QgsGeometry previewGeometry() const;
+
     //! Builds a closed polygon ring approximating a circle. Coordinates are in the same CRS as \a center.
     static QgsGeometry circlePolygon( const QgsPointXY &center, double radius, int segments = 64 );
 
@@ -110,6 +117,8 @@ class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
   signals:
     void shapeCaptured( const QgsGeometry &geometry, const QgsCoordinateReferenceSystem &crs );
     void cleared();
+    //! Emitted whenever the displayed shape preview changes (mouse move, numeric input, programmatic updates).
+    void previewChanged();
 
   private:
     Shape mShape;
@@ -135,6 +144,8 @@ class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
     // Polyline / polygon vertex state
     QVector<QgsPointXY> mVertices;
     bool mCapturing = false;
+    QgsPointXY mPolyCursor;
+    bool mPolyHasCursor = false;
 
     // Numeric attribute input (floating x/y/r/α1/α2 box, enabled via /kadas/showNumericInput)
     enum NumericAttr

@@ -21,6 +21,7 @@
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QPainter>
 #include <QPushButton>
 #include <QToolButton>
 
@@ -28,6 +29,7 @@
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgsmapcanvas.h>
+#include <qgis/qgsmapcanvasitem.h>
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgsmultilinestring.h>
 #include <qgis/qgsmultipolygon.h>
@@ -37,6 +39,93 @@
 #include "kadas/gui/kadasbottombar.h"
 #include "kadas/gui/kadasfeaturepicker.h"
 #include "kadas/gui/maptools/kadasmaptoolmeasure.h"
+
+
+/**
+ * Transient canvas overlay drawing the per-segment / per-part measurement
+ * labels on top of the capture rubber band, replicating the label style of
+ * the legacy KadasGeometryItem measurement rendering.
+ */
+class KadasMeasureLabelsOverlay : public QgsMapCanvasItem
+{
+  public:
+    struct Label
+    {
+        QgsPointXY pos; // canvas CRS
+        QString text;
+        bool center = true; // false: offset below the anchor (e.g. total at last vertex)
+    };
+
+    KadasMeasureLabelsOverlay( QgsMapCanvas *canvas )
+      : QgsMapCanvasItem( canvas )
+    {
+      setZValue( 100 );
+      updatePosition();
+    }
+
+    void setLabels( const QList<Label> &labels )
+    {
+      mLabels = labels;
+      updatePosition();
+    }
+
+    void updatePosition() override { setRect( mMapCanvas->extent() ); }
+
+    void paint( QPainter *painter ) override
+    {
+      if ( mLabels.isEmpty() )
+        return;
+
+      const int red = QgsSettings().value( "/Qgis/default_measure_color_red", 255 ).toInt();
+      const int green = QgsSettings().value( "/Qgis/default_measure_color_green", 0 ).toInt();
+      const int blue = QgsSettings().value( "/Qgis/default_measure_color_blue", 0 ).toInt();
+
+      QFont font = painter->font();
+      font.setPixelSize( 10 );
+      font.setBold( true );
+      painter->setFont( font );
+      painter->setPen( QColor( red, green, blue ) );
+      const QFontMetrics metrics( font );
+
+      static const int sLabelOffset = 16;
+      const QColor rectColor( 255, 255, 255, 192 );
+      for ( const Label &label : mLabels )
+      {
+        const QPointF anchor = toCanvasCoordinates( label.pos ) - pos();
+        const QStringList lines = label.text.split( '\n' );
+        int width = 0;
+        for ( const QString &line : lines )
+          width = std::max( width, metrics.horizontalAdvance( line ) );
+        width += 6;
+        const int height = metrics.height() * lines.size() + 6;
+        const QRectF labelRect( anchor.x() - 0.5 * width, anchor.y() + ( label.center ? 0 : sLabelOffset ) - 0.5 * height, width, height );
+        painter->fillRect( labelRect, rectColor );
+        painter->drawText( labelRect, Qt::AlignCenter | Qt::AlignVCenter, label.text );
+      }
+    }
+
+  private:
+    QList<Label> mLabels;
+};
+
+
+static QVector<QVector<QgsPointXY>> extractPolylines( const QgsGeometry &g )
+{
+  QVector<QVector<QgsPointXY>> polylines;
+  const QgsAbstractGeometry *ag = g.constGet();
+  if ( !ag )
+    return polylines;
+  if ( ag->wkbType() == Qgis::WkbType::LineString || ag->wkbType() == Qgis::WkbType::LineString25D )
+  {
+    polylines.append( g.asPolyline().toVector() );
+  }
+  else
+  {
+    for ( const QgsPolylineXY &pl : g.asMultiPolyline() )
+      polylines.append( pl.toVector() );
+  }
+  return polylines;
+}
 
 
 static KadasShapeCaptureMapTool::Shape shapeFor( KadasMapToolMeasure::MeasureMode m )
@@ -60,11 +149,14 @@ KadasMapToolMeasure::KadasMapToolMeasure( QgsMapCanvas *canvas, MeasureMode meas
 {
   setCursor( Qt::ArrowCursor );
   connect( this, &KadasShapeCaptureMapTool::shapeCaptured, this, &KadasMapToolMeasure::onShapeCaptured );
+  connect( this, &KadasShapeCaptureMapTool::previewChanged, this, &KadasMapToolMeasure::recomputeReadout );
+  connect( this, &KadasShapeCaptureMapTool::cleared, this, &KadasMapToolMeasure::recomputeReadout );
 }
 
 KadasMapToolMeasure::~KadasMapToolMeasure()
 {
   delete mBottomBar;
+  delete mLabelsOverlay;
 }
 
 void KadasMapToolMeasure::activate()
@@ -73,6 +165,8 @@ void KadasMapToolMeasure::activate()
 
   mDa.setSourceCrs( canvas()->mapSettings().destinationCrs(), QgsProject::instance()->transformContext() );
   mDa.setEllipsoid( QgsProject::instance()->ellipsoid() );
+
+  mLabelsOverlay = new KadasMeasureLabelsOverlay( canvas() );
 
   mBottomBar = new KadasBottomBar( canvas() );
   QHBoxLayout *layout = new QHBoxLayout( mBottomBar );
@@ -190,6 +284,8 @@ void KadasMapToolMeasure::deactivate()
 {
   delete mBottomBar;
   mBottomBar = nullptr;
+  delete mLabelsOverlay;
+  mLabelsOverlay = nullptr;
   mTitleLabel = nullptr;
   mReadoutLabel = nullptr;
   mUnitComboBox = nullptr;
@@ -315,22 +411,7 @@ QString KadasMapToolMeasure::lineReadout( const QgsGeometry &g, double &totalLen
   QStringList lines;
   double partTotal = 0.0;
 
-  // Iterate sub-line strings
-  const QgsAbstractGeometry *ag = g.constGet();
-  if ( !ag )
-    return QString();
-
-  // Collect parts as polyline point lists
-  QVector<QVector<QgsPointXY>> polylines;
-  if ( ag->wkbType() == Qgis::WkbType::LineString || ag->wkbType() == Qgis::WkbType::LineString25D )
-  {
-    polylines.append( g.asPolyline().toVector() );
-  }
-  else
-  {
-    for ( const QgsPolylineXY &pl : g.asMultiPolyline() )
-      polylines.append( pl.toVector() );
-  }
+  const QVector<QVector<QgsPointXY>> polylines = extractPolylines( g );
 
   for ( const QVector<QgsPointXY> &part : polylines )
   {
@@ -382,27 +463,38 @@ void KadasMapToolMeasure::recomputeReadout()
   const Qgis::DistanceUnit distUnit = mUnitComboBox ? static_cast<Qgis::DistanceUnit>( mUnitComboBox->currentData().toInt() ) : Qgis::DistanceUnit::Meters;
   const Qgis::AreaUnit areaUnit = QgsUnitTypes::distanceToAreaUnit( distUnit );
 
-  if ( mParts.isEmpty() )
+  // Include the live capture preview as a transient extra part
+  QList<Part> parts = mParts;
+  if ( isCapturing() )
   {
-    switch ( mMeasureMode )
+    const QgsGeometry preview = previewGeometry();
+    if ( !preview.isEmpty() )
     {
-      case MeasureMode::MeasureLine:
-        mReadoutLabel->setText( QStringLiteral( "<b>—</b>" ) );
-        break;
-      case MeasureMode::MeasurePolygon:
-      case MeasureMode::MeasureCircle:
-        mReadoutLabel->setText( QStringLiteral( "<b>—</b>" ) );
-        break;
+      Part p;
+      p.geometry = preview;
+      if ( mMeasureMode == MeasureMode::MeasureCircle )
+      {
+        p.circleCenter = circleCenter();
+        p.circleRadius = circleRadius();
+      }
+      parts.append( p );
     }
+  }
+
+  if ( parts.isEmpty() )
+  {
+    mReadoutLabel->setText( QStringLiteral( "<b>—</b>" ) );
+    if ( mLabelsOverlay )
+      mLabelsOverlay->setLabels( {} );
     return;
   }
 
   QStringList partTexts;
   double total = 0.0;
-  for ( int i = 0, n = mParts.size(); i < n; ++i )
+  for ( int i = 0, n = parts.size(); i < n; ++i )
   {
-    const Part &p = mParts[i];
-    const QString hdr = ( mParts.size() > 1 ) ? tr( "Part %1\n" ).arg( i + 1 ) : QString();
+    const Part &p = parts[i];
+    const QString hdr = ( parts.size() > 1 ) ? tr( "Part %1\n" ).arg( i + 1 ) : QString();
     switch ( mMeasureMode )
     {
       case MeasureMode::MeasureLine:
@@ -426,11 +518,11 @@ void KadasMapToolMeasure::recomputeReadout()
   switch ( mMeasureMode )
   {
     case MeasureMode::MeasureLine:
-      totalLine = ( mParts.size() > 1 ) ? tr( "Total: %1" ).arg( formatLength( total, distUnit ) ) : QString();
+      totalLine = ( parts.size() > 1 ) ? tr( "Total: %1" ).arg( formatLength( total, distUnit ) ) : QString();
       break;
     case MeasureMode::MeasurePolygon:
     case MeasureMode::MeasureCircle:
-      totalLine = ( mParts.size() > 1 ) ? tr( "Total: %1" ).arg( formatArea( total, areaUnit ) ) : QString();
+      totalLine = ( parts.size() > 1 ) ? tr( "Total: %1" ).arg( formatArea( total, areaUnit ) ) : QString();
       break;
   }
 
@@ -441,4 +533,70 @@ void KadasMapToolMeasure::recomputeReadout()
   mReadoutLabel->setText( text );
   if ( mBottomBar )
     mBottomBar->adjustSize();
+
+  updateCanvasLabels( parts );
+}
+
+void KadasMapToolMeasure::updateCanvasLabels( const QList<Part> &parts )
+{
+  if ( !mLabelsOverlay )
+    return;
+
+  const Qgis::DistanceUnit distUnit = mUnitComboBox ? static_cast<Qgis::DistanceUnit>( mUnitComboBox->currentData().toInt() ) : Qgis::DistanceUnit::Meters;
+  const Qgis::AreaUnit areaUnit = QgsUnitTypes::distanceToAreaUnit( distUnit );
+  const bool azimuthEnabled = mAzimuthCheckbox && mAzimuthCheckbox->isChecked();
+  const Qgis::AngleUnit angleUnit = mAngleUnitComboBox ? static_cast<Qgis::AngleUnit>( mAngleUnitComboBox->currentData().toInt() ) : Qgis::AngleUnit::MilNATO;
+  const bool geoNorth = !mNorthComboBox || mNorthComboBox->currentData().value<AzimuthNorth>() == AzimuthNorth::AzimuthGeoNorth;
+
+  QList<KadasMeasureLabelsOverlay::Label> labels;
+  for ( const Part &p : parts )
+  {
+    switch ( mMeasureMode )
+    {
+      case MeasureMode::MeasureLine:
+      {
+        for ( const QVector<QgsPointXY> &part : extractPolylines( p.geometry ) )
+        {
+          if ( part.size() < 2 )
+            continue;
+          double partLen = 0.0;
+          for ( int i = 1, n = part.size(); i < n; ++i )
+          {
+            const QgsPointXY &p1 = part[i - 1];
+            const QgsPointXY &p2 = part[i];
+            const double segLen = mDa.measureLine( p1, p2 );
+            partLen += segLen;
+            QString text = formatLength( segLen, distUnit );
+            if ( azimuthEnabled )
+              text += QStringLiteral( "\n" ) + formatAngle( computeSegmentAzimuth( p1, p2, geoNorth ), angleUnit );
+            labels.append( { QgsPointXY( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) ), text, true } );
+          }
+          labels.append( { part.last(), tr( "Tot.: %1" ).arg( formatLength( partLen, distUnit ) ), false } );
+        }
+        break;
+      }
+
+      case MeasureMode::MeasurePolygon:
+      {
+        if ( p.geometry.isEmpty() )
+          break;
+        const double area = mDa.measureArea( p.geometry );
+        const QgsGeometry centroid = p.geometry.centroid();
+        if ( !centroid.isNull() )
+          labels.append( { centroid.asPoint(), formatArea( area, areaUnit ), true } );
+        break;
+      }
+
+      case MeasureMode::MeasureCircle:
+      {
+        const double radiusM = mDa.measureLine( p.circleCenter, QgsPointXY( p.circleCenter.x() + p.circleRadius, p.circleCenter.y() ) );
+        const double area = M_PI * radiusM * radiusM;
+        // Empty middle line keeps the center vertex marker from covering the text
+        const QString text = formatArea( area, areaUnit ) + QStringLiteral( "\n\n" ) + tr( "Radius: %1" ).arg( formatLength( radiusM, distUnit ) );
+        labels.append( { p.circleCenter, text, true } );
+        break;
+      }
+    }
+  }
+  mLabelsOverlay->setLabels( labels );
 }

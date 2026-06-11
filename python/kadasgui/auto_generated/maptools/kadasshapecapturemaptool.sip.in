@@ -92,6 +92,13 @@ picked feature. Does not emit
 :py:func:`~KadasShapeCaptureMapTool.shapeCaptured`.
 %End
 
+    QgsGeometry previewGeometry() const;
+%Docstring
+Geometry of the shape currently displayed by the rubber band, in canvas
+CRS. While capturing a polyline/polygon, this includes the floating
+cursor vertex. Returns an empty geometry if nothing is displayed yet.
+%End
+
     static QgsGeometry circlePolygon( const QgsPointXY &center, double radius, int segments = 64 );
 %Docstring
 Builds a closed polygon ring approximating a circle. Coordinates are in
@@ -123,6 +130,11 @@ a full circle. Coordinates are in the same CRS as ``center``.
   signals:
     void shapeCaptured( const QgsGeometry &geometry, const QgsCoordinateReferenceSystem &crs );
     void cleared();
+    void previewChanged();
+%Docstring
+Emitted whenever the displayed shape preview changes (mouse move,
+numeric input, programmatic updates).
+%End
 
 };
 

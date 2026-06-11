@@ -32,6 +32,7 @@ class QCheckBox;
 class QComboBox;
 class QLabel;
 class KadasBottomBar;
+class KadasMeasureLabelsOverlay;
 
 
 class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasShapeCaptureMapTool
@@ -83,6 +84,8 @@ class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasShapeCaptureMapTool
     QgsDistanceArea mDa;
     QList<Part> mParts;
 
+    KadasMeasureLabelsOverlay *mLabelsOverlay = nullptr;
+
     KadasBottomBar *mBottomBar = nullptr;
     QLabel *mTitleLabel = nullptr;
     QLabel *mReadoutLabel = nullptr;
@@ -98,6 +101,7 @@ class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasShapeCaptureMapTool
     QString lineReadout( const QgsGeometry &g, double &totalLength ) const;
     QString polygonReadout( const QgsGeometry &g, double &totalArea ) const;
     QString circleReadout( const QgsGeometry &g, double &totalArea ) const;
+    void updateCanvasLabels( const QList<Part> &parts );
 };
 
 #endif // KADASMAPTOOLMEASURE_H

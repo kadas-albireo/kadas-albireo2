@@ -77,6 +77,7 @@ void KadasShapeCaptureMapTool::clear()
   mDragging = false;
   mCapturing = false;
   mVertices.clear();
+  mPolyHasCursor = false;
   mCircleRadius = 0.0;
   mSectorStage = SectorStage::None;
   mSectorStartAngle = 0.0;
@@ -128,10 +129,10 @@ void KadasShapeCaptureMapTool::canvasPressEvent( QgsMapMouseEvent *e )
     if ( e->button() == Qt::RightButton && ( mShape == Shape::Polyline || mShape == Shape::Polygon ) && mCapturing )
     {
       // Right click finishes polyline/polygon capture
+      mCapturing = false;
       const QgsGeometry geom = ( mShape == Shape::Polygon ) ? buildPolygonGeometry() : buildPolylineGeometry();
       if ( !geom.isEmpty() )
         emit shapeCaptured( geom, canvas()->mapSettings().destinationCrs() );
-      mCapturing = false;
     }
     return;
   }
@@ -306,10 +307,10 @@ void KadasShapeCaptureMapTool::canvasDoubleClickEvent( QgsMapMouseEvent *e )
     return;
   // The first click of the double-click already added a vertex via canvasPressEvent.
   Q_UNUSED( e );
+  mCapturing = false;
   const QgsGeometry geom = ( mShape == Shape::Polygon ) ? buildPolygonGeometry() : buildPolylineGeometry();
   if ( !geom.isEmpty() )
     emit shapeCaptured( geom, canvas()->mapSettings().destinationCrs() );
-  mCapturing = false;
 }
 
 void KadasShapeCaptureMapTool::keyPressEvent( QKeyEvent *e )
@@ -334,10 +335,10 @@ void KadasShapeCaptureMapTool::keyPressEvent( QKeyEvent *e )
     }
     if ( e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter )
     {
+      mCapturing = false;
       const QgsGeometry geom = ( mShape == Shape::Polygon ) ? buildPolygonGeometry() : buildPolylineGeometry();
       if ( !geom.isEmpty() )
         emit shapeCaptured( geom, canvas()->mapSettings().destinationCrs() );
-      mCapturing = false;
       e->accept();
       return;
     }
@@ -616,6 +617,7 @@ void KadasShapeCaptureMapTool::updateRectRubberBand()
     mRubberBand->setWidth( 2 );
   }
   mRubberBand->setToGeometry( buildRectGeometry(), nullptr );
+  emit previewChanged();
 }
 
 void KadasShapeCaptureMapTool::updateCircleRubberBand()
@@ -628,6 +630,7 @@ void KadasShapeCaptureMapTool::updateCircleRubberBand()
     mRubberBand->setWidth( 2 );
   }
   mRubberBand->setToGeometry( buildCircleGeometry(), nullptr );
+  emit previewChanged();
 }
 
 void KadasShapeCaptureMapTool::updateSectorRubberBand()
@@ -640,11 +643,14 @@ void KadasShapeCaptureMapTool::updateSectorRubberBand()
     mRubberBand->setWidth( 2 );
   }
   mRubberBand->setToGeometry( buildSectorGeometry(), nullptr );
+  emit previewChanged();
 }
 
 void KadasShapeCaptureMapTool::updatePolyRubberBand( const QgsPointXY &cursor, bool hasCursor )
 {
   const Qgis::GeometryType bandType = ( mShape == Shape::Polygon ) ? Qgis::GeometryType::Polygon : Qgis::GeometryType::Line;
+  mPolyCursor = cursor;
+  mPolyHasCursor = hasCursor;
   if ( !mRubberBand )
   {
     mRubberBand = new QgsRubberBand( canvas(), bandType );
@@ -660,6 +666,37 @@ void KadasShapeCaptureMapTool::updatePolyRubberBand( const QgsPointXY &cursor, b
   else
     mRubberBand->updatePosition();
   mRubberBand->update();
+  emit previewChanged();
+}
+
+QgsGeometry KadasShapeCaptureMapTool::previewGeometry() const
+{
+  switch ( mShape )
+  {
+    case Shape::Rectangle:
+      return buildRectGeometry();
+    case Shape::Circle:
+      return buildCircleGeometry();
+    case Shape::Sector:
+      return buildSectorGeometry();
+    case Shape::Polyline:
+    case Shape::Polygon:
+    {
+      QVector<QgsPointXY> pts = mVertices;
+      if ( mCapturing && mPolyHasCursor && ( pts.isEmpty() || pts.last() != mPolyCursor ) )
+        pts.append( mPolyCursor );
+      if ( mShape == Shape::Polygon )
+      {
+        if ( pts.size() < 3 )
+          return QgsGeometry();
+        return QgsGeometry::fromPolygonXY( QVector<QVector<QgsPointXY>>() << pts );
+      }
+      if ( pts.size() < 2 )
+        return QgsGeometry();
+      return QgsGeometry::fromPolylineXY( pts.toList() );
+    }
+  }
+  return QgsGeometry();
 }
 
 QgsGeometry KadasShapeCaptureMapTool::buildRectGeometry() const
