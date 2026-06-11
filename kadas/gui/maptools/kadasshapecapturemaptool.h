@@ -25,10 +25,12 @@
 #include <qgis/qgspointxy.h>
 
 #include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/kadasattributetypes.h"
 
 class QgsMapCanvas;
 class QgsMapMouseEvent;
 class QgsRubberBand;
+class KadasFloatingInputWidget;
 
 
 /**
@@ -102,6 +104,7 @@ class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
     void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
     void canvasDoubleClickEvent( QgsMapMouseEvent *e ) override;
     void keyPressEvent( QKeyEvent *e ) override;
+    void activate() override;
     void deactivate() override;
 
   signals:
@@ -132,6 +135,26 @@ class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
     // Polyline / polygon vertex state
     QVector<QgsPointXY> mVertices;
     bool mCapturing = false;
+
+    // Numeric attribute input (floating x/y/r/α1/α2 box, enabled via /kadas/showNumericInput)
+    enum NumericAttr
+    {
+      AttrX,
+      AttrY,
+      AttrR,
+      AttrA1,
+      AttrA2,
+    };
+    KadasFloatingInputWidget *mInputWidget = nullptr;
+    bool mIgnoreNextMoveEvent = false;
+
+    void setupNumericInput();
+    void clearNumericInput();
+    void updateNumericInput( QgsMapMouseEvent *e );
+    KadasAttribValues collectAttributeValues() const;
+    KadasAttribValues attribsFromState( const QgsPointXY &cursorPos ) const;
+    void numericInputChanged();
+    void acceptNumericInput();
 
     void resetRubberBand();
     void updateRectRubberBand();

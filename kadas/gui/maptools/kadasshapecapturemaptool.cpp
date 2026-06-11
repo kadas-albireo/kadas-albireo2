@@ -22,8 +22,33 @@
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgsrubberband.h>
+#include <qgis/qgssettings.h>
 
+#include "kadas/gui/kadasfloatinginputwidget.h"
 #include "kadas/gui/maptools/kadasshapecapturemaptool.h"
+
+
+//! Converts an angle in radians CCW from east to a geographic angle in degrees CW from north.
+static double toGeoAngle( double arad )
+{
+  double ageo = -arad / M_PI * 180 + 90.;
+  while ( ageo < 0 )
+    ageo += 360.;
+  while ( ageo >= 360 )
+    ageo -= 360.;
+  return ageo;
+}
+
+//! Converts a geographic angle in degrees CW from north to radians CCW from east.
+static double toRadAngle( double ageo )
+{
+  double arad = -( ageo - 90. ) / 180. * M_PI;
+  while ( arad < 0 )
+    arad += 2 * M_PI;
+  while ( arad >= 2 * M_PI )
+    arad -= 2 * M_PI;
+  return arad;
+}
 
 
 KadasShapeCaptureMapTool::KadasShapeCaptureMapTool( QgsMapCanvas *canvas, Shape shape )
@@ -42,6 +67,8 @@ void KadasShapeCaptureMapTool::setShape( Shape shape )
     return;
   mShape = shape;
   clear();
+  if ( mInputWidget )
+    setupNumericInput();
 }
 
 void KadasShapeCaptureMapTool::clear()
@@ -57,8 +84,15 @@ void KadasShapeCaptureMapTool::clear()
   emit cleared();
 }
 
+void KadasShapeCaptureMapTool::activate()
+{
+  QgsMapTool::activate();
+  setupNumericInput();
+}
+
 void KadasShapeCaptureMapTool::deactivate()
 {
+  clearNumericInput();
   clear();
   QgsMapTool::deactivate();
 }
@@ -157,6 +191,14 @@ void KadasShapeCaptureMapTool::canvasPressEvent( QgsMapMouseEvent *e )
 
 void KadasShapeCaptureMapTool::canvasMoveEvent( QgsMapMouseEvent *e )
 {
+  if ( mIgnoreNextMoveEvent )
+  {
+    // Spurious move event triggered by KadasFloatingInputWidget::adjustCursorAndExtent;
+    // processing it would clobber the user-entered values with the (less precise) warped
+    // cursor position.
+    mIgnoreNextMoveEvent = false;
+    return;
+  }
   switch ( mShape )
   {
     case Shape::Rectangle:
@@ -210,6 +252,8 @@ void KadasShapeCaptureMapTool::canvasMoveEvent( QgsMapMouseEvent *e )
         updatePolyRubberBand( toMapCoordinates( e->pos() ), true );
       break;
   }
+
+  updateNumericInput( e );
 }
 
 void KadasShapeCaptureMapTool::canvasReleaseEvent( QgsMapMouseEvent *e )
@@ -305,6 +349,261 @@ void KadasShapeCaptureMapTool::resetRubberBand()
 {
   delete mRubberBand;
   mRubberBand = nullptr;
+}
+
+void KadasShapeCaptureMapTool::setupNumericInput()
+{
+  clearNumericInput();
+  if ( !QgsSettings().value( "/kadas/showNumericInput", false ).toBool() )
+    return;
+
+  KadasAttribDefs attributes;
+  attributes.insert( AttrX, KadasNumericAttribute { "x" } );
+  attributes.insert( AttrY, KadasNumericAttribute { "y" } );
+  if ( mShape == Shape::Circle || mShape == Shape::Sector )
+    attributes.insert( AttrR, KadasNumericAttribute { "r", KadasNumericAttribute::Type::TypeDistance, 0 } );
+  if ( mShape == Shape::Sector )
+  {
+    attributes.insert( AttrA1, KadasNumericAttribute { QString( QChar( 0x03B1 ) ) + "1", KadasNumericAttribute::Type::TypeAngle, 0 } );
+    attributes.insert( AttrA2, KadasNumericAttribute { QString( QChar( 0x03B1 ) ) + "2", KadasNumericAttribute::Type::TypeAngle, 0 } );
+  }
+
+  mInputWidget = new KadasFloatingInputWidget( canvas() );
+  for ( auto it = attributes.constBegin(), itEnd = attributes.constEnd(); it != itEnd; ++it )
+  {
+    const KadasNumericAttribute &attribute = it.value();
+    KadasFloatingInputWidgetField *attrEdit = new KadasFloatingInputWidgetField( it.key(), attribute.precision( canvas()->mapSettings() ), attribute.min, attribute.max );
+    connect( attrEdit, &KadasFloatingInputWidgetField::inputChanged, this, &KadasShapeCaptureMapTool::numericInputChanged );
+    connect( attrEdit, &KadasFloatingInputWidgetField::inputConfirmed, this, &KadasShapeCaptureMapTool::acceptNumericInput );
+    mInputWidget->addInputField( attribute.name + ":", attrEdit, attribute.suffix( canvas()->mapSettings() ) );
+  }
+  mInputWidget->setFocusedInputField( mInputWidget->inputField( AttrX ) );
+}
+
+void KadasShapeCaptureMapTool::clearNumericInput()
+{
+  delete mInputWidget;
+  mInputWidget = nullptr;
+}
+
+void KadasShapeCaptureMapTool::updateNumericInput( QgsMapMouseEvent *e )
+{
+  if ( !mInputWidget )
+    return;
+  mInputWidget->ensureFocus();
+  const KadasAttribValues values = attribsFromState( toMapCoordinates( e->pos() ) );
+  for ( auto it = values.constBegin(), itEnd = values.constEnd(); it != itEnd; ++it )
+  {
+    if ( KadasFloatingInputWidgetField *field = mInputWidget->inputField( it.key() ) )
+      field->setValue( it.value() );
+  }
+  mInputWidget->move( e->pos().x(), e->pos().y() + 20 );
+  mInputWidget->show();
+  if ( mInputWidget->focusedInputField() )
+  {
+    mInputWidget->focusedInputField()->setFocus();
+    mInputWidget->focusedInputField()->selectAll();
+  }
+}
+
+KadasAttribValues KadasShapeCaptureMapTool::collectAttributeValues() const
+{
+  KadasAttribValues values;
+  if ( !mInputWidget )
+    return values;
+  for ( const KadasFloatingInputWidgetField *field : mInputWidget->inputFields() )
+    values.insert( field->id(), field->text().toDouble() );
+  return values;
+}
+
+KadasAttribValues KadasShapeCaptureMapTool::attribsFromState( const QgsPointXY &cursorPos ) const
+{
+  KadasAttribValues values;
+  switch ( mShape )
+  {
+    case Shape::Rectangle:
+    case Shape::Polyline:
+    case Shape::Polygon:
+      values.insert( AttrX, cursorPos.x() );
+      values.insert( AttrY, cursorPos.y() );
+      break;
+
+    case Shape::Circle:
+      values.insert( AttrX, mDragging ? mAnchor.x() : cursorPos.x() );
+      values.insert( AttrY, mDragging ? mAnchor.y() : cursorPos.y() );
+      values.insert( AttrR, mDragging ? mCircleRadius : 0 );
+      break;
+
+    case Shape::Sector:
+    {
+      const bool started = mSectorStage != SectorStage::None;
+      values.insert( AttrX, started ? mAnchor.x() : cursorPos.x() );
+      values.insert( AttrY, started ? mAnchor.y() : cursorPos.y() );
+      values.insert( AttrR, started ? mCircleRadius : 0 );
+      if ( mSectorStage == SectorStage::HaveRadius )
+      {
+        values.insert( AttrA1, toGeoAngle( mSectorStartAngle ) );
+        values.insert( AttrA2, toGeoAngle( mSectorStopAngle ) );
+      }
+      else
+      {
+        values.insert( AttrA1, 0 );
+        values.insert( AttrA2, 0 );
+      }
+      break;
+    }
+  }
+  return values;
+}
+
+void KadasShapeCaptureMapTool::numericInputChanged()
+{
+  if ( !mInputWidget )
+    return;
+  const KadasAttribValues values = collectAttributeValues();
+  const QgsPointXY pos( values[AttrX], values[AttrY] );
+
+  switch ( mShape )
+  {
+    case Shape::Rectangle:
+      if ( mDragging )
+      {
+        mCurrent = pos;
+        updateRectRubberBand();
+      }
+      break;
+
+    case Shape::Circle:
+      if ( mDragging )
+      {
+        mAnchor = pos;
+        mCircleRadius = values[AttrR];
+        updateCircleRubberBand();
+      }
+      break;
+
+    case Shape::Sector:
+      if ( mSectorStage != SectorStage::None )
+      {
+        mAnchor = pos;
+        mCircleRadius = values[AttrR];
+        mSectorStage = mCircleRadius > 0 ? SectorStage::HaveRadius : SectorStage::HaveCenter;
+        mSectorStartAngle = toRadAngle( values[AttrA1] );
+        mSectorStopAngle = toRadAngle( values[AttrA2] );
+        if ( mSectorStopAngle <= mSectorStartAngle )
+          mSectorStopAngle += 2 * M_PI;
+        updateSectorRubberBand();
+      }
+      break;
+
+    case Shape::Polyline:
+    case Shape::Polygon:
+      if ( mCapturing )
+        updatePolyRubberBand( pos, true );
+      break;
+  }
+
+  // Suppress the spurious move event triggered by adjustCursorAndExtent.
+  mIgnoreNextMoveEvent = true;
+  mInputWidget->adjustCursorAndExtent( pos );
+}
+
+void KadasShapeCaptureMapTool::acceptNumericInput()
+{
+  if ( !mInputWidget )
+    return;
+  const KadasAttribValues values = collectAttributeValues();
+  const QgsPointXY pos( values[AttrX], values[AttrY] );
+
+  switch ( mShape )
+  {
+    case Shape::Rectangle:
+      if ( !mDragging )
+      {
+        mAnchor = pos;
+        mCurrent = pos;
+        mDragging = true;
+      }
+      else
+      {
+        mDragging = false;
+        mCurrent = pos;
+        updateRectRubberBand();
+        const QgsGeometry geom = buildRectGeometry();
+        if ( !geom.isEmpty() )
+          emit shapeCaptured( geom, canvas()->mapSettings().destinationCrs() );
+      }
+      break;
+
+    case Shape::Circle:
+      if ( !mDragging )
+      {
+        mAnchor = pos;
+        mCurrent = pos;
+        mCircleRadius = values[AttrR];
+        mDragging = true;
+        if ( mCircleRadius > 0 )
+          updateCircleRubberBand();
+      }
+      else
+      {
+        mDragging = false;
+        mAnchor = pos;
+        mCircleRadius = values[AttrR];
+        updateCircleRubberBand();
+        const QgsGeometry geom = buildCircleGeometry();
+        if ( !geom.isEmpty() )
+          emit shapeCaptured( geom, canvas()->mapSettings().destinationCrs() );
+      }
+      break;
+
+    case Shape::Sector:
+      switch ( mSectorStage )
+      {
+        case SectorStage::None:
+          resetRubberBand();
+          mAnchor = pos;
+          mCircleRadius = values[AttrR];
+          mSectorStartAngle = 0.0;
+          mSectorStopAngle = 2 * M_PI;
+          mSectorStage = mCircleRadius > 0 ? SectorStage::HaveRadius : SectorStage::HaveCenter;
+          if ( mSectorStage == SectorStage::HaveRadius )
+          {
+            mSectorStartAngle = toRadAngle( values[AttrA1] );
+            mSectorStopAngle = toRadAngle( values[AttrA2] );
+            if ( mSectorStopAngle <= mSectorStartAngle )
+              mSectorStopAngle += 2 * M_PI;
+            updateSectorRubberBand();
+          }
+          break;
+
+        case SectorStage::HaveCenter:
+          mSectorStage = SectorStage::HaveRadius;
+          break;
+
+        case SectorStage::HaveRadius:
+        {
+          mSectorStage = SectorStage::None;
+          updateSectorRubberBand();
+          const QgsGeometry geom = buildSectorGeometry();
+          if ( !geom.isEmpty() )
+            emit shapeCaptured( geom, canvas()->mapSettings().destinationCrs() );
+          break;
+        }
+      }
+      break;
+
+    case Shape::Polyline:
+    case Shape::Polygon:
+      if ( !mCapturing )
+      {
+        mVertices.clear();
+        mCapturing = true;
+      }
+      mVertices.append( pos );
+      updatePolyRubberBand( pos, false );
+      break;
+  }
 }
 
 void KadasShapeCaptureMapTool::updateRectRubberBand()

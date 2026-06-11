@@ -115,6 +115,8 @@ a full circle. Coordinates are in the same CRS as ``center``.
 
     virtual void keyPressEvent( QKeyEvent *e );
 
+    virtual void activate();
+
     virtual void deactivate();
 
 
