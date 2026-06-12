@@ -143,6 +143,17 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
      */
     virtual QgsGeometry representativeGeometry( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const;
 
+    /**
+     * When TRUE, the edit map tool re-renders the annotation layer on every
+     * drag step instead of only on release. The default (FALSE) matches the
+     * QGIS behavior where the rubber-band outline is the only live feedback
+     * and the layer keeps showing the pre-drag rendering. Controllers whose
+     * items cannot be meaningfully previewed by an outline band (e.g.
+     * pictures — the user expects the image itself to follow the cursor)
+     * should return TRUE.
+     */
+    virtual bool liveRepaintOnEdit() const { return false; }
+
     // ----- Position helpers ----------------------------------------------
 
     virtual QgsPointXY position( const QgsAnnotationItem *item ) const = 0;

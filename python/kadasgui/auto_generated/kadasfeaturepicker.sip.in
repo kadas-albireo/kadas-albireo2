@@ -35,6 +35,7 @@ your option) any later version. *
       PICK_OBJECTIVE_TOOLTIP
     };
 
+
     class PickResult
     {
       public:

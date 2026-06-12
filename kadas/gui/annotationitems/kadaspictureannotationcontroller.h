@@ -72,6 +72,10 @@ class KADAS_GUI_EXPORT KadasPictureAnnotationController : public KadasAnnotation
 
     QgsGeometry representativeGeometry( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const override;
 
+    //! The outline band is a poor stand-in for the image itself; re-render
+    //! the layer live while dragging so the picture follows the cursor.
+    bool liveRepaintOnEdit() const override { return true; }
+
     KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = nullptr ) const override;
 
     void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx ) override;

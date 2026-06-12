@@ -101,6 +101,17 @@ Default implementation: the real geometry for line / polygon backed
 items, the bounding-box outline otherwise.
 %End
 
+    virtual bool liveRepaintOnEdit() const;
+%Docstring
+When ``True``, the edit map tool re-renders the annotation layer on
+every drag step instead of only on release. The default (``False``)
+matches the QGIS behavior where the rubber-band outline is the only live
+feedback and the layer keeps showing the pre-drag rendering. Controllers
+whose items cannot be meaningfully previewed by an outline band (e.g.
+pictures — the user expects the image itself to follow the cursor)
+should return ``True``.
+%End
+
 
     virtual QgsPointXY position( const QgsAnnotationItem *item ) const = 0;
     virtual void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos ) = 0;

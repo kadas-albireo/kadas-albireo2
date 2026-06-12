@@ -34,6 +34,9 @@ itemType / \c itemName / \c createItem.
     virtual QgsAnnotationItem *createItem() const;
 
 
+    virtual KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = 0 ) const;
+
+
     virtual QList<QgsAnnotationItem *> generateShadows( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const;
 
     virtual QStringList shadowIds( const QgsAnnotationItem *item ) const;

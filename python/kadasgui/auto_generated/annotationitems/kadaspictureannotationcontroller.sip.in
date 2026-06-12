@@ -84,6 +84,14 @@ the fixedSize handle.
     virtual void translate( QgsAnnotationItem *item, double dx, double dy );
 
 
+    virtual QgsGeometry representativeGeometry( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const;
+
+
+    virtual bool liveRepaintOnEdit() const;
+%Docstring
+the layer live while dragging so the picture follows the cursor.
+%End
+
     virtual KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = 0 ) const;
 
 

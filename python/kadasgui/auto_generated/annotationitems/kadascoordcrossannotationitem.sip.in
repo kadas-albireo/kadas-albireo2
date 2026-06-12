@@ -22,9 +22,12 @@ its position labelled in kilometres. Subclasses \c
 the underlying marker paint does not draw anything; the cross and labels
 are drawn by the overridden \c :py:func:`~render`.
 
-Coordinates are rounded to the nearest kilometre by the controller on
-placement. The annotation layer is expected to use a metric CRS
-(EPSG:3857 in standard Kadas layouts).
+Coordinates are snapped to the nearest kilometre by the controller on
+placement and labelled in the same CRS, so the labels always match the
+snapped grid position. The snapping/labelling CRS is the layer CRS when
+it is metric, EPSG:3857 otherwise (see \c :py:func:`~labelCrs`),
+mirroring the legacy \c KadasCoordinateCrossItem which forced a metric
+item CRS.
 
 Type id: \c "kadas:coordcross".
 %End
@@ -36,6 +39,14 @@ Type id: \c "kadas:coordcross".
     KadasCoordCrossAnnotationItem( const QgsPoint &point = QgsPoint() );
 
     static QString itemTypeId();
+
+    static QgsCoordinateReferenceSystem labelCrs( const QgsCoordinateReferenceSystem &layerCrs );
+%Docstring
+CRS in which the cross position is snapped to a round kilometre and
+labelled: ``layerCrs`` itself when it is metric (or invalid), EPSG:3857
+otherwise (rounding raw degree values would collapse every position to
+0/0).
+%End
 
     virtual QString type() const;
 

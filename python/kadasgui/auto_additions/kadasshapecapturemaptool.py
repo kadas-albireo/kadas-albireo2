@@ -16,9 +16,10 @@ KadasShapeCaptureMapTool.Shape.__doc__ = """
 """
 # --
 try:
+    KadasShapeCaptureMapTool.__attribute_docs__ = {'previewChanged': 'Emitted whenever the displayed shape preview changes (mouse move,\nnumeric input, programmatic updates).\n'}
     KadasShapeCaptureMapTool.circlePolygon = staticmethod(KadasShapeCaptureMapTool.circlePolygon)
     KadasShapeCaptureMapTool.sectorPolygon = staticmethod(KadasShapeCaptureMapTool.sectorPolygon)
-    KadasShapeCaptureMapTool.__overridden_methods__ = ['canvasPressEvent', 'canvasMoveEvent', 'canvasReleaseEvent', 'canvasDoubleClickEvent', 'keyPressEvent', 'deactivate']
+    KadasShapeCaptureMapTool.__overridden_methods__ = ['canvasPressEvent', 'canvasMoveEvent', 'canvasReleaseEvent', 'canvasDoubleClickEvent', 'keyPressEvent', 'activate', 'deactivate']
     KadasShapeCaptureMapTool.__signal_arguments__ = {'shapeCaptured': ['geometry: QgsGeometry', 'crs: QgsCoordinateReferenceSystem']}
 except (NameError, AttributeError):
     pass

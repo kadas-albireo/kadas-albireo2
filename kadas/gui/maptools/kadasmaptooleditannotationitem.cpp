@@ -558,7 +558,12 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
       mController->edit( mItem, mEditContext, adjusted, ctx );
       // During the drag the layer keeps showing the pre-drag rendering;
       // the band shows the live outline above all layers (QGIS behavior).
-      // The layer is re-rendered once on release.
+      // The layer is re-rendered once on release — unless the controller
+      // asks for live repaints (pictures: the band outline is no stand-in
+      // for the image itself). Canvas render caching makes the per-move
+      // refresh re-render only the annotation layer.
+      if ( mController->liveRepaintOnEdit() )
+        mLayer->triggerRepaint();
       updateTempRubberBand();
       refreshHandles();
     }
