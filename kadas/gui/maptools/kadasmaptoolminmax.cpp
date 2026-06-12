@@ -316,12 +316,12 @@ void KadasMapToolMinMax::canvasPressEvent( QgsMapMouseEvent *e )
     };
     if ( inBox( maxPx, -tolH ) )
     {
-      showContextMenu( mPinMaxPos );
+      showContextMenu( mPinMaxPos, true );
       return;
     }
     else if ( inBox( minPx, 0 ) )
     {
-      showContextMenu( mPinMinPos );
+      showContextMenu( mPinMinPos, false );
       return;
     }
   }
@@ -354,8 +354,21 @@ void KadasMapToolMinMax::canvasReleaseEvent( QgsMapMouseEvent *e )
   setCursor( Qt::ArrowCursor );
 }
 
-void KadasMapToolMinMax::showContextMenu( const QgsPointXY &mapPos ) const
+void KadasMapToolMinMax::showContextMenu( const QgsPointXY &mapPos, bool isMaxPin ) const
 {
+  // Highlight the pin's SVG footprint (55x43 px; tri_down floats above the
+  // position, tri_up hangs below) while the context menu is open.
+  const QgsMapToPixel &m2p = canvas()->mapSettings().mapToPixel();
+  const QPointF px = m2p.transform( mapPos ).toQPointF();
+  const double yTop = px.y() + ( isMaxPin ? -43.0 : 0.0 );
+  QVector<QgsPointXY> ring;
+  ring << m2p.toMapCoordinates( px.x() - 27.5, yTop ) << m2p.toMapCoordinates( px.x() + 27.5, yTop ) << m2p.toMapCoordinates( px.x() + 27.5, yTop + 43.0 ) << m2p.toMapCoordinates( px.x() - 27.5, yTop + 43.0 );
+  QgsRubberBand highlight( canvas(), Qgis::GeometryType::Polygon );
+  highlight.setStrokeColor( QColor( 255, 200, 0, 255 ) );
+  highlight.setFillColor( QColor( 255, 200, 0, 63 ) );
+  highlight.setWidth( 2 );
+  highlight.setToGeometry( QgsGeometry::fromPolygonXY( QVector<QVector<QgsPointXY>>() << ring ), nullptr );
+
   QMenu menu;
   menu.addAction( QIcon( ":/kadas/icons/copy_coordinates" ), tr( "Copy coordinates" ), [this, mapPos] {
     const QgsCoordinateReferenceSystem &mapCrs = canvas()->mapSettings().destinationCrs();
@@ -363,8 +376,16 @@ void KadasMapToolMinMax::showContextMenu( const QgsPointXY &mapPos ) const
     QString text = QString( "%1\n%2" ).arg( posStr ).arg( KadasCoordinateFormat::instance()->getHeightAtPos( mapPos, mapCrs ) );
     QApplication::clipboard()->setText( text );
   } );
-  menu.addAction( QIcon( ":/kadas/icons/viewshed_color" ), tr( "Viewshed" ), [this] { mActionViewshed->trigger(); } );
-  menu.addAction( QIcon( ":/kadas/icons/measure_height_profile" ), tr( "Line of sight" ), [this] { mActionProfile->trigger(); } );
+  menu.addAction( QIcon( ":/kadas/icons/viewshed_color" ), tr( "Viewshed" ), [this, mapPos] {
+    mActionViewshed->trigger();
+    if ( KadasShapeCaptureMapTool *tool = dynamic_cast<KadasShapeCaptureMapTool *>( canvas()->mapTool() ) )
+      tool->addPoint( mapPos );
+  } );
+  menu.addAction( QIcon( ":/kadas/icons/measure_height_profile" ), tr( "Line of sight" ), [this, mapPos] {
+    mActionProfile->trigger();
+    if ( KadasShapeCaptureMapTool *tool = dynamic_cast<KadasShapeCaptureMapTool *>( canvas()->mapTool() ) )
+      tool->addPoint( mapPos );
+  } );
   menu.addAction( QIcon( ":/kadas/icons/pin_red" ), tr( "Add pin" ), [this, mapPos] {
     QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::PinsLayer );
     if ( !layer )

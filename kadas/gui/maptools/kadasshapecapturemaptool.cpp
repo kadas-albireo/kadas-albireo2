@@ -124,6 +124,42 @@ void KadasShapeCaptureMapTool::setCapturedPolyline( const QVector<QgsPointXY> &v
   updatePolyRubberBand( QgsPointXY(), false );
 }
 
+void KadasShapeCaptureMapTool::addPoint( const QgsPointXY &pos )
+{
+  switch ( mShape )
+  {
+    case Shape::Rectangle:
+    case Shape::Circle:
+      mAnchor = pos;
+      mCurrent = pos;
+      mDragging = true;
+      break;
+
+    case Shape::Sector:
+      if ( mSectorStage == SectorStage::None )
+      {
+        resetRubberBand();
+        mAnchor = pos;
+        mCircleRadius = 0.0;
+        mSectorStartAngle = 0.0;
+        mSectorStopAngle = 2 * M_PI;
+        mSectorStage = SectorStage::HaveCenter;
+      }
+      break;
+
+    case Shape::Polyline:
+    case Shape::Polygon:
+      if ( !mCapturing )
+      {
+        mVertices.clear();
+        mCapturing = true;
+      }
+      mVertices.append( pos );
+      updatePolyRubberBand( pos, false );
+      break;
+  }
+}
+
 void KadasShapeCaptureMapTool::canvasPressEvent( QgsMapMouseEvent *e )
 {
   if ( e->button() != Qt::LeftButton )

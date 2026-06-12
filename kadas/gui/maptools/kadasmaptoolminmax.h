@@ -71,7 +71,7 @@ class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasShapeCaptureMapTool
     QAction *mActionProfile = nullptr;
 
     static KadasShapeCaptureMapTool::Shape shapeFor( FilterType t );
-    void showContextMenu( const QgsPointXY &mapPos ) const;
+    void showContextMenu( const QgsPointXY &mapPos, bool isMaxPin ) const;
 };
 
 

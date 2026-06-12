@@ -98,6 +98,12 @@ class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
     void setCapturedPolyline( const QVector<QgsPointXY> &vertices );
 
     /**
+     * Programmatically adds a point as if the user had left-clicked at \a pos (canvas CRS):
+     * starts the rectangle/circle drag, places the sector center, or appends a polyline/polygon vertex.
+     */
+    void addPoint( const QgsPointXY &pos );
+
+    /**
      * Geometry of the shape currently displayed by the rubber band, in canvas CRS.
      * While capturing a polyline/polygon, this includes the floating cursor vertex.
      * Returns an empty geometry if nothing is displayed yet.
