@@ -811,6 +811,7 @@ void KadasHeightProfileDialog::updateLineOfSight()
     line->addPoint( QgsPointXY( p2.x(), p2.y() ), true );
     line->setColor( colors[iColor] );
     line->setWidth( 5 );
+    line->setZValue( 10 ); // stack above the profile line band, like legacy setZIndex(10)
     mLinesOfSightRB.append( line );
 
     iColor = ( iColor + 1 ) % 2;
