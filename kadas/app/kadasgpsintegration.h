@@ -34,7 +34,12 @@ class KadasGpsIntegration : public QObject
     ~KadasGpsIntegration();
     void initGui();
 
+    //! Feed the GPS from the built-in simulator instead of a real device (--gps-simulator)
+    static void setSimulatorEnabled( bool enabled ) { sSimulatorEnabled = enabled; }
+
   private:
+    static bool sSimulatorEnabled;
+
     void connectGPS();
     void disconnectGPS();
     void updateGpsFixIcon();

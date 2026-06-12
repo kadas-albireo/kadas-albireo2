@@ -30,6 +30,7 @@
 
 #include "kadas/core/kadas.h"
 #include "kadasapplication.h"
+#include "kadasgpsintegration.h"
 
 int main( int argc, char *argv[] )
 {
@@ -132,9 +133,12 @@ int main( int argc, char *argv[] )
   parser.setApplicationDescription( QStringLiteral( "KADAS Albireo" ) );
   QCommandLineOption networkLoggerOption( QStringList() << QStringLiteral( "network-logger" ), QStringLiteral( "Open the network logger panel at startup." ) );
   parser.addOption( networkLoggerOption );
+  QCommandLineOption gpsSimulatorOption( QStringList() << QStringLiteral( "gps-simulator" ), QStringLiteral( "Feed the GPS from a built-in simulator following a route over Switzerland." ) );
+  parser.addOption( gpsSimulatorOption );
   // Tolerate unknown options instead of aborting (Qt may still inject some).
   parser.parse( QApplication::arguments() );
   const bool openNetworkLogger = parser.isSet( networkLoggerOption );
+  KadasGpsIntegration::setSimulatorEnabled( parser.isSet( gpsSimulatorOption ) );
 
 #ifdef __MINGW32__
   QString gdalDataDir = QDir( QString( "%1/../share/gdal" ).arg( QApplication::applicationDirPath() ) ).absolutePath();

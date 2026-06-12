@@ -9,6 +9,7 @@ set(kadas_SRC
     kadascanvascontextmenu.cpp
     kadasfeedback.cpp
     kadasgpsintegration.cpp
+    kadasgpssimulator.cpp
     kadasgpxintegration.cpp
     kadashandlebadlayers.cpp
     kadashelpviewer.cpp
@@ -72,6 +73,7 @@ set(kadas_HDR
     kadascanvascontextmenu.h
     kadasfeedback.h
     kadasgpsintegration.h
+    kadasgpssimulator.h
     kadasgpxintegration.h
     kadashandlebadlayers.h
     kadashelpviewer.h

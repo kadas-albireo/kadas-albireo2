@@ -20,13 +20,17 @@
 #include <qgis/qgsapplication.h>
 #include <qgis/qgsgpsconnectionregistry.h>
 #include <qgis/qgsgpsdetector.h>
+#include <qgis/qgsnmeaconnection.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapcanvasitem.h>
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsproject.h>
 
 #include "kadasgpsintegration.h"
+#include "kadasgpssimulator.h"
 #include "kadasmainwindow.h"
+
+bool KadasGpsIntegration::sSimulatorEnabled = false;
 
 //! Transient canvas overlay showing the GPS position as a rotatable arrow
 class KadasGpsMarker : public QgsMapCanvasItem
@@ -128,6 +132,22 @@ void KadasGpsIntegration::connectGPS()
   mMainWindow->messageBar()->pushMessage( tr( "Connecting to GPS device..." ), QString(), Qgis::Info, mMainWindow->messageTimeout() );
 
   disconnectGPS(); // cleanup
+
+  if ( sSimulatorEnabled )
+  {
+    QgsGpsConnection *connection = new QgsNmeaConnection( new KadasGpsSimulator() );
+    if ( connection->connect() )
+    {
+      gpsConnected( connection );
+    }
+    else
+    {
+      delete connection;
+      gpsConnectionFailed();
+    }
+    return;
+  }
+
   QString port = QgsSettings().value( "/kadas/gps_port", "" ).toString();
   QgsGpsDetector *gpsDetector = new QgsGpsDetector( port, false ); // deletes itself automatically
   connect( gpsDetector, &QgsGpsDetector::connectionDetected, this, [this, gpsDetector]() {
