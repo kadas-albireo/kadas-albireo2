@@ -266,11 +266,18 @@ void KadasMapToolMinMax::runMinMax( const QgsGeometry &geometry, const QgsCoordi
   // SVG natural size: 55x43. tri_up anchored at top-center -> drawOffset (-W/2, 0)
   // so the icon hangs below the geographic point. tri_down anchored at
   // bottom-center -> drawOffset (-W/2, -H) so it floats above.
+  // QgsRubberBand::updateRect() sizes the graphics item from
+  // (iconSize - 1) / 2 + penWidth around each point and ignores the SVG
+  // extent, so the item rect must be inflated through setIconSize or the
+  // icon gets clipped / culled (visible as missing or cut-off pins).
+  // Painted SVG spans at most 43 px from the point -> half-extent >= 43.
+  constexpr double pinRectIconSize = 2 * 43 + 1;
   if ( !mPinMinBand )
   {
     mPinMinBand = new QgsRubberBand( canvas(), Qgis::GeometryType::Point );
     mPinMinBand->setIcon( QgsRubberBand::ICON_SVG );
     mPinMinBand->setSvgIcon( QStringLiteral( ":/kadas/icons/tri_up" ), QPoint( -27, 0 ) );
+    mPinMinBand->setIconSize( pinRectIconSize );
   }
   mPinMinBand->reset( Qgis::GeometryType::Point );
   mPinMinBand->addPoint( pMin, true );
@@ -281,6 +288,7 @@ void KadasMapToolMinMax::runMinMax( const QgsGeometry &geometry, const QgsCoordi
     mPinMaxBand = new QgsRubberBand( canvas(), Qgis::GeometryType::Point );
     mPinMaxBand->setIcon( QgsRubberBand::ICON_SVG );
     mPinMaxBand->setSvgIcon( QStringLiteral( ":/kadas/icons/tri_down" ), QPoint( -27, -43 ) );
+    mPinMaxBand->setIconSize( pinRectIconSize );
   }
   mPinMaxBand->reset( Qgis::GeometryType::Point );
   mPinMaxBand->addPoint( pMax, true );
