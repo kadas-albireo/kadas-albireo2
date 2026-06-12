@@ -193,11 +193,6 @@ class KadasGpkgExport(KadasGpkgExportBase):
         QgsPathResolver.removePathWriter(preprocessorId)
 
         # Restore project state
-
-        # Remove Flag redlining items outside export extent
-        if self.kadasGpkgExportDialog.filterExtent() is not None:
-            self.__removeRedliningItemsFlag()
-
         project.setFileName(prev_filename if prev_filename else None)
         project.setDirty(prev_dirty)
 
@@ -363,13 +358,10 @@ class KadasGpkgExport(KadasGpkgExportBase):
             QgsProject.instance(), extent, crs
         )
 
-    def __removeRedliningItemsFlag(self):
-        """Reset the collected annotation items"""
-        self.__annotation_items_outside_extent = {}
-
     def __removeFlaggedRedlining(self, doc):
         """Remove annotation items outside export extent from the project XML"""
         strip_annotation_items(doc, self.__annotation_items_outside_extent)
+        self.__annotation_items_outside_extent = {}
 
     def __removeUnselectedProjectLayers(self, doc):
         """Remove redlining/annotation layers not selected for export"""

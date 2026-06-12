@@ -8,6 +8,7 @@ replace the legacy KadasItemLayer flag-and-strip mechanism.
 
 import pytest
 from kadas_gpkg.kadas_gpkg_export import (
+    KadasGpkgExport,
     collect_annotation_items_outside_extent,
     strip_annotation_items,
 )
@@ -185,3 +186,35 @@ def test_round_trip_with_real_project_serialization(project, tmp_path):
     remaining = [el.attrib["id"] for el in doc.iterfind("projectlayers/maplayer/items/item")]
     assert remaining == [inside_id]
     assert outside_id not in remaining
+
+
+def test_exporter_hook_sequence_strips_items(project, tmp_path):
+    """Replays the hook call order of KadasGpkgExport.run().
+
+    Regression test: the collected item ids must survive until
+    __removeFlaggedRedlining runs on the parsed XML (they were once reset
+    in between, turning extent clipping into a silent no-op).
+    """
+    layer = _make_annotation_layer("annotations")
+    inside_id = _add_marker(layer, 2600000, 1200000)
+    _add_marker(layer, 2700000, 1300000)
+    project.addMapLayer(layer)
+
+    exporter = KadasGpkgExport(None)
+    extent = QgsRectangle(2590000, 1190000, 2610000, 1210000)
+
+    # Same sequence as run(): collect, write the project, parse, strip
+    exporter._KadasGpkgExport__flagRedliningItemsOutsideExtent(
+        extent, QgsCoordinateReferenceSystem("EPSG:2056")
+    )
+
+    project_file = str(tmp_path / "project.qgs")
+    assert project.write(project_file)
+
+    parser = ET.XMLParser(strip_cdata=False)
+    doc = ET.parse(project_file, parser=parser)
+
+    exporter._KadasGpkgExport__removeFlaggedRedlining(doc)
+
+    remaining = [el.attrib["id"] for el in doc.iterfind("projectlayers/maplayer/items/item")]
+    assert remaining == [inside_id]
