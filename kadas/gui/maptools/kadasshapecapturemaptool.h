@@ -140,6 +140,7 @@ class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
 
     // Rect / circle drag state
     bool mDragging = false;
+    bool mPressBeganShape = false;
     QgsPointXY mAnchor;
     QgsPointXY mCurrent;
     double mCircleRadius = 0.0;

@@ -77,6 +77,7 @@ void KadasShapeCaptureMapTool::clear()
 {
   resetRubberBand();
   mDragging = false;
+  mPressBeganShape = false;
   mCapturing = false;
   mVertices.clear();
   mPolyHasCursor = false;
@@ -179,9 +180,15 @@ void KadasShapeCaptureMapTool::canvasPressEvent( QgsMapMouseEvent *e )
   {
     case Shape::Rectangle:
     case Shape::Circle:
-      mAnchor = toMapCoordinates( e->pos() );
-      mCurrent = mAnchor;
-      mDragging = true;
+      if ( !mDragging )
+      {
+        // Start a new shape. If the button is released without moving, capture
+        // continues in click-move-click mode and the next click finishes it.
+        mAnchor = toMapCoordinates( e->pos() );
+        mCurrent = mAnchor;
+        mDragging = true;
+        mPressBeganShape = true;
+      }
       break;
 
     case Shape::Sector:
@@ -306,9 +313,16 @@ void KadasShapeCaptureMapTool::canvasReleaseEvent( QgsMapMouseEvent *e )
     {
       if ( !mDragging )
         return;
-      mDragging = false;
       mCurrent = toMapCoordinates( e->pos() );
       updateRectRubberBand();
+      if ( mPressBeganShape )
+      {
+        mPressBeganShape = false;
+        const double tol = searchRadiusMU( canvas() );
+        if ( mCurrent.sqrDist( mAnchor ) < tol * tol )
+          return; // Plain click: keep capturing in click-move-click mode
+      }
+      mDragging = false;
       const QgsGeometry geom = buildRectGeometry();
       if ( !geom.isEmpty() )
         emit shapeCaptured( geom, canvas()->mapSettings().destinationCrs() );
@@ -319,10 +333,17 @@ void KadasShapeCaptureMapTool::canvasReleaseEvent( QgsMapMouseEvent *e )
     {
       if ( !mDragging )
         return;
-      mDragging = false;
       mCurrent = toMapCoordinates( e->pos() );
       mCircleRadius = std::sqrt( mCurrent.sqrDist( mAnchor ) );
       updateCircleRubberBand();
+      if ( mPressBeganShape )
+      {
+        mPressBeganShape = false;
+        const double tol = searchRadiusMU( canvas() );
+        if ( mCurrent.sqrDist( mAnchor ) < tol * tol )
+          return; // Plain click: keep capturing in click-move-click mode
+      }
+      mDragging = false;
       const QgsGeometry geom = buildCircleGeometry();
       if ( !geom.isEmpty() )
         emit shapeCaptured( geom, canvas()->mapSettings().destinationCrs() );
@@ -703,10 +724,9 @@ void KadasShapeCaptureMapTool::updatePolyRubberBand( const QgsPointXY &cursor, b
     displayPoints = geodesicDisplayPoints( displayPoints );
 
   mRubberBand->reset( bandType );
-  for ( const QgsPointXY &v : displayPoints )
-    mRubberBand->addPoint( v, false );
-  mRubberBand->updatePosition();
-  mRubberBand->update();
+  // reset() hides the band; only an addPoint() with doUpdate=true makes it visible again
+  for ( int i = 0, n = displayPoints.size(); i < n; ++i )
+    mRubberBand->addPoint( displayPoints[i], i == n - 1 );
   emit previewChanged();
 }
 
