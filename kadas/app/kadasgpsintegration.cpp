@@ -217,7 +217,6 @@ void KadasGpsIntegration::gpsStateChanged( const QgsGpsInformation &info )
     QgsCoordinateTransform myTransform( QgsCoordinateReferenceSystem( "EPSG:4326" ), destCRS, QgsProject::instance() );
 
     QgsPointXY centerPoint = myTransform.transform( position );
-    QgsRectangle myRect( centerPoint, centerPoint );
 
     // testing if position is outside some proportion of the map extent
     // this is a user setting - useful range: 5% to 100% (0.05 to 1.0)
@@ -227,7 +226,10 @@ void KadasGpsIntegration::gpsStateChanged( const QgsGpsInformation &info )
 
     if ( !extentLimit.contains( centerPoint ) )
     {
-      mMainWindow->mapCanvas()->setExtent( myRect );
+      // setCenter() only shifts the already rendered canvas content; an
+      // explicit refresh() is needed to re-render the newly exposed area
+      mMainWindow->mapCanvas()->setCenter( centerPoint );
+      mMainWindow->mapCanvas()->refresh();
     }
   }
 
