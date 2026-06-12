@@ -50,6 +50,7 @@ class TestKadasProjectMigration : public QObject
     void migrateLegacyKadasItemLayer_translatesLineItem();
     void migrateLegacyKadasItemLayer_translatesPolygonItem();
     void migrateLegacyKadasItemLayer_translatesRectangleItem();
+    void migrateLegacyKadasItemLayer_translatesRectangleItemDifferingCrs();
     void migrateLegacyKadasItemLayer_translatesCircleItem();
     void migrateLegacyKadasItemLayer_translatesPictureItem();
     void migrateLegacyKadasItemLayer_translatesSymbolItem();
@@ -398,6 +399,57 @@ void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesRectangleI
   }
   QVERIFY( rects.contains( QStringLiteral( "5,5,10,10" ) ) );
   QVERIFY( rects.contains( QStringLiteral( "25,30,10,20" ) ) );
+}
+
+void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesRectangleItemDifferingCrs()
+{
+  // When the legacy item CRS differs from the layer CRS, the box must be
+  // laid out in the item CRS (drawCrs mechanism) with only the center
+  // reprojected — NOT corner-transformed and re-laid-out axis-aligned in
+  // the layer CRS, which distorts the shape (regression: EPSG:2056 item in
+  // an EPSG:3857 redlining layer rendered skewed).
+  QDomDocument doc;
+  QDomElement root = doc.createElement( QStringLiteral( "qgis" ) );
+  doc.appendChild( root );
+  QDomElement projectLayersEl = doc.createElement( QStringLiteral( "projectlayers" ) );
+  root.appendChild( projectLayersEl );
+
+  QDomElement mapLayerEl = appendKadasItemLayer( doc, projectLayersEl, QStringLiteral( "rect_crs_id" ), QStringLiteral( "Rects" ), QStringLiteral( "EPSG:3857" ) );
+
+  QDomElement itemEl = doc.createElement( QStringLiteral( "MapItem" ) );
+  itemEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasRectangleItem" ) );
+  itemEl.setAttribute( QStringLiteral( "crs" ), QStringLiteral( "EPSG:2056" ) );
+  itemEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
+  itemEl.setAttribute( QStringLiteral( "outline_color" ), QStringLiteral( "#000000" ) );
+  itemEl.setAttribute( QStringLiteral( "outline_width" ), QStringLiteral( "1" ) );
+  itemEl.setAttribute( QStringLiteral( "outline_style" ), QString::number( static_cast<int>( Qt::SolidLine ) ) );
+  itemEl.setAttribute( QStringLiteral( "fill_color" ), QStringLiteral( "#80ffff00" ) );
+  itemEl.setAttribute( QStringLiteral( "fill_style" ), QString::number( static_cast<int>( Qt::SolidPattern ) ) );
+  itemEl.setAttribute( QStringLiteral( "p1" ), QStringLiteral( "2468106,1295185" ) );
+  itemEl.setAttribute( QStringLiteral( "p2" ), QStringLiteral( "2828106,1094185" ) );
+  mapLayerEl.appendChild( itemEl );
+
+  QStringList filesToAttach;
+  QVERIFY( KadasProjectMigration::migrateProjectXml( QString(), doc, filesToAttach ) );
+
+  const QDomElement migratedLayer = doc.documentElement().firstChildElement( QStringLiteral( "projectlayers" ) ).firstChildElement( QStringLiteral( "maplayer" ) );
+  QCOMPARE( migratedLayer.attribute( QStringLiteral( "type" ) ), QStringLiteral( "annotation" ) );
+  const QDomNodeList items = migratedLayer.firstChildElement( QStringLiteral( "items" ) ).elementsByTagName( QStringLiteral( "item" ) );
+  QCOMPARE( items.size(), 1 );
+  const QDomElement el = items.at( 0 ).toElement();
+  QCOMPARE( el.attribute( QStringLiteral( "type" ) ), QStringLiteral( "kadas:rectangle" ) );
+  // Size stays in the item CRS (LV95 meters)
+  QCOMPARE( el.attribute( QStringLiteral( "w" ) ).toDouble(), 360000.0 );
+  QCOMPARE( el.attribute( QStringLiteral( "h" ) ).toDouble(), 201000.0 );
+  // drawCrs/layerCrs recorded for per-vertex corner transforms
+  QCOMPARE( el.attribute( QStringLiteral( "drawCrs" ) ), QStringLiteral( "EPSG:2056" ) );
+  QCOMPARE( el.attribute( QStringLiteral( "layerCrs" ) ), QStringLiteral( "EPSG:3857" ) );
+  // Center reprojected into the layer CRS (LV95 midpoint -> web mercator):
+  // must be far from the raw LV95 numbers and in mercator range
+  const double cx = el.attribute( QStringLiteral( "cx" ) ).toDouble();
+  const double cy = el.attribute( QStringLiteral( "cy" ) ).toDouble();
+  QVERIFY( cx > 800000 && cx < 1000000 );  // ~8.1 deg lon
+  QVERIFY( cy > 5900000 && cy < 6100000 ); // ~47 deg lat
 }
 
 void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesCircleItem()

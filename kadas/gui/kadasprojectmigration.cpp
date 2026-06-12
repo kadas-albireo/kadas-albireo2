@@ -1319,25 +1319,35 @@ namespace
 
     for ( int i = 0; i < p1List.size(); ++i )
     {
-      QgsPointXY p1 = p1List[i];
-      QgsPointXY p2 = p2List[i];
+      const QgsPointXY p1 = p1List[i];
+      const QgsPointXY p2 = p2List[i];
+      // Layout in the item CRS: the legacy item rendered the box axis-aligned
+      // in its own CRS. Keep size in the item CRS and let the annotation item
+      // transform the corners per-vertex (drawCrs mechanism), so the shape
+      // stays a true rectangle when displayed in the original CRS.
+      const QgsPointXY center( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) );
+      const QSizeF size( std::abs( p2.x() - p1.x() ), std::abs( p2.y() - p1.y() ) );
+      auto *anno = new KadasRectangleAnnotationItem();
       if ( needTransform )
       {
+        QgsPointXY centerLayer;
         try
         {
-          p1 = ct.transform( p1 );
-          p2 = ct.transform( p2 );
+          centerLayer = ct.transform( center );
         }
         catch ( QgsCsException & )
         {
+          delete anno;
           qDeleteAll( out );
           out.clear();
           return out;
         }
+        anno->setBox( centerLayer, size, 0.0, itemCrs, layerCrs );
       }
-      const QgsPointXY center( 0.5 * ( p1.x() + p2.x() ), 0.5 * ( p1.y() + p2.y() ) );
-      const QSizeF size( std::abs( p2.x() - p1.x() ), std::abs( p2.y() - p1.y() ) );
-      auto *anno = new KadasRectangleAnnotationItem( center, size, 0.0 );
+      else
+      {
+        anno->setBox( center, size, 0.0 );
+      }
       anno->setSymbol( makeSymbol() );
       out.append( anno );
     }
