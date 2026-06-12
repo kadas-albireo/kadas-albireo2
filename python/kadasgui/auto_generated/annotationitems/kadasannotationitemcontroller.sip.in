@@ -11,6 +11,7 @@
 
 
 
+
 class KadasAnnotationItemController
 {
 %Docstring(signature="appended")
@@ -88,6 +89,19 @@ to receive subsequent points.
     virtual void onDoubleClick( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx );
 
 
+    virtual QgsGeometry representativeGeometry( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const;
+%Docstring
+Returns a cheap geometry (in the item's layer CRS) representing the
+item's current shape, used by the edit/create map tool as a
+:py:class:`QgsRubberBand` preview drawn above all layers while the item
+is being digitized or dragged. Mirrors QGIS's
+:py:func:`QgsAnnotationItemEditOperationTransientResults.representativeGeometry()`.
+
+Default implementation: the real geometry for line / polygon backed
+items, the bounding-box outline otherwise.
+%End
+
+
     virtual QgsPointXY position( const QgsAnnotationItem *item ) const = 0;
     virtual void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos ) = 0;
     virtual void translate( QgsAnnotationItem *item, double dx, double dy ) = 0;
@@ -95,6 +109,7 @@ to receive subsequent points.
 
     virtual bool hitTest( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const;
     virtual bool intersects( const QgsAnnotationItem *item, const QgsRectangle &mapRect, const KadasAnnotationItemContext &ctx, bool contains = false ) const;
+
 
 
 
@@ -119,6 +134,7 @@ polygon / pointtext) override it.
     virtual QStringList shadowIds( const QgsAnnotationItem *item ) const;
     virtual void setShadowIds( QgsAnnotationItem *item, const QStringList &ids ) const;
 
+
   protected:
 
     static QgsPointXY toMapPos( const QgsPointXY &itemPos, const KadasAnnotationItemContext &ctx );
@@ -126,6 +142,7 @@ polygon / pointtext) override it.
     static QgsRectangle toItemRect( const QgsRectangle &mapRect, const KadasAnnotationItemContext &ctx );
     static QgsRectangle toMapRect( const QgsRectangle &itemRect, const KadasAnnotationItemContext &ctx );
     static double pickTolSqr( const KadasAnnotationItemContext &ctx );
+
 };
 
 /************************************************************************

@@ -29,6 +29,7 @@ class QMenu;
 class QWidget;
 class QgsAnnotationItem;
 class QgsCoordinateReferenceSystem;
+class QgsGeometry;
 class QgsRectangle;
 class QgsRenderContext;
 class QgsSettingsEntryColor;
@@ -127,6 +128,20 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     virtual QgsPointXY positionFromEditAttribs( const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const = 0;
     virtual void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx );
     virtual void onDoubleClick( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx );
+
+    // ----- Digitizing / drag preview geometry ------------------------------
+
+    /**
+     * Returns a cheap geometry (in the item's layer CRS) representing the
+     * item's current shape, used by the edit/create map tool as a
+     * QgsRubberBand preview drawn above all layers while the item is being
+     * digitized or dragged. Mirrors QGIS's
+     * QgsAnnotationItemEditOperationTransientResults::representativeGeometry().
+     *
+     * Default implementation: the real geometry for line / polygon backed
+     * items, the bounding-box outline otherwise.
+     */
+    virtual QgsGeometry representativeGeometry( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const;
 
     // ----- Position helpers ----------------------------------------------
 

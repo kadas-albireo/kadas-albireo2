@@ -26,11 +26,13 @@
 
 #include <qgis/qgsannotationitem.h>
 #include <qgis/qgsannotationlayer.h>
+#include <qgis/qgsgeometry.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapcanvasitem.h>
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgsrectangle.h>
 #include <qgis/qgsrendercontext.h>
+#include <qgis/qgsrubberband.h>
 #include <qgis/qgsfeedback.h>
 #include <qgis/qgssettings.h>
 
@@ -301,12 +303,47 @@ void KadasMapToolEditAnnotationItem::refreshHandles()
     mHandles->update();
 }
 
+void KadasMapToolEditAnnotationItem::updateTempRubberBand()
+{
+  if ( !mItem || !mController || !mLayer || !canvas() )
+  {
+    clearTempRubberBand();
+    return;
+  }
+  KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
+  const QgsGeometry geom = mController->representativeGeometry( mItem, ctx );
+  if ( geom.isEmpty() )
+  {
+    clearTempRubberBand();
+    return;
+  }
+  if ( !mTempRubberBand )
+  {
+    // Styling mirrors QgsMapToolModifyAnnotation's temporary band.
+    mTempRubberBand = new QgsRubberBand( canvas(), geom.type() );
+    const double scaleFactor = canvas()->fontMetrics().xHeight() * .2;
+    mTempRubberBand->setWidth( scaleFactor );
+    mTempRubberBand->setSecondaryStrokeColor( QColor( 255, 255, 255, 100 ) );
+    mTempRubberBand->setColor( QColor( 50, 50, 50, 200 ) );
+  }
+  // setToGeometry() resets the band to the geometry's type and transforms
+  // from the layer CRS to the map CRS.
+  mTempRubberBand->setToGeometry( geom, mLayer->crs() );
+}
+
+void KadasMapToolEditAnnotationItem::clearTempRubberBand()
+{
+  delete mTempRubberBand;
+  mTempRubberBand = nullptr;
+}
+
 void KadasMapToolEditAnnotationItem::deactivate()
 {
   QgsMapTool::deactivate();
   // Drop the uncommitted in-progress item if the user closed the tool mid-draw.
   if ( mAllowCreate && mDrawState != DrawState::Finished )
     clearInProgressItem();
+  clearTempRubberBand();
   if ( mLayer )
     mLayer->triggerRepaint();
   delete mBottomBar;
@@ -400,7 +437,10 @@ void KadasMapToolEditAnnotationItem::addPoint( const QgsPointXY &pos )
       }
       else
       {
+        // Vertex committed: re-render the layer once and keep the preview
+        // band in sync.
         mLayer->triggerRepaint();
+        updateTempRubberBand();
         pushState();
       }
       break;
@@ -449,7 +489,11 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
       clearNumericInput();
     }
     mController->setCurrentPoint( mItem, pos, ctx );
-    mLayer->triggerRepaint();
+    // No layer repaint per mouse move: the preview band (drawn above all
+    // layers) provides the live feedback; the layer is re-rendered only
+    // when a vertex is committed.
+    updateTempRubberBand();
+    refreshHandles();
     return;
   }
 
@@ -473,7 +517,11 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
     {
       const QgsPointXY adjusted( pos.x() - mMoveOffset.x(), pos.y() - mMoveOffset.y() );
       mController->edit( mItem, mEditContext, adjusted, ctx );
-      mLayer->triggerRepaint();
+      // During the drag the layer keeps showing the pre-drag rendering;
+      // the band shows the live outline above all layers (QGIS behavior).
+      // The layer is re-rendered once on release.
+      updateTempRubberBand();
+      refreshHandles();
     }
   }
   else
@@ -518,7 +566,16 @@ void KadasMapToolEditAnnotationItem::canvasReleaseEvent( QgsMapMouseEvent *e )
 {
   mPressedButton = Qt::NoButton;
   if ( e->button() == Qt::LeftButton && mEditContext.isValid() )
+  {
+    // Commit the drag: clear the preview band and render the edited item.
+    if ( mTempRubberBand )
+    {
+      clearTempRubberBand();
+      if ( mLayer )
+        mLayer->triggerRepaint();
+    }
     pushState();
+  }
 }
 
 void KadasMapToolEditAnnotationItem::canvasDoubleClickEvent( QgsMapMouseEvent * )
@@ -583,6 +640,7 @@ void KadasMapToolEditAnnotationItem::deleteItem()
     return;
   mLayer->removeItem( mItemId );
   mLayer->triggerRepaint();
+  clearTempRubberBand();
   mItem = nullptr;
   mItemId.clear();
   canvas()->unsetMapTool( this );
@@ -600,6 +658,10 @@ void KadasMapToolEditAnnotationItem::stateChanged( KadasStateHistory::ChangeType
   mItem = mLayer->item( mItemId );
   mDrawState = ts->drawState;
   mLayer->triggerRepaint();
+  if ( mDrawState == DrawState::InProgress )
+    updateTempRubberBand();
+  else
+    clearTempRubberBand();
   mEditContext = KadasEditContext();
   clearNumericInput();
   if ( mStyleEditor )
@@ -713,6 +775,7 @@ void KadasMapToolEditAnnotationItem::clearInProgressItem()
     mLayer->removeItem( mItemId );
     mLayer->triggerRepaint();
   }
+  clearTempRubberBand();
   mItem = nullptr;
   mItemId.clear();
   mDrawState = DrawState::Empty;
@@ -731,6 +794,7 @@ void KadasMapToolEditAnnotationItem::startPart( const QgsPointXY &pos )
   {
     mDrawState = DrawState::InProgress;
     mLayer->triggerRepaint();
+    updateTempRubberBand();
     pushState();
   }
 }
@@ -741,6 +805,7 @@ void KadasMapToolEditAnnotationItem::finishPart()
     return;
   mController->endPart( mItem );
   mDrawState = DrawState::Finished;
+  clearTempRubberBand();
   mLayer->triggerRepaint();
   pushState();
   emit partFinished();

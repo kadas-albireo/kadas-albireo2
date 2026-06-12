@@ -23,7 +23,12 @@
 #include <QScreen>
 
 #include <qgis/qgsannotationitem.h>
+#include <qgis/qgsannotationlineitem.h>
+#include <qgis/qgsannotationpolygonitem.h>
 #include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgscurve.h>
+#include <qgis/qgscurvepolygon.h>
+#include <qgis/qgsgeometry.h>
 #include <qgis/qgsrectangle.h>
 #include <qgis/qgsrendercontext.h>
 #include <qgis/qgssettings.h>
@@ -37,6 +42,20 @@ void KadasAnnotationItemController::populateContextMenu( QgsAnnotationItem *, QM
 
 void KadasAnnotationItemController::onDoubleClick( QgsAnnotationItem *, const KadasAnnotationItemContext & )
 {}
+
+QgsGeometry KadasAnnotationItemController::representativeGeometry( const QgsAnnotationItem *item, const KadasAnnotationItemContext & ) const
+{
+  if ( !item )
+    return QgsGeometry();
+  if ( const auto *line = dynamic_cast<const QgsAnnotationLineItem *>( item ) )
+    return line->geometry() ? QgsGeometry( line->geometry()->clone() ) : QgsGeometry();
+  if ( const auto *poly = dynamic_cast<const QgsAnnotationPolygonItem *>( item ) )
+    return poly->geometry() ? QgsGeometry( poly->geometry()->clone() ) : QgsGeometry();
+  const QgsRectangle bb = item->boundingBox();
+  if ( bb.isEmpty() )
+    return QgsGeometry();
+  return QgsGeometry::fromRect( bb );
+}
 
 bool KadasAnnotationItemController::hitTest( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
 {

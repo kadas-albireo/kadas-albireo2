@@ -35,6 +35,7 @@ class KadasFloatingInputWidget;
 class QBoxLayout;
 class QgsAnnotationItem;
 class QgsAnnotationLayer;
+class QgsRubberBand;
 
 /**
  * \ingroup gui
@@ -133,10 +134,19 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
 
     KadasAnnotationStyleEditor *mStyleEditor = nullptr;
 
+    // Temporary digitizing/drag preview band, drawn above all layers so the
+    // in-progress geometry stays visible even when the annotation layer is
+    // covered by other layers (mirrors QGIS's annotation map tools). The
+    // layer itself is only repainted at commit points (vertex placed, part
+    // finished, drag released), never per mouse move.
+    QgsRubberBand *mTempRubberBand = nullptr;
+
     class HandlesOverlay;
     HandlesOverlay *mHandles = nullptr;
 
     void refreshHandles();
+    void updateTempRubberBand();
+    void clearTempRubberBand();
     void pushState();
     void deleteItem();
     void setupNumericInput();
