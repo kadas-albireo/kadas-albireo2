@@ -20,6 +20,7 @@
 #include <QVector>
 
 #include <qgis/qgscoordinatereferencesystem.h>
+#include <qgis/qgsdistancearea.h>
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgsmaptool.h>
 #include <qgis/qgspointxy.h>
@@ -160,6 +161,7 @@ class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
     QgsPointXY mPolyCursor;
     bool mPolyHasCursor = false;
     bool mGeodesicPreview = false;
+    QgsDistanceArea mGeodesicDa;
 
     // Numeric attribute input (floating x/y/r/α1/α2 box, enabled via /kadas/showNumericInput)
     enum NumericAttr
@@ -182,7 +184,7 @@ class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
     void acceptNumericInput();
 
     void resetRubberBand();
-    QVector<QgsPointXY> geodesicDisplayPoints( const QVector<QgsPointXY> &points ) const;
+    QVector<QgsPointXY> geodesicDisplayPoints( const QVector<QgsPointXY> &points );
     void updateRectRubberBand();
     void updateCircleRubberBand();
     void updateSectorRubberBand();

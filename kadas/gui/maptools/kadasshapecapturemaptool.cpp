@@ -710,12 +710,15 @@ void KadasShapeCaptureMapTool::updatePolyRubberBand( const QgsPointXY &cursor, b
   emit previewChanged();
 }
 
-QVector<QgsPointXY> KadasShapeCaptureMapTool::geodesicDisplayPoints( const QVector<QgsPointXY> &points ) const
+QVector<QgsPointXY> KadasShapeCaptureMapTool::geodesicDisplayPoints( const QVector<QgsPointXY> &points )
 {
-  QgsDistanceArea da;
-  da.setSourceCrs( canvas()->mapSettings().destinationCrs(), QgsProject::instance()->transformContext() );
-  da.setEllipsoid( QStringLiteral( "WGS84" ) );
-  if ( !da.willUseEllipsoid() )
+  const QgsCoordinateReferenceSystem canvasCrs = canvas()->mapSettings().destinationCrs();
+  if ( mGeodesicDa.sourceCrs() != canvasCrs )
+  {
+    mGeodesicDa.setSourceCrs( canvasCrs, QgsProject::instance()->transformContext() );
+    mGeodesicDa.setEllipsoid( QStringLiteral( "WGS84" ) );
+  }
+  if ( !mGeodesicDa.willUseEllipsoid() )
     return points;
 
   constexpr double interval = 100000; // 100km segments
@@ -723,7 +726,7 @@ QVector<QgsPointXY> KadasShapeCaptureMapTool::geodesicDisplayPoints( const QVect
   out.append( points.first() );
   for ( int i = 0, n = points.size(); i < n - 1; ++i )
   {
-    const QVector<QVector<QgsPointXY>> segments = da.geodesicLine( points[i], points[i + 1], interval, false );
+    const QVector<QVector<QgsPointXY>> segments = mGeodesicDa.geodesicLine( points[i], points[i + 1], interval, false );
     if ( segments.isEmpty() || segments.first().size() < 2 )
     {
       out.append( points[i + 1] );
