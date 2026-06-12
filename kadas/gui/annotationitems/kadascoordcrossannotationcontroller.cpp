@@ -18,8 +18,12 @@
 
 #include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgsannotationpointtextitem.h>
+#include <qgis/qgscoordinatereferencesystem.h>
+#include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgsexception.h>
 #include <qgis/qgsmarkersymbol.h>
 #include <qgis/qgsmarkersymbollayer.h>
+#include <qgis/qgsproject.h>
 
 #include "kadas/gui/annotationitems/kadasannotationitemcontext.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
@@ -32,6 +36,26 @@ namespace
   inline QgsPointXY roundToKilometre( const QgsPointXY &p )
   {
     return QgsPointXY( std::round( p.x() / 1000.0 ) * 1000.0, std::round( p.y() / 1000.0 ) * 1000.0 );
+  }
+
+  // Snap an item-CRS position to the round-km grid of the cross's
+  // snapping/labelling CRS (the layer CRS when metric, EPSG:3857
+  // otherwise — rounding raw degree values would collapse every position
+  // to 0/0). Returns the snapped position back in the item CRS.
+  QgsPointXY snapToKmGrid( const QgsPointXY &itemPos, const QgsCoordinateReferenceSystem &layerCrs )
+  {
+    const QgsCoordinateReferenceSystem crossCrs = KadasCoordCrossAnnotationItem::labelCrs( layerCrs );
+    if ( !layerCrs.isValid() || crossCrs == layerCrs )
+      return roundToKilometre( itemPos );
+    const QgsCoordinateTransform ct( layerCrs, crossCrs, QgsProject::instance() );
+    try
+    {
+      return ct.transform( roundToKilometre( ct.transform( itemPos ) ), Qgis::TransformDirection::Reverse );
+    }
+    catch ( QgsCsException & )
+    {
+      return itemPos;
+    }
   }
 } // namespace
 
@@ -55,7 +79,7 @@ QgsAnnotationItem *KadasCoordCrossAnnotationController::createItem() const
 
 bool KadasCoordCrossAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
 {
-  const QgsPointXY itemPos = roundToKilometre( toItemPos( firstPoint, ctx ) );
+  const QgsPointXY itemPos = snapToKmGrid( toItemPos( firstPoint, ctx ), ctx.itemCrs() );
   if ( auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item ) )
     marker->setGeometry( QgsPoint( itemPos.x(), itemPos.y() ) );
   // CoordCross is finalized on the very first click.
@@ -64,7 +88,10 @@ bool KadasCoordCrossAnnotationController::startPart( QgsAnnotationItem *item, co
 
 void KadasCoordCrossAnnotationController::setPosition( QgsAnnotationItem *item, const QgsPointXY &pos )
 {
-  KadasMarkerAnnotationController::setPosition( item, roundToKilometre( pos ) );
+  // No layer context here, so the snapping CRS is unknown; store the raw
+  // position. Interactive placement and edits go through startPart()/edit(),
+  // which snap to the km grid of the labelling CRS.
+  KadasMarkerAnnotationController::setPosition( item, pos );
 }
 
 void KadasCoordCrossAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
@@ -73,14 +100,13 @@ void KadasCoordCrossAnnotationController::edit( QgsAnnotationItem *item, const K
   KadasMarkerAnnotationController::edit( item, editContext, newPoint, ctx );
   if ( auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item ) )
   {
-    const QgsPointXY snapped = roundToKilometre( QgsPointXY( marker->geometry().x(), marker->geometry().y() ) );
+    const QgsPointXY snapped = snapToKmGrid( QgsPointXY( marker->geometry().x(), marker->geometry().y() ), ctx.itemCrs() );
     marker->setGeometry( QgsPoint( snapped.x(), snapped.y() ) );
   }
 }
 
 QList<QgsAnnotationItem *> KadasCoordCrossAnnotationController::generateShadows( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
 {
-  Q_UNUSED( ctx );
   // The Kadas coord-cross is screen-space (cross arms in pixels, label rendered
   // at canvas-pixel offsets relative to the cross). For a project-time shadow we
   // can only emit a map-space marker + a single coordinate label at the same
@@ -105,8 +131,21 @@ QList<QgsAnnotationItem *> KadasCoordCrossAnnotationController::generateShadows(
   cross->setZIndex( master->zIndex() );
   shadows.append( cross );
 
-  // Coordinate label shadow.
-  const QString label = QStringLiteral( "%1 / %2" ).arg( QString::number( pt.x() / 1000.0, 'f', 0 ) ).arg( QString::number( pt.y() / 1000.0, 'f', 0 ) );
+  // Coordinate label shadow, labelled in the same CRS as the master's
+  // rendered labels (layer CRS when metric, EPSG:3857 otherwise).
+  QgsPointXY labelPt = pt;
+  const QgsCoordinateReferenceSystem layerCrs = ctx.itemCrs();
+  const QgsCoordinateReferenceSystem crossCrs = KadasCoordCrossAnnotationItem::labelCrs( layerCrs );
+  if ( layerCrs.isValid() && crossCrs != layerCrs )
+  {
+    try
+    {
+      labelPt = QgsCoordinateTransform( layerCrs, crossCrs, QgsProject::instance() ).transform( pt );
+    }
+    catch ( QgsCsException & )
+    {}
+  }
+  const QString label = QStringLiteral( "%1 / %2" ).arg( QString::number( labelPt.x() / 1000.0, 'f', 0 ) ).arg( QString::number( labelPt.y() / 1000.0, 'f', 0 ) );
   auto *text = new QgsAnnotationPointTextItem( label, pt );
   text->setZIndex( master->zIndex() );
   shadows.append( text );

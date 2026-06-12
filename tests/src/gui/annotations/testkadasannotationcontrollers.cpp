@@ -21,10 +21,12 @@
 #include <QtTest/QTest>
 
 #include <qgis/qgsannotationlineitem.h>
+#include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgsannotationpolygonitem.h>
 #include <qgis/qgsapplication.h>
 #include <qgis/qgscoordinatereferencesystem.h>
+#include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgslinestring.h>
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgsmarkersymbol.h>
@@ -39,6 +41,8 @@
 #include <kadas/gui/annotationitems/kadasannotationitemcontext.h>
 #include <kadas/gui/annotationitems/kadascircleannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadascircleannotationitem.h>
+#include <kadas/gui/annotationitems/kadascoordcrossannotationcontroller.h>
+#include <kadas/gui/annotationitems/kadascoordcrossannotationitem.h>
 #include <kadas/gui/annotationitems/kadaslineannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadasmarkerannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadaspinannotationcontroller.h>
@@ -78,6 +82,10 @@ class TestKadasAnnotationControllers : public QObject
     // KadasCircleAnnotationController ------------------------------------
     void circle_nodes_returnsCenterAndRing();
     void circle_edit_centerAndRingRoundtrip();
+
+    // KadasCoordCrossAnnotationController ----------------------------------
+    void coordcross_startPart_snapsToKmGridInMetricLayerCrs();
+    void coordcross_startPart_snapsViaMetricCrsOnDegreeLayer();
 
     // KadasPinAnnotationItem ---------------------------------------------
     void pin_defaultIconPath_resolvesInQrc();
@@ -382,6 +390,72 @@ void TestKadasAnnotationControllers::circle_edit_centerAndRingRoundtrip()
   controller.edit( item.get(), ec, QgsPointXY( 100, 0 ), ctx );
   QCOMPARE( circle->ringPoint().x(), 100.0 );
   QCOMPARE( circle->center().x(), 0.0 );
+}
+
+
+// ----- CoordCross --------------------------------------------------------
+
+void TestKadasAnnotationControllers::coordcross_startPart_snapsToKmGridInMetricLayerCrs()
+{
+  // Metric layer CRS: the position snaps to a round km directly in the
+  // layer CRS (which is also the labelling CRS).
+  const QgsCoordinateReferenceSystem crs( QStringLiteral( "EPSG:2056" ) );
+  QgsMapSettings ms;
+  ms.setDestinationCrs( crs );
+  ms.setExtent( QgsRectangle( 2599000, 1199000, 2601000, 1201000 ) );
+  ms.setOutputSize( QSize( 1000, 1000 ) );
+  ms.setOutputDpi( 96 );
+  QgsAnnotationLayer layer( QStringLiteral( "cross-metric" ), QgsAnnotationLayer::LayerOptions( QgsCoordinateTransformContext() ) );
+  layer.setCrs( crs );
+  const KadasAnnotationItemContext ctx( &layer, ms );
+
+  QCOMPARE( KadasCoordCrossAnnotationItem::labelCrs( crs ), crs );
+
+  KadasCoordCrossAnnotationController controller;
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  controller.startPart( item.get(), QgsPointXY( 2600123.4, 1200456.7 ), ctx );
+
+  const auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item.get() );
+  QVERIFY( marker );
+  QCOMPARE( marker->geometry().x(), 2600000.0 );
+  QCOMPARE( marker->geometry().y(), 1200000.0 );
+}
+
+void TestKadasAnnotationControllers::coordcross_startPart_snapsViaMetricCrsOnDegreeLayer()
+{
+  // Degree-based layer CRS: rounding raw lat/lon to the nearest 1000
+  // would collapse every position to (0, 0) — Null Island. The controller
+  // must snap on the EPSG:3857 km grid instead and store the transformed
+  // position back in the layer CRS.
+  const QgsCoordinateReferenceSystem layerCrs( QStringLiteral( "EPSG:4326" ) );
+  const QgsCoordinateReferenceSystem mapCrs( QStringLiteral( "EPSG:3857" ) );
+  QgsMapSettings ms;
+  ms.setDestinationCrs( mapCrs );
+  ms.setExtent( QgsRectangle( 820000, 5930000, 840000, 5950000 ) );
+  ms.setOutputSize( QSize( 1000, 1000 ) );
+  ms.setOutputDpi( 96 );
+  QgsAnnotationLayer layer( QStringLiteral( "cross-degrees" ), QgsAnnotationLayer::LayerOptions( QgsCoordinateTransformContext() ) );
+  layer.setCrs( layerCrs );
+  const KadasAnnotationItemContext ctx( &layer, ms );
+
+  QCOMPARE( KadasCoordCrossAnnotationItem::labelCrs( layerCrs ), mapCrs );
+
+  KadasCoordCrossAnnotationController controller;
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  // Click near Bern in EPSG:3857 map coords.
+  controller.startPart( item.get(), QgsPointXY( 828437.0, 5933749.0 ), ctx );
+
+  const auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item.get() );
+  QVERIFY( marker );
+  // Stored in degrees: must NOT have been rounded to (0, 0).
+  QVERIFY( std::abs( marker->geometry().x() - 7.44 ) < 0.1 );
+  QVERIFY( std::abs( marker->geometry().y() - 46.9 ) < 0.1 );
+  // Transformed back to the metric labelling CRS, the position sits on
+  // the round-km grid.
+  const QgsCoordinateTransform ct( layerCrs, mapCrs, QgsCoordinateTransformContext() );
+  const QgsPointXY snapped = ct.transform( QgsPointXY( marker->geometry().x(), marker->geometry().y() ) );
+  QVERIFY2( std::abs( snapped.x() - 828000.0 ) < 0.001, qPrintable( QString::number( snapped.x(), 'f', 4 ) ) );
+  QVERIFY2( std::abs( snapped.y() - 5934000.0 ) < 0.001, qPrintable( QString::number( snapped.y(), 'f', 4 ) ) );
 }
 
 

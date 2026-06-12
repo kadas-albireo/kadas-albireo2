@@ -19,6 +19,9 @@
 #include <QPainterPath>
 #include <QPen>
 
+#include <qgis/qgscoordinatereferencesystem.h>
+#include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgsexception.h>
 #include <qgis/qgsmarkersymbol.h>
 #include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgsrendercontext.h>
@@ -41,6 +44,13 @@ QString KadasCoordCrossAnnotationItem::type() const
   return itemTypeId();
 }
 
+QgsCoordinateReferenceSystem KadasCoordCrossAnnotationItem::labelCrs( const QgsCoordinateReferenceSystem &layerCrs )
+{
+  if ( !layerCrs.isValid() || layerCrs.mapUnits() == Qgis::DistanceUnit::Meters )
+    return layerCrs;
+  return QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:3857" ) );
+}
+
 void KadasCoordCrossAnnotationItem::installDefaultSymbol()
 {
   // The cross and labels are drawn manually in render(); the marker symbol
@@ -61,13 +71,25 @@ QgsRectangle KadasCoordCrossAnnotationItem::boundingBox() const
 
 QgsRectangle KadasCoordCrossAnnotationItem::boundingBox( QgsRenderContext &context ) const
 {
-  // Inflate the point bounds by the cross half-extent, expressed in map units,
-  // so the canvas chunk loader rasters the labels correctly when the cross
-  // sits near a tile edge.
+  // Inflate the point bounds by the cross half-extent so the canvas chunk
+  // loader rasters the labels correctly when the cross sits near a tile
+  // edge. The half-extent is derived from pixels, i.e. expressed in *map*
+  // units; inflate around the map-CRS position and transform the result
+  // back to the layer CRS (mixing map-unit inflation with layer-CRS
+  // coordinates breaks whenever the two CRSs differ in units, e.g. a
+  // degree-based layer on a metric canvas).
   const double mupp = context.mapToPixel().mapUnitsPerPixel();
   const double crossMu = sCrossSizePx * KadasAnnotationItemController::outputDpiScale( context ) * mupp;
-  const QgsPointXY p = geometry();
-  return QgsRectangle( p.x() - crossMu, p.y() - crossMu, p.x() + crossMu, p.y() + crossMu );
+  try
+  {
+    const QgsPointXY mapPos = context.coordinateTransform().transform( geometry() );
+    QgsRectangle rect( mapPos.x() - crossMu, mapPos.y() - crossMu, mapPos.x() + crossMu, mapPos.y() + crossMu );
+    return context.coordinateTransform().transformBoundingBox( rect, Qgis::TransformDirection::Reverse );
+  }
+  catch ( QgsCsException & )
+  {
+    return boundingBox();
+  }
 }
 
 void KadasCoordCrossAnnotationItem::render( QgsRenderContext &context, QgsFeedback *feedback )
@@ -95,14 +117,29 @@ void KadasCoordCrossAnnotationItem::render( QgsRenderContext &context, QgsFeedba
       double mapCoord;
       double angle;
   };
-  // Labels reflect the coordinate visible on the map at the cross
-  // position — i.e. the destination (map render) CRS coords. Using the
-  // raw layer-CRS geometry would print arbitrary numbers whenever the
-  // annotation layer CRS differs from the project CRS (e.g. a Swiss
-  // CH1903+ cross migrated into a Web-Mercator layer).
+  // Labels show the position in the same CRS the controller snapped it to
+  // a round kilometre in (layer CRS when metric, EPSG:3857 otherwise; see
+  // labelCrs()). Using the destination (map render) CRS instead would
+  // print values that are not on the round-km grid the cross sits on
+  // whenever the project CRS differs from the layer CRS — the cross would
+  // appear offset from the gridline its label claims.
+  QgsPointXY labelPos = geometry();
+  const QgsCoordinateReferenceSystem layerCrs = context.coordinateTransform().sourceCrs();
+  const QgsCoordinateReferenceSystem crossCrs = labelCrs( layerCrs );
+  if ( layerCrs.isValid() && crossCrs != layerCrs )
+  {
+    try
+    {
+      labelPos = QgsCoordinateTransform( layerCrs, crossCrs, context.transformContext() ).transform( labelPos );
+    }
+    catch ( QgsCsException & )
+    {
+      // Keep the raw layer-CRS coordinates as a last resort.
+    }
+  }
   const QList<LabelData> labels = {
-    { screenPos.x() - crossSize, screenPos.y() - 12, mapPos.y(), 0 },
-    { screenPos.x() - 12, screenPos.y() + crossSize, mapPos.x(), -90 },
+    { screenPos.x() - crossSize, screenPos.y() - 12, labelPos.y(), 0 },
+    { screenPos.x() - 12, screenPos.y() + crossSize, labelPos.x(), -90 },
   };
 
   QFont font = painter->font();

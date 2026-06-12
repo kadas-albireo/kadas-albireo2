@@ -20,6 +20,7 @@
 #include <QStringList>
 
 #include <qgis/qgsannotationmarkeritem.h>
+#include <qgis/qgscoordinatereferencesystem.h>
 
 #include "kadas/gui/annotationitems/kadasannotationshadow.h"
 #include "kadas/gui/kadas_gui.h"
@@ -34,9 +35,11 @@
  * not draw anything; the cross and labels are drawn by the overridden
  * \c render().
  *
- * Coordinates are rounded to the nearest kilometre by the controller on
- * placement. The annotation layer is expected to use a metric CRS
- * (EPSG:3857 in standard Kadas layouts).
+ * Coordinates are snapped to the nearest kilometre by the controller on
+ * placement and labelled in the same CRS, so the labels always match the
+ * snapped grid position. The snapping/labelling CRS is the layer CRS when
+ * it is metric, EPSG:3857 otherwise (see \c labelCrs()), mirroring the
+ * legacy \c KadasCoordinateCrossItem which forced a metric item CRS.
  *
  * Type id: \c "kadas:coordcross".
  */
@@ -46,6 +49,14 @@ class KADAS_GUI_EXPORT KadasCoordCrossAnnotationItem : public QgsAnnotationMarke
     KadasCoordCrossAnnotationItem( const QgsPoint &point = QgsPoint() );
 
     static QString itemTypeId() { return QStringLiteral( "kadas:coordcross" ); }
+
+    /**
+     * CRS in which the cross position is snapped to a round kilometre and
+     * labelled: \a layerCrs itself when it is metric (or invalid), EPSG:3857
+     * otherwise (rounding raw degree values would collapse every position
+     * to 0/0).
+     */
+    static QgsCoordinateReferenceSystem labelCrs( const QgsCoordinateReferenceSystem &layerCrs );
 
     QString type() const override;
     void render( QgsRenderContext &context, QgsFeedback *feedback ) override;
