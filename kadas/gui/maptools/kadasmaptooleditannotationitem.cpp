@@ -435,11 +435,12 @@ void KadasMapToolEditAnnotationItem::canvasPressEvent( QgsMapMouseEvent *e )
   if ( mEditContext.isValid() )
     return;
 
-  // Outside of a digitizing part, a click on a different item switches
-  // the tool to editing that item, instead of starting a brand new one
-  // (or doing nothing in pure edit mode). The picker considers items on
-  // any visible annotation layer, not only the currently active one.
-  if ( mDrawState != DrawState::InProgress )
+  // In pure edit mode, a click on a different item switches the tool to
+  // editing that item. In create mode, placement always wins so new items
+  // can be drawn on top of existing ones (use the edit tool or right-click
+  // to pick instead). The picker considers items on any visible annotation
+  // layer, not only the currently active one.
+  if ( !mAllowCreate && mDrawState != DrawState::InProgress )
   {
     const PickedItem hit = pickItemAt( e->mapPoint() );
     if ( !hit.isEmpty() && !( hit.layer == mLayer.data() && hit.itemId == mItemId ) )
