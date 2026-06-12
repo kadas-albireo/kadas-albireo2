@@ -476,9 +476,8 @@ void KadasMapToolEditAnnotationItem::addPoint( const QgsPointXY &pos )
       }
       else
       {
-        // Vertex committed: re-render the layer once and keep the preview
-        // band in sync.
-        mLayer->triggerRepaint();
+        // Vertex committed: the item is disabled in the layer while
+        // digitizing, so only the preview band needs updating.
         updateTempRubberBand();
         pushState();
       }
@@ -696,6 +695,11 @@ void KadasMapToolEditAnnotationItem::stateChanged( KadasStateHistory::ChangeType
   mLayer->replaceItem( mItemId, replacement );
   mItem = mLayer->item( mItemId );
   mDrawState = ts->drawState;
+  // History clones carry the enabled flag of when they were pushed; keep
+  // it consistent with the restored draw state (disabled only while
+  // digitizing, when the band is the preview).
+  if ( mItem )
+    mItem->setEnabled( mDrawState != DrawState::InProgress );
   mLayer->triggerRepaint();
   if ( mDrawState == DrawState::InProgress )
     updateTempRubberBand();
@@ -836,6 +840,11 @@ void KadasMapToolEditAnnotationItem::startPart( const QgsPointXY &pos )
   else
   {
     mDrawState = DrawState::InProgress;
+    // While digitizing, the item must not be rendered by the layer: any
+    // intermediate repaint (e.g. a style change) would leave a stale
+    // "shadow" of the in-progress geometry behind the live band. The
+    // band is the only preview until the part is finished.
+    mItem->setEnabled( false );
     mLayer->triggerRepaint();
     updateTempRubberBand();
     pushState();
@@ -848,6 +857,7 @@ void KadasMapToolEditAnnotationItem::finishPart()
     return;
   mController->endPart( mItem );
   mDrawState = DrawState::Finished;
+  mItem->setEnabled( true );
   clearTempRubberBand();
   mLayer->triggerRepaint();
   pushState();
