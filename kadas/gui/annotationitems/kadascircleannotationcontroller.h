@@ -39,7 +39,9 @@ class KADAS_GUI_EXPORT KadasCircleAnnotationController : public KadasAnnotationI
     QgsAnnotationItem *createItem() const override;
 
     QList<KadasNode> nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const override;
+#ifndef SIP_RUN
     QList<KadasAnnotationMeasurementLabel> measurementLabels( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const override;
+#endif
 
     bool startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx ) override;
     bool startPart( QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) override;
