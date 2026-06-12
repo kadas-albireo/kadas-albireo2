@@ -23,6 +23,8 @@
 #include <qgis/qgis.h>
 #include <qgis/qgsapplication.h>
 #include <qgis/qgslayertreeregistrybridge.h>
+#include <qgis/qgspluginlayer.h>
+#include <qgis/qgspluginlayerregistry.h>
 
 #include "kadas/gui/kadasfeaturepicker.h"
 
@@ -30,6 +32,7 @@ class QNetworkRequest;
 class QTemporaryDir;
 
 class QStackedWidget;
+class QgsAnnotationLayer;
 class QgsLayerTreeGroup;
 class QgsMapLayer;
 class QgsMapLayerConfigWidgetFactory;
@@ -54,6 +57,7 @@ class KadasPluginInterface;
 class KadasPortalAuth;
 class KadasPythonIntegration;
 class KadasRedliningIntegration;
+class KadasAnnotationProjectIntegration;
 
 #define kApp KadasApplication::instance()
 
@@ -80,8 +84,7 @@ class KadasApplication : public QgsApplication
     void addRasterLayers( const QStringList &layerUris, bool quiet = false ) const;
     QgsVectorTileLayer *addVectorTileLayer( const QString &url, const QString &baseName, bool quiet = false, bool forceUpdateUriSources = true );
     QgsPointCloudLayer *addPointCloudLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false );
-    QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> addImageItem( const QString &filename ) const;
-    KadasItemLayer *selectPasteTargetItemLayer( const QList<KadasMapItem *> &items );
+    QPair<QString, QgsAnnotationLayer *> addImageItem( const QString &filename ) const;
     bool askUserForDatumTransform( const QgsCoordinateReferenceSystem &sourceCrs, const QgsCoordinateReferenceSystem &destinationCrs, const QgsMapLayer *layer );
     bool checkTasksDependOnProject();
 
@@ -113,6 +116,13 @@ class KadasApplication : public QgsApplication
     void showLayoutDesigner( QgsPrintLayout *layout );
 
     QgsMapTool *paste( QgsPointXY *mapPos = nullptr );
+
+    /**
+     * Activates the dedicated config tool (bullseye / guide grid widget)
+     * for the parametric annotation \a layer. No-op if \a layer is not a
+     * known parametric layer type.
+     */
+    void editParametricAnnotationLayer( QgsAnnotationLayer *layer );
 
     int computeLayerGroupInsertionOffset( QgsLayerTreeGroup *group ) const;
 
@@ -158,6 +168,7 @@ class KadasApplication : public QgsApplication
     QgsNetworkLogger *mNetworkLogger = nullptr;
     KadasPortalAuth *mPortalAuth = nullptr;
     KadasDeveloperToolsDockWidget *mNetworkLoggerDockWidget = nullptr;
+    KadasAnnotationProjectIntegration *mAnnotationProjectIntegration = nullptr;
 
     void loadPythonSupport();
     QString migrateDatasource( const QString &path ) const;
@@ -192,6 +203,12 @@ class KadasApplication : public QgsApplication
     void extentChanged();
     void saveAttributeTableDocks( QDomDocument &doc );
     void restoreAttributeTables( const QDomDocument &doc );
+    /// After load, scan plain QgsAnnotationLayer instances for the
+    /// `kadas/annotation-type` marker customProperty and replace them
+    /// with the matching Kadas subclass (KadasBullseyeLayer,
+    /// KadasGuideGridLayer) so the right-click "Edit" hook and the
+    /// custom QPainter renderers work post-reload.
+    void promoteAnnotationLayers();
 };
 
 #endif // KADASAPPLICATION_H

@@ -11,7 +11,9 @@
 
 
 
-class KadasMapToolMinMax : KadasMapToolCreateItem
+
+
+class KadasMapToolMinMax : KadasShapeCaptureMapTool
 {
 %Docstring(signature="appended")
 *************************************************************************
@@ -39,26 +41,20 @@ your option) any later version. *
     };
 
     void setFilterType( FilterType filterType );
-    virtual void canvasPressEvent( QgsMapMouseEvent *e );
+    void runMinMax( const QgsGeometry &geometry, const QgsCoordinateReferenceSystem &crs );
+%Docstring
+Runs the min/max computation against an externally-supplied geometry
+(e.g. picked from a feature).
+%End
 
-    virtual void canvasMoveEvent( QgsMapMouseEvent *e );
+    virtual void activate();
+
+    virtual void deactivate();
+
+    virtual void canvasPressEvent( QgsMapMouseEvent *e );
 
     virtual void canvasReleaseEvent( QgsMapMouseEvent *e );
 
-
-};
-
-
-class KadasMapToolMinMaxItemInterface : KadasMapItemInterface
-{
-%TypeHeaderCode
-#include "kadas/gui/maptools/kadasmaptoolminmax.h"
-%End
-  public:
-    KadasMapToolMinMaxItemInterface( QgsMapCanvas *mapCanvas );
-    virtual KadasMapItem *createItem() const;
-
-    void setFilterType( KadasMapToolMinMax::FilterType filterType );
 
 };
 

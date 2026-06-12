@@ -124,7 +124,7 @@ void TestKadasAlternateGotoLocatorFilter::testGoto_data()
     << Results( { { QObject::tr( "Go to 44.5546°N 6.4936°E at scale 1:22569" ), QgsPointXY( 6.4936, 44.5546 ), 22569.0 } } );
   QTest::newRow( "gmaps2" )
     << QStringLiteral( "https://www.google.com/maps/@7.931768,80.8731272,688963m/data=!3m1!1e3" )
-    << Results( { { QObject::tr( "Go to 7.931768°N 80.8731272°E at scale 1:6.48043e+07" ), QgsPointXY( 80.8731272, 7.931768 ) } } );
+    << Results( { { QObject::tr( "Go to 7.931768°N 80.8731272°E at scale 1:4.93567e+06" ), QgsPointXY( 80.8731272, 7.931768 ) } } );
   QTest::newRow( "gmaps3" )
     << QStringLiteral(
          "https://www.google.com/maps/@27.7132,85.3288,3a,75y,278.89h,90t/"

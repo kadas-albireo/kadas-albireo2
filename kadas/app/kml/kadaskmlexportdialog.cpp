@@ -21,7 +21,9 @@
 #include <QPushButton>
 #include <QFileDialog>
 
-#include "kadas/gui/kadasitemlayer.h"
+#include <qgis/qgsannotationlayer.h>
+
+#include "kadas/core/kadaspluginlayer.h"
 #include "kadas/gui/maptools/kadasmaptoolselectrect.h"
 #include "kadasapplication.h"
 #include "kadasmainwindow.h"
@@ -38,7 +40,7 @@ KadasKMLExportDialog::KadasKMLExportDialog( const QList<QgsMapLayer *> &activeLa
     QgsMapLayer *layer = layerTreeLayer->layer();
     if ( !layer )
       continue;
-    else if ( dynamic_cast<KadasPluginLayer *>( layer ) && !dynamic_cast<KadasItemLayer *>( layer ) )
+    else if ( dynamic_cast<KadasPluginLayer *>( layer ) )
     {
       // Omit non-item plugin layers from export (i.e. guide grids etc),
       continue;
@@ -163,7 +165,7 @@ void KadasKMLExportDialog::selectFile()
     {
       QString layerId = mLayerListWidget->item( i )->data( Qt::UserRole ).toString();
       QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerId );
-      if ( layer && !dynamic_cast<QgsVectorLayer *>( layer ) && !dynamic_cast<KadasItemLayer *>( layer ) )
+      if ( layer && !dynamic_cast<QgsVectorLayer *>( layer ) && !dynamic_cast<QgsAnnotationLayer *>( layer ) )
       {
         mLayerListWidget->item( i )->setFlags( Qt::NoItemFlags );
         mLayerListWidget->item( i )->setCheckState( Qt::Unchecked );

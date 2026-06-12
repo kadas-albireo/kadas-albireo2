@@ -12,7 +12,7 @@
 
 
 
-class KadasMapToolHeightProfileItemInterface : KadasMapItemInterface
+class KadasMapToolHeightProfile : KadasShapeCaptureMapTool
 {
 %Docstring(signature="appended")
 *************************************************************************
@@ -29,21 +29,7 @@ your option) any later version. *
 #include "kadas/gui/maptools/kadasmaptoolheightprofile.h"
 %End
   public:
-    KadasMapToolHeightProfileItemInterface( QgsMapCanvas *mapCanvas );
-    virtual KadasMapItem *createItem() const;
-
-
-};
-
-class KadasMapToolHeightProfile : KadasMapToolCreateItem
-{
-%TypeHeaderCode
-#include "kadas/gui/maptools/kadasmaptoolheightprofile.h"
-%End
-  public:
     KadasMapToolHeightProfile( QgsMapCanvas *canvas );
-
-    virtual void canvasPressEvent( QgsMapMouseEvent *e );
 
     virtual void canvasMoveEvent( QgsMapMouseEvent *e );
 

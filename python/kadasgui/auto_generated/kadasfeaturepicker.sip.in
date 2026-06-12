@@ -29,6 +29,12 @@ your option) any later version. *
 #include "kadas/gui/kadasfeaturepicker.h"
 %End
   public:
+    enum class PickObjective
+    {
+      PICK_OBJECTIVE_ANY,
+      PICK_OBJECTIVE_TOOLTIP
+    };
+
     class PickResult
     {
       public:
@@ -41,16 +47,17 @@ your option) any later version. *
         QgsAbstractGeometry *geom;
         QgsCoordinateReferenceSystem crs;
         QgsFeature feature;
-        KadasItemLayer::ItemId itemId;
+
+        QgsAnnotationLayer *annotationLayer;
+        QString annotationItemId;
     };
 
     static PickResult pick(
       const QgsMapCanvas *canvas,
       const QgsPointXY &mapPos,
       Qgis::GeometryType geomType = Qgis::GeometryType::Unknown,
-      KadasItemLayer::PickObjective pickObjective = KadasItemLayer::PickObjective::PICK_OBJECTIVE_ANY
+      KadasFeaturePicker::PickObjective pickObjective = KadasFeaturePicker::PickObjective::PICK_OBJECTIVE_ANY
     );
-    static PickResult pick( const QgsMapCanvas *canvas, const QPoint &canvasPos, const QgsPointXY &mapPos, Qgis::GeometryType geomType );
 
 };
 

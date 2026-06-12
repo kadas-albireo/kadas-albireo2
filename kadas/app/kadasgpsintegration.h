@@ -24,7 +24,7 @@
 class QAction;
 class QToolButton;
 class KadasMainWindow;
-class KadasSymbolItem;
+class KadasGpsMarker;
 
 class KadasGpsIntegration : public QObject
 {
@@ -34,7 +34,12 @@ class KadasGpsIntegration : public QObject
     ~KadasGpsIntegration();
     void initGui();
 
+    //! Feed the GPS from the built-in simulator instead of a real device (--gps-simulator)
+    static void setSimulatorEnabled( bool enabled ) { sSimulatorEnabled = enabled; }
+
   private:
+    static bool sSimulatorEnabled;
+
     void connectGPS();
     void disconnectGPS();
     void updateGpsFixIcon();
@@ -45,7 +50,7 @@ class KadasGpsIntegration : public QObject
     QAction *mActionEnableGps = nullptr;
     QAction *mActionMoveWithGps = nullptr;
     QgsGpsConnection *mConnection = nullptr;
-    KadasSymbolItem *mMarker = nullptr;
+    KadasGpsMarker *mMarker = nullptr;
     Qgis::GpsFixStatus mCurFixStatus = Qgis::GpsFixStatus::NoFix;
 
   private slots:

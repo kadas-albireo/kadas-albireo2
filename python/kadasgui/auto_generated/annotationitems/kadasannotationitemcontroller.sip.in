@@ -1,0 +1,154 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationitemcontroller.h            *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+class KadasAnnotationItemController
+{
+%Docstring(signature="appended")
+Per-type controller for :py:class:`QgsAnnotationItem` instances managed
+by Kadas.
+
+Concrete controllers encapsulate the interactive (draw / edit / snap /
+KML / editor) behavior that previously lived on \c KadasMapItem
+subclasses. One controller is registered per
+:py:class:`QgsAnnotationItem` type id (see \c
+:py:func:`QgsAnnotationItem.type()`) in the \c
+KadasAnnotationControllerRegistry; map tools look the controller up by
+type id and delegate to it, so a tool never needs to know about concrete
+annotation subclasses.
+
+.. note::
+
+   Coordinates passed to draw/edit hooks are in the map CRS unless otherwise
+   noted; numeric attribute distances are in map units. Methods that perform
+   map ↔ item space transforms receive a \c KadasAnnotationItemContext bundling
+   the item's CRS and the map settings.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
+%End
+  public:
+    virtual ~KadasAnnotationItemController();
+
+
+
+    virtual QString itemType() const = 0;
+%Docstring
+:py:class:`QgsAnnotationItem` type id this controller handles (e.g.
+"marker", "kadas:circle").
+%End
+
+    virtual QString itemName() const = 0;
+%Docstring
+Human-readable name for the item kind (used by UI; tr-able).
+%End
+
+
+    virtual QgsAnnotationItem *createItem() const = 0;
+%Docstring
+state machine. Caller takes ownership.
+%End
+
+
+    virtual QList<KadasNode> nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const = 0;
+
+
+    virtual bool startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx ) = 0;
+%Docstring
+Begins a new part at ``firstPoint``. Returns true if the item is ready
+to receive subsequent points.
+%End
+    virtual bool startPart( QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) = 0;
+    virtual void setCurrentPoint( QgsAnnotationItem *item, const QgsPointXY &p, const KadasAnnotationItemContext &ctx ) = 0;
+    virtual void setCurrentAttributes( QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) = 0;
+    virtual bool continuePart( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) = 0;
+    virtual void endPart( QgsAnnotationItem *item ) = 0;
+
+    virtual KadasAttribDefs drawAttribs() const = 0;
+    virtual KadasAttribValues drawAttribsFromPosition( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const = 0;
+    virtual QgsPointXY positionFromDrawAttribs( const QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const = 0;
+
+
+    virtual KadasEditContext getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const = 0;
+    virtual void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx ) = 0;
+    virtual void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) = 0;
+    virtual KadasAttribValues editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const = 0;
+    virtual QgsPointXY positionFromEditAttribs( const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const = 0;
+    virtual void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx );
+    virtual void onDoubleClick( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx );
+
+
+    virtual QgsGeometry representativeGeometry( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const;
+%Docstring
+Returns a cheap geometry (in the item's layer CRS) representing the
+item's current shape, used by the edit/create map tool as a
+:py:class:`QgsRubberBand` preview drawn above all layers while the item
+is being digitized or dragged. Mirrors QGIS's
+:py:func:`QgsAnnotationItemEditOperationTransientResults.representativeGeometry()`.
+
+Default implementation: the real geometry for line / polygon backed
+items, the bounding-box outline otherwise.
+%End
+
+
+    virtual QgsPointXY position( const QgsAnnotationItem *item ) const = 0;
+    virtual void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos ) = 0;
+    virtual void translate( QgsAnnotationItem *item, double dx, double dy ) = 0;
+
+
+    virtual bool hitTest( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const;
+    virtual bool intersects( const QgsAnnotationItem *item, const QgsRectangle &mapRect, const KadasAnnotationItemContext &ctx, bool contains = false ) const;
+
+
+
+
+
+    virtual void applyPersistedStyle( QgsAnnotationItem *item ) const;
+%Docstring
+Called once on creation, before the item is added to the layer.
+%End
+
+    virtual void persistStyle( const QgsAnnotationItem *item ) const;
+%Docstring
+new defaults. Called whenever the user edits the styling row.
+%End
+
+    virtual KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = 0 ) const;
+%Docstring
+polygon / pointtext) override it.
+%End
+
+    virtual QList<QgsAnnotationItem *> generateShadows( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const;
+
+    virtual QStringList shadowIds( const QgsAnnotationItem *item ) const;
+    virtual void setShadowIds( QgsAnnotationItem *item, const QStringList &ids ) const;
+
+
+  protected:
+
+    static QgsPointXY toMapPos( const QgsPointXY &itemPos, const KadasAnnotationItemContext &ctx );
+    static QgsPointXY toItemPos( const QgsPointXY &mapPos, const KadasAnnotationItemContext &ctx );
+    static QgsRectangle toItemRect( const QgsRectangle &mapRect, const KadasAnnotationItemContext &ctx );
+    static QgsRectangle toMapRect( const QgsRectangle &itemRect, const KadasAnnotationItemContext &ctx );
+    static double pickTolSqr( const KadasAnnotationItemContext &ctx );
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationitemcontroller.h            *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

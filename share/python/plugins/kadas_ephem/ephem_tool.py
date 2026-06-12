@@ -1,4 +1,4 @@
-from kadas.kadasgui import KadasItemPos, KadasMapCanvasItemManager, KadasSymbolItem
+from kadas.kadasgui import KadasItemPos, KadasSymbolItem
 from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
 from qgis.gui import QgsMapTool
 from qgis.PyQt.QtCore import Qt
@@ -25,7 +25,7 @@ class EphemTool(QgsMapTool):
         self.pin = KadasSymbolItem(self.iface.mapCanvas().mapSettings().destinationCrs())
         self.pin.setup(":/kadas/icons/pin_blue", 0.5, 1.0)
         self.pin.setVisible(False)
-        KadasMapCanvasItemManager.addItem(self.pin)
+        # TODO: port pin overlay to QgsAnnotationLayer (KadasMapCanvasItemManager removed).
 
         QgsMapTool.activate(self)
 
@@ -33,7 +33,7 @@ class EphemTool(QgsMapTool):
         if self.widget:
             self.widget.cleanup()
             self.widget = None
-        KadasMapCanvasItemManager.removeItem(self.pin)
+        # TODO: port pin overlay to QgsAnnotationLayer.
         self.pin = None
         QgsMapTool.deactivate(self)
 

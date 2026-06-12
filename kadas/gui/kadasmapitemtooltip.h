@@ -23,7 +23,6 @@
 #include "kadas/gui/kadas_gui.h"
 
 class QgsMapCanvas;
-class KadasMapItem;
 
 class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextEdit
 {
@@ -51,7 +50,7 @@ class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextEdit
     QPoint mPos;
     QgsMapCanvas *mCanvas = nullptr;
     bool mMouseMoved = false;
-    const KadasMapItem *mItem = nullptr;
+    QString mLastText;
 
   private slots:
     void positionAndShow();

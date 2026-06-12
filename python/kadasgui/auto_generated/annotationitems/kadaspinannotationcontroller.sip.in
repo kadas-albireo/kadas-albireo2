@@ -1,0 +1,51 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadaspinannotationcontroller.h             *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+class KadasPinAnnotationController : KadasMarkerAnnotationController
+{
+%Docstring(signature="appended")
+Controller for \c KadasPinAnnotationItem (type id \c "kadas:pin").
+
+Pins are markers with a fixed default SVG icon and Kadas-specific \c
+name / \c remarks fields. Behavior (single-click placement, vertex edit,
+KML export) is identical to the generic marker, so this controller
+inherits from \c KadasMarkerAnnotationController and only overrides \c
+itemType / \c itemName / \c createItem.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadaspinannotationcontroller.h"
+%End
+  public:
+    KadasPinAnnotationController();
+
+    virtual QString itemType() const;
+
+    virtual QString itemName() const;
+
+    virtual QgsAnnotationItem *createItem() const;
+
+
+    virtual QList<QgsAnnotationItem *> generateShadows( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const;
+
+    virtual QStringList shadowIds( const QgsAnnotationItem *item ) const;
+
+    virtual void setShadowIds( QgsAnnotationItem *item, const QStringList &ids ) const;
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadaspinannotationcontroller.h             *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

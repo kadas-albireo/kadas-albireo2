@@ -1,0 +1,99 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadasattributetypes.h                                      *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+
+class KadasNumericAttribute
+{
+%Docstring(signature="appended")
+Free-standing replacement for the former \c
+KadasMapItem.NumericAttribute nested type. Kept generic so it can be
+shared between the legacy \c KadasMapItem chain and the new annotation
+controller tree.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/kadasattributetypes.h"
+%End
+  public:
+    QString name;
+    enum class Type
+    {
+      TypeCoordinate,
+      TypeDistance,
+      TypeAngle,
+      TypeOther
+    };
+    Type type;
+    double min;
+    double max;
+    int decimals;
+    int precision( const QgsMapSettings &mapSettings ) const;
+    QString suffix( const QgsMapSettings &mapSettings ) const;
+};
+
+typedef QMap<int, KadasNumericAttribute> KadasAttribDefs;
+typedef QMap<int, double> KadasAttribValues;
+
+
+struct KadasNode
+{
+%TypeHeaderCode
+#include "kadas/gui/kadasattributetypes.h"
+%End
+    QgsPointXY pos;
+};
+
+
+struct KadasEditContext
+{
+%TypeHeaderCode
+#include "kadas/gui/kadasattributetypes.h"
+%End
+    enum class HitPrecision
+    {
+      Body,
+      Precise,
+    };
+
+    KadasEditContext();
+
+    KadasEditContext( const QgsVertexId &_vidx, const QgsPointXY &_pos = QgsPointXY(), const KadasAttribDefs &_attributes = KadasAttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor );
+%Docstring
+Constructs an edit context.
+
+``_vidx``, when valid, denotes a vertex / handle hit and the resulting
+\c precision is automatically \c HitPrecision.Precise. A
+default-constructed ``_vidx`` denotes a whole-item body hit and the
+resulting \c precision is \c HitPrecision.Body — callers with a tighter
+geometric hit (e.g. line stroke) should explicitly upgrade \c precision
+after construction.
+%End
+
+    bool mValid;
+    QgsVertexId vidx;
+    QgsPointXY pos;
+    KadasAttribDefs attributes;
+    Qt::CursorShape cursor;
+    HitPrecision precision;
+    bool isValid() const;
+    bool operator!=( const KadasEditContext &other ) const;
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadasattributetypes.h                                      *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

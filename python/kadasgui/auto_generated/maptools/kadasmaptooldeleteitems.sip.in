@@ -9,7 +9,8 @@
 
 
 
-class KadasMapToolDeleteItemsInterface : KadasMapItemInterface
+
+class KadasMapToolDeleteItems : QgsMapToolExtent
 {
 %Docstring(signature="appended")
 *************************************************************************
@@ -26,23 +27,10 @@ your option) any later version. *
 #include "kadas/gui/maptools/kadasmaptooldeleteitems.h"
 %End
   public:
-    KadasMapToolDeleteItemsInterface( QgsMapCanvas *mapCanvas );
-    virtual KadasMapItem *createItem() const;
-
-
-};
-
-
-class KadasMapToolDeleteItems : KadasMapToolCreateItem
-{
-%TypeHeaderCode
-#include "kadas/gui/maptools/kadasmaptooldeleteitems.h"
-%End
-  public:
     KadasMapToolDeleteItems( QgsMapCanvas *mapCanvas );
     virtual void activate();
 
-    void deleteItems( const KadasMapRect &filterRect );
+    void deleteItems( const QgsRectangle &filterRect );
 
 };
 

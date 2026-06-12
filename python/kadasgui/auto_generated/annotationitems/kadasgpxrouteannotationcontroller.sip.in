@@ -1,0 +1,42 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasgpxrouteannotationcontroller.h        *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+class KadasGpxRouteAnnotationController : KadasLineAnnotationController
+{
+%Docstring(signature="appended")
+Controller for \c KadasGpxRouteAnnotationItem (type id \c
+"kadas:gpxroute").
+
+Inherits the line controller's draw / edit / KML behavior; only the type
+id, display name and item factory differ.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadasgpxrouteannotationcontroller.h"
+%End
+  public:
+    KadasGpxRouteAnnotationController();
+
+    virtual QString itemType() const;
+
+    virtual QString itemName() const;
+
+    virtual QgsAnnotationItem *createItem() const;
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasgpxrouteannotationcontroller.h        *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

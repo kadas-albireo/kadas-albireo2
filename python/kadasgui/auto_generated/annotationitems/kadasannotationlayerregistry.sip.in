@@ -1,0 +1,72 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationlayerregistry.h             *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+class KadasAnnotationLayerRegistry : QObject
+{
+%Docstring(signature="appended")
+Process-wide registry of the well-known singleton Kadas \c
+:py:class:`QgsAnnotationLayer` instances inside the current \c
+:py:class:`QgsProject`.
+
+Each \c StandardLayer enum value names a *role* (Redlining, Symbols,
+Pictures, Pins, Routes, MSS) that the application auto-creates the first
+time a tool needs a destination layer for that role. There is at most
+one layer per role per project; subsequent lookups return the existing
+instance. The mapping from role to project layer id is persisted under a
+dedicated \c StandardAnnotationLayers element in the project XML.
+
+Configurable / parametric annotation layers (bullseye, guidegrid) are
+deliberately out of scope: each instance carries its own configuration
+and a project can hold many of them, so they cannot be keyed by a fixed
+role. Those are handled by \c KadasAnnotationLayer + its promotion
+registry instead.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
+%End
+  public:
+    enum class StandardLayer
+    {
+      RedliningLayer,
+      SymbolsLayer,
+      PicturesLayer,
+      PinsLayer,
+      RoutesLayer,
+      MssLayer
+    };
+
+    static QgsAnnotationLayer *getOrCreateAnnotationLayer( StandardLayer layer );
+%Docstring
+adding it to the current project on first use.
+%End
+
+
+    static void init();
+%Docstring
+Connects to project signals; must be called once at app startup.
+%End
+
+  protected:
+    KadasAnnotationLayerRegistry();
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationlayerregistry.h             *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
