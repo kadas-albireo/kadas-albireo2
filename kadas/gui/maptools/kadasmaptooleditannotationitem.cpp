@@ -26,7 +26,12 @@
 
 #include <qgis/qgsannotationitem.h>
 #include <qgis/qgsannotationlayer.h>
+#include <qgis/qgsannotationlineitem.h>
+#include <qgis/qgsannotationpolygonitem.h>
+#include <qgis/qgsfillsymbol.h>
+#include <qgis/qgsfillsymbollayer.h>
 #include <qgis/qgsgeometry.h>
+#include <qgis/qgslinesymbol.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapcanvasitem.h>
 #include <qgis/qgsmapmouseevent.h>
@@ -319,13 +324,47 @@ void KadasMapToolEditAnnotationItem::updateTempRubberBand()
   }
   if ( !mTempRubberBand )
   {
-    // Styling mirrors QgsMapToolModifyAnnotation's temporary band.
     mTempRubberBand = new QgsRubberBand( canvas(), geom.type() );
-    const double scaleFactor = canvas()->fontMetrics().xHeight() * .2;
-    mTempRubberBand->setWidth( scaleFactor );
-    mTempRubberBand->setSecondaryStrokeColor( QColor( 255, 255, 255, 100 ) );
-    mTempRubberBand->setColor( QColor( 50, 50, 50, 200 ) );
   }
+
+  // Style the band from the item's actual symbol so the preview is drawn
+  // with the right colors / stroke width. Re-applied on every update so
+  // live style-editor changes are reflected immediately. Falls back to
+  // QgsMapToolModifyAnnotation's generic gray band for items without a
+  // line/fill symbol (e.g. the bounding-box preview of markers).
+  const double minWidth = canvas()->fontMetrics().xHeight() * .2;
+  const double mmToPx = canvas()->logicalDpiX() / 25.4;
+  QColor strokeColor( 50, 50, 50, 200 );
+  QColor fillColor( Qt::transparent );
+  QColor secondaryColor( 255, 255, 255, 100 );
+  double widthPx = minWidth;
+  if ( const auto *line = dynamic_cast<const QgsAnnotationLineItem *>( mItem ) )
+  {
+    if ( const QgsLineSymbol *sym = line->symbol() )
+    {
+      strokeColor = sym->color();
+      widthPx = std::max( minWidth, sym->width() * mmToPx );
+      secondaryColor = QColor();
+    }
+  }
+  else if ( const auto *poly = dynamic_cast<const QgsAnnotationPolygonItem *>( mItem ) )
+  {
+    if ( const QgsFillSymbol *sym = poly->symbol() )
+    {
+      fillColor = sym->color();
+      secondaryColor = QColor();
+      if ( const auto *sl = dynamic_cast<const QgsSimpleFillSymbolLayer *>( sym->symbolLayer( 0 ) ) )
+      {
+        strokeColor = sl->strokeColor();
+        widthPx = std::max( minWidth, sl->strokeWidth() * mmToPx );
+      }
+    }
+  }
+  mTempRubberBand->setStrokeColor( strokeColor );
+  mTempRubberBand->setFillColor( fillColor );
+  mTempRubberBand->setSecondaryStrokeColor( secondaryColor );
+  mTempRubberBand->setWidth( widthPx );
+
   // setToGeometry() resets the band to the geometry's type and transforms
   // from the layer CRS to the map CRS.
   mTempRubberBand->setToGeometry( geom, mLayer->crs() );
@@ -740,6 +779,8 @@ void KadasMapToolEditAnnotationItem::setupStyleEditor( QBoxLayout *outer )
       return;
     mStyleEditor->applyToItem( mItem );
     mLayer->triggerRepaint();
+    if ( mTempRubberBand )
+      updateTempRubberBand();
   } );
 
   // Committed: apply, repaint, persist as defaults, and push a history entry.
@@ -748,6 +789,8 @@ void KadasMapToolEditAnnotationItem::setupStyleEditor( QBoxLayout *outer )
       return;
     mStyleEditor->applyToItem( mItem );
     mLayer->triggerRepaint();
+    if ( mTempRubberBand )
+      updateTempRubberBand();
     if ( mController )
       mController->persistStyle( mItem );
     pushState();
