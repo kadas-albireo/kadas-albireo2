@@ -314,6 +314,39 @@ bool KadasPictureAnnotationController::isCalloutVisible( const QgsAnnotationPict
   return false;
 }
 
+void KadasPictureAnnotationController::setCalloutVisible( QgsAnnotationPictureItem *pic, bool visible )
+{
+  if ( !pic )
+    return;
+  ensureBalloon( pic );
+  auto *balloon = dynamic_cast<QgsBalloonCallout *>( pic->callout() );
+  if ( !balloon )
+    return;
+  if ( visible == isCalloutVisible( pic ) )
+    return;
+  if ( visible )
+  {
+    // Restore the default balloon look (the symbol currently encodes the
+    // hidden state, so there are no user customizations to preserve).
+    auto *sl = new QgsSimpleFillSymbolLayer( Qt::white, Qt::SolidPattern, Qt::black, Qt::SolidLine, 1.0 );
+    sl->setStrokeWidthUnit( Qgis::RenderUnit::Pixels );
+    balloon->setFillSymbol( new QgsFillSymbol( QgsSymbolLayerList() << sl ) );
+    balloon->setWedgeWidth( 6 );
+    balloon->setWedgeWidthUnit( Qgis::RenderUnit::Pixels );
+  }
+  else
+  {
+    auto *sl = new QgsSimpleFillSymbolLayer( QColor( 0, 0, 0, 0 ), Qt::SolidPattern, QColor( 0, 0, 0, 0 ), Qt::SolidLine, 0.0 );
+    sl->setStrokeWidthUnit( Qgis::RenderUnit::Pixels );
+    balloon->setFillSymbol( new QgsFillSymbol( QgsSymbolLayerList() << sl ) );
+    balloon->setWedgeWidth( 0 );
+    // Without a balloon the picture must sit centered on its former
+    // anchor instead of floating at the balloon offset.
+    pic->setOffsetFromCallout( defaultCenteredOffset( pic ) );
+    pic->setOffsetFromCalloutUnit( pic->fixedSizeUnit() );
+  }
+}
+
 namespace
 {
   // Session-wide preference shared between the style editor checkbox
@@ -695,6 +728,18 @@ void KadasPictureAnnotationController::populateContextMenu( QgsAnnotationItem *i
     if ( chosen.isEmpty() )
       return;
     KadasPictureAnnotationController::setPath( pic, chosen );
+    if ( layerPtr )
+      layerPtr->triggerRepaint();
+  } );
+
+  // "Show callout frame" — checkable mirror of the style editor's
+  // toggle. Hiding re-centers the picture on its former anchor (see
+  // setCalloutVisible()).
+  QAction *calloutAction = menu->addAction( QObject::tr( "Show callout frame" ) );
+  calloutAction->setCheckable( true );
+  calloutAction->setChecked( isCalloutVisible( pic ) );
+  QObject::connect( calloutAction, &QAction::toggled, calloutAction, [pic, layerPtr]( bool on ) {
+    KadasPictureAnnotationController::setCalloutVisible( pic, on );
     if ( layerPtr )
       layerPtr->triggerRepaint();
   } );

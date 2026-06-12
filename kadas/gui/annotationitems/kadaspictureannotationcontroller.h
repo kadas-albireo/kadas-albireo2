@@ -136,6 +136,19 @@ class KADAS_GUI_EXPORT KadasPictureAnnotationController : public KadasAnnotation
     static bool isCalloutVisible( const QgsAnnotationPictureItem *pic );
 
     /**
+     * \brief Shows or hides the picture's balloon callout.
+     *
+     * Hiding keeps the callout installed but renders it invisible
+     * (transparent fill+stroke, zero wedge — see isCalloutVisible())
+     * and re-centers the picture on its former anchor so the image does
+     * not stay floating at the balloon offset. Showing restores the
+     * default balloon look (white fill, 1px black stroke, 6px wedge)
+     * when the current symbol is the invisible one; an already visible
+     * callout is left untouched.
+     */
+    static void setCalloutVisible( QgsAnnotationPictureItem *pic, bool visible );
+
+    /**
      * \brief Session-wide preference: should corner-resize and the
      * style editor's width/height spinboxes preserve the picture's
      * aspect ratio?

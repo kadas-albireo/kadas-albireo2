@@ -154,6 +154,19 @@ rather than looking at \c
 pic->:py:func:`~KadasPictureAnnotationController.callout` directly.
 %End
 
+    static void setCalloutVisible( QgsAnnotationPictureItem *pic, bool visible );
+%Docstring
+Shows or hides the picture's balloon callout.
+
+Hiding keeps the callout installed but renders it invisible (transparent
+fill+stroke, zero wedge — see
+:py:func:`~KadasPictureAnnotationController.isCalloutVisible`) and
+re-centers the picture on its former anchor so the image does not stay
+floating at the balloon offset. Showing restores the default balloon
+look (white fill, 1px black stroke, 6px wedge) when the current symbol
+is the invisible one; an already visible callout is left untouched.
+%End
+
     static bool lockAspectRatio();
 %Docstring
 Session-wide preference: should corner-resize and the style editor's

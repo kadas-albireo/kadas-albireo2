@@ -800,4 +800,13 @@ void KadasPictureStyleEditor::applyToItem( QgsAnnotationItem *item ) const
   balloon->setFillSymbol( new QgsFillSymbol( QgsSymbolLayerList() << sl ) );
   balloon->setWedgeWidth( wedge );
   balloon->setWedgeWidthUnit( Qgis::RenderUnit::Pixels );
+  if ( !wantCallout )
+  {
+    // Removing the callout frame re-centers the picture on its former
+    // anchor — without a balloon the image must not stay floating at
+    // the balloon offset (matches setCalloutVisible()).
+    const QSizeF size = pic->fixedSize();
+    pic->setOffsetFromCallout( QSizeF( -size.width() / 2.0, -size.height() / 2.0 ) );
+    pic->setOffsetFromCalloutUnit( pic->fixedSizeUnit() );
+  }
 }
