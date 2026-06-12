@@ -607,12 +607,13 @@ void KadasMapToolEditAnnotationItem::canvasReleaseEvent( QgsMapMouseEvent *e )
   if ( e->button() == Qt::LeftButton && mEditContext.isValid() )
   {
     // Commit the drag: clear the preview band and render the edited item.
-    if ( mTempRubberBand )
-    {
-      clearTempRubberBand();
-      if ( mLayer )
-        mLayer->triggerRepaint();
-    }
+    // The repaint must run even when no preview band was shown (items
+    // whose representative geometry is empty): the drag mutated the item
+    // in the layer, which would otherwise keep showing the pre-drag
+    // rendering until the next full canvas refresh.
+    clearTempRubberBand();
+    if ( mLayer )
+      mLayer->triggerRepaint();
     pushState();
   }
 }

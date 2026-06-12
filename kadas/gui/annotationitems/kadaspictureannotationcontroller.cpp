@@ -651,6 +651,29 @@ void KadasPictureAnnotationController::translate( QgsAnnotationItem *item, doubl
   setPosition( item, QgsPointXY( c.x() + dx, c.y() + dy ) );
 }
 
+QgsGeometry KadasPictureAnnotationController::representativeGeometry( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
+{
+  // The base implementation falls back to item->boundingBox(), which for
+  // a FixedSize picture is a degenerate rect collapsed onto the anchor
+  // point — the preview band would be invisible while dragging. Build the
+  // band geometry from the picture's actual visual footprint instead.
+  const auto *pic = asPicture( item );
+  const QgsCoordinateTransform xform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
+  const QRectF screenRect = frameScreenRect( pic, ctx.mapSettings(), xform );
+  if ( !screenRect.isValid() )
+    return KadasAnnotationItemController::representativeGeometry( item, ctx );
+  const QVector<QPointF> cornersPx = { screenRect.topLeft(), screenRect.topRight(), screenRect.bottomRight(), screenRect.bottomLeft() };
+  QVector<QgsPointXY> ring;
+  ring.reserve( 5 );
+  for ( const QPointF &px : cornersPx )
+  {
+    const QgsPointXY mapPt = ctx.mapSettings().mapToPixel().toMapCoordinates( px.toPoint() );
+    ring.append( toItemPos( mapPt, ctx ) );
+  }
+  ring.append( ring.first() );
+  return QgsGeometry::fromPolygonXY( { ring } );
+}
+
 KadasAnnotationStyleEditor *KadasPictureAnnotationController::createStyleEditor( QWidget *parent ) const
 {
   return new KadasPictureStyleEditor( parent );
