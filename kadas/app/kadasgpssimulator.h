@@ -53,8 +53,9 @@ class KadasGpsSimulator : public QIODevice
     QVector<QgsPointXY> mRoute; // WGS84 lon/lat waypoints
     QgsPointXY mPos;            // current WGS84 lon/lat
     int mNextWaypoint = 1;
-    double mCourse = 0;       // degrees, clockwise from north
-    double mSpeedMps = 40;    // ~144 km/h
+    double mCourse = 0;    // degrees, clockwise from north
+    double mSpeedMps = 30; // varies between ~5 and ~55 m/s
+    double mElapsedSecs = 0;
     double mAltitude = 555.0; // m AMSL
 };
 

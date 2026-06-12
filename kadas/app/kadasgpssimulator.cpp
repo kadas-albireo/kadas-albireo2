@@ -79,6 +79,11 @@ qint64 KadasGpsSimulator::writeData( const char *, qint64 size )
 
 void KadasGpsSimulator::advancePosition( double dtSecs )
 {
+  // Vary speed smoothly between ~5 m/s and ~55 m/s (two superimposed waves
+  // with incommensurate periods so the pattern doesn't repeat too obviously)
+  mElapsedSecs += dtSecs;
+  mSpeedMps = 30. + 20. * std::sin( 2 * M_PI * mElapsedSecs / 120. ) + 5. * std::sin( 2 * M_PI * mElapsedSecs / 47. );
+
   double remaining = mSpeedMps * dtSecs;
   while ( remaining > 0 )
   {
