@@ -91,6 +91,9 @@ KadasGpsIntegration::KadasGpsIntegration( KadasMainWindow *mainWindow, QToolButt
 {
   connect( mActionEnableGps, &QAction::triggered, this, &KadasGpsIntegration::enableGPS );
   connect( mGpsToolButton, &QToolButton::toggled, this, &KadasGpsIntegration::enableGPS );
+  // The marker is owned by the canvas scene: when the canvas is destroyed
+  // before us (i.e. on application shutdown), it deletes the marker itself
+  connect( mMainWindow->mapCanvas(), &QObject::destroyed, this, [this]() { mMarker = nullptr; } );
 }
 
 KadasGpsIntegration::~KadasGpsIntegration()
