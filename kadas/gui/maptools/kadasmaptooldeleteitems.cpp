@@ -23,8 +23,10 @@
 #include <qgis/qgsannotationitem.h>
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsfeedback.h>
+#include <qgis/qgsgeometry.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsrendercontext.h>
+#include <qgis/qgsrubberband.h>
 
 #include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
 #include "kadas/gui/maptools/kadasmaptooldeleteitems.h"
@@ -83,6 +85,29 @@ void KadasMapToolDeleteItems::deleteItems( const QgsRectangle &filterRect )
   if ( delItems.isEmpty() )
   {
     return;
+  }
+
+  // Highlight the candidate items on the canvas while the confirmation dialog is open
+  QgsRubberBand highlightBand( canvas(), Qgis::GeometryType::Polygon );
+  highlightBand.setStrokeColor( QColor( 255, 200, 0, 255 ) );
+  highlightBand.setFillColor( QColor( 255, 200, 0, 63 ) );
+  highlightBand.setWidth( 2 );
+  for ( auto it = delItems.constBegin(), itEnd = delItems.constEnd(); it != itEnd; ++it )
+  {
+    QgsAnnotationLayer *annoLayer = it.key();
+    for ( const QString &itemId : it.value() )
+    {
+      const QgsAnnotationItem *item = annoLayer->item( itemId );
+      if ( !item )
+      {
+        continue;
+      }
+      const QgsRectangle bounds = canvas()->mapSettings().layerToMapCoordinates( annoLayer, item->boundingBox( rc ) );
+      if ( !bounds.isEmpty() )
+      {
+        highlightBand.addGeometry( QgsGeometry::fromRect( bounds ), nullptr );
+      }
+    }
   }
 
   QMap<QgsAnnotationLayer *, QCheckBox *> checkboxes;
