@@ -94,6 +94,27 @@ class KadasMarkerStyleEditor : public KadasAnnotationStyleEditor
 };
 
 /**
+ * \brief Style editor for the Kadas pin (SVG marker: size, fill color).
+ *
+ * The pin SVG body is fill-parametrized, so only size and fill color are
+ * editable; the icon shape and white outline are fixed.
+ */
+class KadasPinStyleEditor : public KadasAnnotationStyleEditor
+{
+    Q_OBJECT
+
+  public:
+    explicit KadasPinStyleEditor( QWidget *parent = nullptr );
+
+    void loadFromItem( const QgsAnnotationItem *item ) override;
+    void applyToItem( QgsAnnotationItem *item ) const override;
+
+  private:
+    QSpinBox *mSizeSpin = nullptr;
+    QgsColorButton *mFillColorBtn = nullptr;
+};
+
+/**
  * \brief Style editor for QgsAnnotationLineItem (width, color, pen style).
  */
 class KadasLineStyleEditor : public KadasAnnotationStyleEditor

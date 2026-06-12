@@ -190,9 +190,9 @@ void KadasMarkerStyleEditor::applyToItem( QgsAnnotationItem *item ) const
   auto *sl = dynamic_cast<QgsSimpleMarkerSymbolLayer *>( sym->symbolLayer( 0 ) );
   if ( !sl )
   {
-    auto *replacement = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Circle );
-    sym->changeSymbolLayer( 0, replacement );
-    sl = replacement;
+    // Don't clobber exotic symbol layers (e.g. SVG markers) this editor
+    // doesn't know how to drive; leave the item's symbol untouched.
+    return;
   }
   sl->setShape( static_cast<Qgis::MarkerShape>( mShapeCombo->currentData().toInt() ) );
   sl->setSize( mSizeSpin->value() );
@@ -200,6 +200,56 @@ void KadasMarkerStyleEditor::applyToItem( QgsAnnotationItem *item ) const
   sl->setColor( mFillColorBtn->color() );
   sl->setStrokeColor( mStrokeColorBtn->color() );
   sl->setStrokeStyle( static_cast<Qt::PenStyle>( mStrokeStyleCombo->currentData().toInt() ) );
+  marker->setSymbol( sym.release() );
+}
+
+
+// ----- Pin --------------------------------------------------------------
+
+KadasPinStyleEditor::KadasPinStyleEditor( QWidget *parent )
+  : KadasAnnotationStyleEditor( parent )
+{
+  auto *row = new QHBoxLayout( this );
+  row->setContentsMargins( 0, 0, 0, 0 );
+
+  mSizeSpin = new QSpinBox();
+  mSizeSpin->setRange( 1, 200 );
+  mSizeSpin->setToolTip( tr( "Pin size" ) );
+  row->addWidget( mSizeSpin );
+
+  mFillColorBtn = new QgsColorButton();
+  mFillColorBtn->setAllowOpacity( true );
+  mFillColorBtn->setToolTip( tr( "Pin color" ) );
+  row->addWidget( mFillColorBtn );
+
+  connect( mSizeSpin, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
+  connect( mFillColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
+}
+
+void KadasPinStyleEditor::loadFromItem( const QgsAnnotationItem *item )
+{
+  const auto *marker = dynamic_cast<const QgsAnnotationMarkerItem *>( item );
+  if ( !marker || !marker->symbol() || marker->symbol()->symbolLayerCount() == 0 )
+    return;
+  const auto *sl = dynamic_cast<const QgsSvgMarkerSymbolLayer *>( marker->symbol()->symbolLayer( 0 ) );
+  if ( !sl )
+    return;
+  const QSignalBlocker b1( mSizeSpin ), b2( mFillColorBtn );
+  mSizeSpin->setValue( static_cast<int>( std::round( sl->size() ) ) );
+  mFillColorBtn->setColor( sl->fillColor() );
+}
+
+void KadasPinStyleEditor::applyToItem( QgsAnnotationItem *item ) const
+{
+  auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item );
+  if ( !marker || !marker->symbol() || marker->symbol()->symbolLayerCount() == 0 )
+    return;
+  std::unique_ptr<QgsMarkerSymbol> sym( marker->symbol()->clone() );
+  auto *sl = dynamic_cast<QgsSvgMarkerSymbolLayer *>( sym->symbolLayer( 0 ) );
+  if ( !sl )
+    return;
+  sl->setSize( mSizeSpin->value() );
+  sl->setFillColor( mFillColorBtn->color() );
   marker->setSymbol( sym.release() );
 }
 

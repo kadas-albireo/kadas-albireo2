@@ -23,6 +23,7 @@
 #include <qgis/qgspoint.h>
 #include <qgis/qgssymbollayer.h>
 
+#include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadaspinannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
@@ -72,6 +73,11 @@ QgsAnnotationItem *KadasPinAnnotationController::createItem() const
   auto *item = new KadasPinAnnotationItem();
   item->setZIndex( KadasAnnotationZIndex::Pin );
   return item;
+}
+
+KadasAnnotationStyleEditor *KadasPinAnnotationController::createStyleEditor( QWidget *parent ) const
+{
+  return new KadasPinStyleEditor( parent );
 }
 
 QList<QgsAnnotationItem *> KadasPinAnnotationController::generateShadows( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
