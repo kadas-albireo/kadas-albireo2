@@ -112,7 +112,7 @@ class KADAS_GUI_EXPORT KadasFeaturePicker
     );
 
   private:
-    static PickResult pickAnnotationLayer( QgsAnnotationLayer *layer, const QgsMapCanvas *canvas, const QgsPointXY &mapPos );
+    static PickResult pickAnnotationLayer( QgsAnnotationLayer *layer, const QgsMapCanvas *canvas, const QgsPointXY &mapPos, Qgis::GeometryType geomType = Qgis::GeometryType::Unknown );
     static PickResult pickVectorLayer( QgsVectorLayer *vlayer, const QgsMapCanvas *canvas, const QgsPointXY &mapPos, Qgis::GeometryType geomType );
 };
 

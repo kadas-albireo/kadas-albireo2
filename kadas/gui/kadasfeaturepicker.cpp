@@ -42,7 +42,7 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *can
   {
     if ( qobject_cast<QgsAnnotationLayer *>( layer ) )
     {
-      pickResult = pickAnnotationLayer( static_cast<QgsAnnotationLayer *>( layer ), canvas, mapPos );
+      pickResult = pickAnnotationLayer( static_cast<QgsAnnotationLayer *>( layer ), canvas, mapPos, geomType );
     }
     else if ( qobject_cast<QgsVectorLayer *>( layer ) && pickObjective != KadasFeaturePicker::PickObjective::PICK_OBJECTIVE_TOOLTIP )
     {
@@ -56,7 +56,7 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pick( const QgsMapCanvas *can
   return pickResult;
 }
 
-KadasFeaturePicker::PickResult KadasFeaturePicker::pickAnnotationLayer( QgsAnnotationLayer *layer, const QgsMapCanvas *canvas, const QgsPointXY &mapPos )
+KadasFeaturePicker::PickResult KadasFeaturePicker::pickAnnotationLayer( QgsAnnotationLayer *layer, const QgsMapCanvas *canvas, const QgsPointXY &mapPos, Qgis::GeometryType geomType )
 {
   PickResult pickResult;
 
@@ -106,12 +106,21 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickAnnotationLayer( QgsAnnot
       const KadasEditContext ec = cc->getEditContext( cand, mapPos, ctx );
       if ( !ec.isValid() )
         continue;
+      // When a specific geometry type is requested (e.g. the measure tool
+      // picks lines or polygons), skip items whose representative geometry
+      // does not match, so a click prefers the right kind of shape.
+      if ( geomType != Qgis::GeometryType::Unknown && cc->representativeGeometry( cand, ctx ).type() != geomType )
+        continue;
       c.precision = ec.precision;
       precise.append( c );
     }
     else
     {
-      // No controller for this item type: bbox-only fallback.
+      // No controller for this item type: bbox-only fallback. Such items
+      // carry no usable geometry, so only offer them for untyped picks
+      // (identify / tooltip).
+      if ( geomType != Qgis::GeometryType::Unknown )
+        continue;
       c.precision = KadasEditContext::HitPrecision::Body;
       fallback.append( c );
     }
@@ -132,6 +141,18 @@ KadasFeaturePicker::PickResult KadasFeaturePicker::pickAnnotationLayer( QgsAnnot
   if ( !KadasAnnotationLayerHelpers::isParametricLayer( list[bestIdx].layer ) )
   {
     pickResult.annotationItemId = list[bestIdx].itemId;
+    // Expose the item geometry so geometry consumers (measure, min/max, ...)
+    // can use an annotation just like a vector feature. Geometry is in the
+    // layer CRS, matching pickResult.crs below.
+    if ( QgsAnnotationItem *bestItem = layer->item( list[bestIdx].itemId ) )
+    {
+      if ( KadasAnnotationItemController *cc = KadasAnnotationControllerRegistry::instance()->controllerFor( bestItem->type() ) )
+      {
+        const QgsGeometry g = cc->representativeGeometry( bestItem, ctx );
+        if ( !g.isEmpty() )
+          pickResult.geom = g.constGet()->clone();
+      }
+    }
   }
   pickResult.crs = layer->crs();
   return pickResult;
