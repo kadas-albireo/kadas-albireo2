@@ -32,11 +32,6 @@
 class QgsMapSettings;
 
 
-/**
- * \brief Free-standing replacement for the former \c KadasMapItem::NumericAttribute
- *        nested type. Kept generic so it can be shared between the legacy
- *        \c KadasMapItem chain and the new annotation controller tree.
- */
 class KADAS_GUI_EXPORT KadasNumericAttribute
 {
   public:
@@ -62,11 +57,7 @@ typedef QMap<int, KadasNumericAttribute> KadasAttribDefs;
 typedef QMap<int, double> KadasAttribValues;
 
 
-/**
- * \brief Editing node descriptor (formerly \c KadasMapItem::Node). The
- *        position is stored as a generic \c QgsPointXY; legacy callers that
- *        need \c KadasMapPos semantics convert via the implicit constructor.
- */
+//! Editing node descriptor.
 struct KADAS_GUI_EXPORT KadasNode
 {
     QgsPointXY pos;
@@ -77,21 +68,10 @@ struct KADAS_GUI_EXPORT KadasNode
 };
 
 
-/**
- * \brief Editing context (formerly \c KadasMapItem::EditContext).
- */
+//! Editing context for an annotation hit.
 struct KADAS_GUI_EXPORT KadasEditContext
 {
-    /**
-     * Geometric precision of a hit returned by
-     * \c KadasAnnotationItemController::getEditContext().
-     *
-     * Used by the canvas pickers (\c KadasFeaturePicker and the edit map
-     * tool) to disambiguate overlapping annotations: a precise hit on
-     * vertex / handle / edge always wins over a loose body-containment
-     * hit on another item, regardless of z-index. Within the same
-     * precision tier the existing z-then-area tiebreakers apply.
-     */
+    //! Geometric precision of a hit; a precise (vertex / handle / edge) hit outranks a body hit in picking.
     enum class HitPrecision
     {
       Body = 0,    //!< Loose hit: click is inside the item's filled body / bounding box / containment area.
@@ -100,16 +80,7 @@ struct KADAS_GUI_EXPORT KadasEditContext
 
     KadasEditContext() = default;
 
-    /**
-     * Constructs an edit context.
-     *
-     * \a _vidx, when valid, denotes a vertex / handle hit and the
-     * resulting \c precision is automatically \c HitPrecision::Precise.
-     * A default-constructed \a _vidx denotes a whole-item body hit and
-     * the resulting \c precision is \c HitPrecision::Body — callers
-     * with a tighter geometric hit (e.g. line stroke) should explicitly
-     * upgrade \c precision after construction.
-     */
+    //! Valid \a _vidx implies Precise; a default \a _vidx implies Body (upgrade manually for stroke hits).
     KadasEditContext( const QgsVertexId &_vidx, const QgsPointXY &_pos = QgsPointXY(), const KadasAttribDefs &_attributes = KadasAttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor )
       : mValid( true )
       , vidx( _vidx )

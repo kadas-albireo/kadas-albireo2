@@ -45,12 +45,7 @@ QString KadasPinAnnotationItem::defaultIconPath()
 
 void KadasPinAnnotationItem::installDefaultSymbol()
 {
-  // Standard Kadas pin: SVG anchored at its bottom tip so the geographic
-  // anchor matches the visible point of the pin. 24px is the default
-  // visible size matching the legacy KadasPinItem icon.
   auto *layer = new QgsSvgMarkerSymbolLayer( defaultIconPath(), 24.0 );
-  // The pin body is fill-parametrized (param(fill) in the SVG); set the
-  // classic red explicitly so it doesn't render in the generic default.
   layer->setFillColor( QColor( 255, 0, 0 ) );
   layer->setVerticalAnchorPoint( Qgis::VerticalAnchorPoint::Bottom );
   layer->setHorizontalAnchorPoint( Qgis::HorizontalAnchorPoint::Center );

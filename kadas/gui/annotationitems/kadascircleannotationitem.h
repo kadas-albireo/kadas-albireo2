@@ -25,25 +25,7 @@
 #include "kadas/gui/annotationitems/kadasannotationshadow.h"
 #include "kadas/gui/kadas_gui.h"
 
-/**
- * \ingroup gui
- * \brief Kadas-internal circle annotation item.
- *
- * Subclasses \c QgsAnnotationPolygonItem so the rendered geometry is a
- * \c QgsCurvePolygon whose exterior ring is a \c QgsCompoundCurve made of two
- * \c QgsCircularString arcs (top + bottom semicircle). The geometry is
- * therefore an exact circle — no segmentation. Rendering, callouts, fill
- * symbology and node-based editing are inherited from the parent class.
- *
- * Canonical state is \c center plus \c ringPoint (a point on the
- * circumference); both are stored in the parent layer's CRS, and any
- * mutation rebuilds the curve polygon from these parameters. \c writeXml
- * stamps \c cx/cy/rx/ry alongside the parent's WKT serialization, but
- * \c readXml reads only the canonical params and rebuilds the geometry, so
- * the two representations cannot drift.
- *
- * Type id: \c "kadas:circle".
- */
+//! Circle annotation item (type id "kadas:circle").
 class KADAS_GUI_EXPORT KadasCircleAnnotationItem : public QgsAnnotationPolygonItem
 {
   public:
@@ -59,19 +41,15 @@ class KADAS_GUI_EXPORT KadasCircleAnnotationItem : public QgsAnnotationPolygonIt
     static KadasCircleAnnotationItem *create();
 
     QgsPointXY center() const { return mCenter; }
-    //! Returns a point on the circumference; the radius is the distance to \c center().
     QgsPointXY ringPoint() const { return mRingPoint; }
 
     void setCenter( const QgsPointXY &center );
     void setRingPoint( const QgsPointXY &ringPoint );
 
-    //! UUIDs of save-time QGIS-compat shadow items linked to this master.
-    //! See \c KadasAnnotationShadow.
     const QStringList &shadowIds() const { return mShadow.ids(); }
     void setShadowIds( const QStringList &ids ) { mShadow.setIds( ids ); }
     void setCircle( const QgsPointXY &center, const QgsPointXY &ringPoint );
 
-    //! Returns the (planar) radius in CRS units.
     double radius() const;
 
   private:

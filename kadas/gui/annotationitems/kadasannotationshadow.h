@@ -28,29 +28,14 @@
 /**
  * \ingroup gui
  * \brief Linkage to QGIS-compat "shadow" annotation items.
- *
- * Kadas-specific annotation items (rectangle, circle, pin, coord-cross)
- * keep their \c kadas:* type id and round-trip through QGIS-aware
- * controllers in Kadas. To stay visible when the same project is opened in
- * vanilla QGIS, master items emit parallel "shadow" items in stock QGIS
- * types (polygon / marker / pointtext) at project-save time. Shadows live
- * only in saved XML; they are added to the layer right before save and
- * stripped right after save and right after load.
- *
- * Each master item owns one of these value objects to track the UUIDs of
- * its emitted shadows. The list is persisted as a comma-separated value
- * under the \c kadasShadowIds XML attribute.
  */
 class KadasAnnotationShadow
 {
   public:
-    //! Returns the shadow UUIDs tracked by this object.
     const QStringList &ids() const { return mIds; }
 
-    //! Replaces the tracked shadow UUIDs.
     void setIds( const QStringList &ids ) { mIds = ids; }
 
-    //! \c true when no shadows are tracked.
     bool isEmpty() const { return mIds.isEmpty(); }
 
     //! Writes the \c kadasShadowIds attribute on \a element when non-empty.

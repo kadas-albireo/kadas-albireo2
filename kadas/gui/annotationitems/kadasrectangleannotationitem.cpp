@@ -47,9 +47,6 @@ QString KadasRectangleAnnotationItem::type() const
 
 QVector<QgsPointXY> KadasRectangleAnnotationItem::corners() const
 {
-  // Compute the box's center in the drawing-CRS frame. When draw CRS equals
-  // layer CRS (or either is invalid) this is a no-op identity and the box is
-  // laid out directly in layer CRS, preserving legacy behavior.
   const bool needTransform = mDrawCrs.isValid() && mLayerCrs.isValid() && mDrawCrs != mLayerCrs;
 
   QgsPointXY centerDraw = mCenter;
@@ -67,7 +64,6 @@ QVector<QgsPointXY> KadasRectangleAnnotationItem::corners() const
 
   const double halfW = 0.5 * mSize.width();
   const double halfH = 0.5 * mSize.height();
-  // Local-frame corners in CCW order: BL, BR, TR, TL.
   const double localX[4] = { -halfW, halfW, halfW, -halfW };
   const double localY[4] = { -halfH, -halfH, halfH, halfH };
 
@@ -87,9 +83,6 @@ QVector<QgsPointXY> KadasRectangleAnnotationItem::corners() const
   if ( !needTransform )
     return drawCorners;
 
-  // Project each corner back to the layer CRS individually so the polygon
-  // edges in layer CRS, when re-projected to the map (== draw) CRS, recover
-  // a true rectangle.
   QVector<QgsPointXY> layerCorners;
   layerCorners.reserve( 4 );
   QgsCoordinateTransform ct( mDrawCrs, mLayerCrs, QgsProject::instance()->transformContext() );
@@ -125,8 +118,6 @@ QgsPointXY KadasRectangleAnnotationItem::rotationHandle() const
   }
 
   const double halfH = 0.5 * mSize.height();
-  // Local position: midpoint of top edge, pushed outward by 25% of the
-  // height (so the handle sits clearly outside the rectangle).
   const double localX = 0.0;
   const double localY = halfH + 0.25 * std::abs( mSize.height() );
 
@@ -154,8 +145,6 @@ void KadasRectangleAnnotationItem::rebuildGeometry()
 {
   if ( mSize.isEmpty() )
   {
-    // Degenerate (zero width or height): keep an empty polygon to avoid
-    // tripping up the layer renderer with coincident vertices.
     setGeometry( new QgsPolygon() );
     return;
   }
@@ -163,7 +152,6 @@ void KadasRectangleAnnotationItem::rebuildGeometry()
   auto *ring = new QgsLineString();
   for ( const QgsPointXY &p : c )
     ring->addVertex( QgsPoint( p.x(), p.y() ) );
-  // Close the ring.
   ring->addVertex( QgsPoint( c.first().x(), c.first().y() ) );
   auto *poly = new QgsPolygon();
   poly->setExteriorRing( ring );
@@ -175,8 +163,6 @@ void KadasRectangleAnnotationItem::setBox( const QgsPointXY &center, const QSize
   mCenter = center;
   mSize = size;
   mAngle = angleDegrees;
-  // Legacy 3-arg form: drop any draw-CRS binding so corners() lays out the
-  // box in layer CRS exactly as before.
   mDrawCrs = QgsCoordinateReferenceSystem();
   mLayerCrs = QgsCoordinateReferenceSystem();
   rebuildGeometry();
@@ -212,17 +198,12 @@ void KadasRectangleAnnotationItem::setAngle( double angleDegrees )
 
 bool KadasRectangleAnnotationItem::writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const
 {
-  // Lets the parent serialize the polygon geometry + fill symbol + common
-  // properties; we just stamp the high-level rect parameters alongside.
   QgsAnnotationPolygonItem::writeXml( element, document, context );
   element.setAttribute( QStringLiteral( "cx" ), qgsDoubleToString( mCenter.x() ) );
   element.setAttribute( QStringLiteral( "cy" ), qgsDoubleToString( mCenter.y() ) );
   element.setAttribute( QStringLiteral( "w" ), qgsDoubleToString( mSize.width() ) );
   element.setAttribute( QStringLiteral( "h" ), qgsDoubleToString( mSize.height() ) );
   element.setAttribute( QStringLiteral( "angle" ), qgsDoubleToString( mAngle ) );
-  // Persist the draw-CRS / layer-CRS pair so per-vertex transforms can be
-  // reapplied on reload. authid covers EPSG/IGNF/etc.; toWkt() is the
-  // round-trip-safe fallback for custom CRSes.
   if ( mDrawCrs.isValid() )
   {
     element.setAttribute( QStringLiteral( "drawCrs" ), mDrawCrs.authid() );
@@ -239,8 +220,6 @@ bool KadasRectangleAnnotationItem::writeXml( QDomElement &element, QDomDocument 
 
 bool KadasRectangleAnnotationItem::readXml( const QDomElement &element, const QgsReadWriteContext &context )
 {
-  // Read parent first (polygon geometry + symbol + common props), then override
-  // with the canonical rect parameters (geometry will be rebuilt from them).
   QgsAnnotationPolygonItem::readXml( element, context );
   mCenter = QgsPointXY( element.attribute( QStringLiteral( "cx" ) ).toDouble(), element.attribute( QStringLiteral( "cy" ) ).toDouble() );
   mSize = QSizeF( element.attribute( QStringLiteral( "w" ) ).toDouble(), element.attribute( QStringLiteral( "h" ) ).toDouble() );

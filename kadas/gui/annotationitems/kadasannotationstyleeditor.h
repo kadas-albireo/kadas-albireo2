@@ -32,19 +32,6 @@ class QgsColorButton;
 /**
  * \ingroup gui
  * \brief Per-type style editor widget for a stock QgsAnnotationItem.
- *
- * Concrete subclasses build the type-specific styling row (e.g. shape /
- * size / fill / stroke for markers, font / size / color / buffer for
- * point text) and translate between item state and widget state. The
- * map tool that hosts the bottom bar simply asks the controller for an
- * editor and connects to its two signals.
- *
- * Two signals separate live preview from committed edits:
- *  - \c previewChanged() fires for every interim change (e.g. a keystroke
- *    in the text field). The host should re-apply state to the item and
- *    refresh the layer, but should not push a new history entry.
- *  - \c committed() fires when a discrete edit is finalized. The host
- *    should apply, refresh, push history, and persist the style.
  */
 class KADAS_GUI_EXPORT KadasAnnotationStyleEditor : public QWidget
 {
@@ -95,9 +82,6 @@ class KadasMarkerStyleEditor : public KadasAnnotationStyleEditor
 
 /**
  * \brief Style editor for the Kadas pin (SVG marker: size, fill color).
- *
- * The pin SVG body is fill-parametrized, so only size and fill color are
- * editable; the icon shape and white outline are fixed.
  */
 class KadasPinStyleEditor : public KadasAnnotationStyleEditor
 {
@@ -156,10 +140,6 @@ class KadasPolygonStyleEditor : public KadasAnnotationStyleEditor
 
 /**
  * \brief Style editor for QgsAnnotationPointTextItem (text, font, color, buffer).
- *
- * The text input edits the item's text content and emits \c previewChanged()
- * on every keystroke and \c committed() on focus-out / Enter; the styling
- * widgets emit \c committed() directly.
  */
 class KadasPointTextStyleEditor : public KadasAnnotationStyleEditor
 {
@@ -187,17 +167,6 @@ class QToolButton;
 
 /**
  * \brief Style editor for QgsAnnotationPictureItem with balloon callout.
- *
- * Exposes:
- *  - a "Change image…" button to swap the picture source (file picker);
- *  - balloon body fill / outline colors and outline width (mapped onto
- *    the QgsBalloonCallout's fill symbol);
- *  - the wedge width (in pixels);
- *  - the picture frame size (width / height in pixels) which controls
- *    the QgsAnnotationRectItem fixedSize.
- *
- * Wedge / corner radius / margins are kept at their defaults (the
- * legacy KadasPictureItem look — sharp corners, 4px margin, 6px wedge).
  */
 class KadasPictureStyleEditor : public KadasAnnotationStyleEditor
 {
@@ -220,9 +189,7 @@ class KadasPictureStyleEditor : public KadasAnnotationStyleEditor
     QDoubleSpinBox *mStrokeWidthSpin = nullptr;
     QDoubleSpinBox *mWedgeWidthSpin = nullptr;
     QString mPath;
-    // Aspect ratio captured when the lock was last toggled on, used by
-    // the spinbox-link logic so successive edits walk along the same
-    // ratio instead of drifting due to integer rounding.
+    // Aspect ratio captured when the lock was toggled on.
     double mAspectLockRatio = 0.0;
 };
 

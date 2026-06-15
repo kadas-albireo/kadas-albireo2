@@ -19,18 +19,7 @@
 
 #include "kadas/gui/annotationitems/kadasmarkerannotationcontroller.h"
 
-/**
- * \ingroup gui
- * \brief Controller for \c KadasCoordCrossAnnotationItem (type id
- * \c "kadas:coordcross").
- *
- * The coordinate cross is a single-point item whose position is rounded
- * to the nearest kilometre on placement. Otherwise it follows the same
- * placement / edit workflow as a generic marker, so this controller
- * inherits from \c KadasMarkerAnnotationController and only overrides
- * \c itemType / \c itemName / \c createItem and the position setters
- * that need to apply the rounding.
- */
+//! Controller for KadasCoordCrossAnnotationItem (type id "kadas:coordcross").
 class KADAS_GUI_EXPORT KadasCoordCrossAnnotationController : public KadasMarkerAnnotationController
 {
   public:
@@ -48,11 +37,7 @@ class KADAS_GUI_EXPORT KadasCoordCrossAnnotationController : public KadasMarkerA
     QStringList shadowIds( const QgsAnnotationItem *item ) const override;
     void setShadowIds( QgsAnnotationItem *item, const QStringList &ids ) const override;
 
-    //! The coordinate cross has a fixed visual (white-haloed black cross
-    //! with km labels) drawn entirely in `KadasCoordCrossAnnotationItem::render`,
-    //! so the marker style editor inherited from
-    //! `KadasMarkerAnnotationController` would have no observable effect
-    //! and is suppressed.
+    //! Fixed visual drawn in render(); no style editor.
     KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = nullptr ) const override { return nullptr; }
 };
 

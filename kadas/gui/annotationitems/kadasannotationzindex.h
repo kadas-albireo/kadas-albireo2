@@ -22,14 +22,9 @@
 #include "kadas/gui/kadas_gui.h"
 
 /**
- * Default z-index buckets for Kadas annotation items.
+ * \brief Default z-index buckets for Kadas annotation items.
  *
- * QgsAnnotationLayer renders items by ascending zIndex(); items with the same
- * zIndex are ordered by item id (UUID), which is effectively random. To
- * preserve the legacy KadasItemLayer painter order, every annotation created
- * by Kadas is assigned one of these bucketed values. Within a bucket, callers
- * that need stable ordering (e.g. importers) should apply a small monotonic
- * offset so file order is preserved.
+ * QgsAnnotationLayer renders by ascending zIndex(); ties are ordered by UUID (random).
  */
 class KadasAnnotationZIndex
 {

@@ -50,14 +50,12 @@ void KadasAnnotationItemControllers::registerBuiltins()
 
   KadasAnnotationControllerRegistry *registry = KadasAnnotationControllerRegistry::instance();
 
-  // Stock-type controllers (QGIS annotation item type ids).
   registry->addController( new KadasMarkerAnnotationController() );
   registry->addController( new KadasLineAnnotationController() );
   registry->addController( new KadasPolygonAnnotationController() );
   registry->addController( new KadasPictureAnnotationController() );
   registry->addController( new KadasPointTextAnnotationController() );
 
-  // Kadas-internal type controllers (kadas:* type ids).
   registry->addController( new KadasCircleAnnotationController() );
   registry->addController( new KadasRectangleAnnotationController() );
   registry->addController( new KadasPinAnnotationController() );
@@ -66,8 +64,7 @@ void KadasAnnotationItemControllers::registerBuiltins()
   registry->addController( new KadasGpxRouteAnnotationController() );
   registry->addController( new KadasMilxAnnotationController() );
 
-  // Register Kadas-internal annotation item types with the QGIS annotation
-  // item registry so they round-trip through QgsAnnotationLayer XML.
+  // Register Kadas item types so they round-trip through QgsAnnotationLayer XML.
   QgsAnnotationItemRegistry *itemRegistry = QgsApplication::annotationItemRegistry();
   const auto registerType = []( QgsAnnotationItemRegistry *r, const QString &type, const QString &visible, const QString &visiblePlural, const QgsAnnotationItemCreateFunc &create ) {
     if ( !r->itemMetadata( type ) )

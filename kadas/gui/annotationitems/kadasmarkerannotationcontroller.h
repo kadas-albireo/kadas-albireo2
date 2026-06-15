@@ -22,11 +22,6 @@
 /**
  * \ingroup gui
  * \brief Controller for stock \c QgsAnnotationMarkerItem (type id \c "marker").
- *
- * Drop-in replacement for \c KadasPointItem's interactive behavior. The
- * symbology of the marker (shape, fill, stroke) is stored directly on the
- * \c QgsAnnotationMarkerItem's \c QgsMarkerSymbol, so the controller does not
- * carry any styling state itself.
  */
 class KADAS_GUI_EXPORT KadasMarkerAnnotationController : public KadasAnnotationItemController
 {

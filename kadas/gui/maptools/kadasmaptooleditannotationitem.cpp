@@ -52,13 +52,6 @@
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 
 
-/**
- * \brief Lightweight canvas overlay that paints the controller-supplied
- *        edit handles (vertices) for the item being created/edited.
- *
- * Lives only while the tool is active; the tool calls update() after any
- * change to the item to keep the handles in sync.
- */
 class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
 {
   public:
@@ -74,12 +67,7 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
       updateRect();
     }
 
-    void updateRect()
-    {
-      // Cover the visible map extent so handles outside the item bbox are
-      // still painted (e.g. a rotation handle offset above the rect).
-      setRect( mMapCanvas->mapSettings().visibleExtent() );
-    }
+    void updateRect() { setRect( mMapCanvas->mapSettings().visibleExtent() ); }
 
     void paint( QPainter *painter ) override
     {
@@ -115,8 +103,6 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
       painter->restore();
     }
 
-    // Paints the on-canvas measurement labels (segment lengths, polygon area)
-    // emitted by the controller. Restored from Kadas 2.3 KadasGeometryItem.
     void paintMeasurementLabels( QPainter *painter )
     {
       if ( !mLabelsProvider )
@@ -131,7 +117,7 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
       const int blue = settings.value( QStringLiteral( "/Qgis/default_measure_color_blue" ), 0 ).toInt();
       const QColor textColor( red, green, blue );
       const QColor backgroundColor( 255, 255, 255, 192 );
-      constexpr int offsetBelow = 20; // pixels, when label is anchored to a vertex (e.g. line total)
+      constexpr int offsetBelow = 20; // px
       constexpr int padding = 3;
 
       QFont font = painter->font();
@@ -265,9 +251,6 @@ void KadasMapToolEditAnnotationItem::activate()
 
   if ( mExtraTopWidget )
   {
-    // Embed the integration-supplied widget (e.g. MilX symbol picker
-    // button) into the editor row so it is visually part of the editor,
-    // not a free-floating popup over the map.
     topRow->insertWidget( 1, mExtraTopWidget );
   }
 
@@ -295,7 +278,6 @@ void KadasMapToolEditAnnotationItem::activate()
       mHandles->update();
     }
   } );
-  // Any layer repaint (i.e. any item mutation by this tool) refreshes handles.
   connect( mLayer.data(), &QgsMapLayer::repaintRequested, this, &KadasMapToolEditAnnotationItem::refreshHandles );
 
   mBottomBar->adjustSize();
@@ -327,11 +309,6 @@ void KadasMapToolEditAnnotationItem::updateTempRubberBand()
     mTempRubberBand = new QgsRubberBand( canvas(), geom.type() );
   }
 
-  // Style the band from the item's actual symbol so the preview is drawn
-  // with the right colors / stroke width. Re-applied on every update so
-  // live style-editor changes are reflected immediately. Falls back to
-  // QgsMapToolModifyAnnotation's generic gray band for items without a
-  // line/fill symbol (e.g. the bounding-box preview of markers).
   const double minWidth = canvas()->fontMetrics().xHeight() * .2;
   const double mmToPx = canvas()->logicalDpiX() / 25.4;
   QColor strokeColor( 50, 50, 50, 200 );
@@ -365,8 +342,6 @@ void KadasMapToolEditAnnotationItem::updateTempRubberBand()
   mTempRubberBand->setSecondaryStrokeColor( secondaryColor );
   mTempRubberBand->setWidth( widthPx );
 
-  // setToGeometry() resets the band to the geometry's type and transforms
-  // from the layer CRS to the map CRS.
   mTempRubberBand->setToGeometry( geom, mLayer->crs() );
 }
 
@@ -379,7 +354,6 @@ void KadasMapToolEditAnnotationItem::clearTempRubberBand()
 void KadasMapToolEditAnnotationItem::deactivate()
 {
   QgsMapTool::deactivate();
-  // Drop the uncommitted in-progress item if the user closed the tool mid-draw.
   if ( mAllowCreate && mDrawState != DrawState::Finished )
     clearInProgressItem();
   clearTempRubberBand();
@@ -387,7 +361,6 @@ void KadasMapToolEditAnnotationItem::deactivate()
     mLayer->triggerRepaint();
   delete mBottomBar;
   mBottomBar = nullptr;
-  // Style editor was a child of mBottomBar; its pointer is now dangling.
   mStyleEditor = nullptr;
   if ( mHandles )
   {
@@ -411,14 +384,11 @@ void KadasMapToolEditAnnotationItem::canvasPressEvent( QgsMapMouseEvent *e )
 
   if ( e->button() == Qt::RightButton )
   {
-    // Right-click during digitizing finalizes the part.
     if ( mAllowCreate && mDrawState == DrawState::InProgress )
     {
       finishPart();
       return;
     }
-    // Otherwise, if the click hits an annotation, show a z-order menu;
-    // a click on empty canvas closes the tool.
     const PickedItem hit = pickItemAt( e->mapPoint() );
     if ( !hit.isEmpty() )
       showContextMenu( hit.layer, hit.itemId, e->globalPosition().toPoint() );
@@ -430,16 +400,9 @@ void KadasMapToolEditAnnotationItem::canvasPressEvent( QgsMapMouseEvent *e )
   if ( e->button() != Qt::LeftButton )
     return;
 
-  // Click on a vertex/handle is handled by canvasMoveEvent (drag) +
-  // canvasReleaseEvent (pushState). Nothing to do here.
   if ( mEditContext.isValid() )
     return;
 
-  // In pure edit mode, a click on a different item switches the tool to
-  // editing that item. In create mode, placement always wins so new items
-  // can be drawn on top of existing ones (use the edit tool or right-click
-  // to pick instead). The picker considers items on any visible annotation
-  // layer, not only the currently active one.
   if ( !mAllowCreate && mDrawState != DrawState::InProgress )
   {
     const PickedItem hit = pickItemAt( e->mapPoint() );
@@ -477,8 +440,6 @@ void KadasMapToolEditAnnotationItem::addPoint( const QgsPointXY &pos )
       }
       else
       {
-        // Vertex committed: the item is disabled in the layer while
-        // digitizing, so only the preview band needs updating.
         updateTempRubberBand();
         pushState();
       }
@@ -487,8 +448,6 @@ void KadasMapToolEditAnnotationItem::addPoint( const QgsPointXY &pos )
     case DrawState::Finished:
       if ( !mMultipart )
       {
-        // Detach from the just-finalized item (it stays on the layer) and
-        // create a fresh one in its place.
         mItem = nullptr;
         mItemId.clear();
         createInitialItem();
@@ -516,9 +475,6 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
   KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
   const QgsPointXY pos = e->mapPoint();
 
-  // While actively digitizing a part, skip vertex hit-testing entirely:
-  // the just-placed vertex sits at (or very near) the cursor and would
-  // make mEditContext flip-flop, causing flicker and unnecessary work.
   if ( mAllowCreate && mDrawState == DrawState::InProgress )
   {
     if ( mEditContext.isValid() )
@@ -528,17 +484,11 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
       clearNumericInput();
     }
     mController->setCurrentPoint( mItem, pos, ctx );
-    // No layer repaint per mouse move: the preview band (drawn above all
-    // layers) provides the live feedback; the layer is re-rendered only
-    // when a vertex is committed.
     updateTempRubberBand();
     refreshHandles();
     return;
   }
 
-  // In single-part create mode, after a part is finalized the next click
-  // must place a new item — not drag the just-placed one. Suppress the
-  // edit context so canvasPressEvent never enters the drag branch.
   if ( mAllowCreate && !mMultipart && mDrawState == DrawState::Finished )
   {
     if ( mEditContext.isValid() )
@@ -556,12 +506,6 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
     {
       const QgsPointXY adjusted( pos.x() - mMoveOffset.x(), pos.y() - mMoveOffset.y() );
       mController->edit( mItem, mEditContext, adjusted, ctx );
-      // During the drag the layer keeps showing the pre-drag rendering;
-      // the band shows the live outline above all layers (QGIS behavior).
-      // The layer is re-rendered once on release — unless the controller
-      // asks for live repaints (pictures: the band outline is no stand-in
-      // for the image itself). Canvas render caching makes the per-move
-      // refresh re-render only the annotation layer.
       if ( mController->liveRepaintOnEdit() )
         mLayer->triggerRepaint();
       updateTempRubberBand();
@@ -611,19 +555,10 @@ void KadasMapToolEditAnnotationItem::canvasReleaseEvent( QgsMapMouseEvent *e )
   mPressedButton = Qt::NoButton;
   if ( e->button() == Qt::LeftButton && mEditContext.isValid() )
   {
-    // Commit the drag: clear the preview band and render the edited item.
-    // The repaint must run even when no preview band was shown (items
-    // whose representative geometry is empty): the drag mutated the item
-    // in the layer, which would otherwise keep showing the pre-drag
-    // rendering until the next full canvas refresh.
     clearTempRubberBand();
     if ( mLayer )
       mLayer->triggerRepaint();
     pushState();
-    // A handle drag may have changed item properties the style editor also
-    // exposes (e.g. a picture's fixedSize). Resync the editor so a later
-    // previewChanged/applyToItem doesn't write back stale widget values and
-    // revert the drag. loadFromItem uses signal blockers, so it won't emit.
     if ( mStyleEditor )
       mStyleEditor->loadFromItem( mItem );
   }
@@ -644,7 +579,6 @@ void KadasMapToolEditAnnotationItem::keyPressEvent( QKeyEvent *e )
   {
     if ( mAllowCreate && mDrawState == DrawState::InProgress )
     {
-      // Discard the current part and start fresh.
       clearInProgressItem();
       createInitialItem();
       if ( mItem )
@@ -708,9 +642,6 @@ void KadasMapToolEditAnnotationItem::stateChanged( KadasStateHistory::ChangeType
   mLayer->replaceItem( mItemId, replacement );
   mItem = mLayer->item( mItemId );
   mDrawState = ts->drawState;
-  // History clones carry the enabled flag of when they were pushed; keep
-  // it consistent with the restored draw state (disabled only while
-  // digitizing, when the band is the preview).
   if ( mItem )
     mItem->setEnabled( mDrawState != DrawState::InProgress );
   mLayer->triggerRepaint();
@@ -770,7 +701,6 @@ void KadasMapToolEditAnnotationItem::inputChanged()
   KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
   const KadasAttribValues values = collectAttributeValues();
 
-  // Suppress the spurious move event triggered by adjustCursorAndExtent.
   mIgnoreNextMoveEvent = true;
   const QgsPointXY newPos = mController->positionFromEditAttribs( mItem, mEditContext, values, ctx );
   mInputWidget->adjustCursorAndExtent( newPos );
@@ -790,7 +720,6 @@ void KadasMapToolEditAnnotationItem::setupStyleEditor( QBoxLayout *outer )
   mStyleEditor->loadFromItem( mItem );
   outer->addWidget( mStyleEditor );
 
-  // Live preview: apply state to the item and repaint, but don't push history.
   connect( mStyleEditor, &KadasAnnotationStyleEditor::previewChanged, this, [this] {
     if ( !mItem || !mLayer )
       return;
@@ -800,7 +729,6 @@ void KadasMapToolEditAnnotationItem::setupStyleEditor( QBoxLayout *outer )
       updateTempRubberBand();
   } );
 
-  // Committed: apply, repaint, persist as defaults, and push a history entry.
   connect( mStyleEditor, &KadasAnnotationStyleEditor::committed, this, [this] {
     if ( !mItem || !mLayer )
       return;
@@ -853,10 +781,6 @@ void KadasMapToolEditAnnotationItem::startPart( const QgsPointXY &pos )
   else
   {
     mDrawState = DrawState::InProgress;
-    // While digitizing, the item must not be rendered by the layer: any
-    // intermediate repaint (e.g. a style change) would leave a stale
-    // "shadow" of the in-progress geometry behind the live band. The
-    // band is the only preview until the part is finished.
     mItem->setEnabled( false );
     mLayer->triggerRepaint();
     updateTempRubberBand();
@@ -889,20 +813,6 @@ KadasMapToolEditAnnotationItem::PickedItem KadasMapToolEditAnnotationItem::pickI
   const double radiusmu = radiusmm * rc.scaleFactor() * rc.mapToPixel().mapUnitsPerPixel();
   const QgsRectangle mapBounds( mapPos.x() - radiusmu, mapPos.y() - radiusmu, mapPos.x() + radiusmu, mapPos.y() + radiusmu );
 
-  // Walk all visible annotation layers so a click can pick items from
-  // any of them (Pictures / Routes / Pins / Symbols / Mss / Redlining
-  // ...). QgsAnnotationLayer::itemsInBounds is a bounding-box test, so
-  // we refine each candidate with the controller's getEditContext()
-  // (vertex / handle / edge / actual body containment). Candidates are
-  // ranked by KadasFeaturePicker::rankAnnotationCandidates: precise
-  // hits (vertex / handle / stroke edge) outrank loose body / bbox
-  // hits regardless of z, with z-then-area as tiebreaker inside each
-  // precision tier. A controller that reports no hit means "genuinely
-  // missed" — skip such candidates entirely (otherwise a right-click in
-  // empty space inside an item's AABB would falsely show the context
-  // menu). Only items WITHOUT a registered controller go into the
-  // bbox-only fallback so identify-style flows still resolve something
-  // for unknown item types.
   QList<KadasFeaturePicker::AnnotationPickCandidate> precise;
   QList<KadasFeaturePicker::AnnotationPickCandidate> fallback;
 
@@ -912,8 +822,6 @@ KadasMapToolEditAnnotationItem::PickedItem KadasMapToolEditAnnotationItem::pickI
     QgsAnnotationLayer *al = qobject_cast<QgsAnnotationLayer *>( ml );
     if ( !al )
       continue;
-    // Parametric layers (bullseye, guide grid, ...) are edited atomically
-    // via their dedicated config tool, never item by item.
     if ( KadasAnnotationLayerHelpers::isParametricLayer( al ) )
       continue;
     const QgsRectangle layerBounds = canvas()->mapSettings().mapToLayerCoordinates( al, mapBounds );
@@ -945,7 +853,6 @@ KadasMapToolEditAnnotationItem::PickedItem KadasMapToolEditAnnotationItem::pickI
       }
       else
       {
-        // No controller for this item type: bbox-only fallback.
         c.precision = KadasEditContext::HitPrecision::Body;
         fallback.append( c );
       }
@@ -966,10 +873,6 @@ void KadasMapToolEditAnnotationItem::switchToItem( QgsAnnotationLayer *layer, co
 {
   if ( !canvas() || !layer || itemId.isEmpty() )
     return;
-  // Replace the active tool with a fresh edit-mode tool bound to the
-  // clicked item (on its own layer, which may differ from the layer the
-  // current tool was created with). The current tool is destroyed by
-  // setMapTool().
   canvas()->setMapTool( new KadasMapToolEditAnnotationItem( canvas(), layer, itemId ) );
 }
 
@@ -981,8 +884,6 @@ void KadasMapToolEditAnnotationItem::showContextMenu( QgsAnnotationLayer *layer,
   if ( !target )
     return;
 
-  // Collect z-indices of all items on this layer to compute neighbor swaps
-  // and front/back extremes.
   const QMap<QString, QgsAnnotationItem *> all = layer->items();
   QList<int> zs;
   zs.reserve( all.size() );
@@ -995,7 +896,6 @@ void KadasMapToolEditAnnotationItem::showContextMenu( QgsAnnotationLayer *layer,
   const int minZ = zs.first();
   const int maxZ = zs.last();
 
-  // Find next higher and next lower distinct z values.
   int nextHigher = curZ;
   bool hasHigher = false;
   for ( int z : zs )
@@ -1047,8 +947,6 @@ void KadasMapToolEditAnnotationItem::showContextMenu( QgsAnnotationLayer *layer,
 
   target->setZIndex( newZ );
   layer->triggerRepaint();
-  // If the right-clicked item is the one currently being edited, keep
-  // history in sync.
   if ( layer == mLayer.data() && itemId == mItemId )
     pushState();
 }

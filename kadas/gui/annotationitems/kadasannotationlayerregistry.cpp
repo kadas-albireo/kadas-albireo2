@@ -81,13 +81,7 @@ QgsAnnotationLayer *KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( St
   {
     QgsAnnotationLayer::LayerOptions options( QgsProject::instance()->transformContext() );
     annoLayer = new QgsAnnotationLayer( standardLayerNames()[layer], options );
-    // MilX/MSS content is always WGS84 (libmss IPC convention). Other
-    // standard layers default to the current project CRS so that
-    // axis-aligned items (rectangles, circles) drawn in the map's
-    // drawing frame are stored axis-aligned in the layer too — no
-    // per-vertex projection skew. If the project CRS later changes,
-    // the items keep their stored geometry and the controllers fall
-    // back to per-vertex transforms (see KadasRectangleAnnotationItem).
+    // MSS content is always WGS84 (libmss IPC convention); other layers default to the project CRS.
     QgsCoordinateReferenceSystem layerCrs;
     if ( layer == StandardLayer::MssLayer )
     {
@@ -140,10 +134,7 @@ void KadasAnnotationLayerRegistry::onProjectCrsChanged()
       continue;
     if ( annoLayer->crs() == newCrs )
       continue;
-    // Only retarget layers that don't yet hold any user-drawn item:
-    // changing the CRS on a non-empty layer would silently re-interpret
-    // every stored coordinate as being in the new CRS and shift/skew
-    // existing items.
+    // Skip non-empty layers: changing CRS would re-interpret stored coordinates.
     if ( !annoLayer->isEmpty() )
       continue;
     annoLayer->setCrs( newCrs );

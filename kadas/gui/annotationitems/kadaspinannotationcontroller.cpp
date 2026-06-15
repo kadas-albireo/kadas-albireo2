@@ -31,11 +31,7 @@
 
 namespace
 {
-  // Walk the symbol layer list and rewrite any SvgMarker layer whose path
-  // points at a Qt resource (\":/...\") to an inline base64-encoded payload.
-  // This makes the saved QGIS shadow self-contained: vanilla QGIS can't
-  // resolve Kadas qrc paths, so without this the shadow would render as a
-  // missing-SVG placeholder. \\see QgsSymbolLayerUtils::svgSymbolNameToPath.
+  // Inlines qrc SVG paths as base64 so the saved QGIS shadow is self-contained (vanilla QGIS can't resolve Kadas qrc paths).
   void embedQrcSvgPaths( QgsMarkerSymbol *symbol )
   {
     if ( !symbol )
@@ -47,7 +43,7 @@ namespace
         continue;
       const QString path = svg->path();
       if ( !path.startsWith( QLatin1Char( ':' ) ) )
-        continue; // not a qrc path; leave it
+        continue;
       QFile f( path );
       if ( !f.open( QIODevice::ReadOnly ) )
         continue;

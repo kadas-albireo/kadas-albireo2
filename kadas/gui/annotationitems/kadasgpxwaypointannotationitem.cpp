@@ -47,7 +47,6 @@ QString KadasGpxWaypointAnnotationItem::type() const
 
 void KadasGpxWaypointAnnotationItem::installDefaultSymbol()
 {
-  // Legacy KadasGpxWaypointItem default: yellow circle, stroke == fill.
   auto *layer = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Circle );
   layer->setColor( Qt::yellow );
   layer->setStrokeColor( Qt::yellow );
@@ -63,7 +62,6 @@ void KadasGpxWaypointAnnotationItem::render( QgsRenderContext &context, QgsFeedb
   if ( mName.isEmpty() )
     return;
 
-  // Project layer-CRS point to screen coordinates.
   QgsPointXY p = geometry();
   try
   {
@@ -75,7 +73,6 @@ void KadasGpxWaypointAnnotationItem::render( QgsRenderContext &context, QgsFeedb
   }
   const QPointF screenPos = context.mapToPixel().transform( QgsPointXY( p ) ).toQPointF();
 
-  // Pick label color: configured override, otherwise the marker fill color.
   QColor labelColor = mLabelColor;
   if ( !labelColor.isValid() )
   {
@@ -86,7 +83,6 @@ void KadasGpxWaypointAnnotationItem::render( QgsRenderContext &context, QgsFeedb
   }
   const QColor bufferColor = ( 0.2126 * labelColor.red() + 0.7152 * labelColor.green() + 0.0722 * labelColor.blue() ) > 128 ? Qt::black : Qt::white;
 
-  // Offset the label up-and-right of the marker by roughly the marker size.
   const double markerSize = symbol() ? context.convertToPainterUnits( symbol()->size(), Qgis::RenderUnit::Millimeters ) : 10.0;
   QFont font = mLabelFont;
   font.setPointSizeF( font.pointSizeF() * KadasAnnotationItemController::outputDpiScale( context ) );

@@ -27,14 +27,7 @@
 
 /**
  * \ingroup gui
- * \brief Kadas-internal annotation item representing a GPX route.
- *
- * Subclasses \c QgsAnnotationLineItem and pre-installs a yellow line
- * symbol matching the legacy \c KadasGpxRouteItem default style. Adds
- * \c name, \c number, \c labelFont and \c labelColor fields, and renders
- * the name as repeating buffered labels along the route.
- *
- * Type id: \c "kadas:gpxroute".
+ * \brief Annotation item for a GPX route (type id \c "kadas:gpxroute").
  */
 class KADAS_GUI_EXPORT KadasGpxRouteAnnotationItem : public QgsAnnotationLineItem
 {

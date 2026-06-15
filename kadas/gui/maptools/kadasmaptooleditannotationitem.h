@@ -39,19 +39,7 @@ class QgsRubberBand;
 
 /**
  * \ingroup gui
- * \brief Map tool that creates and/or edits a \c QgsAnnotationItem on a
- *        \c QgsAnnotationLayer, driven by a \c KadasAnnotationItemController.
- *
- * The tool has two entry modes:
- *  - **Edit mode**: started with an existing \a itemId; clicks on vertices
- *    drag them, the styling row in the bottom bar updates the symbol.
- *  - **Create mode**: started with a \a controller and a target \a layer;
- *    clicks place vertices for a fresh item, a right-click / Enter finalizes
- *    the part. After finalization, clicks on existing vertices keep editing
- *    them, while clicks on empty canvas start a brand-new item (single-part).
- *
- * Last-used styling per geometry kind (marker / line / polygon) is persisted
- * via \c QgsSettingsEntry and re-applied to freshly created items.
+ * \brief Map tool to create/edit a \c QgsAnnotationItem on a \c QgsAnnotationLayer via a \c KadasAnnotationItemController.
  */
 class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
 {
@@ -77,23 +65,13 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     //! Create-mode: overrides the controller's createItem() factory.
     void setItemFactory( std::function<QgsAnnotationItem *()> factory ) SIP_SKIP { mItemFactory = std::move( factory ); }
 
-    /**
-     * Inserts a custom widget into the tool's bottom-bar top row, alongside
-     * the undo / redo / close buttons. Must be called before \c activate();
-     * ownership transfers to the bar created at activation. Used by per-item
-     * integrations that need a dedicated control (e.g. the MilX symbol
-     * picker button) embedded in the editor instead of floating over the
-     * map.
-     */
+    //! Inserts a custom widget into the bottom-bar top row; call before \c activate(), ownership transfers.
     void setExtraTopWidget( QWidget *widget ) { mExtraTopWidget = widget; }
 
     //! The annotation item the tool is currently driving (may be null).
     QgsAnnotationItem *currentItem() const { return mItem; }
 
-    /**
-     * Create-mode: drives the create state machine with an explicit point,
-     * as if the user had left-clicked at \a pos. No-op in pure edit mode.
-     */
+    //! Create-mode: place a vertex at \a pos as if left-clicked; no-op in edit mode.
     void addPoint( const QgsPointXY &pos );
 
   signals:
@@ -134,11 +112,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
 
     KadasAnnotationStyleEditor *mStyleEditor = nullptr;
 
-    // Temporary digitizing/drag preview band, drawn above all layers so the
-    // in-progress geometry stays visible even when the annotation layer is
-    // covered by other layers (mirrors QGIS's annotation map tools). The
-    // layer itself is only repainted at commit points (vertex placed, part
-    // finished, drag released), never per mouse move.
+    // Preview band drawn above all layers; the layer is repainted only at commit points, never per mouse move.
     QgsRubberBand *mTempRubberBand = nullptr;
 
     class HandlesOverlay;
@@ -155,17 +129,12 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
 
     void setupStyleEditor( QBoxLayout *outer );
 
-    // Create-flow helpers.
     void createInitialItem();
     void clearInProgressItem();
     void startPart( const QgsPointXY &pos );
     void finishPart();
 
-    // Result of picking an annotation item on the canvas. The picker
-    // walks ALL visible annotation layers so the edit tool can switch to
-    // items that belong to a different layer than the one currently
-    // being edited (e.g. user is in redlining-create mode but clicks on
-    // a Routes-layer item from the open project).
+    // Result of picking an annotation item across all visible annotation layers.
     struct PickedItem
     {
         QgsAnnotationLayer *layer = nullptr;
@@ -173,12 +142,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
         bool isEmpty() const { return !layer || itemId.isEmpty(); }
     };
     PickedItem pickItemAt( const QgsPointXY &mapPos ) const;
-    // Switches the tool to edit \a itemId on \a layer, rebuilding the
-    // styling row to match the new item's geometry kind.
     void switchToItem( QgsAnnotationLayer *layer, const QString &itemId );
-    // Pops up a context menu for \a itemId on \a layer at the given
-    // global screen position with bring-to-front / send-to-back /
-    // forward / backward.
     void showContextMenu( QgsAnnotationLayer *layer, const QString &itemId, const QPoint &globalPos );
 
   private slots:

@@ -53,7 +53,6 @@ QString KadasGpxRouteAnnotationItem::type() const
 
 void KadasGpxRouteAnnotationItem::installDefaultSymbol()
 {
-  // Legacy KadasGpxRouteItem default: 2px yellow solid line.
   auto *layer = new QgsSimpleLineSymbolLayer( Qt::yellow, 0.6 );
   setSymbol( new QgsLineSymbol( QgsSymbolLayerList() << layer ) );
 }
@@ -83,7 +82,6 @@ void KadasGpxRouteAnnotationItem::render( QgsRenderContext &context, QgsFeedback
   const QColor strokeColor = symbol() ? symbol()->color() : QColor( Qt::yellow );
   const QColor bufferColor = ( 0.2126 * strokeColor.red() + 0.7152 * strokeColor.green() + 0.0722 * strokeColor.blue() ) > 128 ? Qt::black : Qt::white;
 
-  // Project curve vertices through the layer's coordinate transform to screen.
   QVector<QPointF> screenPoints;
   screenPoints.reserve( curve->numPoints() );
   for ( int i = 0, n = curve->numPoints(); i < n; ++i )

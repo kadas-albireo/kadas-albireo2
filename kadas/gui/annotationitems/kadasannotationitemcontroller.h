@@ -41,16 +41,7 @@ class KadasAnnotationStyleEditor;
 #ifndef SIP_RUN
 /**
  * \ingroup gui
- * \brief A single on-canvas measurement label (e.g. segment length, total
- *        area) emitted by an annotation item controller.
- *
- * Restored from the Kadas 2.3 \c KadasGeometryItem on-canvas measurement
- * labels: lines emit one label per segment plus a total at the trailing
- * vertex; polygons emit a single area label at the centroid.
- *
- * \a mapPos is in the map canvas CRS. \a centered controls whether the
- * label is drawn centered on \a mapPos (segment midpoints, polygon
- * centroid) or offset below it (line totals at the trailing vertex).
+ * \brief A single on-canvas measurement label emitted by an annotation item controller.
  */
 struct KadasAnnotationMeasurementLabel
 {
@@ -63,18 +54,6 @@ struct KadasAnnotationMeasurementLabel
 /**
  * \ingroup gui
  * \brief Per-type controller for QgsAnnotationItem instances managed by Kadas.
- *
- * Concrete controllers encapsulate the interactive (draw / edit / snap / KML / editor)
- * behavior that previously lived on \c KadasMapItem subclasses.  One controller is
- * registered per QgsAnnotationItem type id (see \c QgsAnnotationItem::type()) in the
- * \c KadasAnnotationControllerRegistry; map tools look the controller up by type id
- * and delegate to it, so a tool never needs to know about concrete annotation
- * subclasses.
- *
- * \note Coordinates passed to draw/edit hooks are in the map CRS unless otherwise
- *       noted; numeric attribute distances are in map units. Methods that perform
- *       map ↔ item space transforms receive a \c KadasAnnotationItemContext bundling
- *       the item's CRS and the map settings.
  */
 class KADAS_GUI_EXPORT KadasAnnotationItemController
 {
@@ -82,8 +61,7 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     virtual ~KadasAnnotationItemController() = default;
 
 #ifndef SIP_RUN
-    //! Settings tree node shared by all canonical controllers for their
-    //! persisted last-used style entries (kadas/annotation/...).
+    //! Settings tree node for persisted last-used style entries (kadas/annotation/...).
     static inline QgsSettingsTreeNode *sTreeAnnotation = KadasSettingsTree::sTreeKadas->createChildNode( QStringLiteral( "annotation" ) );
 #endif
 
@@ -97,8 +75,7 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
 
     // ----- Factory ---------------------------------------------------------
 
-    //! Creates a fresh, blank annotation item ready to be driven through the draw
-    //! state machine. Caller takes ownership.
+    //! Creates a fresh annotation item. Caller takes ownership.
     virtual QgsAnnotationItem *createItem() const = 0;
 
     // ----- Edit nodes (snap & vertex handles) ------------------------------
@@ -131,27 +108,10 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
 
     // ----- Digitizing / drag preview geometry ------------------------------
 
-    /**
-     * Returns a cheap geometry (in the item's layer CRS) representing the
-     * item's current shape, used by the edit/create map tool as a
-     * QgsRubberBand preview drawn above all layers while the item is being
-     * digitized or dragged. Mirrors QGIS's
-     * QgsAnnotationItemEditOperationTransientResults::representativeGeometry().
-     *
-     * Default implementation: the real geometry for line / polygon backed
-     * items, the bounding-box outline otherwise.
-     */
+    //! Geometry (item CRS) for the edit tool's rubber-band preview. Mirrors QgsAnnotationItemEditOperationTransientResults::representativeGeometry().
     virtual QgsGeometry representativeGeometry( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const;
 
-    /**
-     * When TRUE, the edit map tool re-renders the annotation layer on every
-     * drag step instead of only on release. The default (FALSE) matches the
-     * QGIS behavior where the rubber-band outline is the only live feedback
-     * and the layer keeps showing the pre-drag rendering. Controllers whose
-     * items cannot be meaningfully previewed by an outline band (e.g.
-     * pictures — the user expects the image itself to follow the cursor)
-     * should return TRUE.
-     */
+    //! When TRUE, the edit tool re-renders the layer on every drag step (e.g. pictures) rather than only on release.
     virtual bool liveRepaintOnEdit() const { return false; }
 
     // ----- Position helpers ----------------------------------------------
@@ -169,11 +129,6 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     virtual bool intersects( const QgsAnnotationItem *item, const QgsRectangle &mapRect, const KadasAnnotationItemContext &ctx, bool contains = false ) const;
 
     // ----- On-canvas measurement labels ------------------------------------
-    //
-    // Restored from Kadas 2.3 (legacy KadasGeometryItem). The edit/create
-    // map tool overlays these labels on the canvas while the item is being
-    // traced or while it is selected for editing. Default: empty list.
-    // Concrete controllers (line, polygon, ...) override.
 #ifndef SIP_RUN
     virtual QList<KadasAnnotationMeasurementLabel> measurementLabels( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
     {
@@ -197,28 +152,14 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
 #endif
 
     // ----- Persisted last-used style --------------------------------------
-    //
-    // Hooks for the styling row in KadasMapToolEditAnnotationItem to feed the
-    // user's last-used style back into a freshly created item. Only the
-    // canonical generic controllers (marker / linestring / polygon /
-    // pointtext) override these; specialized controllers (rectangle,
-    // circle, coord-cross, pin, gpx, milx, picture, ...) inherit the no-op
-    // default so their controller-supplied symbol stays untouched.
 
-    //! Applies the persisted defaults stored via QgsSettingsEntry to \a item.
-    //! Called once on creation, before the item is added to the layer.
+    //! Applies persisted style defaults to \a item on creation.
     virtual void applyPersistedStyle( QgsAnnotationItem *item ) const { Q_UNUSED( item ); }
 
-    //! Stores the current style of \a item back into QgsSettingsEntry as the
-    //! new defaults. Called whenever the user edits the styling row.
+    //! Stores \a item's current style as the new persisted defaults.
     virtual void persistStyle( const QgsAnnotationItem *item ) const { Q_UNUSED( item ); }
 
-    //! Returns a freshly constructed style editor widget for this item type,
-    //! parented to \a parent and owned by the caller. Default returns
-    //! \c nullptr — specialized controllers (rectangle, circle, coord-cross,
-    //! pin, gpx, milx, picture, ...) inherit this and contribute no styling
-    //! row. Only the canonical generic controllers (marker / linestring /
-    //! polygon / pointtext) override it.
+    //! Returns a style editor widget for this item type, or nullptr if none. Caller takes ownership.
     virtual KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = nullptr ) const
     {
       Q_UNUSED( parent );
@@ -226,19 +167,8 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     }
 
     // ----- QGIS-compat shadows --------------------------------------------
-    //
-    // Kadas-specific item types (kadas:rectangle, kadas:circle, kadas:pin,
-    // kadas:coordcross) are not registered in vanilla QGIS and would be
-    // dropped on read. To keep them visible when the same project is
-    // opened in QGIS, controllers can emit parallel "shadow" items in
-    // stock QGIS types (polygon / marker / pointtext / linestring).
-    // Shadows are added to the layer immediately before save and removed
-    // immediately after; on load, shadows present in the layer XML are
-    // also stripped (they were re-emitted from the master items by the
-    // pre-save pass that wrote the project).
-    //
-    // Returns freshly allocated shadow items; caller takes ownership.
-    // Default implementation returns an empty list.
+
+    //! Returns freshly allocated shadow items for QGIS compatibility; caller takes ownership.
     virtual QList<QgsAnnotationItem *> generateShadows( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
     {
       Q_UNUSED( item );
@@ -246,12 +176,6 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
       return {};
     }
 
-    // Read/write the shadow id list stored on a master item. Controllers
-    // whose master type carries shadow ids must override both. The
-    // helpers in KadasAnnotationLayerHelpers dispatch through the
-    // controller registry so adding a new master type only requires
-    // overriding these (no central registry of dynamic_casts to keep in
-    // sync).
     virtual QStringList shadowIds( const QgsAnnotationItem *item ) const
     {
       Q_UNUSED( item );
@@ -264,29 +188,12 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     }
 
 #ifndef SIP_RUN
-    /**
-     * Ratio of the render device's DPI to the user's primary screen DPI.
-     *
-     * Use this when scaling pixel-defined visual sizes (cross arms, label
-     * fonts in points) inside an item's \c render() override so the
-     * on-screen size stays constant across zoom levels and only scales up
-     * for high-DPI export devices. On screen the value is ≈1.0; on a
-     * 300 dpi print export it is ≈3.1.
-     *
-     * Mirrors the legacy \c KadasMapItem::outputDpiScale() helper from
-     * Kadas 2.3. Prefer this over \c QgsRenderContext::scaleFactor()
-     * which returns pixels-per-millimetre (~3.78 at 96 dpi) and would
-     * make pixel-defined visuals visibly larger than their legacy size.
-     *
-     * Public so annotation \c QgsAnnotationItem subclasses (which do not
-     * inherit from this controller class) can use it directly from their
-     * \c render() override.
-     */
+    //! Ratio of render device DPI to primary screen DPI, for scaling pixel-defined visuals in render() (≈1.0 on screen).
     static double outputDpiScale( const QgsRenderContext &context );
 #endif
 
   protected:
-    // ----- Transform helpers (mirror KadasMapItem's) ---------------------
+    // ----- Transform helpers ---------------------
 
     static QgsPointXY toMapPos( const QgsPointXY &itemPos, const KadasAnnotationItemContext &ctx );
     static QgsPointXY toItemPos( const QgsPointXY &mapPos, const KadasAnnotationItemContext &ctx );
@@ -295,9 +202,7 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     static double pickTolSqr( const KadasAnnotationItemContext &ctx );
 
 #ifndef SIP_RUN
-    // Formatting helpers for measurementLabels() overrides. Honor the
-    // shared "/kadas/measure_decimals" setting (same one KadasMapToolMeasure
-    // uses).
+    // Honor the shared "/kadas/measure_decimals" setting.
     static QString formatLengthMeters( double meters );
     static QString formatAreaSquareMeters( double sqMeters );
 #endif

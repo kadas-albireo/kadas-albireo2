@@ -27,14 +27,7 @@
 
 /**
  * \ingroup gui
- * \brief Kadas-internal annotation item representing a GPX waypoint.
- *
- * Subclasses \c QgsAnnotationMarkerItem and pre-installs a yellow circle
- * simple-marker symbol matching the legacy \c KadasGpxWaypointItem default
- * style. Adds \c name, \c labelFont and \c labelColor fields and renders
- * the name as a buffered label next to the marker.
- *
- * Type id: \c "kadas:gpxwaypoint".
+ * \brief Annotation item for a GPX waypoint (type id \c "kadas:gpxwaypoint").
  */
 class KADAS_GUI_EXPORT KadasGpxWaypointAnnotationItem : public QgsAnnotationMarkerItem
 {

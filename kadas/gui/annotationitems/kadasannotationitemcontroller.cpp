@@ -61,8 +61,6 @@ bool KadasAnnotationItemController::hitTest( const QgsAnnotationItem *item, cons
 {
   if ( !item )
     return false;
-  // Default: hit if the click falls within the item's bounding box (in map space).
-  // Subclasses with cheap tighter tests should override.
   return toMapRect( item->boundingBox(), ctx ).contains( pos );
 }
 
@@ -70,7 +68,6 @@ QPair<QgsPointXY, double> KadasAnnotationItemController::closestPoint( const Qgs
 {
   if ( !item )
     return { pos, std::numeric_limits<double>::max() };
-  // Fallback: report the bounding-box center (in map space). Subclasses should override.
   const QgsPointXY centerItem = item->boundingBox().center();
   const QgsPointXY centerMap = toMapPos( centerItem, ctx );
   const QgsPointXY cp( centerMap.x(), centerMap.y() );
@@ -126,8 +123,6 @@ QString KadasAnnotationItemController::formatLengthMeters( double meters )
 QString KadasAnnotationItemController::formatAreaSquareMeters( double sqMeters )
 {
   const int decimals = QgsSettings().value( QStringLiteral( "/kadas/measure_decimals" ), "2" ).toInt();
-  // Mirror KadasMapToolMeasure: prefer km² for very large areas to keep the
-  // on-canvas label compact.
   if ( sqMeters >= 1000000.0 )
     return QStringLiteral( "%1 km²" ).arg( sqMeters / 1000000.0, 0, 'f', decimals );
   return QStringLiteral( "%1 m²" ).arg( sqMeters, 0, 'f', decimals );
@@ -135,9 +130,6 @@ QString KadasAnnotationItemController::formatAreaSquareMeters( double sqMeters )
 
 double KadasAnnotationItemController::outputDpiScale( const QgsRenderContext &context )
 {
-  // Mirrors KadasMapItem::outputDpiScale() from the Kadas 2.3 base class:
-  // ratio of the render device's DPI to the primary screen DPI. ≈1.0 on
-  // screen; scales up only on high-DPI export devices.
   const QScreen *screen = QGuiApplication::primaryScreen();
   const double screenDpi = screen ? screen->logicalDotsPerInchX() : 96.0;
   if ( !context.painter() || !context.painter()->device() || screenDpi <= 0.0 )

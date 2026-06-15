@@ -21,11 +21,7 @@
 
 /**
  * \ingroup gui
- * \brief Controller for \c KadasGpxRouteAnnotationItem (type id
- * \c "kadas:gpxroute").
- *
- * Inherits the line controller's draw / edit / KML behavior; only the
- * type id, display name and item factory differ.
+ * \brief Controller for \c KadasGpxRouteAnnotationItem (type id \c "kadas:gpxroute").
  */
 class KADAS_GUI_EXPORT KadasGpxRouteAnnotationController : public KadasLineAnnotationController
 {

@@ -53,9 +53,6 @@ QgsCoordinateReferenceSystem KadasCoordCrossAnnotationItem::labelCrs( const QgsC
 
 void KadasCoordCrossAnnotationItem::installDefaultSymbol()
 {
-  // The cross and labels are drawn manually in render(); the marker symbol
-  // is kept fully transparent so the base QgsAnnotationMarkerItem painter
-  // does not draw anything on top of it.
   auto *layer = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Circle );
   layer->setColor( QColor( 0, 0, 0, 0 ) );
   layer->setStrokeColor( QColor( 0, 0, 0, 0 ) );
@@ -71,13 +68,6 @@ QgsRectangle KadasCoordCrossAnnotationItem::boundingBox() const
 
 QgsRectangle KadasCoordCrossAnnotationItem::boundingBox( QgsRenderContext &context ) const
 {
-  // Inflate the point bounds by the cross half-extent so the canvas chunk
-  // loader rasters the labels correctly when the cross sits near a tile
-  // edge. The half-extent is derived from pixels, i.e. expressed in *map*
-  // units; inflate around the map-CRS position and transform the result
-  // back to the layer CRS (mixing map-unit inflation with layer-CRS
-  // coordinates breaks whenever the two CRSs differ in units, e.g. a
-  // degree-based layer on a metric canvas).
   const double mupp = context.mapToPixel().mapUnitsPerPixel();
   const double crossMu = sCrossSizePx * KadasAnnotationItemController::outputDpiScale( context ) * mupp;
   try
@@ -94,8 +84,6 @@ QgsRectangle KadasCoordCrossAnnotationItem::boundingBox( QgsRenderContext &conte
 
 void KadasCoordCrossAnnotationItem::render( QgsRenderContext &context, QgsFeedback *feedback )
 {
-  // Draw nothing through the base symbol (it is transparent), but allow it
-  // to update any cached state.
   QgsAnnotationMarkerItem::render( context, feedback );
 
   const double crossSize = sCrossSizePx * KadasAnnotationItemController::outputDpiScale( context );
@@ -117,12 +105,6 @@ void KadasCoordCrossAnnotationItem::render( QgsRenderContext &context, QgsFeedba
       double mapCoord;
       double angle;
   };
-  // Labels show the position in the same CRS the controller snapped it to
-  // a round kilometre in (layer CRS when metric, EPSG:3857 otherwise; see
-  // labelCrs()). Using the destination (map render) CRS instead would
-  // print values that are not on the round-km grid the cross sits on
-  // whenever the project CRS differs from the layer CRS — the cross would
-  // appear offset from the gridline its label claims.
   QgsPointXY labelPos = geometry();
   const QgsCoordinateReferenceSystem layerCrs = context.coordinateTransform().sourceCrs();
   const QgsCoordinateReferenceSystem crossCrs = labelCrs( layerCrs );
@@ -133,9 +115,7 @@ void KadasCoordCrossAnnotationItem::render( QgsRenderContext &context, QgsFeedba
       labelPos = QgsCoordinateTransform( layerCrs, crossCrs, context.transformContext() ).transform( labelPos );
     }
     catch ( QgsCsException & )
-    {
-      // Keep the raw layer-CRS coordinates as a last resort.
-    }
+    {}
   }
   const QList<LabelData> labels = {
     { screenPos.x() - crossSize, screenPos.y() - 12, labelPos.y(), 0 },
@@ -181,10 +161,6 @@ bool KadasCoordCrossAnnotationItem::writeXml( QDomElement &element, QDomDocument
 bool KadasCoordCrossAnnotationItem::readXml( const QDomElement &element, const QgsReadWriteContext &context )
 {
   QgsAnnotationMarkerItem::readXml( element, context );
-  // The cross visual is fully drawn in render(); always force the
-  // base-class marker symbol back to fully transparent so projects
-  // saved before the marker style editor was suppressed do not show
-  // a stray dot in the centre of the cross on reload.
   installDefaultSymbol();
   mShadow.readXml( element );
   return true;

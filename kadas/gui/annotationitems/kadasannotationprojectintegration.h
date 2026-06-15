@@ -29,19 +29,6 @@ class QgsAnnotationPictureItem;
 /**
  * \ingroup gui
  * \brief Wires the save-time shadow mechanism into the active QgsProject.
- *
- * On construction this object connects to \c QgsProject::readProject so any
- * Kadas-shadow items left over in a project file (e.g. one saved by an
- * older Kadas session that wasn't cleaned up) are stripped after load,
- * leaving the in-memory layer pristine.
- *
- * The save half of the lifecycle is driven explicitly by callers:
- * \c KadasApplication::projectSave() is expected to call
- * \c prepareForSave() immediately before \c QgsProject::write() and
- * \c stripAfterSave() immediately after, so the on-disk project contains
- * the QGIS-compat shadows but the running session does not.
- *
- * Single instance owned by \c KadasApplication.
  */
 class KADAS_GUI_EXPORT KadasAnnotationProjectIntegration : public QObject
 {
@@ -49,21 +36,17 @@ class KADAS_GUI_EXPORT KadasAnnotationProjectIntegration : public QObject
   public:
     explicit KadasAnnotationProjectIntegration( QObject *parent = nullptr );
 
-    //! Iterates all \c QgsAnnotationLayer instances in the active project and
-    //! calls \c KadasAnnotationLayerHelpers::prepareLayerForSave on each.
+    //! Calls prepareLayerForSave() on every annotation layer in the project.
     void prepareForSave();
 
-    //! Iterates all \c QgsAnnotationLayer instances in the active project and
-    //! calls \c KadasAnnotationLayerHelpers::stripShadowsFromLayer on each.
+    //! Calls stripShadowsFromLayer() on every annotation layer in the project.
     void stripAfterSave();
 
   private slots:
     void onProjectRead( const QDomDocument &doc );
 
   private:
-    // Live attachment paths captured by prepareForSave() so they can be
-    // restored by stripAfterSave() after QgsProject::write() has run with
-    // the "attachment:..." identifiers in place.
+    // Live paths captured by prepareForSave(), restored by stripAfterSave().
     QHash<QgsAnnotationPictureItem *, QString> mPicturePathsBeforeSave;
 };
 

@@ -77,14 +77,8 @@ QList<KadasNode> KadasRectangleAnnotationController::nodes( const QgsAnnotationI
 
 bool KadasRectangleAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
 {
-  // Work entirely in MAP CRS so the rectangle is true-rectangular on the
-  // map regardless of the layer's CRS. The first click anchor is therefore
-  // remembered in map space.
   mDrawAnchor = firstPoint;
   mDrawAnchorValid = true;
-  // Center starts at the click; size is zero. Angle stays at 0 during draw.
-  // Stash drawCrs (= map CRS) and layerCrs so the item can per-vertex
-  // project corners back to layer CRS for storage.
   asRect( item )->setBox( toItemPos( firstPoint, ctx ), QSizeF( 0, 0 ), 0.0, ctx.mapSettings().destinationCrs(), ctx.itemCrs() );
   return true;
 }
@@ -97,7 +91,6 @@ bool KadasRectangleAnnotationController::startPart( QgsAnnotationItem *item, con
 void KadasRectangleAnnotationController::setCurrentPoint( QgsAnnotationItem *item, const QgsPointXY &p, const KadasAnnotationItemContext &ctx )
 {
   KadasRectangleAnnotationItem *rect = asRect( item );
-  // Build the box axis-aligned in MAP CRS (the user's drawing frame).
   const QgsPointXY anchorMap = mDrawAnchorValid ? mDrawAnchor : toMapPos( rect->center(), ctx );
   const double w = std::abs( p.x() - anchorMap.x() );
   const double h = std::abs( p.y() - anchorMap.y() );
@@ -112,7 +105,6 @@ void KadasRectangleAnnotationController::setCurrentAttributes( QgsAnnotationItem
 
 bool KadasRectangleAnnotationController::continuePart( QgsAnnotationItem *, const KadasAnnotationItemContext & )
 {
-  // Two-click item.
   return false;
 }
 
@@ -156,9 +148,6 @@ KadasEditContext KadasRectangleAnnotationController::getEditContext( const QgsAn
   if ( pos.sqrDist( rotMap ) < pickTolSqr( ctx ) )
     return KadasEditContext( QgsVertexId( 0, 0, RotationHandleVertex ), rotMap, drawAttribs(), Qt::CrossCursor );
 
-  // Body test: point-in-rotated-quad. Using the AABB would falsely select
-  // the rectangle for clicks in the corners of its bounding box that lie
-  // outside the actual rotated shape.
   const auto csMap = [&]() {
     QVector<QgsPointXY> v;
     v.reserve( cs.size() );
@@ -167,7 +156,6 @@ KadasEditContext KadasRectangleAnnotationController::getEditContext( const QgsAn
     return v;
   }();
   auto pointInQuad = [&]( const QgsPointXY &p ) {
-    // Standard ray-casting: count crossings of horizontal ray from p.
     bool inside = false;
     const int n = csMap.size();
     for ( int i = 0, j = n - 1; i < n; j = i++ )
@@ -196,19 +184,13 @@ void KadasRectangleAnnotationController::edit( QgsAnnotationItem *item, const Ka
 
   const int v = editContext.vidx.vertex;
 
-  // All edit math is performed in MAP CRS so the rectangle remains true
-  // rectangular on the map (the user's drawing frame). Results are written
-  // back via setBox(...) with drawCrs=mapCrs / layerCrs=itemCrs so the item
-  // refreshes its per-vertex projection bookkeeping.
   const QgsCoordinateReferenceSystem mapCrs = ctx.mapSettings().destinationCrs();
   const QgsCoordinateReferenceSystem layerCrs = ctx.itemCrs();
   const QgsPointXY centerMap = toMapPos( rect->center(), ctx );
 
   if ( v == RotationHandleVertex )
   {
-    // Compute new angle (in map frame) from center -> newPoint vector.
-    // The rotation handle is offset along +Y in the local map frame, so
-    // atan2(dx, dy) yields the CCW rotation from the +Y axis.
+    // Handle offset along +Y, so atan2(dx, dy) gives the CCW rotation from +Y.
     const double dx = newPoint.x() - centerMap.x();
     const double dy = newPoint.y() - centerMap.y();
     const double angleRad = std::atan2( dx, dy );
@@ -218,9 +200,6 @@ void KadasRectangleAnnotationController::edit( QgsAnnotationItem *item, const Ka
 
   if ( v >= 0 && v < 4 )
   {
-    // Resize: the opposite corner stays fixed; the dragged corner moves to
-    // the cursor. We work in the rectangle's local (un-rotated) MAP frame
-    // so resizing remains correct under rotation and across CRS pairs.
     const auto cs = rect->corners();
     const QgsPointXY anchorMap = toMapPos( cs[( v + 2 ) % 4], ctx );
 
@@ -231,7 +210,6 @@ void KadasRectangleAnnotationController::edit( QgsAnnotationItem *item, const Ka
     auto toLocal = [&]( const QgsPointXY &p ) {
       const double dx = p.x() - centerMap.x();
       const double dy = p.y() - centerMap.y();
-      // Inverse rotation: rotate by -angle.
       return QPointF( cosA * dx + sinA * dy, -sinA * dx + cosA * dy );
     };
 
@@ -241,7 +219,6 @@ void KadasRectangleAnnotationController::edit( QgsAnnotationItem *item, const Ka
     const double localCx = 0.5 * ( anchorLocal.x() + cursorLocal.x() );
     const double localCy = 0.5 * ( anchorLocal.y() + cursorLocal.y() );
 
-    // Map the new local center back to map coords, then to layer CRS.
     const double newMapCx = centerMap.x() + cosA * localCx - sinA * localCy;
     const double newMapCy = centerMap.y() + sinA * localCx + cosA * localCy;
     const QgsPointXY newCenterLayer = toItemPos( QgsPointXY( newMapCx, newMapCy ), ctx );
@@ -251,7 +228,6 @@ void KadasRectangleAnnotationController::edit( QgsAnnotationItem *item, const Ka
     return;
   }
 
-  // Whole-item move via map-space delta on the center.
   const double dxMap = newPoint.x() - centerMap.x();
   const double dyMap = newPoint.y() - centerMap.y();
   const QgsPointXY newCenterMap( centerMap.x() + dxMap, centerMap.y() + dyMap );
@@ -311,7 +287,6 @@ QString KadasRectangleAnnotationController::asKml( const QgsAnnotationItem *item
       outStream << " ";
     outStream << QString::number( p.x(), 'f', 10 ) << "," << QString::number( p.y(), 'f', 10 );
   }
-  // Close the ring.
   QgsPointXY p0 = ct.transform( cs.first() );
   outStream << " " << QString::number( p0.x(), 'f', 10 ) << "," << QString::number( p0.y(), 'f', 10 );
   outStream << "</coordinates>\n</LinearRing></outerBoundaryIs>\n</Polygon>\n";
@@ -340,7 +315,6 @@ QList<KadasAnnotationMeasurementLabel> KadasRectangleAnnotationController::measu
   da.setSourceCrs( ctx.itemCrs(), ctx.mapSettings().transformContext() );
   da.setEllipsoid( QgsProject::instance()->ellipsoid() );
 
-  // One length label at the midpoint of each of the 4 edges.
   for ( int i = 0; i < 4; ++i )
   {
     const QgsPointXY &a = corners[i];
@@ -350,7 +324,6 @@ QList<KadasAnnotationMeasurementLabel> KadasRectangleAnnotationController::measu
     labels.append( { toMapPos( midItem, ctx ), formatLengthMeters( seg ), true } );
   }
 
-  // Area label at the centroid of the polygon geometry (matches polygon controller).
   double areaM2 = 0.0;
   QgsPointXY centroidItem = rect->center();
   if ( const QgsAbstractGeometry *g = rect->geometry() )

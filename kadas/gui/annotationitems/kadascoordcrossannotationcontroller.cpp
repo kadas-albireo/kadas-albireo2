@@ -38,10 +38,7 @@ namespace
     return QgsPointXY( std::round( p.x() / 1000.0 ) * 1000.0, std::round( p.y() / 1000.0 ) * 1000.0 );
   }
 
-  // Snap an item-CRS position to the round-km grid of the cross's
-  // snapping/labelling CRS (the layer CRS when metric, EPSG:3857
-  // otherwise — rounding raw degree values would collapse every position
-  // to 0/0). Returns the snapped position back in the item CRS.
+  // Snaps an item-CRS position to the round-km grid of the labelling CRS (degrees would round to 0/0).
   QgsPointXY snapToKmGrid( const QgsPointXY &itemPos, const QgsCoordinateReferenceSystem &layerCrs )
   {
     const QgsCoordinateReferenceSystem crossCrs = KadasCoordCrossAnnotationItem::labelCrs( layerCrs );
@@ -82,21 +79,16 @@ bool KadasCoordCrossAnnotationController::startPart( QgsAnnotationItem *item, co
   const QgsPointXY itemPos = snapToKmGrid( toItemPos( firstPoint, ctx ), ctx.itemCrs() );
   if ( auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item ) )
     marker->setGeometry( QgsPoint( itemPos.x(), itemPos.y() ) );
-  // CoordCross is finalized on the very first click.
   return false;
 }
 
 void KadasCoordCrossAnnotationController::setPosition( QgsAnnotationItem *item, const QgsPointXY &pos )
 {
-  // No layer context here, so the snapping CRS is unknown; store the raw
-  // position. Interactive placement and edits go through startPart()/edit(),
-  // which snap to the km grid of the labelling CRS.
   KadasMarkerAnnotationController::setPosition( item, pos );
 }
 
 void KadasCoordCrossAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
-  // When dragging the single vertex, snap the resulting position to a km grid.
   KadasMarkerAnnotationController::edit( item, editContext, newPoint, ctx );
   if ( auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item ) )
   {
@@ -107,21 +99,11 @@ void KadasCoordCrossAnnotationController::edit( QgsAnnotationItem *item, const K
 
 QList<QgsAnnotationItem *> KadasCoordCrossAnnotationController::generateShadows( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
 {
-  // The Kadas coord-cross is screen-space (cross arms in pixels, label rendered
-  // at canvas-pixel offsets relative to the cross). For a project-time shadow we
-  // can only emit a map-space marker + a single coordinate label at the same
-  // point. The four-quadrant labels and screen-pixel arm length cannot be
-  // reproduced without canvas state, so the QGIS shadow is a single \"+\" marker
-  // with one km-coordinate text label colocated with it.\n
   const auto *master = static_cast<const KadasCoordCrossAnnotationItem *>( item );
   const QgsPointXY pt = master->geometry();
 
   QList<QgsAnnotationItem *> shadows;
 
-  // Cross-shaped marker shadow. The Kadas master draws an 80px-wide cross
-  // (~21mm at 96 DPI); match that order of magnitude for the QGIS shadow
-  // so the cross has comparable visual weight when rendered with the
-  // mm-based simple-marker layer.
   auto *cross = new QgsAnnotationMarkerItem( QgsPoint( pt.x(), pt.y() ) );
   auto *layer = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Cross, 20.0 );
   layer->setStrokeColor( QColor( 0, 0, 0 ) );
@@ -131,8 +113,6 @@ QList<QgsAnnotationItem *> KadasCoordCrossAnnotationController::generateShadows(
   cross->setZIndex( master->zIndex() );
   shadows.append( cross );
 
-  // Coordinate label shadow, labelled in the same CRS as the master's
-  // rendered labels (layer CRS when metric, EPSG:3857 otherwise).
   QgsPointXY labelPt = pt;
   const QgsCoordinateReferenceSystem layerCrs = ctx.itemCrs();
   const QgsCoordinateReferenceSystem crossCrs = KadasCoordCrossAnnotationItem::labelCrs( layerCrs );

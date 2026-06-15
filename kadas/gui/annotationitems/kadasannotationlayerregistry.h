@@ -33,20 +33,6 @@ class QgsAnnotationLayer;
  * \ingroup gui
  * \brief Process-wide registry of the well-known singleton Kadas
  *        \c QgsAnnotationLayer instances inside the current \c QgsProject.
- *
- * Each \c StandardLayer enum value names a *role* (Redlining, Symbols,
- * Pictures, Pins, Routes, MSS) that the application auto-creates the
- * first time a tool needs a destination layer for that role.  There is
- * at most one layer per role per project; subsequent lookups return the
- * existing instance.  The mapping from role to project layer id is
- * persisted under a dedicated \c StandardAnnotationLayers element in the
- * project XML.
- *
- * Configurable / parametric annotation layers (bullseye, guidegrid)
- * are deliberately out of scope: each instance carries its own
- * configuration and a project can hold many of them, so they cannot be
- * keyed by a fixed role.  Those are handled by \c KadasAnnotationLayer
- * + its promotion registry instead.
  */
 class KADAS_GUI_EXPORT KadasAnnotationLayerRegistry : public QObject
 {
@@ -62,8 +48,7 @@ class KADAS_GUI_EXPORT KadasAnnotationLayerRegistry : public QObject
       MssLayer
     };
 
-    //! Returns the well-known annotation layer for \a layer, creating and
-    //! adding it to the current project on first use.
+    //! Returns the standard annotation layer for \a layer, creating it on first use.
     static QgsAnnotationLayer *getOrCreateAnnotationLayer( StandardLayer layer );
 
     //! Returns the human-readable layer names keyed by \c StandardLayer.
@@ -83,13 +68,7 @@ class KADAS_GUI_EXPORT KadasAnnotationLayerRegistry : public QObject
     void clear();
     void readFromProject( const QDomDocument &doc );
     void writeToProject( QDomDocument &doc );
-    //! Slot bound to \c QgsProject::crsChanged. For each tracked standard
-    //! annotation layer that is still empty (no items), retargets its CRS
-    //! to the new project CRS so freshly drawn axis-aligned items
-    //! (rectangles, circles) stay un-skewed. MSS is excluded
-    //! (libmss IPC requires WGS84) and non-empty layers are left
-    //! untouched (mutating their CRS would re-interpret existing
-    //! coordinates and shift / skew already-drawn items).
+    //! Retargets empty standard layers to the new project CRS (MSS excluded; non-empty layers untouched).
     void onProjectCrsChanged();
 };
 

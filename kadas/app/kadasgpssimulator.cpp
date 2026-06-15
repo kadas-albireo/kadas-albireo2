@@ -47,7 +47,6 @@ bool KadasGpsSimulator::open( OpenMode mode )
   if ( !QIODevice::open( mode ) )
     return false;
   mTimer.start();
-  // Provide an initial fix immediately
   emitSentences();
   return true;
 }
@@ -73,14 +72,12 @@ qint64 KadasGpsSimulator::readData( char *data, qint64 maxSize )
 
 qint64 KadasGpsSimulator::writeData( const char *, qint64 size )
 {
-  // Discard anything written to the "receiver"
   return size;
 }
 
 void KadasGpsSimulator::advancePosition( double dtSecs )
 {
-  // Vary speed smoothly between ~5 m/s and ~55 m/s (two superimposed waves
-  // with incommensurate periods so the pattern doesn't repeat too obviously)
+  // Smoothly vary speed between ~5 and ~55 m/s via two incommensurate sine waves.
   mElapsedSecs += dtSecs;
   mSpeedMps = 30. + 20. * std::sin( 2 * M_PI * mElapsedSecs / 120. ) + 5. * std::sin( 2 * M_PI * mElapsedSecs / 47. );
 
@@ -88,7 +85,7 @@ void KadasGpsSimulator::advancePosition( double dtSecs )
   while ( remaining > 0 )
   {
     const QgsPointXY target = mRoute[mNextWaypoint];
-    // Local equirectangular approximation, good enough for a simulator
+    // Local equirectangular approximation
     const double mPerDegLat = 111320.;
     const double mPerDegLon = mPerDegLat * std::cos( mPos.y() * M_PI / 180. );
     const double dxM = ( target.x() - mPos.x() ) * mPerDegLon;

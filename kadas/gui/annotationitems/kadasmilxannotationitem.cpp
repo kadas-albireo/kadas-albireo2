@@ -57,20 +57,9 @@ QgsRectangle KadasMilxAnnotationItem::boundingBox() const
 
 Qgis::AnnotationItemFlags KadasMilxAnnotationItem::flags() const
 {
-  // The symbol is a fixed-screen-pixel bitmap painted around mPoints[0]
-  // with libmss-computed offsets, plus optional leader/attribute points
-  // far outside the mPoints extent — the rendered footprint is scale-
-  // dependent and not captured by the raw mPoints bounding box.
-  //
-  // Marking the item ScaleDependentBoundingBox makes
-  // `QgsAnnotationLayer::addItem` route us to `mNonIndexedItems` instead
-  // of the spatial index. That matters because the layer indexes items
-  // *at addItem time*: the create-mode tool inserts a fresh, empty MILX
-  // item (no mPoints yet, bbox() == empty rect), then mutates it as the
-  // user clicks. The spatial index still holds the original empty bbox,
-  // so `queryIndex(extent)` never returns the item and the renderer
-  // never paints it. Non-indexed items are always added to the cull
-  // candidate set, sidestepping this entirely.
+  // ScaleDependentBoundingBox routes us to the layer's non-indexed items: the
+  // spatial index would cache the empty bbox of a freshly-created MILX item
+  // (mutated later as the user clicks) and never return it for rendering.
   return Qgis::AnnotationItemFlag::ScaleDependentBoundingBox;
 }
 
@@ -80,12 +69,8 @@ void KadasMilxAnnotationItem::render( QgsRenderContext &context, QgsFeedback *fe
   if ( mPoints.isEmpty() || mMssString.isEmpty() )
     return;
 
-  // Thread-safety: this method may be invoked from a non-GUI thread
-  // (3D / async map renderers). All KadasMilxClient calls funnel through
-  // KadasMilxClient::processRequest(), which dispatches via
-  // Qt::BlockingQueuedConnection to its own worker thread when invoked
-  // outside the GUI thread; the lazy `instance()` getter is mutex-guarded.
-  // See kadasmilxclient.cpp for the dispatch logic.
+  // Thread-safety: render() may run off the GUI thread; KadasMilxClient
+  // funnels all calls through its mutex-guarded, thread-dispatching client.
 
   // Build a transient QgsMapSettings from the render context so we can reuse
   // toSymbol() / computeScreenExtent() (the libmss IPC path is shared with
@@ -139,9 +124,7 @@ bool KadasMilxAnnotationItem::writeXml( QDomElement &element, QDomDocument &docu
   }
   element.appendChild( pointsElem );
 
-  // Control point indices reported by libmss (rendered as red ctrl handles,
-  // omitted from geometry export). Persisted so that opening a saved project
-  // does not require an immediate libmss round-trip just to redraw nodes.
+  // Control point indices reported by libmss; persisted to avoid a libmss round-trip on project load.
   QDomElement ctrlElem = document.createElement( QStringLiteral( "kadasControlPoints" ) );
   for ( int idx : mControlPoints )
   {
@@ -151,8 +134,7 @@ bool KadasMilxAnnotationItem::writeXml( QDomElement &element, QDomDocument &docu
   }
   element.appendChild( ctrlElem );
 
-  // Symbol attributes (width / length / radius / attitude), keyed by libmss
-  // attribute id; values are in WGS84 metres / degrees.
+  // Symbol attributes (width / length / radius / attitude), keyed by libmss attr id; in WGS84 m/deg.
   QDomElement attrsElem = document.createElement( QStringLiteral( "kadasAttributes" ) );
   for ( auto it = mAttributes.cbegin(), itEnd = mAttributes.cend(); it != itEnd; ++it )
   {
@@ -230,7 +212,6 @@ bool KadasMilxAnnotationItem::readXml( const QDomElement &element, const QgsRead
 
   mUserOffset = QPoint( element.attribute( QStringLiteral( "kadasUserOffsetX" ), QStringLiteral( "0" ) ).toInt(), element.attribute( QStringLiteral( "kadasUserOffsetY" ), QStringLiteral( "0" ) ).toInt() );
 
-  // Items loaded from XML are by definition finalized.
   mDrawStatus = DrawStatus::Finished;
   mPressedPoints = mPoints.size();
 
@@ -359,11 +340,8 @@ KadasMilxAnnotationItem *KadasMilxAnnotationItem::fromMilx( const QDomElement &i
   }
 
   // Fill in derived metadata via libmss (control point indices, military
-  // name fallback, symbol type / point cardinality). This mirrors the
-  // tail of \c KadasMilxItem::finalize() but skips its corridor-only
-  // \c getControlPoints projection branch (the legacy importer never
-  // emitted IsMIPCorridorPointList for the cases we care about; if it
-  // shows up in real MILXly files we'll port that too).
+  // name fallback, symbol type / point cardinality). Skips the legacy
+  // corridor-only getControlPoints branch (unused by the cases we import).
   if ( item->mPoints.size() > 1 )
   {
     KadasMilxClient::getControlPointIndices( item->mMssString, item->mPoints.count(), KadasMilxClient::globalSymbolSettings(), item->mControlPoints );
@@ -425,8 +403,7 @@ int KadasMilxAnnotationItem::exportLayerToMilxly( QgsAnnotationLayer *annoLayer,
   milxLayerEl.appendChild( symbolSizeEl );
 
   QDomElement bwEl = doc.createElement( QStringLiteral( "DisplayBW" ) );
-  // The "approved" / black-and-white flag does not have an annotation-layer
-  // analogue yet; default to off until the per-layer property is rewired.
+  // No annotation-layer analogue yet; default to off.
   bwEl.appendChild( doc.createTextNode( QStringLiteral( "0" ) ) );
   milxLayerEl.appendChild( bwEl );
 

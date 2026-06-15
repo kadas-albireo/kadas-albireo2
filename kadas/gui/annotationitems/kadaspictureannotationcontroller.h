@@ -25,18 +25,6 @@ class QgsAnnotationLayer;
 /**
  * \ingroup gui
  * \brief Controller for stock \c QgsAnnotationPictureItem (type id \c "picture").
- *
- * Drop-in replacement for \c KadasPictureItem. The geographic anchor lives
- * as the center of the item's \c bounds() (the item is configured with
- * \c Qgis::AnnotationPlacementMode::FixedSize at item creation time) and the
- * picture's offset from that anchor is stored as the base
- * \c QgsAnnotationItem::offsetFromCallout(). A simple-line callout is
- * auto-installed at item creation so the leader line from the anchor to the
- * picture is rendered for free by the parent layer.
- *
- * Single-click placement: the click sets the anchor (bounds center). The
- * picture defaults to a 200x150 px frame, which the user can resize via the
- * fixedSize handle.
  */
 class KADAS_GUI_EXPORT KadasPictureAnnotationController : public KadasAnnotationItemController
 {
@@ -72,8 +60,7 @@ class KADAS_GUI_EXPORT KadasPictureAnnotationController : public KadasAnnotation
 
     QgsGeometry representativeGeometry( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const override;
 
-    //! The outline band is a poor stand-in for the image itself; re-render
-    //! the layer live while dragging so the picture follows the cursor.
+    //! Re-render the layer live while dragging (the outline band is a poor stand-in for the image).
     bool liveRepaintOnEdit() const override { return true; }
 
     KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = nullptr ) const override;
@@ -84,80 +71,27 @@ class KADAS_GUI_EXPORT KadasPictureAnnotationController : public KadasAnnotation
     QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = nullptr ) const override;
 #endif
 
-    //! Convenience: sets the picture's source path (auto-detects format from extension).
     static void setPath( QgsAnnotationPictureItem *item, const QString &path );
 
     /**
-     * Idempotently installs a balloon callout on \a pic so it acts as a
-     * cartoon speech-bubble: the picture frame is the bubble body, with a
-     * wedge pointing back to the geographic anchor (bounds.center).
-     *
-     * Steps performed (each is skipped if already in place):
-     *  - install a \c QgsBalloonCallout (white fill, 1px black stroke,
-     *    4px margins, 6px wedge, 0 corner radius) when no callout exists
-     *  - set \c calloutAnchor to \c bounds().center() when empty
-     *  - set \c offsetFromCallout to \c -size/2 (centered-on-anchor,
-     *    wedge has zero length) when the offset is invalid
-     *
-     * Centralized here because every picture creation site (controller,
-     * \c KadasApplication::addImageItem, paste-from-clipboard,
-     * \c KadasPictureItem / \c KadasSymbolItem migration) needs the same
-     * callout layout. Calling this on a picture that already has one is
-     * a no-op and never overwrites the user's customizations.
+     * Idempotently installs a balloon callout on \a pic (white fill, 1px
+     * black stroke, 4px margins, 6px wedge); a no-op if already present.
      */
     static void ensureBalloon( QgsAnnotationPictureItem *pic );
 
-    /**
-     * \brief Returns the next zIndex to assign to a freshly created
-     * picture in \a layer so it stacks visually above all existing
-     * pictures in that layer.
-     *
-     * Pictures share the same nominal bucket
-     * (\c KadasAnnotationZIndex::Picture); within the bucket
-     * \c QgsAnnotationLayer breaks ties by item-id (UUID), which is
-     * effectively random. Assigning a strictly increasing zIndex per
-     * new picture guarantees that the most recently added one is on
-     * top, which is what users expect both visually and when
-     * click-picking through overlapping pictures.
-     */
+    //! Next zIndex so a freshly created picture stacks above existing pictures in \a layer.
     static int nextPictureZIndex( const QgsAnnotationLayer *layer );
 
     /**
-     * \brief Returns whether the picture's balloon callout is visible.
-     *
-     * The "Show callout" toggle in the style editor is encoded by setting
-     * the balloon symbol to fully transparent fill+stroke and a zero
-     * wedge width — the renderer still places the picture at
-     * \c anchor+offset, but the balloon shape itself is invisible. Code
-     * that depends on whether the callout is shown (e.g. picture-drag
-     * behavior) checks this predicate rather than looking at
-     * \c pic->callout() directly.
+     * Returns whether the picture's balloon callout is visible. Hidden is
+     * encoded as transparent fill+stroke and zero wedge width.
      */
     static bool isCalloutVisible( const QgsAnnotationPictureItem *pic );
 
-    /**
-     * \brief Shows or hides the picture's balloon callout.
-     *
-     * Hiding keeps the callout installed but renders it invisible
-     * (transparent fill+stroke, zero wedge — see isCalloutVisible())
-     * and re-centers the picture on its former anchor so the image does
-     * not stay floating at the balloon offset. Showing restores the
-     * default balloon look (white fill, 1px black stroke, 6px wedge)
-     * when the current symbol is the invisible one; an already visible
-     * callout is left untouched.
-     */
+    //! Shows or hides the balloon callout; hiding re-centers the picture on its former anchor.
     static void setCalloutVisible( QgsAnnotationPictureItem *pic, bool visible );
 
-    /**
-     * \brief Session-wide preference: should corner-resize and the
-     * style editor's width/height spinboxes preserve the picture's
-     * aspect ratio?
-     *
-     * Stored as a static so the style editor (which owns the
-     * checkbox) and the controller (which performs corner drags from
-     * the map tool) agree without needing per-picture state. Default
-     * is \c true (the safer default — free resize stretches images).
-     */
+    //! Session-wide preference: should corner-resize preserve the picture's aspect ratio?
     static bool lockAspectRatio();
     static void setLockAspectRatio( bool on );
 

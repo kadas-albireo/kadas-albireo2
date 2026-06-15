@@ -26,18 +26,7 @@ class KadasAnnotationItemController;
 
 /**
  * \ingroup gui
- * \brief Process-wide registry mapping QgsAnnotationItem type ids to their
- *        Kadas controller.
- *
- * Map tools, editors and KML export look up the controller for a given
- * \c QgsAnnotationItem via \c controllerFor(item->type()) and delegate
- * interactive behavior (draw / edit / snap / tooltip / KML) to it.
- *
- * Registration happens at application startup, typically from
- * \c KadasApplication::init().
- *
- * The registry owns the registered controllers; they are deleted when
- * the registry is destroyed (or when overwritten).
+ * \brief Process-wide registry mapping QgsAnnotationItem type ids to their Kadas controller.
  */
 class KADAS_GUI_EXPORT KadasAnnotationControllerRegistry
 {
@@ -47,16 +36,13 @@ class KADAS_GUI_EXPORT KadasAnnotationControllerRegistry
 
     ~KadasAnnotationControllerRegistry();
 
-    //! Registers \a controller for the type id it reports via
-    //! \c KadasAnnotationItemController::itemType(). Takes ownership of \a controller.
-    //! Replacing an existing registration deletes the previous one.
+    //! Registers \a controller under its itemType(); takes ownership and replaces any existing.
     void addController( KadasAnnotationItemController *controller );
 
-    //! Returns the controller registered for QgsAnnotationItem type id \a typeId,
-    //! or nullptr if none.
+    //! Returns the controller for type id \a typeId, or nullptr.
     KadasAnnotationItemController *controllerFor( const QString &typeId ) const;
 
-    //! Returns the registered annotation item type ids, in registration order.
+    //! Registered type ids, in registration order.
     QStringList registeredTypes() const;
 
   private:

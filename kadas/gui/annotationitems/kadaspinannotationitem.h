@@ -25,17 +25,7 @@
 #include "kadas/gui/annotationitems/kadasannotationshadow.h"
 #include "kadas/gui/kadas_gui.h"
 
-/**
- * \ingroup gui
- * \brief Kadas-internal "pin" annotation item.
- *
- * Subclasses \c QgsAnnotationMarkerItem and pre-configures the marker
- * symbol with the standard Kadas pin SVG (anchored at the bottom tip).
- * Adds two extra text fields, \c name and \c remarks, that are used by
- * the layer tree for tooltips.
- *
- * Type id: \c "kadas:pin".
- */
+//! "Pin" annotation item (type id "kadas:pin").
 class KADAS_GUI_EXPORT KadasPinAnnotationItem : public QgsAnnotationMarkerItem
 {
   public:
@@ -56,11 +46,8 @@ class KADAS_GUI_EXPORT KadasPinAnnotationItem : public QgsAnnotationMarkerItem
     QString remarks() const { return mRemarks; }
     void setRemarks( const QString &remarks ) { mRemarks = remarks; }
 
-    //! Path of the SVG icon used by default for new pins (resource path).
     static QString defaultIconPath();
 
-    //! UUIDs of save-time QGIS-compat shadow items linked to this master.
-    //! See \c KadasAnnotationShadow.
     const QStringList &shadowIds() const { return mShadow.ids(); }
     void setShadowIds( const QStringList &ids ) { mShadow.setIds( ids ); }
 

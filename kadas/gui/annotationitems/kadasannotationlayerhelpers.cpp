@@ -34,10 +34,7 @@ namespace
     return KEY_PREFIX + itemId + QStringLiteral( ":tooltip" );
   }
 
-  // Dispatch shadow-id access through the controller registry so that
-  // adding a new master type only requires overriding shadowIds() /
-  // setShadowIds() on its controller. Returns the controller for \a item,
-  // or nullptr if no controller is registered for the item's type.
+  // Dispatch shadow-id access through the controller registry.
   KadasAnnotationItemController *controllerFor( const QgsAnnotationItem *item )
   {
     if ( !item )
@@ -102,10 +99,7 @@ void KadasAnnotationLayerHelpers::stripShadowsFromLayer( QgsAnnotationLayer *lay
 {
   if ( !layer )
     return;
-  // Collect the set of (master, shadow ids) first. We can NOT keep iterating
-  // a snapshot of layer->items() while deleting items from the layer, since
-  // removeItem() destroys the item and any dangling pointer in our snapshot
-  // would crash on the next dynamic_cast. Capture all the work, then act.
+  // Capture (master, ids) first; removeItem() destroys items, invalidating the snapshot mid-iteration.
   struct Work
   {
       QgsAnnotationItem *master;
@@ -144,8 +138,7 @@ void KadasAnnotationLayerHelpers::prepareLayerForSave( QgsAnnotationLayer *layer
 
   const KadasAnnotationItemContext ctx( layer, QgsMapSettings() );
 
-  // Snapshot master ids/items first; addItem() during iteration would
-  // mutate the underlying map.
+  // Snapshot first; addItem() during iteration would mutate the map.
   const QMap<QString, QgsAnnotationItem *> snapshot = layer->items();
   for ( auto it = snapshot.constBegin(); it != snapshot.constEnd(); ++it )
   {

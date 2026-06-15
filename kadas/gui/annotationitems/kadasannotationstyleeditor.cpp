@@ -190,8 +190,7 @@ void KadasMarkerStyleEditor::applyToItem( QgsAnnotationItem *item ) const
   auto *sl = dynamic_cast<QgsSimpleMarkerSymbolLayer *>( sym->symbolLayer( 0 ) );
   if ( !sl )
   {
-    // Don't clobber exotic symbol layers (e.g. SVG markers) this editor
-    // doesn't know how to drive; leave the item's symbol untouched.
+    // Don't clobber symbol layers this editor can't drive (e.g. SVG markers).
     return;
   }
   sl->setShape( static_cast<Qgis::MarkerShape>( mShapeCombo->currentData().toInt() ) );
@@ -533,10 +532,7 @@ KadasPictureStyleEditor::KadasPictureStyleEditor( QWidget *parent )
   mChangeImageBtn = new QToolButton();
   mChangeImageBtn->setText( tr( "Change image…" ) );
   mChangeImageBtn->setToolTip( tr( "Pick a new picture from a file or fetch one from a URL." ) );
-  // Tool-button + dropdown menu so the user can pick between local file
-  // or a remote URL. InstantPopup means the entire button surface opens
-  // the menu (rather than splitting click vs arrow), which is the
-  // cleanest UX when both choices are first-class.
+  // InstantPopup: whole button opens the file/URL menu.
   mChangeImageBtn->setPopupMode( QToolButton::InstantPopup );
   mChangeImageBtn->setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
   auto *menu = new QMenu( mChangeImageBtn );
@@ -555,19 +551,13 @@ KadasPictureStyleEditor::KadasPictureStyleEditor( QWidget *parent )
   mHeightSpin->setToolTip( tr( "Picture height" ) );
   row->addWidget( mHeightSpin );
 
-  // Lock aspect-ratio: when checked, editing one size spinbox or
-  // dragging a corner handle scales the other dimension proportionally.
-  // Stored as a session-wide preference on the controller (so corner
-  // drags from the map tool see the same flag).
+  // Lock aspect-ratio; stored session-wide on the controller so map-tool drags share it.
   mLockAspectBox = new QCheckBox( tr( "Lock ratio" ) );
   mLockAspectBox->setToolTip( tr( "Preserve the picture's aspect ratio when resizing." ) );
   mLockAspectBox->setChecked( KadasPictureAnnotationController::lockAspectRatio() );
   row->addWidget( mLockAspectBox );
 
-  // "Show callout" toggles the balloon shape entirely. When unchecked
-  // the picture renders flat (no wedge, no frame), centered on the
-  // anchor. The frame / stroke / wedge controls below are disabled in
-  // that mode since they have no visible effect.
+  // "Show callout" toggles the balloon shape; frame/stroke/wedge controls disable when off.
   mShowCalloutBox = new QCheckBox( tr( "Show callout" ) );
   mShowCalloutBox->setToolTip( tr( "Display the picture inside a balloon shape pointing at its anchor." ) );
   row->addWidget( mShowCalloutBox );
@@ -621,8 +611,6 @@ KadasPictureStyleEditor::KadasPictureStyleEditor( QWidget *parent )
       QMessageBox::warning( this, tr( "Picture URL" ), tr( "Please enter a valid http:// or https:// URL." ) );
       return;
     }
-    // Blocking GET keeps the wiring simple: the user already paused the
-    // edit flow on the menu, an extra modal wait is acceptable here.
     QNetworkRequest req( url );
     QgsNetworkReplyContent content = QgsNetworkAccessManager::instance()->blockingGet( req );
     if ( content.error() != QNetworkReply::NoError || content.content().isEmpty() )
@@ -630,10 +618,7 @@ KadasPictureStyleEditor::KadasPictureStyleEditor( QWidget *parent )
       QMessageBox::warning( this, tr( "Picture URL" ), tr( "Failed to download image: %1" ).arg( content.errorString() ) );
       return;
     }
-    // Save into the project archive so the picture survives a project
-    // save/reload — same lifecycle as a file picked from disk via
-    // KadasApplication::addImageItem. Picks the basename from the URL
-    // path, falling back to a generic name if the URL has no file part.
+    // Save into the project archive so the picture survives save/reload.
     QString baseName = QFileInfo( url.path() ).fileName();
     if ( baseName.isEmpty() )
       baseName = QStringLiteral( "downloaded_image" );
@@ -652,10 +637,6 @@ KadasPictureStyleEditor::KadasPictureStyleEditor( QWidget *parent )
   connect( mWidthSpin, qOverload<int>( &QSpinBox::valueChanged ), this, [this]( int w ) {
     if ( mLockAspectBox->isChecked() && mHeightSpin->value() > 0 && w > 0 )
     {
-      // Maintain the current aspect captured at the moment of the
-      // edit: derive the target height from the previous w/h ratio.
-      // Using the spinbox's current values ensures successive edits
-      // walk smoothly along the locked ratio.
       const double aspect = mAspectLockRatio > 0 ? mAspectLockRatio : 1.0;
       const int newH = std::max( 16, std::min( 2000, static_cast<int>( std::round( w / aspect ) ) ) );
       const QSignalBlocker b( mHeightSpin );
@@ -702,8 +683,7 @@ void KadasPictureStyleEditor::loadFromItem( const QgsAnnotationItem *item )
   const QSizeF size = pic->fixedSize();
   mWidthSpin->setValue( static_cast<int>( std::round( size.width() ) ) );
   mHeightSpin->setValue( static_cast<int>( std::round( size.height() ) ) );
-  // Capture the picture's current aspect for the lock-ratio link;
-  // also restore the checkbox from the controller's session-wide flag.
+  // Capture current aspect for the lock-ratio link.
   if ( size.height() > 0 )
     mAspectLockRatio = size.width() / size.height();
   {
@@ -711,9 +691,7 @@ void KadasPictureStyleEditor::loadFromItem( const QgsAnnotationItem *item )
     mLockAspectBox->setChecked( KadasPictureAnnotationController::lockAspectRatio() );
   }
 
-  // Pull fill / stroke from the balloon callout's symbol layer if present;
-  // fall back to the same defaults the controller uses (white / black /
-  // 1px / 6px wedge).
+  // Pull fill/stroke from the balloon callout, falling back to defaults (white/black/1px/6px).
   QColor fill = Qt::white;
   QColor stroke = Qt::black;
   double strokeWidth = 1.0;
@@ -738,11 +716,7 @@ void KadasPictureStyleEditor::loadFromItem( const QgsAnnotationItem *item )
   mStrokeColorBtn->setColor( stroke );
   mStrokeWidthSpin->setValue( strokeWidth );
   mWedgeWidthSpin->setValue( wedge );
-  // The "Show callout" state is encoded in the symbol itself: a fully
-  // transparent fill+stroke and a zero wedge means the user has hidden
-  // the balloon (see applyToItem). When that's the case, fall back to
-  // visible defaults in the spinboxes so re-enabling produces a sane
-  // balloon instead of an invisible one.
+  // Transparent fill+stroke and zero wedge encodes a hidden callout; show visible defaults so re-enabling works.
   const bool calloutVisible = pic->callout() && ( fill.alpha() > 0 || stroke.alpha() > 0 || wedge > 0.0 );
   if ( !calloutVisible )
   {
@@ -767,22 +741,14 @@ void KadasPictureStyleEditor::applyToItem( QgsAnnotationItem *item ) const
   if ( !pic )
     return;
 
-  // Image source — only re-set if the user actually picked a new file
-  // (mPath is updated synchronously by the file dialog).
+  // Only re-set the image if the user picked a new file.
   if ( !mPath.isEmpty() && mPath != pic->path() )
     pic->setPath( pictureFormatFromPath( mPath ), mPath );
 
   pic->setFixedSize( QSizeF( mWidthSpin->value(), mHeightSpin->value() ) );
-  // Preserve the picture's existing fixedSizeUnit. Paste-SVG creates
-  // pictures in Millimeters (100mm ~ 378px at 96dpi); forcing Pixels
-  // would silently shrink such images by ~3.8x on the first edit.
+  // Preserve existing fixedSizeUnit; forcing Pixels would shrink mm-based (paste-SVG) pictures ~3.8x.
 
-  // Show-callout toggle: an unchecked box keeps the balloon callout
-  // installed but renders it invisible (transparent fill/stroke,
-  // zero-width wedge). The renderer then stays in the with-callout
-  // FixedSize branch so the picture is positioned at anchor+offset
-  // exactly where it was visually, instead of jumping to bounds.center
-  // as it would with `setCallout(nullptr)`.
+  // Unchecked keeps the callout installed but invisible, so the picture stays at anchor+offset instead of jumping to bounds.center.
   auto *balloon = dynamic_cast<QgsBalloonCallout *>( pic->callout() );
   if ( !balloon )
   {
@@ -802,9 +768,7 @@ void KadasPictureStyleEditor::applyToItem( QgsAnnotationItem *item ) const
   balloon->setWedgeWidthUnit( Qgis::RenderUnit::Pixels );
   if ( !wantCallout )
   {
-    // Removing the callout frame re-centers the picture on its former
-    // anchor — without a balloon the image must not stay floating at
-    // the balloon offset (matches setCalloutVisible()).
+    // Re-center the picture on its anchor when the callout is hidden.
     const QSizeF size = pic->fixedSize();
     pic->setOffsetFromCallout( QSizeF( -size.width() / 2.0, -size.height() / 2.0 ) );
     pic->setOffsetFromCalloutUnit( pic->fixedSizeUnit() );

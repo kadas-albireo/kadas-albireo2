@@ -31,8 +31,6 @@
 #include "kadas/gui/annotationitems/kadaspointtextannotationcontroller.h"
 
 
-// ----- Persisted last-used style ----------------------------------------
-
 const QgsSettingsEntryDouble *KadasPointTextAnnotationController::settingsSize
   = new QgsSettingsEntryDouble( QStringLiteral( "text-size" ), sTreeAnnotation, 10.0, QStringLiteral( "Last-used point-text size (points)." ) );
 const QgsSettingsEntryColor *KadasPointTextAnnotationController::settingsColor
@@ -133,16 +131,8 @@ KadasEditContext KadasPointTextAnnotationController::getEditContext( const QgsAn
     return KadasEditContext( QgsVertexId( 0, 0, 0 ), testPos, drawAttribs() );
   }
 
-  // Hit-test against the rendered glyph box, not just the anchor point:
-  // depending on alignment the visible text extends well away from the
-  // anchor, and a fixed pickTolSqr around the anchor would miss most of
-  // it (same rationale as the marker controller's symbol-footprint
-  // test). boundingBox( QgsRenderContext& ) accounts for font size,
-  // alignment and rotation; it is expressed in layer CRS, so transform
-  // the click accordingly.
   QgsRenderContext rc = QgsRenderContext::fromMapSettings( ctx.mapSettings() );
   QgsRectangle bbox = item->boundingBox( rc );
-  // Pad by a few pixels so the user can grab the text edge.
   bbox.grow( 4 * ctx.mapSettings().mapUnitsPerPixel() );
   if ( bbox.contains( toItemPos( pos, ctx ) ) )
   {

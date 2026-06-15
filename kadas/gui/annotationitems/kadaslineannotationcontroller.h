@@ -22,11 +22,6 @@
 /**
  * \ingroup gui
  * \brief Controller for stock \c QgsAnnotationLineItem (type id \c "linestring").
- *
- * Drives a click-by-click draw state machine on a single \c QgsLineString.
- * Multi-part strokes, geodesic lines and measurement modes (previously
- * exposed by \c KadasLineItem) are not yet supported and will return as a
- * Kadas-internal annotation-item subclass.
  */
 class KADAS_GUI_EXPORT KadasLineAnnotationController : public KadasAnnotationItemController
 {

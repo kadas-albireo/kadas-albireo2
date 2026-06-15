@@ -94,8 +94,6 @@ void KadasCircleAnnotationController::setCurrentPoint( QgsAnnotationItem *item, 
 
 void KadasCircleAnnotationController::setCurrentAttributes( QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
 {
-  // Interpret AttrX/AttrY as the desired ring point in map CRS, or AttrR as a
-  // radius around the (already-set) center.
   KadasCircleAnnotationItem *c = asCircle( item );
   if ( values.contains( AttrR ) )
   {
@@ -109,7 +107,6 @@ void KadasCircleAnnotationController::setCurrentAttributes( QgsAnnotationItem *i
 
 bool KadasCircleAnnotationController::continuePart( QgsAnnotationItem *, const KadasAnnotationItemContext & )
 {
-  // Two-click item: first click started, second click finishes.
   return false;
 }
 
@@ -170,7 +167,6 @@ void KadasCircleAnnotationController::edit( QgsAnnotationItem *item, const Kadas
   const QgsPointXY newIp = toItemPos( newPoint, ctx );
   if ( editContext.vidx.vertex == 0 )
   {
-    // Move center; keep radius (translate ring point by the same delta).
     const QgsPointXY oldC = circle->center();
     const QgsPointXY oldR = circle->ringPoint();
     const double dx = newIp.x() - oldC.x();
@@ -184,7 +180,6 @@ void KadasCircleAnnotationController::edit( QgsAnnotationItem *item, const Kadas
   }
   else
   {
-    // Whole-item move: shift both points by the map-space delta.
     const QgsPointXY oldCenterMap = toMapPos( circle->center(), ctx );
     const double dxMap = newPoint.x() - oldCenterMap.x();
     const double dyMap = newPoint.y() - oldCenterMap.y();
@@ -293,13 +288,11 @@ QList<KadasAnnotationMeasurementLabel> KadasCircleAnnotationController::measurem
     areaM2 = da.measureArea( geom );
   }
 
-  // Radius label at the midpoint of the center↔ring segment.
   const QgsPointXY centerMap = toMapPos( circle->center(), ctx );
   const QgsPointXY ringMap = toMapPos( circle->ringPoint(), ctx );
   const QgsPointXY midMap( 0.5 * ( centerMap.x() + ringMap.x() ), 0.5 * ( centerMap.y() + ringMap.y() ) );
   labels.append( { midMap, formatLengthMeters( radiusM ), true } );
 
-  // Area label at the center.
   labels.append( { centerMap, formatAreaSquareMeters( areaM2 ), true } );
   return labels;
 }

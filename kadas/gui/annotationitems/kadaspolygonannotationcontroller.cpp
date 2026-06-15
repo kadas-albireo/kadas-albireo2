@@ -64,8 +64,7 @@ namespace
     return static_cast<const QgsAnnotationPolygonItem *>( item );
   }
 
-  //! Returns the mutable exterior LineString of the polygon, replacing the polygon with a clone if needed.
-  //! May return nullptr if the polygon has no exterior ring or it is not a LineString-backed curve.
+  //! Returns the mutable exterior LineString of the polygon, cloning it via setGeometry() for in-place edits.
   QgsLineString *takeMutableExterior( QgsAnnotationPolygonItem *item )
   {
     const QgsCurvePolygon *poly = item->geometry();
@@ -125,8 +124,7 @@ QList<KadasNode> KadasPolygonAnnotationController::nodes( const QgsAnnotationIte
 bool KadasPolygonAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
 {
   const QgsPointXY ip = toItemPos( firstPoint, ctx );
-  // Seed with two coincident points (anchor + rubber band) plus the closing
-  // vertex required to keep the ring valid.
+  // Seed anchor + rubber band + closing vertex to keep the ring valid.
   auto *ring = new QgsLineString();
   ring->addVertex( QgsPoint( ip.x(), ip.y() ) );
   ring->addVertex( QgsPoint( ip.x(), ip.y() ) );
@@ -151,8 +149,7 @@ void KadasPolygonAnnotationController::setCurrentPoint( QgsAnnotationItem *item,
   if ( n < 2 )
     return;
   const QgsPointXY ip = toItemPos( p, ctx );
-  // Move the rubber-band vertex (the second-to-last; the last is the closing
-  // duplicate of the first vertex).
+  // Move the rubber-band vertex (second-to-last; last is the closing duplicate).
   ring->moveVertex( QgsVertexId( 0, 0, n - 2 ), QgsPoint( ip.x(), ip.y() ) );
 }
 
@@ -224,10 +221,9 @@ KadasEditContext KadasPolygonAnnotationController::getEditContext( const QgsAnno
       return KadasEditContext( QgsVertexId( 0, 0, i ), mp, drawAttribs() );
     }
   }
-  // Fall back: a click inside the polygon body selects it for whole-
-  // geometry translation. Use actual polygon containment, NOT bbox
-  // containment — a U-shaped polygon's bbox includes the empty area
-  // between its arms, where the user shouldn't pick it.
+  // Fall back: a click inside the polygon body selects it for whole-geometry
+  // move. Use actual containment, not bbox (a U-shaped polygon's bbox covers
+  // the empty gap between its arms).
   if ( last > 0 )
   {
     const QgsPointXY itemPos = toItemPos( pos, ctx );
@@ -365,12 +361,12 @@ QList<KadasAnnotationMeasurementLabel> KadasPolygonAnnotationController::measure
   if ( !poly || !poly->exteriorRing() || poly->exteriorRing()->numPoints() < 3 )
     return labels;
 
-  // Use project ellipsoid for ellipsoidal area; mirrors KadasPolygonItem::measureGeometry.
+  // Use project ellipsoid for ellipsoidal area.
   QgsDistanceArea da;
   da.setSourceCrs( ctx.itemCrs(), ctx.mapSettings().transformContext() );
   da.setEllipsoid( QgsProject::instance()->ellipsoid() );
 
-  // One length label per exterior-ring edge (matches line/rectangle).
+  // One length label per exterior-ring edge.
   const QgsCurve *ring = poly->exteriorRing();
   const int n = ring->numPoints();
   for ( int i = 1; i < n; ++i )

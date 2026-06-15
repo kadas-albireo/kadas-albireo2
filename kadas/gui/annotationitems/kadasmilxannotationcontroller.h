@@ -22,13 +22,6 @@
 /**
  * \ingroup gui
  * \brief Controller for \c KadasMilxAnnotationItem (type id \c "kadas:milx").
- *
- * Stub implementation. The legacy \c KadasMilxItem driving libmss IPC
- * (\c KadasMilxClient) is being ported in slices 35+; for now this controller
- * only provides identity and a factory so the type registers cleanly with
- * \c KadasAnnotationControllerRegistry. All draw/edit hooks are no-ops that
- * return sensible empty defaults — drawing new MILX symbols is not yet
- * supported through the annotation map tools.
  */
 class KADAS_GUI_EXPORT KadasMilxAnnotationController : public KadasAnnotationItemController
 {

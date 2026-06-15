@@ -27,11 +27,7 @@ class QgsRenderContext;
 
 /**
  * \ingroup gui
- * \brief Helpers to read / write per-annotation-layer MilX symbol settings.
- *
- * Settings are stashed as \c QgsMapLayer::customProperty entries under the
- * \c "kadas/milx/..." namespace. When \c override is \c false (the default),
- * \c resolve() falls back to \c KadasMilxClient::globalSymbolSettings().
+ * \brief Read / write per-annotation-layer MilX symbol settings (\c kadas/milx/... customProperties).
  */
 class KADAS_GUI_EXPORT KadasMilxLayerSettings
 {
@@ -45,11 +41,7 @@ class KADAS_GUI_EXPORT KadasMilxLayerSettings
     //! Returns layer override if enabled, otherwise the global settings.
     static KadasMilxSymbolSettings resolve( const QgsMapLayer *layer );
 
-    /**
-     * Resolve at render time by looking up the source layer through the
-     * render context's expression scope (\c layer_id variable). Falls back
-     * to global settings if the layer cannot be located.
-     */
+    //! Resolve at render time via the context's \c layer_id; falls back to global settings.
     static KadasMilxSymbolSettings resolve( const QgsRenderContext &context );
 };
 

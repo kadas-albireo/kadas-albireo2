@@ -52,10 +52,7 @@ void KadasAnnotationLayer::promoteAll( QgsProject *project )
   if ( !project )
     return;
 
-  // QGIS serializes every annotation layer as plain type="annotation"; on
-  // load, walk the project and rebuild Kadas subclass instances from the
-  // `kadas/annotation-type` customProperty marker so that the layer-tree
-  // right-click "Edit" hook and the custom QPainter renderers work again.
+  // QGIS serializes annotation layers as plain type="annotation"; rebuild Kadas subclasses from the kadas/annotation-type marker.
   QList<QPair<QgsAnnotationLayer *, KadasAnnotationLayer *>> swaps;
   const QMap<QString, QgsMapLayer *> layers = project->mapLayers();
   for ( QgsMapLayer *layer : layers )
@@ -68,10 +65,7 @@ void KadasAnnotationLayer::promoteAll( QgsProject *project )
     if ( it == registry().constEnd() )
       continue;
 
-    // Round-trip plain layer state through XML into a new subclass
-    // instance: readLayerXml preserves customProperties + items + CRS +
-    // opacity + name, and the subclass's own readXml() override then
-    // fills its config from the customProperties.
+    // XML round-trip carries customProperties / items / CRS / opacity / name into the subclass.
     QDomDocument doc;
     QDomElement layerEl = doc.createElement( QStringLiteral( "maplayer" ) );
     doc.appendChild( layerEl );
@@ -101,7 +95,6 @@ void KadasAnnotationLayer::promoteAll( QgsProject *project )
     const bool visible = node ? node->isVisible() : true;
     const bool expanded = node ? node->isExpanded() : false;
 
-    // Drop the plain layer; QgsProject deletes it when not transferred back.
     project->removeMapLayer( id );
     promoted->setId( id ); // keep references in layer-tree, project files, etc.
     project->addMapLayer( promoted, false );

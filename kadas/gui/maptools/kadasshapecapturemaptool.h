@@ -35,17 +35,10 @@ class KadasFloatingInputWidget;
 
 
 /**
- * Lightweight shape-capture map tool.
+ * \brief Shape-capture map tool: rectangle, circle, sector, polyline, polygon.
  *
- * Captures one of: rectangle, circle (center + radius), circular sector
- * (center + radius + sweep), polyline, polygon. Rendering relies on
- * QgsRubberBand. On completion, emits shapeCaptured() with the resulting
- * geometry in the canvas destination CRS.
- *
- * The rubber band stays visible after capture until clear() is called or a
- * new capture starts; this allows callers (e.g. viewshed) to keep showing
- * the captured shape while a configuration dialog is open and to update it
- * via setCircleRadius() / setCapturedGeometry().
+ * Emits shapeCaptured() with the geometry in the canvas destination CRS. The
+ * rubber band stays visible after capture until clear() or a new capture starts.
  */
 class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
 {
@@ -70,11 +63,7 @@ class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
     //! Removes any rubber band and resets capture state.
     void clear();
 
-    /**
-     * When enabled, polyline/polygon previews are drawn as densified geodesic (great circle)
-     * segments instead of straight Cartesian segments. Only affects the displayed rubber band;
-     * previewGeometry() and shapeCaptured() still report the raw vertices.
-     */
+    //! When enabled, poly previews are drawn as densified geodesic segments (display only).
     void setGeodesicPreview( bool enabled ) { mGeodesicPreview = enabled; }
 
     //! Replaces the displayed circle / sector preview (Circle and Sector modes). New radius is in canvas map units.
@@ -92,32 +81,19 @@ class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
     //! True while the user is actively capturing (mid-drag for rect/circle, mid-vertex-stream for poly).
     bool isCapturing() const { return mDragging || mCapturing || mSectorStage != SectorStage::None; }
 
-    /**
-     * Replaces the displayed polyline/polygon preview with the given vertices in canvas CRS.
-     * Used by callers that seed the tool from an externally picked feature. Does not emit shapeCaptured().
-     */
+    //! Replaces the poly preview with \a vertices (canvas CRS); does not emit shapeCaptured().
     void setCapturedPolyline( const QVector<QgsPointXY> &vertices );
 
-    /**
-     * Programmatically adds a point as if the user had left-clicked at \a pos (canvas CRS):
-     * starts the rectangle/circle drag, places the sector center, or appends a polyline/polygon vertex.
-     */
+    //! Adds a point as if the user had left-clicked at \a pos (canvas CRS).
     void addPoint( const QgsPointXY &pos );
 
-    /**
-     * Geometry of the shape currently displayed by the rubber band, in canvas CRS.
-     * While capturing a polyline/polygon, this includes the floating cursor vertex.
-     * Returns an empty geometry if nothing is displayed yet.
-     */
+    //! Geometry currently shown by the rubber band, in canvas CRS (includes the floating cursor vertex while capturing).
     QgsGeometry previewGeometry() const;
 
-    //! Builds a closed polygon ring approximating a circle. Coordinates are in the same CRS as \a center.
+    //! Builds a closed polygon ring approximating a circle, in the CRS of \a center.
     static QgsGeometry circlePolygon( const QgsPointXY &center, double radius, int segments = 64 );
 
-    /**
-     * Builds a pie-slice polygon (center, arc from \a startAngle to \a stopAngle in radians CCW from east).
-     * A sweep of 2*pi or more yields a full circle. Coordinates are in the same CRS as \a center.
-     */
+    //! Pie-slice polygon from \a startAngle to \a stopAngle (radians CCW from east); a sweep of 2*pi or more yields a full circle.
     static QgsGeometry sectorPolygon( const QgsPointXY &center, double radius, double startAngle, double stopAngle, int segments = 64 );
 
     void canvasPressEvent( QgsMapMouseEvent *e ) override;
@@ -138,14 +114,12 @@ class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
     Shape mShape;
     QgsRubberBand *mRubberBand = nullptr;
 
-    // Rect / circle drag state
     bool mDragging = false;
     bool mPressBeganShape = false;
     QgsPointXY mAnchor;
     QgsPointXY mCurrent;
     double mCircleRadius = 0.0;
 
-    // Sector click state
     enum class SectorStage
     {
       None,
@@ -156,7 +130,6 @@ class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
     double mSectorStartAngle = 0.0;
     double mSectorStopAngle = 0.0;
 
-    // Polyline / polygon vertex state
     QVector<QgsPointXY> mVertices;
     bool mCapturing = false;
     QgsPointXY mPolyCursor;
@@ -164,7 +137,7 @@ class KADAS_GUI_EXPORT KadasShapeCaptureMapTool : public QgsMapTool
     bool mGeodesicPreview = false;
     QgsDistanceArea mGeodesicDa;
 
-    // Numeric attribute input (floating x/y/r/α1/α2 box, enabled via /kadas/showNumericInput)
+    // Numeric input box, enabled via /kadas/showNumericInput
     enum NumericAttr
     {
       AttrX,

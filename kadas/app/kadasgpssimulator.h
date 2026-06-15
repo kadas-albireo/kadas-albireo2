@@ -24,9 +24,7 @@
 #include <qgis/qgspointxy.h>
 
 /**
- * A QIODevice which emits NMEA sentences simulating a GPS receiver moving
- * along a route over Switzerland. Intended to be fed to a QgsNmeaConnection
- * to test the GPS integration without real hardware (--gps-simulator).
+ * \brief QIODevice emitting NMEA sentences for a simulated GPS moving over Switzerland (--gps-simulator).
  */
 class KadasGpsSimulator : public QIODevice
 {

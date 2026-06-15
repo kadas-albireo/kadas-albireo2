@@ -25,24 +25,7 @@
 #include "kadas/gui/annotationitems/kadasannotationshadow.h"
 #include "kadas/gui/kadas_gui.h"
 
-/**
- * \ingroup gui
- * \brief Kadas-internal "coordinate cross" annotation item.
- *
- * Renders a black-on-white cross at a point with the X/Y coordinates of
- * its position labelled in kilometres. Subclasses \c QgsAnnotationMarkerItem
- * with a transparent marker symbol so the underlying marker paint does
- * not draw anything; the cross and labels are drawn by the overridden
- * \c render().
- *
- * Coordinates are snapped to the nearest kilometre by the controller on
- * placement and labelled in the same CRS, so the labels always match the
- * snapped grid position. The snapping/labelling CRS is the layer CRS when
- * it is metric, EPSG:3857 otherwise (see \c labelCrs()), mirroring the
- * legacy \c KadasCoordinateCrossItem which forced a metric item CRS.
- *
- * Type id: \c "kadas:coordcross".
- */
+//! "Coordinate cross" annotation item (type id "kadas:coordcross").
 class KADAS_GUI_EXPORT KadasCoordCrossAnnotationItem : public QgsAnnotationMarkerItem
 {
   public:
@@ -50,12 +33,7 @@ class KADAS_GUI_EXPORT KadasCoordCrossAnnotationItem : public QgsAnnotationMarke
 
     static QString itemTypeId() { return QStringLiteral( "kadas:coordcross" ); }
 
-    /**
-     * CRS in which the cross position is snapped to a round kilometre and
-     * labelled: \a layerCrs itself when it is metric (or invalid), EPSG:3857
-     * otherwise (rounding raw degree values would collapse every position
-     * to 0/0).
-     */
+    //! Snapping/labelling CRS: layerCrs if metric, else EPSG:3857 (degrees would round to 0/0).
     static QgsCoordinateReferenceSystem labelCrs( const QgsCoordinateReferenceSystem &layerCrs );
 
     QString type() const override;
@@ -68,8 +46,6 @@ class KADAS_GUI_EXPORT KadasCoordCrossAnnotationItem : public QgsAnnotationMarke
 
     static KadasCoordCrossAnnotationItem *create();
 
-    //! UUIDs of save-time QGIS-compat shadow items linked to this master.
-    //! See \c KadasAnnotationShadow.
     const QStringList &shadowIds() const { return mShadow.ids(); }
     void setShadowIds( const QStringList &ids ) { mShadow.setIds( ids ); }
 

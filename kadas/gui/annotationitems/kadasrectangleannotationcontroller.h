@@ -19,18 +19,7 @@
 
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 
-/**
- * \ingroup gui
- * \brief Controller for \c KadasRectangleAnnotationItem (type id \c "kadas:rectangle").
- *
- * Two-click drawing UX: first click sets the center, second click sets the
- * opposite corner (interpreted as half-extents in the current rotated frame;
- * during draw the angle stays at zero so the user gets an axis-aligned
- * rectangle, rotation can be applied later via the rotation handle).
- *
- * Edit handles: 4 corner vertices (resize) + a rotation handle exposed as
- * vertex index 4. A whole-item move is offered when no handle is hit.
- */
+//! Controller for KadasRectangleAnnotationItem (type id "kadas:rectangle").
 class KADAS_GUI_EXPORT KadasRectangleAnnotationController : public KadasAnnotationItemController
 {
   public:
@@ -86,10 +75,6 @@ class KADAS_GUI_EXPORT KadasRectangleAnnotationController : public KadasAnnotati
     //! Vertex 4 is the rotation handle; vertices 0..3 are the corners.
     static constexpr int RotationHandleVertex = 4;
 
-    // Transient draw-anchor: the position of the first click. Reset on every
-    // startPart() and consulted by setCurrentPoint() to grow the rectangle
-    // from the click toward the cursor regardless of which quadrant the
-    // cursor traverses. Map-CRS coordinates (the user's drawing frame).
     QgsPointXY mDrawAnchor;
     bool mDrawAnchorValid = false;
 };

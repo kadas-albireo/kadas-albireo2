@@ -80,9 +80,7 @@ QgsAnnotationItem *KadasMarkerAnnotationController::createItem() const
 {
   auto *item = new QgsAnnotationMarkerItem( QgsPoint() );
   item->setZIndex( KadasAnnotationZIndex::Marker );
-  // QgsAnnotationMarkerItem ships with an empty QgsMarkerSymbol (zero
-  // symbol layers), which renders nothing. Install a sensible default so
-  // a freshly placed marker is visible even before any persisted style.
+  // QgsAnnotationMarkerItem ships with an empty symbol; install a visible default.
   auto *sl = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Circle );
   sl->setSize( 3.0 );
   sl->setColor( QColor( 255, 0, 0 ) );
@@ -102,7 +100,6 @@ bool KadasMarkerAnnotationController::startPart( QgsAnnotationItem *item, const 
 {
   const QgsPointXY ip = toItemPos( firstPoint, ctx );
   asMarker( item )->setGeometry( QgsPoint( ip.x(), ip.y() ) );
-  // Marker is fully placed after the first click; no further points expected.
   return false;
 }
 
@@ -112,14 +109,10 @@ bool KadasMarkerAnnotationController::startPart( QgsAnnotationItem *item, const 
 }
 
 void KadasMarkerAnnotationController::setCurrentPoint( QgsAnnotationItem *, const QgsPointXY &, const KadasAnnotationItemContext & )
-{
-  // no-op: marker is finalized in startPart
-}
+{}
 
 void KadasMarkerAnnotationController::setCurrentAttributes( QgsAnnotationItem *, const KadasAttribValues &, const KadasAnnotationItemContext & )
-{
-  // no-op
-}
+{}
 
 bool KadasMarkerAnnotationController::continuePart( QgsAnnotationItem *, const KadasAnnotationItemContext & )
 {
@@ -127,9 +120,7 @@ bool KadasMarkerAnnotationController::continuePart( QgsAnnotationItem *, const K
 }
 
 void KadasMarkerAnnotationController::endPart( QgsAnnotationItem * )
-{
-  // no-op
-}
+{}
 
 KadasAttribDefs KadasMarkerAnnotationController::drawAttribs() const
 {
@@ -157,15 +148,11 @@ KadasEditContext KadasMarkerAnnotationController::getEditContext( const QgsAnnot
   const QgsPointXY geom = asMarker( item )->geometry();
   const QgsPointXY testPos = toMapPos( geom, ctx );
 
-  // Hit-test against the actual rendered symbol footprint, not just the
-  // geographic anchor: SVG markers (notably the Kadas pin) are anchored
-  // at their bottom tip, so the visible body extends well above the
-  // anchor. A fixed pickTolSqr around the anchor would miss most of the
-  // icon and the user couldn't select pins by clicking their body.
+  // Hit-test against the rendered symbol footprint, not just the anchor:
+  // SVG markers (e.g. the Kadas pin) are anchored at their bottom tip.
   if ( const QgsMarkerSymbol *symRaw = asMarker( item )->symbol() )
   {
-    // QgsMarkerSymbol::bounds() requires startRender/stopRender, which
-    // are non-const. Clone so we don't mutate the rendered symbol.
+    // QgsMarkerSymbol::bounds() needs startRender/stopRender (non-const); clone to avoid mutating it.
     std::unique_ptr<QgsMarkerSymbol> sym( symRaw->clone() );
     QgsRenderContext rc = QgsRenderContext::fromMapSettings( ctx.mapSettings() );
     const QPointF anchorPx = ctx.mapSettings().mapToPixel().transform( testPos ).toQPointF();
@@ -183,8 +170,7 @@ KadasEditContext KadasMarkerAnnotationController::getEditContext( const QgsAnnot
     }
   }
 
-  // Fallback for items without a symbol (defensive): legacy fixed-tolerance
-  // circular hit around the anchor.
+  // Fallback for items without a symbol: fixed-tolerance hit around the anchor.
   if ( pos.sqrDist( testPos ) < pickTolSqr( ctx ) )
   {
     return KadasEditContext( QgsVertexId( 0, 0, 0 ), testPos, drawAttribs() );
@@ -266,8 +252,6 @@ QString KadasMarkerAnnotationController::asKml( const QgsAnnotationItem *item, c
   QString outString;
   QTextStream outStream( &outString );
   outStream << "<Placemark>\n";
-  // Note: Kadas-specific exportName() lived on KadasMapItem; QgsAnnotationItem has no equivalent.
-  // The owning layer / per-item metadata can carry a display name in the future; for now omit.
   outStream << "<name></name>\n";
   outStream << "<Style>\n";
   outStream << QString( "<LineStyle><width>%1</width><color>%2</color></LineStyle>\n<PolyStyle><fill>%3</fill><color>%4</color></PolyStyle>\n" )
@@ -302,17 +286,14 @@ void KadasMarkerAnnotationController::applyPersistedStyle( QgsAnnotationItem *it
   auto *sl = dynamic_cast<QgsSimpleMarkerSymbolLayer *>( sym->symbolLayer( 0 ) );
   if ( !sl )
   {
-    // Subclasses (pin SVG, coord cross, GPX waypoint, ...) ship a custom
-    // symbol that must not be replaced by the generic-marker defaults.
+    // Subclasses (pin SVG, coord cross, GPX waypoint, ...) ship a custom symbol; don't replace it.
     return;
   }
-  // Preserve the shape chosen by the toolbar / item factory; persist only
-  // the visual style attributes (size, colors, stroke).
+  // Persist only the visual style attributes; keep the shape chosen by the factory.
   const int size = std::max( 1, settingsSize->value() );
   sl->setSize( size );
   sl->setStrokeWidth( settingsStrokeWidth->value() );
-  // Reject fully-transparent fills, which would make every freshly placed
-  // marker invisible after a single accidental persist.
+  // Reject fully-transparent fills (would make the marker invisible).
   QColor fill = settingsFillColor->value();
   if ( fill.alpha() == 0 )
     fill.setAlpha( 255 );

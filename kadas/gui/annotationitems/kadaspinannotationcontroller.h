@@ -19,16 +19,7 @@
 
 #include "kadas/gui/annotationitems/kadasmarkerannotationcontroller.h"
 
-/**
- * \ingroup gui
- * \brief Controller for \c KadasPinAnnotationItem (type id \c "kadas:pin").
- *
- * Pins are markers with a fixed default SVG icon and Kadas-specific
- * \c name / \c remarks fields. Behavior (single-click placement, vertex
- * edit, KML export) is identical to the generic marker, so this controller
- * inherits from \c KadasMarkerAnnotationController and only overrides
- * \c itemType / \c itemName / \c createItem.
- */
+//! Controller for KadasPinAnnotationItem (type id "kadas:pin").
 class KADAS_GUI_EXPORT KadasPinAnnotationController : public KadasMarkerAnnotationController
 {
   public:

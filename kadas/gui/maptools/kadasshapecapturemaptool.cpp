@@ -167,7 +167,6 @@ void KadasShapeCaptureMapTool::canvasPressEvent( QgsMapMouseEvent *e )
   {
     if ( e->button() == Qt::RightButton && ( mShape == Shape::Polyline || mShape == Shape::Polygon ) && mCapturing )
     {
-      // Right click finishes polyline/polygon capture
       mCapturing = false;
       const QgsGeometry geom = ( mShape == Shape::Polygon ) ? buildPolygonGeometry() : buildPolylineGeometry();
       if ( !geom.isEmpty() )
@@ -182,8 +181,6 @@ void KadasShapeCaptureMapTool::canvasPressEvent( QgsMapMouseEvent *e )
     case Shape::Circle:
       if ( !mDragging )
       {
-        // Start a new shape. If the button is released without moving, capture
-        // continues in click-move-click mode and the next click finishes it.
         mAnchor = toMapCoordinates( e->pos() );
         mCurrent = mAnchor;
         mDragging = true;
@@ -195,7 +192,6 @@ void KadasShapeCaptureMapTool::canvasPressEvent( QgsMapMouseEvent *e )
       switch ( mSectorStage )
       {
         case SectorStage::None:
-          // First click: place the center
           resetRubberBand();
           mAnchor = toMapCoordinates( e->pos() );
           mCircleRadius = 0.0;
@@ -205,13 +201,11 @@ void KadasShapeCaptureMapTool::canvasPressEvent( QgsMapMouseEvent *e )
           break;
 
         case SectorStage::HaveCenter:
-          // Second click: fix radius + start angle, begin sweeping
           mSectorStage = SectorStage::HaveRadius;
           break;
 
         case SectorStage::HaveRadius:
         {
-          // Third click: finish the sector
           mSectorStage = SectorStage::None;
           updateSectorRubberBand();
           const QgsGeometry geom = buildSectorGeometry();
@@ -239,9 +233,6 @@ void KadasShapeCaptureMapTool::canvasMoveEvent( QgsMapMouseEvent *e )
 {
   if ( mIgnoreNextMoveEvent )
   {
-    // Spurious move event triggered by KadasFloatingInputWidget::adjustCursorAndExtent;
-    // processing it would clobber the user-entered values with the (less precise) warped
-    // cursor position.
     mIgnoreNextMoveEvent = false;
     return;
   }
@@ -267,7 +258,6 @@ void KadasShapeCaptureMapTool::canvasMoveEvent( QgsMapMouseEvent *e )
       const QgsPointXY p = toMapCoordinates( e->pos() );
       if ( mSectorStage == SectorStage::HaveCenter )
       {
-        // Radius + start angle follow the cursor; full circle until the sweep starts
         mCircleRadius = std::sqrt( p.sqrDist( mAnchor ) );
         mSectorStartAngle = std::atan2( p.y() - mAnchor.y(), p.x() - mAnchor.x() );
         if ( mSectorStartAngle < 0 )
@@ -281,7 +271,6 @@ void KadasShapeCaptureMapTool::canvasMoveEvent( QgsMapMouseEvent *e )
         while ( mSectorStopAngle <= mSectorStartAngle )
           mSectorStopAngle += 2 * M_PI;
 
-        // Snap to full circle when the sweep end is within pick tolerance of its start
         const QgsPointXY pStart( mAnchor.x() + mCircleRadius * std::cos( mSectorStartAngle ), mAnchor.y() + mCircleRadius * std::sin( mSectorStartAngle ) );
         const QgsPointXY pEnd( mAnchor.x() + mCircleRadius * std::cos( mSectorStopAngle ), mAnchor.y() + mCircleRadius * std::sin( mSectorStopAngle ) );
         const double tol = searchRadiusMU( canvas() );
@@ -353,7 +342,6 @@ void KadasShapeCaptureMapTool::canvasReleaseEvent( QgsMapMouseEvent *e )
     case Shape::Sector:
     case Shape::Polyline:
     case Shape::Polygon:
-      // Sector advances on press; vertex addition is handled in press; release does nothing extra.
       break;
   }
 }
@@ -563,7 +551,6 @@ void KadasShapeCaptureMapTool::numericInputChanged()
       break;
   }
 
-  // Suppress the spurious move event triggered by adjustCursorAndExtent.
   mIgnoreNextMoveEvent = true;
   mInputWidget->adjustCursorAndExtent( pos );
 }
@@ -741,17 +728,12 @@ QVector<QgsPointXY> KadasShapeCaptureMapTool::geodesicDisplayPoints( const QVect
   if ( !mGeodesicDa.willUseEllipsoid() )
     return points;
 
-  constexpr double interval = 100000; // densify long geodesic segments every 100km
+  constexpr double interval = 100000; // densify geodesic segments every 100 km
   QVector<QgsPointXY> out;
   out.append( points.first() );
   for ( int i = 0, n = points.size(); i < n - 1; ++i )
   {
-    // QgsDistanceArea::geodesicLine() always evaluates its first sample at a full
-    // interval along the geodesic, even when the segment is shorter than the
-    // interval. That produces a densified point *beyond* the endpoint, drawing a
-    // long spike past the cursor. Only densify segments that are actually longer
-    // than the interval; shorter ones are visually indistinguishable from a
-    // straight line.
+    // QgsDistanceArea::geodesicLine() overshoots by one full interval for sub-interval segments, so only densify segments longer than the interval.
     if ( mGeodesicDa.measureLine( points[i], points[i + 1] ) <= interval )
     {
       out.append( points[i + 1] );
@@ -763,7 +745,6 @@ QVector<QgsPointXY> KadasShapeCaptureMapTool::geodesicDisplayPoints( const QVect
       out.append( points[i + 1] );
       continue;
     }
-    // breakLine is false, so geodesicLine never splits: a single part is returned.
     const QVector<QgsPointXY> &segment = segments.first();
     for ( int j = 1, m = segment.size(); j < m; ++j )
       out.append( segment[j] );

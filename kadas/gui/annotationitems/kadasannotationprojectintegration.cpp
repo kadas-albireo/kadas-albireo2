@@ -51,18 +51,7 @@ namespace
     return result;
   }
 
-  // QgsAnnotationPictureItem::writeXml/readXml stores the raw mPath, with no
-  // pathResolver translation. Pictures created via Kadas paths live in the
-  // project archive's attachment dir (a temp folder with a random name) so
-  // a literal save of the path makes the picture unrenderable on reload —
-  // the renderer feeds the dead path into svg/imageCache, those return
-  // nothing, and the image cache draws a "?" placeholder.
-  //
-  // Workaround: rewrite all picture paths that point inside the current
-  // attachment dir to "attachment:<basename>" before save and resolve them
-  // back to the (now extracted) real path right after load. The save-side
-  // code also restores the live path after write so the in-memory state is
-  // unchanged for the running session.
+  // QgsAnnotationPictureItem::writeXml stores the raw path verbatim, so attachment-dir paths break on reload; rewrite to "attachment:<name>" before save and resolve after load.
 
   QList<QgsAnnotationPictureItem *> picturesIn( QgsAnnotationLayer *layer )
   {
@@ -76,9 +65,7 @@ namespace
     return result;
   }
 
-  // (id, item) pairs for all picture items on \a layer. Needed when the
-  // caller has to address per-item layer customProperties (offset
-  // side-channel keyed by item id).
+  // (id, item) pairs for all picture items on \a layer.
   QList<QPair<QString, QgsAnnotationPictureItem *>> picturesInWithIds( QgsAnnotationLayer *layer )
   {
     QList<QPair<QString, QgsAnnotationPictureItem *>> result;
@@ -110,8 +97,7 @@ namespace
     return attached.contains( absolutePath );
   }
 
-  // Convert live attachment paths -> "attachment:..." identifiers.
-  // Returns the previous paths so the caller can restore them after write.
+  // Convert live attachment paths to "attachment:..." identifiers; returns previous paths for restore.
   QHash<QgsAnnotationPictureItem *, QString> rewritePathsForSave()
   {
     QHash<QgsAnnotationPictureItem *, QString> previous;
@@ -137,8 +123,7 @@ namespace
       it.key()->setPath( it.key()->format(), it.value() );
   }
 
-  // After load, "attachment:..." identifiers must be resolved against the
-  // newly-extracted archive directory before the renderer can read them.
+  // After load, resolve "attachment:..." identifiers against the extracted archive dir.
   void resolveAttachmentPathsAfterLoad()
   {
     for ( QgsAnnotationLayer *layer : annotationLayers() )
@@ -157,18 +142,7 @@ namespace
 
   // ---- offsetFromCallout side-channel ----
   //
-  // QgsAnnotationItem::writeCommonProperties guards the offset write
-  // with `if ( mOffsetFromCallout.isValid() )`. QSizeF::isValid() is
-  // false for any negative dimension, so a centered-on-anchor offset
-  // (-size/2, -size/2) — the canonical "no balloon visible" state used
-  // by Kadas pictures — is silently dropped on save. Reload then
-  // resets the offset to the default-invalid sentinel and the picture
-  // jumps to the wrong place ("balloon back on the anchor").
-  //
-  // Workaround: write the offset (and its unit) into the layer's
-  // customProperties under `kadas:picture-offset:<itemId>` and
-  // `kadas:picture-offset-unit:<itemId>`. The layer XML always
-  // round-trips customProperties, so the value survives.
+  // QgsAnnotationItem::writeCommonProperties drops negative offsetFromCallout (QSizeF::isValid() false), so persist it via layer customProperties instead.
 
   QString offsetKey( const QString &itemId )
   {
@@ -187,9 +161,7 @@ namespace
       {
         const QString id = pair.first;
         const QgsAnnotationPictureItem *pic = pair.second;
-        // Only write when something non-default exists. An invalid
-        // size (default-constructed QSizeF) means "QGIS-default", we
-        // don't need to side-channel that.
+        // Skip the default (zero) offset; only side-channel non-default values.
         const QSizeF off = pic->offsetFromCallout();
         if ( off.width() == 0 && off.height() == 0 )
         {
@@ -225,13 +197,7 @@ namespace
     }
   }
 
-  // Walk every picture and run ensureBalloon. Handles two migration
-  // cases on project load:
-  //  - Project saved by an older Kadas (or by vanilla QGIS) without a
-  //    callout installed — install the canonical balloon.
-  //  - Project where the saved offset was the QGIS default (invalid),
-  //    e.g. saved before the side-channel above was wired up — give
-  //    the picture a centered-on-anchor offset so it renders sensibly.
+  // Run ensureBalloon on every picture to migrate calloutless/default-offset pictures.
   void ensureBalloonsAfterLoad()
   {
     for ( QgsAnnotationLayer *layer : annotationLayers() )
@@ -254,9 +220,6 @@ void KadasAnnotationProjectIntegration::prepareForSave()
   for ( QgsAnnotationLayer *layer : annotationLayers() )
     KadasAnnotationLayerHelpers::prepareLayerForSave( layer );
   mPicturePathsBeforeSave = rewritePathsForSave();
-  // Persist the offsetFromCallout via the layer customProperty side
-  // channel because QGIS drops negative offsets at write time. See the
-  // long comment above writePictureOffsetsToCustomProperties.
   writePictureOffsetsToCustomProperties();
 }
 
@@ -270,19 +233,12 @@ void KadasAnnotationProjectIntegration::stripAfterSave()
 
 void KadasAnnotationProjectIntegration::onProjectRead( const QDomDocument & )
 {
-  // Defensive: a project written by an older Kadas session might still
-  // contain shadow items if the save-side strip didn't run. Drop them now
-  // so they don't appear as duplicates next to the masters.
+  // Strip leftover shadow items from projects saved by older sessions.
   stripAfterSave();
-  // Re-point picture items at the freshly-extracted attachment files in
-  // the archive's temp directory; the renderer reads mPath verbatim.
+  // Re-point picture items at the freshly-extracted attachment files.
   resolveAttachmentPathsAfterLoad();
-  // Restore offset side-channel before ensureBalloon runs so a saved
-  // negative offset is honored instead of being clobbered by the
-  // -size/2 default.
+  // Restore offset side-channel before ensureBalloon runs.
   readPictureOffsetsFromCustomProperties();
-  // Migrate calloutless / partially-configured pictures to the canonical
-  // Kadas balloon look so editing UX is uniform regardless of how the
-  // picture was originally created.
+  // Migrate calloutless pictures to the canonical balloon look.
   ensureBalloonsAfterLoad();
 }

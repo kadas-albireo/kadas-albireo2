@@ -58,8 +58,7 @@ namespace
     return static_cast<const QgsAnnotationLineItem *>( item );
   }
 
-  //! Returns a mutable QgsLineString backing the item, or nullptr if the curve is not a LineString.
-  //! Mutates the item via setGeometry() with a clone of the underlying line for in-place edits.
+  //! Returns a mutable QgsLineString backing the item, cloning it via setGeometry() for in-place edits.
   QgsLineString *takeMutableLine( QgsAnnotationLineItem *item )
   {
     const QgsCurve *curve = item->geometry();
@@ -112,8 +111,7 @@ QList<KadasNode> KadasLineAnnotationController::nodes( const QgsAnnotationItem *
 bool KadasLineAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
 {
   const QgsPointXY ip = toItemPos( firstPoint, ctx );
-  // Mirror legacy behavior: seed with two coincident points so that
-  // setCurrentPoint() can update the trailing one as a "rubber band".
+  // Seed with two coincident points so setCurrentPoint() can rubber-band the trailing one.
   auto *ls = new QgsLineString();
   ls->addVertex( QgsPoint( ip.x(), ip.y() ) );
   ls->addVertex( QgsPoint( ip.x(), ip.y() ) );
@@ -199,14 +197,9 @@ KadasEditContext KadasLineAnnotationController::getEditContext( const QgsAnnotat
       return KadasEditContext( QgsVertexId( 0, 0, i ), mp, drawAttribs() );
     }
   }
-  // Fall back: a hit on (or close to) any segment selects the whole line
-  // for translation. The handle is anchored at the first vertex so the
-  // edit() body-move branch can compute the drag offset.
-  // NOTE: a bbox-contains check would be wrong here — a diagonal line
-  // has a large bounding box that covers vast empty space, so any click
-  // inside that bbox would (incorrectly) pick the line, even if it's
-  // far from the actual stroke. We instead require the click to fall
-  // within pickTolSqr of one of the segments.
+  // Fall back: a hit close to any segment selects the whole line for
+  // translation, anchored at the first vertex. A bbox check would be wrong
+  // (a diagonal line's bbox covers vast empty space), so require a segment hit.
   if ( n >= 2 )
   {
     const double tolSqr = pickTolSqr( ctx );
@@ -223,12 +216,7 @@ KadasEditContext KadasLineAnnotationController::getEditContext( const QgsAnnotat
       {
         const QgsPoint p0 = curve->vertexAt( QgsVertexId( 0, 0, 0 ) );
         const QgsPointXY refPos = toMapPos( QgsPointXY( p0.x(), p0.y() ), ctx );
-        // A click that lands on the actual line stroke is a geometrically
-        // precise hit, NOT a loose body containment — even though we use
-        // the whole-line-move semantics (ArrowCursor + invalid vidx) for
-        // the subsequent drag. Flag it as Precise so the canvas picker
-        // prefers this line over a higher-z polygon whose body merely
-        // contains the click.
+        // Mark Precise so the canvas picker prefers this stroke hit over a higher-z polygon body.
         KadasEditContext ec( QgsVertexId(), refPos, KadasAttribDefs(), Qt::ArrowCursor );
         ec.precision = KadasEditContext::HitPrecision::Precise;
         return ec;
@@ -356,9 +344,8 @@ QList<KadasAnnotationMeasurementLabel> KadasLineAnnotationController::measuremen
   if ( n < 2 )
     return labels;
 
-  // Measurement uses the project ellipsoid in the item CRS, then transforms
-  // anchor points into the map CRS for on-canvas placement (legacy
-  // behavior of KadasLineItem::measureGeometry).
+  // Measurement uses the project ellipsoid in the item CRS; anchors are
+  // transformed to the map CRS for on-canvas placement.
   QgsDistanceArea da;
   da.setSourceCrs( ctx.itemCrs(), ctx.mapSettings().transformContext() );
   da.setEllipsoid( QgsProject::instance()->ellipsoid() );

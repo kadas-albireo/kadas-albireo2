@@ -55,15 +55,10 @@ void KadasCircleAnnotationItem::rebuildGeometry()
   const double r = radius();
   if ( r <= 0 )
   {
-    // Degenerate: keep a non-curved empty polygon to avoid render glitches.
     setGeometry( new QgsPolygon() );
     return;
   }
 
-  // Build the circle as two circular-string arcs (top + bottom semicircles)
-  // joined into a closed compound curve. The points are picked at fixed
-  // angles relative to the +X axis: 0 (east), 90 (north), 180 (west),
-  // 270 (south). Each arc passes through start, mid, end.
   const double cx = mCenter.x();
   const double cy = mCenter.y();
   const QgsPoint pE( cx + r, cy );
@@ -104,9 +99,6 @@ void KadasCircleAnnotationItem::setCircle( const QgsPointXY &center, const QgsPo
 
 bool KadasCircleAnnotationItem::writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const
 {
-  // The parent serializes the curve-polygon geometry + fill symbol + common
-  // properties. We add the canonical center/ring parameters so loading is
-  // exact (the parent's WKT is a fall-back / sanity record).
   QgsAnnotationPolygonItem::writeXml( element, document, context );
   element.setAttribute( QStringLiteral( "cx" ), qgsDoubleToString( mCenter.x() ) );
   element.setAttribute( QStringLiteral( "cy" ), qgsDoubleToString( mCenter.y() ) );

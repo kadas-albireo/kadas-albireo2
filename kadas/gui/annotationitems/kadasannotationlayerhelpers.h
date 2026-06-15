@@ -27,78 +27,27 @@ class QgsAnnotationLayer;
 
 /**
  * \ingroup gui
- * \brief Static helpers for attaching Kadas-specific per-item metadata
- *        (editor widget name, tooltip) to a stock \c QgsAnnotationLayer.
- *
- * Stock \c QgsAnnotationItem subclasses do not expose a custom-property bag,
- * so per-instance metadata that Kadas needs (and which has no upstream
- * equivalent) is stored on the owning layer instead.  This keeps the items
- * themselves stock and round-trippable through vanilla QGIS, at the cost of
- * losing metadata when an item is moved between layers (which Kadas does not
- * currently allow from the UI).
- *
- * Storage schema: each datum is stored as a layer custom property keyed
- * <tt>kadas:item-meta:&lt;itemId&gt;:&lt;field&gt;</tt>.  Project save/load
- * preserves these because layer custom properties are part of the standard
- * QGIS layer XML.
+ * \brief Static helpers for attaching Kadas-specific per-item metadata to a stock QgsAnnotationLayer.
  */
 class KADAS_GUI_EXPORT KadasAnnotationLayerHelpers
 {
   public:
-    /**
-     * Returns TRUE if \a layer is a parametric Kadas annotation layer
-     * (bullseye, guide grid, ...), i.e. carries the
-     * <tt>kadas/annotation-type</tt> customProperty marker. Such layers own
-     * exactly one logical object whose items are auto-generated from a
-     * configuration; hit testing and editing must treat the layer
-     * atomically (via its dedicated edit tool) instead of exposing the
-     * generated child items individually.
-     *
-     * The check uses the customProperty marker rather than a qobject_cast
-     * because the concrete subclasses live in the app layer, which gui
-     * code must not depend on.
-     */
+    //! TRUE if \a layer is a parametric Kadas annotation layer (carries the kadas/annotation-type customProperty).
     static bool isParametricLayer( const QgsAnnotationLayer *layer );
 
-    //! Returns the tooltip stored for \a itemId on \a layer, or an empty
-    //! string if none is set.
+    //! Tooltip stored for \a itemId on \a layer, or empty.
     static QString tooltip( const QgsAnnotationLayer *layer, const QString &itemId );
 
-    //! Sets the \a tooltip for \a itemId on \a layer. Passing an empty
-    //! \a tooltip removes it.
+    //! Sets \a tooltip for \a itemId; empty removes it.
     static void setTooltip( QgsAnnotationLayer *layer, const QString &itemId, const QString &tooltip );
 
-    /**
-     * Creates a new \c QgsAnnotationLayer named \a name. If \a preferredCrs is
-     * valid it is used as the layer CRS (so callers importing data in a
-     * known native CRS can avoid round-trip reprojection). Otherwise the
-     * current project CRS is used, falling back to EPSG:3857 if the project
-     * has no CRS. The returned layer is NOT added to the project; the
-     * caller is expected to call \c QgsProject::instance()->addMapLayer().
-     */
+    //! Creates a QgsAnnotationLayer named \a name (using \a preferredCrs, else project CRS, else EPSG:3857). Not added to the project.
     static QgsAnnotationLayer *createLayer( const QString &name, const QgsCoordinateReferenceSystem &preferredCrs = QgsCoordinateReferenceSystem() );
 
-    /**
-     * For every Kadas master annotation item in \a layer that has a registered
-     * controller exposing \c generateShadows(), creates the shadow items,
-     * inserts them into the layer, and stores their ids on the master via
-     * \c setShadowIds(). Idempotent: existing shadows referenced by the
-     * master are stripped first to avoid accumulation across repeated saves.
-     *
-     * Intended to be called immediately before \c QgsProject::write().
-     */
+    //! Generates and inserts QGIS-compat shadow items for every master item. Call before QgsProject::write(). Idempotent.
     static void prepareLayerForSave( QgsAnnotationLayer *layer );
 
-    /**
-     * For every Kadas master annotation item in \a layer that has non-empty
-     * \c shadowIds(), removes the referenced shadow items from the layer and
-     * clears the master's shadow id list.
-     *
-     * Intended to be called immediately after \c QgsProject::write() (to
-     * leave the in-memory layer pristine for the running session) and after
-     * \c QgsProject::read() (to drop any shadows that survived the
-     * round-trip when the project was saved by a previous Kadas session).
-     */
+    //! Removes shadow items and clears master shadow id lists. Call after QgsProject::write() and after read().
     static void stripShadowsFromLayer( QgsAnnotationLayer *layer );
 
   private:

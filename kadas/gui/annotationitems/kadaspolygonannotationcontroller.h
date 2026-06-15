@@ -22,10 +22,6 @@
 /**
  * \ingroup gui
  * \brief Controller for stock \c QgsAnnotationPolygonItem (type id \c "polygon").
- *
- * Drives a click-by-click draw state machine on a single \c QgsPolygon.
- * Multi-part / multi-ring polygons are not yet supported and will return
- * via a Kadas-internal annotation-item subclass.
  */
 class KADAS_GUI_EXPORT KadasPolygonAnnotationController : public KadasAnnotationItemController
 {

@@ -27,13 +27,6 @@
  * \ingroup gui
  * \brief Bundles the per-call context that \c KadasAnnotationItemController
  *        needs for map-space ↔ item-space transforms.
- *
- * A \c QgsAnnotationItem stores its geometry in the CRS of the
- * \c QgsAnnotationLayer it belongs to.  Map tools in turn work in the map
- * canvas CRS.  Controllers therefore need both pieces of information to
- * project geometry between the two; this lightweight struct passes them
- * together.  Aligns with QGIS's own annotation tooling, where the layer is
- * the single source of truth for the item CRS.
  */
 class KADAS_GUI_EXPORT KadasAnnotationItemContext
 {

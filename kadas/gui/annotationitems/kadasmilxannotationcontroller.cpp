@@ -46,8 +46,6 @@
 
 namespace
 {
-  // Mirrors the legacy KadasMilxItem node renderers so the on-canvas
-  // appearance of MilX nodes does not change when the controller takes over.
   void posPointNodeRenderer( QPainter *painter, const QPointF &screenPoint, int nodeSize )
   {
     painter->setPen( QPen( Qt::black, 1 ) );
@@ -86,12 +84,11 @@ QList<KadasNode> KadasMilxAnnotationController::nodes( const QgsAnnotationItem *
   if ( pts.isEmpty() || milx->mssString().isEmpty() )
     return {};
 
-  // Ask libmss which point indices are draggable control points; the rest
-  // are rendered as plain position nodes (matches legacy KadasMilxItem::nodes).
+  // Control point indices are draggable; the rest render as plain position nodes.
   QList<int> controlIndices;
   KadasMilxClient::getControlPointIndices( milx->mssString(), pts.size(), KadasMilxLayerSettings::resolve( ctx.layer() ), controlIndices );
 
-  // MilX points are stored in EPSG:4326; project them to the map CRS for display.
+  // MilX points are stored in EPSG:4326; project to the map CRS for display.
   const QgsCoordinateTransform xform( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
 
   QList<KadasNode> result;
@@ -119,9 +116,8 @@ bool KadasMilxAnnotationController::startPart( QgsAnnotationItem *item, const Qg
   if ( milx->mssString().isEmpty() )
     return false;
 
-  // First click: append the user point in item CRS (4326), bump the
-  // pressed-points counter, then ask libmss to materialize the symbol
-  // (which usually back-fills control points up to mMinNumPoints).
+  // First click: append the user point in item CRS, then let libmss
+  // materialize the symbol (back-fills control points up to mMinNumPoints).
   milx->setDrawStatus( KadasMilxAnnotationItem::DrawStatus::Drawing );
   QList<QgsPointXY> pts = milx->points();
   pts.append( toItemPos( firstPoint, ctx ) );
@@ -154,9 +150,7 @@ void KadasMilxAnnotationController::setCurrentPoint( QgsAnnotationItem *item, co
   if ( milx->mssString().isEmpty() || milx->drawStatus() != KadasMilxAnnotationItem::DrawStatus::Drawing )
     return;
 
-  // Live preview: ask libmss to move the next non-pressed slot to the
-  // current cursor position. The slot index equals pressedPoints (matches
-  // the legacy KadasMilxItem semantics).
+  // Live preview: move the next non-pressed slot (index = pressedPoints) to the cursor.
   const QPoint screenPoint = ctx.mapSettings().mapToPixel().transform( p ).toQPointF().toPoint();
   KadasMilxClient::NPointSymbol symbol = milx->toSymbol( ctx.mapSettings() );
   KadasMilxClient::NPointSymbolGraphic result;
@@ -179,9 +173,7 @@ bool KadasMilxAnnotationController::continuePart( QgsAnnotationItem *item, const
   auto *milx = static_cast<KadasMilxAnnotationItem *>( item );
   milx->setPressedPoints( milx->pressedPoints() + 1 );
 
-  // Once the minimum number of points has been clicked, additional clicks
-  // append a new point to the symbol (only meaningful for variable-point
-  // symbols; libmss otherwise stops at minNumPoints).
+  // Past the minimum, extra clicks append a point (variable-point symbols only).
   if ( milx->pressedPoints() >= milx->minNumPoints() && milx->hasVariablePoints() )
   {
     const QList<QgsPointXY> pts = milx->points();
@@ -293,9 +285,8 @@ KadasEditContext KadasMilxAnnotationController::getEditContext( const QgsAnnotat
     }
   }
 
-  // 3) Whole-symbol drag fallback (vidx invalid). Anchor on the first
-  //    point — for single-point symbols, shift the anchor by the user
-  //    offset so the drag visually starts on the rendered glyph.
+  // 3) Whole-symbol drag fallback. Anchor on the first point; for
+  //    single-point symbols shift by the user offset so the drag starts on the glyph.
   if ( hitTest( item, pos, ctx ) && !pts.isEmpty() )
   {
     QgsPointXY refMap;
@@ -344,15 +335,14 @@ void KadasMilxAnnotationController::edit( QgsAnnotationItem *item, const KadasEd
     }
     else
     {
-      // Single-point symbols: bypass libmss and update the geometry directly.
+      // Single-point symbols: update the geometry directly, bypassing libmss.
       const QgsPointXY itemPos = toItemPos( newPoint, ctx );
       milx->setPoints( { itemPos } );
     }
   }
   else if ( milx->isMultiPoint() )
   {
-    // Whole-symbol drag (multipoint): translate every geometry / attribute
-    // point by the same map-space delta. No libmss round-trip needed.
+    // Whole-symbol drag (multipoint): translate every point by the same map-space delta.
     if ( milx->points().isEmpty() )
       return;
     const QgsPointXY refMap = toMapPos( milx->points().front(), ctx );
@@ -389,8 +379,7 @@ void KadasMilxAnnotationController::edit( QgsAnnotationItem *item, const KadasEd
   auto *milx = static_cast<KadasMilxAnnotationItem *>( item );
   if ( values.size() == 1 )
   {
-    // Single shape attribute (length / width / radius / attitude): replace
-    // the stored value, then ask libmss to recompute the symbol graphic.
+    // Single shape attribute (length / width / radius / attitude): store it, then recompute via libmss.
     const KadasMilxAttrType attr = static_cast<KadasMilxAttrType>( values.firstKey() );
     QMap<KadasMilxAttrType, double> attrs = milx->attributes();
     attrs[attr] = values[values.firstKey()];
@@ -418,8 +407,7 @@ KadasAttribValues KadasMilxAnnotationController::editAttribsFromPosition( const 
 {
   if ( editContext.attributes.size() == 1 )
   {
-    // Single shape attribute: report the current stored value, not a
-    // position-derived one (the input dialog binds to the attribute id key).
+    // Report the stored attribute value, not a position-derived one.
     const auto *milx = static_cast<const KadasMilxAnnotationItem *>( item );
     const KadasMilxAttrType attr = static_cast<KadasMilxAttrType>( editContext.attributes.firstKey() );
     KadasAttribValues values;
@@ -473,8 +461,7 @@ void KadasMilxAnnotationController::translate( QgsAnnotationItem *item, double d
   for ( QgsPointXY &p : pts )
     p.set( p.x() + dx, p.y() + dy );
   milx->setPoints( pts );
-  // Attribute points (libmss-managed handles for width/length/etc.) live in
-  // the same CRS as the geometry points; translate them in lockstep.
+  // Attribute points live in the same CRS as the geometry; translate them in lockstep.
   QMap<KadasMilxAttrType, QgsPointXY> aps = milx->attributePoints();
   for ( auto it = aps.begin(), itEnd = aps.end(); it != itEnd; ++it )
   {
@@ -485,9 +472,8 @@ void KadasMilxAnnotationController::translate( QgsAnnotationItem *item, double d
 
 QString KadasMilxAnnotationController::asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip ) const
 {
-  // Mirrors the legacy KadasMilxItem::asKml: render the symbol at a fixed
-  // world-wide extent, store the PNG inside the KMZ, then emit either a
-  // <Placemark>+<StyleMap> (single-point) or a <GroundOverlay> (multipoint).
+  // Mirrors the legacy KadasMilxItem::asKml: render at a world extent, store
+  // the PNG in the KMZ, then emit a Placemark (single-point) or GroundOverlay (multipoint).
   if ( !kmzZip )
     return QString();
 
@@ -495,9 +481,7 @@ QString KadasMilxAnnotationController::asKml( const QgsAnnotationItem *item, con
   if ( milx->mssString().isEmpty() || milx->points().isEmpty() )
     return QString();
 
-  // Build a transient QgsMapSettings that mimics the legacy export render
-  // context (world extent in EPSG:4326). Reusing item-level helpers keeps
-  // the libmss IPC path identical to the on-canvas one.
+  // Transient QgsMapSettings mimicking the legacy export render context (world extent in EPSG:4326).
   const QgsRectangle worldExtent( -180., -90., 180., 90. );
   const double factor = QgsUnitTypes::fromUnitToUnitFactor( Qgis::DistanceUnit::Degrees, Qgis::DistanceUnit::Meters ) * renderContext.scaleFactor() * 1000 / renderContext.rendererScale();
   QgsMapSettings ms;
@@ -524,8 +508,7 @@ QString KadasMilxAnnotationController::asKml( const QgsAnnotationItem *item, con
     return QString();
   }
 
-  // Item geometry is always EPSG:4326; the itemCrs argument is informational
-  // here (and matches itemCrs of the parent annotation layer in practice).
+  // Item geometry is always EPSG:4326; itemCrs is informational here.
   QgsPoint pos( milx->points().front() );
   if ( itemCrs.isValid() && itemCrs != QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ) )
   {
@@ -581,8 +564,7 @@ QString KadasMilxAnnotationController::asKml( const QgsAnnotationItem *item, con
 
 namespace
 {
-  // Pick the topmost main window, used as parent for libmss' modal symbol
-  // editor dialog (mirrors the legacy KadasMilxItem behavior).
+  // Topmost main window, used as parent for libmss' modal symbol editor dialog.
   WId mainWindowWid()
   {
     for ( QWidget *widget : QApplication::topLevelWidgets() )
@@ -622,7 +604,7 @@ void KadasMilxAnnotationController::populateContextMenu( QgsAnnotationItem *item
   {
     if ( editContext.vidx.vertex >= 0 )
     {
-      // Right-click on an existing node → delete (if libmss says it's removable).
+      // Right-click on an existing node → delete (if libmss allows).
       QAction *actionDeletePoint = menu->addAction( QIcon( QStringLiteral( ":/kadas/icons/delete_node" ) ), QObject::tr( "Delete node" ), [milx, &ctxRef = ctx, screenRect, dpi, symbol, editContext]() mutable {
         KadasMilxClient::NPointSymbolGraphic result;
         if ( KadasMilxClient::deletePoint( screenRect, dpi, symbol, editContext.vidx.vertex, KadasMilxLayerSettings::resolve( ctxRef.layer() ), result ) )
@@ -633,7 +615,7 @@ void KadasMilxAnnotationController::populateContextMenu( QgsAnnotationItem *item
     }
     else
     {
-      // Right-click on the symbol body → insert a node at the click position.
+      // Right-click on the symbol body → insert a node at the click.
       menu->addAction( QIcon( QStringLiteral( ":/kadas/icons/add_node" ) ), QObject::tr( "Add node" ), [milx, &ctxRef = ctx, screenRect, dpi, symbol, screenPos]() mutable {
         KadasMilxClient::NPointSymbolGraphic result;
         if ( KadasMilxClient::insertPoint( screenRect, dpi, symbol, screenPos, KadasMilxLayerSettings::resolve( ctxRef.layer() ), result ) )
@@ -676,12 +658,9 @@ bool KadasMilxAnnotationController::hitTest( const QgsAnnotationItem *item, cons
   if ( milx->points().isEmpty() || milx->mssString().isEmpty() )
     return false;
 
-  // Defer the precise hit test to libmss — the rendered MilX glyph is
-  // typically much larger than the convex hull of its control points,
-  // so the default bounding-box test would miss most of the symbol.
+  // Defer the hit test to libmss: the rendered glyph is typically much
+  // larger than the convex hull of its control points.
   KadasMilxClient::NPointSymbol symbol = milx->toSymbol( ctx.mapSettings() );
-  // toSymbol() doesn't throw — but a degenerate (empty xml/points) state is
-  // still possible if controller is invoked on a half-built item.
   if ( symbol.xml.isEmpty() || symbol.points.isEmpty() )
     return false;
   // Account for the user-applied screen-space offset before asking libmss.

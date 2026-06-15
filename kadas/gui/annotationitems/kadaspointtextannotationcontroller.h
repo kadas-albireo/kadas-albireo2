@@ -19,15 +19,7 @@
 
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 
-/**
- * \ingroup gui
- * \brief Controller for stock \c QgsAnnotationPointTextItem (type id \c "pointtext").
- *
- * Replaces the interactive behavior previously on \c KadasTextItem.
- * Text content, font, color and rotation live on the
- * \c QgsAnnotationPointTextItem itself (via \c QgsTextFormat); the
- * controller only drives the click-to-place state machine and KML export.
- */
+//! Controller for stock QgsAnnotationPointTextItem (type id "pointtext").
 class KADAS_GUI_EXPORT KadasPointTextAnnotationController : public KadasAnnotationItemController
 {
   public:

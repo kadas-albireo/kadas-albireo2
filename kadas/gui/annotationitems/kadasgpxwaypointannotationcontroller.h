@@ -21,11 +21,7 @@
 
 /**
  * \ingroup gui
- * \brief Controller for \c KadasGpxWaypointAnnotationItem (type id
- * \c "kadas:gpxwaypoint").
- *
- * Inherits the marker controller's draw / edit / KML behavior; only the
- * type id, display name and item factory differ.
+ * \brief Controller for \c KadasGpxWaypointAnnotationItem (type id \c "kadas:gpxwaypoint").
  */
 class KADAS_GUI_EXPORT KadasGpxWaypointAnnotationController : public KadasMarkerAnnotationController
 {
