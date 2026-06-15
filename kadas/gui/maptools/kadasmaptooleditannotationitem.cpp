@@ -620,6 +620,12 @@ void KadasMapToolEditAnnotationItem::canvasReleaseEvent( QgsMapMouseEvent *e )
     if ( mLayer )
       mLayer->triggerRepaint();
     pushState();
+    // A handle drag may have changed item properties the style editor also
+    // exposes (e.g. a picture's fixedSize). Resync the editor so a later
+    // previewChanged/applyToItem doesn't write back stale widget values and
+    // revert the drag. loadFromItem uses signal blockers, so it won't emit.
+    if ( mStyleEditor )
+      mStyleEditor->loadFromItem( mItem );
   }
 }
 
