@@ -99,25 +99,17 @@ QString KadasProjectMigration::migrateProject( const QString &fileName, QStringL
     if ( !migrateProjectXml( basedir, doc, filesToAttach ) )
       return fileName;
 
-    // Write the mutated XML back over the unzipped `.qgs`, then repack
-    // the whole archive into a new temp `.qgz`. Keep the temp dir alive
-    // until QGIS has finished reading the archive by transferring its
-    // ownership through a static list — `QgsArchive` deletes its
-    // backing temp dir in the destructor.
+    // Write the migrated XML back over the unzipped `.qgs`.
     if ( !qgsFile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
       return fileName;
     qgsFile.write( doc.toString().toUtf8() );
     qgsFile.close();
 
-    // Repack into a brand-new `.qgz` inside a fresh temp dir. The target
-    // path must be one that never existed before: QgsArchive::zip()
-    // finishes with QFile::rename() onto this path, and on Windows
-    // renaming onto a name we just created+removed ourselves can fail
-    // (delete-pending state / AV holding the handle), which silently
-    // dropped us back to the un-migrated project. A unique dir gives a
-    // clean, never-locked destination on every platform.
+    // Repack into a fresh temp dir under a never-used name: zip() ends with
+    // a rename, which on Windows fails onto a name we created and removed
+    // ourselves (delete-pending), silently dropping the migration.
     auto outDir = std::make_unique<QTemporaryDir>();
-    outDir->setAutoRemove( false ); // returned `.qgz` must outlive this call
+    outDir->setAutoRemove( false );
     if ( !outDir->isValid() )
     {
       QgsMessageLog::
@@ -131,7 +123,7 @@ QString KadasProjectMigration::migrateProject( const QString &fileName, QStringL
         logMessage( QStringLiteral( "Kadas project migration: failed to write the migrated project archive '%1'; opening the original instead" ).arg( outPath ), QStringLiteral( "Kadas" ), Qgis::MessageLevel::Warning );
       return fileName;
     }
-    outDir.release(); // leak the dir so the migrated archive survives
+    outDir.release(); // migrated archive must outlive this call
     return outPath;
   }
 
