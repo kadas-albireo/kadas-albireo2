@@ -741,22 +741,32 @@ QVector<QgsPointXY> KadasShapeCaptureMapTool::geodesicDisplayPoints( const QVect
   if ( !mGeodesicDa.willUseEllipsoid() )
     return points;
 
-  constexpr double interval = 100000; // 100km segments
+  constexpr double interval = 100000; // densify long geodesic segments every 100km
   QVector<QgsPointXY> out;
   out.append( points.first() );
   for ( int i = 0, n = points.size(); i < n - 1; ++i )
   {
+    // QgsDistanceArea::geodesicLine() always evaluates its first sample at a full
+    // interval along the geodesic, even when the segment is shorter than the
+    // interval. That produces a densified point *beyond* the endpoint, drawing a
+    // long spike past the cursor. Only densify segments that are actually longer
+    // than the interval; shorter ones are visually indistinguishable from a
+    // straight line.
+    if ( mGeodesicDa.measureLine( points[i], points[i + 1] ) <= interval )
+    {
+      out.append( points[i + 1] );
+      continue;
+    }
     const QVector<QVector<QgsPointXY>> segments = mGeodesicDa.geodesicLine( points[i], points[i + 1], interval, false );
     if ( segments.isEmpty() || segments.first().size() < 2 )
     {
       out.append( points[i + 1] );
       continue;
     }
-    for ( const QVector<QgsPointXY> &segment : segments )
-    {
-      for ( int j = 1, m = segment.size(); j < m; ++j )
-        out.append( segment[j] );
-    }
+    // breakLine is false, so geodesicLine never splits: a single part is returned.
+    const QVector<QgsPointXY> &segment = segments.first();
+    for ( int j = 1, m = segment.size(); j < m; ++j )
+      out.append( segment[j] );
   }
   return out;
 }
