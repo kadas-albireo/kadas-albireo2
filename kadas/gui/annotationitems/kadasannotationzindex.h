@@ -31,29 +31,30 @@
  * that need stable ordering (e.g. importers) should apply a small monotonic
  * offset so file order is preserved.
  */
-namespace KadasAnnotationZIndex
+class KadasAnnotationZIndex
 {
-  // Filled / area items go first so lines and markers paint on top.
-  constexpr int Polygon = 0;
-  constexpr int Rectangle = Polygon;
-  constexpr int Circle = Polygon;
+  public:
+    // Filled / area items go first so lines and markers paint on top.
+    static constexpr int Polygon = 0;
+    static constexpr int Rectangle = Polygon;
+    static constexpr int Circle = Polygon;
 
-  // Linear items.
-  constexpr int Line = 10000;
-  constexpr int GpxRoute = Line;
+    // Linear items.
+    static constexpr int Line = 10000;
+    static constexpr int GpxRoute = Line;
 
-  // Bitmap / raster pictures (above polygons but below markers and labels).
-  constexpr int Picture = 20000;
+    // Bitmap / raster pictures (above polygons but below markers and labels).
+    static constexpr int Picture = 20000;
 
-  // Point markers.
-  constexpr int Marker = 30000;
-  constexpr int Pin = Marker;
-  constexpr int CoordCross = Marker;
-  constexpr int GpxWaypoint = Marker;
-  constexpr int Milx = Marker;
+    // Point markers.
+    static constexpr int Marker = 30000;
+    static constexpr int Pin = Marker;
+    static constexpr int CoordCross = Marker;
+    static constexpr int GpxWaypoint = Marker;
+    static constexpr int Milx = Marker;
 
-  // Text / labels paint above everything else.
-  constexpr int PointText = 40000;
-} // namespace KadasAnnotationZIndex
+    // Text / labels paint above everything else.
+    static constexpr int PointText = 40000;
+};
 
 #endif // KADASANNOTATIONZINDEX_H

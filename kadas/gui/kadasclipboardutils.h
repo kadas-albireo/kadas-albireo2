@@ -26,9 +26,10 @@
  * NSPasteboard API on Apple platforms to avoid a crash in ImageIO's TIFF
  * encoder caused by a libtiff symbol conflict with GDAL.
  */
-namespace KadasClipboardUtils
+class KadasClipboardUtils
 {
-  void copyImageToClipboard( const QImage &image );
-}
+  public:
+    static void copyImageToClipboard( const QImage &image );
+};
 
 #endif // KADASCLIPBOARDUTILS_H

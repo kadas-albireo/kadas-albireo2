@@ -21,16 +21,17 @@
 
 #include "kadas/gui/kadas_gui.h"
 
-namespace KadasAnnotationItemControllers
+class KADAS_GUI_EXPORT KadasAnnotationItemControllers
 {
-  /**
-   * Registers the built-in Kadas annotation item controllers (marker, line,
-   * polygon, picture, pointtext, circle, rectangle, pin, gpxwaypoint,
-   * gpxroute) with the global \c KadasAnnotationControllerRegistry.
-   *
-   * Safe to call more than once: subsequent calls are no-ops.
-   */
-  KADAS_GUI_EXPORT void registerBuiltins();
-} // namespace KadasAnnotationItemControllers
+  public:
+    /**
+     * Registers the built-in Kadas annotation item controllers (marker, line,
+     * polygon, picture, pointtext, circle, rectangle, pin, gpxwaypoint,
+     * gpxroute) with the global \c KadasAnnotationControllerRegistry.
+     *
+     * Safe to call more than once: subsequent calls are no-ops.
+     */
+    static void registerBuiltins();
+};
 
 #endif // KADASANNOTATIONITEMCONTROLLERS_H

@@ -33,23 +33,24 @@ class QgsRenderContext;
  * \c "kadas/milx/..." namespace. When \c override is \c false (the default),
  * \c resolve() falls back to \c KadasMilxClient::globalSymbolSettings().
  */
-namespace KadasMilxLayerSettings
+class KADAS_GUI_EXPORT KadasMilxLayerSettings
 {
-  KADAS_GUI_EXPORT bool overrideEnabled( const QgsMapLayer *layer );
-  KADAS_GUI_EXPORT void setOverrideEnabled( QgsMapLayer *layer, bool enabled );
+  public:
+    static bool overrideEnabled( const QgsMapLayer *layer );
+    static void setOverrideEnabled( QgsMapLayer *layer, bool enabled );
 
-  KADAS_GUI_EXPORT KadasMilxSymbolSettings layerSettings( const QgsMapLayer *layer );
-  KADAS_GUI_EXPORT void setLayerSettings( QgsMapLayer *layer, const KadasMilxSymbolSettings &settings );
+    static KadasMilxSymbolSettings layerSettings( const QgsMapLayer *layer );
+    static void setLayerSettings( QgsMapLayer *layer, const KadasMilxSymbolSettings &settings );
 
-  //! Returns layer override if enabled, otherwise the global settings.
-  KADAS_GUI_EXPORT KadasMilxSymbolSettings resolve( const QgsMapLayer *layer );
+    //! Returns layer override if enabled, otherwise the global settings.
+    static KadasMilxSymbolSettings resolve( const QgsMapLayer *layer );
 
-  /**
-   * Resolve at render time by looking up the source layer through the
-   * render context's expression scope (\c layer_id variable). Falls back
-   * to global settings if the layer cannot be located.
-   */
-  KADAS_GUI_EXPORT KadasMilxSymbolSettings resolve( const QgsRenderContext &context );
-} // namespace KadasMilxLayerSettings
+    /**
+     * Resolve at render time by looking up the source layer through the
+     * render context's expression scope (\c layer_id variable). Falls back
+     * to global settings if the layer cannot be located.
+     */
+    static KadasMilxSymbolSettings resolve( const QgsRenderContext &context );
+};
 
 #endif // KADASMILXLAYERSETTINGS_H
