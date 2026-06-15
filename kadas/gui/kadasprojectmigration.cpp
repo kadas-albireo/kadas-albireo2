@@ -24,6 +24,7 @@
 #include <QFile>
 #include <QMap>
 #include <QSizeF>
+#include <QTemporaryDir>
 
 #include <cmath>
 
@@ -31,6 +32,7 @@
 #include <qgis/qgscircularstring.h>
 #include <qgis/qgslinestring.h>
 #include <qgis/qgslogger.h>
+#include <qgis/qgsmessagelog.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
@@ -107,15 +109,29 @@ QString KadasProjectMigration::migrateProject( const QString &fileName, QStringL
     qgsFile.write( doc.toString().toUtf8() );
     qgsFile.close();
 
-    QTemporaryFile outFile( QDir::tempPath() + QStringLiteral( "/kadas-migrated-XXXXXX.qgz" ) );
-    outFile.setAutoRemove( false );
-    if ( !outFile.open() )
+    // Repack into a brand-new `.qgz` inside a fresh temp dir. The target
+    // path must be one that never existed before: QgsArchive::zip()
+    // finishes with QFile::rename() onto this path, and on Windows
+    // renaming onto a name we just created+removed ourselves can fail
+    // (delete-pending state / AV holding the handle), which silently
+    // dropped us back to the un-migrated project. A unique dir gives a
+    // clean, never-locked destination on every platform.
+    auto outDir = std::make_unique<QTemporaryDir>();
+    outDir->setAutoRemove( false ); // returned `.qgz` must outlive this call
+    if ( !outDir->isValid() )
+    {
+      QgsMessageLog::
+        logMessage( QStringLiteral( "Kadas project migration: could not create a temp dir for the migrated project; opening the original instead" ), QStringLiteral( "Kadas" ), Qgis::MessageLevel::Warning );
       return fileName;
-    const QString outPath = outFile.fileName();
-    outFile.close();
-    QFile::remove( outPath ); // QgsArchive::zip refuses to overwrite an existing file
+    }
+    const QString outPath = QDir( outDir->path() ).filePath( QStringLiteral( "kadas-migrated.qgz" ) );
     if ( !archive->zip( outPath ) )
+    {
+      QgsMessageLog::
+        logMessage( QStringLiteral( "Kadas project migration: failed to write the migrated project archive '%1'; opening the original instead" ).arg( outPath ), QStringLiteral( "Kadas" ), Qgis::MessageLevel::Warning );
       return fileName;
+    }
+    outDir.release(); // leak the dir so the migrated archive survives
     return outPath;
   }
 
