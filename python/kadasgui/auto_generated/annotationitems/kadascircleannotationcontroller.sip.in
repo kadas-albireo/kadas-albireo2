@@ -12,13 +12,7 @@
 class KadasCircleAnnotationController : KadasAnnotationItemController
 {
 %Docstring(signature="appended")
-Controller for \c KadasCircleAnnotationItem (type id \c "kadas:circle").
-
-Two-click drawing UX: first click sets the center, second click sets the
-radius via a point on the circumference. Edit handles expose center and
-ring point.
-
-Multi-part and geodesic mode are not supported in v1.
+Controller for KadasCircleAnnotationItem (type id "kadas:circle").
 %End
 
 %TypeHeaderCode

@@ -14,11 +14,6 @@ class KadasMarkerAnnotationController : KadasAnnotationItemController
 %Docstring(signature="appended")
 Controller for stock \c :py:class:`QgsAnnotationMarkerItem` (type id \c
 "marker").
-
-Drop-in replacement for \c KadasPointItem's interactive behavior. The
-symbology of the marker (shape, fill, stroke) is stored directly on the
-\c :py:class:`QgsAnnotationMarkerItem`'s \c :py:class:`QgsMarkerSymbol`,
-so the controller does not carry any styling state itself.
 %End
 
 %TypeHeaderCode

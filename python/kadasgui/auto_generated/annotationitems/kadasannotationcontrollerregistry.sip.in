@@ -16,17 +16,6 @@ class KadasAnnotationControllerRegistry
 %Docstring(signature="appended")
 Process-wide registry mapping :py:class:`QgsAnnotationItem` type ids to
 their Kadas controller.
-
-Map tools, editors and KML export look up the controller for a given \c
-:py:class:`QgsAnnotationItem` via \c
-controllerFor(item->:py:func:`~type`) and delegate interactive behavior
-(draw / edit / snap / tooltip / KML) to it.
-
-Registration happens at application startup, typically from \c
-KadasApplication.init().
-
-The registry owns the registered controllers; they are deleted when the
-registry is destroyed (or when overwritten).
 %End
 
 %TypeHeaderCode
@@ -42,17 +31,19 @@ Returns the process-wide registry instance.
 
     void addController( KadasAnnotationItemController *controller );
 %Docstring
-Replacing an existing registration deletes the previous one.
+Registers ``controller`` under its
+:py:func:`~KadasAnnotationControllerRegistry.itemType`; takes ownership
+and replaces any existing.
 %End
 
     KadasAnnotationItemController *controllerFor( const QString &typeId ) const;
 %Docstring
-or None if none.
+Returns the controller for type id ``typeId``, or None.
 %End
 
     QStringList registeredTypes() const;
 %Docstring
-Returns the registered annotation item type ids, in registration order.
+Registered type ids, in registration order.
 %End
 
   private:

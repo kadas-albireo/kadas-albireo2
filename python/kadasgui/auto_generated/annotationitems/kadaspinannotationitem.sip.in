@@ -14,14 +14,7 @@
 class KadasPinAnnotationItem : QgsAnnotationMarkerItem
 {
 %Docstring(signature="appended")
-Kadas-internal "pin" annotation item.
-
-Subclasses \c :py:class:`QgsAnnotationMarkerItem` and pre-configures the
-marker symbol with the standard Kadas pin SVG (anchored at the bottom
-tip). Adds two extra text fields, \c name and \c remarks, that are used
-by the layer tree for tooltips.
-
-Type id: \c "kadas:pin".
+"Pin" annotation item (type id "kadas:pin").
 %End
 
 %TypeHeaderCode
@@ -50,14 +43,8 @@ Type id: \c "kadas:pin".
     void setRemarks( const QString &remarks );
 
     static QString defaultIconPath();
-%Docstring
-Path of the SVG icon used by default for new pins (resource path).
-%End
 
     const QStringList &shadowIds() const;
-%Docstring
-See \c KadasAnnotationShadow.
-%End
     void setShadowIds( const QStringList &ids );
 
 };

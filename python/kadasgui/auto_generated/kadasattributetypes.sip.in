@@ -16,10 +16,14 @@
 class KadasNumericAttribute
 {
 %Docstring(signature="appended")
-Free-standing replacement for the former \c
-KadasMapItem.NumericAttribute nested type. Kept generic so it can be
-shared between the legacy \c KadasMapItem chain and the new annotation
-controller tree.
+*************************************************************************
+
+This program is free software; you can redistribute it and/or modify *
+it under the terms of the GNU General Public License as published by *
+the Free Software Foundation; either version 2 of the License, or * (at
+your option) any later version. *
+
+**************************************************************************
 %End
 
 %TypeHeaderCode
@@ -70,14 +74,8 @@ struct KadasEditContext
 
     KadasEditContext( const QgsVertexId &_vidx, const QgsPointXY &_pos = QgsPointXY(), const KadasAttribDefs &_attributes = KadasAttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor );
 %Docstring
-Constructs an edit context.
-
-``_vidx``, when valid, denotes a vertex / handle hit and the resulting
-\c precision is automatically \c HitPrecision.Precise. A
-default-constructed ``_vidx`` denotes a whole-item body hit and the
-resulting \c precision is \c HitPrecision.Body — callers with a tighter
-geometric hit (e.g. line stroke) should explicitly upgrade \c precision
-after construction.
+Valid ``_vidx`` implies Precise; a default ``_vidx`` implies Body
+(upgrade manually for stroke hits).
 %End
 
     bool mValid;

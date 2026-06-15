@@ -14,14 +14,7 @@
 class KadasGpxRouteAnnotationItem : QgsAnnotationLineItem
 {
 %Docstring(signature="appended")
-Kadas-internal annotation item representing a GPX route.
-
-Subclasses \c :py:class:`QgsAnnotationLineItem` and pre-installs a
-yellow line symbol matching the legacy \c KadasGpxRouteItem default
-style. Adds \c name, \c number, \c labelFont and \c labelColor fields,
-and renders the name as repeating buffered labels along the route.
-
-Type id: \c "kadas:gpxroute".
+Annotation item for a GPX route (type id \c "kadas:gpxroute").
 %End
 
 %TypeHeaderCode

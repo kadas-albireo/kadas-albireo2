@@ -14,10 +14,6 @@ class KadasPolygonAnnotationController : KadasAnnotationItemController
 %Docstring(signature="appended")
 Controller for stock \c :py:class:`QgsAnnotationPolygonItem` (type id \c
 "polygon").
-
-Drives a click-by-click draw state machine on a single \c
-:py:class:`QgsPolygon`. Multi-part / multi-ring polygons are not yet
-supported and will return via a Kadas-internal annotation-item subclass.
 %End
 
 %TypeHeaderCode

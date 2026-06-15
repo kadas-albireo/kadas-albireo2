@@ -12,14 +12,8 @@
 class KadasPointTextAnnotationController : KadasAnnotationItemController
 {
 %Docstring(signature="appended")
-Controller for stock \c :py:class:`QgsAnnotationPointTextItem` (type id
-\c "pointtext").
-
-Replaces the interactive behavior previously on \c KadasTextItem. Text
-content, font, color and rotation live on the \c
-:py:class:`QgsAnnotationPointTextItem` itself (via \c
-:py:class:`QgsTextFormat`); the controller only drives the
-click-to-place state machine and KML export.
+Controller for stock :py:class:`QgsAnnotationPointTextItem` (type id
+"pointtext").
 %End
 
 %TypeHeaderCode

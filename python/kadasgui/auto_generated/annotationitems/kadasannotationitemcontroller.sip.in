@@ -17,22 +17,6 @@ class KadasAnnotationItemController
 %Docstring(signature="appended")
 Per-type controller for :py:class:`QgsAnnotationItem` instances managed
 by Kadas.
-
-Concrete controllers encapsulate the interactive (draw / edit / snap /
-KML / editor) behavior that previously lived on \c KadasMapItem
-subclasses. One controller is registered per
-:py:class:`QgsAnnotationItem` type id (see \c
-:py:func:`QgsAnnotationItem.type()`) in the \c
-KadasAnnotationControllerRegistry; map tools look the controller up by
-type id and delegate to it, so a tool never needs to know about concrete
-annotation subclasses.
-
-.. note::
-
-   Coordinates passed to draw/edit hooks are in the map CRS unless otherwise
-   noted; numeric attribute distances are in map units. Methods that perform
-   map ↔ item space transforms receive a \c KadasAnnotationItemContext bundling
-   the item's CRS and the map settings.
 %End
 
 %TypeHeaderCode
@@ -57,7 +41,7 @@ Human-readable name for the item kind (used by UI; tr-able).
 
     virtual QgsAnnotationItem *createItem() const = 0;
 %Docstring
-state machine. Caller takes ownership.
+Creates a fresh annotation item. Caller takes ownership.
 %End
 
 
@@ -91,25 +75,14 @@ to receive subsequent points.
 
     virtual QgsGeometry representativeGeometry( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const;
 %Docstring
-Returns a cheap geometry (in the item's layer CRS) representing the
-item's current shape, used by the edit/create map tool as a
-:py:class:`QgsRubberBand` preview drawn above all layers while the item
-is being digitized or dragged. Mirrors QGIS's
+Geometry (item CRS) for the edit tool's rubber-band preview. Mirrors
 :py:func:`QgsAnnotationItemEditOperationTransientResults.representativeGeometry()`.
-
-Default implementation: the real geometry for line / polygon backed
-items, the bounding-box outline otherwise.
 %End
 
     virtual bool liveRepaintOnEdit() const;
 %Docstring
-When ``True``, the edit map tool re-renders the annotation layer on
-every drag step instead of only on release. The default (``False``)
-matches the QGIS behavior where the rubber-band outline is the only live
-feedback and the layer keeps showing the pre-drag rendering. Controllers
-whose items cannot be meaningfully previewed by an outline band (e.g.
-pictures — the user expects the image itself to follow the cursor)
-should return ``True``.
+When ``True``, the edit tool re-renders the layer on every drag step
+(e.g. pictures) rather than only on release.
 %End
 
 
@@ -127,20 +100,26 @@ should return ``True``.
 
     virtual void applyPersistedStyle( QgsAnnotationItem *item ) const;
 %Docstring
-Called once on creation, before the item is added to the layer.
+Applies persisted style defaults to ``item`` on creation.
 %End
 
     virtual void persistStyle( const QgsAnnotationItem *item ) const;
 %Docstring
-new defaults. Called whenever the user edits the styling row.
+Stores ``item``'s current style as the new persisted defaults.
 %End
 
     virtual KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = 0 ) const;
 %Docstring
-polygon / pointtext) override it.
+Returns a style editor widget for this item type, or None if none.
+Caller takes ownership.
 %End
 
+
     virtual QList<QgsAnnotationItem *> generateShadows( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const;
+%Docstring
+Returns freshly allocated shadow items for QGIS compatibility; caller
+takes ownership.
+%End
 
     virtual QStringList shadowIds( const QgsAnnotationItem *item ) const;
     virtual void setShadowIds( QgsAnnotationItem *item, const QStringList &ids ) const;

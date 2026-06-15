@@ -16,19 +16,11 @@
 class KadasShapeCaptureMapTool : QgsMapTool
 {
 %Docstring(signature="appended")
-Lightweight shape-capture map tool.
+Shape-capture map tool: rectangle, circle, sector, polyline, polygon.
 
-Captures one of: rectangle, circle (center + radius), circular sector
-(center + radius + sweep), polyline, polygon. Rendering relies on
-:py:class:`QgsRubberBand`. On completion, emits
-:py:func:`~shapeCaptured` with the resulting geometry in the canvas
-destination CRS.
-
-The rubber band stays visible after capture until :py:func:`~clear` is
-called or a new capture starts; this allows callers (e.g. viewshed) to
-keep showing the captured shape while a configuration dialog is open and
-to update it via :py:func:`~setCircleRadius` /
-:py:func:`~setCapturedGeometry`.
+Emits :py:func:`~shapeCaptured` with the geometry in the canvas
+destination CRS. The rubber band stays visible after capture until
+:py:func:`~clear` or a new capture starts.
 %End
 
 %TypeHeaderCode
@@ -57,12 +49,8 @@ Removes any rubber band and resets capture state.
 
     void setGeodesicPreview( bool enabled );
 %Docstring
-When enabled, polyline/polygon previews are drawn as densified geodesic
-(great circle) segments instead of straight Cartesian segments. Only
-affects the displayed rubber band;
-:py:func:`~KadasShapeCaptureMapTool.previewGeometry` and
-:py:func:`~KadasShapeCaptureMapTool.shapeCaptured` still report the raw
-vertices.
+When enabled, poly previews are drawn as densified geodesic segments
+(display only).
 %End
 
     void setCircleRadius( double radius );
@@ -96,37 +84,31 @@ mid-vertex-stream for poly).
 
     void setCapturedPolyline( const QVector<QgsPointXY> &vertices );
 %Docstring
-Replaces the displayed polyline/polygon preview with the given vertices
-in canvas CRS. Used by callers that seed the tool from an externally
-picked feature. Does not emit
+Replaces the poly preview with ``vertices`` (canvas CRS); does not emit
 :py:func:`~KadasShapeCaptureMapTool.shapeCaptured`.
 %End
 
     void addPoint( const QgsPointXY &pos );
 %Docstring
-Programmatically adds a point as if the user had left-clicked at ``pos``
-(canvas CRS): starts the rectangle/circle drag, places the sector
-center, or appends a polyline/polygon vertex.
+Adds a point as if the user had left-clicked at ``pos`` (canvas CRS).
 %End
 
     QgsGeometry previewGeometry() const;
 %Docstring
-Geometry of the shape currently displayed by the rubber band, in canvas
-CRS. While capturing a polyline/polygon, this includes the floating
-cursor vertex. Returns an empty geometry if nothing is displayed yet.
+Geometry currently shown by the rubber band, in canvas CRS (includes the
+floating cursor vertex while capturing).
 %End
 
     static QgsGeometry circlePolygon( const QgsPointXY &center, double radius, int segments = 64 );
 %Docstring
-Builds a closed polygon ring approximating a circle. Coordinates are in
-the same CRS as ``center``.
+Builds a closed polygon ring approximating a circle, in the CRS of
+``center``.
 %End
 
     static QgsGeometry sectorPolygon( const QgsPointXY &center, double radius, double startAngle, double stopAngle, int segments = 64 );
 %Docstring
-Builds a pie-slice polygon (center, arc from ``startAngle`` to
-``stopAngle`` in radians CCW from east). A sweep of 2*pi or more yields
-a full circle. Coordinates are in the same CRS as ``center``.
+Pie-slice polygon from ``startAngle`` to ``stopAngle`` (radians CCW from
+east); a sweep of 2*pi or more yields a full circle.
 %End
 
     virtual void canvasPressEvent( QgsMapMouseEvent *e );

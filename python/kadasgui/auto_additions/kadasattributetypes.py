@@ -24,14 +24,7 @@ KadasNumericAttribute.Type.__doc__ = """
 # monkey patching scoped based enum
 KadasEditContext.HitPrecision.Body.__doc__ = "Loose hit: click is inside the item's filled body / bounding box / containment area."
 KadasEditContext.HitPrecision.Precise.__doc__ = "Tight hit: click is on a vertex, handle, or stroke / outline."
-KadasEditContext.HitPrecision.__doc__ = """Geometric precision of a hit returned by
-\c KadasAnnotationItemController.getEditContext().
-
-Used by the canvas pickers (\c KadasFeaturePicker and the edit map
-tool) to disambiguate overlapping annotations: a precise hit on
-vertex / handle / edge always wins over a loose body-containment
-hit on another item, regardless of z-index. Within the same
-precision tier the existing z-then-area tiebreakers apply.
+KadasEditContext.HitPrecision.__doc__ = """Geometric precision of a hit; a precise (vertex / handle / edge) hit outranks a body hit in picking.
 
 * ``Body``: Loose hit: click is inside the item's filled body / bounding box / containment area.
 * ``Precise``: Tight hit: click is on a vertex, handle, or stroke / outline.
@@ -39,12 +32,10 @@ precision tier the existing z-then-area tiebreakers apply.
 """
 # --
 try:
-    KadasNode.__doc__ = """Editing node descriptor (formerly \c KadasMapItem.Node). The
-position is stored as a generic \c :py:class:`QgsPointXY`; legacy callers that
-need \c KadasMapPos semantics convert via the implicit constructor."""
+    KadasNode.__doc__ = """Editing node descriptor."""
 except (NameError, AttributeError):
     pass
 try:
-    KadasEditContext.__doc__ = """Editing context (formerly \c KadasMapItem.EditContext)."""
+    KadasEditContext.__doc__ = """Editing context for an annotation hit."""
 except (NameError, AttributeError):
     pass

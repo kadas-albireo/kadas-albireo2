@@ -14,9 +14,6 @@ class KadasGpxWaypointAnnotationController : KadasMarkerAnnotationController
 %Docstring(signature="appended")
 Controller for \c KadasGpxWaypointAnnotationItem (type id \c
 "kadas:gpxwaypoint").
-
-Inherits the marker controller's draw / edit / KML behavior; only the
-type id, display name and item factory differ.
 %End
 
 %TypeHeaderCode

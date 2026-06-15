@@ -15,21 +15,8 @@
 class KadasMapToolEditAnnotationItem : QgsMapTool
 {
 %Docstring(signature="appended")
-Map tool that creates and/or edits a \c :py:class:`QgsAnnotationItem` on
-a \c :py:class:`QgsAnnotationLayer`, driven by a \c
-KadasAnnotationItemController.
-
-The tool has two entry modes: - **Edit mode**: started with an existing
-``itemId``; clicks on vertices drag them, the styling row in the bottom
-bar updates the symbol. - **Create mode**: started with a ``controller``
-and a target ``layer``; clicks place vertices for a fresh item, a
-right-click / Enter finalizes the part. After finalization, clicks on
-existing vertices keep editing them, while clicks on empty canvas start
-a brand-new item (single-part).
-
-Last-used styling per geometry kind (marker / line / polygon) is
-persisted via \c :py:class:`QgsSettingsEntry` and re-applied to freshly
-created items.
+Map tool to create/edit a \c :py:class:`QgsAnnotationItem` on a \c
+:py:class:`QgsAnnotationLayer` via a \c KadasAnnotationItemController.
 %End
 
 %TypeHeaderCode
@@ -70,12 +57,9 @@ default false.
 
     void setExtraTopWidget( QWidget *widget );
 %Docstring
-Inserts a custom widget into the tool's bottom-bar top row, alongside
-the undo / redo / close buttons. Must be called before \c
-:py:func:`~KadasMapToolEditAnnotationItem.activate`; ownership transfers
-to the bar created at activation. Used by per-item integrations that
-need a dedicated control (e.g. the MilX symbol picker button) embedded
-in the editor instead of floating over the map.
+Inserts a custom widget into the bottom-bar top row; call before \c
+:py:func:`~KadasMapToolEditAnnotationItem.activate`, ownership
+transfers.
 %End
 
     QgsAnnotationItem *currentItem() const;
@@ -85,8 +69,8 @@ The annotation item the tool is currently driving (may be null).
 
     void addPoint( const QgsPointXY &pos );
 %Docstring
-Create-mode: drives the create state machine with an explicit point, as
-if the user had left-clicked at ``pos``. No-op in pure edit mode.
+Create-mode: place a vertex at ``pos`` as if left-clicked; no-op in edit
+mode.
 %End
 
   signals:

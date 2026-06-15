@@ -14,11 +14,6 @@ class KadasLineAnnotationController : KadasAnnotationItemController
 %Docstring(signature="appended")
 Controller for stock \c :py:class:`QgsAnnotationLineItem` (type id \c
 "linestring").
-
-Drives a click-by-click draw state machine on a single \c
-:py:class:`QgsLineString`. Multi-part strokes, geodesic lines and
-measurement modes (previously exposed by \c KadasLineItem) are not yet
-supported and will return as a Kadas-internal annotation-item subclass.
 %End
 
 %TypeHeaderCode

@@ -14,9 +14,6 @@ class KadasGpxRouteAnnotationController : KadasLineAnnotationController
 %Docstring(signature="appended")
 Controller for \c KadasGpxRouteAnnotationItem (type id \c
 "kadas:gpxroute").
-
-Inherits the line controller's draw / edit / KML behavior; only the type
-id, display name and item factory differ.
 %End
 
 %TypeHeaderCode

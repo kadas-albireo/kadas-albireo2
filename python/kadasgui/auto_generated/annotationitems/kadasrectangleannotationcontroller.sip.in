@@ -12,17 +12,7 @@
 class KadasRectangleAnnotationController : KadasAnnotationItemController
 {
 %Docstring(signature="appended")
-Controller for \c KadasRectangleAnnotationItem (type id \c
-"kadas:rectangle").
-
-Two-click drawing UX: first click sets the center, second click sets the
-opposite corner (interpreted as half-extents in the current rotated
-frame; during draw the angle stays at zero so the user gets an
-axis-aligned rectangle, rotation can be applied later via the rotation
-handle).
-
-Edit handles: 4 corner vertices (resize) + a rotation handle exposed as
-vertex index 4. A whole-item move is offered when no handle is hit.
+Controller for KadasRectangleAnnotationItem (type id "kadas:rectangle").
 %End
 
 %TypeHeaderCode

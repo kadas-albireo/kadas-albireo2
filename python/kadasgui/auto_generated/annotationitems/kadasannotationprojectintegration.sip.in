@@ -16,21 +16,6 @@ class KadasAnnotationProjectIntegration : QObject
 %Docstring(signature="appended")
 Wires the save-time shadow mechanism into the active
 :py:class:`QgsProject`.
-
-On construction this object connects to \c
-:py:class:`QgsProject`.readProject so any Kadas-shadow items left over
-in a project file (e.g. one saved by an older Kadas session that wasn't
-cleaned up) are stripped after load, leaving the in-memory layer
-pristine.
-
-The save half of the lifecycle is driven explicitly by callers: \c
-KadasApplication.projectSave() is expected to call \c
-:py:func:`~prepareForSave` immediately before \c
-:py:func:`QgsProject.write()` and \c :py:func:`~stripAfterSave`
-immediately after, so the on-disk project contains the QGIS-compat
-shadows but the running session does not.
-
-Single instance owned by \c KadasApplication.
 %End
 
 %TypeHeaderCode
@@ -41,12 +26,15 @@ Single instance owned by \c KadasApplication.
 
     void prepareForSave();
 %Docstring
-calls \c KadasAnnotationLayerHelpers.prepareLayerForSave on each.
+Calls :py:func:`~KadasAnnotationProjectIntegration.prepareLayerForSave`
+on every annotation layer in the project.
 %End
 
     void stripAfterSave();
 %Docstring
-calls \c KadasAnnotationLayerHelpers.stripShadowsFromLayer on each.
+Calls
+:py:func:`~KadasAnnotationProjectIntegration.stripShadowsFromLayer` on
+every annotation layer in the project.
 %End
 
 };

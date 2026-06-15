@@ -15,20 +15,8 @@
 class KadasAnnotationLayerHelpers
 {
 %Docstring(signature="appended")
-Static helpers for attaching Kadas-specific per-item metadata (editor
-widget name, tooltip) to a stock \c :py:class:`QgsAnnotationLayer`.
-
-Stock \c :py:class:`QgsAnnotationItem` subclasses do not expose a
-custom-property bag, so per-instance metadata that Kadas needs (and
-which has no upstream equivalent) is stored on the owning layer instead.
-This keeps the items themselves stock and round-trippable through
-vanilla QGIS, at the cost of losing metadata when an item is moved
-between layers (which Kadas does not currently allow from the UI).
-
-Storage schema: each datum is stored as a layer custom property keyed
-<tt>kadas:item-meta:&lt;itemId&gt;:&lt;field&gt;</tt>. Project save/load
-preserves these because layer custom properties are part of the standard
-QGIS layer XML.
+Static helpers for attaching Kadas-specific per-item metadata to a stock
+:py:class:`QgsAnnotationLayer`.
 %End
 
 %TypeHeaderCode
@@ -37,65 +25,38 @@ QGIS layer XML.
   public:
     static bool isParametricLayer( const QgsAnnotationLayer *layer );
 %Docstring
-Returns ``True`` if ``layer`` is a parametric Kadas annotation layer
-(bullseye, guide grid, ...), i.e. carries the
-<tt>kadas/annotation-type</tt> customProperty marker. Such layers own
-exactly one logical object whose items are auto-generated from a
-configuration; hit testing and editing must treat the layer atomically
-(via its dedicated edit tool) instead of exposing the generated child
-items individually.
-
-The check uses the customProperty marker rather than a qobject_cast
-because the concrete subclasses live in the app layer, which gui code
-must not depend on.
+``True`` if ``layer`` is a parametric Kadas annotation layer (carries
+the kadas/annotation-type customProperty).
 %End
 
     static QString tooltip( const QgsAnnotationLayer *layer, const QString &itemId );
 %Docstring
-string if none is set.
+Tooltip stored for ``itemId`` on ``layer``, or empty.
 %End
 
     static void setTooltip( QgsAnnotationLayer *layer, const QString &itemId, const QString &tooltip );
 %Docstring
-``tooltip`` removes it.
+Sets ``tooltip`` for ``itemId``; empty removes it.
 %End
 
     static QgsAnnotationLayer *createLayer( const QString &name, const QgsCoordinateReferenceSystem &preferredCrs = QgsCoordinateReferenceSystem() );
 %Docstring
-Creates a new \c :py:class:`QgsAnnotationLayer` named ``name``. If
-``preferredCrs`` is valid it is used as the layer CRS (so callers
-importing data in a known native CRS can avoid round-trip reprojection).
-Otherwise the current project CRS is used, falling back to EPSG:3857 if
-the project has no CRS. The returned layer is NOT added to the project;
-the caller is expected to call \c
-:py:func:`QgsProject.instance()`->:py:func:`~KadasAnnotationLayerHelpers.addMapLayer`.
+Creates a :py:class:`QgsAnnotationLayer` named ``name`` (using
+``preferredCrs``, else project CRS, else EPSG:3857). Not added to the
+project.
 %End
 
     static void prepareLayerForSave( QgsAnnotationLayer *layer );
 %Docstring
-For every Kadas master annotation item in ``layer`` that has a
-registered controller exposing \c
-:py:func:`~KadasAnnotationLayerHelpers.generateShadows`, creates the
-shadow items, inserts them into the layer, and stores their ids on the
-master via \c :py:func:`~KadasAnnotationLayerHelpers.setShadowIds`.
-Idempotent: existing shadows referenced by the master are stripped first
-to avoid accumulation across repeated saves.
-
-Intended to be called immediately before \c
-:py:func:`QgsProject.write()`.
+Generates and inserts QGIS-compat shadow items for every master item.
+Call before :py:func:`QgsProject.write()`. Idempotent.
 %End
 
     static void stripShadowsFromLayer( QgsAnnotationLayer *layer );
 %Docstring
-For every Kadas master annotation item in ``layer`` that has non-empty
-\c :py:func:`~KadasAnnotationLayerHelpers.shadowIds`, removes the
-referenced shadow items from the layer and clears the master's shadow id
-list.
-
-Intended to be called immediately after \c :py:func:`QgsProject.write()`
-(to leave the in-memory layer pristine for the running session) and
-after \c :py:func:`QgsProject.read()` (to drop any shadows that survived
-the round-trip when the project was saved by a previous Kadas session).
+Removes shadow items and clears master shadow id lists. Call after
+:py:func:`QgsProject.write()` and after
+:py:func:`~KadasAnnotationLayerHelpers.read`.
 %End
 
   private:
