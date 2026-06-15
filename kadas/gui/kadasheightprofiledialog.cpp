@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
+
 #include <QApplication>
 #include <QCheckBox>
 #include <QClipboard>
@@ -334,7 +336,11 @@ void KadasHeightProfileDialog::setPoints( const QList<QgsPointXY> &points, const
 
 void KadasHeightProfileDialog::setMarkerPos( int segment, const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs )
 {
-  if ( isBusy() || mSegmentLengths.isEmpty() )
+  // mPlotSamples can be empty even when mSegmentLengths is populated: setPoints()
+  // fills the segment lengths and mNSamples before replot(), and replot() bails
+  // out early (no heightmap configured, raster failed to open, ...) before any
+  // sample is produced. Guard against that to avoid an out-of-range access.
+  if ( isBusy() || mSegmentLengths.isEmpty() || mPlotSamples.isEmpty() )
   {
     return;
   }
@@ -345,7 +351,7 @@ void KadasHeightProfileDialog::setMarkerPos( int segment, const QgsPointXY &p, c
   {
     x += mSegmentLengths[i];
   }
-  int idx = std::min( int( x / mTotLength * mNSamples ), mNSamples - 1 );
+  int idx = std::min( int( x / mTotLength * mNSamples ), int( mPlotSamples.size() ) - 1 );
   QPointF sample = mPlotSamples.at( idx );
   mPlotMarker->setValue( sample );
   mPlotMarker->setLabel( sample.y() == mNoDataValue ? "" : QString::number( qRound( sample.y() ) ) );
@@ -354,12 +360,13 @@ void KadasHeightProfileDialog::setMarkerPos( int segment, const QgsPointXY &p, c
 
 void KadasHeightProfileDialog::setMarkerPlotPos( const QPoint &pos )
 {
-  if ( isBusy() || mSegmentLengths.isEmpty() )
+  if ( isBusy() || mSegmentLengths.isEmpty() || mPlotSamples.isEmpty() )
   {
     return;
   }
 
   int idx = mPlot->invTransform( QwtPlot::xBottom, pos.x() );
+  idx = std::clamp( idx, 0, int( mPlotSamples.size() ) - 1 );
   QPointF sample = mPlotSamples.at( idx );
   mPlotMarker->setValue( sample );
   mPlotMarker->setLabel( sample.y() == mNoDataValue ? "" : QString::number( qRound( sample.y() ) ) );
