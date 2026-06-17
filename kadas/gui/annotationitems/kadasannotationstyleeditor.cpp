@@ -57,7 +57,6 @@
 #include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsproject.h>
-#include <qgis/qgssymbollayerutils.h>
 #include <qgis/qgstextformat.h>
 
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
@@ -98,6 +97,23 @@ namespace
   {
     for ( Qt::PenStyle style : sPenStyleChoices )
       combo->addItem( outlineStyleIcon( style ), QString(), QVariant::fromValue( static_cast<int>( style ) ) );
+  }
+
+  QIcon fillStyleIcon( Qt::BrushStyle style )
+  {
+    QPixmap pix( 24, 16 );
+    pix.fill( Qt::transparent );
+    QPainter p( &pix );
+    p.setRenderHint( QPainter::Antialiasing );
+    QBrush brush( Qt::black, style );
+    p.fillRect( 0, 0, 24, 16, brush );
+    return pix;
+  }
+
+  void populateBrushStyleCombo( QComboBox *combo )
+  {
+    for ( Qt::BrushStyle style : sBrushStyleChoices )
+      combo->addItem( fillStyleIcon( style ), QString(), QVariant::fromValue( static_cast<int>( style ) ) );
   }
 
   void selectByData( QComboBox *combo, int data )
@@ -353,8 +369,7 @@ KadasPolygonStyleEditor::KadasPolygonStyleEditor( QWidget *parent )
   row->addWidget( mStrokeStyleCombo );
 
   mFillStyleCombo = new QComboBox();
-  for ( Qt::BrushStyle style : sBrushStyleChoices )
-    mFillStyleCombo->addItem( QgsSymbolLayerUtils::encodeBrushStyle( style ), QVariant::fromValue( static_cast<int>( style ) ) );
+  populateBrushStyleCombo( mFillStyleCombo );
   mFillStyleCombo->setToolTip( tr( "Fill style" ) );
   row->addWidget( mFillStyleCombo );
 

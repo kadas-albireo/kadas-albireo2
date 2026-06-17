@@ -32,6 +32,7 @@
 #include <qgis/qgsfillsymbollayer.h>
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgslinesymbol.h>
+#include <qgis/qgslinesymbollayer.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapcanvasitem.h>
 #include <qgis/qgsmapmouseevent.h>
@@ -315,6 +316,7 @@ void KadasMapToolEditAnnotationItem::updateTempRubberBand()
   QColor fillColor( Qt::transparent );
   QColor secondaryColor( 255, 255, 255, 100 );
   Qt::BrushStyle brushStyle = Qt::SolidPattern;
+  Qt::PenStyle lineStyle = Qt::SolidLine;
   double widthPx = minWidth;
   if ( const auto *line = dynamic_cast<const QgsAnnotationLineItem *>( mItem ) )
   {
@@ -323,6 +325,11 @@ void KadasMapToolEditAnnotationItem::updateTempRubberBand()
       strokeColor = sym->color();
       widthPx = std::max( minWidth, sym->width() * mmToPx );
       secondaryColor = QColor();
+      if ( const auto *sl = dynamic_cast<const QgsSimpleLineSymbolLayer *>( sym->symbolLayer( 0 ) ) )
+      {
+        // Mirror the dash pattern so a dashed line does not preview as solid.
+        lineStyle = sl->penStyle();
+      }
     }
   }
   else if ( const auto *poly = dynamic_cast<const QgsAnnotationPolygonItem *>( mItem ) )
@@ -337,12 +344,15 @@ void KadasMapToolEditAnnotationItem::updateTempRubberBand()
         widthPx = std::max( minWidth, sl->strokeWidth() * mmToPx );
         // Mirror the fill pattern so a hatched polygon does not preview as a solid block.
         brushStyle = sl->brushStyle();
+        // Mirror the dash pattern so a dashed outline does not preview as solid.
+        lineStyle = sl->strokeStyle();
       }
     }
   }
   mTempRubberBand->setStrokeColor( strokeColor );
   mTempRubberBand->setFillColor( fillColor );
   mTempRubberBand->setBrushStyle( brushStyle );
+  mTempRubberBand->setLineStyle( lineStyle );
   mTempRubberBand->setSecondaryStrokeColor( secondaryColor );
   mTempRubberBand->setWidth( widthPx );
 
