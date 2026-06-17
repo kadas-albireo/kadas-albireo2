@@ -311,7 +311,11 @@ void KadasMapToolEditAnnotationItem::updateTempRubberBand()
   }
 
   const double minWidth = canvas()->fontMetrics().xHeight() * .2;
-  const double mmToPx = canvas()->logicalDpiX() / 25.4;
+  // Convert symbol widths the same way the canvas renders them: through the map
+  // settings render context (physical/logical screen DPI), then back to the
+  // logical pixels the rubber band paints in by undoing the device pixel ratio.
+  QgsRenderContext context = QgsRenderContext::fromMapSettings( canvas()->mapSettings() );
+  const double dpr = std::max( 1.0, static_cast<double>( context.devicePixelRatio() ) );
   QColor strokeColor( 50, 50, 50, 200 );
   QColor fillColor( Qt::transparent );
   QColor secondaryColor( 255, 255, 255, 100 );
@@ -323,12 +327,16 @@ void KadasMapToolEditAnnotationItem::updateTempRubberBand()
     if ( const QgsLineSymbol *sym = line->symbol() )
     {
       strokeColor = sym->color();
-      widthPx = std::max( minWidth, sym->width() * mmToPx );
       secondaryColor = QColor();
       if ( const auto *sl = dynamic_cast<const QgsSimpleLineSymbolLayer *>( sym->symbolLayer( 0 ) ) )
       {
+        widthPx = std::max( minWidth, context.convertToPainterUnits( sl->width(), sl->widthUnit() ) / dpr );
         // Mirror the dash pattern so a dashed line does not preview as solid.
         lineStyle = sl->penStyle();
+      }
+      else
+      {
+        widthPx = std::max( minWidth, context.convertToPainterUnits( sym->width(), Qgis::RenderUnit::Millimeters ) / dpr );
       }
     }
   }
@@ -341,7 +349,7 @@ void KadasMapToolEditAnnotationItem::updateTempRubberBand()
       if ( const auto *sl = dynamic_cast<const QgsSimpleFillSymbolLayer *>( sym->symbolLayer( 0 ) ) )
       {
         strokeColor = sl->strokeColor();
-        widthPx = std::max( minWidth, sl->strokeWidth() * mmToPx );
+        widthPx = std::max( minWidth, context.convertToPainterUnits( sl->strokeWidth(), sl->strokeWidthUnit() ) / dpr );
         // Mirror the fill pattern so a hatched polygon does not preview as a solid block.
         brushStyle = sl->brushStyle();
         // Mirror the dash pattern so a dashed outline does not preview as solid.
