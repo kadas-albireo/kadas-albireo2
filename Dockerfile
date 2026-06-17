@@ -66,6 +66,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxcb-xfixes0-dev \
     libxcb-xinerama0-dev \
     libxcb-xkb-dev \
+    libxcb-xinput-dev \
+    libxcb-cursor-dev \
+    libsm-dev \
+    libice-dev \
+    libegl1-mesa-dev \
     # dbus (Qt requires it on Linux)
     libdbus-1-dev \
     # fontconfig / freetype (Qt font rendering)
