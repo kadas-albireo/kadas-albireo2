@@ -39,6 +39,10 @@ class KADAS_GUI_EXPORT KadasCoordCrossAnnotationController : public KadasMarkerA
 
     //! Fixed visual drawn in render(); no style editor.
     KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = nullptr ) const override { return nullptr; }
+
+    //! The cross is drawn in render() over a hidden symbol; never adopt or write the shared point style.
+    void applyPersistedStyle( QgsAnnotationItem * ) const override {}
+    void persistStyle( const QgsAnnotationItem * ) const override {}
 };
 
 #endif // KADASCOORDCROSSANNOTATIONCONTROLLER_H

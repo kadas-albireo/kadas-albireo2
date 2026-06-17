@@ -48,6 +48,14 @@ Controller for KadasCoordCrossAnnotationItem (type id
 Fixed visual drawn in
 :py:func:`~KadasCoordCrossAnnotationController.render`; no style editor.
 %End
+
+    virtual void applyPersistedStyle( QgsAnnotationItem * ) const;
+%Docstring
+The cross is drawn in
+:py:func:`~KadasCoordCrossAnnotationController.render` over a hidden
+symbol; never adopt or write the shared point style.
+%End
+    virtual void persistStyle( const QgsAnnotationItem * ) const;
 };
 
 /************************************************************************
