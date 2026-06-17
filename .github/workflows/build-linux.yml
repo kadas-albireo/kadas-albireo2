@@ -6,6 +6,9 @@ on:
       docs-artifact-name:
         required: true
         type: string
+  push:
+    branches:
+      - linux-build-vcpkg
   workflow_dispatch:
     inputs:
       debug_enabled:
@@ -13,6 +16,10 @@ on:
         required: false
         default: false
         type: boolean
+
+concurrency:
+  group: build-linux-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -29,7 +36,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: 📥 Download docs artifact
-        if: github.event_name != 'workflow_dispatch'
+        if: github.event_name != 'workflow_dispatch' && github.event_name != 'push'
         uses: actions/download-artifact@v8
         with:
           name: ${{ inputs.docs-artifact-name }}
