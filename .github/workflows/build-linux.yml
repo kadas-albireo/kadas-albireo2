@@ -100,7 +100,20 @@ jobs:
 
           cmake -D VCPKG_INSTALL_OPTIONS="" build
 
-      - name: 🐚 Setup SSH (tmate) session on failure or on demand
+      - name: � Display vcpkg error logs
+        if: failure()
+        run: |
+          LOG_ROOT="build/_deps/vcpkg-src/buildtrees"
+          echo "::group::Searching for vcpkg error logs"
+          find "${LOG_ROOT}" -name "*.log" -type f 2>/dev/null
+          echo "::endgroup::"
+          for log_file in $(find "${LOG_ROOT}" -name "*.log" -type f 2>/dev/null); do
+            echo "::group::Contents of ${log_file}"
+            cat "${log_file}" || echo "Failed to read ${log_file}"
+            echo "::endgroup::"
+          done
+
+      - name: �🐚 Setup SSH (tmate) session on failure or on demand
         if: ${{ failure() || (github.event_name == 'workflow_dispatch' && inputs.debug_enabled) }}
         uses: mxschmitt/action-tmate@v3
         with:
