@@ -354,6 +354,11 @@ void KadasMapToolEditAnnotationItem::clearTempRubberBand()
 void KadasMapToolEditAnnotationItem::deactivate()
 {
   QgsMapTool::deactivate();
+  if ( mEditItemHidden && mItem )
+  {
+    mEditItemHidden = false;
+    mItem->setEnabled( true );
+  }
   if ( mAllowCreate && mDrawState != DrawState::Finished )
     clearInProgressItem();
   clearTempRubberBand();
@@ -507,7 +512,16 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
       const QgsPointXY adjusted( pos.x() - mMoveOffset.x(), pos.y() - mMoveOffset.y() );
       mController->edit( mItem, mEditContext, adjusted, ctx );
       if ( mController->liveRepaintOnEdit() )
+      {
         mLayer->triggerRepaint();
+      }
+      else if ( !mEditItemHidden )
+      {
+        // Hide the original so the rubber band is the only preview (no ghost/duplicate).
+        mEditItemHidden = true;
+        mItem->setEnabled( false );
+        mLayer->triggerRepaint();
+      }
       updateTempRubberBand();
       refreshHandles();
     }
@@ -555,6 +569,11 @@ void KadasMapToolEditAnnotationItem::canvasReleaseEvent( QgsMapMouseEvent *e )
   mPressedButton = Qt::NoButton;
   if ( e->button() == Qt::LeftButton && mEditContext.isValid() )
   {
+    if ( mEditItemHidden )
+    {
+      mEditItemHidden = false;
+      mItem->setEnabled( true );
+    }
     clearTempRubberBand();
     if ( mLayer )
       mLayer->triggerRepaint();

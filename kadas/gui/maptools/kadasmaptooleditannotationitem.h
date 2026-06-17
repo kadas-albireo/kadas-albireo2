@@ -104,6 +104,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     KadasEditContext mEditContext;
     QgsVector mMoveOffset;
     Qt::MouseButton mPressedButton = Qt::NoButton;
+    bool mEditItemHidden = false;
 
     KadasBottomBar *mBottomBar = nullptr;
     KadasStateHistory *mStateHistory = nullptr;

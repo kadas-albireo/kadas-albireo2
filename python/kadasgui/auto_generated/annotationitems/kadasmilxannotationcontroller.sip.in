@@ -69,6 +69,12 @@ Controller for \c KadasMilxAnnotationItem (type id \c "kadas:milx").
     virtual void translate( QgsAnnotationItem *item, double dx, double dy );
 
 
+    virtual bool liveRepaintOnEdit() const;
+%Docstring
+Re-render the layer live while dragging (the outline band is a poor
+stand-in for the symbol).
+%End
+
     virtual bool hitTest( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const;
 
     virtual void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx );

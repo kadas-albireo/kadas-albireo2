@@ -55,6 +55,9 @@ class KADAS_GUI_EXPORT KadasMilxAnnotationController : public KadasAnnotationIte
     void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos ) override;
     void translate( QgsAnnotationItem *item, double dx, double dy ) override;
 
+    //! Re-render the layer live while dragging (the outline band is a poor stand-in for the symbol).
+    bool liveRepaintOnEdit() const override { return true; }
+
     bool hitTest( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const override;
     void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx ) override;
     void onDoubleClick( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) override;

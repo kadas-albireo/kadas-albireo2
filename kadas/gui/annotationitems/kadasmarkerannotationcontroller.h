@@ -55,6 +55,9 @@ class KADAS_GUI_EXPORT KadasMarkerAnnotationController : public KadasAnnotationI
     void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos ) override;
     void translate( QgsAnnotationItem *item, double dx, double dy ) override;
 
+    //! Re-render the layer live while dragging (the outline band is a poor stand-in for the symbol).
+    bool liveRepaintOnEdit() const override { return true; }
+
 #ifndef SIP_RUN
     QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = nullptr ) const override;
 #endif

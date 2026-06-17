@@ -70,6 +70,12 @@ Controller for stock :py:class:`QgsAnnotationPointTextItem` (type id
     virtual void translate( QgsAnnotationItem *item, double dx, double dy );
 
 
+    virtual bool liveRepaintOnEdit() const;
+%Docstring
+Re-render the layer live while dragging (the outline band is a poor
+stand-in for the text).
+%End
+
 
     virtual void applyPersistedStyle( QgsAnnotationItem *item ) const;
 
