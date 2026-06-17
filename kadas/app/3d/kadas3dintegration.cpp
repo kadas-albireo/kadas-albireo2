@@ -189,9 +189,6 @@ Kadas3DMapCanvasWidget *Kadas3DIntegration::createNewMapCanvas3D( const QString 
   map->setOrigin( QgsVector3D( fullExtent3d.center().x(), fullExtent3d.center().y(), 0 ) );
   map->setSelectionColor( mMapCanvas->selectionColor() );
   map->setBackgroundColor( mMapCanvas->canvasColor() );
-  // Kadas item layers no longer need explicit 3D-renderer attachment after
-  // KadasMapItemLayer3DRenderer removal (slice 7k). KadasItemLayer is in burn-in
-  // for legacy project migration only.
   map->setLayers( mMapCanvas->layers( true ) );
   map->setTemporalRange( mMapCanvas->temporalRange() );
 
