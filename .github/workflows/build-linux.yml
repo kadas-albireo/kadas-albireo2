@@ -1,0 +1,153 @@
+---
+name: 🐧 Build - Linux
+on:
+  workflow_call:
+    inputs:
+      docs-artifact-name:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        description: 'Open an SSH (tmate) session on the runner for interactive debugging'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            triplet: x64-linux-dynamic
+    name: build (linux)
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: 🐣 Checkout
+        uses: actions/checkout@v6
+
+      - name: 📥 Download docs artifact
+        if: github.event_name != 'workflow_dispatch'
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ inputs.docs-artifact-name }}
+          path: share/docs/html/
+
+      - name: 🔨 Prepare build env
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential git curl wget zip unzip tar pkg-config ninja-build \
+            gcc g++ gfortran \
+            autoconf automake libtool autoconf-archive \
+            bison flex \
+            python3 python3-dev python3-pip \
+            nasm yasm gperf swig \
+            libgl1-mesa-dev libglu1-mesa-dev \
+            libx11-dev libxext-dev libxfixes-dev libxi-dev libxrender-dev \
+            libxkbcommon-dev libxkbcommon-x11-dev libx11-xcb-dev \
+            libxcb1-dev libxcb-glx0-dev libxcb-icccm4-dev libxcb-image0-dev \
+            libxcb-keysyms1-dev libxcb-randr0-dev libxcb-render-util0-dev \
+            libxcb-render0-dev libxcb-shape0-dev libxcb-shm0-dev libxcb-sync-dev \
+            libxcb-util-dev libxcb-xfixes0-dev libxcb-xinerama0-dev libxcb-xkb-dev \
+            libdbus-1-dev libfontconfig1-dev libfreetype-dev libharfbuzz-dev \
+            libatspi2.0-dev libudev-dev libssl-dev libcups2-dev libasound2-dev \
+            libzstd-dev zlib1g-dev libbz2-dev liblzma-dev libsqlite3-dev \
+            perl xvfb
+
+      - name: 🐩 Install CMake and Ninja
+        uses: lukka/get-cmake@latest
+        with:
+          # Pin to specific version to avoid rebuilding too often
+          # Also helps to avoid spurious build failures like https://github.com/qgis/QGIS/pull/47098
+          cmakeVersion: 3.29.0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: 🔢 Determine version
+        id: version
+        uses: ./.github/actions/determine-version
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🌱 Install dependencies and generate project files
+        env:
+          GDAL_PYTHON_BINDINGS_WITHOUT_NUMPY: "Yes"
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Install first only with binarycaching, then run again to build
+          # whatever the NuGet cache did not have.
+          cmake -S . \
+                -G Ninja \
+                -B build \
+                -D KADAS_VERSION=${{ steps.version.outputs.version }} \
+                -D VCPKG_TARGET_TRIPLET="${{ matrix.triplet }}" \
+                -D VCPKG_HOST_TRIPLET="${{ matrix.triplet }}" \
+                -D VCPKG_INSTALL_OPTIONS="--only-binarycaching" \
+                -D NUGET_USERNAME=kadas-albireo \
+                -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }} || true
+
+          cmake -D VCPKG_INSTALL_OPTIONS="" build
+
+      - name: 🐚 Setup SSH (tmate) session on failure or on demand
+        if: ${{ failure() || (github.event_name == 'workflow_dispatch' && inputs.debug_enabled) }}
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+
+      - name: 📑 Upload vcpkg build logs
+        uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: build-logs-${{ matrix.triplet }}
+          path: |
+            build/_deps/vcpkg-src/buildtrees/**/*.log
+
+      - name: 📦 Create SDK
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
+        run: |
+          ./build/_deps/vcpkg-src/vcpkg export --zip --output-dir=./sdk --x-install-root=./build/vcpkg_installed  --x-manifest-root=vcpkg
+          cd sdk && for f in vcpkg-export-*.zip; do mv "$f" "${f/vcpkg-export/vcpkg-export-${{ matrix.triplet }}}"; done
+
+      - name: 📤 Upload SDK
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
+        uses: actions/upload-artifact@v7
+        with:
+          archive: false
+          path: sdk/vcpkg-export-${{ matrix.triplet }}-*.zip
+
+      - name: 📝 Compile plugins translation
+        run: |
+          # lrelease is run from cmake for app
+          # plugins need to be handled
+          export PATH="${{ github.workspace }}/build/vcpkg_installed/${{ matrix.triplet }}/tools/Qt6/bin:${PATH}"
+          for PLUGIN in about gpkg print ephem; do
+            lrelease share/python/plugins/kadas_${PLUGIN}/i18n/*.ts
+          done
+
+      - name: 🌋 Build
+        run: |
+          cmake --build build
+
+      - name: 🧪 Run CTest
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          xvfb-run -a ctest --test-dir build --output-on-failure --timeout 120
+
+      - name: 🧪 Install pytest for plugin tests
+        run: |
+          ./build/vcpkg_installed/${{ matrix.triplet }}/tools/python3/python3 -m pip install pytest
+
+      - name: 🧪 Run plugin tests
+        env:
+          PYTHONPATH: "${{ github.workspace }}/build/output/python:${{ github.workspace }}/share/python/plugins"
+          LD_LIBRARY_PATH: "${{ github.workspace }}/build/vcpkg_installed/${{ matrix.triplet }}/lib"
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          xvfb-run -a ./build/vcpkg_installed/${{ matrix.triplet }}/tools/python3/python3 \
+            -m pytest share/python/plugins/kadas_gpkg/tests/ -v
