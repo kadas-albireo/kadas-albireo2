@@ -736,7 +736,7 @@ void KadasHeightProfileDialog::updateLineOfSight()
   pY.reserve( nSamples );
   double earthRadius = 6370000;
   double meterToDisplayUnit = QgsUnitTypes::fromUnitToUnitFactor( Qgis::DistanceUnit::Meters, KadasCoordinateFormat::instance()->getHeightDisplayUnit() );
-  for ( const QPointF &p : mPlotSamples )
+  for ( const QPointF &p : std::as_const( mPlotSamples ) )
   {
     pX.append( p.x() / mNSamples * mTotLengthMeters );
     double hCorr = 0.87 * pX.last() * pX.last() / ( 2 * earthRadius ) * meterToDisplayUnit;
