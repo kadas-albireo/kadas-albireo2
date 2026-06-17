@@ -46,6 +46,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libx11-dev \
     libxext-dev \
     libxfixes-dev \
+    libxrandr-dev \
+    libxdamage-dev \
+    libxcomposite-dev \
+    libxtst-dev \
     libxi-dev \
     libxrender-dev \
     libxkbcommon-dev \
