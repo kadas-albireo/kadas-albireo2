@@ -25,8 +25,10 @@
 #include <qgis/qgscurvepolygon.h>
 #include <qgis/qgsdistancearea.h>
 #include <qgis/qgsfillsymbol.h>
+#include <qgis/qgsfillsymbollayer.h>
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgssettingsentryimpl.h>
 
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
@@ -46,6 +48,20 @@ namespace
     return static_cast<const KadasRectangleAnnotationItem *>( item );
   }
 } // namespace
+
+
+// ----- Persisted last-used style ----------------------------------------
+
+const QgsSettingsEntryDouble *KadasRectangleAnnotationController::settingsStrokeWidth
+  = new QgsSettingsEntryDouble( QStringLiteral( "rectangle-stroke-width" ), sTreeAnnotation, 0.5, QStringLiteral( "Last-used rectangle outline width (mm)." ) );
+const QgsSettingsEntryColor *KadasRectangleAnnotationController::settingsFillColor
+  = new QgsSettingsEntryColor( QStringLiteral( "rectangle-fill-color" ), sTreeAnnotation, QColor( 255, 0, 0, 80 ), QStringLiteral( "Last-used rectangle fill color." ) );
+const QgsSettingsEntryColor *KadasRectangleAnnotationController::settingsStrokeColor
+  = new QgsSettingsEntryColor( QStringLiteral( "rectangle-stroke-color" ), sTreeAnnotation, QColor( 255, 0, 0 ), QStringLiteral( "Last-used rectangle outline color." ) );
+const QgsSettingsEntryInteger *KadasRectangleAnnotationController::settingsStrokeStyle
+  = new QgsSettingsEntryInteger( QStringLiteral( "rectangle-stroke-style" ), sTreeAnnotation, static_cast<int>( Qt::SolidLine ), QStringLiteral( "Last-used rectangle outline style." ) );
+const QgsSettingsEntryInteger *KadasRectangleAnnotationController::settingsBrushStyle
+  = new QgsSettingsEntryInteger( QStringLiteral( "rectangle-brush-style" ), sTreeAnnotation, static_cast<int>( Qt::SolidPattern ), QStringLiteral( "Last-used rectangle fill style." ) );
 
 
 QString KadasRectangleAnnotationController::itemType() const
@@ -298,6 +314,44 @@ QString KadasRectangleAnnotationController::asKml( const QgsAnnotationItem *item
 KadasAnnotationStyleEditor *KadasRectangleAnnotationController::createStyleEditor( QWidget *parent ) const
 {
   return new KadasPolygonStyleEditor( parent );
+}
+
+void KadasRectangleAnnotationController::applyPersistedStyle( QgsAnnotationItem *item ) const
+{
+  auto *poly = dynamic_cast<QgsAnnotationPolygonItem *>( item );
+  if ( !poly || !settingsStrokeColor->exists() )
+    return;
+  std::unique_ptr<QgsFillSymbol> sym( poly->symbol() ? poly->symbol()->clone() : new QgsFillSymbol() );
+  if ( sym->symbolLayerCount() == 0 )
+    sym->appendSymbolLayer( new QgsSimpleFillSymbolLayer() );
+  auto *sl = dynamic_cast<QgsSimpleFillSymbolLayer *>( sym->symbolLayer( 0 ) );
+  if ( !sl )
+  {
+    auto *replacement = new QgsSimpleFillSymbolLayer();
+    sym->changeSymbolLayer( 0, replacement );
+    sl = replacement;
+  }
+  sl->setStrokeWidth( settingsStrokeWidth->value() );
+  sl->setColor( settingsFillColor->value() );
+  sl->setStrokeColor( settingsStrokeColor->value() );
+  sl->setStrokeStyle( static_cast<Qt::PenStyle>( settingsStrokeStyle->value() ) );
+  sl->setBrushStyle( static_cast<Qt::BrushStyle>( settingsBrushStyle->value() ) );
+  poly->setSymbol( sym.release() );
+}
+
+void KadasRectangleAnnotationController::persistStyle( const QgsAnnotationItem *item ) const
+{
+  const auto *poly = dynamic_cast<const QgsAnnotationPolygonItem *>( item );
+  if ( !poly || !poly->symbol() || poly->symbol()->symbolLayerCount() == 0 )
+    return;
+  const auto *sl = dynamic_cast<const QgsSimpleFillSymbolLayer *>( poly->symbol()->symbolLayer( 0 ) );
+  if ( !sl )
+    return;
+  settingsStrokeWidth->setValue( sl->strokeWidth() );
+  settingsFillColor->setValue( sl->color() );
+  settingsStrokeColor->setValue( sl->strokeColor() );
+  settingsStrokeStyle->setValue( static_cast<int>( sl->strokeStyle() ) );
+  settingsBrushStyle->setValue( static_cast<int>( sl->brushStyle() ) );
 }
 
 QList<KadasAnnotationMeasurementLabel> KadasRectangleAnnotationController::measurementLabels( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const

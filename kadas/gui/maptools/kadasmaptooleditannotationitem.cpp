@@ -314,6 +314,7 @@ void KadasMapToolEditAnnotationItem::updateTempRubberBand()
   QColor strokeColor( 50, 50, 50, 200 );
   QColor fillColor( Qt::transparent );
   QColor secondaryColor( 255, 255, 255, 100 );
+  Qt::BrushStyle brushStyle = Qt::SolidPattern;
   double widthPx = minWidth;
   if ( const auto *line = dynamic_cast<const QgsAnnotationLineItem *>( mItem ) )
   {
@@ -334,11 +335,14 @@ void KadasMapToolEditAnnotationItem::updateTempRubberBand()
       {
         strokeColor = sl->strokeColor();
         widthPx = std::max( minWidth, sl->strokeWidth() * mmToPx );
+        // Mirror the fill pattern so a hatched polygon does not preview as a solid block.
+        brushStyle = sl->brushStyle();
       }
     }
   }
   mTempRubberBand->setStrokeColor( strokeColor );
   mTempRubberBand->setFillColor( fillColor );
+  mTempRubberBand->setBrushStyle( brushStyle );
   mTempRubberBand->setSecondaryStrokeColor( secondaryColor );
   mTempRubberBand->setWidth( widthPx );
 

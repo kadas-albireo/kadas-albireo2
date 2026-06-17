@@ -59,11 +59,21 @@ class KADAS_GUI_EXPORT KadasRectangleAnnotationController : public KadasAnnotati
     QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = nullptr ) const override;
 #endif
 
+    void applyPersistedStyle( QgsAnnotationItem *item ) const override;
+    void persistStyle( const QgsAnnotationItem *item ) const override;
     KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = nullptr ) const override;
 
     QList<QgsAnnotationItem *> generateShadows( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const override;
     QStringList shadowIds( const QgsAnnotationItem *item ) const override;
     void setShadowIds( QgsAnnotationItem *item, const QStringList &ids ) const override;
+
+#ifndef SIP_RUN
+    static const QgsSettingsEntryDouble *settingsStrokeWidth;
+    static const QgsSettingsEntryColor *settingsFillColor;
+    static const QgsSettingsEntryColor *settingsStrokeColor;
+    static const QgsSettingsEntryInteger *settingsStrokeStyle;
+    static const QgsSettingsEntryInteger *settingsBrushStyle;
+#endif
 
   private:
     enum AttribIds

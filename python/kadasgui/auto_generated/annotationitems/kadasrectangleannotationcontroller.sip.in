@@ -70,6 +70,10 @@ Controller for KadasRectangleAnnotationItem (type id "kadas:rectangle").
 
 
 
+    virtual void applyPersistedStyle( QgsAnnotationItem *item ) const;
+
+    virtual void persistStyle( const QgsAnnotationItem *item ) const;
+
     virtual KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = 0 ) const;
 
 
@@ -78,6 +82,7 @@ Controller for KadasRectangleAnnotationItem (type id "kadas:rectangle").
     virtual QStringList shadowIds( const QgsAnnotationItem *item ) const;
 
     virtual void setShadowIds( QgsAnnotationItem *item, const QStringList &ids ) const;
+
 
 
 };
