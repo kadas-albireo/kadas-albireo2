@@ -100,7 +100,7 @@ jobs:
 
           cmake -D VCPKG_INSTALL_OPTIONS="" build
 
-      - name: � Display vcpkg error logs
+      - name: 📋 Display vcpkg error logs
         if: failure()
         run: |
           LOG_ROOT="build/_deps/vcpkg-src/buildtrees"
@@ -113,12 +113,6 @@ jobs:
             echo "::endgroup::"
           done
 
-      - name: �🐚 Setup SSH (tmate) session on failure or on demand
-        if: ${{ failure() || (github.event_name == 'workflow_dispatch' && inputs.debug_enabled) }}
-        uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: true
-
       - name: 📑 Upload vcpkg build logs
         uses: actions/upload-artifact@v7
         if: failure()
@@ -127,7 +121,13 @@ jobs:
           path: |
             build/_deps/vcpkg-src/buildtrees/**/*.log
 
-      - name: 📦 Create SDK
+      - name: 🐚 Setup SSH (tmate) session on failure or on demand
+        if: ${{ failure() || (github.event_name == 'workflow_dispatch' && inputs.debug_enabled) }}
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+
+      - name:  Create SDK
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
         run: |
           ./build/_deps/vcpkg-src/vcpkg export --zip --output-dir=./sdk --x-install-root=./build/vcpkg_installed  --x-manifest-root=vcpkg
