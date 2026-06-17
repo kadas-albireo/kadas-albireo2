@@ -233,6 +233,10 @@ void KadasAnnotationProjectIntegration::stripAfterSave()
 
 void KadasAnnotationProjectIntegration::onProjectRead( const QDomDocument & )
 {
+  // Rebuild Kadas items that a vanilla-QGIS round trip dropped (unknown master
+  // type) but whose stock shadows survived, before the shadows get stripped.
+  for ( QgsAnnotationLayer *layer : annotationLayers() )
+    KadasAnnotationLayerHelpers::reconstructOrphanCrosses( layer );
   // Strip leftover shadow items from projects saved by older sessions.
   stripAfterSave();
   // Re-point picture items at the freshly-extracted attachment files.

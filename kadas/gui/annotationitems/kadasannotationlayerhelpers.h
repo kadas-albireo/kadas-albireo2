@@ -50,6 +50,9 @@ class KADAS_GUI_EXPORT KadasAnnotationLayerHelpers
     //! Removes shadow items and clears master shadow id lists. Call after QgsProject::write() and after read().
     static void stripShadowsFromLayer( QgsAnnotationLayer *layer );
 
+    //! Rebuilds coordinate-cross items orphaned by a vanilla-QGIS round trip (unknown master type dropped, stock shadows kept), recovering position from the shadow marker. Consumes the orphan side-channel. Call after read().
+    static void reconstructOrphanCrosses( QgsAnnotationLayer *layer );
+
   private:
     KadasAnnotationLayerHelpers() = delete;
 #ifdef SIP_RUN

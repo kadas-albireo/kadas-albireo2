@@ -59,6 +59,14 @@ Removes shadow items and clears master shadow id lists. Call after
 :py:func:`~KadasAnnotationLayerHelpers.read`.
 %End
 
+    static void reconstructOrphanCrosses( QgsAnnotationLayer *layer );
+%Docstring
+Rebuilds coordinate-cross items orphaned by a vanilla-QGIS round trip
+(unknown master type dropped, stock shadows kept), recovering position
+from the shadow marker. Consumes the orphan side-channel. Call after
+:py:func:`~KadasAnnotationLayerHelpers.read`.
+%End
+
   private:
     KadasAnnotationLayerHelpers();
 };

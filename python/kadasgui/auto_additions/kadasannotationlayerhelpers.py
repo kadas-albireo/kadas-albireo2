@@ -6,5 +6,6 @@ try:
     KadasAnnotationLayerHelpers.createLayer = staticmethod(KadasAnnotationLayerHelpers.createLayer)
     KadasAnnotationLayerHelpers.prepareLayerForSave = staticmethod(KadasAnnotationLayerHelpers.prepareLayerForSave)
     KadasAnnotationLayerHelpers.stripShadowsFromLayer = staticmethod(KadasAnnotationLayerHelpers.stripShadowsFromLayer)
+    KadasAnnotationLayerHelpers.reconstructOrphanCrosses = staticmethod(KadasAnnotationLayerHelpers.reconstructOrphanCrosses)
 except (NameError, AttributeError):
     pass

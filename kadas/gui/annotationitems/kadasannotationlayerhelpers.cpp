@@ -16,22 +16,42 @@
 
 #include <qgis/qgsannotationitem.h>
 #include <qgis/qgsannotationlayer.h>
+#include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgscoordinatereferencesystem.h>
+#include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
 
 #include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontext.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
+#include "kadas/gui/annotationitems/kadascoordcrossannotationitem.h"
 
 
 namespace
 {
   const QString KEY_PREFIX = QStringLiteral( "kadas:item-meta:" );
+  const QString ORPHAN_PREFIX = QStringLiteral( "kadas:orphan:" );
 
   QString tooltipKey( const QString &itemId )
   {
     return KEY_PREFIX + itemId + QStringLiteral( ":tooltip" );
+  }
+
+  QString orphanKey( const QString &masterId )
+  {
+    return ORPHAN_PREFIX + masterId;
+  }
+
+  // Drop every kadas:orphan:* side-channel record so repeated saves don't accumulate stale entries.
+  void clearOrphanRecords( QgsAnnotationLayer *layer )
+  {
+    const QStringList keys = layer->customPropertyKeys();
+    for ( const QString &key : keys )
+    {
+      if ( key.startsWith( ORPHAN_PREFIX ) )
+        layer->removeCustomProperty( key );
+    }
   }
 
   // Dispatch shadow-id access through the controller registry.
@@ -131,6 +151,7 @@ void KadasAnnotationLayerHelpers::prepareLayerForSave( QgsAnnotationLayer *layer
 
   // Drop any pre-existing shadows so repeated saves don't accumulate them.
   stripShadowsFromLayer( layer );
+  clearOrphanRecords( layer );
 
   auto *registry = KadasAnnotationControllerRegistry::instance();
   if ( !registry )
@@ -160,5 +181,58 @@ void KadasAnnotationLayerHelpers::prepareLayerForSave( QgsAnnotationLayer *layer
         shadowIds.append( id );
     }
     setMasterShadowIds( master, shadowIds );
+
+    // Side-channel the master identity (type + shadow ids) as a layer custom
+    // property: it survives a vanilla-QGIS round trip that drops the unknown
+    // master item type but keeps the stock shadows, letting us rebuild on load.
+    QStringList record;
+    record << master->type() << shadowIds;
+    layer->setCustomProperty( orphanKey( it.key() ), record.join( QLatin1Char( '|' ) ) );
+  }
+}
+
+void KadasAnnotationLayerHelpers::reconstructOrphanCrosses( QgsAnnotationLayer *layer )
+{
+  if ( !layer )
+    return;
+
+  const QStringList keys = layer->customPropertyKeys();
+  for ( const QString &key : keys )
+  {
+    if ( !key.startsWith( ORPHAN_PREFIX ) )
+      continue;
+
+    const QString masterId = key.mid( ORPHAN_PREFIX.length() );
+    const QStringList record = layer->customProperty( key ).toString().split( QLatin1Char( '|' ), Qt::SkipEmptyParts );
+    layer->removeCustomProperty( key ); // consume; prepareLayerForSave rewrites it on the next save
+
+    if ( record.isEmpty() )
+      continue;
+    // Master survived the round trip (project opened straight in Kadas): the
+    // regular shadow-strip path handles its shadows, nothing to reconstruct.
+    if ( layer->item( masterId ) )
+      continue;
+    if ( record.first() != KadasCoordCrossAnnotationItem::itemTypeId() )
+      continue;
+
+    const QStringList shadowIds = record.mid( 1 );
+    // Recover the (possibly QGIS-moved) position from the stock cross marker.
+    bool found = false;
+    QgsPointXY pos;
+    for ( const QString &sid : shadowIds )
+    {
+      if ( auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( layer->item( sid ) ) )
+      {
+        pos = marker->geometry();
+        found = true;
+        break;
+      }
+    }
+    if ( !found )
+      continue;
+
+    layer->addItem( new KadasCoordCrossAnnotationItem( QgsPoint( pos.x(), pos.y() ) ) );
+    for ( const QString &sid : shadowIds )
+      layer->removeItem( sid );
   }
 }

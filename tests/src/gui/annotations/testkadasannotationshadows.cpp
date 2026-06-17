@@ -70,6 +70,11 @@ class TestKadasAnnotationShadows : public QObject
     void stripShadowsFromLayer_removesShadowsAndClearsIds();
     void prepareIsIdempotent();
 
+    // Orphan reconstruction after a vanilla-QGIS round trip --------------
+    void reconstructOrphanCrosses_rebuildsDroppedMaster();
+    void reconstructOrphanCrosses_recoversMovedPosition();
+    void reconstructOrphanCrosses_keepsMasterWhenPresent();
+
   private:
     static KadasAnnotationItemContext makeContext();
 };
@@ -239,6 +244,96 @@ void TestKadasAnnotationShadows::prepareIsIdempotent()
   const int after2 = layer.items().size();
 
   QCOMPARE( after1, after2 );
+}
+
+
+// ------------------------ orphan reconstruction ------------------------
+
+void TestKadasAnnotationShadows::reconstructOrphanCrosses_rebuildsDroppedMaster()
+{
+  QgsAnnotationLayer::LayerOptions opts { QgsCoordinateTransformContext() };
+  QgsAnnotationLayer layer( QStringLiteral( "test" ), opts );
+  layer.setCrs( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:3857" ) ) );
+
+  auto *master = new KadasCoordCrossAnnotationItem();
+  master->setGeometry( QgsPoint( 1000, 2000 ) );
+  const QString masterId = layer.addItem( master );
+
+  KadasAnnotationLayerHelpers::prepareLayerForSave( &layer );
+  // master + cross marker + label shadow
+  QCOMPARE( layer.items().size(), 3 );
+
+  // Simulate a vanilla-QGIS round trip: the unknown master type is dropped,
+  // the stock shadows and the layer custom properties survive.
+  layer.removeItem( masterId );
+  QCOMPARE( layer.items().size(), 2 );
+
+  KadasAnnotationLayerHelpers::reconstructOrphanCrosses( &layer );
+
+  // Shadows replaced by exactly one reconstructed coordinate cross.
+  QCOMPARE( layer.items().size(), 1 );
+  auto *cross = dynamic_cast<KadasCoordCrossAnnotationItem *>( layer.items().first() );
+  QVERIFY( cross );
+  QCOMPARE( cross->geometry().x(), 1000.0 );
+  QCOMPARE( cross->geometry().y(), 2000.0 );
+
+  // Orphan side-channel consumed.
+  for ( const QString &key : layer.customPropertyKeys() )
+    QVERIFY( !key.startsWith( QLatin1String( "kadas:orphan:" ) ) );
+}
+
+void TestKadasAnnotationShadows::reconstructOrphanCrosses_recoversMovedPosition()
+{
+  QgsAnnotationLayer::LayerOptions opts { QgsCoordinateTransformContext() };
+  QgsAnnotationLayer layer( QStringLiteral( "test" ), opts );
+  layer.setCrs( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:3857" ) ) );
+
+  auto *master = new KadasCoordCrossAnnotationItem();
+  master->setGeometry( QgsPoint( 1000, 2000 ) );
+  const QString masterId = layer.addItem( master );
+
+  KadasAnnotationLayerHelpers::prepareLayerForSave( &layer );
+  layer.removeItem( masterId );
+
+  // The user dragged the cross in vanilla QGIS: move the stock marker shadow.
+  for ( QgsAnnotationItem *item : layer.items() )
+  {
+    if ( auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item ) )
+      marker->setGeometry( QgsPoint( 5000, 6000 ) );
+  }
+
+  KadasAnnotationLayerHelpers::reconstructOrphanCrosses( &layer );
+
+  QCOMPARE( layer.items().size(), 1 );
+  auto *cross = dynamic_cast<KadasCoordCrossAnnotationItem *>( layer.items().first() );
+  QVERIFY( cross );
+  // Reconstructed at the moved marker position, not the original.
+  QCOMPARE( cross->geometry().x(), 5000.0 );
+  QCOMPARE( cross->geometry().y(), 6000.0 );
+}
+
+void TestKadasAnnotationShadows::reconstructOrphanCrosses_keepsMasterWhenPresent()
+{
+  // Project opened straight in Kadas: the master deserializes fine, so
+  // reconstruction must not add a duplicate. It only consumes the record.
+  QgsAnnotationLayer::LayerOptions opts { QgsCoordinateTransformContext() };
+  QgsAnnotationLayer layer( QStringLiteral( "test" ), opts );
+  layer.setCrs( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:3857" ) ) );
+
+  auto *master = new KadasCoordCrossAnnotationItem();
+  master->setGeometry( QgsPoint( 1000, 2000 ) );
+  const QString masterId = layer.addItem( master );
+
+  KadasAnnotationLayerHelpers::prepareLayerForSave( &layer );
+  const int withShadows = layer.items().size();
+
+  KadasAnnotationLayerHelpers::reconstructOrphanCrosses( &layer );
+
+  // No new master added; the original is untouched.
+  QCOMPARE( layer.items().size(), withShadows );
+  QVERIFY( dynamic_cast<KadasCoordCrossAnnotationItem *>( layer.item( masterId ) ) );
+  for ( const QString &key : layer.customPropertyKeys() )
+    QVERIFY( !key.startsWith( QLatin1String( "kadas:orphan:" ) ) );
 }
 
 
