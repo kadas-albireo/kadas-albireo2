@@ -10,12 +10,6 @@ on:
     branches:
       - linux-build-vcpkg
   workflow_dispatch:
-    inputs:
-      debug_enabled:
-        description: 'Open an SSH (tmate) session on the runner for interactive debugging'
-        required: false
-        default: false
-        type: boolean
 
 concurrency:
   group: build-linux-${{ github.ref }}
@@ -126,12 +120,6 @@ jobs:
           name: build-logs-${{ matrix.triplet }}
           path: |
             build/_deps/vcpkg-src/buildtrees/**/*.log
-
-      - name: 🐚 Setup SSH (tmate) session on failure or on demand
-        if: ${{ failure() || (github.event_name == 'workflow_dispatch' && inputs.debug_enabled) }}
-        uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: true
 
       - name:  Create SDK
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'release'
