@@ -44,7 +44,7 @@ class KADAS_CORE_EXPORT KadasSettingsTree
 
     //! Whether map tools display the numeric input widget while digitizing. Key preserved as "kadas/showNumericInput".
     static inline QgsSettingsEntryBool *settingsShowNumericInput
-      = new QgsSettingsEntryBool( QStringLiteral( "showNumericInput" ), sTreeKadas, false, QStringLiteral( "Whether map tools display the numeric input widget while digitizing." ) );
+      = new QgsSettingsEntryBool( QStringLiteral( "show-numeric-input" ), sTreeKadas, false, QStringLiteral( "Whether map tools display the numeric input widget while digitizing." ) );
 
 #endif
 
