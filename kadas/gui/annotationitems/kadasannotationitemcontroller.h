@@ -17,8 +17,11 @@
 #ifndef KADASANNOTATIONITEMCONTROLLER_H
 #define KADASANNOTATIONITEMCONTROLLER_H
 
+#include <QColor>
 #include <QString>
 #include <QStringList>
+
+#include <qgis/qgis.h>
 
 #include "kadas/core/kadassettingstree.h"
 #include "kadas/gui/kadas_gui.h"
@@ -48,6 +51,25 @@ struct KadasAnnotationMeasurementLabel
     QgsPointXY mapPos;
     QString text;
     bool centered = true;
+};
+
+/**
+ * \ingroup gui
+ * \brief Styling for the annotation edit tool's drag-preview rubber band.
+ *
+ * Supplied by a controller via KadasAnnotationItemController::previewStyle() so the
+ * map tool does not need to introspect QGIS symbol layers. \a width is expressed in
+ * \a widthUnit; the tool converts it to canvas pixels and floors it to a minimum.
+ */
+struct KadasAnnotationPreviewStyle
+{
+    QColor strokeColor = QColor( 50, 50, 50, 200 );
+    QColor fillColor = QColor( Qt::transparent );
+    QColor secondaryColor = QColor( 255, 255, 255, 100 );
+    Qt::BrushStyle brushStyle = Qt::SolidPattern;
+    Qt::PenStyle lineStyle = Qt::SolidLine;
+    double width = 0;
+    Qgis::RenderUnit widthUnit = Qgis::RenderUnit::Millimeters;
 };
 #endif
 
@@ -110,6 +132,11 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
 
     //! Geometry (item CRS) for the edit tool's rubber-band preview. Mirrors QgsAnnotationItemEditOperationTransientResults::representativeGeometry().
     virtual QgsGeometry representativeGeometry( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const;
+
+#ifndef SIP_RUN
+    //! Styling for the edit tool's rubber-band preview. The default reads the item's line/fill symbol; controllers may override for custom previews.
+    virtual KadasAnnotationPreviewStyle previewStyle( const QgsAnnotationItem *item ) const;
+#endif
 
     //! When TRUE, the edit tool re-renders the layer on every drag step (e.g. pictures) rather than only on release.
     virtual bool liveRepaintOnEdit() const { return false; }

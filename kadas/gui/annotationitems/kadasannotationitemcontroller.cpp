@@ -28,7 +28,11 @@
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgscurve.h>
 #include <qgis/qgscurvepolygon.h>
+#include <qgis/qgsfillsymbol.h>
+#include <qgis/qgsfillsymbollayer.h>
 #include <qgis/qgsgeometry.h>
+#include <qgis/qgslinesymbol.h>
+#include <qgis/qgslinesymbollayer.h>
 #include <qgis/qgsrectangle.h>
 #include <qgis/qgsrendercontext.h>
 #include <qgis/qgssettings.h>
@@ -55,6 +59,50 @@ QgsGeometry KadasAnnotationItemController::representativeGeometry( const QgsAnno
   if ( bb.isEmpty() )
     return QgsGeometry();
   return QgsGeometry::fromRect( bb );
+}
+
+KadasAnnotationPreviewStyle KadasAnnotationItemController::previewStyle( const QgsAnnotationItem *item ) const
+{
+  KadasAnnotationPreviewStyle style;
+  if ( const auto *line = dynamic_cast<const QgsAnnotationLineItem *>( item ) )
+  {
+    if ( const QgsLineSymbol *sym = line->symbol() )
+    {
+      style.strokeColor = sym->color();
+      style.secondaryColor = QColor();
+      if ( const auto *sl = dynamic_cast<const QgsSimpleLineSymbolLayer *>( sym->symbolLayer( 0 ) ) )
+      {
+        style.width = sl->width();
+        style.widthUnit = sl->widthUnit();
+        // Mirror the dash pattern so a dashed line does not preview as solid.
+        style.lineStyle = sl->penStyle();
+      }
+      else
+      {
+        style.width = sym->width();
+        style.widthUnit = Qgis::RenderUnit::Millimeters;
+      }
+    }
+  }
+  else if ( const auto *poly = dynamic_cast<const QgsAnnotationPolygonItem *>( item ) )
+  {
+    if ( const QgsFillSymbol *sym = poly->symbol() )
+    {
+      style.fillColor = sym->color();
+      style.secondaryColor = QColor();
+      if ( const auto *sl = dynamic_cast<const QgsSimpleFillSymbolLayer *>( sym->symbolLayer( 0 ) ) )
+      {
+        style.strokeColor = sl->strokeColor();
+        style.width = sl->strokeWidth();
+        style.widthUnit = sl->strokeWidthUnit();
+        // Mirror the fill pattern so a hatched polygon does not preview as a solid block.
+        style.brushStyle = sl->brushStyle();
+        // Mirror the dash pattern so a dashed outline does not preview as solid.
+        style.lineStyle = sl->strokeStyle();
+      }
+    }
+  }
+  return style;
 }
 
 bool KadasAnnotationItemController::hitTest( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const

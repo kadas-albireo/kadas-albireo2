@@ -26,13 +26,7 @@
 
 #include <qgis/qgsannotationitem.h>
 #include <qgis/qgsannotationlayer.h>
-#include <qgis/qgsannotationlineitem.h>
-#include <qgis/qgsannotationpolygonitem.h>
-#include <qgis/qgsfillsymbol.h>
-#include <qgis/qgsfillsymbollayer.h>
 #include <qgis/qgsgeometry.h>
-#include <qgis/qgslinesymbol.h>
-#include <qgis/qgslinesymbollayer.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapcanvasitem.h>
 #include <qgis/qgsmapmouseevent.h>
@@ -316,52 +310,14 @@ void KadasMapToolEditAnnotationItem::updateTempRubberBand()
   // logical pixels the rubber band paints in by undoing the device pixel ratio.
   QgsRenderContext context = QgsRenderContext::fromMapSettings( canvas()->mapSettings() );
   const double dpr = std::max( 1.0, static_cast<double>( context.devicePixelRatio() ) );
-  QColor strokeColor( 50, 50, 50, 200 );
-  QColor fillColor( Qt::transparent );
-  QColor secondaryColor( 255, 255, 255, 100 );
-  Qt::BrushStyle brushStyle = Qt::SolidPattern;
-  Qt::PenStyle lineStyle = Qt::SolidLine;
-  double widthPx = minWidth;
-  if ( const auto *line = dynamic_cast<const QgsAnnotationLineItem *>( mItem ) )
-  {
-    if ( const QgsLineSymbol *sym = line->symbol() )
-    {
-      strokeColor = sym->color();
-      secondaryColor = QColor();
-      if ( const auto *sl = dynamic_cast<const QgsSimpleLineSymbolLayer *>( sym->symbolLayer( 0 ) ) )
-      {
-        widthPx = std::max( minWidth, context.convertToPainterUnits( sl->width(), sl->widthUnit() ) / dpr );
-        // Mirror the dash pattern so a dashed line does not preview as solid.
-        lineStyle = sl->penStyle();
-      }
-      else
-      {
-        widthPx = std::max( minWidth, context.convertToPainterUnits( sym->width(), Qgis::RenderUnit::Millimeters ) / dpr );
-      }
-    }
-  }
-  else if ( const auto *poly = dynamic_cast<const QgsAnnotationPolygonItem *>( mItem ) )
-  {
-    if ( const QgsFillSymbol *sym = poly->symbol() )
-    {
-      fillColor = sym->color();
-      secondaryColor = QColor();
-      if ( const auto *sl = dynamic_cast<const QgsSimpleFillSymbolLayer *>( sym->symbolLayer( 0 ) ) )
-      {
-        strokeColor = sl->strokeColor();
-        widthPx = std::max( minWidth, context.convertToPainterUnits( sl->strokeWidth(), sl->strokeWidthUnit() ) / dpr );
-        // Mirror the fill pattern so a hatched polygon does not preview as a solid block.
-        brushStyle = sl->brushStyle();
-        // Mirror the dash pattern so a dashed outline does not preview as solid.
-        lineStyle = sl->strokeStyle();
-      }
-    }
-  }
-  mTempRubberBand->setStrokeColor( strokeColor );
-  mTempRubberBand->setFillColor( fillColor );
-  mTempRubberBand->setBrushStyle( brushStyle );
-  mTempRubberBand->setLineStyle( lineStyle );
-  mTempRubberBand->setSecondaryStrokeColor( secondaryColor );
+  const KadasAnnotationPreviewStyle style = mController->previewStyle( mItem );
+  const double widthPx = std::max( minWidth, context.convertToPainterUnits( style.width, style.widthUnit ) / dpr );
+
+  mTempRubberBand->setStrokeColor( style.strokeColor );
+  mTempRubberBand->setFillColor( style.fillColor );
+  mTempRubberBand->setBrushStyle( style.brushStyle );
+  mTempRubberBand->setLineStyle( style.lineStyle );
+  mTempRubberBand->setSecondaryStrokeColor( style.secondaryColor );
   mTempRubberBand->setWidth( widthPx );
 
   mTempRubberBand->setToGeometry( geom, mLayer->crs() );
