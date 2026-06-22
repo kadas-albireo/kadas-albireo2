@@ -157,6 +157,15 @@ namespace
   {
     for ( QgsAnnotationLayer *layer : annotationLayers() )
     {
+      // Drop every offset side-channel entry first, then rewrite only the
+      // current non-default offsets. Iterating just the live pictures would
+      // leak keys for deleted items, which would pile up in the project file.
+      const QStringList keys = layer->customPropertyKeys();
+      for ( const QString &key : keys )
+      {
+        if ( key.startsWith( QLatin1String( "kadas:picture-offset:" ) ) || key.startsWith( QLatin1String( "kadas:picture-offset-unit:" ) ) )
+          layer->removeCustomProperty( key );
+      }
       for ( const auto &pair : picturesInWithIds( layer ) )
       {
         const QString id = pair.first;
@@ -164,11 +173,7 @@ namespace
         // Skip the default (zero) offset; only side-channel non-default values.
         const QSizeF off = pic->offsetFromCallout();
         if ( off.width() == 0 && off.height() == 0 )
-        {
-          layer->removeCustomProperty( offsetKey( id ) );
-          layer->removeCustomProperty( offsetUnitKey( id ) );
           continue;
-        }
         layer->setCustomProperty( offsetKey( id ), QgsSymbolLayerUtils::encodeSize( off ) );
         layer->setCustomProperty( offsetUnitKey( id ), QgsUnitTypes::encodeUnit( pic->offsetFromCalloutUnit() ) );
       }
