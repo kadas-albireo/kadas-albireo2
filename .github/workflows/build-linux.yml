@@ -6,9 +6,6 @@ on:
       docs-artifact-name:
         required: true
         type: string
-  push:
-    branches:
-      - linux-build-vcpkg
   workflow_dispatch:
 
 concurrency:
