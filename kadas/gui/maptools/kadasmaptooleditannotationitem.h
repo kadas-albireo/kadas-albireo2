@@ -91,6 +91,11 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     struct ToolState;
 
     KadasAnnotationItemController *mController = nullptr;
+    // mLayer owns the annotation item; mItemId is the authoritative, stable
+    // reference to it. mItem is a non-owning cache of mLayer->item( mItemId )
+    // and must be re-resolved from the layer after any structural change
+    // (replaceItem/addItem/removeItem). It may dangle if the item is removed
+    // outside the tool, so it is cleared to nullptr whenever that can happen.
     QPointer<QgsAnnotationLayer> mLayer;
     QString mItemId;
     QgsAnnotationItem *mItem = nullptr;
