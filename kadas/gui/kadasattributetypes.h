@@ -22,6 +22,7 @@
 #include <QPointF>
 #include <QString>
 #include <Qt>
+#include <functional>
 #include <limits>
 
 #include <qgis/qgspointxy.h>
@@ -62,8 +63,8 @@ struct KADAS_GUI_EXPORT KadasNode
 {
     QgsPointXY pos;
 #ifndef SIP_RUN
-    typedef void ( *node_renderer_t )( QPainter *, const QPointF &, int );
-    node_renderer_t render = nullptr;
+    //! Optional custom handle painter (painter, screen position, size). When unset the edit tool draws its standard handle. std::function allows capturing renderers (e.g. per-node colour or index).
+    std::function<void( QPainter *, const QPointF &, int )> render;
 #endif
 };
 
