@@ -97,7 +97,9 @@ struct KADAS_GUI_EXPORT KadasEditContext
     Qt::CursorShape cursor = Qt::CrossCursor;
     HitPrecision precision = HitPrecision::Body;
     bool isValid() const { return mValid; }
-    bool operator!=( const KadasEditContext &other ) const { return vidx != other.vidx || mValid != other.mValid; }
+
+    //! TRUE when both contexts reference the same edit target, i.e. the same vertex identity and validity. \a pos, \a attributes, \a cursor and \a precision are deliberately ignored: they change on every mouse move while the hovered handle stays the same.
+    bool isSameTarget( const KadasEditContext &other ) const { return vidx == other.vidx && mValid == other.mValid; }
 };
 
 #endif // KADASATTRIBUTETYPES_H

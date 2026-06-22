@@ -85,7 +85,14 @@ Valid ``_vidx`` implies Precise; a default ``_vidx`` implies Body
     Qt::CursorShape cursor;
     HitPrecision precision;
     bool isValid() const;
-    bool operator!=( const KadasEditContext &other ) const;
+
+    bool isSameTarget( const KadasEditContext &other ) const;
+%Docstring
+``True`` when both contexts reference the same edit target, i.e. the
+same vertex identity and validity. ``pos``, ``attributes``, ``cursor``
+and ``precision`` are deliberately ignored: they change on every mouse
+move while the hovered handle stays the same.
+%End
 };
 
 /************************************************************************

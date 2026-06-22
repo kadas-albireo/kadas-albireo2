@@ -557,7 +557,7 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
       setCursor( Qt::ArrowCursor );
       clearNumericInput();
     }
-    else if ( mEditContext != oldContext )
+    else if ( !mEditContext.isSameTarget( oldContext ) )
     {
       setCursor( mEditContext.cursor );
       mMoveOffset = QgsVector( pos.x() - mEditContext.pos.x(), pos.y() - mEditContext.pos.y() );
