@@ -144,13 +144,22 @@ namespace
   //
   // QgsAnnotationItem::writeCommonProperties drops negative offsetFromCallout (QSizeF::isValid() false), so persist it via layer customProperties instead.
 
+  // Single source of truth for the offset side-channel key namespace, so the
+  // generic customProperty walk below never has to hardcode these strings.
+  const QString sOffsetKeyPrefix = QStringLiteral( "kadas:picture-offset:" );
+  const QString sOffsetUnitKeyPrefix = QStringLiteral( "kadas:picture-offset-unit:" );
+
   QString offsetKey( const QString &itemId )
   {
-    return QStringLiteral( "kadas:picture-offset:" ) + itemId;
+    return sOffsetKeyPrefix + itemId;
   }
   QString offsetUnitKey( const QString &itemId )
   {
-    return QStringLiteral( "kadas:picture-offset-unit:" ) + itemId;
+    return sOffsetUnitKeyPrefix + itemId;
+  }
+  bool isOffsetCustomProperty( const QString &key )
+  {
+    return key.startsWith( sOffsetKeyPrefix ) || key.startsWith( sOffsetUnitKeyPrefix );
   }
 
   void writePictureOffsetsToCustomProperties()
@@ -163,7 +172,7 @@ namespace
       const QStringList keys = layer->customPropertyKeys();
       for ( const QString &key : keys )
       {
-        if ( key.startsWith( QLatin1String( "kadas:picture-offset:" ) ) || key.startsWith( QLatin1String( "kadas:picture-offset-unit:" ) ) )
+        if ( isOffsetCustomProperty( key ) )
           layer->removeCustomProperty( key );
       }
       for ( const auto &pair : picturesInWithIds( layer ) )
