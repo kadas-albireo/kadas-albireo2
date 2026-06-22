@@ -67,6 +67,10 @@ class KADAS_GUI_EXPORT KadasMilxAnnotationController : public KadasAnnotationIte
 #endif
 
   private:
+    // Position attribute ids for the whole-symbol X/Y inputs. They are negative
+    // so they never collide with the non-negative libmss KadasMilxAttrType ids,
+    // which double as KadasAttribDefs/KadasAttribValues keys for the per-symbol
+    // attribute control points (see getEditContext ring 1).
     enum AttribIds
     {
       AttrX = -2,
