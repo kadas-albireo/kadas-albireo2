@@ -24,8 +24,8 @@
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrubberband.h>
-#include <qgis/qgssettings.h>
 
+#include "kadas/core/kadassettingstree.h"
 #include "kadas/gui/kadasfloatinginputwidget.h"
 #include "kadas/gui/maptools/kadasshapecapturemaptool.h"
 
@@ -402,7 +402,7 @@ void KadasShapeCaptureMapTool::resetRubberBand()
 void KadasShapeCaptureMapTool::setupNumericInput()
 {
   clearNumericInput();
-  if ( !QgsSettings().value( "/kadas/showNumericInput", false ).toBool() )
+  if ( !KadasSettingsTree::settingsShowNumericInput->value() )
     return;
 
   KadasAttribDefs attributes;

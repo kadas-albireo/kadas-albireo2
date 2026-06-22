@@ -48,6 +48,7 @@
 #include <qgis/qgsvectortilelayer.h>
 
 #include "kadas/core/kadas.h"
+#include "kadas/core/kadassettingstree.h"
 #include "kadas/gui/kadasclipboard.h"
 #include "kadas/gui/kadascoordinatedisplayer.h"
 #include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
@@ -236,7 +237,7 @@ void KadasMainWindow::init()
     mMagnifierSpinBox->blockSignals( false );
   } );
 
-  mNumericInputCheckbox->setChecked( QgsSettings().value( "/kadas/showNumericInput", false ).toBool() );
+  mNumericInputCheckbox->setChecked( KadasSettingsTree::settingsShowNumericInput->value() );
   connect( mNumericInputCheckbox, &QCheckBox::toggled, this, &KadasMainWindow::onNumericInputCheckboxToggled );
 
   QgsLayerTreeModel *model = new QgsLayerTreeModel( QgsProject::instance()->layerTreeRoot(), this );
@@ -1170,7 +1171,7 @@ void KadasMainWindow::onSnappingChanged( bool enabled )
 
 void KadasMainWindow::onNumericInputCheckboxToggled( bool checked )
 {
-  QgsSettings().setValue( "/kadas/showNumericInput", checked );
+  KadasSettingsTree::settingsShowNumericInput->setValue( checked );
 }
 
 void KadasMainWindow::showFavoriteContextMenu( const QPoint &pos )

@@ -16,6 +16,7 @@
 #ifndef KADASSETTINGSTREE_H
 #define KADASSETTINGSTREE_H
 
+#include <qgis/qgssettingsentryimpl.h>
 #include <qgis/qgssettingstreenode.h>
 
 #include "kadas/core/kadas_core.h"
@@ -40,6 +41,10 @@ class KADAS_CORE_EXPORT KadasSettingsTree
     static inline QgsSettingsTreeNode *sTreePortal = treeRoot()->createChildNode( QStringLiteral( "portal" ) );
     static inline QgsSettingsTreeNode *sTreePlugins = treeRoot()->createChildNode( QStringLiteral( "plugins" ) );
     static inline QgsSettingsTreeNode *sTreeGpx = treeRoot()->createChildNode( QStringLiteral( "gpx" ) );
+
+    //! Whether map tools display the numeric input widget while digitizing. Key preserved as "kadas/showNumericInput".
+    static inline QgsSettingsEntryBool *settingsShowNumericInput
+      = new QgsSettingsEntryBool( QStringLiteral( "showNumericInput" ), sTreeKadas, false, QStringLiteral( "Whether map tools display the numeric input widget while digitizing." ) );
 
 #endif
 

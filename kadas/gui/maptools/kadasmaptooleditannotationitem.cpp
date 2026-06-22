@@ -655,7 +655,7 @@ void KadasMapToolEditAnnotationItem::stateChanged( KadasStateHistory::ChangeType
 void KadasMapToolEditAnnotationItem::setupNumericInput()
 {
   clearNumericInput();
-  if ( !QgsSettings().value( "/kadas/showNumericInput", false ).toBool() )
+  if ( !KadasSettingsTree::settingsShowNumericInput->value() )
     return;
   if ( !mEditContext.isValid() || mEditContext.attributes.isEmpty() )
     return;
