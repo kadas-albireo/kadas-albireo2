@@ -24,21 +24,22 @@
 #include <QMessageBox>
 #include <QProgressDialog>
 
+#include <qgis/qgsannotationlayer.h>
+#include <qgis/qgsdistancearea.h>
 #include <qgis/qgsmapcanvas.h>
-#include <qgis/qgsmultisurface.h>
 #include <qgis/qgspalettedrasterrenderer.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgssettings.h>
+#include <qgis/qgsunittypes.h>
 
 #include "kadas/core/kadas.h"
 #include "kadas/core/kadascoordinateformat.h"
 #include "kadas/analysis/kadasviewshedfilter.h"
-#include "kadas/gui/mapitems/kadascircularsectoritem.h"
-#include "kadas/gui/mapitems/kadassymbolitem.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
+#include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptoolviewshed.h"
-#include "kadas/gui/kadasmapcanvasitemmanager.h"
 
 
 KadasViewshedDialog::KadasViewshedDialog( double radius, QWidget *parent )
@@ -182,22 +183,17 @@ void KadasViewshedDialog::adjustMinAngle()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-KadasMapItem *KadasMapToolViewshedItemInterface::createItem() const
-{
-  KadasCircularSectorItem *item = new KadasCircularSectorItem( mCanvas->mapSettings().destinationCrs() );
-  return item;
-}
-
 KadasMapToolViewshed::KadasMapToolViewshed( QgsMapCanvas *mapCanvas )
-  : KadasMapToolCreateItem( mapCanvas, std::move( std::make_unique<KadasMapToolViewshedItemInterface>( KadasMapToolViewshedItemInterface( mapCanvas ) ) ) )
+  : KadasShapeCaptureMapTool( mapCanvas, KadasShapeCaptureMapTool::Shape::Sector )
 {
   setCursor( Qt::ArrowCursor );
-  setToolLabel( tr( "Compute viewshed" ) );
-  connect( this, &KadasMapToolCreateItem::partFinished, this, &KadasMapToolViewshed::drawFinished );
+  connect( this, &KadasShapeCaptureMapTool::shapeCaptured, this, &KadasMapToolViewshed::onShapeCaptured );
 }
 
-void KadasMapToolViewshed::drawFinished()
+void KadasMapToolViewshed::onShapeCaptured( const QgsGeometry &geometry, const QgsCoordinateReferenceSystem &crs )
 {
+  Q_UNUSED( geometry );
+
   QString layerid = QgsProject::instance()->readEntry( "Heightmap", "layer" );
   QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerid );
   if ( !layer || layer->type() != Qgis::LayerType::Raster )
@@ -207,20 +203,17 @@ void KadasMapToolViewshed::drawFinished()
     return;
   }
 
-  const KadasCircularSectorItem *item = dynamic_cast<const KadasCircularSectorItem *>( currentItem() );
-  if ( !item )
+  const QgsPointXY center = circleCenter();
+  double curRadiusMapUnits = circleRadius();
+  if ( curRadiusMapUnits <= 0 )
   {
     clear();
     return;
   }
 
-  QgsPointXY center = item->constState()->centers.last();
-  double curRadius = item->constState()->radii.last();
+  double curRadiusMeters = curRadiusMapUnits * QgsUnitTypes::fromUnitToUnitFactor( crs.mapUnits(), Qgis::DistanceUnit::Meters );
 
-  QgsCoordinateReferenceSystem canvasCrs = canvas()->mapSettings().destinationCrs();
-  curRadius *= QgsUnitTypes::fromUnitToUnitFactor( canvasCrs.mapUnits(), Qgis::DistanceUnit::Meters );
-
-  KadasViewshedDialog viewshedDialog( curRadius );
+  KadasViewshedDialog viewshedDialog( curRadiusMeters );
   connect( &viewshedDialog, &KadasViewshedDialog::radiusChanged, this, &KadasMapToolViewshed::adjustRadius );
   if ( viewshedDialog.exec() == QDialog::Rejected )
   {
@@ -228,25 +221,28 @@ void KadasMapToolViewshed::drawFinished()
     return;
   }
 
+  // Re-read radius after dialog (the user may have adjusted it)
+  curRadiusMapUnits = circleRadius();
+  curRadiusMeters = curRadiusMapUnits * QgsUnitTypes::fromUnitToUnitFactor( crs.mapUnits(), Qgis::DistanceUnit::Meters );
+
   QString outputFileName = QString( "viewshed_%1,%2.tif" ).arg( center.x() ).arg( center.y() );
   QString outputFile = QgsProject::instance()->createAttachedFile( outputFileName );
 
+  // Limit the computation to the captured sector (full circle if no sweep was drawn)
+  QgsPolygonXY poly = sectorPolygon( center, curRadiusMapUnits, sectorStartAngle(), sectorStopAngle() ).asPolygon();
   QVector<QgsPointXY> filterRegion;
-  QgsPolygonXY poly = QgsGeometry( item->geometry()->geometryN( 0 )->clone() ).asPolygon();
   if ( !poly.isEmpty() )
   {
     filterRegion = poly.front();
   }
-  center = item->constState()->centers.last();
-  curRadius = item->constState()->radii.last();
 
-  if ( mCanvas->mapSettings().mapUnits() == Qgis::DistanceUnit::Degrees )
+  if ( crs.mapUnits() == Qgis::DistanceUnit::Degrees )
   {
-    // Need to compute radius in meters
+    // Need to compute radius in meters using the ellipsoid
     QgsDistanceArea da;
     da.setEllipsoid( QgsProject::instance()->readEntry( "Measure", "/Ellipsoid", "NONE" ) );
-    curRadius = da.measureLine( center, QgsPoint( center.x() + curRadius, center.y() ) );
-    curRadius = da.convertLengthMeasurement( curRadius, Qgis::DistanceUnit::Meters );
+    curRadiusMeters = da.measureLine( center, QgsPoint( center.x() + curRadiusMapUnits, center.y() ) );
+    curRadiusMeters = da.convertLengthMeasurement( curRadiusMeters, Qgis::DistanceUnit::Meters );
   }
 
   double heightConv = QgsUnitTypes::fromUnitToUnitFactor( KadasCoordinateFormat::instance()->getHeightDisplayUnit(), Qgis::DistanceUnit::Meters );
@@ -264,14 +260,14 @@ void KadasMapToolViewshed::drawFinished()
     outputFile,
     "GTiff",
     center,
-    canvasCrs,
+    crs,
     viewshedDialog.observerHeight() * heightConv,
     viewshedDialog.targetHeight() * heightConv,
     viewshedDialog.observerHeightRelativeToGround(),
     viewshedDialog.targetHeightRelativeToGround(),
     viewshedDialog.observerMinVertAngle(),
     viewshedDialog.observerMaxVertAngle(),
-    curRadius,
+    curRadiusMeters,
     Qgis::DistanceUnit::Meters,
     &p,
     &errMsg,
@@ -281,31 +277,39 @@ void KadasMapToolViewshed::drawFinished()
   QApplication::restoreOverrideCursor();
   if ( success )
   {
-    QgsRasterLayer *layer = new QgsRasterLayer( outputFile, tr( "Viewshed [%1]" ).arg( center.toString() ) );
+    QgsRasterLayer *outLayer = new QgsRasterLayer( outputFile, tr( "Viewshed [%1]" ).arg( center.toString() ) );
     QgsPalettedRasterRenderer *renderer
       = new QgsPalettedRasterRenderer( 0, 1, { QgsPalettedRasterRenderer::Class( 0, QColor( 255, 0, 0 ), tr( "Invisible" ) ), QgsPalettedRasterRenderer::Class( 255, QColor( 0, 255, 0 ), tr( "Visible" ) ) } );
-    layer->setRenderer( renderer );
-    layer->setOpacity( 30 );
-    QgsProject::instance()->addMapLayer( layer );
+    outLayer->setRenderer( renderer );
+    outLayer->setOpacity( 30 );
+    QgsProject::instance()->addMapLayer( outLayer );
 
-    KadasSymbolItem *pin = new KadasSymbolItem( canvasCrs );
-    pin->setup( ":/kadas/icons/pin_red", 0.5, 1.0 );
-    pin->associateToLayer( layer );
-    pin->setPosition( KadasItemPos::fromPoint( center ) );
-
-    pin->setTooltip(
-      tr( "<b>Observer position</b>: %1<br />" ).arg( KadasCoordinateFormat::instance()->getDisplayString( pin->position(), pin->crs() ) )
-      + tr( "<b>Observer height</b>: %1 %2 %3<br />" )
-          .arg( viewshedDialog.observerHeight() )
-          .arg( QgsUnitTypes::toString( KadasCoordinateFormat::instance()->getHeightDisplayUnit() ) )
-          .arg( viewshedDialog.observerHeightRelativeToGround() ? tr( "above ground" ) : tr( "above sea level" ) )
-      + tr( "<b>Observer vertical angle range</b>: %1° to %2°<br />" ).arg( viewshedDialog.observerMinVertAngle() ).arg( viewshedDialog.observerMaxVertAngle() )
-      + tr( "<b>Target height</b>: %1 %2 %3" )
-          .arg( viewshedDialog.targetHeight() )
-          .arg( QgsUnitTypes::toString( KadasCoordinateFormat::instance()->getHeightDisplayUnit() ) )
-          .arg( viewshedDialog.targetHeightRelativeToGround() ? tr( "above ground" ) : tr( "above sea level" ) )
-    );
-    KadasMapCanvasItemManager::addItem( pin );
+    QgsAnnotationLayer *pinsLayer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::PinsLayer );
+    if ( pinsLayer )
+    {
+      const QgsPointXY layerPos = QgsCoordinateTransform( crs, pinsLayer->crs(), QgsProject::instance()->transformContext() ).transform( center );
+      auto *pin = new KadasPinAnnotationItem( QgsPoint( layerPos.x(), layerPos.y() ) );
+      pin->setName( tr( "Observer position" ) );
+      pin->setRemarks(
+        tr( "<b>Observer position</b>: %1<br />" ).arg( KadasCoordinateFormat::instance()->getDisplayString( center, crs ) )
+        + tr( "<b>Observer height</b>: %1 %2 %3<br />" )
+            .arg( viewshedDialog.observerHeight() )
+            .arg( QgsUnitTypes::toString( KadasCoordinateFormat::instance()->getHeightDisplayUnit() ) )
+            .arg( viewshedDialog.observerHeightRelativeToGround() ? tr( "above ground" ) : tr( "above sea level" ) )
+        + tr( "<b>Observer vertical angle range</b>: %1° to %2°<br />" ).arg( viewshedDialog.observerMinVertAngle() ).arg( viewshedDialog.observerMaxVertAngle() )
+        + tr( "<b>Target height</b>: %1 %2 %3" )
+            .arg( viewshedDialog.targetHeight() )
+            .arg( QgsUnitTypes::toString( KadasCoordinateFormat::instance()->getHeightDisplayUnit() ) )
+            .arg( viewshedDialog.targetHeightRelativeToGround() ? tr( "above ground" ) : tr( "above sea level" ) )
+      );
+      const QString pinId = pinsLayer->addItem( pin );
+      // Tie pin lifetime to the viewshed raster: when the raster is removed, drop the pin too.
+      QObject::connect( outLayer, &QObject::destroyed, pinsLayer, [pinsLayer, pinId]() {
+        pinsLayer->removeItem( pinId );
+        pinsLayer->triggerRepaint();
+      } );
+      pinsLayer->triggerRepaint();
+    }
   }
   else if ( !errMsg.isEmpty() )
   {
@@ -314,20 +318,9 @@ void KadasMapToolViewshed::drawFinished()
   clear();
 }
 
-void KadasMapToolViewshed::adjustRadius( double newRadius )
+void KadasMapToolViewshed::adjustRadius( double newRadiusMeters )
 {
-  Qgis::DistanceUnit measureUnit = Qgis::DistanceUnit::Meters;
   Qgis::DistanceUnit targetUnit = canvas()->mapSettings().destinationCrs().mapUnits();
-  newRadius *= QgsUnitTypes::fromUnitToUnitFactor( measureUnit, targetUnit );
-
-  KadasCircularSectorItem *item = dynamic_cast<KadasCircularSectorItem *>( mutableItem() );
-  if ( !item )
-  {
-    return;
-  }
-
-  KadasCircularSectorItem::State *state = item->constState()->clone();
-  state->radii.last() = newRadius;
-  item->setState( state );
-  delete state;
+  double newRadiusMapUnits = newRadiusMeters * QgsUnitTypes::fromUnitToUnitFactor( Qgis::DistanceUnit::Meters, targetUnit );
+  setCircleRadius( newRadiusMapUnits );
 }

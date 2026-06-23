@@ -1,0 +1,94 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/maptools/kadasmaptooleditannotationitem.h                  *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+class KadasMapToolEditAnnotationItem : QgsMapTool
+{
+%Docstring(signature="appended")
+Map tool to create/edit a \c :py:class:`QgsAnnotationItem` on a \c
+:py:class:`QgsAnnotationLayer` via a \c KadasAnnotationItemController.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
+%End
+  public:
+    KadasMapToolEditAnnotationItem( QgsMapCanvas *canvas, QgsAnnotationLayer *layer, const QString &itemId );
+%Docstring
+Edit an existing annotation item in place.
+%End
+    KadasMapToolEditAnnotationItem( QgsMapCanvas *canvas, KadasAnnotationItemController *controller, QgsAnnotationLayer *layer );
+%Docstring
+Create a new annotation item via ``controller``, then keep editing it.
+%End
+
+    virtual void activate();
+
+    virtual void deactivate();
+
+
+    virtual void canvasPressEvent( QgsMapMouseEvent *e );
+
+    virtual void canvasMoveEvent( QgsMapMouseEvent *e );
+
+    virtual void canvasReleaseEvent( QgsMapMouseEvent *e );
+
+    virtual void canvasDoubleClickEvent( QgsMapMouseEvent *e );
+
+    virtual void keyPressEvent( QKeyEvent *e );
+
+
+    void setMultipart( bool multipart );
+%Docstring
+Create-mode: when true, finalized parts accumulate on the same item;
+default false.
+%End
+
+
+    void setExtraTopWidget( QWidget *widget );
+%Docstring
+Inserts a custom widget into the bottom-bar top row; call before \c
+:py:func:`~KadasMapToolEditAnnotationItem.activate`, ownership
+transfers.
+%End
+
+    QgsAnnotationItem *currentItem() const;
+%Docstring
+The annotation item the tool is currently driving (may be null).
+%End
+
+    void addPoint( const QgsPointXY &pos );
+%Docstring
+Create-mode: place a vertex at ``pos`` as if left-clicked; no-op in edit
+mode.
+%End
+
+  signals:
+    void partFinished();
+%Docstring
+Create-mode: emitted whenever a part is finalized.
+%End
+    void cleared();
+%Docstring
+Create-mode: emitted after a fresh item replaces the previous one.
+%End
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/maptools/kadasmaptooleditannotationitem.h                  *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

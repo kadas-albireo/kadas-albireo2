@@ -1,0 +1,48 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadaspinannotationcontroller.h             *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+class KadasPinAnnotationController : KadasMarkerAnnotationController
+{
+%Docstring(signature="appended")
+Controller for KadasPinAnnotationItem (type id "kadas:pin").
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadaspinannotationcontroller.h"
+%End
+  public:
+    KadasPinAnnotationController();
+
+    virtual QString itemType() const;
+
+    virtual QString itemName() const;
+
+    virtual QgsAnnotationItem *createItem() const;
+
+
+    virtual KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = 0 ) const;
+
+
+    virtual QList<QgsAnnotationItem *> generateShadows( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const;
+
+    virtual QStringList shadowIds( const QgsAnnotationItem *item ) const;
+
+    virtual void setShadowIds( QgsAnnotationItem *item, const QStringList &ids ) const;
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadaspinannotationcontroller.h             *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

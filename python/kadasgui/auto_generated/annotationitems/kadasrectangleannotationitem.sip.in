@@ -1,0 +1,83 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasrectangleannotationitem.h             *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+class KadasRectangleAnnotationItem : QgsAnnotationPolygonItem
+{
+%Docstring(signature="appended")
+Rotated rectangle annotation item (type id "kadas:rectangle").
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadasrectangleannotationitem.h"
+%End
+  public:
+    KadasRectangleAnnotationItem( const QgsPointXY &center = QgsPointXY(), const QSizeF &size = QSizeF( 0, 0 ), double angleDegrees = 0.0 );
+
+    static QString itemTypeId();
+
+    virtual QString type() const;
+
+    virtual bool writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const;
+
+    virtual bool readXml( const QDomElement &element, const QgsReadWriteContext &context );
+
+    virtual KadasRectangleAnnotationItem *clone() const;
+
+
+    static KadasRectangleAnnotationItem *create();
+
+    QgsPointXY center() const;
+    QSizeF size() const;
+    double angle() const;
+
+    QgsCoordinateReferenceSystem drawCrs() const;
+%Docstring
+CRS in which size and angle are expressed (invalid = legacy).
+%End
+
+    QgsCoordinateReferenceSystem layerCrs() const;
+%Docstring
+Parent layer CRS, used to project corners from drawCrs (invalid =
+legacy).
+%End
+
+    void setBox( const QgsPointXY &center, const QSizeF &size, double angleDegrees );
+%Docstring
+Legacy overload: axis-aligned layout in the layer CRS.
+%End
+
+    void setBox( const QgsPointXY &center, const QSizeF &size, double angleDegrees, const QgsCoordinateReferenceSystem &drawCrs, const QgsCoordinateReferenceSystem &layerCrs );
+
+    void setCenter( const QgsPointXY &center );
+    void setSize( const QSizeF &size );
+    void setAngle( double angleDegrees );
+
+    QVector<QgsPointXY> corners() const;
+%Docstring
+Corners in CCW order: BL, BR, TR, TL.
+%End
+
+    QgsPointXY rotationHandle() const;
+
+    const QStringList &shadowIds() const;
+    void setShadowIds( const QStringList &ids );
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasrectangleannotationitem.h             *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

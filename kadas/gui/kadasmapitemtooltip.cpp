@@ -18,12 +18,12 @@
 #include <QDesktopServices>
 #include <QUrlQuery>
 
+#include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsmapcanvas.h>
 
+#include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
 #include "kadas/gui/kadasfeaturepicker.h"
-#include "kadas/gui/kadasmapcanvasitem.h"
 #include "kadas/gui/kadasmapitemtooltip.h"
-#include "kadas/gui/mapitems/kadasmapitem.h"
 
 KadasMapItemTooltip::KadasMapItemTooltip( QgsMapCanvas *canvas )
   : QTextEdit( canvas )
@@ -41,39 +41,32 @@ KadasMapItemTooltip::KadasMapItemTooltip( QgsMapCanvas *canvas )
 
 void KadasMapItemTooltip::updateForPos( const QPoint &canvasPos )
 {
-  const KadasMapItem *item = nullptr;
+  QString annotationTooltip;
 
-  QGraphicsItem *canvasItem = mCanvas->itemAt( canvasPos );
-  if ( dynamic_cast<KadasMapCanvasItem *>( canvasItem ) && static_cast<KadasMapCanvasItem *>( canvasItem )->isVisible() )
+  KadasFeaturePicker::PickResult result
+    = KadasFeaturePicker::pick( mCanvas, mCanvas->getCoordinateTransform()->toMapCoordinates( canvasPos ), Qgis::GeometryType::Unknown, KadasFeaturePicker::PickObjective::PICK_OBJECTIVE_TOOLTIP );
+  if ( result.annotationLayer && !result.annotationItemId.isEmpty() )
   {
-    KadasMapCanvasItem *mapCanvasItem = static_cast<KadasMapCanvasItem *>( canvasItem );
-    item = mapCanvasItem->mapItem();
-  }
-  else
-  {
-    KadasFeaturePicker::PickResult result
-      = KadasFeaturePicker::pick( mCanvas, mCanvas->getCoordinateTransform()->toMapCoordinates( canvasPos ), Qgis::GeometryType::Unknown, KadasItemLayer::PickObjective::PICK_OBJECTIVE_TOOLTIP );
-    if ( result.itemId != KadasItemLayer::ITEM_ID_NULL )
-    {
-      item = static_cast<KadasItemLayer *>( result.layer )->items()[result.itemId];
-    }
+    annotationTooltip = KadasAnnotationLayerHelpers::tooltip( result.annotationLayer, result.annotationItemId );
   }
 
-  // If hovering over an item, update/show tooltip
-  if ( item )
+  // If hovering over an annotation item with a tooltip, update/show
+  const QString currentText = annotationTooltip;
+  const bool hasHover = !annotationTooltip.isEmpty();
+  if ( hasHover )
   {
     mHideTimer.stop();
     mPos = canvasPos;
-    if ( mItem != item )
+    if ( currentText != mLastText )
     {
-      mItem = item;
-      setText( item->tooltip() );
+      mLastText = currentText;
+      setText( currentText );
       if ( isVisible() )
       {
         hide();
       }
     }
-    if ( !item->tooltip().isEmpty() )
+    if ( !currentText.isEmpty() )
     {
       mShowTimer.start( 500 );
     }
@@ -175,7 +168,7 @@ void KadasMapItemTooltip::mouseReleaseEvent( QMouseEvent *ev )
 
 void KadasMapItemTooltip::clear()
 {
-  mItem = nullptr;
+  mLastText.clear();
   setText( "" );
   mShowTimer.stop();
   hide();

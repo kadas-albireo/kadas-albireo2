@@ -1,0 +1,104 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadasattributetypes.h                                      *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+
+class KadasNumericAttribute
+{
+%Docstring(signature="appended")
+*************************************************************************
+
+This program is free software; you can redistribute it and/or modify *
+it under the terms of the GNU General Public License as published by *
+the Free Software Foundation; either version 2 of the License, or * (at
+your option) any later version. *
+
+**************************************************************************
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/kadasattributetypes.h"
+%End
+  public:
+    QString name;
+    enum class Type
+    {
+      TypeCoordinate,
+      TypeDistance,
+      TypeAngle,
+      TypeOther
+    };
+    Type type;
+    double min;
+    double max;
+    int decimals;
+    int precision( const QgsMapSettings &mapSettings ) const;
+    QString suffix( const QgsMapSettings &mapSettings ) const;
+};
+
+typedef QMap<int, KadasNumericAttribute> KadasAttribDefs;
+typedef QMap<int, double> KadasAttribValues;
+
+
+struct KadasNode
+{
+%TypeHeaderCode
+#include "kadas/gui/kadasattributetypes.h"
+%End
+    QgsPointXY pos;
+};
+
+
+struct KadasEditContext
+{
+%TypeHeaderCode
+#include "kadas/gui/kadasattributetypes.h"
+%End
+    enum class HitPrecision
+    {
+      Body,
+      Precise,
+    };
+
+    KadasEditContext();
+
+    KadasEditContext( const QgsVertexId &_vidx, const QgsPointXY &_pos = QgsPointXY(), const KadasAttribDefs &_attributes = KadasAttribDefs(), Qt::CursorShape _cursor = Qt::CrossCursor );
+%Docstring
+Valid ``_vidx`` implies Precise; a default ``_vidx`` implies Body
+(upgrade manually for stroke hits).
+%End
+
+    bool mValid;
+    QgsVertexId vidx;
+    QgsPointXY pos;
+    KadasAttribDefs attributes;
+    Qt::CursorShape cursor;
+    HitPrecision precision;
+    bool isValid() const;
+
+    bool isSameTarget( const KadasEditContext &other ) const;
+%Docstring
+``True`` when both contexts reference the same edit target, i.e. the
+same vertex identity and validity. ``pos``, ``attributes``, ``cursor``
+and ``precision`` are deliberately ignored: they change on every mouse
+move while the hovered handle stays the same.
+%End
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadasattributetypes.h                                      *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

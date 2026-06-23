@@ -24,8 +24,7 @@
 #include "kadas/gui/kadasfeaturepicker.h"
 
 class QgsGeometryRubberBand;
-class KadasItemContextMenuActions;
-class KadasSelectionRectItem;
+class QgsRubberBand;
 
 
 class KadasCanvasContextMenu : public QMenu
@@ -54,9 +53,11 @@ class KadasCanvasContextMenu : public QMenu
 
     void copyFeature();
     void deleteItems();
+    void deleteAnnotationItem();
+    void copyAnnotationItemPosition();
+    void createWaypointFromPin();
+    void createPinFromMarker();
     void editItem();
-    void raiseItem();
-    void lowerItem();
     void paste();
 
     void drawPin();
@@ -84,12 +85,11 @@ class KadasCanvasContextMenu : public QMenu
     void print();
 
   private:
-    KadasItemContextMenuActions *mItemActions = nullptr;
     QgsPointXY mMapPos;
     QgsMapCanvas *mCanvas = nullptr;
     KadasFeaturePicker::PickResult mPickResult;
     QgsGeometryRubberBand *mGeomSel = nullptr;
-    KadasSelectionRectItem *mSelRect = nullptr;
+    QgsRubberBand *mSelRectBand = nullptr;
 };
 
 #endif // KADASCANVASCONTEXTMENU_H

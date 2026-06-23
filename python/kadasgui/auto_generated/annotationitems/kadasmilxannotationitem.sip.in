@@ -1,0 +1,147 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasmilxannotationitem.h                  *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+class KadasMilxAnnotationItem : QgsAnnotationItem
+{
+%Docstring(signature="appended")
+Kadas MilX (military symbology) annotation item.
+
+Holds an MSS string and a list of WGS84 points; rendering, hit-testing
+and editing delegate to \c KadasMilxClient. Type id: \c "kadas:milx".
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
+%End
+  public:
+    KadasMilxAnnotationItem();
+
+    static QString itemTypeId();
+
+    virtual QString type() const;
+
+    virtual QgsRectangle boundingBox() const;
+
+    virtual Qgis::AnnotationItemFlags flags() const;
+
+    virtual void render( QgsRenderContext &context, QgsFeedback *feedback );
+
+    virtual bool writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const;
+
+    virtual bool readXml( const QDomElement &element, const QgsReadWriteContext &context );
+
+    virtual KadasMilxAnnotationItem *clone() const;
+
+
+    static KadasMilxAnnotationItem *create();
+
+    void writeMilx( QDomDocument &doc, QDomElement &itemElement, int symbolSize ) const;
+%Docstring
+Write this item as a `<MilXGraphic>` DOM element (legacy MilXly schema).
+``symbolSize`` is the layer's symbol size in px (for the user-offset
+factor).
+%End
+
+    static KadasMilxAnnotationItem *fromMilx( const QDomElement &itemElement, const QgsCoordinateTransform &crst, int symbolSize );
+%Docstring
+Construct a \c KadasMilxAnnotationItem from a `<MilXGraphic>` element.
+``crst`` projects source coordinates to EPSG:4326; caller takes
+ownership.
+%End
+
+    static int exportLayerToMilxly( QgsAnnotationLayer *annoLayer, QDomElement &milxLayerEl, int dpi );
+%Docstring
+Serialize all `kadas:milx` items in ``annoLayer`` into ``milxLayerEl``
+as a `<MilXLayer>` block. Returns the number of items emitted.
+%End
+
+    static bool importLayerFromMilxly( QgsAnnotationLayer *annoLayer, const QDomElement &milxLayerEl, int dpi, const QgsCoordinateTransformContext &transformContext, QString &errorMsg );
+%Docstring
+Populate ``annoLayer`` with `kadas:milx` items parsed from
+``milxLayerEl``. Returns true on success; sets ``errorMsg`` on failure.
+%End
+
+    QString mssString() const;
+    void setMssString( const QString &mssString );
+
+    QString militaryName() const;
+    void setMilitaryName( const QString &militaryName );
+
+    QString symbolType() const;
+    void setSymbolType( const QString &symbolType );
+
+    int minNumPoints() const;
+    void setMinNumPoints( int minNumPoints );
+
+    bool hasVariablePoints() const;
+    void setHasVariablePoints( bool hasVariablePoints );
+
+    QList<QgsPointXY> points() const;
+%Docstring
+Points, stored in EPSG:4326 (MilX is always WGS84).
+%End
+    void setPoints( const QList<QgsPointXY> &points );
+
+    QList<int> controlPoints() const;
+%Docstring
+Indices into :py:func:`~KadasMilxAnnotationItem.points` that libmss
+reports as draggable control points.
+%End
+    void setControlPoints( const QList<int> &cp );
+
+
+    QPoint userOffset() const;
+%Docstring
+User-applied screen-space offset (drag of the symbol graphic).
+%End
+    void setUserOffset( const QPoint &offset );
+
+    int pressedPoints() const;
+%Docstring
+Number of physical clicks made during interactive draw.
+%End
+    void setPressedPoints( int n );
+
+    enum class DrawStatus
+    {
+      Empty,
+      Drawing,
+      Finished
+    };
+    DrawStatus drawStatus() const;
+    void setDrawStatus( DrawStatus s );
+
+
+
+    static QRect computeScreenExtent( const QgsMapSettings &mapSettings );
+%Docstring
+On-screen extent of ``mapSettings``' visible map extent (in device
+pixels).
+%End
+
+    bool isMultiPoint() const;
+%Docstring
+True when the symbol has more than one geometry point or carries a shape
+attribute.
+%End
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasmilxannotationitem.h                  *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

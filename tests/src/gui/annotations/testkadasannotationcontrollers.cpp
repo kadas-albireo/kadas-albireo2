@@ -1,0 +1,752 @@
+/***************************************************************************
+    testkadasannotationcontrollers.cpp
+    ----------------------------------
+    copyright            : (C) 2026 by Denis Rouzaud
+    email                : denis at opengis dot ch
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
+#include <memory>
+
+#include <QFile>
+#include <QStandardPaths>
+#include <QtTest/QTest>
+
+#include <qgis/qgsannotationlineitem.h>
+#include <qgis/qgsannotationlayer.h>
+#include <qgis/qgsannotationmarkeritem.h>
+#include <qgis/qgsannotationpolygonitem.h>
+#include <qgis/qgsapplication.h>
+#include <qgis/qgscoordinatereferencesystem.h>
+#include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgslinestring.h>
+#include <qgis/qgsmapsettings.h>
+#include <qgis/qgsmarkersymbol.h>
+#include <qgis/qgsmarkersymbollayer.h>
+#include <qgis/qgspoint.h>
+#include <qgis/qgspointxy.h>
+#include <qgis/qgspolygon.h>
+#include <qgis/qgsrectangle.h>
+
+#include <kadas/gui/kadasattributetypes.h>
+#include <kadas/gui/kadasfeaturepicker.h>
+#include <kadas/gui/annotationitems/kadasannotationitemcontext.h>
+#include <kadas/gui/annotationitems/kadascircleannotationcontroller.h>
+#include <kadas/gui/annotationitems/kadascircleannotationitem.h>
+#include <kadas/gui/annotationitems/kadascoordcrossannotationcontroller.h>
+#include <kadas/gui/annotationitems/kadascoordcrossannotationitem.h>
+#include <kadas/gui/annotationitems/kadaslineannotationcontroller.h>
+#include <kadas/gui/annotationitems/kadasmarkerannotationcontroller.h>
+#include <kadas/gui/annotationitems/kadaspinannotationcontroller.h>
+#include <kadas/gui/annotationitems/kadaspinannotationitem.h>
+#include <kadas/gui/annotationitems/kadaspolygonannotationcontroller.h>
+#include <kadas/gui/annotationitems/kadasrectangleannotationcontroller.h>
+#include <kadas/gui/annotationitems/kadasrectangleannotationitem.h>
+
+
+/**
+ * Controller-level unit tests for the unified annotation pipeline.
+ *
+ * These do not exercise the map tool — they hit the controllers directly
+ * with a synthetic KadasAnnotationItemContext so the tests are fast and
+ * have no dependency on a live QgsMapCanvas or layer.
+ */
+class TestKadasAnnotationControllers : public QObject
+{
+    Q_OBJECT
+
+  private slots:
+    void initTestCase();
+
+    // KadasMarkerAnnotationController ------------------------------------
+    void marker_createItem_hasVisibleSymbol();
+    void marker_applyPersistedStyle_preservesShape();
+    void marker_applyPersistedStyle_rejectsTransparentFill();
+    void marker_getEditContext_hitsWithinTolerance();
+    void marker_getEditContext_hitsAnchorOffsetSymbolBody();
+    void pin_getEditContext_hitsBodyAndTip();
+
+    // KadasRectangleAnnotationController ---------------------------------
+    void rectangle_nodes_returnFourCornersPlusRotation();
+    void rectangle_getEditContext_rotatedQuadHitTest();
+    void rectangle_edit_movesCorrectCorner();
+
+    // KadasCircleAnnotationController ------------------------------------
+    void circle_nodes_returnsCenterAndRing();
+    void circle_edit_centerAndRingRoundtrip();
+
+    // KadasCoordCrossAnnotationController ----------------------------------
+    void coordcross_startPart_snapsToKmGridInMetricLayerCrs();
+    void coordcross_startPart_snapsViaMetricCrsOnDegreeLayer();
+
+    // KadasPinAnnotationItem ---------------------------------------------
+    void pin_defaultIconPath_resolvesInQrc();
+
+    // KadasLineAnnotationController --------------------------------------
+    void line_getEditContext_hitsOnSegmentNotInBoundingBox();
+    void line_getEditContext_hitsVertex();
+
+    // KadasPolygonAnnotationController -----------------------------------
+    void polygon_getEditContext_hitsBodyNotBoundingBox();
+
+    // Multi-type hit isolation -------------------------------------------
+    void hitTest_multipleTypesSelectsByGeometryNotBbox();
+
+    // Selection ranking --------------------------------------------------
+    void selection_lineEdgeHitIsPrecise();
+    void selection_polygonBodyHitIsBody();
+    void selection_rankerPrefersPrecisionOverZIndex();
+
+  private:
+    static KadasAnnotationItemContext makeContext();
+};
+
+
+void TestKadasAnnotationControllers::initTestCase()
+{
+  // Isolate QSettings used by KadasMarkerAnnotationController persisted
+  // entries so we never clobber the developer's settings.
+  QStandardPaths::setTestModeEnabled( true );
+  QgsApplication::init();
+}
+
+KadasAnnotationItemContext TestKadasAnnotationControllers::makeContext()
+{
+  // Use a CRS where map units are meters and 1 unit ≈ 1 unit so the test
+  // distances stay readable (EPSG:3857). Item CRS == map CRS so toMapPos /
+  // toItemPos are identities.
+  const QgsCoordinateReferenceSystem crs( QStringLiteral( "EPSG:3857" ) );
+  QgsMapSettings ms;
+  ms.setDestinationCrs( crs );
+  ms.setExtent( QgsRectangle( -1000, -1000, 1000, 1000 ) );
+  ms.setOutputSize( QSize( 1000, 1000 ) );
+  ms.setOutputDpi( 96 );
+  static QgsAnnotationLayer sLayer( QStringLiteral( "test" ), QgsAnnotationLayer::LayerOptions( QgsCoordinateTransformContext() ) );
+  sLayer.setCrs( crs );
+  return KadasAnnotationItemContext( &sLayer, ms );
+}
+
+
+// ----- Marker -----------------------------------------------------------
+
+void TestKadasAnnotationControllers::marker_createItem_hasVisibleSymbol()
+{
+  KadasMarkerAnnotationController controller;
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  QVERIFY( item );
+  auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item.get() );
+  QVERIFY( marker );
+  QVERIFY( marker->symbol() );
+  // Regression: an empty QgsMarkerSymbol() has zero layers and renders
+  // nothing, leaving the user with only the vertex handle visible.
+  QVERIFY( marker->symbol()->symbolLayerCount() > 0 );
+  auto *sl = dynamic_cast<const QgsSimpleMarkerSymbolLayer *>( marker->symbol()->symbolLayer( 0 ) );
+  QVERIFY( sl );
+  QVERIFY( sl->size() > 0 );
+  QVERIFY( sl->color().alpha() > 0 );
+}
+
+void TestKadasAnnotationControllers::marker_applyPersistedStyle_preservesShape()
+{
+  KadasMarkerAnnotationController controller;
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  auto *marker = static_cast<QgsAnnotationMarkerItem *>( item.get() );
+
+  // Pretend the toolbar handed us a Triangle.
+  auto *sl = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Triangle );
+  sl->setSize( 4 );
+  sl->setColor( QColor( 0, 200, 0 ) );
+  marker->setSymbol( new QgsMarkerSymbol( QgsSymbolLayerList() << sl ) );
+
+  // Persist, then re-apply: shape must survive (toolbar wins, not settings).
+  controller.persistStyle( marker );
+  controller.applyPersistedStyle( marker );
+
+  auto *sl2 = dynamic_cast<const QgsSimpleMarkerSymbolLayer *>( marker->symbol()->symbolLayer( 0 ) );
+  QVERIFY( sl2 );
+  QCOMPARE( sl2->shape(), Qgis::MarkerShape::Triangle );
+}
+
+void TestKadasAnnotationControllers::marker_applyPersistedStyle_rejectsTransparentFill()
+{
+  KadasMarkerAnnotationController controller;
+
+  // Persist a fully transparent fill, simulating the bug where the user
+  // accidentally picked alpha=0 in the inline color editor.
+  KadasMarkerAnnotationController::settingsFillColor->setValue( QColor( 255, 0, 0, 0 ) );
+  KadasMarkerAnnotationController::settingsStrokeColor->setValue( QColor( 0, 0, 0 ) );
+  KadasMarkerAnnotationController::settingsSize->setValue( 4 );
+  KadasMarkerAnnotationController::settingsStrokeWidth->setValue( 0.4 );
+  KadasMarkerAnnotationController::settingsStrokeStyle->setValue( static_cast<int>( Qt::SolidLine ) );
+
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  auto *marker = static_cast<QgsAnnotationMarkerItem *>( item.get() );
+  controller.applyPersistedStyle( marker );
+
+  auto *sl = dynamic_cast<const QgsSimpleMarkerSymbolLayer *>( marker->symbol()->symbolLayer( 0 ) );
+  QVERIFY( sl );
+  QVERIFY2( sl->color().alpha() > 0, "transparent persisted fill must be rejected" );
+}
+
+void TestKadasAnnotationControllers::marker_getEditContext_hitsWithinTolerance()
+{
+  KadasMarkerAnnotationController controller;
+  const auto ctx = makeContext();
+
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  controller.startPart( item.get(), QgsPointXY( 100, 200 ), ctx );
+
+  // Right on the marker point: hit.
+  KadasEditContext ec = controller.getEditContext( item.get(), QgsPointXY( 100, 200 ), ctx );
+  QVERIFY( ec.isValid() );
+
+  // Far away: miss.
+  ec = controller.getEditContext( item.get(), QgsPointXY( 500, 500 ), ctx );
+  QVERIFY( !ec.isValid() );
+}
+
+void TestKadasAnnotationControllers::marker_getEditContext_hitsAnchorOffsetSymbolBody()
+{
+  // Regression: pins use an SVG anchored at their bottom tip, so the
+  // visible body extends well above the geographic anchor. Hit-testing
+  // a fixed circular tolerance around the anchor (the legacy behavior)
+  // would miss most of the visible icon and pins were unselectable.
+  // The controller must hit-test against the rendered symbol footprint.
+  KadasMarkerAnnotationController controller;
+  const auto ctx = makeContext();
+
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  controller.startPart( item.get(), QgsPointXY( 100, 200 ), ctx );
+  auto *marker = static_cast<QgsAnnotationMarkerItem *>( item.get() );
+
+  // Build a tall, bottom-anchored simple marker that mimics a pin:
+  //  - 20 mm at 96 DPI ≈ 75 px tall
+  //  - anchored at the bottom so the body is rendered ABOVE the anchor.
+  // makeContext() uses 2 m/px so the symbol body extends ≈ 150 m above
+  // the anchor in map coordinates.
+  auto *sl = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Square );
+  sl->setSize( 20.0 );
+  sl->setVerticalAnchorPoint( Qgis::VerticalAnchorPoint::Bottom );
+  sl->setColor( QColor( 255, 0, 0 ) );
+  marker->setSymbol( new QgsMarkerSymbol( QgsSymbolLayerList() << sl ) );
+
+  // Click 60 m ABOVE the anchor — well above the legacy ~10 m circular
+  // tolerance, but inside the bottom-anchored symbol's body.
+  KadasEditContext ec = controller.getEditContext( item.get(), QgsPointXY( 100, 260 ), ctx );
+  QVERIFY2( ec.isValid(), "click on bottom-anchored marker body must hit" );
+
+  // Right on the anchor still hits.
+  ec = controller.getEditContext( item.get(), QgsPointXY( 100, 200 ), ctx );
+  QVERIFY( ec.isValid() );
+
+  // 100 m BELOW the anchor — outside the bottom-anchored symbol body.
+  ec = controller.getEditContext( item.get(), QgsPointXY( 100, 100 ), ctx );
+  QVERIFY2( !ec.isValid(), "click below bottom-anchored marker must miss" );
+}
+
+
+// ----- Pin (probe + behavioral test) ------------------------------------
+
+void TestKadasAnnotationControllers::pin_getEditContext_hitsBodyAndTip()
+{
+  // Regression for the Kadas pin (bottom-anchored SVG marker): clicks on
+  // the visible body must register as hits. The body extends UPWARD from
+  // the geographic anchor (anchor = tip), so clicks above the anchor in
+  // map y (i.e. larger map-y at this CRS) hit, clicks well below miss.
+  //
+  // QgsSvgMarkerSymbolLayer::bounds() over-shifts the symbol footprint by
+  // a scaleFactor-dependent amount; the controller normalizes the anchor
+  // and re-applies it itself. Without that workaround pins were
+  // unselectable.
+  KadasPinAnnotationController controller;
+  const auto ctx = makeContext();
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  controller.startPart( item.get(), QgsPointXY( 0, 0 ), ctx );
+
+  // Pin renders ≈ 24 mm tall at 96 dpi = ≈ 91 px ≈ 182 m in this CRS
+  // (mupp = 2). With Bottom anchor the body spans map-y [0, 182] above
+  // the anchor, and map-x ≈ [-90, 90].
+
+  // Hit: 100 m above the anchor — squarely in the body.
+  KadasEditContext ec = controller.getEditContext( item.get(), QgsPointXY( 0, 100 ), ctx );
+  QVERIFY2( ec.isValid(), "click on pin body must hit" );
+
+  // Hit: 50 m above and offset 40 m to the side — still inside the body.
+  ec = controller.getEditContext( item.get(), QgsPointXY( 40, 50 ), ctx );
+  QVERIFY2( ec.isValid(), "click on offset pin body must hit" );
+
+  // Hit: right at the geographic anchor (tip) — bottom edge of bounds.
+  ec = controller.getEditContext( item.get(), QgsPointXY( 0, 0 ), ctx );
+  QVERIFY2( ec.isValid(), "click on pin tip must hit" );
+
+  // Miss: well below the anchor (south of the tip), outside the body.
+  ec = controller.getEditContext( item.get(), QgsPointXY( 0, -100 ), ctx );
+  QVERIFY2( !ec.isValid(), "click below pin tip must miss" );
+
+  // Miss: well above the body (north of the head).
+  ec = controller.getEditContext( item.get(), QgsPointXY( 0, 400 ), ctx );
+  QVERIFY2( !ec.isValid(), "click far above pin head must miss" );
+
+  // Miss: far to the side.
+  ec = controller.getEditContext( item.get(), QgsPointXY( 300, 50 ), ctx );
+  QVERIFY2( !ec.isValid(), "click far to the side of pin must miss" );
+}
+
+
+// ----- Rectangle --------------------------------------------------------
+
+void TestKadasAnnotationControllers::rectangle_nodes_returnFourCornersPlusRotation()
+{
+  KadasRectangleAnnotationController controller;
+  const auto ctx = makeContext();
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  auto *rect = static_cast<KadasRectangleAnnotationItem *>( item.get() );
+  rect->setBox( QgsPointXY( 0, 0 ), QSizeF( 100, 50 ), 0.0 );
+
+  const auto nodes = controller.nodes( item.get(), ctx );
+  QCOMPARE( nodes.size(), 5 ); // 4 corners + 1 rotation handle
+}
+
+void TestKadasAnnotationControllers::rectangle_getEditContext_rotatedQuadHitTest()
+{
+  KadasRectangleAnnotationController controller;
+  const auto ctx = makeContext();
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  auto *rect = static_cast<KadasRectangleAnnotationItem *>( item.get() );
+
+  // 200x100 rectangle centered at origin, rotated 45°.
+  rect->setBox( QgsPointXY( 0, 0 ), QSizeF( 200, 100 ), 45.0 );
+
+  // Origin is inside the rotated quad.
+  KadasEditContext ec = controller.getEditContext( item.get(), QgsPointXY( 0, 0 ), ctx );
+  QVERIFY2( ec.isValid(), "click at center of rotated rectangle should hit body" );
+
+  // Top-right of the AABB but outside the rotated quad: must miss.
+  // AABB extends roughly to ~106 along each axis; (95, 95) lies within
+  // the AABB but outside the rotated body.
+  ec = controller.getEditContext( item.get(), QgsPointXY( 95, 95 ), ctx );
+  QVERIFY2( !ec.isValid(), "click in AABB corner outside rotated body must miss" );
+}
+
+void TestKadasAnnotationControllers::rectangle_edit_movesCorrectCorner()
+{
+  KadasRectangleAnnotationController controller;
+  const auto ctx = makeContext();
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  auto *rect = static_cast<KadasRectangleAnnotationItem *>( item.get() );
+  rect->setBox( QgsPointXY( 0, 0 ), QSizeF( 100, 100 ), 0.0 );
+
+  // Pick the BR corner (vertex 1) and drag it to (200, -50).
+  const auto cornersBefore = rect->corners();
+  KadasEditContext ec( QgsVertexId( 0, 0, 1 ), cornersBefore[1] );
+  controller.edit( item.get(), ec, QgsPointXY( 200, -50 ), ctx );
+
+  // After the drag the rectangle's center / size must reflect the new BR.
+  // BR was (50, -50) -> now (200, -50). TL stays at (-50, 50). New box:
+  // center = (75, 0), size = (250, 100).
+  QCOMPARE( rect->size().width(), 250.0 );
+  QCOMPARE( rect->size().height(), 100.0 );
+  QCOMPARE( rect->center().x(), 75.0 );
+  QCOMPARE( rect->center().y(), 0.0 );
+}
+
+
+// ----- Circle -----------------------------------------------------------
+
+void TestKadasAnnotationControllers::circle_nodes_returnsCenterAndRing()
+{
+  KadasCircleAnnotationController controller;
+  const auto ctx = makeContext();
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  auto *circle = static_cast<KadasCircleAnnotationItem *>( item.get() );
+  circle->setCenter( QgsPointXY( 10, 20 ) );
+  circle->setRingPoint( QgsPointXY( 30, 20 ) );
+
+  const auto nodes = controller.nodes( item.get(), ctx );
+  QCOMPARE( nodes.size(), 2 ); // center + ring point
+  QCOMPARE( nodes[0].pos.x(), 10.0 );
+  QCOMPARE( nodes[1].pos.x(), 30.0 );
+}
+
+void TestKadasAnnotationControllers::circle_edit_centerAndRingRoundtrip()
+{
+  KadasCircleAnnotationController controller;
+  const auto ctx = makeContext();
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  auto *circle = static_cast<KadasCircleAnnotationItem *>( item.get() );
+  circle->setCenter( QgsPointXY( 0, 0 ) );
+  circle->setRingPoint( QgsPointXY( 50, 0 ) );
+
+  // Drag the ring vertex (vid 1) outward to (100, 0): radius doubles.
+  KadasEditContext ec( QgsVertexId( 0, 0, 1 ), QgsPointXY( 50, 0 ) );
+  controller.edit( item.get(), ec, QgsPointXY( 100, 0 ), ctx );
+  QCOMPARE( circle->ringPoint().x(), 100.0 );
+  QCOMPARE( circle->center().x(), 0.0 );
+}
+
+
+// ----- CoordCross --------------------------------------------------------
+
+void TestKadasAnnotationControllers::coordcross_startPart_snapsToKmGridInMetricLayerCrs()
+{
+  // Metric layer CRS: the position snaps to a round km directly in the
+  // layer CRS (which is also the labelling CRS).
+  const QgsCoordinateReferenceSystem crs( QStringLiteral( "EPSG:2056" ) );
+  QgsMapSettings ms;
+  ms.setDestinationCrs( crs );
+  ms.setExtent( QgsRectangle( 2599000, 1199000, 2601000, 1201000 ) );
+  ms.setOutputSize( QSize( 1000, 1000 ) );
+  ms.setOutputDpi( 96 );
+  QgsAnnotationLayer layer( QStringLiteral( "cross-metric" ), QgsAnnotationLayer::LayerOptions( QgsCoordinateTransformContext() ) );
+  layer.setCrs( crs );
+  const KadasAnnotationItemContext ctx( &layer, ms );
+
+  QCOMPARE( KadasCoordCrossAnnotationItem::labelCrs( crs ), crs );
+
+  KadasCoordCrossAnnotationController controller;
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  controller.startPart( item.get(), QgsPointXY( 2600123.4, 1200456.7 ), ctx );
+
+  const auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item.get() );
+  QVERIFY( marker );
+  QCOMPARE( marker->geometry().x(), 2600000.0 );
+  QCOMPARE( marker->geometry().y(), 1200000.0 );
+}
+
+void TestKadasAnnotationControllers::coordcross_startPart_snapsViaMetricCrsOnDegreeLayer()
+{
+  // Degree-based layer CRS: rounding raw lat/lon to the nearest 1000
+  // would collapse every position to (0, 0) — Null Island. The controller
+  // must snap on the EPSG:3857 km grid instead and store the transformed
+  // position back in the layer CRS.
+  const QgsCoordinateReferenceSystem layerCrs( QStringLiteral( "EPSG:4326" ) );
+  const QgsCoordinateReferenceSystem mapCrs( QStringLiteral( "EPSG:3857" ) );
+  QgsMapSettings ms;
+  ms.setDestinationCrs( mapCrs );
+  ms.setExtent( QgsRectangle( 820000, 5930000, 840000, 5950000 ) );
+  ms.setOutputSize( QSize( 1000, 1000 ) );
+  ms.setOutputDpi( 96 );
+  QgsAnnotationLayer layer( QStringLiteral( "cross-degrees" ), QgsAnnotationLayer::LayerOptions( QgsCoordinateTransformContext() ) );
+  layer.setCrs( layerCrs );
+  const KadasAnnotationItemContext ctx( &layer, ms );
+
+  QCOMPARE( KadasCoordCrossAnnotationItem::labelCrs( layerCrs ), mapCrs );
+
+  KadasCoordCrossAnnotationController controller;
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  // Click near Bern in EPSG:3857 map coords.
+  controller.startPart( item.get(), QgsPointXY( 828437.0, 5933749.0 ), ctx );
+
+  const auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item.get() );
+  QVERIFY( marker );
+  // Stored in degrees: must NOT have been rounded to (0, 0).
+  QVERIFY( std::abs( marker->geometry().x() - 7.44 ) < 0.1 );
+  QVERIFY( std::abs( marker->geometry().y() - 46.9 ) < 0.1 );
+  // Transformed back to the metric labelling CRS, the position sits on
+  // the round-km grid.
+  const QgsCoordinateTransform ct( layerCrs, mapCrs, QgsCoordinateTransformContext() );
+  const QgsPointXY snapped = ct.transform( QgsPointXY( marker->geometry().x(), marker->geometry().y() ) );
+  QVERIFY2( std::abs( snapped.x() - 828000.0 ) < 0.001, qPrintable( QString::number( snapped.x(), 'f', 4 ) ) );
+  QVERIFY2( std::abs( snapped.y() - 5934000.0 ) < 0.001, qPrintable( QString::number( snapped.y(), 'f', 4 ) ) );
+}
+
+
+// ----- Pin --------------------------------------------------------------
+
+void TestKadasAnnotationControllers::pin_defaultIconPath_resolvesInQrc()
+{
+  // Regression: the pin icon must resolve through Qt's resource system,
+  // otherwise QgsSvgMarkerSymbolLayer falls back to a "?" placeholder.
+  // The qrc itself is compiled into the kadas app target (not kadas_gui),
+  // so this test verifies the contract by checking that:
+  //   1. defaultIconPath() returns a Qt resource path (":/...")
+  //   2. the corresponding on-disk SVG exists in kadas/resources/icons/.
+  const QString path = KadasPinAnnotationItem::defaultIconPath();
+  QVERIFY2( !path.isEmpty(), "defaultIconPath must not be empty" );
+  QVERIFY2( path.startsWith( QLatin1String( ":/kadas/icons/" ) ), qPrintable( QStringLiteral( "expected ':/kadas/icons/...' got %1" ).arg( path ) ) );
+  const QString relative = path.mid( QStringLiteral( ":/kadas/" ).size() );
+  const QString diskPath = QStringLiteral( "%1/kadas/resources/%2.svg" ).arg( CMAKE_SOURCE_DIR, relative );
+  QVERIFY2( QFile::exists( diskPath ), qPrintable( QStringLiteral( "pin SVG file missing: %1" ).arg( diskPath ) ) );
+}
+
+
+// ----- Line -------------------------------------------------------------
+
+namespace
+{
+  // Build a QgsAnnotationLineItem with the given polyline (in item CRS,
+  // which equals map CRS in makeContext()).
+  std::unique_ptr<QgsAnnotationLineItem> makeLine( const QVector<QgsPointXY> &pts )
+  {
+    auto *ls = new QgsLineString();
+    for ( const QgsPointXY &p : pts )
+      ls->addVertex( QgsPoint( p.x(), p.y() ) );
+    return std::make_unique<QgsAnnotationLineItem>( ls );
+  }
+
+  std::unique_ptr<QgsAnnotationPolygonItem> makePolygon( const QVector<QgsPointXY> &ringPts )
+  {
+    auto *ring = new QgsLineString();
+    for ( const QgsPointXY &p : ringPts )
+      ring->addVertex( QgsPoint( p.x(), p.y() ) );
+    auto *poly = new QgsPolygon();
+    poly->setExteriorRing( ring );
+    return std::make_unique<QgsAnnotationPolygonItem>( poly );
+  }
+} //namespace
+
+void TestKadasAnnotationControllers::line_getEditContext_hitsOnSegmentNotInBoundingBox()
+{
+  // Regression: a long diagonal line's bounding box covers vast empty
+  // space. Selection must use distance-to-segment, not bbox containment,
+  // otherwise any click in the bbox falsely picks the line.
+  KadasLineAnnotationController controller;
+  const auto ctx = makeContext();
+
+  // Diagonal from (0, 0) to (1000, 1000).
+  auto item = makeLine( { QgsPointXY( 0, 0 ), QgsPointXY( 1000, 1000 ) } );
+
+  // Click ON the segment, near its midpoint: hit.
+  KadasEditContext ec = controller.getEditContext( item.get(), QgsPointXY( 500, 500 ), ctx );
+  QVERIFY2( ec.isValid(), "click on segment must hit" );
+
+  // Click in the bbox but far from the diagonal (top-left corner of
+  // bbox, no segment passes nearby): must miss.
+  ec = controller.getEditContext( item.get(), QgsPointXY( 50, 950 ), ctx );
+  QVERIFY2( !ec.isValid(), "click in bbox far from segment must miss" );
+
+  // Sanity: click well outside bbox: miss.
+  ec = controller.getEditContext( item.get(), QgsPointXY( -500, -500 ), ctx );
+  QVERIFY( !ec.isValid() );
+}
+
+void TestKadasAnnotationControllers::line_getEditContext_hitsVertex()
+{
+  KadasLineAnnotationController controller;
+  const auto ctx = makeContext();
+  auto item = makeLine( { QgsPointXY( 0, 0 ), QgsPointXY( 100, 0 ), QgsPointXY( 100, 100 ) } );
+
+  // On a vertex: hit (as a vertex edit, not body move).
+  KadasEditContext ec = controller.getEditContext( item.get(), QgsPointXY( 100, 0 ), ctx );
+  QVERIFY( ec.isValid() );
+  QVERIFY( ec.vidx.isValid() );
+}
+
+
+// ----- Polygon ----------------------------------------------------------
+
+void TestKadasAnnotationControllers::polygon_getEditContext_hitsBodyNotBoundingBox()
+{
+  // Regression: a U-shaped polygon's bounding box includes the empty
+  // area between its arms. The controller must use real geometry
+  // containment, not bbox containment.
+  KadasPolygonAnnotationController controller;
+  const auto ctx = makeContext();
+
+  // U shape (open at the top): outer ring traces a thick "U".
+  //   *--*    *--*
+  //   |  |    |  |
+  //   |  *----*  |
+  //   |          |
+  //   *----------*
+  auto item = makePolygon( {
+    QgsPointXY( 0, 0 ),
+    QgsPointXY( 100, 0 ),
+    QgsPointXY( 100, 80 ),
+    QgsPointXY( 70, 80 ),
+    QgsPointXY( 70, 30 ),
+    QgsPointXY( 30, 30 ),
+    QgsPointXY( 30, 80 ),
+    QgsPointXY( 0, 80 ),
+    QgsPointXY( 0, 0 ),
+  } );
+
+  // Click in the gap between arms (50, 60): inside bbox, NOT inside U.
+  KadasEditContext ec = controller.getEditContext( item.get(), QgsPointXY( 50, 60 ), ctx );
+  QVERIFY2( !ec.isValid(), "click in U's empty gap must miss" );
+
+  // Click in solid body of left arm: hit.
+  ec = controller.getEditContext( item.get(), QgsPointXY( 15, 50 ), ctx );
+  QVERIFY2( ec.isValid(), "click inside left arm of U must hit body" );
+
+  // Click in solid base of U: hit.
+  ec = controller.getEditContext( item.get(), QgsPointXY( 50, 15 ), ctx );
+  QVERIFY( ec.isValid() );
+}
+
+
+// ----- Multi-type isolation --------------------------------------------
+
+void TestKadasAnnotationControllers::hitTest_multipleTypesSelectsByGeometryNotBbox()
+{
+  // Stage: a long diagonal line whose bbox covers a marker placed in
+  // the empty corner. The picker (via getEditContext) must only hit the
+  // line when the click is actually near a segment, so a click on the
+  // marker's point selects the marker — not the line.
+  KadasLineAnnotationController lineCtrl;
+  KadasMarkerAnnotationController markerCtrl;
+  KadasPolygonAnnotationController polyCtrl;
+  const auto ctx = makeContext();
+
+  auto line = makeLine( { QgsPointXY( 0, 0 ), QgsPointXY( 800, 800 ) } );
+
+  std::unique_ptr<QgsAnnotationItem> markerItem( markerCtrl.createItem() );
+  markerCtrl.startPart( markerItem.get(), QgsPointXY( 50, 700 ), ctx );
+
+  // U-shaped polygon with a gap centered around (500, 60).
+  auto poly = makePolygon( {
+    QgsPointXY( 400, 0 ),
+    QgsPointXY( 600, 0 ),
+    QgsPointXY( 600, 100 ),
+    QgsPointXY( 540, 100 ),
+    QgsPointXY( 540, 30 ),
+    QgsPointXY( 460, 30 ),
+    QgsPointXY( 460, 100 ),
+    QgsPointXY( 400, 100 ),
+    QgsPointXY( 400, 0 ),
+  } );
+
+  // 1) Click on the marker (in the line's bbox, far from the diagonal):
+  //    only marker hits.
+  const QgsPointXY pMarker( 50, 700 );
+  QVERIFY2( markerCtrl.getEditContext( markerItem.get(), pMarker, ctx ).isValid(), "marker should hit at its point" );
+  QVERIFY2( !lineCtrl.getEditContext( line.get(), pMarker, ctx ).isValid(), "line must NOT hit at marker (was the regression)" );
+
+  // 2) Click in the U's empty gap (also inside line bbox, far from line):
+  //    nothing should hit.
+  const QgsPointXY pGap( 500, 60 );
+  QVERIFY2( !polyCtrl.getEditContext( poly.get(), pGap, ctx ).isValid(), "polygon must NOT hit in U gap" );
+  QVERIFY2( !lineCtrl.getEditContext( line.get(), pGap, ctx ).isValid(), "line must NOT hit in U gap" );
+
+  // 3) Click ON the diagonal: only the line hits.
+  const QgsPointXY pLine( 400, 400 );
+  QVERIFY2( lineCtrl.getEditContext( line.get(), pLine, ctx ).isValid(), "line should hit on segment" );
+  QVERIFY2( !markerCtrl.getEditContext( markerItem.get(), pLine, ctx ).isValid(), "marker should not hit far from its point" );
+  QVERIFY2( !polyCtrl.getEditContext( poly.get(), pLine, ctx ).isValid(), "polygon should not hit far from its body" );
+
+  // 4) Click in solid polygon arm: only polygon hits.
+  const QgsPointXY pPoly( 420, 50 );
+  QVERIFY2( polyCtrl.getEditContext( poly.get(), pPoly, ctx ).isValid(), "polygon should hit in solid body" );
+  QVERIFY2( !lineCtrl.getEditContext( line.get(), pPoly, ctx ).isValid(), "line must NOT hit in polygon body (off-diagonal)" );
+}
+
+
+// ----- Selection ranking ------------------------------------------------
+
+void TestKadasAnnotationControllers::selection_lineEdgeHitIsPrecise()
+{
+  // Regression: a click that falls on a line's stroke is a geometrically
+  // precise hit. The KadasLineAnnotationController returns an edit
+  // context with an invalid vidx (the subsequent drag uses whole-line
+  // move semantics), so the default precision derivation from vidx
+  // alone would mistakenly tag it as Body. The controller must
+  // explicitly upgrade it to Precise so the canvas picker outranks a
+  // higher-z polygon whose body merely contains the same click.
+  KadasLineAnnotationController lineCtrl;
+  const auto ctx = makeContext();
+  auto line = makeLine( { QgsPointXY( 0, 0 ), QgsPointXY( 100, 0 ) } );
+
+  // On a vertex: precise (covers the default vidx-derived path).
+  KadasEditContext ecVertex = lineCtrl.getEditContext( line.get(), QgsPointXY( 0, 0 ), ctx );
+  QVERIFY( ecVertex.isValid() );
+  QVERIFY( ecVertex.vidx.isValid() );
+  QCOMPARE( ecVertex.precision, KadasEditContext::HitPrecision::Precise );
+
+  // On the segment between vertices: also precise (covers the explicit
+  // upgrade in the edge-hit branch).
+  KadasEditContext ecEdge = lineCtrl.getEditContext( line.get(), QgsPointXY( 50, 0 ), ctx );
+  QVERIFY( ecEdge.isValid() );
+  QVERIFY( !ecEdge.vidx.isValid() ); // whole-line drag, no vertex
+  QCOMPARE( ecEdge.precision, KadasEditContext::HitPrecision::Precise );
+}
+
+void TestKadasAnnotationControllers::selection_polygonBodyHitIsBody()
+{
+  // The polygon containment hit is geometrically loose: the click is
+  // anywhere inside the filled body. The edit context returned by
+  // KadasPolygonAnnotationController has an invalid vidx so the
+  // default-derived precision must be Body.
+  KadasPolygonAnnotationController polyCtrl;
+  const auto ctx = makeContext();
+  auto poly = makePolygon( {
+    QgsPointXY( 0, 0 ),
+    QgsPointXY( 100, 0 ),
+    QgsPointXY( 100, 100 ),
+    QgsPointXY( 0, 100 ),
+    QgsPointXY( 0, 0 ),
+  } );
+
+  KadasEditContext ec = polyCtrl.getEditContext( poly.get(), QgsPointXY( 50, 50 ), ctx );
+  QVERIFY( ec.isValid() );
+  QVERIFY( !ec.vidx.isValid() );
+  QCOMPARE( ec.precision, KadasEditContext::HitPrecision::Body );
+}
+
+void TestKadasAnnotationControllers::selection_rankerPrefersPrecisionOverZIndex()
+{
+  // End-to-end regression for KadasFeaturePicker::rankAnnotationCandidates:
+  // a low-z line whose edge is hit by the click must outrank a high-z
+  // polygon whose body merely contains the same click. Without the
+  // precision tier, the high-z polygon would have won.
+  KadasFeaturePicker::AnnotationPickCandidate lineCand;
+  lineCand.itemId = QStringLiteral( "line" );
+  lineCand.precision = KadasEditContext::HitPrecision::Precise;
+  lineCand.zIndex = 1;
+  lineCand.bboxArea = 1000000.0;
+
+  KadasFeaturePicker::AnnotationPickCandidate polyCand;
+  polyCand.itemId = QStringLiteral( "poly" );
+  polyCand.precision = KadasEditContext::HitPrecision::Body;
+  polyCand.zIndex = 99;      // way higher
+  polyCand.bboxArea = 100.0; // way smaller
+
+  // Order must not matter.
+  {
+    const QList<KadasFeaturePicker::AnnotationPickCandidate> list { lineCand, polyCand };
+    const int best = KadasFeaturePicker::rankAnnotationCandidates( list );
+    QCOMPARE( best, 0 );
+    QCOMPARE( list.at( best ).itemId, QStringLiteral( "line" ) );
+  }
+  {
+    const QList<KadasFeaturePicker::AnnotationPickCandidate> list { polyCand, lineCand };
+    const int best = KadasFeaturePicker::rankAnnotationCandidates( list );
+    QCOMPARE( best, 1 );
+    QCOMPARE( list.at( best ).itemId, QStringLiteral( "line" ) );
+  }
+
+  // Within the same precision tier the existing z-then-area tiebreakers
+  // must still apply.
+  KadasFeaturePicker::AnnotationPickCandidate a;
+  a.itemId = QStringLiteral( "a" );
+  a.precision = KadasEditContext::HitPrecision::Body;
+  a.zIndex = 1;
+  a.bboxArea = 10.0;
+  KadasFeaturePicker::AnnotationPickCandidate b;
+  b.itemId = QStringLiteral( "b" );
+  b.precision = KadasEditContext::HitPrecision::Body;
+  b.zIndex = 2; // higher z wins over a
+  b.bboxArea = 100.0;
+  KadasFeaturePicker::AnnotationPickCandidate c;
+  c.itemId = QStringLiteral( "c" );
+  c.precision = KadasEditContext::HitPrecision::Body;
+  c.zIndex = 2;      // tie with b on z
+  c.bboxArea = 50.0; // smaller area wins
+  const QList<KadasFeaturePicker::AnnotationPickCandidate> tie { a, b, c };
+  const int bestIdx = KadasFeaturePicker::rankAnnotationCandidates( tie );
+  QCOMPARE( tie.at( bestIdx ).itemId, QStringLiteral( "c" ) );
+
+  // Empty list returns -1.
+  QCOMPARE( KadasFeaturePicker::rankAnnotationCandidates( {} ), -1 );
+}
+
+
+QTEST_MAIN( TestKadasAnnotationControllers )
+#include "testkadasannotationcontrollers.moc"

@@ -29,11 +29,10 @@ class QgsAbstractGeometry;
 class QgsFeature;
 class QgsGeometryRubberBand;
 class QgsMapCanvas;
-class QgsPinAnnotationItem;
 class QgsRasterIdentifyResult;
 class QgsRasterLayer;
+class QgsRubberBand;
 class QgsVectorLayer;
-class KadasPinItem;
 
 
 class KadasMapIdentifyDialog : public QDialog
@@ -54,15 +53,15 @@ class KadasMapIdentifyDialog : public QDialog
     QgsMapCanvas *mCanvas = nullptr;
     QTreeWidget *mTreeWidget = nullptr;
     QgsGeometryRubberBand *mRubberband = nullptr;
-    QPointer<KadasPinItem> mClickPosPin;
-    QPointer<KadasPinItem> mResultPin;
+    QgsRubberBand *mClickPosPin = nullptr;
+    QgsRubberBand *mResultPin = nullptr;
     QList<QgsAbstractGeometry *> mGeometries;
     QTimer *mTimeoutTimer = nullptr;
     QNetworkReply *mRasterIdentifyReply = nullptr;
     QMap<QString, QTreeWidgetItem *> mLayerTreeItemMap;
 
     void collectInfo( const QgsPointXY &mapPos );
-    void addPluginLayerResults( KadasPluginLayer *pLayer, const QList<KadasPluginLayer::IdentifyResult> &results );
+    void addPluginLayerResults( QgsMapLayer *pLayer, const QList<KadasPluginLayer::IdentifyResult> &results );
     void addVectorLayerResult( QgsVectorLayer *vLayer, const QgsFeature &feature );
     void addRasterIdentifyResult( QgsRasterLayer *rLayer, const QgsRasterIdentifyResult &result );
 

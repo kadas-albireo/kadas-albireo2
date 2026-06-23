@@ -1,0 +1,60 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationcontrollerregistry.h        *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+class KadasAnnotationControllerRegistry
+{
+%Docstring(signature="appended")
+Process-wide registry mapping :py:class:`QgsAnnotationItem` type ids to
+their Kadas controller.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
+%End
+  public:
+    static KadasAnnotationControllerRegistry *instance();
+%Docstring
+Returns the process-wide registry instance.
+%End
+
+    ~KadasAnnotationControllerRegistry();
+
+    void addController( KadasAnnotationItemController *controller );
+%Docstring
+Registers ``controller`` under its
+:py:func:`~KadasAnnotationControllerRegistry.itemType`; takes ownership
+and replaces any existing.
+%End
+
+    KadasAnnotationItemController *controllerFor( const QString &typeId ) const;
+%Docstring
+Returns the controller for type id ``typeId``, or None.
+%End
+
+    QStringList registeredTypes() const;
+%Docstring
+Registered type ids, in registration order.
+%End
+
+  private:
+    KadasAnnotationControllerRegistry();
+    KadasAnnotationControllerRegistry( const KadasAnnotationControllerRegistry & );
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationcontrollerregistry.h        *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

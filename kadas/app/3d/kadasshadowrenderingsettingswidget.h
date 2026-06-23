@@ -20,6 +20,9 @@
 
 #include "qgsshadowsettings.h"
 
+class QgsLightsModel;
+class QgsLightsProxyModel;
+
 class KadasShadowRenderingSettingsWidget : public QWidget, private Ui::ShadowRenderingSettingsWidget
 {
     Q_OBJECT
@@ -28,12 +31,17 @@ class KadasShadowRenderingSettingsWidget : public QWidget, private Ui::ShadowRen
     //! Constructor
     explicit KadasShadowRenderingSettingsWidget( QWidget *parent = nullptr );
 
+    //! Sets a \a model to display available light sources
+    void setLightSourceModel( QgsLightsModel *model );
+
     //! Sets the shadow settings in the current widget UI
     void setShadowSettings( const QgsShadowSettings &skyboxSettings );
     //! Returns the shadow settings from the widget UI
     QgsShadowSettings toShadowSettings();
-  public slots:
-    void onDirectionalLightsCountChanged( int newCount );
+
+  private:
+    QgsLightsModel *mLightsModel = nullptr;
+    QgsLightsProxyModel *mLightsProxyModel = nullptr;
 };
 
 #endif // SHADOWRENDERINGSETTINGSWIDGET_H

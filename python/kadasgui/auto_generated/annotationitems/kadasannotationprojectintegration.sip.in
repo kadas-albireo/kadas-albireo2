@@ -1,0 +1,48 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationprojectintegration.h        *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+class KadasAnnotationProjectIntegration : QObject
+{
+%Docstring(signature="appended")
+Wires the save-time shadow mechanism into the active
+:py:class:`QgsProject`.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadasannotationprojectintegration.h"
+%End
+  public:
+    explicit KadasAnnotationProjectIntegration( QObject *parent = 0 );
+
+    void prepareForSave();
+%Docstring
+Calls :py:func:`~KadasAnnotationProjectIntegration.prepareLayerForSave`
+on every annotation layer in the project.
+%End
+
+    void stripAfterSave();
+%Docstring
+Calls
+:py:func:`~KadasAnnotationProjectIntegration.stripShadowsFromLayer` on
+every annotation layer in the project.
+%End
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationprojectintegration.h        *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

@@ -14,16 +14,73 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QPainter>
+#include <QSvgRenderer>
+
 #include <qgis/qgsapplication.h>
 #include <qgis/qgsgpsconnectionregistry.h>
 #include <qgis/qgsgpsdetector.h>
+#include <qgis/qgsnmeaconnection.h>
+#include <qgis/qgsmapcanvas.h>
+#include <qgis/qgsmapcanvasitem.h>
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsproject.h>
 
-#include "kadas/gui/kadasmapcanvasitemmanager.h"
-#include "kadas/gui/mapitems/kadassymbolitem.h"
 #include "kadasgpsintegration.h"
+#include "kadasgpssimulator.h"
 #include "kadasmainwindow.h"
+
+bool KadasGpsIntegration::sSimulatorEnabled = false;
+
+//! Transient canvas overlay showing the GPS position as a rotatable arrow
+class KadasGpsMarker : public QgsMapCanvasItem
+{
+  public:
+    explicit KadasGpsMarker( QgsMapCanvas *canvas )
+      : QgsMapCanvasItem( canvas )
+      , mSvg( QStringLiteral( ":/kadas/icons/gpsarrow" ) )
+    {
+      setZValue( 200 );
+    }
+
+    void setGpsPosition( const QgsPointXY &mapPos, double direction )
+    {
+      mMapPos = mapPos;
+      if ( !std::isnan( direction ) )
+        mDirection = direction;
+      updatePosition();
+    }
+
+    void updatePosition() override
+    {
+      prepareGeometryChange();
+      setPos( toCanvasCoordinates( mMapPos ) );
+      update();
+    }
+
+    QRectF boundingRect() const override
+    {
+      // half diagonal of the rotated icon
+      const double r = SIZE * M_SQRT1_2;
+      return QRectF( -r, -r, 2 * r, 2 * r );
+    }
+
+    void paint( QPainter *painter ) override
+    {
+      painter->save();
+      painter->setRenderHint( QPainter::Antialiasing );
+      painter->setRenderHint( QPainter::SmoothPixmapTransform );
+      painter->rotate( mDirection );
+      mSvg.render( painter, QRectF( -SIZE / 2., -SIZE / 2., SIZE, SIZE ) );
+      painter->restore();
+    }
+
+  private:
+    static constexpr double SIZE = 92;
+    QSvgRenderer mSvg;
+    QgsPointXY mMapPos;
+    double mDirection = 0;
+};
 
 KadasGpsIntegration::KadasGpsIntegration( KadasMainWindow *mainWindow, QToolButton *gpsToolButton, QAction *actionEnableGps, QAction *actionMoveWithGps )
   : QObject( mainWindow )
@@ -34,6 +91,9 @@ KadasGpsIntegration::KadasGpsIntegration( KadasMainWindow *mainWindow, QToolButt
 {
   connect( mActionEnableGps, &QAction::triggered, this, &KadasGpsIntegration::enableGPS );
   connect( mGpsToolButton, &QToolButton::toggled, this, &KadasGpsIntegration::enableGPS );
+  // The marker is owned by the canvas scene: when the canvas is destroyed
+  // before us (i.e. on application shutdown), it deletes the marker itself
+  connect( mMainWindow->mapCanvas(), &QObject::destroyed, this, [this]() { mMarker = nullptr; } );
 }
 
 KadasGpsIntegration::~KadasGpsIntegration()
@@ -75,6 +135,22 @@ void KadasGpsIntegration::connectGPS()
   mMainWindow->messageBar()->pushMessage( tr( "Connecting to GPS device..." ), QString(), Qgis::Info, mMainWindow->messageTimeout() );
 
   disconnectGPS(); // cleanup
+
+  if ( sSimulatorEnabled )
+  {
+    QgsGpsConnection *connection = new QgsNmeaConnection( new KadasGpsSimulator() );
+    if ( connection->connect() )
+    {
+      gpsConnected( connection );
+    }
+    else
+    {
+      delete connection;
+      gpsConnectionFailed();
+    }
+    return;
+  }
+
   QString port = QgsSettings().value( "/kadas/gps_port", "" ).toString();
   QgsGpsDetector *gpsDetector = new QgsGpsDetector( port, false ); // deletes itself automatically
   connect( gpsDetector, &QgsGpsDetector::connectionDetected, this, [this, gpsDetector]() {
@@ -144,7 +220,6 @@ void KadasGpsIntegration::gpsStateChanged( const QgsGpsInformation &info )
     QgsCoordinateTransform myTransform( QgsCoordinateReferenceSystem( "EPSG:4326" ), destCRS, QgsProject::instance() );
 
     QgsPointXY centerPoint = myTransform.transform( position );
-    QgsRectangle myRect( centerPoint, centerPoint );
 
     // testing if position is outside some proportion of the map extent
     // this is a user setting - useful range: 5% to 100% (0.05 to 1.0)
@@ -154,19 +229,30 @@ void KadasGpsIntegration::gpsStateChanged( const QgsGpsInformation &info )
 
     if ( !extentLimit.contains( centerPoint ) )
     {
-      mMainWindow->mapCanvas()->setExtent( myRect );
+      // setCenter() only shifts the already rendered canvas content; an
+      // explicit refresh() is needed to re-render the newly exposed area
+      mMainWindow->mapCanvas()->setCenter( centerPoint );
+      mMainWindow->mapCanvas()->refresh();
     }
   }
 
   // Update marker
   if ( !mMarker )
   {
-    mMarker = new KadasSymbolItem( QgsCoordinateReferenceSystem( "EPSG:4326" ) );
-    mMarker->setup( ":/kadas/icons/gpsarrow", 0.5, 0.5, 92, 92 );
-    KadasMapCanvasItemManager::addItem( mMarker );
+    mMarker = new KadasGpsMarker( mMainWindow->mapCanvas() );
   }
-  mMarker->setPosition( KadasItemPos::fromPoint( position ) );
-  mMarker->setAngle( -info.direction );
+  // Reproject WGS84 position to canvas CRS
+  const QgsCoordinateTransform t( QgsCoordinateReferenceSystem( "EPSG:4326" ), mMainWindow->mapCanvas()->mapSettings().destinationCrs(), QgsProject::instance()->transformContext() );
+  QgsPointXY canvasPos;
+  try
+  {
+    canvasPos = t.transform( position );
+  }
+  catch ( const QgsCsException & )
+  {
+    canvasPos = position;
+  }
+  mMarker->setGpsPosition( canvasPos, info.direction );
 }
 
 void KadasGpsIntegration::updateGpsFixIcon()
