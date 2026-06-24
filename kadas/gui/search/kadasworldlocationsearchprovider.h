@@ -24,9 +24,6 @@
 #include "kadas/gui/kadas_gui.h"
 
 
-class QNetworkReply;
-class QEventLoop;
-
 class QgsMapCanvas;
 
 class KADAS_GUI_EXPORT KadasWorldLocationSearchProvider : public QgsLocatorFilter
@@ -43,9 +40,6 @@ class KADAS_GUI_EXPORT KadasWorldLocationSearchProvider : public QgsLocatorFilte
     virtual void triggerResult( const QgsLocatorResult &result ) override;
     virtual void clearPreviousResults() override;
 
-  private slots:
-    void handleNetworkReply();
-
   private:
     static const int sResultCountLimit;
 
@@ -54,9 +48,7 @@ class KADAS_GUI_EXPORT KadasWorldLocationSearchProvider : public QgsLocatorFilte
     QgsMapCanvas *mMapCanvas = nullptr;
     QMap<QString, QPair<QString, int>> mCategoryMap;
 
-    QNetworkReply *mCurrentReply = nullptr;
-    QgsFeedback *mFeedback = nullptr;
-    QEventLoop *mEventLoop = nullptr;
+    void parseReply( const QByteArray &replyContent, QgsFeedback *feedback );
 };
 
 #endif // KADASWORLDVBSLOCATIONSEARCHPROVIDER_H
