@@ -3998,7 +3998,7 @@ Bitte mit kleinerer Auflösung oder Papiergröße wiederholen.</translation>
         <translation>Allgemeines Verzeichnis der Ortschaften</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.h" line="45"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.h" line="42"/>
         <source>Location Search</source>
         <translation>Standortsuche</translation>
     </message>
@@ -7110,12 +7110,12 @@ bewegen</translation>
 <context>
     <name>KadasWorldLocationSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.cpp" line="58"/>
+        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.cpp" line="59"/>
         <source>World Places</source>
         <translation>Weltorte</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.h" line="40"/>
+        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.h" line="37"/>
         <source> World Location Search</source>
         <translation>Weltstandortsuche</translation>
     </message>

@@ -3999,7 +3999,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation>Répertoire général de noms de lieux</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadaslocationsearchprovider.h" line="45"/>
+        <location filename="../kadas/gui/search/kadaslocationsearchprovider.h" line="42"/>
         <source>Location Search</source>
         <translation>Rechercher une localisation</translation>
     </message>
@@ -7110,12 +7110,12 @@ avec géoloc.</translation>
 <context>
     <name>KadasWorldLocationSearchProvider</name>
     <message>
-        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.cpp" line="58"/>
+        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.cpp" line="59"/>
         <source>World Places</source>
         <translation>Lieux mondiaux</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.h" line="40"/>
+        <location filename="../kadas/gui/search/kadasworldlocationsearchprovider.h" line="37"/>
         <source> World Location Search</source>
         <translation>Rechercher une localisation mondiale</translation>
     </message>
