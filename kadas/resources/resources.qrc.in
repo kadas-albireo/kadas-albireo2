@@ -78,6 +78,7 @@
         <file alias="icons/search_filter_rect">icons/search_filter_rect.svg</file>
         <file alias="icons/draw_point">icons/draw_point.svg</file>
         <file alias="icons/draw_square">icons/draw_square.svg</file>
+        <file alias="icons/draw_diamond">icons/draw_diamond.svg</file>
         <file alias="icons/draw_triangle">icons/draw_triangle.svg</file>
         <file alias="icons/draw_line">icons/draw_line.svg</file>
         <file alias="icons/draw_rectangle">icons/draw_rectangle.svg</file>
