@@ -70,6 +70,11 @@ void KadasRibbonButton::paintEvent( QPaintEvent * /*e*/ )
 
   // Menu arrow
   int buttonWidth = width();
+  // Width available for the icon and label: the whole button, unless a split
+  // menu reserves an arrow area on the right, in which case content is centred
+  // over the tool half (left edge to the separator) so long labels stay clear
+  // of the divider instead of overflowing it.
+  int contentWidth = buttonWidth;
   if ( menu() )
   {
     if ( popupMode() == QToolButton::MenuButtonPopup )
@@ -87,6 +92,7 @@ void KadasRibbonButton::paintEvent( QPaintEvent * /*e*/ )
       }
 
       const int dividerX = menuRect.left();
+      contentWidth = dividerX;
       const int dividerMargin = 6;
       // Use the dark-blue ribbon background color so the split reads as the
       // ribbon showing through between the tool and the menu halves.
@@ -127,7 +133,7 @@ void KadasRibbonButton::paintEvent( QPaintEvent * /*e*/ )
   {
     QSize iSize = iconSize();
     int pixmapY = iconBottomY - iSize.height();
-    int pixmapX = buttonWidth / 2.0 - iSize.width() / 2.0;
+    int pixmapX = contentWidth / 2.0 - iSize.width() / 2.0;
     // Monochrome icon: white while idle, brand yellow when active (checked),
     // muted dark-blue when disabled. Keeps ribbon icons coherent and legible.
     QPixmap pixmap = buttonIcon.pixmap( QSize( 1024, 1024 ), QIcon::Normal, QIcon::On );
@@ -194,7 +200,7 @@ void KadasRibbonButton::paintEvent( QPaintEvent * /*e*/ )
     QStringList rawRextLines = buttonText.split( "\n" );
     // Insert additional line breaks where exceeds button width
     QStringList textLines;
-    int maxWidth = buttonWidth - 10;
+    int maxWidth = contentWidth - 10;
     for ( const QString &line : rawRextLines )
     {
       if ( fm.horizontalAdvance( line ) > maxWidth )
@@ -229,7 +235,7 @@ void KadasRibbonButton::paintEvent( QPaintEvent * /*e*/ )
       QString textLine = textLines.at( i );
       double textWidth = fm.horizontalAdvance( textLine );
       double textHeight = fm.boundingRect( textLine ).height();
-      int textX = ( buttonWidth - textWidth ) / 2.0;
+      int textX = ( contentWidth - textWidth ) / 2.0;
       int textY = iconBottomY + textHeight * ( i + 1 ) /*+ i * 1*/;
       if ( smallIcon )
       {
