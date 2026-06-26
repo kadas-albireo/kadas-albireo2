@@ -111,6 +111,21 @@ void KadasSidePanelHost::reconcileReflow()
   // The layout now holds the final set of panels for this burst; toggle
   // visibility once and re-anchor against the captured extent.
   updateVisibility();
+
+  // Apply the new geometry synchronously so the canvas resize happens now,
+  // while the canvas is frozen, rather than on a later event-loop turn. If it
+  // were left deferred, the settle timer could thaw and disarm before the
+  // resize arrived, leaving QGIS to recentre the map on its own -- a visible
+  // horizontal shift when switching to a differently sized panel.
+  if ( QWidget *parent = parentWidget() )
+  {
+    if ( QLayout *parentLayout = parent->layout() )
+    {
+      parentLayout->invalidate();
+      parentLayout->activate();
+    }
+  }
+
   armCanvasAnchor( mPendingAnchor );
   mPendingAnchor = CanvasAnchor();
 }
