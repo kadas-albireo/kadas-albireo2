@@ -182,6 +182,12 @@ KadasMarkerStyleEditor::KadasMarkerStyleEditor( QWidget *parent )
   connect( mFillColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
   connect( mStrokeColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
   connect( mStrokeStyleCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasAnnotationStyleEditor::committed );
+  // A non-filled shape (cross, line, arrow) has no fill, so grey out the fill
+  // control for it to avoid the impression it mirrors the outline colour.
+  connect( mShapeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, [this] {
+    const auto shape = static_cast<Qgis::MarkerShape>( mShapeCombo->currentData().toInt() );
+    mFillColorBtn->setEnabled( QgsSimpleMarkerSymbolLayerBase::shapeIsFilled( shape ) );
+  } );
 }
 
 void KadasMarkerStyleEditor::loadFromItem( const QgsAnnotationItem *item )
@@ -197,7 +203,8 @@ void KadasMarkerStyleEditor::loadFromItem( const QgsAnnotationItem *item )
   selectByData( mShapeCombo, static_cast<int>( sl->shape() ) );
   mSizeSpin->setValue( static_cast<int>( std::round( sl->size() ) ) );
   mStrokeWidthSpin->setValue( sl->strokeWidth() );
-  mFillColorBtn->setColor( sl->color() );
+  mFillColorBtn->setColor( sl->fillColor() );
+  mFillColorBtn->setEnabled( QgsSimpleMarkerSymbolLayerBase::shapeIsFilled( sl->shape() ) );
   mStrokeColorBtn->setColor( sl->strokeColor() );
   selectByData( mStrokeStyleCombo, static_cast<int>( sl->strokeStyle() ) );
 }
@@ -219,7 +226,7 @@ void KadasMarkerStyleEditor::applyToItem( QgsAnnotationItem *item ) const
   sl->setShape( static_cast<Qgis::MarkerShape>( mShapeCombo->currentData().toInt() ) );
   sl->setSize( mSizeSpin->value() );
   sl->setStrokeWidth( mStrokeWidthSpin->value() );
-  sl->setColor( mFillColorBtn->color() );
+  sl->setFillColor( mFillColorBtn->color() );
   sl->setStrokeColor( mStrokeColorBtn->color() );
   sl->setStrokeStyle( static_cast<Qt::PenStyle>( mStrokeStyleCombo->currentData().toInt() ) );
   // A non-filled shape (cross, line, arrow) is drawn from its outline alone, so

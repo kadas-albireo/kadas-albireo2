@@ -297,7 +297,7 @@ void KadasMarkerAnnotationController::applyPersistedStyle( QgsAnnotationItem *it
   QColor fill = settingsFillColor->value();
   if ( fill.alpha() == 0 )
     fill.setAlpha( 255 );
-  sl->setColor( fill );
+  sl->setFillColor( fill );
   sl->setStrokeColor( settingsStrokeColor->value() );
   sl->setStrokeStyle( static_cast<Qt::PenStyle>( settingsStrokeStyle->value() ) );
   // Non-filled shapes (cross, line, arrow) are drawn from their stroke alone:
@@ -325,7 +325,7 @@ void KadasMarkerAnnotationController::persistStyle( const QgsAnnotationItem *ite
     return;
   settingsSize->setValue( static_cast<int>( std::round( sl->size() ) ) );
   settingsStrokeWidth->setValue( sl->strokeWidth() );
-  settingsFillColor->setValue( sl->color() );
+  settingsFillColor->setValue( sl->fillColor() );
   settingsStrokeColor->setValue( sl->strokeColor() );
   settingsStrokeStyle->setValue( static_cast<int>( sl->strokeStyle() ) );
 }
