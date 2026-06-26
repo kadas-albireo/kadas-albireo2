@@ -15,8 +15,11 @@
  ***************************************************************************/
 
 #include <QAction>
+#include <QAbstractSpinBox>
+#include <QComboBox>
 #include <QPushButton>
 #include <QRegularExpression>
+#include <QToolButton>
 
 #include <qgis/qgsapplication.h>
 #include <qgis/qgslayertreeview.h>
@@ -102,22 +105,14 @@ void KadasMapToolGuideGrid::keyReleaseEvent( QKeyEvent *e )
 static const QRegularExpression g_cooRegExp( "^\\s*(\\d+\\.?\\d*)[,\\s]?\\s*(\\d+\\.?\\d*)\\s*$" );
 
 KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QgsMapLayer *layer )
-  : KadasBottomBar( canvas )
+  : KadasSidePanel( canvas )
 {
-  setLayout( new QHBoxLayout );
-  layout()->setSpacing( 10 );
+  setTitle( tr( "Guide grid" ) );
+  connect( this, &KadasSidePanel::closeRequested, this, &KadasGuideGridWidget::close );
 
   QWidget *base = new QWidget();
   ui.setupUi( base );
-  layout()->addWidget( base );
-
-  QPushButton *closeButton = new QPushButton();
-  closeButton->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
-  closeButton->setIcon( QIcon( ":/kadas/icons/close" ) );
-  closeButton->setToolTip( tr( "Close" ) );
-  connect( closeButton, &QPushButton::clicked, this, &KadasGuideGridWidget::close );
-  layout()->addWidget( closeButton );
-  layout()->setAlignment( closeButton, Qt::AlignTop );
+  addRow( base );
 
   for ( int c = 'A'; c <= 'Z'; ++c )
   {
@@ -133,6 +128,17 @@ KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeVi
   ui.comboBoxQuadrants->addItem( tr( "Don't label quadrants" ), KadasGuideGridLayer::DontLabelQuadrants );
   ui.comboBoxQuadrants->addItem( tr( "Label one quadrant" ), KadasGuideGridLayer::LabelOneQuadrant );
   ui.comboBoxQuadrants->addItem( tr( "Label all quadrants" ), KadasGuideGridLayer::LabelAllQuadrants );
+
+  // The label-position combos carry long captions; let them shrink and elide
+  // the current text instead of forcing the whole panel to the widest item
+  // (the full text stays available in the drop-down and as a tooltip).
+  for ( QComboBox *combo : { ui.comboBoxLabelPos, ui.comboBoxQuadrants } )
+  {
+    combo->setSizeAdjustPolicy( QComboBox::AdjustToMinimumContentsLengthWithIcon );
+    combo->setMinimumContentsLength( 6 );
+    combo->setToolTip( combo->currentText() );
+    connect( combo, qOverload<int>( &QComboBox::currentIndexChanged ), combo, [combo] { combo->setToolTip( combo->currentText() ); } );
+  }
 
   auto layerFilter = []( QgsMapLayer *layer ) { return dynamic_cast<KadasGuideGridLayer *>( layer ) != nullptr; };
   auto layerCreator = [this]( const QString &name ) { return createLayer( name ); };
@@ -157,8 +163,27 @@ KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeVi
   ui.spinBoxHeight->setRange( 1, 99999999 );
   connect( ui.spinBoxHeight, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasGuideGridWidget::updateBottomRight );
 
+  // The numeric fields have very large ranges, so by default they reserve
+  // enough width to show their maximum value, which blows up the panel width.
+  // Cap them to a compact, readable size; large values still scroll/step.
+  const int numericFieldWidth = ui.spinBoxWidth->fontMetrics().horizontalAdvance( QStringLiteral( "999999" ) ) + 36;
+  const QList<QAbstractSpinBox *> numericFields = { ui.spinBoxCols, ui.spinBoxRows, ui.spinBoxWidth, ui.spinBoxHeight };
+  for ( QAbstractSpinBox *spin : numericFields )
+  {
+    spin->setMaximumWidth( numericFieldWidth );
+  }
+
   connect( ui.toolButtonLockHeight, &QToolButton::toggled, this, &KadasGuideGridWidget::updateLockIcon );
   connect( ui.toolButtonLockWidth, &QToolButton::toggled, this, &KadasGuideGridWidget::updateLockIcon );
+
+  // Keep the lock buttons compact and flush against their spin box.
+  const int lockButtonSize = ui.spinBoxWidth->sizeHint().height();
+  for ( QToolButton *lock : { ui.toolButtonLockWidth, ui.toolButtonLockHeight } )
+  {
+    lock->setAutoRaise( true );
+    lock->setFixedSize( lockButtonSize, lockButtonSize );
+    lock->setIconSize( QSize( lockButtonSize - 8, lockButtonSize - 8 ) );
+  }
 
   connect( ui.toolButtonColor, &QgsColorButton::colorChanged, this, &KadasGuideGridWidget::updateColor );
   connect( ui.spinBoxLineWidth, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasGuideGridWidget::updateLineWidth );

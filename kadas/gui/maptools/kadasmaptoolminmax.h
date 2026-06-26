@@ -26,7 +26,7 @@ class QAction;
 class QComboBox;
 class QgsRubberBand;
 
-class KadasBottomBar;
+class KadasSidePanel;
 
 
 class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasShapeCaptureMapTool
@@ -60,7 +60,7 @@ class KADAS_GUI_EXPORT KadasMapToolMinMax : public KadasShapeCaptureMapTool
   private:
     FilterType mFilterType = FilterType::FilterRect;
     QComboBox *mFilterTypeCombo = nullptr;
-    KadasBottomBar *mBottomBar = nullptr;
+    KadasSidePanel *mBottomBar = nullptr;
     QgsRubberBand *mPinMinBand = nullptr;
     QgsRubberBand *mPinMaxBand = nullptr;
     QgsPointXY mPinMinPos;

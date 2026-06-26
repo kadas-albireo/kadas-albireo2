@@ -31,7 +31,7 @@
 class QCheckBox;
 class QComboBox;
 class QLabel;
-class KadasBottomBar;
+class KadasSidePanel;
 class KadasMeasureLabelsOverlay;
 
 
@@ -86,8 +86,7 @@ class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasShapeCaptureMapTool
 
     KadasMeasureLabelsOverlay *mLabelsOverlay = nullptr;
 
-    KadasBottomBar *mBottomBar = nullptr;
-    QLabel *mTitleLabel = nullptr;
+    KadasSidePanel *mBottomBar = nullptr;
     QLabel *mReadoutLabel = nullptr;
     QComboBox *mUnitComboBox = nullptr;
     QComboBox *mAngleUnitComboBox = nullptr;

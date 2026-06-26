@@ -1,0 +1,74 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadassidepanelhost.h                                       *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+class KadasSidePanelHost : QWidget
+{
+%Docstring(signature="appended")
+Reflow container for side panels docked beside the map canvas.
+
+A host lives in the central horizontal layout, next to the map canvas.
+When a panel is added, the host becomes visible and pushes the canvas
+aside (reflow) instead of overlaying it. When the last panel is removed,
+the host collapses to zero width so the canvas occupies the full width
+again.
+
+The host is edge-aware so the same infrastructure can be reused for a
+left panel (e.g. layer tree / catalog) and a right panel (e.g. map tool
+bars).
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/kadassidepanelhost.h"
+%End
+  public:
+    enum class Edge
+    {
+      Left,
+      Right
+    };
+
+    static QString objectNameForEdge( Edge edge );
+%Docstring
+Returns the canonical object name used to locate the host for a given
+edge.
+%End
+
+    explicit KadasSidePanelHost( Edge edge, QWidget *parent = 0 );
+
+    Edge edge() const;
+
+    void setMapCanvas( QgsMapCanvas *canvas );
+%Docstring
+Sets the map canvas the host reflows. When set, showing or hiding a
+panel keeps the canvas content visually anchored: instead of the whole
+map shifting, only the strip now covered by the panel is cropped.
+%End
+
+    void addPanel( QWidget *panel );
+%Docstring
+Docks a panel into the host and shows the host.
+%End
+    void removePanel( QWidget *panel );
+%Docstring
+Removes a panel from the host, collapsing the host if it becomes empty.
+%End
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadassidepanelhost.h                                       *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

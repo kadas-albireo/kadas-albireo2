@@ -22,6 +22,8 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QFontComboBox>
+#include <QFormLayout>
+#include <QGroupBox>
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QInputDialog>
@@ -130,44 +132,49 @@ namespace
 KadasMarkerStyleEditor::KadasMarkerStyleEditor( QWidget *parent )
   : KadasAnnotationStyleEditor( parent )
 {
-  auto *row = new QHBoxLayout( this );
-  row->setContentsMargins( 0, 0, 0, 0 );
+  auto *form = new QFormLayout( this );
+  form->setContentsMargins( 0, 0, 0, 0 );
+  form->setFieldGrowthPolicy( QFormLayout::AllNonFixedFieldsGrow );
 
   mShapeCombo = new QComboBox();
   for ( Qgis::MarkerShape shape : sShapeChoices )
     mShapeCombo->addItem( QgsSimpleMarkerSymbolLayerBase::encodeShape( shape ), QVariant::fromValue( static_cast<int>( shape ) ) );
   mShapeCombo->setToolTip( tr( "Marker shape" ) );
-  row->addWidget( mShapeCombo );
+  form->addRow( tr( "Shape" ), mShapeCombo );
 
   mSizeSpin = new QSpinBox();
   mSizeSpin->setRange( 1, 100 );
   mSizeSpin->setSuffix( QStringLiteral( " mm" ) );
   mSizeSpin->setToolTip( tr( "Marker size" ) );
-  row->addWidget( mSizeSpin );
+  form->addRow( tr( "Size" ), mSizeSpin );
 
   mStrokeWidthSpin = new QDoubleSpinBox();
   mStrokeWidthSpin->setRange( 0.0, 20.0 );
   mStrokeWidthSpin->setDecimals( 1 );
   mStrokeWidthSpin->setSingleStep( 0.1 );
   mStrokeWidthSpin->setToolTip( tr( "Outline width" ) );
-  row->addWidget( mStrokeWidthSpin );
 
   mFillColorBtn = new QgsColorButton();
   mFillColorBtn->setAllowOpacity( true );
   mFillColorBtn->setShowNoColor( true );
   mFillColorBtn->setToolTip( tr( "Fill color" ) );
-  row->addWidget( mFillColorBtn );
+  form->addRow( tr( "Fill" ), mFillColorBtn );
 
   mStrokeColorBtn = new QgsColorButton();
   mStrokeColorBtn->setAllowOpacity( true );
   mStrokeColorBtn->setShowNoColor( true );
   mStrokeColorBtn->setToolTip( tr( "Outline color" ) );
-  row->addWidget( mStrokeColorBtn );
 
   mStrokeStyleCombo = new QComboBox();
   populatePenStyleCombo( mStrokeStyleCombo );
   mStrokeStyleCombo->setToolTip( tr( "Outline style" ) );
-  row->addWidget( mStrokeStyleCombo );
+
+  auto *outlineRow = new QHBoxLayout();
+  outlineRow->setContentsMargins( 0, 0, 0, 0 );
+  outlineRow->addWidget( mStrokeColorBtn );
+  outlineRow->addWidget( mStrokeWidthSpin );
+  outlineRow->addWidget( mStrokeStyleCombo );
+  form->addRow( tr( "Outline" ), outlineRow );
 
   connect( mShapeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasAnnotationStyleEditor::committed );
   connect( mSizeSpin, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
@@ -175,6 +182,12 @@ KadasMarkerStyleEditor::KadasMarkerStyleEditor( QWidget *parent )
   connect( mFillColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
   connect( mStrokeColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
   connect( mStrokeStyleCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasAnnotationStyleEditor::committed );
+  // A non-filled shape (cross, line, arrow) has no fill, so grey out the fill
+  // control for it to avoid the impression it mirrors the outline colour.
+  connect( mShapeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, [this] {
+    const auto shape = static_cast<Qgis::MarkerShape>( mShapeCombo->currentData().toInt() );
+    mFillColorBtn->setEnabled( QgsSimpleMarkerSymbolLayerBase::shapeIsFilled( shape ) );
+  } );
 }
 
 void KadasMarkerStyleEditor::loadFromItem( const QgsAnnotationItem *item )
@@ -190,7 +203,8 @@ void KadasMarkerStyleEditor::loadFromItem( const QgsAnnotationItem *item )
   selectByData( mShapeCombo, static_cast<int>( sl->shape() ) );
   mSizeSpin->setValue( static_cast<int>( std::round( sl->size() ) ) );
   mStrokeWidthSpin->setValue( sl->strokeWidth() );
-  mFillColorBtn->setColor( sl->color() );
+  mFillColorBtn->setColor( sl->fillColor() );
+  mFillColorBtn->setEnabled( QgsSimpleMarkerSymbolLayerBase::shapeIsFilled( sl->shape() ) );
   mStrokeColorBtn->setColor( sl->strokeColor() );
   selectByData( mStrokeStyleCombo, static_cast<int>( sl->strokeStyle() ) );
 }
@@ -212,9 +226,18 @@ void KadasMarkerStyleEditor::applyToItem( QgsAnnotationItem *item ) const
   sl->setShape( static_cast<Qgis::MarkerShape>( mShapeCombo->currentData().toInt() ) );
   sl->setSize( mSizeSpin->value() );
   sl->setStrokeWidth( mStrokeWidthSpin->value() );
-  sl->setColor( mFillColorBtn->color() );
+  sl->setFillColor( mFillColorBtn->color() );
   sl->setStrokeColor( mStrokeColorBtn->color() );
   sl->setStrokeStyle( static_cast<Qt::PenStyle>( mStrokeStyleCombo->currentData().toInt() ) );
+  // A non-filled shape (cross, line, arrow) is drawn from its outline alone, so
+  // a NoPen style or zero width would make it vanish. Keep it drawable.
+  if ( !QgsSimpleMarkerSymbolLayerBase::shapeIsFilled( sl->shape() ) )
+  {
+    if ( sl->strokeStyle() == Qt::NoPen )
+      sl->setStrokeStyle( Qt::SolidLine );
+    if ( sl->strokeWidth() <= 0.0 )
+      sl->setStrokeWidth( std::max( 0.4, mSizeSpin->value() * 0.15 ) );
+  }
   marker->setSymbol( sym.release() );
 }
 
@@ -224,18 +247,19 @@ void KadasMarkerStyleEditor::applyToItem( QgsAnnotationItem *item ) const
 KadasPinStyleEditor::KadasPinStyleEditor( QWidget *parent )
   : KadasAnnotationStyleEditor( parent )
 {
-  auto *row = new QHBoxLayout( this );
-  row->setContentsMargins( 0, 0, 0, 0 );
+  auto *form = new QFormLayout( this );
+  form->setContentsMargins( 0, 0, 0, 0 );
+  form->setFieldGrowthPolicy( QFormLayout::AllNonFixedFieldsGrow );
 
   mSizeSpin = new QSpinBox();
   mSizeSpin->setRange( 1, 200 );
   mSizeSpin->setToolTip( tr( "Pin size" ) );
-  row->addWidget( mSizeSpin );
+  form->addRow( tr( "Size" ), mSizeSpin );
 
   mFillColorBtn = new QgsColorButton();
   mFillColorBtn->setAllowOpacity( true );
   mFillColorBtn->setToolTip( tr( "Pin color" ) );
-  row->addWidget( mFillColorBtn );
+  form->addRow( tr( "Color" ), mFillColorBtn );
 
   connect( mSizeSpin, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
   connect( mFillColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
@@ -274,26 +298,27 @@ void KadasPinStyleEditor::applyToItem( QgsAnnotationItem *item ) const
 KadasLineStyleEditor::KadasLineStyleEditor( QWidget *parent )
   : KadasAnnotationStyleEditor( parent )
 {
-  auto *row = new QHBoxLayout( this );
-  row->setContentsMargins( 0, 0, 0, 0 );
+  auto *form = new QFormLayout( this );
+  form->setContentsMargins( 0, 0, 0, 0 );
+  form->setFieldGrowthPolicy( QFormLayout::AllNonFixedFieldsGrow );
 
   mStrokeWidthSpin = new QDoubleSpinBox();
   mStrokeWidthSpin->setRange( 0.0, 20.0 );
   mStrokeWidthSpin->setDecimals( 1 );
   mStrokeWidthSpin->setSingleStep( 0.1 );
   mStrokeWidthSpin->setToolTip( tr( "Line width" ) );
-  row->addWidget( mStrokeWidthSpin );
+  form->addRow( tr( "Width" ), mStrokeWidthSpin );
 
   mStrokeColorBtn = new QgsColorButton();
   mStrokeColorBtn->setAllowOpacity( true );
   mStrokeColorBtn->setShowNoColor( true );
   mStrokeColorBtn->setToolTip( tr( "Line color" ) );
-  row->addWidget( mStrokeColorBtn );
+  form->addRow( tr( "Color" ), mStrokeColorBtn );
 
   mStrokeStyleCombo = new QComboBox();
   populatePenStyleCombo( mStrokeStyleCombo );
   mStrokeStyleCombo->setToolTip( tr( "Line style" ) );
-  row->addWidget( mStrokeStyleCombo );
+  form->addRow( tr( "Style" ), mStrokeStyleCombo );
 
   connect( mStrokeWidthSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
   connect( mStrokeColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
@@ -341,37 +366,46 @@ void KadasLineStyleEditor::applyToItem( QgsAnnotationItem *item ) const
 KadasPolygonStyleEditor::KadasPolygonStyleEditor( QWidget *parent )
   : KadasAnnotationStyleEditor( parent )
 {
-  auto *row = new QHBoxLayout( this );
-  row->setContentsMargins( 0, 0, 0, 0 );
+  auto *form = new QFormLayout( this );
+  form->setContentsMargins( 0, 0, 0, 0 );
+  form->setFieldGrowthPolicy( QFormLayout::AllNonFixedFieldsGrow );
 
   mStrokeWidthSpin = new QDoubleSpinBox();
   mStrokeWidthSpin->setRange( 0.0, 20.0 );
   mStrokeWidthSpin->setDecimals( 1 );
   mStrokeWidthSpin->setSingleStep( 0.1 );
   mStrokeWidthSpin->setToolTip( tr( "Outline width" ) );
-  row->addWidget( mStrokeWidthSpin );
 
   mFillColorBtn = new QgsColorButton();
   mFillColorBtn->setAllowOpacity( true );
   mFillColorBtn->setShowNoColor( true );
   mFillColorBtn->setToolTip( tr( "Fill color" ) );
-  row->addWidget( mFillColorBtn );
 
   mStrokeColorBtn = new QgsColorButton();
   mStrokeColorBtn->setAllowOpacity( true );
   mStrokeColorBtn->setShowNoColor( true );
   mStrokeColorBtn->setToolTip( tr( "Outline color" ) );
-  row->addWidget( mStrokeColorBtn );
 
   mStrokeStyleCombo = new QComboBox();
   populatePenStyleCombo( mStrokeStyleCombo );
   mStrokeStyleCombo->setToolTip( tr( "Outline style" ) );
-  row->addWidget( mStrokeStyleCombo );
 
   mFillStyleCombo = new QComboBox();
   populateBrushStyleCombo( mFillStyleCombo );
   mFillStyleCombo->setToolTip( tr( "Fill style" ) );
-  row->addWidget( mFillStyleCombo );
+
+  auto *fillRow = new QHBoxLayout();
+  fillRow->setContentsMargins( 0, 0, 0, 0 );
+  fillRow->addWidget( mFillColorBtn );
+  fillRow->addWidget( mFillStyleCombo );
+  form->addRow( tr( "Fill" ), fillRow );
+
+  auto *outlineRow = new QHBoxLayout();
+  outlineRow->setContentsMargins( 0, 0, 0, 0 );
+  outlineRow->addWidget( mStrokeColorBtn );
+  outlineRow->addWidget( mStrokeWidthSpin );
+  outlineRow->addWidget( mStrokeStyleCombo );
+  form->addRow( tr( "Outline" ), outlineRow );
 
   connect( mStrokeWidthSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
   connect( mFillColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
@@ -426,22 +460,16 @@ void KadasPolygonStyleEditor::applyToItem( QgsAnnotationItem *item ) const
 KadasPointTextStyleEditor::KadasPointTextStyleEditor( QWidget *parent )
   : KadasAnnotationStyleEditor( parent )
 {
-  auto *outer = new QVBoxLayout( this );
-  outer->setContentsMargins( 0, 0, 0, 0 );
+  auto *form = new QFormLayout( this );
+  form->setContentsMargins( 0, 0, 0, 0 );
+  form->setFieldGrowthPolicy( QFormLayout::AllNonFixedFieldsGrow );
 
-  auto *textRow = new QHBoxLayout();
-  outer->addLayout( textRow );
-  textRow->addWidget( new QLabel( tr( "Text:" ) ) );
   mTextEdit = new QLineEdit();
   mTextEdit->setPlaceholderText( tr( "Enter text" ) );
-  textRow->addWidget( mTextEdit, 1 );
-
-  auto *styleRow = new QHBoxLayout();
-  outer->addLayout( styleRow );
+  form->addRow( tr( "Text" ), mTextEdit );
 
   mFontCombo = new QFontComboBox();
   mFontCombo->setToolTip( tr( "Font family" ) );
-  styleRow->addWidget( mFontCombo, 1 );
 
   mSizeSpin = new QDoubleSpinBox();
   mSizeSpin->setRange( 1.0, 200.0 );
@@ -449,19 +477,22 @@ KadasPointTextStyleEditor::KadasPointTextStyleEditor( QWidget *parent )
   mSizeSpin->setSingleStep( 0.5 );
   mSizeSpin->setSuffix( QStringLiteral( " pt" ) );
   mSizeSpin->setToolTip( tr( "Font size" ) );
-  styleRow->addWidget( mSizeSpin );
+
+  auto *fontRow = new QHBoxLayout();
+  fontRow->setContentsMargins( 0, 0, 0, 0 );
+  fontRow->addWidget( mFontCombo, 1 );
+  fontRow->addWidget( mSizeSpin );
+  form->addRow( tr( "Font" ), fontRow );
 
   mColorBtn = new QgsColorButton();
   mColorBtn->setAllowOpacity( true );
   mColorBtn->setToolTip( tr( "Text color" ) );
-  styleRow->addWidget( mColorBtn );
+  form->addRow( tr( "Color" ), mColorBtn );
 
-  styleRow->addWidget( new QLabel( tr( "Border:" ) ) );
   mBufferColorBtn = new QgsColorButton();
   mBufferColorBtn->setAllowOpacity( true );
   mBufferColorBtn->setShowNoColor( true );
   mBufferColorBtn->setToolTip( tr( "Text border color" ) );
-  styleRow->addWidget( mBufferColorBtn );
 
   mBufferWidthSpin = new QDoubleSpinBox();
   mBufferWidthSpin->setRange( 0.0, 10.0 );
@@ -469,7 +500,12 @@ KadasPointTextStyleEditor::KadasPointTextStyleEditor( QWidget *parent )
   mBufferWidthSpin->setSingleStep( 0.1 );
   mBufferWidthSpin->setSuffix( QStringLiteral( " mm" ) );
   mBufferWidthSpin->setToolTip( tr( "Text border width" ) );
-  styleRow->addWidget( mBufferWidthSpin );
+
+  auto *borderRow = new QHBoxLayout();
+  borderRow->setContentsMargins( 0, 0, 0, 0 );
+  borderRow->addWidget( mBufferColorBtn );
+  borderRow->addWidget( mBufferWidthSpin );
+  form->addRow( tr( "Border" ), borderRow );
 
   // Live preview while typing; commit on focus-out / Enter.
   connect( mTextEdit, &QLineEdit::textChanged, this, &KadasAnnotationStyleEditor::previewChanged );
@@ -541,8 +577,9 @@ namespace
 KadasPictureStyleEditor::KadasPictureStyleEditor( QWidget *parent )
   : KadasAnnotationStyleEditor( parent )
 {
-  auto *row = new QHBoxLayout( this );
-  row->setContentsMargins( 0, 0, 0, 0 );
+  auto *form = new QFormLayout( this );
+  form->setContentsMargins( 0, 0, 0, 0 );
+  form->setFieldGrowthPolicy( QFormLayout::AllNonFixedFieldsGrow );
 
   mChangeImageBtn = new QToolButton();
   mChangeImageBtn->setText( tr( "Change image…" ) );
@@ -554,41 +591,41 @@ KadasPictureStyleEditor::KadasPictureStyleEditor( QWidget *parent )
   QAction *fromFileAction = menu->addAction( tr( "From file…" ) );
   QAction *fromUrlAction = menu->addAction( tr( "From URL…" ) );
   mChangeImageBtn->setMenu( menu );
-  row->addWidget( mChangeImageBtn );
+  form->addRow( tr( "Image" ), mChangeImageBtn );
 
-  row->addWidget( new QLabel( tr( "Size:" ) ) );
   mWidthSpin = new QSpinBox();
   mWidthSpin->setRange( 16, 2000 );
   mWidthSpin->setToolTip( tr( "Picture width" ) );
-  row->addWidget( mWidthSpin );
   mHeightSpin = new QSpinBox();
   mHeightSpin->setRange( 16, 2000 );
   mHeightSpin->setToolTip( tr( "Picture height" ) );
-  row->addWidget( mHeightSpin );
 
   // Lock aspect-ratio; stored session-wide on the controller so map-tool drags share it.
   mLockAspectBox = new QCheckBox( tr( "Lock ratio" ) );
   mLockAspectBox->setToolTip( tr( "Preserve the picture's aspect ratio when resizing." ) );
   mLockAspectBox->setChecked( KadasPictureAnnotationController::lockAspectRatio() );
-  row->addWidget( mLockAspectBox );
+
+  auto *sizeRow = new QHBoxLayout();
+  sizeRow->setContentsMargins( 0, 0, 0, 0 );
+  sizeRow->addWidget( mWidthSpin );
+  sizeRow->addWidget( new QLabel( QStringLiteral( "\u00d7" ) ) );
+  sizeRow->addWidget( mHeightSpin );
+  sizeRow->addWidget( mLockAspectBox );
+  form->addRow( tr( "Size" ), sizeRow );
 
   // "Show callout" toggles the balloon shape; frame/stroke/wedge controls disable when off.
   mShowCalloutBox = new QCheckBox( tr( "Show callout" ) );
   mShowCalloutBox->setToolTip( tr( "Display the picture inside a balloon shape pointing at its anchor." ) );
-  row->addWidget( mShowCalloutBox );
 
-  row->addWidget( new QLabel( tr( "Frame:" ) ) );
   mFillColorBtn = new QgsColorButton();
   mFillColorBtn->setAllowOpacity( true );
   mFillColorBtn->setShowNoColor( true );
   mFillColorBtn->setToolTip( tr( "Balloon fill color" ) );
-  row->addWidget( mFillColorBtn );
 
   mStrokeColorBtn = new QgsColorButton();
   mStrokeColorBtn->setAllowOpacity( true );
   mStrokeColorBtn->setShowNoColor( true );
   mStrokeColorBtn->setToolTip( tr( "Balloon outline color" ) );
-  row->addWidget( mStrokeColorBtn );
 
   mStrokeWidthSpin = new QDoubleSpinBox();
   mStrokeWidthSpin->setRange( 0.0, 10.0 );
@@ -596,16 +633,26 @@ KadasPictureStyleEditor::KadasPictureStyleEditor( QWidget *parent )
   mStrokeWidthSpin->setSingleStep( 0.5 );
   mStrokeWidthSpin->setSuffix( QStringLiteral( " px" ) );
   mStrokeWidthSpin->setToolTip( tr( "Balloon outline width" ) );
-  row->addWidget( mStrokeWidthSpin );
 
-  row->addWidget( new QLabel( tr( "Wedge:" ) ) );
   mWedgeWidthSpin = new QDoubleSpinBox();
   mWedgeWidthSpin->setRange( 1.0, 60.0 );
   mWedgeWidthSpin->setDecimals( 1 );
   mWedgeWidthSpin->setSingleStep( 1.0 );
   mWedgeWidthSpin->setSuffix( QStringLiteral( " px" ) );
   mWedgeWidthSpin->setToolTip( tr( "Width of the balloon wedge base" ) );
-  row->addWidget( mWedgeWidthSpin );
+
+  QGroupBox *calloutGroup = new QGroupBox( tr( "Callout" ) );
+  QFormLayout *calloutForm = new QFormLayout( calloutGroup );
+  calloutForm->setFieldGrowthPolicy( QFormLayout::AllNonFixedFieldsGrow );
+  calloutForm->addRow( mShowCalloutBox );
+  calloutForm->addRow( tr( "Fill" ), mFillColorBtn );
+  auto *frameOutlineRow = new QHBoxLayout();
+  frameOutlineRow->setContentsMargins( 0, 0, 0, 0 );
+  frameOutlineRow->addWidget( mStrokeColorBtn );
+  frameOutlineRow->addWidget( mStrokeWidthSpin );
+  calloutForm->addRow( tr( "Outline" ), frameOutlineRow );
+  calloutForm->addRow( tr( "Wedge" ), mWedgeWidthSpin );
+  form->addRow( calloutGroup );
 
   connect( fromFileAction, &QAction::triggered, this, [this]() {
     const QString chosen

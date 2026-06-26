@@ -70,6 +70,38 @@ KadasRibbonButton::disabled {
   color: #263B4E;
 }
 
+/** Ribbon dropdown gallery (e.g. the drawing tool picker) **/
+QMenu#mRibbonGalleryMenu {
+  background-color: #263B4E;
+  border: 1px solid #263B4E;
+  padding: 0;
+}
+
+KadasRibbonActionGallery {
+  background-color: #263B4E;
+}
+
+KadasRibbonActionGallery QLabel {
+  color: #FFFFFF;
+}
+
+KadasRibbonActionGallery QToolButton {
+  color: #FFFFFF;
+  background-color: #5D7081;
+  border: 1px solid #5D7081;
+  border-radius: 2px;
+  padding: 2px;
+}
+
+KadasRibbonActionGallery QToolButton:hover {
+  border: 1px solid #3daee9;
+}
+
+KadasRibbonActionGallery QToolButton:checked {
+  color: #263B4E;
+  background-color: #BEDCF6;
+}
+
 
 /** Layer tree view, catalog */
 QgsCollapsibleGroupBox#mLayersBox,

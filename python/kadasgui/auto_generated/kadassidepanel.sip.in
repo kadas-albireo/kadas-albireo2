@@ -1,0 +1,98 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadassidepanel.h                                           *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+class KadasSidePanel : QFrame
+{
+%Docstring(signature="appended")
+A neutral-styled container that docks into a KadasSidePanelHost beside
+the map canvas. It is a drop-in replacement for KadasBottomBar for map
+tool bars: create one, populate it with a layout, then :py:func:`~show`
+it. The canvas reflows to make room (the panel does not overlay the
+canvas).
+
+The panel docks itself into the matching host (located on the map canvas
+window) on construction and undocks on destruction, mirroring the
+create/populate/show/delete lifecycle used by KadasBottomBar consumers.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/kadassidepanel.h"
+%End
+  public:
+    KadasSidePanel( QgsMapCanvas *canvas, KadasSidePanelHost::Edge edge = KadasSidePanelHost::Edge::Right );
+    ~KadasSidePanel();
+
+    void setTitle( const QString &title );
+%Docstring
+Adds the first row: a bold title and a close button (emits
+:py:func:`~KadasSidePanel.closeRequested`).
+%End
+
+    void addUndoRedoRow();
+%Docstring
+Adds an undo/redo button row (emits
+:py:func:`~KadasSidePanel.undoRequested`/:py:func:`~KadasSidePanel.redoRequested`).
+%End
+
+    void addRow( const QString &label, QWidget *widget /Transfer/ );
+%Docstring
+Adds a label + widget row, the default vertical layout style.
+%End
+    void addRow( const QString &label, const QList<QWidget *> &widgets /Transfer/ );
+%Docstring
+Adds a single label followed by several widgets sharing that row.
+%End
+    void addRow( QWidget *widget /Transfer/ );
+%Docstring
+Adds a full-width widget row (no label).
+%End
+    void addRow( QLayout *layout /Transfer/ );
+%Docstring
+Adds a full-width layout row (e.g. a button row).
+%End
+
+    QFormLayout *addGroup( const QString &title );
+%Docstring
+Creates a titled group box spanning the panel width and returns its form
+layout to populate.
+%End
+
+  public slots:
+    void setCanUndo( bool enabled );
+%Docstring
+Enables/disables the undo button created by
+:py:func:`~KadasSidePanel.addUndoRedoRow`.
+%End
+    void setCanRedo( bool enabled );
+%Docstring
+Enables/disables the redo button created by
+:py:func:`~KadasSidePanel.addUndoRedoRow`.
+%End
+
+  signals:
+    void closeRequested();
+    void undoRequested();
+    void redoRequested();
+
+  protected:
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadassidepanel.h                                           *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
