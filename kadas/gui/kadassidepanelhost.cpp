@@ -163,18 +163,20 @@ void KadasSidePanelHost::armCanvasAnchor( const CanvasAnchor &anchor )
   if ( !anchor.valid || !mCanvas )
     return;
 
-  // The panel is shown empty and then populated synchronously, so the canvas
-  // reflows to its final width over a burst of resizes once control returns to
-  // the event loop. Freeze rendering for the whole burst so the user never
-  // sees the intermediate, rescaled extent, and re-anchor on each resize until
-  // it settles (see eventFilter / finishCanvasAnchor).
+  // Freeze rendering for the whole reflow burst so the user never sees the
+  // intermediate, rescaled extent, and re-anchor on each resize until it
+  // settles (see eventFilter / finishCanvasAnchor).
   mArmedAnchor = anchor;
   mCanvas->freeze( true );
-  mSettleTimer->start();
 
-  // Re-anchor once now in case the reflow already happened synchronously and
-  // no further resize event is delivered.
-  QMetaObject::invokeMethod( this, &KadasSidePanelHost::applyArmedAnchor, Qt::QueuedConnection );
+  // The layout was already applied synchronously in reconcileReflow, so the
+  // canvas is at its final size: re-anchor *now*, before the settle timer can
+  // run. applyArmedAnchor() starts the timer at its end, so the thaw can never
+  // be scheduled ahead of the first anchoring -- a race that previously left
+  // the map at the extent QGIS recentred on resize (a visible shift, most
+  // often when closing a panel right after switching to a differently sized
+  // one). The eventFilter still catches any straggler resize while armed.
+  applyArmedAnchor();
 }
 
 bool KadasSidePanelHost::eventFilter( QObject *watched, QEvent *event )
