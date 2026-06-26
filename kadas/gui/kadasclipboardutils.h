@@ -22,14 +22,23 @@
 #define SIP_NO_FILE
 
 /**
- * Utility to copy a QImage to the system clipboard, using native macOS
- * NSPasteboard API on Apple platforms to avoid a crash in ImageIO's TIFF
- * encoder caused by a libtiff symbol conflict with GDAL.
+ * Utility to exchange a QImage with the system clipboard, using native macOS
+ * NSPasteboard API on Apple platforms to avoid crashes in Apple's ImageIO
+ * codecs (a libtiff symbol conflict with GDAL when encoding, and a PNG decoder
+ * crash when the pasteboard transcodes screenshots when reading).
  */
 class KadasClipboardUtils
 {
   public:
     static void copyImageToClipboard( const QImage &image );
+
+    /**
+     * Returns the image currently held on the system clipboard, or a null
+     * QImage if none is available. On macOS the raw bytes are read directly
+     * from NSPasteboard and decoded with Qt, avoiding Apple's flavour
+     * translation which crashes on some screenshots.
+     */
+    static QImage imageFromClipboard();
 };
 
 #endif // KADASCLIPBOARDUTILS_H

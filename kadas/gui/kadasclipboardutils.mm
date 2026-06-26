@@ -37,3 +37,44 @@ void KadasClipboardUtils::copyImageToClipboard(const QImage &image) {
   [pasteboard clearContents];
   [pasteboard setData:data forType:NSPasteboardTypePNG];
 }
+
+QImage KadasClipboardUtils::imageFromClipboard() {
+  NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
+  if (!pasteboard)
+    return QImage();
+
+  NSArray<NSPasteboardType> *available = [pasteboard types];
+  if (available.count == 0)
+    return QImage();
+
+  // Read the raw encoded bytes of a flavour that is actually present and decode
+  // them with Qt's own image readers. This avoids QMimeData::imageData() /
+  // QClipboard::image(), which make the pasteboard transcode the image via
+  // Apple's ImageIO (PasteboardCopyItemFlavorData -> CreateImageFromImage).
+  // That translation crashes (SIGBUS) on some screenshots.
+  NSMutableArray<NSPasteboardType> *candidates = [NSMutableArray array];
+  for (NSPasteboardType preferred in @[
+         NSPasteboardTypePNG, NSPasteboardTypeTIFF, @"public.jpeg",
+         @"com.compuserve.gif"
+       ]) {
+    if ([available containsObject:preferred])
+      [candidates addObject:preferred];
+  }
+  for (NSPasteboardType type in available) {
+    if (![candidates containsObject:type])
+      [candidates addObject:type];
+  }
+
+  for (NSPasteboardType type in candidates) {
+    NSData *data = [pasteboard dataForType:type];
+    if (!data || data.length == 0)
+      continue;
+    const QByteArray bytes(static_cast<const char *>(data.bytes),
+                           static_cast<int>(data.length));
+    const QImage image = QImage::fromData(bytes);
+    if (!image.isNull())
+      return image;
+  }
+
+  return QImage();
+}
