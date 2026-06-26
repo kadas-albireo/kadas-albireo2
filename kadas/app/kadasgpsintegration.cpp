@@ -276,7 +276,28 @@ void KadasGpsIntegration::updateGpsFixIcon()
 
 void KadasGpsIntegration::setGPSIcon( const QColor &color )
 {
-  QPixmap pixmap( mGpsToolButton->size() );
-  pixmap.fill( color );
+  // Paint the status indicator at the button's icon size so it always renders,
+  // even when the button has not been laid out yet (size() would be empty).
+  QSize iconSize = mGpsToolButton->iconSize();
+  if ( iconSize.isEmpty() )
+    iconSize = QSize( 16, 16 );
+
+  const qreal dpr = mGpsToolButton->devicePixelRatioF();
+  QPixmap pixmap( iconSize * dpr );
+  pixmap.setDevicePixelRatio( dpr );
+  pixmap.fill( Qt::transparent );
+
+  // Draw a filled status dot with an outline whose lightness contrasts with
+  // the fill colour, so the indicator stays visible on both light and dark
+  // themes and in the black "disconnected" state.
+  const QColor outline = qGray( color.rgb() ) < 128 ? QColor( 230, 230, 230 ) : QColor( 40, 40, 40 );
+  QPainter painter( &pixmap );
+  painter.setRenderHint( QPainter::Antialiasing, true );
+  painter.setBrush( color );
+  painter.setPen( QPen( outline, 1.0 ) );
+  const QRectF dot( 1.5, 1.5, iconSize.width() - 3.0, iconSize.height() - 3.0 );
+  painter.drawEllipse( dot );
+  painter.end();
+
   mGpsToolButton->setIcon( QIcon( pixmap ) );
 }
