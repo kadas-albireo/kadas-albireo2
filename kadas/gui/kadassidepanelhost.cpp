@@ -72,6 +72,11 @@ void KadasSidePanelHost::addPanel( QWidget *panel )
   if ( !panel )
     return;
   const CanvasAnchor anchor = captureCanvasAnchor();
+  // Freeze before the visibility toggle below resizes and rescales the canvas,
+  // otherwise QGIS paints one frame at the reflowed scale before the anchor
+  // logic snaps it back (a visible scale glitch).
+  if ( anchor.valid && mCanvas )
+    mCanvas->freeze( true );
   // Panels expand vertically to fill the host, so simply append them.
   mLayout->addWidget( panel );
   updateVisibility();
@@ -83,6 +88,10 @@ void KadasSidePanelHost::removePanel( QWidget *panel )
   if ( !panel )
     return;
   const CanvasAnchor anchor = captureCanvasAnchor();
+  // Freeze before the visibility toggle below resizes and rescales the canvas
+  // (see addPanel) so the reflow does not flash an intermediate scale.
+  if ( anchor.valid && mCanvas )
+    mCanvas->freeze( true );
   mLayout->removeWidget( panel );
   updateVisibility();
   armCanvasAnchor( anchor );
