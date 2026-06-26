@@ -115,6 +115,10 @@
 #include "guidegrid/kadasmaptoolguidegrid.h"
 
 
+#ifdef Q_OS_MAC
+#include "kadas/gui/kadasclipboardutils.h"
+#endif
+
 static QStringList splitSubLayerDef( const QString &subLayerDef )
 {
   return subLayerDef.split( QgsDataProvider::sublayerSeparator() );
@@ -1373,7 +1377,17 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
     const QMimeData *mimeData = KadasClipboard::instance()->mimeData();
     if ( mimeData && mimeData->hasImage() )
     {
-      QImage image = qvariant_cast<QImage>( mimeData->imageData() );
+      QImage image;
+#ifdef Q_OS_MAC
+      // Read the clipboard image natively (see KadasClipboardUtils). Qt's
+      // QMimeData::imageData() makes the Cocoa pasteboard transcode the image
+      // via Apple's ImageIO, which crashes (SIGBUS) on some screenshots.
+      image = KadasClipboardUtils::imageFromClipboard();
+      if ( image.isNull() )
+#endif
+        image = qvariant_cast<QImage>( mimeData->imageData() );
+      if ( image.isNull() )
+        return nullptr;
       QString filename = QgsProject::instance()->createAttachedFile( "pasted_image.png" );
       image.save( filename );
       QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::PicturesLayer );

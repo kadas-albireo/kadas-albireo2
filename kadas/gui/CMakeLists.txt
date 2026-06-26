@@ -1,6 +1,8 @@
 set(kadas_gui_SRC
     kadasattributetabledialog.cpp
     kadasbottombar.cpp
+    kadassidepanel.cpp
+    kadassidepanelhost.cpp
     kadascatalogbrowser.cpp
     kadascatalogprovider.cpp
     kadasclipboard.cpp
@@ -78,6 +80,8 @@ set(kadas_gui_SRC
 set(kadas_gui_HDR
     kadasattributetabledialog.h
     kadasbottombar.h
+    kadassidepanel.h
+    kadassidepanelhost.h
     kadascatalogbrowser.h
     kadascatalogprovider.h
     kadasclipboard.h
