@@ -18,6 +18,8 @@
 #include <QDragEnterEvent>
 #include <QPainter>
 #include <QPainterPath>
+#include <QStyle>
+#include <QStyleOptionToolButton>
 
 #include "kadas/gui/kadasribbonbutton.h"
 
@@ -70,15 +72,53 @@ void KadasRibbonButton::paintEvent( QPaintEvent * /*e*/ )
   int buttonWidth = width();
   if ( menu() )
   {
-    int y = height() - 6;
-    p.setPen( Qt::transparent );
-    p.setBrush( QColor( 38, 59, 78 ) );
-    QPainterPath arrow;
-    arrow.moveTo( width() - 12, y - 2 );
-    arrow.lineTo( width() - 3, y - 2 );
-    arrow.lineTo( width() - 7.5, y + 3 );
-    arrow.closeSubpath();
-    p.drawPath( arrow );
+    if ( popupMode() == QToolButton::MenuButtonPopup )
+    {
+      // Office-style split button: a vertical divider separates the main
+      // (tool) area from the menu (arrow) area. The divider is drawn at the
+      // left edge of the sub-control rectangle Qt uses to hit-test menu
+      // clicks, so the visual split matches the clickable split exactly.
+      QStyleOptionToolButton opt;
+      initStyleOption( &opt );
+      QRect menuRect = style()->subControlRect( QStyle::CC_ToolButton, &opt, QStyle::SC_ToolButtonMenu, this );
+      if ( !menuRect.isValid() || menuRect.width() <= 0 )
+      {
+        menuRect = QRect( width() - 18, 0, 18, height() );
+      }
+
+      const int dividerX = menuRect.left();
+      const int dividerMargin = 6;
+      // Use the dark-blue ribbon background color so the split reads as the
+      // ribbon showing through between the tool and the menu halves.
+      QPen dividerPen( QColor( 0x26, 0x3B, 0x4E ) );
+      dividerPen.setWidth( 1 );
+      p.setPen( dividerPen );
+      p.setBrush( Qt::NoBrush );
+      p.drawLine( dividerX, dividerMargin, dividerX, height() - dividerMargin );
+
+      const double arrowCx = menuRect.center().x() + 0.5;
+      const double arrowCy = height() / 2.0;
+      p.setPen( Qt::transparent );
+      p.setBrush( QColor( 38, 59, 78 ) );
+      QPainterPath arrow;
+      arrow.moveTo( arrowCx - 4, arrowCy - 2 );
+      arrow.lineTo( arrowCx + 4, arrowCy - 2 );
+      arrow.lineTo( arrowCx, arrowCy + 3 );
+      arrow.closeSubpath();
+      p.drawPath( arrow );
+    }
+    else
+    {
+      int y = height() - 6;
+      p.setPen( Qt::transparent );
+      p.setBrush( QColor( 38, 59, 78 ) );
+      QPainterPath arrow;
+      arrow.moveTo( width() - 12, y - 2 );
+      arrow.lineTo( width() - 3, y - 2 );
+      arrow.lineTo( width() - 7.5, y + 3 );
+      arrow.closeSubpath();
+      p.drawPath( arrow );
+    }
   }
 
   // Icon
@@ -88,22 +128,48 @@ void KadasRibbonButton::paintEvent( QPaintEvent * /*e*/ )
     QSize iSize = iconSize();
     int pixmapY = iconBottomY - iSize.height();
     int pixmapX = buttonWidth / 2.0 - iSize.width() / 2.0;
-    if ( isEnabled() && !isChecked() )
+    // Monochrome icon: white while idle, brand yellow when active (checked),
+    // muted dark-blue when disabled. Keeps ribbon icons coherent and legible.
+    QPixmap pixmap = buttonIcon.pixmap( QSize( 1024, 1024 ), QIcon::Normal, QIcon::On );
+    const QRect iconRect( pixmapX, pixmapY, iSize.width(), iSize.height() );
+    QColor iconColor = QColor( 38, 59, 78 );
+    if ( isEnabled() )
+      iconColor = isChecked() ? QColor( 0xFF, 0xCC, 0x00 ) : QColor( 255, 255, 255 );
+
+    // Tint the icon through its alpha channel so edges keep their antialiasing
+    // (a 1-bit mask would look jagged). The outline and fill share the exact
+    // same silhouette, so the fill can never peek outside the outline.
+    // Work in raw device pixels (force a 1.0 device-pixel ratio): on a
+    // high-DPI screen the source pixmap carries a >1 ratio, and drawing it
+    // into a ratio-1 buffer would otherwise paint only its top-left quarter,
+    // making the icon render at half size.
+    auto tintedPixmap = []( const QPixmap &source, const QColor &color ) {
+      QPixmap src = source;
+      src.setDevicePixelRatio( 1.0 );
+      QPixmap out( src.size() );
+      out.fill( Qt::transparent );
+      QPainter pp( &out );
+      pp.setRenderHint( QPainter::SmoothPixmapTransform );
+      pp.drawPixmap( 0, 0, src );
+      pp.setCompositionMode( QPainter::CompositionMode_SourceIn );
+      pp.fillRect( out.rect(), color );
+      pp.end();
+      return out;
+    };
+
+    p.save();
+    p.setRenderHint( QPainter::SmoothPixmapTransform );
+    if ( isEnabled() && isChecked() )
     {
-      QPixmap pixmap = buttonIcon.pixmap( iSize, QIcon::Normal, QIcon::On );
-      p.drawPixmap( pixmapX, pixmapY, pixmap );
+      // Black outline behind the yellow icon for contrast on the light fill.
+      const QPixmap outline = tintedPixmap( pixmap, QColor( 0, 0, 0 ) );
+      for ( int dx = -1; dx <= 1; ++dx )
+        for ( int dy = -1; dy <= 1; ++dy )
+          if ( dx != 0 || dy != 0 )
+            p.drawPixmap( iconRect.translated( dx, dy ), outline );
     }
-    else
-    {
-      // Largest pixmap, to avoid issues with masking a downscaled image
-      QPixmap pixmap = buttonIcon.pixmap( QSize( 1024, 1024 ), QIcon::Normal, QIcon::On );
-      QBitmap mask = pixmap.createMaskFromColor( QColor( 0, 0, 0, 0 ), Qt::MaskInColor );
-      p.save();
-      p.setRenderHint( QPainter::SmoothPixmapTransform );
-      p.setPen( QColor( 38, 59, 78 ) );
-      p.drawPixmap( QRect( pixmapX, pixmapY, iSize.width(), iSize.height() ), mask );
-      p.restore();
-    }
+    p.drawPixmap( iconRect, tintedPixmap( pixmap, iconColor ) );
+    p.restore();
   }
 
   // Text

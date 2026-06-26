@@ -76,6 +76,17 @@
         <file alias="icons/search_filter_none">icons/search_filter_none.svg</file>
         <file alias="icons/search_filter_poly">icons/search_filter_poly.svg</file>
         <file alias="icons/search_filter_rect">icons/search_filter_rect.svg</file>
+        <file alias="icons/draw_point">icons/draw_point.svg</file>
+        <file alias="icons/draw_square">icons/draw_square.svg</file>
+        <file alias="icons/draw_triangle">icons/draw_triangle.svg</file>
+        <file alias="icons/draw_line">icons/draw_line.svg</file>
+        <file alias="icons/draw_rectangle">icons/draw_rectangle.svg</file>
+        <file alias="icons/draw_polygon">icons/draw_polygon.svg</file>
+        <file alias="icons/draw_circle">icons/draw_circle.svg</file>
+        <file alias="icons/draw_text">icons/draw_text.svg</file>
+        <file alias="icons/draw_coordcross">icons/draw_coordcross.svg</file>
+        <file alias="icons/draw_star">icons/draw_star.svg</file>
+        <file alias="icons/draw_pin">icons/draw_pin.svg</file>
         <file alias="icons/redlining_circle">icons/redlining_circle.svg</file>
         <file alias="icons/redlining_line">icons/redlining_line.svg</file>
         <file alias="icons/redlining_point">icons/redlining_point.svg</file>
@@ -87,7 +98,6 @@
         <file alias="icons/reset">icons/reset.svg</file>
         <file alias="icons/close">icons/close.svg</file>
         <file alias="icons/search">icons/search.svg</file>
-        <file alias="icons/shape">icons/shape.png</file>
         <file alias="icons/textBold">icons/textBold.png</file>
         <file alias="icons/textItalic">icons/textItalic.png</file>
         <file alias="icons/undo">icons/undo.svg</file>

@@ -17,9 +17,9 @@
 #include <functional>
 
 #include <QAction>
-#include <QMenu>
+#include <QActionGroup>
+#include <QIcon>
 #include <QShortcut>
-#include <QToolButton>
 
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationmarkeritem.h>
@@ -49,7 +49,7 @@ namespace
   {
     auto *item = new QgsAnnotationMarkerItem( QgsPoint() );
     auto *sl = new QgsSimpleMarkerSymbolLayer( shape );
-    sl->setColor( Qt::yellow );
+    sl->setColor( Qt::white );
     sl->setStrokeColor( Qt::red );
     sl->setStrokeWidth( 0.4 );
     sl->setSize( 4 );
@@ -59,75 +59,54 @@ namespace
 } // namespace
 
 
-KadasRedliningIntegration::KadasRedliningIntegration( QToolButton *buttonNewObject, QObject *parent )
+KadasRedliningIntegration::KadasRedliningIntegration( QObject *parent )
   : QObject( parent )
-  , mButtonNewObject( buttonNewObject )
 {
-  QAction *actionNewMarker = new QAction( QIcon( ":/kadas/icons/redlining_point" ), tr( "Marker" ), this );
-
   using V = AnnotationVariant;
 
-  mActionNewPoint = new QAction( QIcon( ":/kadas/icons/redlining_point" ), tr( "Point" ), this );
-  mActionNewPoint->setCheckable( true );
-  connect( mActionNewPoint, &QAction::triggered, this, [this]( bool active ) { toggleAnnotation( active, V::MarkerCircle ); } );
+  mActionGroup = new QActionGroup( this );
+  mActionGroup->setExclusionPolicy( QActionGroup::ExclusionPolicy::ExclusiveOptional );
 
-  mActionNewSquare = new QAction( QIcon( ":/kadas/icons/redlining_square" ), tr( "Square" ), this );
-  mActionNewSquare->setCheckable( true );
-  connect( mActionNewSquare, &QAction::triggered, this, [this]( bool active ) { toggleAnnotation( active, V::MarkerSquare ); } );
+  // Markers: a curated subset of the simple-marker shapes from the style editor.
+  mActionNewPoint = createToolAction( QIcon( ":/kadas/icons/draw_point" ), tr( "Point" ), QStringLiteral( "draw-marker-circle" ), V::MarkerCircle );
+  mActionNewSquare = createToolAction( QIcon( ":/kadas/icons/draw_square" ), tr( "Square" ), QStringLiteral( "draw-marker-square" ), V::MarkerSquare );
+  mActionNewTriangle = createToolAction( QIcon( ":/kadas/icons/draw_triangle" ), tr( "Triangle" ), QStringLiteral( "draw-marker-triangle" ), V::MarkerTriangle );
+  mActionNewDiamond = createToolAction( QIcon( ":/kadas/icons/draw_square" ), tr( "Diamond" ), QStringLiteral( "draw-marker-diamond" ), V::MarkerDiamond );
+  mActionNewStar = createToolAction( QIcon( ":/kadas/icons/draw_star" ), tr( "Star" ), QStringLiteral( "draw-marker-star" ), V::MarkerStar );
+  mActionNewCross = createToolAction( QIcon( ":/kadas/icons/draw_coordcross" ), tr( "Cross" ), QStringLiteral( "draw-marker-cross" ), V::MarkerCross );
+  mMarkerActions = { mActionNewPoint, mActionNewSquare, mActionNewTriangle, mActionNewDiamond, mActionNewStar, mActionNewCross };
 
-  mActionNewTriangle = new QAction( QIcon( ":/kadas/icons/redlining_triangle" ), tr( "Triangle" ), this );
-  mActionNewTriangle->setCheckable( true );
-  connect( mActionNewTriangle, &QAction::triggered, this, [this]( bool active ) { toggleAnnotation( active, V::MarkerTriangle ); } );
-
-  mActionNewLine = new QAction( QIcon( ":/kadas/icons/redlining_line" ), tr( "Line" ), this );
-  mActionNewLine->setCheckable( true );
-  connect( mActionNewLine, &QAction::triggered, this, [this]( bool active ) { toggleAnnotation( active, V::Line ); } );
+  // Shapes: lines and polygons.
+  mActionNewLine = createToolAction( QIcon( ":/kadas/icons/draw_line" ), tr( "Line" ), QStringLiteral( "draw-line" ), V::Line );
   connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_L ), kApp->mainWindow() ), &QShortcut::activated, mActionNewLine, &QAction::trigger );
 
-  mActionNewRectangle = new QAction( QIcon( ":/kadas/icons/redlining_rectangle" ), tr( "Rectangle" ), this );
-  mActionNewRectangle->setCheckable( true );
-  connect( mActionNewRectangle, &QAction::triggered, this, [this]( bool active ) { toggleAnnotation( active, V::Rectangle ); } );
-  connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_R ), kApp->mainWindow() ), &QShortcut::activated, mActionNewRectangle, &QAction::trigger );
-
-  mActionNewPolygon = new QAction( QIcon( ":/kadas/icons/redlining_polygon" ), tr( "Polygon" ), this );
-  mActionNewPolygon->setCheckable( true );
-  connect( mActionNewPolygon, &QAction::triggered, this, [this]( bool active ) { toggleAnnotation( active, V::Polygon ); } );
+  mActionNewPolygon = createToolAction( QIcon( ":/kadas/icons/draw_polygon" ), tr( "Polygon" ), QStringLiteral( "draw-polygon" ), V::Polygon );
   connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_P ), kApp->mainWindow() ), &QShortcut::activated, mActionNewPolygon, &QAction::trigger );
 
-  mActionNewCircle = new QAction( QIcon( ":/kadas/icons/redlining_circle" ), tr( "Circle" ), this );
-  mActionNewCircle->setCheckable( true );
-  connect( mActionNewCircle, &QAction::triggered, this, [this]( bool active ) { toggleAnnotation( active, V::Circle ); } );
-  connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_C ), kApp->mainWindow() ), &QShortcut::activated, mActionNewCircle, &QAction::trigger );
+  mActionNewRectangle = createToolAction( QIcon( ":/kadas/icons/draw_rectangle" ), tr( "Rectangle" ), QStringLiteral( "draw-rectangle" ), V::Rectangle );
+  connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_R ), kApp->mainWindow() ), &QShortcut::activated, mActionNewRectangle, &QAction::trigger );
 
-  mActionNewText = new QAction( QIcon( ":/kadas/icons/redlining_text" ), tr( "Text" ), this );
-  mActionNewText->setCheckable( true );
-  connect( mActionNewText, &QAction::triggered, this, [this]( bool active ) { toggleAnnotation( active, V::Text ); } );
+  mActionNewCircle = createToolAction( QIcon( ":/kadas/icons/draw_circle" ), tr( "Circle" ), QStringLiteral( "draw-circle" ), V::Circle );
+  connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_C ), kApp->mainWindow() ), &QShortcut::activated, mActionNewCircle, &QAction::trigger );
+  mShapeActions = { mActionNewLine, mActionNewPolygon, mActionNewRectangle, mActionNewCircle };
+
+  // Other annotation tools.
+  mActionNewText = createToolAction( QIcon( ":/kadas/icons/draw_text" ), tr( "Text" ), QStringLiteral( "draw-text" ), V::Text );
   connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_T ), kApp->mainWindow() ), &QShortcut::activated, mActionNewText, &QAction::trigger );
 
   // CoordinateCross has no annotation-item equivalent yet; keep it on the legacy tool.
-  mActionNewCoordCross = new QAction( QIcon( ":/kadas/icons/coord_cross" ), tr( "Coordinate Cross" ), this );
-  mActionNewCoordCross->setCheckable( true );
-  connect( mActionNewCoordCross, &QAction::triggered, this, [this]( bool active ) { toggleAnnotation( active, V::CoordCross ); } );
+  mActionNewCoordCross = createToolAction( QIcon( ":/kadas/icons/draw_coordcross" ), tr( "Coordinate Cross" ), QStringLiteral( "draw-coordcross" ), V::CoordCross );
   connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_O ), kApp->mainWindow() ), &QShortcut::activated, mActionNewCoordCross, &QAction::trigger );
+}
 
-  QMenu *menuNewMarker = new QMenu();
-  menuNewMarker->addAction( mActionNewPoint );
-  menuNewMarker->addAction( mActionNewSquare );
-  menuNewMarker->addAction( mActionNewTriangle );
-  actionNewMarker->setMenu( menuNewMarker );
-
-  QMenu *menuNewObject = new QMenu();
-  menuNewObject->addAction( actionNewMarker );
-  menuNewObject->addAction( mActionNewLine );
-  menuNewObject->addAction( mActionNewRectangle );
-  menuNewObject->addAction( mActionNewPolygon );
-  menuNewObject->addAction( mActionNewCircle );
-  menuNewObject->addAction( mActionNewText );
-  menuNewObject->addAction( mActionNewCoordCross );
-  mButtonNewObject->setMenu( menuNewObject );
-  mButtonNewObject->setPopupMode( QToolButton::InstantPopup );
-  mButtonNewObject->setIcon( QIcon( ":/kadas/icons/shape" ) );
-  mButtonNewObject->setCheckable( true );
+QAction *KadasRedliningIntegration::createToolAction( const QIcon &icon, const QString &text, const QString &objectName, AnnotationVariant variant )
+{
+  QAction *action = new QAction( icon, text, this );
+  action->setObjectName( objectName );
+  action->setCheckable( true );
+  mActionGroup->addAction( action );
+  connect( action, &QAction::toggled, this, [this, variant]( bool active ) { toggleAnnotation( active, variant ); } );
+  return action;
 }
 
 QgsAnnotationLayer *KadasRedliningIntegration::getOrCreateAnnotationLayer()
@@ -167,6 +146,18 @@ void KadasRedliningIntegration::toggleAnnotation( bool active, AnnotationVariant
       typeId = QStringLiteral( "marker" );
       factory = [] { return makeShapedMarker( Qgis::MarkerShape::Triangle ); };
       break;
+    case AnnotationVariant::MarkerDiamond:
+      typeId = QStringLiteral( "marker" );
+      factory = [] { return makeShapedMarker( Qgis::MarkerShape::Diamond ); };
+      break;
+    case AnnotationVariant::MarkerStar:
+      typeId = QStringLiteral( "marker" );
+      factory = [] { return makeShapedMarker( Qgis::MarkerShape::Star ); };
+      break;
+    case AnnotationVariant::MarkerCross:
+      typeId = QStringLiteral( "marker" );
+      factory = [] { return makeShapedMarker( Qgis::MarkerShape::Cross ); };
+      break;
     case AnnotationVariant::Line:
       typeId = QStringLiteral( "linestring" );
       break;
@@ -201,25 +192,11 @@ void KadasRedliningIntegration::toggleAnnotation( bool active, AnnotationVariant
   tool->setMultipart( false );
   tool->setAction( action );
 
-  connect( tool, &QgsMapTool::activated, this, &KadasRedliningIntegration::activateNewButtonObject );
-  connect( tool, &QgsMapTool::deactivated, this, &KadasRedliningIntegration::deactivateNewButtonObject );
+  // When the tool is deactivated (Escape, replaced by another tool, ...),
+  // keep its action unchecked so the owning split button reflects it.
+  connect( tool, &QgsMapTool::deactivated, action, [action] { action->setChecked( false ); } );
 
   kApp->mainWindow()->layerTreeView()->setCurrentLayer( layer );
   kApp->mainWindow()->layerTreeView()->setLayerVisible( layer, true );
   canvas->setMapTool( tool );
-}
-
-void KadasRedliningIntegration::activateNewButtonObject()
-{
-  QAction *action = kApp->mainWindow()->mapCanvas()->mapTool()->action();
-  mButtonNewObject->setText( action->text() );
-  mButtonNewObject->setIcon( action->icon() );
-  mButtonNewObject->setChecked( true );
-}
-
-void KadasRedliningIntegration::deactivateNewButtonObject()
-{
-  mButtonNewObject->setText( tr( "Drawing" ) );
-  mButtonNewObject->setIcon( QIcon( ":/kadas/icons/shape" ) );
-  mButtonNewObject->setChecked( false );
 }
