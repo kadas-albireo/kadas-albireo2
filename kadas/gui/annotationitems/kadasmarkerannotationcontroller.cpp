@@ -301,11 +301,14 @@ void KadasMarkerAnnotationController::applyPersistedStyle( QgsAnnotationItem *it
   sl->setStrokeColor( settingsStrokeColor->value() );
   sl->setStrokeStyle( static_cast<Qt::PenStyle>( settingsStrokeStyle->value() ) );
   // Non-filled shapes (cross, line, arrow) are drawn from their stroke alone:
-  // the stroke colour set above is what shows, and the fill is ignored. A zero
-  // outline width (fine for filled shapes, which still show their fill) would
-  // otherwise leave them invisible, so guarantee a width tied to the size.
+  // the stroke colour set above is what shows, and the fill is ignored. A
+  // NoPen style or zero outline width (both fine for filled shapes, which
+  // still show their fill) would otherwise leave them invisible, so coerce the
+  // outline to something drawable.
   if ( !QgsSimpleMarkerSymbolLayerBase::shapeIsFilled( sl->shape() ) )
   {
+    if ( sl->strokeStyle() == Qt::NoPen )
+      sl->setStrokeStyle( Qt::SolidLine );
     if ( sl->strokeWidth() <= 0.0 )
       sl->setStrokeWidth( std::max( 0.4, size * 0.15 ) );
   }

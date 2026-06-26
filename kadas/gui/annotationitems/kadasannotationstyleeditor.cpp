@@ -222,6 +222,15 @@ void KadasMarkerStyleEditor::applyToItem( QgsAnnotationItem *item ) const
   sl->setColor( mFillColorBtn->color() );
   sl->setStrokeColor( mStrokeColorBtn->color() );
   sl->setStrokeStyle( static_cast<Qt::PenStyle>( mStrokeStyleCombo->currentData().toInt() ) );
+  // A non-filled shape (cross, line, arrow) is drawn from its outline alone, so
+  // a NoPen style or zero width would make it vanish. Keep it drawable.
+  if ( !QgsSimpleMarkerSymbolLayerBase::shapeIsFilled( sl->shape() ) )
+  {
+    if ( sl->strokeStyle() == Qt::NoPen )
+      sl->setStrokeStyle( Qt::SolidLine );
+    if ( sl->strokeWidth() <= 0.0 )
+      sl->setStrokeWidth( std::max( 0.4, mSizeSpin->value() * 0.15 ) );
+  }
   marker->setSymbol( sym.release() );
 }
 
