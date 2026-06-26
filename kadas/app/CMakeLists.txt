@@ -27,6 +27,9 @@ set(kadas_SRC
     kadaspluginmanager.cpp
     kadaspythonintegration.cpp
     kadasredliningintegration.cpp
+    kadasribbonactiongallery.cpp
+    kadasribbonsplitbutton.cpp
+    kadasstatusbar.cpp
     kadastemporalcontroller.cpp
     3d/kadas3dintegration.cpp
     3d/kadas3dlayertreemodel.cpp
@@ -91,6 +94,9 @@ set(kadas_HDR
     kadaspluginmanager.h
     kadaspythonintegration.h
     kadasredliningintegration.h
+    kadasribbonactiongallery.h
+    kadasribbonsplitbutton.h
+    kadasstatusbar.h
     kadastemporalcontroller.h
     3d/kadas3dintegration.h
     3d/kadas3dlayertreemodel.h
