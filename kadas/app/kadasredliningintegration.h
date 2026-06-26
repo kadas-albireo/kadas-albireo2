@@ -17,11 +17,13 @@
 #ifndef KADASREDLININGINTEGRATION_H
 #define KADASREDLININGINTEGRATION_H
 
+#include <QList>
 #include <QObject>
 #include <QPointer>
 
 
 class QAction;
+class QActionGroup;
 class QToolButton;
 
 class QgsAnnotationLayer;
@@ -35,15 +37,28 @@ class KadasRedliningIntegration : public QObject
 {
     Q_OBJECT
   public:
-    KadasRedliningIntegration( QToolButton *buttonNewObject, QObject *parent );
+    KadasRedliningIntegration( QObject *parent );
 
     //! Returns (creating if needed) the redlining QgsAnnotationLayer used
     //! by the redlining toolbar actions.
     QgsAnnotationLayer *getOrCreateAnnotationLayer();
 
+    //! Shared exclusive (optional) group holding every checkable drawing
+    //! tool action, so at most one drawing tool is active at a time.
+    QActionGroup *actionGroup() const { return mActionGroup; }
+
+    //! Marker shape tool actions (circle, square, triangle, diamond, star, cross).
+    QList<QAction *> markerActions() const { return mMarkerActions; }
+
+    //! Geometric shape tool actions (line, polygon, rectangle, circle).
+    QList<QAction *> shapeActions() const { return mShapeActions; }
+
     QAction *actionNewPoint() const { return mActionNewPoint; }
     QAction *actionNewSquare() const { return mActionNewSquare; }
     QAction *actionNewTriangle() const { return mActionNewTriangle; }
+    QAction *actionNewDiamond() const { return mActionNewDiamond; }
+    QAction *actionNewStar() const { return mActionNewStar; }
+    QAction *actionNewCross() const { return mActionNewCross; }
     QAction *actionNewLine() const { return mActionNewLine; }
     QAction *actionNewRectangle() const { return mActionNewRectangle; }
     QAction *actionNewPolygon() const { return mActionNewPolygon; }
@@ -58,6 +73,9 @@ class KadasRedliningIntegration : public QObject
       MarkerCircle,
       MarkerSquare,
       MarkerTriangle,
+      MarkerDiamond,
+      MarkerStar,
+      MarkerCross,
       Line,
       Rectangle,
       Polygon,
@@ -66,11 +84,14 @@ class KadasRedliningIntegration : public QObject
       CoordCross,
     };
 
-    QToolButton *mButtonNewObject = nullptr;
+    QActionGroup *mActionGroup = nullptr;
 
     QAction *mActionNewPoint = nullptr;
     QAction *mActionNewSquare = nullptr;
     QAction *mActionNewTriangle = nullptr;
+    QAction *mActionNewDiamond = nullptr;
+    QAction *mActionNewStar = nullptr;
+    QAction *mActionNewCross = nullptr;
     QAction *mActionNewLine = nullptr;
     QAction *mActionNewRectangle = nullptr;
     QAction *mActionNewPolygon = nullptr;
@@ -78,13 +99,13 @@ class KadasRedliningIntegration : public QObject
     QAction *mActionNewText = nullptr;
     QAction *mActionNewCoordCross = nullptr;
 
+    QList<QAction *> mMarkerActions;
+    QList<QAction *> mShapeActions;
+
     QPointer<QgsAnnotationLayer> mLastAnnotationLayer;
 
+    QAction *createToolAction( const QIcon &icon, const QString &text, const QString &objectName, AnnotationVariant variant );
     void toggleAnnotation( bool active, AnnotationVariant variant );
-
-  private slots:
-    void activateNewButtonObject();
-    void deactivateNewButtonObject();
 };
 
 #endif // KADASREDLININGINTEGRATION_H

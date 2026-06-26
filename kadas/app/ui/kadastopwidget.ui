@@ -1172,7 +1172,7 @@ Sight</string>
            <number>10</number>
           </property>
           <item>
-           <widget class="KadasRibbonButton" name="mToolButtonRedliningNewObject">
+           <widget class="KadasRibbonButton" name="mToolButtonMarkers">
             <property name="sizePolicy">
              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -1192,41 +1192,7 @@ Sight</string>
              </size>
             </property>
             <property name="text">
-             <string>Drawing</string>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>24</width>
-              <height>24</height>
-             </size>
-            </property>
-            <property name="toolButtonStyle">
-             <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="KadasRibbonButton" name="mPinButton">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>80</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>80</width>
-              <height>80</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Pin</string>
+             <string>Markers</string>
             </property>
             <property name="iconSize">
              <size>
@@ -1237,7 +1203,7 @@ Sight</string>
            </widget>
           </item>
           <item>
-           <widget class="KadasRibbonButton" name="mAddImageButton">
+           <widget class="KadasRibbonButton" name="mToolButtonShapes">
             <property name="sizePolicy">
              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -1257,7 +1223,38 @@ Sight</string>
              </size>
             </property>
             <property name="text">
-             <string>Image</string>
+             <string>Shapes</string>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>32</width>
+              <height>32</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="KadasRibbonButton" name="mToolButtonOthers">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>80</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>80</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Others</string>
             </property>
             <property name="iconSize">
              <size>
@@ -2196,7 +2193,7 @@ Sight</string>
    </property>
    <property name="icon">
     <iconset resource="../../resources/resources.qrc">
-     <normaloff>:/kadas/icons/pin</normaloff>:/kadas/icons/pin</iconset>
+     <normaloff>:/kadas/icons/draw_pin</normaloff>:/kadas/icons/draw_pin</iconset>
    </property>
    <property name="text">
     <string>Pin</string>
