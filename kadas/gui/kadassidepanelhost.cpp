@@ -57,11 +57,14 @@ void KadasSidePanelHost::setMapCanvas( QgsMapCanvas *canvas )
 
     if ( !mSettleTimer )
     {
-      // The toggle triggers a short burst of resizes as the layout settles.
-      // Once they stop arriving, thaw the canvas and disarm.
+      // The toggle triggers a short burst of resizes as the layout settles;
+      // each one restarts this timer. A zero interval coalesces the burst yet
+      // thaws on the very next event-loop turn after the last resize, so the
+      // canvas is never left frozen long enough to show a stale/blank strip
+      // when a narrower panel grows the canvas.
       mSettleTimer = new QTimer( this );
       mSettleTimer->setSingleShot( true );
-      mSettleTimer->setInterval( 150 );
+      mSettleTimer->setInterval( 0 );
       connect( mSettleTimer, &QTimer::timeout, this, &KadasSidePanelHost::finishCanvasAnchor );
     }
   }
