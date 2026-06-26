@@ -85,6 +85,10 @@ class KADAS_GUI_EXPORT KadasSidePanelHost : public QWidget
     void updateVisibility();
     //! Records the canvas edge/scale to preserve before a reflow.
     CanvasAnchor captureCanvasAnchor() const;
+    //! Captures the anchor, freezes the canvas and defers a single reflow.
+    void scheduleReflow();
+    //! Toggles host visibility and arms re-anchoring once the burst settles.
+    void reconcileReflow();
     //! Freezes the canvas and arms re-anchoring for the reflows a toggle triggers.
     void armCanvasAnchor( const CanvasAnchor &anchor );
     //! Restores the armed scale/edge at the canvas' current width.
@@ -97,6 +101,10 @@ class KADAS_GUI_EXPORT KadasSidePanelHost : public QWidget
     QgsMapCanvas *mCanvas = nullptr;
     //! Scale/edge to preserve while the canvas reflows; invalid when disarmed.
     CanvasAnchor mArmedAnchor;
+    //! Anchor captured at the start of a reflow burst, applied on reconcile.
+    CanvasAnchor mPendingAnchor;
+    //! True while a coalesced reflow is queued; suppresses re-capturing.
+    bool mReflowPending = false;
     //! Fires once the reflow-driven resizes stop arriving, to thaw and disarm.
     QTimer *mSettleTimer = nullptr;
     //! Re-entrancy guard so re-anchoring does not recurse through resizes.
