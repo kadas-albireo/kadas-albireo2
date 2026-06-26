@@ -71,30 +71,45 @@ void KadasSidePanelHost::addPanel( QWidget *panel )
 {
   if ( !panel )
     return;
-  const CanvasAnchor anchor = captureCanvasAnchor();
-  // Freeze before the visibility toggle below resizes and rescales the canvas,
-  // otherwise QGIS paints one frame at the reflowed scale before the anchor
-  // logic snaps it back (a visible scale glitch).
-  if ( anchor.valid && mCanvas )
-    mCanvas->freeze( true );
+  // Capture the pre-reflow state and freeze before touching the layout, then
+  // defer the visibility/reflow to the next event-loop turn (see
+  // scheduleReflow): switching tools destroys one panel and creates another,
+  // so coalescing both into a single reflow avoids the host momentarily
+  // emptying and the canvas flashing to full width and back.
+  scheduleReflow();
   // Panels expand vertically to fill the host, so simply append them.
   mLayout->addWidget( panel );
-  updateVisibility();
-  armCanvasAnchor( anchor );
 }
 
 void KadasSidePanelHost::removePanel( QWidget *panel )
 {
   if ( !panel )
     return;
-  const CanvasAnchor anchor = captureCanvasAnchor();
-  // Freeze before the visibility toggle below resizes and rescales the canvas
-  // (see addPanel) so the reflow does not flash an intermediate scale.
-  if ( anchor.valid && mCanvas )
-    mCanvas->freeze( true );
+  scheduleReflow();
   mLayout->removeWidget( panel );
+}
+
+void KadasSidePanelHost::scheduleReflow()
+{
+  if ( mReflowPending )
+    return; // Anchor already captured before this burst's first layout change.
+  mReflowPending = true;
+  // Capture the anchor before any layout change so a remove+add in the same
+  // turn is measured against the original, settled extent.
+  mPendingAnchor = captureCanvasAnchor();
+  if ( mPendingAnchor.valid && mCanvas )
+    mCanvas->freeze( true );
+  QMetaObject::invokeMethod( this, &KadasSidePanelHost::reconcileReflow, Qt::QueuedConnection );
+}
+
+void KadasSidePanelHost::reconcileReflow()
+{
+  mReflowPending = false;
+  // The layout now holds the final set of panels for this burst; toggle
+  // visibility once and re-anchor against the captured extent.
   updateVisibility();
-  armCanvasAnchor( anchor );
+  armCanvasAnchor( mPendingAnchor );
+  mPendingAnchor = CanvasAnchor();
 }
 
 void KadasSidePanelHost::updateVisibility()
