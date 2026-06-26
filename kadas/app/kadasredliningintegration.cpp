@@ -71,7 +71,7 @@ KadasRedliningIntegration::KadasRedliningIntegration( QObject *parent )
   mActionNewPoint = createToolAction( QIcon( ":/kadas/icons/draw_point" ), tr( "Point" ), QStringLiteral( "draw-marker-circle" ), V::MarkerCircle );
   mActionNewSquare = createToolAction( QIcon( ":/kadas/icons/draw_square" ), tr( "Square" ), QStringLiteral( "draw-marker-square" ), V::MarkerSquare );
   mActionNewTriangle = createToolAction( QIcon( ":/kadas/icons/draw_triangle" ), tr( "Triangle" ), QStringLiteral( "draw-marker-triangle" ), V::MarkerTriangle );
-  mActionNewDiamond = createToolAction( QIcon( ":/kadas/icons/draw_square" ), tr( "Diamond" ), QStringLiteral( "draw-marker-diamond" ), V::MarkerDiamond );
+  mActionNewDiamond = createToolAction( QIcon( ":/kadas/icons/draw_diamond" ), tr( "Diamond" ), QStringLiteral( "draw-marker-diamond" ), V::MarkerDiamond );
   mActionNewStar = createToolAction( QIcon( ":/kadas/icons/draw_star" ), tr( "Star" ), QStringLiteral( "draw-marker-star" ), V::MarkerStar );
   mActionNewCross = createToolAction( QIcon( ":/kadas/icons/draw_coordcross" ), tr( "Cross" ), QStringLiteral( "draw-marker-cross" ), V::MarkerCross );
   mMarkerActions = { mActionNewPoint, mActionNewSquare, mActionNewTriangle, mActionNewDiamond, mActionNewStar, mActionNewCross };
