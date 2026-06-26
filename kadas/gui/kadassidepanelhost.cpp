@@ -165,9 +165,9 @@ void KadasSidePanelHost::armCanvasAnchor( const CanvasAnchor &anchor )
 
   // Freeze rendering for the whole reflow burst so the user never sees the
   // intermediate, rescaled extent, and re-anchor on each resize until it
-  // settles (see eventFilter / finishCanvasAnchor).
+  // settles (see eventFilter / finishCanvasAnchor). The canvas is already
+  // frozen by scheduleReflow.
   mArmedAnchor = anchor;
-  mCanvas->freeze( true );
 
   // The layout was already applied synchronously in reconcileReflow, so the
   // canvas is at its final size: re-anchor *now*, before the settle timer can
