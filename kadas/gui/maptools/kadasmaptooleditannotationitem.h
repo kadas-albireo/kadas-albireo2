@@ -30,7 +30,7 @@
 
 class KadasAnnotationItemController;
 class KadasAnnotationStyleEditor;
-class KadasBottomBar;
+class KadasSidePanel;
 class KadasFloatingInputWidget;
 class QBoxLayout;
 class QgsAnnotationItem;
@@ -111,7 +111,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     Qt::MouseButton mPressedButton = Qt::NoButton;
     bool mEditItemHidden = false;
 
-    KadasBottomBar *mBottomBar = nullptr;
+    KadasSidePanel *mBottomBar = nullptr;
     KadasStateHistory *mStateHistory = nullptr;
     KadasFloatingInputWidget *mInputWidget = nullptr;
     bool mIgnoreNextMoveEvent = false;
@@ -133,7 +133,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     void clearNumericInput();
     KadasAttribValues collectAttributeValues() const;
 
-    void setupStyleEditor( QBoxLayout *outer );
+    void setupStyleEditor();
 
     void createInitialItem();
     void clearInProgressItem();

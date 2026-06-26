@@ -20,7 +20,7 @@
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgsmaptool.h>
 
-#include "kadas/gui/kadasbottombar.h"
+#include "kadas/gui/kadassidepanel.h"
 #include "ui_kadasmapgridwidgetbase.h"
 
 class QgsLayerTreeView;
@@ -48,7 +48,7 @@ class KadasMapToolMapGrid : public QgsMapTool
     void close();
 };
 
-class KadasMapGridWidget : public KadasBottomBar
+class KadasMapGridWidget : public KadasSidePanel
 {
     Q_OBJECT
 

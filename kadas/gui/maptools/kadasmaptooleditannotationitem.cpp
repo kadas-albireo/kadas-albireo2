@@ -41,7 +41,7 @@
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
-#include "kadas/gui/kadasbottombar.h"
+#include "kadas/gui/kadassidepanel.h"
 #include "kadas/gui/kadasfeaturepicker.h"
 #include "kadas/gui/kadasfloatinginputwidget.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
@@ -208,48 +208,22 @@ void KadasMapToolEditAnnotationItem::activate()
   mStateHistory->push( new ToolState( mItem->clone(), mDrawState ) );
   connect( mStateHistory, &KadasStateHistory::stateChanged, this, &KadasMapToolEditAnnotationItem::stateChanged );
 
-  mBottomBar = new KadasBottomBar( canvas() );
-  auto *outer = new QVBoxLayout();
-  outer->setContentsMargins( 8, 4, 8, 4 );
-  mBottomBar->setLayout( outer );
+  mBottomBar = new KadasSidePanel( canvas() );
+  mBottomBar->setTitle( ( mAllowCreate ? tr( "Draw %1" ) : tr( "Edit %1" ) ).arg( mController->itemName() ) );
+  connect( mBottomBar, &KadasSidePanel::closeRequested, this, [this] { canvas()->unsetMapTool( this ); } );
 
-  auto *topRow = new QHBoxLayout();
-  outer->addLayout( topRow );
-
-  QLabel *label = new QLabel( ( mAllowCreate ? tr( "Draw %1" ) : tr( "Edit %1" ) ).arg( mController->itemName() ) );
-  QFont font = label->font();
-  font.setBold( true );
-  label->setFont( font );
-  topRow->addWidget( label );
-
-  QPushButton *undoButton = new QPushButton();
-  undoButton->setIcon( QIcon( ":/kadas/icons/undo" ) );
-  undoButton->setToolTip( tr( "Undo" ) );
-  undoButton->setEnabled( false );
-  connect( undoButton, &QPushButton::clicked, this, [this] { mStateHistory->undo(); } );
-  connect( mStateHistory, &KadasStateHistory::canUndoChanged, undoButton, &QPushButton::setEnabled );
-  topRow->addWidget( undoButton );
-
-  QPushButton *redoButton = new QPushButton();
-  redoButton->setIcon( QIcon( ":/kadas/icons/redo" ) );
-  redoButton->setToolTip( tr( "Redo" ) );
-  redoButton->setEnabled( false );
-  connect( redoButton, &QPushButton::clicked, this, [this] { mStateHistory->redo(); } );
-  connect( mStateHistory, &KadasStateHistory::canRedoChanged, redoButton, &QPushButton::setEnabled );
-  topRow->addWidget( redoButton );
-
-  QPushButton *closeButton = new QPushButton();
-  closeButton->setIcon( QIcon( ":/kadas/icons/close" ) );
-  closeButton->setToolTip( tr( "Close" ) );
-  connect( closeButton, &QPushButton::clicked, this, [this] { canvas()->unsetMapTool( this ); } );
-  topRow->addWidget( closeButton );
+  mBottomBar->addUndoRedoRow();
+  connect( mBottomBar, &KadasSidePanel::undoRequested, this, [this] { mStateHistory->undo(); } );
+  connect( mBottomBar, &KadasSidePanel::redoRequested, this, [this] { mStateHistory->redo(); } );
+  connect( mStateHistory, &KadasStateHistory::canUndoChanged, mBottomBar, &KadasSidePanel::setCanUndo );
+  connect( mStateHistory, &KadasStateHistory::canRedoChanged, mBottomBar, &KadasSidePanel::setCanRedo );
 
   if ( mExtraTopWidget )
   {
-    topRow->insertWidget( 1, mExtraTopWidget );
+    mBottomBar->addRow( mExtraTopWidget );
   }
 
-  setupStyleEditor( outer );
+  setupStyleEditor();
 
   mHandles = new HandlesOverlay(
     canvas(),
@@ -707,7 +681,7 @@ void KadasMapToolEditAnnotationItem::inputChanged()
   pushState();
 }
 
-void KadasMapToolEditAnnotationItem::setupStyleEditor( QBoxLayout *outer )
+void KadasMapToolEditAnnotationItem::setupStyleEditor()
 {
   if ( !mController )
     return;
@@ -715,7 +689,7 @@ void KadasMapToolEditAnnotationItem::setupStyleEditor( QBoxLayout *outer )
   if ( !mStyleEditor )
     return;
   mStyleEditor->loadFromItem( mItem );
-  outer->addWidget( mStyleEditor );
+  mBottomBar->addRow( mStyleEditor );
 
   connect( mStyleEditor, &KadasAnnotationStyleEditor::previewChanged, this, [this] {
     if ( !mItem || !mLayer )
