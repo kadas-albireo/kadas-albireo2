@@ -30,7 +30,7 @@ vcpkg_from_github(
   mac_install_images.patch
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
-  annotation-iem-rotation.patch # https://github.com/qgis/QGIS/pull/66610
+  annotation-item-rotation.patch # https://github.com/qgis/QGIS/pull/66610
                                 # rotation for rectangle-based annotations
                                 # (images + text)
 )
