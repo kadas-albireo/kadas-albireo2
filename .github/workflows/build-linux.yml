@@ -69,7 +69,7 @@ jobs:
       - name: 🔨 Prepare build env
         run: |
           sudo apt-get update
-          # Same toolchain/deps as COMPILING_LINUX.md. mono-complete is required
+          # mono-complete is required
           # for the vcpkg NuGet binary cache on Linux (see cmake/VcpkgToolchain.cmake).
           # ccache accelerates recompiles of the kadas objects (and cold vcpkg
           # port builds); Qt's fragile io_uring backend is disabled triplet-wide
