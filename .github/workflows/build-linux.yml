@@ -44,7 +44,7 @@ jobs:
       - name: 🧹 Free up disk space
         # The vcpkg dependency build needs tens of GB; GitHub-hosted runners
         # only have ~14 GB free on /. Reclaim space and move scratch to /mnt.
-        uses: jlumbroso/free-disk-space@main
+        uses: jlumbroso/free-disk-space@v1.3.1
         with:
           tool-cache: true
           large-packages: false
@@ -61,7 +61,7 @@ jobs:
           path: share/docs/html/
 
       - name: 🐩 Install CMake and Ninja
-        uses: lukka/get-cmake@latest
+        uses: lukka/get-cmake@v4.3.3
         with:
           # Pin to specific version to avoid rebuilding too often
           cmakeVersion: 3.31.10
