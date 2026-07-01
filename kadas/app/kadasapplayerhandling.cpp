@@ -216,14 +216,14 @@ void KadasAppLayerHandling::postProcessAddedLayer( QgsMapLayer *layer )
       {
         // Render annotations (text + markers) as billboards in 3D, with a callout
         // line vertically joining each item to the terrain.
-        QgsAnnotationLayer3DRenderer *renderer = new QgsAnnotationLayer3DRenderer();
+        std::unique_ptr<QgsAnnotationLayer3DRenderer> renderer = std::make_unique<QgsAnnotationLayer3DRenderer>();
         renderer->setLayer( al );
         renderer->setShowCalloutLines( true );
         renderer->setCalloutLineColor( QColor( 255, 255, 0 ) );
         QgsTextFormat textFormat;
         textFormat.setColor( QColor( 255, 255, 0 ) );
         renderer->setTextFormat( textFormat );
-        layer->setRenderer3D( renderer );
+        layer->setRenderer3D( renderer.release() );
       }
       break;
     }
