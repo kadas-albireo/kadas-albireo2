@@ -32,6 +32,10 @@ vcpkg_from_github(
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
   bigobj-vectorlayer.patch # https://github.com/qgis/QGIS/pull/66271
+  # Auto-configure ccache (sloppiness/compiler_type) instead of aborting on
+  # ccache < 4.8 (e.g. Ubuntu 22.04's 4.5.1) so ccache keeps working with no
+  # manual `ccache --set-config` step.
+  ccache-autoconfig.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
