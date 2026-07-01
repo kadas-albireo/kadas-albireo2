@@ -31,10 +31,6 @@ vcpkg_from_github(
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
   bigobj-vectorlayer.patch # https://github.com/qgis/QGIS/pull/66271
-  # Auto-configure ccache (sloppiness/compiler_type) instead of aborting on
-  # ccache < 4.8 (e.g. Ubuntu 22.04's 4.5.1) so ccache keeps working with no
-  # manual `ccache --set-config` step.
-  ccache-autoconfig.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
@@ -77,6 +73,9 @@ list(APPEND QGIS_OPTIONS
      "-DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=ProgramDatabase"
 )
 
+# Disable ccache for the QGIS port build. vcpkg already restores completed
+# packages from its own binary cache, and the ccache doesn't work on Ubuntu 22.04, so better to not build with it
+list(APPEND QGIS_OPTIONS "-DUSE_CCACHE:BOOL=OFF")
 list(APPEND QGIS_OPTIONS "-DENABLE_TESTS:BOOL=OFF")
 list(APPEND QGIS_OPTIONS "-DWITH_GRASS7:BOOL=OFF")
 list(APPEND QGIS_OPTIONS "-DWITH_SPATIALITE:BOOL=ON")
