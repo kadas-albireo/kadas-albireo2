@@ -1,0 +1,80 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationlayerhelpers.h              *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+
+class KadasAnnotationLayerHelpers
+{
+%Docstring(signature="appended")
+Static helpers for attaching Kadas-specific per-item metadata to a stock
+:py:class:`QgsAnnotationLayer`.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
+%End
+  public:
+    static bool isParametricLayer( const QgsAnnotationLayer *layer );
+%Docstring
+``True`` if ``layer`` is a parametric Kadas annotation layer (carries
+the kadas/annotation-type customProperty).
+%End
+
+    static QString tooltip( const QgsAnnotationLayer *layer, const QString &itemId );
+%Docstring
+Tooltip stored for ``itemId`` on ``layer``, or empty.
+%End
+
+    static void setTooltip( QgsAnnotationLayer *layer, const QString &itemId, const QString &tooltip );
+%Docstring
+Sets ``tooltip`` for ``itemId``; empty removes it.
+%End
+
+    static QgsAnnotationLayer *createLayer( const QString &name, const QgsCoordinateReferenceSystem &preferredCrs = QgsCoordinateReferenceSystem() );
+%Docstring
+Creates a :py:class:`QgsAnnotationLayer` named ``name`` (using
+``preferredCrs``, else project CRS, else EPSG:3857). Not added to the
+project.
+%End
+
+    static void prepareLayerForSave( QgsAnnotationLayer *layer );
+%Docstring
+Generates and inserts QGIS-compat shadow items for every master item.
+Call before :py:func:`QgsProject.write()`. Idempotent.
+%End
+
+    static void stripShadowsFromLayer( QgsAnnotationLayer *layer );
+%Docstring
+Removes shadow items and clears master shadow id lists. Call after
+:py:func:`QgsProject.write()` and after
+:py:func:`~KadasAnnotationLayerHelpers.read`.
+%End
+
+    static void reconstructOrphanCrosses( QgsAnnotationLayer *layer );
+%Docstring
+Rebuilds coordinate-cross items orphaned by a vanilla-QGIS round trip
+(unknown master type dropped, stock shadows kept), recovering position
+from the shadow marker. Consumes the orphan side-channel. Call after
+:py:func:`~KadasAnnotationLayerHelpers.read`.
+%End
+
+  private:
+    KadasAnnotationLayerHelpers();
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationlayerhelpers.h              *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

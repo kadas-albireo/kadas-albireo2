@@ -1,0 +1,59 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadascircleannotationitem.h                *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+class KadasCircleAnnotationItem : QgsAnnotationPolygonItem
+{
+%Docstring(signature="appended")
+Circle annotation item (type id "kadas:circle").
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadascircleannotationitem.h"
+%End
+  public:
+    KadasCircleAnnotationItem( const QgsPointXY &center = QgsPointXY(), const QgsPointXY &ringPoint = QgsPointXY() );
+
+    static QString itemTypeId();
+
+    virtual QString type() const;
+
+    virtual bool writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const;
+
+    virtual bool readXml( const QDomElement &element, const QgsReadWriteContext &context );
+
+    virtual KadasCircleAnnotationItem *clone() const;
+
+
+    static KadasCircleAnnotationItem *create();
+
+    QgsPointXY center() const;
+    QgsPointXY ringPoint() const;
+
+    void setCenter( const QgsPointXY &center );
+    void setRingPoint( const QgsPointXY &ringPoint );
+
+    const QStringList &shadowIds() const;
+    void setShadowIds( const QStringList &ids );
+    void setCircle( const QgsPointXY &center, const QgsPointXY &ringPoint );
+
+    double radius() const;
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadascircleannotationitem.h                *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

@@ -13,10 +13,6 @@ KadasMapToolMinMax.FilterType.__doc__ = """
 # --
 KadasMapToolMinMax.FilterType.baseClass = KadasMapToolMinMax
 try:
-    KadasMapToolMinMax.__overridden_methods__ = ['canvasPressEvent', 'canvasMoveEvent', 'canvasReleaseEvent']
-except (NameError, AttributeError):
-    pass
-try:
-    KadasMapToolMinMaxItemInterface.__overridden_methods__ = ['createItem']
+    KadasMapToolMinMax.__overridden_methods__ = ['activate', 'deactivate', 'canvasPressEvent', 'canvasReleaseEvent']
 except (NameError, AttributeError):
     pass

@@ -48,11 +48,15 @@
 #include <qgis/qgsvectortilelayer.h>
 
 #include "kadas/core/kadas.h"
+#include "kadas/core/kadassettingstree.h"
 #include "kadas/gui/kadasclipboard.h"
 #include "kadas/gui/kadascoordinatedisplayer.h"
-#include "kadas/gui/kadasitemlayer.h"
-#include "kadas/gui/kadasmapcanvasitem.h"
-#include "kadas/gui/kadasmapcanvasitemmanager.h"
+#include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
+#include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
+#include "kadas/gui/annotationitems/kadaspinannotationitem.h"
+#include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
+#include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 #include "kadas/gui/kadasprojecttemplateselectiondialog.h"
 
 #include "kadas/gui/catalog/kadasarcgisrestcatalogprovider.h"
@@ -60,11 +64,7 @@
 #include "kadas/gui/catalog/kadasvbscatalogprovider.h"
 #include "kadas/gui/catalog/kadasarcgisportalcatalogprovider.h"
 
-#include "kadas/gui/mapitems/kadasmapitem.h"
-#include "kadas/gui/mapitems/kadassymbolitem.h"
-#include "kadas/gui/mapitemeditors/kadassymbolattributeseditor.h"
 #include "kadas/gui/maptools/kadasmaptooldeleteitems.h"
-#include "kadas/gui/maptools/kadasmaptooledititem.h"
 #include "kadas/gui/maptools/kadasmaptoolheightprofile.h"
 #include "kadas/gui/maptools/kadasmaptoolhillshade.h"
 #include "kadas/gui/maptools/kadasmaptoolmeasure.h"
@@ -105,13 +105,6 @@
 #include "mapgrid/kadasmaptoolmapgrid.h"
 #include "milx/kadasmilxintegration.h"
 
-
-KadasMapItem *KadasSymbolAttributesEditorInterface::createItem() const
-{
-  KadasPinItem *item = new KadasPinItem( QgsCoordinateReferenceSystem( "EPSG:3857" ) );
-  item->setEditor( "KadasSymbolAttributesEditor" );
-  return item;
-}
 
 KadasMainWindow::KadasMainWindow()
 {
@@ -244,7 +237,7 @@ void KadasMainWindow::init()
     mMagnifierSpinBox->blockSignals( false );
   } );
 
-  mNumericInputCheckbox->setChecked( QgsSettings().value( "/kadas/showNumericInput", false ).toBool() );
+  mNumericInputCheckbox->setChecked( KadasSettingsTree::settingsShowNumericInput->value() );
   connect( mNumericInputCheckbox, &QCheckBox::toggled, this, &KadasMainWindow::onNumericInputCheckboxToggled );
 
   QgsLayerTreeModel *model = new QgsLayerTreeModel( QgsProject::instance()->layerTreeRoot(), this );
@@ -258,9 +251,6 @@ void KadasMainWindow::init()
   mLayerTreeView->setModel( model );
   mLayerTreeView->setMenuProvider( new KadasLayerTreeViewMenuProvider( mLayerTreeView ) );
   connect( mLayerTreeView, &QAbstractItemView::doubleClicked, this, &KadasMainWindow::layerTreeViewDoubleClicked );
-
-  connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemAdded, this, &KadasMainWindow::addMapCanvasItem );
-  connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemWillBeRemoved, this, &KadasMainWindow::removeMapCanvasItem );
 
   QgsSnappingConfig snappingConfig;
   snappingConfig.setMode( Qgis::SnappingMode::AllLayers );
@@ -614,8 +604,7 @@ void KadasMainWindow::dropEvent( QDropEvent *event )
       }
       if ( addAsMapItem )
       {
-        QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> pair = kApp->addImageItem( fileName );
-        KadasItemLayerRegistry::getOrCreateItemLayer( pair.second )->addItem( pair.first );
+        kApp->addImageItem( fileName );
       }
       else
       {
@@ -1182,7 +1171,7 @@ void KadasMainWindow::onSnappingChanged( bool enabled )
 
 void KadasMainWindow::onNumericInputCheckboxToggled( bool checked )
 {
-  QgsSettings().setValue( "/kadas/showNumericInput", checked );
+  KadasSettingsTree::settingsShowNumericInput->setValue( checked );
 }
 
 void KadasMainWindow::showFavoriteContextMenu( const QPoint &pos )
@@ -1380,23 +1369,6 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
   QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( mLayerTreeView->layerTreeModel()->rootGroup(), 0 ) );
 }
 
-void KadasMainWindow::addMapCanvasItem( const KadasMapItem *item )
-{
-  KadasMapCanvasItem *canvasItem = new KadasMapCanvasItem( item, mMapCanvas );
-  Q_UNUSED( canvasItem ); //item is already added automatically to canvas scene
-}
-
-void KadasMainWindow::removeMapCanvasItem( const KadasMapItem *item )
-{
-  for ( QGraphicsItem *canvasItem : mMapCanvas->items() )
-  {
-    if ( dynamic_cast<KadasMapCanvasItem *>( canvasItem ) && static_cast<KadasMapCanvasItem *>( canvasItem )->mapItem() == item )
-    {
-      delete canvasItem;
-    }
-  }
-}
-
 void KadasMainWindow::checkLayerProjection( QgsMapLayer *layer )
 {
   if ( layer->crs().authid().startsWith( "USER:" ) )
@@ -1468,7 +1440,13 @@ int KadasMainWindow::messageTimeout() const
 
 QgsMapTool *KadasMainWindow::addPinTool()
 {
-  return new KadasMapToolCreateItem( mapCanvas(), std::move( std::make_unique<KadasSymbolAttributesEditorInterface>( KadasSymbolAttributesEditorInterface() ) ), KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::PinsLayer ) );
+  KadasAnnotationItemController *controller = KadasAnnotationControllerRegistry::instance()->controllerFor( KadasPinAnnotationItem::itemTypeId() );
+  QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::PinsLayer );
+  if ( !controller || !layer )
+    return nullptr;
+  auto *tool = new KadasMapToolEditAnnotationItem( mapCanvas(), controller, layer );
+  tool->setMultipart( false );
+  return tool;
 }
 
 void KadasMainWindow::addLocalPicture()
@@ -1489,8 +1467,8 @@ void KadasMainWindow::addLocalPicture()
   }
   QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
 
-  QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> pair = kApp->addImageItem( filename );
-  mMapCanvas->setMapTool( new KadasMapToolEditItem( mapCanvas(), pair.first, KadasItemLayerRegistry::getOrCreateItemLayer( pair.second ) ) );
+  QPair<QString, QgsAnnotationLayer *> pair = kApp->addImageItem( filename );
+  mMapCanvas->setMapTool( new KadasMapToolEditAnnotationItem( mapCanvas(), pair.second, pair.first ) );
 }
 
 void KadasMainWindow::addRemotePicture()
@@ -1544,8 +1522,8 @@ void KadasMainWindow::addRemotePicture()
     tempfile.write( newReq.reply().content() );
     tempfile.flush();
 
-    QPair<KadasMapItem *, KadasItemLayerRegistry::StandardLayer> pair = kApp->addImageItem( tempfile.fileName() );
-    mMapCanvas->setMapTool( new KadasMapToolEditItem( mapCanvas(), pair.first, KadasItemLayerRegistry::getOrCreateItemLayer( pair.second ) ) );
+    QPair<QString, QgsAnnotationLayer *> pair = kApp->addImageItem( tempfile.fileName() );
+    mMapCanvas->setMapTool( new KadasMapToolEditAnnotationItem( mapCanvas(), pair.second, pair.first ) );
     break;
   }
 }

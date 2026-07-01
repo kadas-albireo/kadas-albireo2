@@ -11,12 +11,9 @@ set(kadas_gui_SRC
     kadasfeaturepicker.cpp
     kadasfloatinginputwidget.cpp
     kadasheightprofiledialog.cpp
-    kadasitemcontextmenuactions.cpp
-    kadasitemlayer.cpp
+    kadasattributetypes.cpp
     kadaslayerpropertiesdialog.cpp
     kadaslayerselectionwidget.cpp
-    kadasmapcanvasitem.cpp
-    kadasmapcanvasitemmanager.cpp
     kadasmapitemtooltip.cpp
     kadasmapwidget.cpp
     kadasprojectmigration.cpp
@@ -24,10 +21,35 @@ set(kadas_gui_SRC
     kadasribbonbutton.cpp
     kadasrichtexteditor.cpp
     kadastextbrowser.cpp
-    maptools/kadasmaptoolcreateitem.cpp
+    annotationitems/kadasannotationcontrollerregistry.cpp
+    annotationitems/kadasannotationitemcontroller.cpp
+    annotationitems/kadasannotationitemcontrollers.cpp
+    annotationitems/kadasannotationlayerhelpers.cpp
+    annotationitems/kadasannotationlayerregistry.cpp
+    annotationitems/kadasannotationprojectintegration.cpp
+    annotationitems/kadasannotationstyleeditor.cpp
+    annotationitems/kadascircleannotationcontroller.cpp
+    annotationitems/kadascircleannotationitem.cpp
+    annotationitems/kadascoordcrossannotationcontroller.cpp
+    annotationitems/kadascoordcrossannotationitem.cpp
+    annotationitems/kadasgpxrouteannotationcontroller.cpp
+    annotationitems/kadasgpxrouteannotationitem.cpp
+    annotationitems/kadasgpxwaypointannotationcontroller.cpp
+    annotationitems/kadasgpxwaypointannotationitem.cpp
+    annotationitems/kadaslineannotationcontroller.cpp
+    annotationitems/kadasmarkerannotationcontroller.cpp
+    annotationitems/kadasmilxannotationcontroller.cpp
+    annotationitems/kadasmilxannotationitem.cpp
+    annotationitems/kadasmilxlayersettings.cpp
+    annotationitems/kadaspictureannotationcontroller.cpp
+    annotationitems/kadaspinannotationcontroller.cpp
+    annotationitems/kadaspinannotationitem.cpp
+    annotationitems/kadaspointtextannotationcontroller.cpp
+    annotationitems/kadaspolygonannotationcontroller.cpp
+    annotationitems/kadasrectangleannotationcontroller.cpp
+    annotationitems/kadasrectangleannotationitem.cpp
     maptools/kadasmaptooldeleteitems.cpp
-    maptools/kadasmaptooledititem.cpp
-    maptools/kadasmaptooledititemgroup.cpp
+    maptools/kadasmaptooleditannotationitem.cpp
     maptools/kadasmaptoolheightprofile.cpp
     maptools/kadasmaptoolhillshade.cpp
     maptools/kadasmaptoolmeasure.cpp
@@ -36,10 +58,8 @@ set(kadas_gui_SRC
     maptools/kadasmaptoolselectrect.cpp
     maptools/kadasmaptoolslope.cpp
     maptools/kadasmaptoolviewshed.cpp
+    maptools/kadasshapecapturemaptool.cpp
     milx/kadasmilxclient.cpp
-    milx/kadasmilxeditor.cpp
-    milx/kadasmilxitem.cpp
-    milx/kadasmilxlayer.cpp
     milx/kadasmilxlayerpropertiespage.cpp
     milx/kadasmilxlibrary.cpp
     catalog/kadasarcgisportalcatalogprovider.cpp
@@ -53,29 +73,6 @@ set(kadas_gui_SRC
     search/kadaspinsearchprovider.cpp
     search/kadasremotedatasearchprovider.cpp
     search/kadasworldlocationsearchprovider.cpp
-    mapitemeditors/kadasgpxrouteeditor.cpp
-    mapitemeditors/kadasgpxwaypointeditor.cpp
-    mapitemeditors/kadasmapitemeditor.cpp
-    mapitemeditors/kadasredliningitemeditor.cpp
-    mapitemeditors/kadasredliningtexteditor.cpp
-    mapitemeditors/kadassymbolattributeseditor.cpp
-    mapitems/kadasanchoreditem.cpp
-    mapitems/kadascircleitem.cpp
-    mapitems/kadascircularsectoritem.cpp
-    mapitems/kadascoordinatecrossitem.cpp
-    mapitems/kadasgeometryitem.cpp
-    mapitems/kadasgpxrouteitem.cpp
-    mapitems/kadasgpxwaypointitem.cpp
-    mapitems/kadaslineitem.cpp
-    mapitems/kadasmapitem.cpp
-    mapitems/kadaspictureitem.cpp
-    mapitems/kadaspointitem.cpp
-    mapitems/kadaspolygonitem.cpp
-    mapitems/kadasrectangleitem.cpp
-    mapitems/kadasrectangleitembase.cpp
-    mapitems/kadasselectionrectitem.cpp
-    mapitems/kadassymbolitem.cpp
-    mapitems/kadastextitem.cpp
 )
 
 set(kadas_gui_HDR
@@ -90,13 +87,9 @@ set(kadas_gui_HDR
     kadasfeaturepicker.h
     kadasfloatinginputwidget.h
     kadasheightprofiledialog.h
-    kadasitemcontextmenuactions.h
-    kadasitemlayer.h
+    kadasattributetypes.h
     kadaslayerpropertiesdialog.h
     kadaslayerselectionwidget.h
-    kadasmapcanvasitem.h
-    kadasmapcanvasitemmanager.h
-    kadasmapiteminterface.h
     kadasmapitemtooltip.h
     kadasplugininterface.h
     kadasprojectmigration.h
@@ -105,10 +98,38 @@ set(kadas_gui_HDR
     kadasrichtexteditor.h
     kadassearchprovider.h
     kadastextbrowser.h
-    maptools/kadasmaptoolcreateitem.h
+    annotationitems/kadasannotationcontrollerregistry.h
+    annotationitems/kadasannotationitemcontext.h
+    annotationitems/kadasannotationitemcontroller.h
+    annotationitems/kadasannotationitemcontrollers.h
+    annotationitems/kadasannotationlayerhelpers.h
+    annotationitems/kadasannotationlayerregistry.h
+    annotationitems/kadasannotationprojectintegration.h
+    annotationitems/kadasannotationshadow.h
+    annotationitems/kadasannotationstyleeditor.h
+    annotationitems/kadasannotationzindex.h
+    annotationitems/kadascircleannotationcontroller.h
+    annotationitems/kadascircleannotationitem.h
+    annotationitems/kadascoordcrossannotationcontroller.h
+    annotationitems/kadascoordcrossannotationitem.h
+    annotationitems/kadasgpxrouteannotationcontroller.h
+    annotationitems/kadasgpxrouteannotationitem.h
+    annotationitems/kadasgpxwaypointannotationcontroller.h
+    annotationitems/kadasgpxwaypointannotationitem.h
+    annotationitems/kadaslineannotationcontroller.h
+    annotationitems/kadasmarkerannotationcontroller.h
+    annotationitems/kadasmilxannotationcontroller.h
+    annotationitems/kadasmilxannotationitem.h
+    annotationitems/kadasmilxlayersettings.h
+    annotationitems/kadaspictureannotationcontroller.h
+    annotationitems/kadaspinannotationcontroller.h
+    annotationitems/kadaspinannotationitem.h
+    annotationitems/kadaspointtextannotationcontroller.h
+    annotationitems/kadaspolygonannotationcontroller.h
+    annotationitems/kadasrectangleannotationcontroller.h
+    annotationitems/kadasrectangleannotationitem.h
     maptools/kadasmaptooldeleteitems.h
-    maptools/kadasmaptooledititem.h
-    maptools/kadasmaptooledititemgroup.h
+    maptools/kadasmaptooleditannotationitem.h
     maptools/kadasmaptoolheightprofile.h
     maptools/kadasmaptoolhillshade.h
     maptools/kadasmaptoolmeasure.h
@@ -117,11 +138,9 @@ set(kadas_gui_HDR
     maptools/kadasmaptoolselectrect.h
     maptools/kadasmaptoolslope.h
     maptools/kadasmaptoolviewshed.h
+    maptools/kadasshapecapturemaptool.h
     milx/kadasmilxclient.h
-    milx/kadasmilxeditor.h
     milx/kadasmilxinterface.h
-    milx/kadasmilxitem.h
-    milx/kadasmilxlayer.h
     milx/kadasmilxlayerpropertiespage.h
     milx/kadasmilxlibrary.h
     catalog/kadasarcgisportalcatalogprovider.h
@@ -136,29 +155,6 @@ set(kadas_gui_HDR
     search/kadasremotedatasearchprovider.h
     search/kadasworldlocationsearchprovider.h
     kadasmapwidget.h
-    mapitemeditors/kadasgpxrouteeditor.h
-    mapitemeditors/kadasgpxwaypointeditor.h
-    mapitemeditors/kadasmapitemeditor.h
-    mapitemeditors/kadasredliningitemeditor.h
-    mapitemeditors/kadasredliningtexteditor.h
-    mapitemeditors/kadassymbolattributeseditor.h
-    mapitems/kadasanchoreditem.h
-    mapitems/kadascircleitem.h
-    mapitems/kadascircularsectoritem.h
-    mapitems/kadascoordinatecrossitem.h
-    mapitems/kadasgeometryitem.h
-    mapitems/kadasgpxrouteitem.h
-    mapitems/kadasgpxwaypointitem.h
-    mapitems/kadaslineitem.h
-    mapitems/kadasmapitem.h
-    mapitems/kadaspictureitem.h
-    mapitems/kadaspointitem.h
-    mapitems/kadaspolygonitem.h
-    mapitems/kadasrectangleitem.h
-    mapitems/kadasrectangleitembase.h
-    mapitems/kadasselectionrectitem.h
-    mapitems/kadassymbolitem.h
-    mapitems/kadastextitem.h
 )
 
 file(GLOB kadas_gui_UI ui/*.ui)
@@ -190,6 +186,7 @@ target_link_libraries(
   Qt6::Concurrent
   QuaZip::QuaZip
   QGIS::Gui
+  QGIS::3D
   ${GeographicLib_LIBRARIES}
   PkgConfig::LIBRSVG
   PkgConfig::CAIRO

@@ -184,6 +184,9 @@ Kadas3DMapConfigWidget::Kadas3DMapConfigWidget( Qgs3DMapSettings *map, QgsMapCan
   widgetTerrainMaterial->setSettings( &terrainShadingMaterial, nullptr );
 
   widgetLights->setLights( mMap->lightSources() );
+  widgetLights->setPointLightCrs( mMap->crs() );
+  widgetLights->setMapExtent( mMap->extent() );
+  widgetLights->setSceneMode( mMap->sceneMode() );
 
   connect( cboTerrainType, static_cast<void ( QComboBox::* )( int )>( &QComboBox::currentIndexChanged ), this, &Kadas3DMapConfigWidget::onTerrainTypeChanged );
   connect( cboTerrainLayer, static_cast<void ( QComboBox::* )( int )>( &QgsMapLayerComboBox::currentIndexChanged ), this, &Kadas3DMapConfigWidget::onTerrainLayerChanged );
@@ -202,10 +205,9 @@ Kadas3DMapConfigWidget::Kadas3DMapConfigWidget( Qgs3DMapSettings *map, QgsMapCan
   // ==================
   // Page: Shadows
   mShadowSettingsWidget = new KadasShadowRenderingSettingsWidget( this );
-  mShadowSettingsWidget->onDirectionalLightsCountChanged( widgetLights->directionalLightCount() );
+  mShadowSettingsWidget->setLightSourceModel( widgetLights->lightSourceModel() );
   mShadowSettingsWidget->setShadowSettings( map->shadowSettings() );
   groupShadowRendering->layout()->addWidget( mShadowSettingsWidget );
-  connect( widgetLights, &KadasLightsWidget::directionalLightsCountChanged, mShadowSettingsWidget, &KadasShadowRenderingSettingsWidget::onDirectionalLightsCountChanged );
 
   connect( widgetLights, &KadasLightsWidget::lightsAdded, this, &Kadas3DMapConfigWidget::validate );
   connect( widgetLights, &KadasLightsWidget::lightsRemoved, this, &Kadas3DMapConfigWidget::validate );

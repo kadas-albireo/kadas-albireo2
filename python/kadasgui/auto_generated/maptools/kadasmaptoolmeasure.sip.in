@@ -11,7 +11,9 @@
 
 
 
-class KadasMeasureWidget : KadasMapItemEditor
+
+
+class KadasMapToolMeasure : KadasShapeCaptureMapTool
 {
 %Docstring(signature="appended")
 *************************************************************************
@@ -28,6 +30,13 @@ your option) any later version. *
 #include "kadas/gui/maptools/kadasmaptoolmeasure.h"
 %End
   public:
+    enum class MeasureMode
+    {
+      MeasureLine,
+      MeasurePolygon,
+      MeasureCircle
+    };
+
     enum class AzimuthNorth
     {
       AzimuthMapNorth,
@@ -35,58 +44,18 @@ your option) any later version. *
     };
 
 
-
-    KadasMeasureWidget( KadasMapItem *item );
-
-    virtual void syncItemToWidget();
-    virtual void syncWidgetToItem();
-
-
-    virtual void setItem( KadasMapItem *item );
-
-
-  signals:
-    void clearRequested();
-    void pickRequested();
-
-};
-
-
-class KadasMapToolMeasure : KadasMapToolCreateItem
-{
-%TypeHeaderCode
-#include "kadas/gui/maptools/kadasmaptoolmeasure.h"
-%End
-  public:
-    enum class MeasureMode
-    {
-      MeasureLine,
-      MeasurePolygon,
-      MeasureCircle
-    };
     KadasMapToolMeasure( QgsMapCanvas *canvas, MeasureMode measureMode );
+    ~KadasMapToolMeasure();
 
     virtual void activate();
 
-    virtual void canvasPressEvent( QgsMapMouseEvent *e );
+    virtual void deactivate();
 
-    virtual void canvasMoveEvent( QgsMapMouseEvent *e );
+    virtual void canvasPressEvent( QgsMapMouseEvent *e );
 
     virtual void canvasReleaseEvent( QgsMapMouseEvent *e );
 
     virtual void keyReleaseEvent( QKeyEvent *e );
-
-
-};
-
-class KadasMapToolMeasureItemInterface : KadasMapItemInterface
-{
-%TypeHeaderCode
-#include "kadas/gui/maptools/kadasmaptoolmeasure.h"
-%End
-  public:
-    KadasMapToolMeasureItemInterface( QgsMapCanvas *mapCanvas, KadasMapToolMeasure::MeasureMode measureMode );
-    virtual KadasMapItem *createItem() const;
 
 
 };

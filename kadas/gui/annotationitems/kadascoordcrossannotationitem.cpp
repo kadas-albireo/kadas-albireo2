@@ -1,0 +1,172 @@
+/***************************************************************************
+    kadascoordcrossannotationitem.cpp
+    ---------------------------------
+    copyright            : (C) 2026 by Denis Rouzaud
+    email                : denis at opengis dot ch
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
+#include <QFont>
+#include <QPainter>
+#include <QPainterPath>
+#include <QPen>
+
+#include <qgis/qgscoordinatereferencesystem.h>
+#include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgsexception.h>
+#include <qgis/qgsmarkersymbol.h>
+#include <qgis/qgsmarkersymbollayer.h>
+#include <qgis/qgsrendercontext.h>
+
+#include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
+#include "kadas/gui/annotationitems/kadasannotationshadow.h"
+#include "kadas/gui/annotationitems/kadascoordcrossannotationitem.h"
+
+
+KadasCoordCrossAnnotationItem::KadasCoordCrossAnnotationItem( const QgsPoint &point )
+  : QgsAnnotationMarkerItem( point )
+{
+  setZIndex( KadasAnnotationZIndex::CoordCross );
+  installDefaultSymbol();
+}
+
+QString KadasCoordCrossAnnotationItem::type() const
+{
+  return itemTypeId();
+}
+
+QgsCoordinateReferenceSystem KadasCoordCrossAnnotationItem::labelCrs( const QgsCoordinateReferenceSystem &layerCrs )
+{
+  if ( !layerCrs.isValid() || layerCrs.mapUnits() == Qgis::DistanceUnit::Meters )
+    return layerCrs;
+  return QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:3857" ) );
+}
+
+void KadasCoordCrossAnnotationItem::installDefaultSymbol()
+{
+  auto *layer = new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Circle );
+  layer->setColor( QColor( 0, 0, 0, 0 ) );
+  layer->setStrokeColor( QColor( 0, 0, 0, 0 ) );
+  layer->setSize( 0.1 );
+  setSymbol( new QgsMarkerSymbol( QgsSymbolLayerList() << layer ) );
+}
+
+QgsRectangle KadasCoordCrossAnnotationItem::boundingBox() const
+{
+  const QgsPointXY p = geometry();
+  return QgsRectangle( p.x(), p.y(), p.x(), p.y() );
+}
+
+QgsRectangle KadasCoordCrossAnnotationItem::boundingBox( QgsRenderContext &context ) const
+{
+  const double mupp = context.mapToPixel().mapUnitsPerPixel();
+  const double crossMu = sCrossSizePx * KadasAnnotationItemController::outputDpiScale( context ) * mupp;
+  try
+  {
+    const QgsPointXY mapPos = context.coordinateTransform().transform( geometry() );
+    QgsRectangle rect( mapPos.x() - crossMu, mapPos.y() - crossMu, mapPos.x() + crossMu, mapPos.y() + crossMu );
+    return context.coordinateTransform().transformBoundingBox( rect, Qgis::TransformDirection::Reverse );
+  }
+  catch ( QgsCsException & )
+  {
+    return boundingBox();
+  }
+}
+
+void KadasCoordCrossAnnotationItem::render( QgsRenderContext &context, QgsFeedback *feedback )
+{
+  QgsAnnotationMarkerItem::render( context, feedback );
+
+  const double crossSize = sCrossSizePx * KadasAnnotationItemController::outputDpiScale( context );
+  const QgsPointXY mapPos = context.coordinateTransform().transform( geometry() );
+  const QPointF screenPos = context.mapToPixel().transform( mapPos ).toQPointF();
+
+  QPainter *painter = context.painter();
+  painter->save();
+  painter->setPen( QPen( Qt::white, 10 ) );
+  painter->drawLine( QLineF( screenPos.x() - crossSize, screenPos.y(), screenPos.x() + crossSize, screenPos.y() ) );
+  painter->drawLine( QLineF( screenPos.x(), screenPos.y() - crossSize, screenPos.x(), screenPos.y() + crossSize ) );
+  painter->setPen( QPen( Qt::black, 3 ) );
+  painter->drawLine( QLineF( screenPos.x() - crossSize, screenPos.y(), screenPos.x() + crossSize, screenPos.y() ) );
+  painter->drawLine( QLineF( screenPos.x(), screenPos.y() - crossSize, screenPos.x(), screenPos.y() + crossSize ) );
+
+  struct LabelData
+  {
+      double x, y;
+      double mapCoord;
+      double angle;
+  };
+  QgsPointXY labelPos = geometry();
+  const QgsCoordinateReferenceSystem layerCrs = context.coordinateTransform().sourceCrs();
+  const QgsCoordinateReferenceSystem crossCrs = labelCrs( layerCrs );
+  if ( layerCrs.isValid() && crossCrs != layerCrs )
+  {
+    try
+    {
+      labelPos = QgsCoordinateTransform( layerCrs, crossCrs, context.transformContext() ).transform( labelPos );
+    }
+    catch ( QgsCsException & )
+    {}
+  }
+  const QList<LabelData> labels = {
+    { screenPos.x() - crossSize, screenPos.y() - 12, labelPos.y(), 0 },
+    { screenPos.x() - 12, screenPos.y() + crossSize, labelPos.x(), -90 },
+  };
+
+  QFont font = painter->font();
+  font.setPixelSize( sFontSizePx * KadasAnnotationItemController::outputDpiScale( context ) );
+
+  for ( const LabelData &label : labels )
+  {
+    QPainterPath path;
+    path.addText( 0, 0, font, QString::number( label.mapCoord / 1000., 'f', 0 ) );
+    painter->save();
+    painter->translate( label.x, label.y );
+    painter->rotate( label.angle );
+    painter->setBrush( Qt::black );
+    painter->setPen( QPen( Qt::white, qRound( sFontSizePx / 3. ) ) );
+    painter->drawPath( path );
+    painter->setPen( Qt::NoPen );
+    painter->drawPath( path );
+    painter->restore();
+  }
+  painter->restore();
+}
+
+KadasCoordCrossAnnotationItem *KadasCoordCrossAnnotationItem::clone() const
+{
+  auto *item = new KadasCoordCrossAnnotationItem( QgsPoint( geometry().x(), geometry().y() ) );
+  if ( symbol() )
+    item->setSymbol( symbol()->clone() );
+  item->copyCommonProperties( this );
+  return item;
+}
+
+bool KadasCoordCrossAnnotationItem::writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const
+{
+  QgsAnnotationMarkerItem::writeXml( element, document, context );
+  mShadow.writeXml( element );
+  return true;
+}
+
+bool KadasCoordCrossAnnotationItem::readXml( const QDomElement &element, const QgsReadWriteContext &context )
+{
+  QgsAnnotationMarkerItem::readXml( element, context );
+  installDefaultSymbol();
+  mShadow.readXml( element );
+  return true;
+}
+
+KadasCoordCrossAnnotationItem *KadasCoordCrossAnnotationItem::create()
+{
+  return new KadasCoordCrossAnnotationItem();
+}

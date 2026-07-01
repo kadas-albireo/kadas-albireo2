@@ -17,27 +17,35 @@
 #ifndef KADASMAPTOOLMEASURE_H
 #define KADASMAPTOOLMEASURE_H
 
-#include <qgis/qgsunittypes.h>
-#include <qgis/qgssettingsentryenumflag.h>
+#include <QList>
 
-#include "kadas/gui/kadas_gui.h"
-#include "kadas/gui/kadasmapiteminterface.h"
-#include "kadas/gui/kadasbottombar.h"
-#include "kadas/gui/mapitemeditors/kadasmapitemeditor.h"
-#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
+#include <qgis/qgsdistancearea.h>
+#include <qgis/qgsgeometry.h>
+#include <qgis/qgssettingsentryenumflag.h>
+#include <qgis/qgsunittypes.h>
+
 #include "kadas/core/kadassettingstree.h"
+#include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/maptools/kadasshapecapturemaptool.h"
 
 class QCheckBox;
 class QComboBox;
 class QLabel;
-class QgsGeometry;
-class QgsVectorLayer;
-class KadasGeometryItem;
+class KadasBottomBar;
+class KadasMeasureLabelsOverlay;
 
-class KADAS_GUI_EXPORT KadasMeasureWidget : public KadasMapItemEditor
+
+class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasShapeCaptureMapTool
 {
     Q_OBJECT
   public:
+    enum class MeasureMode
+    {
+      MeasureLine,
+      MeasurePolygon,
+      MeasureCircle
+    };
+
     enum class AzimuthNorth
     {
       AzimuthMapNorth,
@@ -48,74 +56,52 @@ class KADAS_GUI_EXPORT KadasMeasureWidget : public KadasMapItemEditor
     static const inline QgsSettingsEntryEnumFlag<AzimuthNorth> *settingsLastAzimuthNorth
       = new QgsSettingsEntryEnumFlag<AzimuthNorth>( QStringLiteral( "last-azimuth-north" ), KadasSettingsTree::sTreeKadas, AzimuthNorth::AzimuthGeoNorth ) SIP_SKIP;
 
+    KadasMapToolMeasure( QgsMapCanvas *canvas, MeasureMode measureMode );
+    ~KadasMapToolMeasure() override;
 
-    KadasMeasureWidget( KadasMapItem *item );
+    void activate() override;
+    void deactivate() override;
+    void canvasPressEvent( QgsMapMouseEvent *e ) override;
+    void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
+    void keyReleaseEvent( QKeyEvent *e ) override;
 
-    void syncItemToWidget() override {}
-    void syncWidgetToItem() override;
-
-    void setItem( KadasMapItem *item ) override;
-
-  signals:
-    void clearRequested();
-    void pickRequested();
+  private slots:
+    void requestPick();
+    void onShapeCaptured( const QgsGeometry &geometry, const QgsCoordinateReferenceSystem &crs );
+    void recomputeReadout();
 
   private:
-    QLabel *mMeasurementLabel = nullptr;
+    struct Part
+    {
+        QgsGeometry geometry; // canvas CRS
+        QgsPointXY circleCenter;
+        double circleRadius = 0.0;
+    };
+
+    MeasureMode mMeasureMode;
+    bool mPickFeature = false;
+
+    QgsDistanceArea mDa;
+    QList<Part> mParts;
+
+    KadasMeasureLabelsOverlay *mLabelsOverlay = nullptr;
+
+    KadasBottomBar *mBottomBar = nullptr;
+    QLabel *mTitleLabel = nullptr;
+    QLabel *mReadoutLabel = nullptr;
     QComboBox *mUnitComboBox = nullptr;
     QComboBox *mAngleUnitComboBox = nullptr;
     QComboBox *mNorthComboBox = nullptr;
     QCheckBox *mAzimuthCheckbox = nullptr;
 
-  private slots:
-    void setDistanceUnit( int index );
-    void setAngleUnit( int index );
-    void setAzimutEnabled( bool enabled );
-    void setAzimuthNorth( int index );
-    void updateTotal();
-};
-
-
-class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasMapToolCreateItem
-{
-    Q_OBJECT
-  public:
-    enum class MeasureMode
-    {
-      MeasureLine,
-      MeasurePolygon,
-      MeasureCircle
-    };
-    KadasMapToolMeasure( QgsMapCanvas *canvas, MeasureMode measureMode );
-
-    void activate() override;
-    void canvasPressEvent( QgsMapMouseEvent *e ) override;
-    void canvasMoveEvent( QgsMapMouseEvent *e ) override;
-    void canvasReleaseEvent( QgsMapMouseEvent *e ) override;
-    void keyReleaseEvent( QKeyEvent *e ) override;
-
-  private:
-    bool mPickFeature = false;
-    MeasureMode mMeasureMode = MeasureMode::MeasureLine;
-
-  private slots:
-    void requestPick();
-};
-
-class KADAS_GUI_EXPORT KadasMapToolMeasureItemInterface : public KadasMapItemInterface
-{
-  public:
-    KadasMapToolMeasureItemInterface( QgsMapCanvas *mapCanvas, KadasMapToolMeasure::MeasureMode measureMode )
-      : KadasMapItemInterface()
-      , mCanvas( mapCanvas )
-      , mMeasureMode( measureMode )
-    {}
-    KadasMapItem *createItem() const override;
-
-  private:
-    KadasGeometryItem *setupItem( KadasGeometryItem *item ) const;
-    QgsMapCanvas *mCanvas = nullptr;
-    KadasMapToolMeasure::MeasureMode mMeasureMode = KadasMapToolMeasure::MeasureMode::MeasureLine;
+    QString formatLength( double meters, Qgis::DistanceUnit unit ) const;
+    QString formatArea( double sqMeters, Qgis::AreaUnit unit ) const;
+    QString formatAngle( double radians, Qgis::AngleUnit unit ) const;
+    double computeSegmentAzimuth( const QgsPointXY &p1, const QgsPointXY &p2, bool geoNorth ) const;
+    QString lineReadout( const QgsGeometry &g, double &totalLength ) const;
+    QString polygonReadout( const QgsGeometry &g, double &totalArea ) const;
+    QString circleReadout( const QgsGeometry &g, double &totalArea ) const;
+    void updateCanvasLabels( const QList<Part> &parts );
 };
 
 #endif // KADASMAPTOOLMEASURE_H

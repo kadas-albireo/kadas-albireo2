@@ -4,10 +4,12 @@ set(kadas_SRC
     main.cpp
     kadasapplayerhandling.cpp
     kadasapplication.cpp
+    kadasannotationlayer.cpp
     kadasbookmarksmenu.cpp
     kadascanvascontextmenu.cpp
     kadasfeedback.cpp
     kadasgpsintegration.cpp
+    kadasgpssimulator.cpp
     kadasgpxintegration.cpp
     kadashandlebadlayers.cpp
     kadashelpviewer.cpp
@@ -66,10 +68,12 @@ set(kadas_SRC
 set(kadas_HDR
     kadasapplayerhandling.h
     kadasapplication.h
+    kadasannotationlayer.h
     kadasbookmarksmenu.h
     kadascanvascontextmenu.h
     kadasfeedback.h
     kadasgpsintegration.h
+    kadasgpssimulator.h
     kadasgpxintegration.h
     kadashandlebadlayers.h
     kadashelpviewer.h
@@ -234,6 +238,7 @@ target_link_libraries(
   Qt6::Sql
   Qt6::OpenGL
   Qt6::PrintSupport
+  Qt6::Svg
   QuaZip::QuaZip
   ${AXCONTAINER_LIBRARY}
   QGIS::Core

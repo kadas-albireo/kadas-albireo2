@@ -1,0 +1,58 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasgpxwaypointannotationitem.h           *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+class KadasGpxWaypointAnnotationItem : QgsAnnotationMarkerItem
+{
+%Docstring(signature="appended")
+Annotation item for a GPX waypoint (type id \c "kadas:gpxwaypoint").
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadasgpxwaypointannotationitem.h"
+%End
+  public:
+    KadasGpxWaypointAnnotationItem( const QgsPoint &point = QgsPoint() );
+
+    static QString itemTypeId();
+
+    virtual QString type() const;
+
+    virtual void render( QgsRenderContext &context, QgsFeedback *feedback );
+
+    virtual bool writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const;
+
+    virtual bool readXml( const QDomElement &element, const QgsReadWriteContext &context );
+
+    virtual KadasGpxWaypointAnnotationItem *clone() const;
+
+
+    static KadasGpxWaypointAnnotationItem *create();
+
+    QString name() const;
+    void setName( const QString &name );
+
+    QFont labelFont() const;
+    void setLabelFont( const QFont &font );
+
+    QColor labelColor() const;
+    void setLabelColor( const QColor &color );
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasgpxwaypointannotationitem.h           *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

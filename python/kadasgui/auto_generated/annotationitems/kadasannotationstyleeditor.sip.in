@@ -1,0 +1,54 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationstyleeditor.h               *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+class KadasAnnotationStyleEditor : QWidget
+{
+%Docstring(signature="appended")
+Per-type style editor widget for a stock :py:class:`QgsAnnotationItem`.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
+%End
+  public:
+
+    virtual void loadFromItem( const QgsAnnotationItem *item ) = 0;
+%Docstring
+Populates the widgets from ``item``'s current state.
+%End
+
+    virtual void applyToItem( QgsAnnotationItem *item ) const = 0;
+%Docstring
+Writes the widgets' state back into ``item``.
+%End
+
+  signals:
+    void previewChanged();
+%Docstring
+Emitted continuously while the user is interacting (live preview).
+%End
+    void committed();
+%Docstring
+Emitted when a discrete edit is finalized (push history + persist).
+%End
+};
+
+
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationstyleeditor.h               *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

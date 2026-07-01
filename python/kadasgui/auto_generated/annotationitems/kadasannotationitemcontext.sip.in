@@ -1,0 +1,51 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationitemcontext.h               *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+class KadasAnnotationItemContext
+{
+%Docstring(signature="appended")
+Bundles the per-call context that \c KadasAnnotationItemController needs
+for map-space ↔ item-space transforms.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadasannotationitemcontext.h"
+%End
+  public:
+    KadasAnnotationItemContext();
+    KadasAnnotationItemContext( QgsAnnotationLayer *layer, const QgsMapSettings &mapSettings );
+
+    QgsAnnotationLayer *layer() const;
+%Docstring
+Owning annotation layer.
+%End
+
+    const QgsMapSettings &mapSettings() const;
+%Docstring
+Map canvas settings; \c
+:py:func:`~KadasAnnotationItemContext.destinationCrs` is the map CRS.
+%End
+
+    QgsCoordinateReferenceSystem itemCrs() const;
+%Docstring
+CRS of the item, i.e. the parent annotation layer's CRS.
+%End
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadasannotationitemcontext.h               *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

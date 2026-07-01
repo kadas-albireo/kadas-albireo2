@@ -15,36 +15,35 @@
  ***************************************************************************/
 
 #include <QAction>
+#include <QCursor>
 #include <QDialog>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QPlainTextEdit>
+#include <QPointer>
 #include <QSlider>
 #include <QTabWidget>
+#include <QToolButton>
 #include <quazip/quazipfile.h>
 
+#include <qgis/qgsannotationlayer.h>
 #include <qgis/qgslogger.h>
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 
-#include "kadas/gui/maptools/kadasmaptoolcreateitem.h"
+#include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
+#include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
+#include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
+#include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 #include "kadas/gui/milx/kadasmilxclient.h"
-#include "kadas/gui/milx/kadasmilxeditor.h"
-#include "kadas/gui/milx/kadasmilxitem.h"
-#include "kadas/gui/milx/kadasmilxlayer.h"
 #include "kadas/gui/milx/kadasmilxlayerpropertiespage.h"
 #include "kadas/gui/milx/kadasmilxlibrary.h"
 #include "kadasapplication.h"
 #include "kadasmainwindow.h"
 #include "milx/kadasmilxintegration.h"
 #include "milx/kadasmilxexportdialog.h"
-
-
-KadasMapItem *KadasMilxInterface::createItem() const
-{
-  return new KadasMilxItem();
-}
 
 
 KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
@@ -120,8 +119,6 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
 
   mMilxLibrary = new KadasMilxLibrary( kApp->mainWindow()->winId() );
 
-  KadasMapItemEditor::registry()->insert( "KadasMilxEditor", [this]( KadasMapItem *item, KadasMapItemEditor::EditorType type ) { return new KadasMilxEditor( item, type, mMilxLibrary ); } );
-
   kApp->mainWindow()->addCustomDropHandler( &mDropHandler );
 
   mLayerPropertiesFactory = new KadasMilxLayerPropertiesPageFactory( this );
@@ -135,48 +132,131 @@ KadasMilxIntegration::~KadasMilxIntegration()
   delete mMilxLibrary;
 }
 
-KadasMilxLayer *KadasMilxIntegration::getLayer()
-{
-  for ( QgsMapLayer *layer : QgsProject::instance()->mapLayers() )
-  {
-    if ( dynamic_cast<KadasMilxLayer *>( layer ) )
-    {
-      return static_cast<KadasMilxLayer *>( layer );
-    }
-  }
-  return nullptr;
-}
-
-KadasMilxLayer *KadasMilxIntegration::getOrCreateLayer()
-{
-  KadasMilxLayer *layer = getLayer();
-  if ( !layer )
-  {
-    layer = new KadasMilxLayer();
-    QgsProject::instance()->addMapLayer( layer );
-  }
-  return layer;
-}
-
 void KadasMilxIntegration::createMilx( bool active )
 {
   QgsMapCanvas *canvas = kApp->mainWindow()->mapCanvas();
-  if ( active )
+  if ( !active )
   {
-    KadasLayerSelectionWidget::LayerFilter layerFilter = []( QgsMapLayer *layer ) { return dynamic_cast<KadasMilxLayer *>( layer ); };
-    KadasLayerSelectionWidget::LayerCreator layerCreator = []( const QString &name ) { return new KadasMilxLayer( name ); };
+    if ( canvas->mapTool() && canvas->mapTool()->action() == mUi.mActionMilx )
+      canvas->unsetMapTool( canvas->mapTool() );
+    mMilxLibrary->hide();
+    return;
+  }
 
-    KadasMapToolCreateItem *tool = new KadasMapToolCreateItem( canvas, std::make_unique<KadasMilxInterface>(), getOrCreateLayer() );
-    tool->setAction( mUi.mActionMilx );
-    tool->showLayerSelection( true, kApp->mainWindow()->layerTreeView(), layerFilter, layerCreator );
-    kApp->mainWindow()->layerTreeView()->setCurrentLayer( getOrCreateLayer() );
-    kApp->mainWindow()->layerTreeView()->setLayerVisible( getOrCreateLayer(), true );
-    canvas->setMapTool( tool );
-  }
-  else if ( !active && canvas->mapTool() && canvas->mapTool()->action() == mUi.mActionMilx )
-  {
-    canvas->unsetMapTool( canvas->mapTool() );
-  }
+  KadasAnnotationItemController *controller = KadasAnnotationControllerRegistry::instance()->controllerFor( KadasMilxAnnotationItem::itemTypeId() );
+  if ( !controller )
+    return;
+
+  QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::MssLayer );
+  if ( !layer )
+    return;
+
+  // Build the create-mode tool. The factory starts out producing items
+  // with an empty MSS string; the controller's startPart refuses to draw
+  // until a symbol is picked, so canvas clicks before selection are
+  // harmless. Selecting a symbol later re-arms the factory and seeds the
+  // current in-progress item.
+  auto pickedDesc = std::make_shared<KadasMilxSymbolDesc>();
+  KadasMapToolEditAnnotationItem *tool = new KadasMapToolEditAnnotationItem( canvas, controller, layer );
+  tool->setMultipart( false );
+  tool->setAction( mUi.mActionMilx );
+  tool->setItemFactory( [pickedDesc]() -> QgsAnnotationItem * {
+    auto *item = new KadasMilxAnnotationItem();
+    if ( !pickedDesc->symbolXml.isEmpty() )
+    {
+      item->setMssString( pickedDesc->symbolXml );
+      item->setMilitaryName( pickedDesc->militaryName );
+      item->setSymbolType( pickedDesc->symbolType );
+      item->setMinNumPoints( pickedDesc->minNumPoints );
+      item->setHasVariablePoints( pickedDesc->hasVariablePoints );
+    }
+    return item;
+  } );
+
+  // "Symbol: [Select...]" button hosted in the editor's bottom bar (the
+  // visual position the legacy KadasMilxEditor used). Clicking it pops
+  // the library up above the button. Once a symbol is picked, the icon
+  // updates and the next canvas click starts drawing.
+  QToolButton *symbolButton = new QToolButton();
+  symbolButton->setText( tr( "Select symbol..." ) );
+  symbolButton->setToolTip( tr( "Select MSS symbol" ) );
+  symbolButton->setIconSize( QSize( 32, 32 ) );
+  symbolButton->setCheckable( true );
+  symbolButton->setFixedHeight( 35 );
+  tool->setExtraTopWidget( symbolButton );
+
+  QPointer<KadasMapToolEditAnnotationItem> toolPtr( tool );
+  QPointer<QToolButton> buttonPtr( symbolButton );
+
+  // Clean any prior one-shot wiring on the shared library. A new tool /
+  // button gets fresh connections; the old captures stop firing as soon
+  // as their tool deactivates and the QPointer goes null.
+  disconnect( mMilxLibrary, &KadasMilxLibrary::symbolSelected, this, nullptr );
+  disconnect( mMilxLibrary, &KadasMilxLibrary::visibilityChanged, this, nullptr );
+
+  connect( symbolButton, &QToolButton::clicked, this, [this, buttonPtr]( bool checked ) {
+    if ( !buttonPtr )
+      return;
+    if ( checked )
+    {
+      const int width = 320;
+      const int height = 320;
+      const QPoint anchor = buttonPtr->mapToGlobal( QPoint( buttonPtr->width() / 2, 0 ) );
+      mMilxLibrary->resize( width, height );
+      mMilxLibrary->move( anchor.x() - width / 2, anchor.y() - height );
+      mMilxLibrary->show();
+      mMilxLibrary->focusFilter();
+    }
+    else
+    {
+      mMilxLibrary->hide();
+    }
+  } );
+
+  connect( mMilxLibrary, &KadasMilxLibrary::visibilityChanged, this, [buttonPtr]( bool visible ) {
+    if ( buttonPtr && buttonPtr->isChecked() != visible )
+      buttonPtr->setChecked( visible );
+  } );
+
+  connect( mMilxLibrary, &KadasMilxLibrary::symbolSelected, this, [pickedDesc, toolPtr, buttonPtr]( const KadasMilxSymbolDesc &desc ) {
+    *pickedDesc = desc;
+    if ( buttonPtr )
+    {
+      if ( !desc.symbolXml.isEmpty() )
+      {
+        buttonPtr->setIcon( QIcon( QPixmap::fromImage( desc.icon ) ) );
+        buttonPtr->setText( QString() );
+      }
+      else
+      {
+        buttonPtr->setIcon( QIcon() );
+        buttonPtr->setText( QObject::tr( "Select symbol..." ) );
+      }
+    }
+    if ( !toolPtr )
+      return;
+    // Seed the in-progress (still-empty) item with the chosen symbol so
+    // the very next canvas click starts drawing it.
+    if ( auto *item = toolPtr->currentItem() )
+    {
+      if ( item->type() == KadasMilxAnnotationItem::itemTypeId() )
+      {
+        auto *milx = static_cast<KadasMilxAnnotationItem *>( item );
+        if ( milx->points().isEmpty() )
+        {
+          milx->setMssString( desc.symbolXml );
+          milx->setMilitaryName( desc.militaryName );
+          milx->setSymbolType( desc.symbolType );
+          milx->setMinNumPoints( desc.minNumPoints );
+          milx->setHasVariablePoints( desc.hasVariablePoints );
+        }
+      }
+    }
+  } );
+
+  kApp->mainWindow()->layerTreeView()->setCurrentLayer( layer );
+  kApp->mainWindow()->layerTreeView()->setLayerVisible( layer, true );
+  canvas->setMapTool( tool );
 }
 
 void KadasMilxIntegration::readProjectSettings()
@@ -227,9 +307,20 @@ void KadasMilxIntegration::refreshMilxLayers()
 {
   for ( QgsMapLayer *layer : QgsProject::instance()->mapLayers().values() )
   {
-    if ( qobject_cast<KadasMilxLayer *>( layer ) )
+    auto *annoLayer = qobject_cast<QgsAnnotationLayer *>( layer );
+    if ( !annoLayer )
+      continue;
+    // Only repaint annotation layers that actually carry MilX content;
+    // otherwise we'd thrash unrelated redlining/symbol layers on every
+    // global setting change.
+    const QMap<QString, QgsAnnotationItem *> items = annoLayer->items();
+    for ( auto it = items.constBegin(); it != items.constEnd(); ++it )
     {
-      layer->triggerRepaint();
+      if ( it.value() && it.value()->type() == KadasMilxAnnotationItem::itemTypeId() )
+      {
+        annoLayer->triggerRepaint();
+        break;
+      }
     }
   }
 }
@@ -342,19 +433,19 @@ void KadasMilxIntegration::saveMilxly()
 
   for ( const QString &layerId : exportLayers )
   {
-    QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerId );
-    if ( qobject_cast<KadasMilxLayer *>( layer ) )
+    auto *annoLayer = qobject_cast<QgsAnnotationLayer *>( QgsProject::instance()->mapLayer( layerId ) );
+    if ( !annoLayer )
+      continue;
+    QDomElement milxLayerEl = doc.createElement( "MilXLayer" );
+    const int emitted = KadasMilxAnnotationItem::exportLayerToMilxly( annoLayer, milxLayerEl, dpi );
+    if ( emitted == 0 )
+      continue;
+    milxDocumentEl.appendChild( milxLayerEl );
+    if ( cartoucheLayerId == layerId )
     {
-      QDomElement milxLayerEl = doc.createElement( "MilXLayer" );
-      milxDocumentEl.appendChild( milxLayerEl );
-      static_cast<KadasMilxLayer *>( layer )->exportToMilxly( milxLayerEl, dpi );
-
-      if ( cartoucheLayerId == layerId )
-      {
-        QDomDocument cartoucheDoc;
-        cartoucheDoc.setContent( cartouche );
-        milxLayerEl.appendChild( cartoucheDoc.documentElement() );
-      }
+      QDomDocument cartoucheDoc;
+      cartoucheDoc.setContent( cartouche );
+      milxLayerEl.appendChild( cartoucheDoc.documentElement() );
     }
   }
   QString inputXml = doc.toString();
@@ -461,19 +552,19 @@ void KadasMilxIntegration::exportKml()
 
   for ( const QString &layerId : exportLayers )
   {
-    QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerId );
-    if ( qobject_cast<KadasMilxLayer *>( layer ) )
+    auto *annoLayer = qobject_cast<QgsAnnotationLayer *>( QgsProject::instance()->mapLayer( layerId ) );
+    if ( !annoLayer )
+      continue;
+    QDomElement milxLayerEl = doc.createElement( "MilXLayer" );
+    const int emitted = KadasMilxAnnotationItem::exportLayerToMilxly( annoLayer, milxLayerEl, dpi );
+    if ( emitted == 0 )
+      continue;
+    milxDocumentEl.appendChild( milxLayerEl );
+    if ( cartoucheLayerId == layerId )
     {
-      QDomElement milxLayerEl = doc.createElement( "MilXLayer" );
-      milxDocumentEl.appendChild( milxLayerEl );
-      static_cast<KadasMilxLayer *>( layer )->exportToMilxly( milxLayerEl, dpi );
-
-      if ( cartoucheLayerId == layerId )
-      {
-        QDomDocument cartoucheDoc;
-        cartoucheDoc.setContent( cartouche );
-        milxLayerEl.appendChild( cartoucheDoc.documentElement() );
-      }
+      QDomDocument cartoucheDoc;
+      cartoucheDoc.setContent( cartouche );
+      milxLayerEl.appendChild( cartoucheDoc.documentElement() );
     }
   }
   QString inputXml = doc.toString();
@@ -594,14 +685,17 @@ bool KadasMilxIntegration::importMilxly( const QString &filename, QString &error
   int dpi = kApp->mainWindow()->mapCanvas()->mapSettings().outputDpi();
 
   QDomNodeList milxLayerEls = milxDocumentEl.elementsByTagName( "MilXLayer" );
-  QList<KadasMilxLayer *> importedLayers;
+  QList<QgsAnnotationLayer *> importedLayers;
   QList<QPair<QString, QString>> cartouches;
   for ( int iLayer = 0, nLayers = milxLayerEls.count(); iLayer < nLayers; ++iLayer )
   {
     QDomElement milxLayerEl = milxLayerEls.at( iLayer ).toElement();
-    KadasMilxLayer *layer = new KadasMilxLayer();
-    if ( !layer->importFromMilxly( milxLayerEl, dpi, errorMsg ) )
+    QgsAnnotationLayer::LayerOptions options( QgsProject::instance()->transformContext() );
+    auto *layer = new QgsAnnotationLayer( QString(), options );
+    layer->setCrs( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ) );
+    if ( !KadasMilxAnnotationItem::importLayerFromMilxly( layer, milxLayerEl, dpi, QgsProject::instance()->transformContext(), errorMsg ) )
     {
+      delete layer;
       break;
     }
     importedLayers.append( layer );
@@ -617,7 +711,7 @@ bool KadasMilxIntegration::importMilxly( const QString &filename, QString &error
 
   if ( errorMsg.isEmpty() )
   {
-    for ( KadasMilxLayer *layer : importedLayers )
+    for ( QgsAnnotationLayer *layer : importedLayers )
     {
       QgsProject::instance()->addMapLayer( layer );
     }

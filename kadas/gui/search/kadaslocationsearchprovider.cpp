@@ -85,19 +85,7 @@ KadasLocationSearchFilter::KadasLocationSearchFilter( QgsMapCanvas *mapCanvas )
   mCategoryMap.insert( "gazetteer", qMakePair( tr( "General place name directory" ), 21 ) );
 }
 
-KadasLocationSearchFilter::~KadasLocationSearchFilter()
-{
-  if ( mCurrentReply )
-  {
-    mCurrentReply->abort();
-    mCurrentReply->deleteLater();
-  }
-  if ( mEventLoop )
-  {
-    mEventLoop->quit();
-    delete mEventLoop;
-  }
-}
+KadasLocationSearchFilter::~KadasLocationSearchFilter() = default;
 
 QgsLocatorFilter *KadasLocationSearchFilter::clone() const
 {
@@ -108,15 +96,6 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
 {
   if ( string.length() < 3 )
     return;
-
-  if ( mCurrentReply )
-  {
-    mCurrentReply->abort();
-    mCurrentReply->deleteLater();
-    mCurrentReply = nullptr;
-  }
-
-  mFeedback = feedback;
 
   QString serviceUrl;
   if ( QgsSettings().value( "/kadas/isOffline" ).toBool() )
@@ -147,48 +126,37 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
   QNetworkRequest req( url );
   req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
 
-  //QgsNetworkAccessManager *nam = QgsNetworkAccessManager::instance();
-  // we have performance issues with QgsNetworkAccessManager::instance()
-  QNetworkAccessManager *nam = new QNetworkAccessManager( this );
-  mCurrentReply = nam->get( req );
+  // Perform the request synchronously on this locator worker thread with QgsBlockingNetworkRequest
+  QgsBlockingNetworkRequest blockingRequest;
+  const QgsBlockingNetworkRequest::ErrorCode errorCode = blockingRequest.get( req, false, feedback );
 
-  mEventLoop = new QEventLoop;
-  connect( mCurrentReply, &QNetworkReply::finished, this, &KadasLocationSearchFilter::handleNetworkReply );
-  connect( feedback, &QgsFeedback::canceled, mEventLoop, [&]() {
-    mCurrentReply->abort();
-    mCurrentReply->deleteLater();
-    mCurrentReply = nullptr;
-    mEventLoop->quit();
-  } );
+  if ( feedback && feedback->isCanceled() )
+    return;
+  if ( errorCode != QgsBlockingNetworkRequest::NoError )
+  {
+    QgsDebugMsgLevel( QString( "Location search request failed: %1" ).arg( blockingRequest.errorMessage() ), 2 );
+    return;
+  }
 
-  mEventLoop->exec();
-  delete mEventLoop;
-  mEventLoop = nullptr;
+  parseReply( blockingRequest.reply().content(), feedback );
 }
 
-void KadasLocationSearchFilter::handleNetworkReply()
+void KadasLocationSearchFilter::parseReply( const QByteArray &replyContent, QgsFeedback *feedback )
 {
-  if ( !mCurrentReply )
-    return;
-
-  QByteArray replyContent = mCurrentReply->readAll();
   QJsonParseError err;
   QJsonDocument doc = QJsonDocument::fromJson( replyContent, &err );
   if ( doc.isNull() )
+  {
     QgsDebugMsgLevel( QString( "Parsing error: %1" ).arg( err.errorString() ), 2 );
+    return;
+  }
 
   QJsonObject resultMap = doc.object();
   const QJsonArray constResults = resultMap["results"].toArray();
   for ( const QJsonValue &item : constResults )
   {
-    if ( mFeedback && mFeedback->isCanceled() )
-    {
-      mCurrentReply->deleteLater();
-      mCurrentReply = nullptr;
-      if ( mEventLoop )
-        mEventLoop->quit();
+    if ( feedback && feedback->isCanceled() )
       return;
-    }
 
     QJsonObject itemMap = item.toObject();
     QJsonObject itemAttrsMap = itemMap["attrs"].toObject();
@@ -229,10 +197,6 @@ void KadasLocationSearchFilter::handleNetworkReply()
     result.setUserData( resultData );
     emit resultFetched( result );
   }
-  mCurrentReply->deleteLater();
-  mCurrentReply = nullptr;
-  if ( mEventLoop )
-    mEventLoop->quit();
 }
 
 void KadasLocationSearchFilter::triggerResult( const QgsLocatorResult &result )

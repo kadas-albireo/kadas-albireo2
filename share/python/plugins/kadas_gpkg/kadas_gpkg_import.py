@@ -4,7 +4,7 @@ import os
 import sqlite3
 import tempfile
 
-from kadas.kadasgui import KadasMapCanvasItemManager, KadasMapItem, KadasProjectMigration
+from kadas.kadasgui import KadasProjectMigration
 from qgis.core import (
     Qgis,
     QgsApplication,
@@ -108,12 +108,10 @@ class KadasGpkgImport(QObject):
                 else:
                     addedLayers.append(layerid)
 
-            for i in range(0, mapcanvasitems.size()):
-                mapcanvasitem = mapcanvasitems.at(i).toElement()
-                if mapcanvasitem.attribute("associatedLayer") in addedLayers:
-                    item = KadasMapItem.fromXml(mapcanvasitem)
-                    if item:
-                        KadasMapCanvasItemManager.addItem(item)
+            # Legacy MapCanvasItems import disabled: KadasMapCanvasItemManager was
+            # removed alongside KadasItemLayer demolition. Items embedded in GPKG
+            # project files no longer render. TODO: port to QgsAnnotationLayer.
+            _ = mapcanvasitems
 
             QgsPathResolver.removePathPreprocessor(preprocessorId)
             conn.close()

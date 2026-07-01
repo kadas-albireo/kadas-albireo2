@@ -1,0 +1,75 @@
+/***************************************************************************
+    kadasannotationlayerregistry.h
+    ------------------------------
+    copyright            : (C) 2026 by Denis Rouzaud
+    email                : denis at opengis dot ch
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
+#ifndef KADASANNOTATIONLAYERREGISTRY_H
+#define KADASANNOTATIONLAYERREGISTRY_H
+
+#include <QList>
+#include <QMap>
+#include <QObject>
+#include <QString>
+
+#include "qgis/qgis_sip.h"
+
+#include "kadas/gui/kadas_gui.h"
+
+class QDomDocument;
+class QgsAnnotationLayer;
+
+/**
+ * \ingroup gui
+ * \brief Process-wide registry of the well-known singleton Kadas
+ *        \c QgsAnnotationLayer instances inside the current \c QgsProject.
+ */
+class KADAS_GUI_EXPORT KadasAnnotationLayerRegistry : public QObject
+{
+    Q_OBJECT
+  public:
+    enum class StandardLayer
+    {
+      RedliningLayer,
+      SymbolsLayer,
+      PicturesLayer,
+      PinsLayer,
+      RoutesLayer,
+      MssLayer
+    };
+
+    //! Returns the standard annotation layer for \a layer, creating it on first use.
+    static QgsAnnotationLayer *getOrCreateAnnotationLayer( StandardLayer layer );
+
+    //! Returns the human-readable layer names keyed by \c StandardLayer.
+    static const QMap<StandardLayer, QString> &standardLayerNames() SIP_SKIP;
+
+    //! Connects to project signals; must be called once at app startup.
+    static void init();
+
+  protected:
+    KadasAnnotationLayerRegistry();
+
+  private:
+    static KadasAnnotationLayerRegistry *instance();
+    QMap<StandardLayer, QString> mLayerIdMap;
+
+  private slots:
+    void clear();
+    void readFromProject( const QDomDocument &doc );
+    void writeToProject( QDomDocument &doc );
+    //! Retargets empty standard layers to the new project CRS (MSS excluded; non-empty layers untouched).
+    void onProjectCrsChanged();
+};
+
+#endif // KADASANNOTATIONLAYERREGISTRY_H

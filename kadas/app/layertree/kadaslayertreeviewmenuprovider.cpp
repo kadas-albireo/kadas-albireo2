@@ -27,8 +27,9 @@
 #include <qgis/qgsvectorlayer.h>
 
 #include "kadas/core/kadaspluginlayer.h"
-#include "kadas/gui/milx/kadasmilxlayer.h"
 #include "kadasapplication.h"
+#include "kadasbullseyelayer.h"
+#include "kadasguidegridlayer.h"
 #include "kadaslayerrefreshmanager.h"
 #include "kadaslayertreeviewmenuprovider.h"
 #include "kadasmainwindow.h"
@@ -86,6 +87,22 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
         if ( plt )
         {
           plt->addLayerTreeMenuActions( menu, pluginLayer );
+        }
+      }
+      else if ( qobject_cast<KadasGuideGridLayer *>( layer ) )
+      {
+        QAction *editAction = kApp->mainWindow()->actionGuideGrid();
+        if ( editAction )
+        {
+          menu->addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, [editAction] { editAction->trigger(); } );
+        }
+      }
+      else if ( qobject_cast<KadasBullseyeLayer *>( layer ) )
+      {
+        QAction *editAction = kApp->mainWindow()->actionBullseye();
+        if ( editAction )
+        {
+          menu->addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, [editAction] { editAction->trigger(); } );
         }
       }
       menu->addAction( actions->actionZoomToLayers( kApp->mainWindow()->mapCanvas(), menu ) );

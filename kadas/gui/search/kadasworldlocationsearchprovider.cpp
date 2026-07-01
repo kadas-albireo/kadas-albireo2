@@ -37,6 +37,7 @@
 #include <qgis/qgslinesymbol.h>
 #include <qgis/qgslinesymbollayer.h>
 #include <qgis/qgslogger.h>
+#include <qgis/qgsblockingnetworkrequest.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmarkersymbol.h>
 #include <qgis/qgsmarkersymbollayer.h>
@@ -68,8 +69,6 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
   if ( string.length() < 3 )
     return;
 
-  mFeedback = feedback;
-
   QString serviceUrl;
   if ( QgsSettings().value( "/kadas/isOffline" ).toBool() )
   {
@@ -100,52 +99,36 @@ void KadasWorldLocationSearchProvider::fetchResults( const QString &string, cons
   QNetworkRequest req( url );
   req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
 
-  //QgsNetworkAccessManager *nam = QgsNetworkAccessManager::instance();
-  // we have performance issues with QgsNetworkAccessManager::instance()
-  QNetworkAccessManager *nam = new QNetworkAccessManager( this );
-  mCurrentReply = nam->get( req );
+  // same pattern as kadaslocationsearchprovider.cpp
+  QgsBlockingNetworkRequest blockingRequest;
+  const QgsBlockingNetworkRequest::ErrorCode errorCode = blockingRequest.get( req, false, feedback );
 
-  mEventLoop = new QEventLoop;
-  connect( mCurrentReply, &QNetworkReply::finished, this, &KadasWorldLocationSearchProvider::handleNetworkReply );
-  connect( feedback, &QgsFeedback::canceled, mEventLoop, [&]() {
-    if ( mCurrentReply )
-    {
-      mCurrentReply->abort();
-      mCurrentReply->deleteLater();
-      mCurrentReply = nullptr;
-    }
-    if ( mEventLoop )
-      mEventLoop->quit();
-  } );
-  mEventLoop->exec();
-  delete mEventLoop;
-  mEventLoop = nullptr;
+  if ( feedback && feedback->isCanceled() )
+    return;
+  if ( errorCode != QgsBlockingNetworkRequest::NoError )
+  {
+    QgsDebugMsgLevel( QString( "World location search request failed: %1" ).arg( blockingRequest.errorMessage() ), 2 );
+    return;
+  }
+
+  parseReply( blockingRequest.reply().content(), feedback );
 }
 
-void KadasWorldLocationSearchProvider::handleNetworkReply()
+void KadasWorldLocationSearchProvider::parseReply( const QByteArray &replyContent, QgsFeedback *feedback )
 {
-  if ( !mCurrentReply )
-    return;
-
-  QByteArray replyText = mCurrentReply->readAll();
   QJsonParseError err;
-  QJsonDocument doc = QJsonDocument::fromJson( replyText, &err );
+  QJsonDocument doc = QJsonDocument::fromJson( replyContent, &err );
   if ( doc.isNull() )
   {
     QgsDebugMsgLevel( QString( "Parsing error: %1" ).arg( err.errorString() ), 2 );
+    return;
   }
   QJsonObject resultMap = doc.object();
   const QJsonArray constResults = resultMap["results"].toArray();
   for ( const QJsonValue &item : constResults )
   {
-    if ( mFeedback && mFeedback->isCanceled() )
-    {
-      mCurrentReply->deleteLater();
-      mCurrentReply = nullptr;
-      if ( mEventLoop )
-        mEventLoop->quit();
+    if ( feedback && feedback->isCanceled() )
       return;
-    }
     QJsonObject itemMap = item.toObject();
     QJsonObject itemAttrsMap = itemMap["attrs"].toObject();
     QString origin = itemAttrsMap["origin"].toString();
@@ -173,10 +156,6 @@ void KadasWorldLocationSearchProvider::handleNetworkReply()
     result.setUserData( resultData );
     emit resultFetched( result );
   }
-  mCurrentReply->deleteLater();
-  mCurrentReply = nullptr;
-  if ( mEventLoop )
-    mEventLoop->quit();
 }
 
 void KadasWorldLocationSearchProvider::triggerResult( const QgsLocatorResult &result )

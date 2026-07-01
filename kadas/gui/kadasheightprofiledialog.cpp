@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <algorithm>
+
 #include <QApplication>
 #include <QCheckBox>
 #include <QClipboard>
@@ -58,10 +60,11 @@
 #ifdef Q_OS_MAC
 #include "kadas/gui/kadasclipboardutils.h"
 #endif
-#include "kadas/gui/kadasitemlayer.h"
-#include "kadas/gui/kadasmapcanvasitemmanager.h"
-#include "kadas/gui/mapitems/kadaslineitem.h"
-#include "kadas/gui/mapitems/kadassymbolitem.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
+#include "kadas/gui/annotationitems/kadasannotationzindex.h"
+#include <qgis/qgsrubberband.h>
+#include <qgis/qgsannotationlayer.h>
+#include <qgis/qgsannotationpictureitem.h>
 #include "kadas/gui/maptools/kadasmaptoolheightprofile.h"
 
 
@@ -333,7 +336,11 @@ void KadasHeightProfileDialog::setPoints( const QList<QgsPointXY> &points, const
 
 void KadasHeightProfileDialog::setMarkerPos( int segment, const QgsPointXY &p, const QgsCoordinateReferenceSystem &crs )
 {
-  if ( isBusy() || mSegmentLengths.isEmpty() )
+  // mPlotSamples can be empty even when mSegmentLengths is populated: setPoints()
+  // fills the segment lengths and mNSamples before replot(), and replot() bails
+  // out early (no heightmap configured, raster failed to open, ...) before any
+  // sample is produced. Guard against that to avoid an out-of-range access.
+  if ( isBusy() || mSegmentLengths.isEmpty() || mPlotSamples.isEmpty() )
   {
     return;
   }
@@ -344,7 +351,7 @@ void KadasHeightProfileDialog::setMarkerPos( int segment, const QgsPointXY &p, c
   {
     x += mSegmentLengths[i];
   }
-  int idx = std::min( int( x / mTotLength * mNSamples ), mNSamples - 1 );
+  int idx = std::min( int( x / mTotLength * mNSamples ), int( mPlotSamples.size() ) - 1 );
   QPointF sample = mPlotSamples.at( idx );
   mPlotMarker->setValue( sample );
   mPlotMarker->setLabel( sample.y() == mNoDataValue ? "" : QString::number( qRound( sample.y() ) ) );
@@ -353,12 +360,13 @@ void KadasHeightProfileDialog::setMarkerPos( int segment, const QgsPointXY &p, c
 
 void KadasHeightProfileDialog::setMarkerPlotPos( const QPoint &pos )
 {
-  if ( isBusy() || mSegmentLengths.isEmpty() )
+  if ( isBusy() || mSegmentLengths.isEmpty() || mPlotSamples.isEmpty() )
   {
     return;
   }
 
   int idx = mPlot->invTransform( QwtPlot::xBottom, pos.x() );
+  idx = std::clamp( idx, 0, int( mPlotSamples.size() ) - 1 );
   QPointF sample = mPlotSamples.at( idx );
   mPlotMarker->setValue( sample );
   mPlotMarker->setLabel( sample.y() == mNoDataValue ? "" : QString::number( qRound( sample.y() ) ) );
@@ -728,7 +736,7 @@ void KadasHeightProfileDialog::updateLineOfSight()
   pY.reserve( nSamples );
   double earthRadius = 6370000;
   double meterToDisplayUnit = QgsUnitTypes::fromUnitToUnitFactor( Qgis::DistanceUnit::Meters, KadasCoordinateFormat::instance()->getHeightDisplayUnit() );
-  for ( const QPointF &p : mPlotSamples )
+  for ( const QPointF &p : std::as_const( mPlotSamples ) )
   {
     pX.append( p.x() / mNSamples * mTotLengthMeters );
     double hCorr = 0.87 * pX.last() * pX.last() / ( 2 * earthRadius ) * meterToDisplayUnit;
@@ -801,16 +809,16 @@ void KadasHeightProfileDialog::updateLineOfSight()
     curve->attach( mPlot );
     mLinesOfSight.append( curve );
 
-    KadasLineItem *line = new KadasLineItem( mTool->canvas()->mapSettings().destinationCrs() );
+    QgsRubberBand *line = new QgsRubberBand( mTool->canvas(), Qgis::GeometryType::Line );
     double lambda1 = losSamples.front().x() / mNSamples;
     double lambda2 = losSamples.back().x() / mNSamples;
     QgsPoint p1( mPoints[0] + ( mPoints[1] - mPoints[0] ) * lambda1 );
     QgsPoint p2( mPoints[0] + ( mPoints[1] - mPoints[0] ) * lambda2 );
-    QgsLineString geom( QgsPointSequence() << p1 << p2 );
-    line->addPartFromGeometry( geom );
-    line->setOutline( QPen( colors[iColor], 5 ) );
-    line->setZIndex( 10 );
-    KadasMapCanvasItemManager::instance()->addItem( line );
+    line->addPoint( QgsPointXY( p1.x(), p1.y() ), false );
+    line->addPoint( QgsPointXY( p2.x(), p2.y() ), true );
+    line->setColor( colors[iColor] );
+    line->setWidth( 5 );
+    line->setZValue( 10 ); // stack above the profile line band, like legacy setZIndex(10)
     mLinesOfSightRB.append( line );
 
     iColor = ( iColor + 1 ) % 2;
@@ -847,16 +855,25 @@ void KadasHeightProfileDialog::copyToClipboard()
 
 void KadasHeightProfileDialog::addToCanvas()
 {
-  QImage image = renderPlotImage();
+  const QImage image = renderPlotImage();
 
-  QString filename = QgsProject::instance()->createAttachedFile( "heightProfile.png" );
+  const QString filename = QgsProject::instance()->createAttachedFile( "heightProfile.png" );
   image.save( filename );
 
-  KadasSymbolItem *item = new KadasSymbolItem( mTool->canvas()->mapSettings().destinationCrs() );
-  item->setFilePath( filename );
-  item->setPosition( KadasItemPos::fromPoint( mTool->canvas()->extent().center() ) );
-  KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::SymbolsLayer )->addItem( item );
-  KadasItemLayerRegistry::getOrCreateItemLayer( KadasItemLayerRegistry::StandardLayer::SymbolsLayer )->triggerRepaint();
+  QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::SymbolsLayer );
+  const QgsCoordinateTransform canvasToLayer( mTool->canvas()->mapSettings().destinationCrs(), layer->crs(), QgsProject::instance()->transformContext() );
+  const QgsPointXY center = canvasToLayer.transform( mTool->canvas()->extent().center() );
+  const QgsRectangle bounds( center.x(), center.y(), center.x(), center.y() );
+
+  auto *item = new QgsAnnotationPictureItem( Qgis::PictureFormat::Raster, filename, bounds );
+  item->setZIndex( KadasAnnotationZIndex::Picture );
+  item->setPlacementMode( Qgis::AnnotationPlacementMode::FixedSize );
+  const double widthMm = 80.0;
+  const double aspect = image.height() > 0 ? static_cast<double>( image.width() ) / image.height() : 1.0;
+  item->setFixedSize( QSizeF( widthMm, widthMm / aspect ) );
+  item->setFixedSizeUnit( Qgis::RenderUnit::Millimeters );
+  layer->addItem( item );
+  layer->triggerRepaint();
 }
 
 void KadasHeightProfileDialog::saveToFile()

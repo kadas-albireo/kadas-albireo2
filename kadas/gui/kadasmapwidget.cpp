@@ -30,10 +30,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 
-#include "kadas/gui/kadasmapcanvasitem.h"
-#include "kadas/gui/kadasmapcanvasitemmanager.h"
 #include "kadas/gui/kadasmapwidget.h"
-#include "kadas/gui/mapitems/kadasmapitem.h"
 #include "kadas/gui/maptools/kadasmaptoolpan.h"
 
 KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &title, QgsMapCanvas *masterCanvas, QWidget *parent )
@@ -105,17 +102,10 @@ KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &ti
   mapTool->setParent( mMapCanvas );
   mMapCanvas->setMapTool( mapTool );
 
-  for ( const KadasMapItem *item : KadasMapCanvasItemManager::items() )
-  {
-    addMapCanvasItem( item );
-  }
-
   connect( mMasterCanvas, &QgsMapCanvas::extentsChanged, this, &KadasMapWidget::syncCanvasExtents );
   connect( mMasterCanvas, &QgsMapCanvas::destinationCrsChanged, this, &KadasMapWidget::updateMapProjection );
   connect( QgsProject::instance()->layerTreeRoot(), &QgsLayerTree::layerOrderChanged, this, &KadasMapWidget::updateLayerSelectionMenu );
   connect( mMapCanvas, &QgsMapCanvas::xyCoordinates, mMasterCanvas, &QgsMapCanvas::xyCoordinates );
-  connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemAdded, this, &KadasMapWidget::addMapCanvasItem );
-  connect( KadasMapCanvasItemManager::instance(), &KadasMapCanvasItemManager::itemWillBeRemoved, this, &KadasMapWidget::removeMapCanvasItem );
 
   const QList<QgsMapLayer *> layers = mMasterCanvas->layers();
   for ( QgsMapLayer *layer : layers )
@@ -341,24 +331,6 @@ bool KadasMapWidget::eventFilter( QObject *obj, QEvent *ev )
   }
 
   return QObject::eventFilter( obj, ev );
-}
-
-void KadasMapWidget::addMapCanvasItem( const KadasMapItem *item )
-{
-  KadasMapCanvasItem *canvasItem = new KadasMapCanvasItem( item, mMapCanvas );
-  Q_UNUSED( canvasItem ); //item is already added automatically to canvas scene
-}
-
-void KadasMapWidget::removeMapCanvasItem( const KadasMapItem *item )
-{
-  const QList<QGraphicsItem *> items = mMapCanvas->items();
-  for ( QGraphicsItem *canvasItem : items )
-  {
-    if ( dynamic_cast<KadasMapCanvasItem *>( canvasItem ) && static_cast<KadasMapCanvasItem *>( canvasItem )->mapItem() == item )
-    {
-      delete canvasItem;
-    }
-  }
 }
 
 void KadasMapWidget::contextMenuEvent( QContextMenuEvent *e )

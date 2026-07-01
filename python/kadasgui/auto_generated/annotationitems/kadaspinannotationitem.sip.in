@@ -1,0 +1,58 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadaspinannotationitem.h                   *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+class KadasPinAnnotationItem : QgsAnnotationMarkerItem
+{
+%Docstring(signature="appended")
+"Pin" annotation item (type id "kadas:pin").
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/annotationitems/kadaspinannotationitem.h"
+%End
+  public:
+    KadasPinAnnotationItem( const QgsPoint &point = QgsPoint() );
+
+    static QString itemTypeId();
+
+    virtual QString type() const;
+
+    virtual bool writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const;
+
+    virtual bool readXml( const QDomElement &element, const QgsReadWriteContext &context );
+
+    virtual KadasPinAnnotationItem *clone() const;
+
+
+    static KadasPinAnnotationItem *create();
+
+    QString name() const;
+    void setName( const QString &name );
+
+    QString remarks() const;
+    void setRemarks( const QString &remarks );
+
+    static QString defaultIconPath();
+
+    const QStringList &shadowIds() const;
+    void setShadowIds( const QStringList &ids );
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/annotationitems/kadaspinannotationitem.h                   *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
