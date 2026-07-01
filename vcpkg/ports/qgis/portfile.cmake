@@ -74,7 +74,8 @@ list(APPEND QGIS_OPTIONS
 )
 
 # Disable ccache for the QGIS port build. vcpkg already restores completed
-# packages from its own binary cache, and the ccache doesn't work on Ubuntu 22.04, so better to not build with it
+# packages from its own binary cache, and the ccache doesn't work on Ubuntu
+# 22.04, so better to not build with it
 list(APPEND QGIS_OPTIONS "-DUSE_CCACHE:BOOL=OFF")
 list(APPEND QGIS_OPTIONS "-DENABLE_TESTS:BOOL=OFF")
 list(APPEND QGIS_OPTIONS "-DWITH_GRASS7:BOOL=OFF")
