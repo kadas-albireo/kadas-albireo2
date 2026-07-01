@@ -1,0 +1,222 @@
+---
+name: 🐧 Build - Linux
+on:
+  workflow_call:
+    inputs:
+      docs-artifact-name:
+        required: true
+        type: string
+  workflow_dispatch:
+
+# Cancel a stale, in-progress run when a newer one starts for the same PR/ref
+# (criterion #3). Also collapses repeated manual dispatches of the same ref.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      # Stop the whole pipeline the moment any matrix leg hits a critical error
+      # (criterion #4). Single-leg today, but correct as legs are added.
+      fail-fast: true
+      matrix:
+        include:
+        # currently just test for Ubuntu 24.04, but we could add more
+          - os: ubuntu-24.04
+            triplet: x64-linux-dynamic
+    name: build (linux)
+    runs-on: ${{ matrix.os }}
+    # The first (cold-cache) run compiles all of Qt/QGIS/GDAL from scratch and
+    # can take several hours; once the NuGet binary cache is warm, runs are fast.
+    timeout-minutes: 360
+
+    env:
+      # Keep the ccache store on the big /mnt disk (root only has ~14 GB free).
+      # Job-level so both the kadas compile and, via VCPKG_KEEP_ENV_VARS below,
+      # cold vcpkg port builds share the same persisted cache.
+      CCACHE_DIR: /mnt/ccache
+
+    steps:
+      - name: 🐣 Checkout
+        uses: actions/checkout@v6
+
+      - name: 🧹 Free up disk space
+        # The vcpkg dependency build needs tens of GB; GitHub-hosted runners
+        # only have ~14 GB free on /. Reclaim space and move scratch to /mnt.
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          tool-cache: true
+          large-packages: false
+
+      - name: 🗄️ Prepare scratch dirs on /mnt
+        run: |
+          sudo mkdir -p /mnt/vcpkg-buildtrees /mnt/vcpkg-downloads /mnt/vcpkg-bincache /mnt/tmp /mnt/ccache
+          sudo chown -R "$USER" /mnt/vcpkg-buildtrees /mnt/vcpkg-downloads /mnt/vcpkg-bincache /mnt/tmp /mnt/ccache
+
+      - name: 📥 Download docs artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ inputs.docs-artifact-name }}
+          path: share/docs/html/
+
+      - name: 🐩 Install CMake and Ninja
+        uses: lukka/get-cmake@v4.3.3
+        with:
+          # Pin to specific version to avoid rebuilding too often
+          cmakeVersion: 3.31.10
+
+      - name: 🔨 Prepare build env
+        run: |
+          sudo apt-get update
+          # mono-complete is required
+          # for the vcpkg NuGet binary cache on Linux (see cmake/VcpkgToolchain.cmake).
+          # ccache accelerates recompiles of the kadas objects (and cold vcpkg
+          # port builds); Qt's fragile io_uring backend is disabled triplet-wide
+          # (see vcpkg/triplets/x64-linux-dynamic.cmake), so liburing-dev is no
+          # longer needed here.
+          sudo apt-get install -y \
+            build-essential ninja-build ccache git curl zip unzip tar \
+            pkg-config autoconf automake libtool autoconf-archive \
+            bison flex nasm swig python3 python3-pip mono-complete \
+            libgl1-mesa-dev libglu1-mesa-dev '^libxcb.*-dev' libx11-xcb-dev \
+            libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Setup oras
+        uses: oras-project/setup-oras@v2
+
+      - name: Fetch tif
+        run: |
+          oras pull ghcr.io/kadas-albireo/kadas-albireo2/dtm_analysis:1.0 -o .
+
+      - name: 🔢 Determine version
+        id: version
+        uses: ./.github/actions/determine-version
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🏎️ Restore ccache
+        # First-party actions/cache only (no third-party action). The unique
+        # per-commit `key` never hits on restore, so `restore-keys` always falls
+        # back to the newest cache for this triplet, then any for this OS —
+        # giving branch builds a warm start from their base / main (criterion #2).
+        # Because the exact key never matches, actions/cache always saves a fresh
+        # snapshot in its post-job step, keeping the cache current.
+        uses: actions/cache@v5
+        with:
+          path: /mnt/ccache
+          key: ccache-${{ matrix.os }}-${{ matrix.triplet }}-${{ github.sha }}
+          restore-keys: |
+            ccache-${{ matrix.os }}-${{ matrix.triplet }}-
+            ccache-${{ matrix.os }}-
+
+      - name: 🏎️ Configure ccache
+        # Run ccache ourselves rather than via a wrapper action. compiler_type=gcc
+        # is what Qt6 precompiled headers need; on ccache >= 4.8 (Ubuntu 24.04)
+        # it can also be set per-invocation, but pinning it here is harmless and
+        # matches what the qgis ccache-autoconfig patch does for older ccache.
+        run: |
+          ccache --version
+          ccache --max-size=2G
+          ccache --set-config=compiler_type=gcc
+          ccache --zero-stats
+
+      - name: 🌱 Install dependencies and generate project files
+        env:
+          # Asset cache (downloaded source tarballs), read-only, like the other OSes.
+          X_VCPKG_ASSET_SOURCES: x-azurl,https://assetcache.open-vcpkg.org/assetcache,,read
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TMPDIR: /mnt/tmp
+          VCPKG_DOWNLOADS: /mnt/vcpkg-downloads
+          VCPKG_DEFAULT_BINARY_CACHE: /mnt/vcpkg-bincache
+          # Let vcpkg's sandboxed port builds see our persistent ccache store, so
+          # cold dependency compiles (e.g. qgis) also populate/reuse ccache.
+          VCPKG_KEEP_ENV_VARS: CCACHE_DIR
+        run: |
+          cmake -S . \
+                -G Ninja \
+                -B build \
+                -D CMAKE_BUILD_TYPE=Release \
+                -D CMAKE_C_COMPILER_LAUNCHER=ccache \
+                -D CMAKE_CXX_COMPILER_LAUNCHER=ccache \
+                -D KADAS_VERSION=${{ steps.version.outputs.version }} \
+                -D VCPKG_TARGET_TRIPLET="${{ matrix.triplet }}" \
+                -D VCPKG_HOST_TRIPLET="${{ matrix.triplet }}" \
+                -D VCPKG_INSTALL_OPTIONS="--x-buildtrees-root=/mnt/vcpkg-buildtrees" \
+                -D NUGET_USERNAME=kadas-albireo \
+                -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📋 Display vcpkg error logs
+        if: failure()
+        run: |
+          for log_file in $(find /mnt/vcpkg-buildtrees -name "*.log" -type f 2>/dev/null); do
+            echo "::group::$log_file"
+            cat "$log_file" || true
+            echo "::endgroup::"
+          done
+
+      - name: 📑 Upload vcpkg build logs
+        uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: build-logs-${{ matrix.triplet }}-${{ matrix.os }}
+          path: |
+            /mnt/vcpkg-buildtrees/**/*.log
+
+      - name: 📝 Compile plugins translation
+        run: |
+          export PATH="${{ github.workspace }}/build/vcpkg_installed/${{ matrix.triplet }}/tools/Qt6/bin:${PATH}"
+          for PLUGIN in about gpkg print ephem; do
+            lrelease share/python/plugins/kadas_${PLUGIN}/i18n/*.ts
+          done
+
+      - name: 🌋 Build
+        # Saturate every available core (criterion #4). Ninja already defaults
+        # to nproc, but pinning it keeps the intent explicit and portable if the
+        # generator ever changes.
+        run: |
+          cmake --build build --parallel "$(nproc)"
+
+      - name: 📊 ccache stats
+        if: always()
+        run: ccache --show-stats
+
+      - name: 🧪 Run CTest
+        env:
+          QT_QPA_PLATFORM: offscreen
+          LD_LIBRARY_PATH: "${{ github.workspace }}/build/vcpkg_installed/${{ matrix.triplet }}/lib"
+          QT_PLUGIN_PATH: "${{ github.workspace }}/build/vcpkg_installed/${{ matrix.triplet }}/Qt6/plugins"
+        run: |
+          ctest --test-dir build --output-on-failure --timeout 120
+
+      - name: 🚭 PySmokeTest
+        env:
+          PYTHONPATH: build/output/python/
+          LD_LIBRARY_PATH: "${{ github.workspace }}/build/vcpkg_installed/${{ matrix.triplet }}/lib:${{ github.workspace }}/build/output/lib"
+        run: |
+          set -e
+          ./build/vcpkg_installed/${{ matrix.triplet }}/tools/python3/python3 <<EOF
+          from kadas.kadasgui import *
+          from kadas.kadascore import *
+          from kadas.kadasanalysis import *
+          print("kadas python modules import OK")
+          EOF
+
+      - name: 🧪 Install pytest for plugin tests
+        run: |
+          ./build/vcpkg_installed/${{ matrix.triplet }}/tools/python3/python3 -m pip install pytest
+
+      - name: 🧪 Run plugin tests
+        env:
+          PYTHONPATH: "${{ github.workspace }}/build/output/python:${{ github.workspace }}/share/python/plugins"
+          LD_LIBRARY_PATH: "${{ github.workspace }}/build/vcpkg_installed/${{ matrix.triplet }}/lib"
+          KADAS_BIN_DIR: "${{ github.workspace }}/build/output/bin"
+          QT_PLUGIN_PATH: "${{ github.workspace }}/build/vcpkg_installed/${{ matrix.triplet }}/Qt6/plugins"
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          ./build/vcpkg_installed/${{ matrix.triplet }}/tools/python3/python3 \
+            -m pytest share/python/plugins/kadas_gpkg/tests/ -v
