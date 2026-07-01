@@ -19,5 +19,6 @@ set(VCPKG_BUILD_TYPE release)
 #
 # This option is appended to *every* port's CMake configure line; ports that
 # don't define FEATURE_liburing simply ignore it (a harmless "Manually-specified
-# variables were not used by the project" warning at the end of their configure).
+# variables were not used by the project" warning at the end of their
+# configure).
 list(APPEND VCPKG_CMAKE_CONFIGURE_OPTIONS "-DFEATURE_liburing:BOOL=OFF")
