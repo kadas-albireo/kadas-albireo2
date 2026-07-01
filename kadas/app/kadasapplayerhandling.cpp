@@ -63,6 +63,7 @@
 
 #include <qgis/qgis_3d.h>
 #include <qgis/qgspolygon3dsymbol.h>
+#include <qgis/qgsphongmaterialsettings.h>
 #include <qgis/qgsvectorlayer3drenderer.h>
 
 
