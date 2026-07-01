@@ -1,0 +1,2816 @@
+From 70d8bec68e1dc0dc489aba054bd5173f64c8314d Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Wed, 1 Jul 2026 00:15:53 +0200
+Subject: [PATCH 01/10] add itemsChanged signal to annotation layer
+
+---
+ python/PyQt6/core/auto_additions/qgsannotationlayer.py   | 1 +
+ .../auto_generated/annotations/qgsannotationlayer.sip.in | 9 +++++++++
+ src/core/annotations/qgsannotationlayer.cpp              | 8 ++++++++
+ src/core/annotations/qgsannotationlayer.h                | 9 +++++++++
+ 4 files changed, 27 insertions(+)
+
+diff --git a/python/PyQt6/core/auto_additions/qgsannotationlayer.py b/python/PyQt6/core/auto_additions/qgsannotationlayer.py
+index 276a8cba645d..ae7002fde8e8 100644
+--- a/python/PyQt6/core/auto_additions/qgsannotationlayer.py
++++ b/python/PyQt6/core/auto_additions/qgsannotationlayer.py
+@@ -9,6 +9,7 @@
+ except (NameError, AttributeError):
+     pass
+ try:
++    QgsAnnotationLayer.__attribute_docs__ = {'itemsChanged': 'Emitted when items are added, removed or modified in the layer.\n\n.. versionadded:: 4.4\n'}
+     QgsAnnotationLayer.__overridden_methods__ = ['properties', 'clone', 'createMapRenderer', 'extent', 'setTransformContext', 'readXml', 'writeXml', 'writeSymbology', 'readSymbology', 'writeStyle', 'readStyle', 'isEditable', 'supportsEditing', 'dataProvider', 'htmlMetadata', 'resolveReferences']
+     QgsAnnotationLayer.__group__ = ['annotations']
+ except (NameError, AttributeError):
+diff --git a/python/PyQt6/core/auto_generated/annotations/qgsannotationlayer.sip.in b/python/PyQt6/core/auto_generated/annotations/qgsannotationlayer.sip.in
+index b9f69d184b2b..211fcf56c939 100644
+--- a/python/PyQt6/core/auto_generated/annotations/qgsannotationlayer.sip.in
++++ b/python/PyQt6/core/auto_generated/annotations/qgsannotationlayer.sip.in
+@@ -215,6 +215,15 @@ only be visible when the linked layer is also visible.
+ .. seealso:: :py:func:`linkedVisibilityLayer`
+ 
+ .. versionadded:: 3.40
++%End
++
++  signals:
++
++    void itemsChanged();
++%Docstring
++Emitted when items are added, removed or modified in the layer.
++
++.. versionadded:: 4.4
+ %End
+ 
+ };
+diff --git a/src/core/annotations/qgsannotationlayer.cpp b/src/core/annotations/qgsannotationlayer.cpp
+index ecec80594c4e..e9112a0baddc 100644
+--- a/src/core/annotations/qgsannotationlayer.cpp
++++ b/src/core/annotations/qgsannotationlayer.cpp
+@@ -131,6 +131,7 @@ QString QgsAnnotationLayer::addItem( QgsAnnotationItem *item )
+   else
+     mSpatialIndex->insert( uuid, item->boundingBox() );
+ 
++  emit itemsChanged();
+   triggerRepaint();
+ 
+   return uuid;
+@@ -161,6 +162,7 @@ void QgsAnnotationLayer::replaceItem( const QString &id, QgsAnnotationItem *item
+   else
+     mSpatialIndex->insert( id, item->boundingBox() );
+ 
++  emit itemsChanged();
+   triggerRepaint();
+ }
+ 
+@@ -185,6 +187,7 @@ bool QgsAnnotationLayer::removeItem( const QString &id )
+ 
+   item.reset();
+ 
++  emit itemsChanged();
+   triggerRepaint();
+ 
+   return true;
+@@ -199,6 +202,7 @@ void QgsAnnotationLayer::clear()
+   mSpatialIndex = std::make_unique< QgsAnnotationLayerSpatialIndex >();
+   mNonIndexedItems.clear();
+ 
++  emit itemsChanged();
+   triggerRepaint();
+ }
+ 
+@@ -285,7 +289,10 @@ Qgis::AnnotationItemEditOperationResult QgsAnnotationLayer::applyEditV2( QgsAbst
+   }
+ 
+   if ( res != Qgis::AnnotationItemEditOperationResult::Invalid )
++  {
++    emit itemsChanged();
+     triggerRepaint();
++  }
+ 
+   return res;
+ }
+@@ -381,6 +388,7 @@ bool QgsAnnotationLayer::readXml( const QDomNode &layerNode, QgsReadWriteContext
+     mLinkedLayer = QgsMapLayerRef( layerId, layerName, layerSource, layerProvider );
+   }
+ 
++  emit itemsChanged();
+   triggerRepaint();
+ 
+   return mValid;
+diff --git a/src/core/annotations/qgsannotationlayer.h b/src/core/annotations/qgsannotationlayer.h
+index 0fbed1be5164..df7ea9f91efb 100644
+--- a/src/core/annotations/qgsannotationlayer.h
++++ b/src/core/annotations/qgsannotationlayer.h
+@@ -225,6 +225,15 @@ class CORE_EXPORT QgsAnnotationLayer : public QgsMapLayer
+      */
+     void setLinkedVisibilityLayer( QgsMapLayer *layer );
+ 
++  signals:
++
++    /**
++     * Emitted when items are added, removed or modified in the layer.
++     *
++     * \since QGIS 4.4
++     */
++    void itemsChanged();
++
+   private:
+     QStringList queryIndex( const QgsRectangle &bounds, QgsFeedback *feedback = nullptr ) const;
+     bool writeItems( QDomNode &node, QDomDocument &doc, QString &errorMessage, const QgsReadWriteContext &context, StyleCategories categories = AllStyleCategories ) const;
+
+From 0db062814f6354dc2ff26576444716139b9533a5 Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Wed, 1 Jul 2026 00:16:06 +0200
+Subject: [PATCH 02/10] add SetItemBounds annotation edit operation
+
+---
+ .../qgsannotationitemeditoperation.py         |  10 +
+ .../qgsannotationitemeditoperation.sip.in     |  32 +++
+ python/PyQt6/core/class_map.yaml              | 185 +++++++++---------
+ .../qgsannotationitemeditoperation.cpp        |  15 ++
+ .../qgsannotationitemeditoperation.h          |  27 +++
+ .../annotations/qgsannotationlineitem.cpp     |   4 +
+ .../annotations/qgsannotationlinetextitem.cpp |   4 +
+ .../annotations/qgsannotationmarkeritem.cpp   |   2 +
+ .../qgsannotationpointtextitem.cpp            |   2 +
+ .../annotations/qgsannotationpolygonitem.cpp  |   4 +
+ 10 files changed, 197 insertions(+), 88 deletions(-)
+
+diff --git a/python/PyQt6/core/auto_additions/qgsannotationitemeditoperation.py b/python/PyQt6/core/auto_additions/qgsannotationitemeditoperation.py
+index 37c89e2a367a..f132ab7d347f 100644
+--- a/python/PyQt6/core/auto_additions/qgsannotationitemeditoperation.py
++++ b/python/PyQt6/core/auto_additions/qgsannotationitemeditoperation.py
+@@ -5,6 +5,7 @@
+ QgsAbstractAnnotationItemEditOperation.Type.AddNode.__doc__ = "Add a node"
+ QgsAbstractAnnotationItemEditOperation.Type.TranslateItem.__doc__ = "Translate (move) an item"
+ QgsAbstractAnnotationItemEditOperation.Type.RotateItem.__doc__ = "Rotate an item \n.. versionadded:: 4.0"
++QgsAbstractAnnotationItemEditOperation.Type.SetItemBounds.__doc__ = "Set the bounds of an item \n.. versionadded:: 4.4"
+ QgsAbstractAnnotationItemEditOperation.Type.__doc__ = """Operation type
+ 
+ * ``MoveNode``: Move a node
+@@ -15,6 +16,10 @@
+ 
+   .. versionadded:: 4.0
+ 
++* ``SetItemBounds``: Set the bounds of an item
++
++  .. versionadded:: 4.4
++
+ 
+ """
+ # --
+@@ -48,6 +53,11 @@
+     QgsAnnotationItemEditOperationRotateItem.__group__ = ['annotations']
+ except (NameError, AttributeError):
+     pass
++try:
++    QgsAnnotationItemEditOperationSetItemBounds.__overridden_methods__ = ['type']
++    QgsAnnotationItemEditOperationSetItemBounds.__group__ = ['annotations']
++except (NameError, AttributeError):
++    pass
+ try:
+     QgsAnnotationItemEditContext.__group__ = ['annotations']
+ except (NameError, AttributeError):
+diff --git a/python/PyQt6/core/auto_generated/annotations/qgsannotationitemeditoperation.sip.in b/python/PyQt6/core/auto_generated/annotations/qgsannotationitemeditoperation.sip.in
+index b272200ca8d7..68f9898c3aa5 100644
+--- a/python/PyQt6/core/auto_generated/annotations/qgsannotationitemeditoperation.sip.in
++++ b/python/PyQt6/core/auto_generated/annotations/qgsannotationitemeditoperation.sip.in
+@@ -74,6 +74,7 @@ Abstract base class for annotation item edit operations.
+       AddNode,
+       TranslateItem,
+       RotateItem,
++      SetItemBounds,
+     };
+ 
+     QgsAbstractAnnotationItemEditOperation( const QString &itemId );
+@@ -327,6 +328,37 @@ Returns the rotation angle value (in degrees clockwise).
+ };
+ 
+ 
++class QgsAnnotationItemEditOperationSetItemBounds : QgsAbstractAnnotationItemEditOperation
++{
++%Docstring(signature="appended")
++Annotation item edit operation consisting of setting the bounds of an
++item.
++
++.. versionadded:: 4.4
++%End
++
++%TypeHeaderCode
++#include "qgsannotationitemeditoperation.h"
++%End
++  public:
++    QgsAnnotationItemEditOperationSetItemBounds( const QString &itemId, const QgsRectangle &bounds );
++%Docstring
++Constructor for QgsAnnotationItemEditOperationSetItemBounds, setting the
++item with the specified ``itemId`` to the given ``bounds`` (in the
++annotation layer's CRS).
++%End
++
++    virtual Type type() const;
++
++
++    QgsRectangle bounds() const;
++%Docstring
++Returns the new item bounds (in the annotation layer's CRS).
++%End
++
++};
++
++
+ class QgsAnnotationItemEditOperationTransientResults
+ {
+ %Docstring(signature="appended")
+diff --git a/python/PyQt6/core/class_map.yaml b/python/PyQt6/core/class_map.yaml
+index 90a8169a7464..d920edf2193a 100644
+--- a/python/PyQt6/core/class_map.yaml
++++ b/python/PyQt6/core/class_map.yaml
+@@ -108,8 +108,8 @@ QgsAbstract3DSymbol.setMaterialSettings: src/core/./3d/qgsabstract3dsymbol.h#L12
+ QgsAbstract3DSymbol.type: src/core/./3d/qgsabstract3dsymbol.h#L53
+ QgsAbstract3DSymbol.writeXml: src/core/./3d/qgsabstract3dsymbol.h#L58
+ QgsAbstract3DSymbol: src/core/./3d/qgsabstract3dsymbol.h#L47
+-QgsAbstractAnnotationItemEditOperation.itemId: src/core/annotations/qgsannotationitemeditoperation.h#L106
+-QgsAbstractAnnotationItemEditOperation.type: src/core/annotations/qgsannotationitemeditoperation.h#L101
++QgsAbstractAnnotationItemEditOperation.itemId: src/core/annotations/qgsannotationitemeditoperation.h#L107
++QgsAbstractAnnotationItemEditOperation.type: src/core/annotations/qgsannotationitemeditoperation.h#L102
+ QgsAbstractAnnotationItemEditOperation: src/core/annotations/qgsannotationitemeditoperation.h#L76
+ QgsAbstractBabelFormat.QgsAbstractBabelFormat: src/core/gps/qgsbabelformat.h#L79
+ QgsAbstractBabelFormat.capabilities: src/core/gps/qgsbabelformat.h#L47
+@@ -798,39 +798,39 @@ QgsAnnotation.setRelativePosition: src/core/annotations/qgsannotation.h#L160
+ QgsAnnotation.setVisible: src/core/annotations/qgsannotation.h#L98
+ QgsAnnotation.writeXml: src/core/annotations/qgsannotation.h#L260
+ QgsAnnotation: src/core/annotations/qgsannotation.h#L52
+-QgsAnnotationItem.applyEdit: src/core/annotations/qgsannotationitem.h#L164
+-QgsAnnotationItem.applyEditV2: src/core/annotations/qgsannotationitem.h#L171
+-QgsAnnotationItem.boundingBox: src/core/annotations/qgsannotationitem.h#L120
+-QgsAnnotationItem.boundingBox: src/core/annotations/qgsannotationitem.h#L129
+-QgsAnnotationItem.callout: src/core/annotations/qgsannotationitem.h#L298
+-QgsAnnotationItem.calloutAnchor: src/core/annotations/qgsannotationitem.h#L326
+-QgsAnnotationItem.clone: src/core/annotations/qgsannotationitem.h#L110
+-QgsAnnotationItem.copyCommonProperties: src/core/annotations/qgsannotationitem.h#L397
+-QgsAnnotationItem.enabled: src/core/annotations/qgsannotationitem.h#L209
+-QgsAnnotationItem.flags: src/core/annotations/qgsannotationitem.h#L101
+-QgsAnnotationItem.offsetFromCallout: src/core/annotations/qgsannotationitem.h#L355
+-QgsAnnotationItem.offsetFromCalloutUnit: src/core/annotations/qgsannotationitem.h#L379
+-QgsAnnotationItem.readCommonProperties: src/core/annotations/qgsannotationitem.h#L413
+-QgsAnnotationItem.readXml: src/core/annotations/qgsannotationitem.h#L157
+-QgsAnnotationItem.render: src/core/annotations/qgsannotationitem.h#L137
+-QgsAnnotationItem.renderCallout: src/core/annotations/qgsannotationitem.h#L422
+-QgsAnnotationItem.setCallout: src/core/annotations/qgsannotationitem.h#L311
+-QgsAnnotationItem.setCalloutAnchor: src/core/annotations/qgsannotationitem.h#L341
+-QgsAnnotationItem.setEnabled: src/core/annotations/qgsannotationitem.h#L217
+-QgsAnnotationItem.setOffsetFromCallout: src/core/annotations/qgsannotationitem.h#L369
+-QgsAnnotationItem.setOffsetFromCalloutUnit: src/core/annotations/qgsannotationitem.h#L389
+-QgsAnnotationItem.setSymbologyReferenceScale: src/core/annotations/qgsannotationitem.h#L281
+-QgsAnnotationItem.setUseSymbologyReferenceScale: src/core/annotations/qgsannotationitem.h#L247
+-QgsAnnotationItem.setZIndex: src/core/annotations/qgsannotationitem.h#L201
+-QgsAnnotationItem.symbologyReferenceScale: src/core/annotations/qgsannotationitem.h#L264
+-QgsAnnotationItem.transientEditResults: src/core/annotations/qgsannotationitem.h#L178
+-QgsAnnotationItem.transientEditResultsV2: src/core/annotations/qgsannotationitem.h#L185
+-QgsAnnotationItem.type: src/core/annotations/qgsannotationitem.h#L115
+-QgsAnnotationItem.useSymbologyReferenceScale: src/core/annotations/qgsannotationitem.h#L239
+-QgsAnnotationItem.writeCommonProperties: src/core/annotations/qgsannotationitem.h#L405
+-QgsAnnotationItem.writeXml: src/core/annotations/qgsannotationitem.h#L147
+-QgsAnnotationItem.zIndex: src/core/annotations/qgsannotationitem.h#L193
+-QgsAnnotationItem: src/core/annotations/qgsannotationitem.h#L47
++QgsAnnotationItem.applyEdit: src/core/annotations/qgsannotationitem.h#L165
++QgsAnnotationItem.applyEditV2: src/core/annotations/qgsannotationitem.h#L172
++QgsAnnotationItem.boundingBox: src/core/annotations/qgsannotationitem.h#L121
++QgsAnnotationItem.boundingBox: src/core/annotations/qgsannotationitem.h#L130
++QgsAnnotationItem.callout: src/core/annotations/qgsannotationitem.h#L299
++QgsAnnotationItem.calloutAnchor: src/core/annotations/qgsannotationitem.h#L327
++QgsAnnotationItem.clone: src/core/annotations/qgsannotationitem.h#L111
++QgsAnnotationItem.copyCommonProperties: src/core/annotations/qgsannotationitem.h#L398
++QgsAnnotationItem.enabled: src/core/annotations/qgsannotationitem.h#L210
++QgsAnnotationItem.flags: src/core/annotations/qgsannotationitem.h#L102
++QgsAnnotationItem.offsetFromCallout: src/core/annotations/qgsannotationitem.h#L356
++QgsAnnotationItem.offsetFromCalloutUnit: src/core/annotations/qgsannotationitem.h#L380
++QgsAnnotationItem.readCommonProperties: src/core/annotations/qgsannotationitem.h#L414
++QgsAnnotationItem.readXml: src/core/annotations/qgsannotationitem.h#L158
++QgsAnnotationItem.render: src/core/annotations/qgsannotationitem.h#L138
++QgsAnnotationItem.renderCallout: src/core/annotations/qgsannotationitem.h#L423
++QgsAnnotationItem.setCallout: src/core/annotations/qgsannotationitem.h#L312
++QgsAnnotationItem.setCalloutAnchor: src/core/annotations/qgsannotationitem.h#L342
++QgsAnnotationItem.setEnabled: src/core/annotations/qgsannotationitem.h#L218
++QgsAnnotationItem.setOffsetFromCallout: src/core/annotations/qgsannotationitem.h#L370
++QgsAnnotationItem.setOffsetFromCalloutUnit: src/core/annotations/qgsannotationitem.h#L390
++QgsAnnotationItem.setSymbologyReferenceScale: src/core/annotations/qgsannotationitem.h#L282
++QgsAnnotationItem.setUseSymbologyReferenceScale: src/core/annotations/qgsannotationitem.h#L248
++QgsAnnotationItem.setZIndex: src/core/annotations/qgsannotationitem.h#L202
++QgsAnnotationItem.symbologyReferenceScale: src/core/annotations/qgsannotationitem.h#L265
++QgsAnnotationItem.transientEditResults: src/core/annotations/qgsannotationitem.h#L179
++QgsAnnotationItem.transientEditResultsV2: src/core/annotations/qgsannotationitem.h#L186
++QgsAnnotationItem.type: src/core/annotations/qgsannotationitem.h#L116
++QgsAnnotationItem.useSymbologyReferenceScale: src/core/annotations/qgsannotationitem.h#L240
++QgsAnnotationItem.writeCommonProperties: src/core/annotations/qgsannotationitem.h#L406
++QgsAnnotationItem.writeXml: src/core/annotations/qgsannotationitem.h#L148
++QgsAnnotationItem.zIndex: src/core/annotations/qgsannotationitem.h#L194
++QgsAnnotationItem: src/core/annotations/qgsannotationitem.h#L48
+ QgsAnnotationItemAbstractMetadata.createItem: src/core/annotations/qgsannotationitemregistry.h#L79
+ QgsAnnotationItemAbstractMetadata.type: src/core/annotations/qgsannotationitemregistry.h#L63
+ QgsAnnotationItemAbstractMetadata.visibleName: src/core/annotations/qgsannotationitemregistry.h#L69
+@@ -841,32 +841,35 @@ QgsAnnotationItemEditContext.renderContext: src/core/annotations/qgsannotationit
+ QgsAnnotationItemEditContext.setCurrentItemBounds: src/core/annotations/qgsannotationitemeditoperation.h#L50
+ QgsAnnotationItemEditContext.setRenderContext: src/core/annotations/qgsannotationitemeditoperation.h#L64
+ QgsAnnotationItemEditContext: src/core/annotations/qgsannotationitemeditoperation.h#L33
+-QgsAnnotationItemEditOperationAddNode.point: src/core/annotations/qgsannotationitemeditoperation.h#L224
+-QgsAnnotationItemEditOperationAddNode.type: src/core/annotations/qgsannotationitemeditoperation.h#L219
+-QgsAnnotationItemEditOperationAddNode: src/core/annotations/qgsannotationitemeditoperation.h#L211
+-QgsAnnotationItemEditOperationDeleteNode.before: src/core/annotations/qgsannotationitemeditoperation.h#L199
+-QgsAnnotationItemEditOperationDeleteNode.nodeId: src/core/annotations/qgsannotationitemeditoperation.h#L194
+-QgsAnnotationItemEditOperationDeleteNode.type: src/core/annotations/qgsannotationitemeditoperation.h#L189
+-QgsAnnotationItemEditOperationDeleteNode: src/core/annotations/qgsannotationitemeditoperation.h#L180
+-QgsAnnotationItemEditOperationMoveNode.after: src/core/annotations/qgsannotationitemeditoperation.h#L147
+-QgsAnnotationItemEditOperationMoveNode.before: src/core/annotations/qgsannotationitemeditoperation.h#L140
+-QgsAnnotationItemEditOperationMoveNode.nodeId: src/core/annotations/qgsannotationitemeditoperation.h#L133
+-QgsAnnotationItemEditOperationMoveNode.translationXPixels: src/core/annotations/qgsannotationitemeditoperation.h#L155
+-QgsAnnotationItemEditOperationMoveNode.translationYPixels: src/core/annotations/qgsannotationitemeditoperation.h#L163
+-QgsAnnotationItemEditOperationMoveNode.type: src/core/annotations/qgsannotationitemeditoperation.h#L128
+-QgsAnnotationItemEditOperationMoveNode: src/core/annotations/qgsannotationitemeditoperation.h#L117
+-QgsAnnotationItemEditOperationRotateItem.angle: src/core/annotations/qgsannotationitemeditoperation.h#L312
+-QgsAnnotationItemEditOperationRotateItem.type: src/core/annotations/qgsannotationitemeditoperation.h#L307
+-QgsAnnotationItemEditOperationRotateItem: src/core/annotations/qgsannotationitemeditoperation.h#L298
+-QgsAnnotationItemEditOperationTransientResults.representativeGeometry: src/core/annotations/qgsannotationitemeditoperation.h#L343
+-QgsAnnotationItemEditOperationTransientResults: src/core/annotations/qgsannotationitemeditoperation.h#L324
+-QgsAnnotationItemEditOperationTranslateItem.nodeId: src/core/annotations/qgsannotationitemeditoperation.h#L252
+-QgsAnnotationItemEditOperationTranslateItem.translationX: src/core/annotations/qgsannotationitemeditoperation.h#L259
+-QgsAnnotationItemEditOperationTranslateItem.translationXPixels: src/core/annotations/qgsannotationitemeditoperation.h#L274
+-QgsAnnotationItemEditOperationTranslateItem.translationY: src/core/annotations/qgsannotationitemeditoperation.h#L266
+-QgsAnnotationItemEditOperationTranslateItem.translationYPixels: src/core/annotations/qgsannotationitemeditoperation.h#L282
+-QgsAnnotationItemEditOperationTranslateItem.type: src/core/annotations/qgsannotationitemeditoperation.h#L247
+-QgsAnnotationItemEditOperationTranslateItem: src/core/annotations/qgsannotationitemeditoperation.h#L236
++QgsAnnotationItemEditOperationAddNode.point: src/core/annotations/qgsannotationitemeditoperation.h#L225
++QgsAnnotationItemEditOperationAddNode.type: src/core/annotations/qgsannotationitemeditoperation.h#L220
++QgsAnnotationItemEditOperationAddNode: src/core/annotations/qgsannotationitemeditoperation.h#L212
++QgsAnnotationItemEditOperationDeleteNode.before: src/core/annotations/qgsannotationitemeditoperation.h#L200
++QgsAnnotationItemEditOperationDeleteNode.nodeId: src/core/annotations/qgsannotationitemeditoperation.h#L195
++QgsAnnotationItemEditOperationDeleteNode.type: src/core/annotations/qgsannotationitemeditoperation.h#L190
++QgsAnnotationItemEditOperationDeleteNode: src/core/annotations/qgsannotationitemeditoperation.h#L181
++QgsAnnotationItemEditOperationMoveNode.after: src/core/annotations/qgsannotationitemeditoperation.h#L148
++QgsAnnotationItemEditOperationMoveNode.before: src/core/annotations/qgsannotationitemeditoperation.h#L141
++QgsAnnotationItemEditOperationMoveNode.nodeId: src/core/annotations/qgsannotationitemeditoperation.h#L134
++QgsAnnotationItemEditOperationMoveNode.translationXPixels: src/core/annotations/qgsannotationitemeditoperation.h#L156
++QgsAnnotationItemEditOperationMoveNode.translationYPixels: src/core/annotations/qgsannotationitemeditoperation.h#L164
++QgsAnnotationItemEditOperationMoveNode.type: src/core/annotations/qgsannotationitemeditoperation.h#L129
++QgsAnnotationItemEditOperationMoveNode: src/core/annotations/qgsannotationitemeditoperation.h#L118
++QgsAnnotationItemEditOperationRotateItem.angle: src/core/annotations/qgsannotationitemeditoperation.h#L313
++QgsAnnotationItemEditOperationRotateItem.type: src/core/annotations/qgsannotationitemeditoperation.h#L308
++QgsAnnotationItemEditOperationRotateItem: src/core/annotations/qgsannotationitemeditoperation.h#L299
++QgsAnnotationItemEditOperationSetItemBounds.bounds: src/core/annotations/qgsannotationitemeditoperation.h#L339
++QgsAnnotationItemEditOperationSetItemBounds.type: src/core/annotations/qgsannotationitemeditoperation.h#L334
++QgsAnnotationItemEditOperationSetItemBounds: src/core/annotations/qgsannotationitemeditoperation.h#L325
++QgsAnnotationItemEditOperationTransientResults.representativeGeometry: src/core/annotations/qgsannotationitemeditoperation.h#L370
++QgsAnnotationItemEditOperationTransientResults: src/core/annotations/qgsannotationitemeditoperation.h#L351
++QgsAnnotationItemEditOperationTranslateItem.nodeId: src/core/annotations/qgsannotationitemeditoperation.h#L253
++QgsAnnotationItemEditOperationTranslateItem.translationX: src/core/annotations/qgsannotationitemeditoperation.h#L260
++QgsAnnotationItemEditOperationTranslateItem.translationXPixels: src/core/annotations/qgsannotationitemeditoperation.h#L275
++QgsAnnotationItemEditOperationTranslateItem.translationY: src/core/annotations/qgsannotationitemeditoperation.h#L267
++QgsAnnotationItemEditOperationTranslateItem.translationYPixels: src/core/annotations/qgsannotationitemeditoperation.h#L283
++QgsAnnotationItemEditOperationTranslateItem.type: src/core/annotations/qgsannotationitemeditoperation.h#L248
++QgsAnnotationItemEditOperationTranslateItem: src/core/annotations/qgsannotationitemeditoperation.h#L237
+ QgsAnnotationItemNode.__repr__: src/core/annotations/qgsannotationitemnode.h#L52
+ QgsAnnotationItemNode.cursor: src/core/annotations/qgsannotationitemnode.h#L109
+ QgsAnnotationItemNode.id: src/core/annotations/qgsannotationitemnode.h#L69
+@@ -897,6 +900,7 @@ QgsAnnotationLayer.htmlMetadata: src/core/annotations/qgsannotationlayer.h#L190
+ QgsAnnotationLayer.isEditable: src/core/annotations/qgsannotationlayer.h#L186
+ QgsAnnotationLayer.isEmpty: src/core/annotations/qgsannotationlayer.h#L130
+ QgsAnnotationLayer.item: src/core/annotations/qgsannotationlayer.h#L145
++QgsAnnotationLayer.itemsChanged: src/core/annotations/qgsannotationlayer.h#L235
+ QgsAnnotationLayer.itemsInBounds: src/core/annotations/qgsannotationlayer.h#L155
+ QgsAnnotationLayer.linkedVisibilityLayer: src/core/annotations/qgsannotationlayer.h#L217
+ QgsAnnotationLayer.paintEffect: src/core/annotations/qgsannotationlayer.h#L198
+@@ -1032,33 +1036,38 @@ QgsAnnotationPolygonItem.transientEditResultsV2: src/core/annotations/qgsannotat
+ QgsAnnotationPolygonItem.type: src/core/annotations/qgsannotationpolygonitem.h#L42
+ QgsAnnotationPolygonItem.writeXml: src/core/annotations/qgsannotationpolygonitem.h#L44
+ QgsAnnotationPolygonItem: src/core/annotations/qgsannotationpolygonitem.h#L33
+-QgsAnnotationRectItem.applyEditV2: src/core/annotations/qgsannotationrectitem.h#L46
+-QgsAnnotationRectItem.backgroundEnabled: src/core/annotations/qgsannotationrectitem.h#L131
+-QgsAnnotationRectItem.backgroundSymbol: src/core/annotations/qgsannotationrectitem.h#L147
+-QgsAnnotationRectItem.boundingBox: src/core/annotations/qgsannotationrectitem.h#L48
+-QgsAnnotationRectItem.boundingBox: src/core/annotations/qgsannotationrectitem.h#L49
+-QgsAnnotationRectItem.bounds: src/core/annotations/qgsannotationrectitem.h#L61
+-QgsAnnotationRectItem.copyCommonProperties: src/core/annotations/qgsannotationrectitem.h#L194
+-QgsAnnotationRectItem.fixedSize: src/core/annotations/qgsannotationrectitem.h#L97
+-QgsAnnotationRectItem.fixedSizeUnit: src/core/annotations/qgsannotationrectitem.h#L115
+-QgsAnnotationRectItem.flags: src/core/annotations/qgsannotationrectitem.h#L43
+-QgsAnnotationRectItem.frameEnabled: src/core/annotations/qgsannotationrectitem.h#L165
+-QgsAnnotationRectItem.frameSymbol: src/core/annotations/qgsannotationrectitem.h#L181
+-QgsAnnotationRectItem.placementMode: src/core/annotations/qgsannotationrectitem.h#L80
+-QgsAnnotationRectItem.readCommonProperties: src/core/annotations/qgsannotationrectitem.h#L196
+-QgsAnnotationRectItem.render: src/core/annotations/qgsannotationrectitem.h#L44
+-QgsAnnotationRectItem.renderInBounds: src/core/annotations/qgsannotationrectitem.h#L207
+-QgsAnnotationRectItem.setBackgroundEnabled: src/core/annotations/qgsannotationrectitem.h#L139
+-QgsAnnotationRectItem.setBackgroundSymbol: src/core/annotations/qgsannotationrectitem.h#L157
+-QgsAnnotationRectItem.setBounds: src/core/annotations/qgsannotationrectitem.h#L73
+-QgsAnnotationRectItem.setFixedSize: src/core/annotations/qgsannotationrectitem.h#L107
+-QgsAnnotationRectItem.setFixedSizeUnit: src/core/annotations/qgsannotationrectitem.h#L123
+-QgsAnnotationRectItem.setFrameEnabled: src/core/annotations/qgsannotationrectitem.h#L173
+-QgsAnnotationRectItem.setFrameSymbol: src/core/annotations/qgsannotationrectitem.h#L191
+-QgsAnnotationRectItem.setPlacementMode: src/core/annotations/qgsannotationrectitem.h#L87
+-QgsAnnotationRectItem.transientEditResultsV2: src/core/annotations/qgsannotationrectitem.h#L47
+-QgsAnnotationRectItem.writeCommonProperties: src/core/annotations/qgsannotationrectitem.h#L195
+-QgsAnnotationRectItem: src/core/annotations/qgsannotationrectitem.h#L33
++QgsAnnotationRectItem.appliedRotation: src/core/annotations/qgsannotationrectitem.h#L171
++QgsAnnotationRectItem.applyEditV2: src/core/annotations/qgsannotationrectitem.h#L48
++QgsAnnotationRectItem.backgroundEnabled: src/core/annotations/qgsannotationrectitem.h#L197
++QgsAnnotationRectItem.backgroundSymbol: src/core/annotations/qgsannotationrectitem.h#L213
++QgsAnnotationRectItem.boundingBox: src/core/annotations/qgsannotationrectitem.h#L50
++QgsAnnotationRectItem.boundingBox: src/core/annotations/qgsannotationrectitem.h#L51
++QgsAnnotationRectItem.bounds: src/core/annotations/qgsannotationrectitem.h#L63
++QgsAnnotationRectItem.copyCommonProperties: src/core/annotations/qgsannotationrectitem.h#L260
++QgsAnnotationRectItem.fixedSize: src/core/annotations/qgsannotationrectitem.h#L99
++QgsAnnotationRectItem.fixedSizeUnit: src/core/annotations/qgsannotationrectitem.h#L117
++QgsAnnotationRectItem.flags: src/core/annotations/qgsannotationrectitem.h#L45
++QgsAnnotationRectItem.frameEnabled: src/core/annotations/qgsannotationrectitem.h#L231
++QgsAnnotationRectItem.frameSymbol: src/core/annotations/qgsannotationrectitem.h#L247
++QgsAnnotationRectItem.placementMode: src/core/annotations/qgsannotationrectitem.h#L82
++QgsAnnotationRectItem.readCommonProperties: src/core/annotations/qgsannotationrectitem.h#L262
++QgsAnnotationRectItem.render: src/core/annotations/qgsannotationrectitem.h#L46
++QgsAnnotationRectItem.renderInBounds: src/core/annotations/qgsannotationrectitem.h#L273
++QgsAnnotationRectItem.rotation: src/core/annotations/qgsannotationrectitem.h#L133
++QgsAnnotationRectItem.rotationMode: src/core/annotations/qgsannotationrectitem.h#L149
++QgsAnnotationRectItem.setBackgroundEnabled: src/core/annotations/qgsannotationrectitem.h#L205
++QgsAnnotationRectItem.setBackgroundSymbol: src/core/annotations/qgsannotationrectitem.h#L223
++QgsAnnotationRectItem.setBounds: src/core/annotations/qgsannotationrectitem.h#L75
++QgsAnnotationRectItem.setFixedSize: src/core/annotations/qgsannotationrectitem.h#L109
++QgsAnnotationRectItem.setFixedSizeUnit: src/core/annotations/qgsannotationrectitem.h#L125
++QgsAnnotationRectItem.setFrameEnabled: src/core/annotations/qgsannotationrectitem.h#L239
++QgsAnnotationRectItem.setFrameSymbol: src/core/annotations/qgsannotationrectitem.h#L257
++QgsAnnotationRectItem.setPlacementMode: src/core/annotations/qgsannotationrectitem.h#L89
++QgsAnnotationRectItem.setRotation: src/core/annotations/qgsannotationrectitem.h#L141
++QgsAnnotationRectItem.setRotationMode: src/core/annotations/qgsannotationrectitem.h#L157
++QgsAnnotationRectItem.transientEditResultsV2: src/core/annotations/qgsannotationrectitem.h#L49
++QgsAnnotationRectItem.writeCommonProperties: src/core/annotations/qgsannotationrectitem.h#L261
++QgsAnnotationRectItem: src/core/annotations/qgsannotationrectitem.h#L35
+ QgsAnnotationRectangleTextItem.alignment: src/core/annotations/qgsannotationrectangletextitem.h#L88
+ QgsAnnotationRectangleTextItem.clone: src/core/annotations/qgsannotationrectangletextitem.h#L53
+ QgsAnnotationRectangleTextItem.create: src/core/annotations/qgsannotationrectangletextitem.h#L50
+diff --git a/src/core/annotations/qgsannotationitemeditoperation.cpp b/src/core/annotations/qgsannotationitemeditoperation.cpp
+index 2fd44ffd3b76..248ea572c969 100644
+--- a/src/core/annotations/qgsannotationitemeditoperation.cpp
++++ b/src/core/annotations/qgsannotationitemeditoperation.cpp
+@@ -119,6 +119,21 @@ QgsAbstractAnnotationItemEditOperation::Type QgsAnnotationItemEditOperationRotat
+ }
+ 
+ 
++//
++// QgsAnnotationItemEditOperationSetItemBounds
++//
++
++QgsAnnotationItemEditOperationSetItemBounds::QgsAnnotationItemEditOperationSetItemBounds( const QString &itemId, const QgsRectangle &bounds )
++  : QgsAbstractAnnotationItemEditOperation( itemId )
++  , mBounds( bounds )
++{}
++
++QgsAbstractAnnotationItemEditOperation::Type QgsAnnotationItemEditOperationSetItemBounds::type() const
++{
++  return Type::SetItemBounds;
++}
++
++
+ //
+ // QgsAnnotationItemEditOperationAddNode
+ //
+diff --git a/src/core/annotations/qgsannotationitemeditoperation.h b/src/core/annotations/qgsannotationitemeditoperation.h
+index b39e97b3eeb1..b2368738edba 100644
+--- a/src/core/annotations/qgsannotationitemeditoperation.h
++++ b/src/core/annotations/qgsannotationitemeditoperation.h
+@@ -86,6 +86,7 @@ class CORE_EXPORT QgsAbstractAnnotationItemEditOperation
+       AddNode,       //!< Add a node
+       TranslateItem, //!< Translate (move) an item
+       RotateItem,    //!< Rotate an item \since QGIS 4.0
++      SetItemBounds, //!< Set the bounds of an item \since QGIS 4.4
+     };
+ 
+     /**
+@@ -316,6 +317,32 @@ class CORE_EXPORT QgsAnnotationItemEditOperationRotateItem : public QgsAbstractA
+ };
+ 
+ 
++/**
++ * \ingroup core
++ * \brief Annotation item edit operation consisting of setting the bounds of an item.
++ * \since QGIS 4.4
++ */
++class CORE_EXPORT QgsAnnotationItemEditOperationSetItemBounds : public QgsAbstractAnnotationItemEditOperation
++{
++  public:
++    /**
++     * Constructor for QgsAnnotationItemEditOperationSetItemBounds, setting the item with the specified \a itemId
++     * to the given \a bounds (in the annotation layer's CRS).
++     */
++    QgsAnnotationItemEditOperationSetItemBounds( const QString &itemId, const QgsRectangle &bounds );
++
++    Type type() const override;
++
++    /**
++     * Returns the new item bounds (in the annotation layer's CRS).
++     */
++    QgsRectangle bounds() const { return mBounds; }
++
++  private:
++    QgsRectangle mBounds;
++};
++
++
+ /**
+  * \ingroup core
+  * \brief Encapsulates the transient results of an in-progress annotation edit operation.
+diff --git a/src/core/annotations/qgsannotationlineitem.cpp b/src/core/annotations/qgsannotationlineitem.cpp
+index e0ae04ff353a..8de1f7b277fd 100644
+--- a/src/core/annotations/qgsannotationlineitem.cpp
++++ b/src/core/annotations/qgsannotationlineitem.cpp
+@@ -142,6 +142,9 @@ Qgis::AnnotationItemEditOperationResult QgsAnnotationLineItem::applyEditV2( QgsA
+       mCurve->transform( transform );
+       return Qgis::AnnotationItemEditOperationResult::Success;
+     }
++
++    case QgsAbstractAnnotationItemEditOperation::Type::SetItemBounds:
++      break;
+   }
+ 
+   return Qgis::AnnotationItemEditOperationResult::Invalid;
+@@ -183,6 +186,7 @@ QgsAnnotationItemEditOperationTransientResults *QgsAnnotationLineItem::transient
+       return new QgsAnnotationItemEditOperationTransientResults( QgsGeometry( std::move( modifiedCurve ) ) );
+     }
+ 
++    case QgsAbstractAnnotationItemEditOperation::Type::SetItemBounds:
+     case QgsAbstractAnnotationItemEditOperation::Type::DeleteNode:
+     case QgsAbstractAnnotationItemEditOperation::Type::AddNode:
+       break;
+diff --git a/src/core/annotations/qgsannotationlinetextitem.cpp b/src/core/annotations/qgsannotationlinetextitem.cpp
+index 44e8b1d8fba3..9189ba0a1576 100644
+--- a/src/core/annotations/qgsannotationlinetextitem.cpp
++++ b/src/core/annotations/qgsannotationlinetextitem.cpp
+@@ -164,6 +164,9 @@ Qgis::AnnotationItemEditOperationResult QgsAnnotationLineTextItem::applyEditV2(
+       mCurve->transform( transform );
+       return Qgis::AnnotationItemEditOperationResult::Success;
+     }
++
++    case QgsAbstractAnnotationItemEditOperation::Type::SetItemBounds:
++      break;
+   }
+ 
+   return Qgis::AnnotationItemEditOperationResult::Invalid;
+@@ -205,6 +208,7 @@ QgsAnnotationItemEditOperationTransientResults *QgsAnnotationLineTextItem::trans
+       return new QgsAnnotationItemEditOperationTransientResults( QgsGeometry( std::move( modifiedCurve ) ) );
+     }
+ 
++    case QgsAbstractAnnotationItemEditOperation::Type::SetItemBounds:
+     case QgsAbstractAnnotationItemEditOperation::Type::DeleteNode:
+     case QgsAbstractAnnotationItemEditOperation::Type::AddNode:
+       break;
+diff --git a/src/core/annotations/qgsannotationmarkeritem.cpp b/src/core/annotations/qgsannotationmarkeritem.cpp
+index d7b9f8cb05ac..ccc63f70f90e 100644
+--- a/src/core/annotations/qgsannotationmarkeritem.cpp
++++ b/src/core/annotations/qgsannotationmarkeritem.cpp
+@@ -118,6 +118,7 @@ Qgis::AnnotationItemEditOperationResult QgsAnnotationMarkerItem::applyEditV2( Qg
+       break;
+     }
+ 
++    case QgsAbstractAnnotationItemEditOperation::Type::SetItemBounds:
+     case QgsAbstractAnnotationItemEditOperation::Type::AddNode:
+       break;
+   }
+@@ -142,6 +143,7 @@ QgsAnnotationItemEditOperationTransientResults *QgsAnnotationMarkerItem::transie
+     }
+ 
+     case QgsAbstractAnnotationItemEditOperation::Type::RotateItem:
++    case QgsAbstractAnnotationItemEditOperation::Type::SetItemBounds:
+     case QgsAbstractAnnotationItemEditOperation::Type::DeleteNode:
+     case QgsAbstractAnnotationItemEditOperation::Type::AddNode:
+       break;
+diff --git a/src/core/annotations/qgsannotationpointtextitem.cpp b/src/core/annotations/qgsannotationpointtextitem.cpp
+index 93b41f835f1c..0ecfc1e3a784 100644
+--- a/src/core/annotations/qgsannotationpointtextitem.cpp
++++ b/src/core/annotations/qgsannotationpointtextitem.cpp
+@@ -277,6 +277,7 @@ Qgis::AnnotationItemEditOperationResult QgsAnnotationPointTextItem::applyEditV2(
+       return Qgis::AnnotationItemEditOperationResult::Success;
+     }
+ 
++    case QgsAbstractAnnotationItemEditOperation::Type::SetItemBounds:
+     case QgsAbstractAnnotationItemEditOperation::Type::AddNode:
+       break;
+   }
+@@ -301,6 +302,7 @@ QgsAnnotationItemEditOperationTransientResults *QgsAnnotationPointTextItem::tran
+     }
+ 
+     case QgsAbstractAnnotationItemEditOperation::Type::RotateItem:
++    case QgsAbstractAnnotationItemEditOperation::Type::SetItemBounds:
+     case QgsAbstractAnnotationItemEditOperation::Type::DeleteNode:
+     case QgsAbstractAnnotationItemEditOperation::Type::AddNode:
+       break;
+diff --git a/src/core/annotations/qgsannotationpolygonitem.cpp b/src/core/annotations/qgsannotationpolygonitem.cpp
+index ec7b526737e8..3d983137f122 100644
+--- a/src/core/annotations/qgsannotationpolygonitem.cpp
++++ b/src/core/annotations/qgsannotationpolygonitem.cpp
+@@ -170,6 +170,9 @@ Qgis::AnnotationItemEditOperationResult QgsAnnotationPolygonItem::applyEditV2( Q
+       mPolygon->transform( transform );
+       return Qgis::AnnotationItemEditOperationResult::Success;
+     }
++
++    case QgsAbstractAnnotationItemEditOperation::Type::SetItemBounds:
++      break;
+   }
+ 
+   return Qgis::AnnotationItemEditOperationResult::Invalid;
+@@ -211,6 +214,7 @@ QgsAnnotationItemEditOperationTransientResults *QgsAnnotationPolygonItem::transi
+       return new QgsAnnotationItemEditOperationTransientResults( QgsGeometry( std::move( modifiedPolygon ) ) );
+     }
+ 
++    case QgsAbstractAnnotationItemEditOperation::Type::SetItemBounds:
+     case QgsAbstractAnnotationItemEditOperation::Type::DeleteNode:
+     case QgsAbstractAnnotationItemEditOperation::Type::AddNode:
+       break;
+
+From 1bd1deb2d499de105cefc626d0ec9404b727a272 Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Wed, 1 Jul 2026 00:16:20 +0200
+Subject: [PATCH 03/10] add rotation support to rectangle annotation items
+
+---
+ .../annotations/qgsannotationrectitem.sip.in  |  60 ++++++++
+ .../annotations/qgsannotationrectitem.cpp     | 136 +++++++++++++++++-
+ src/core/annotations/qgsannotationrectitem.h  |  76 +++++++++-
+ 3 files changed, 264 insertions(+), 8 deletions(-)
+
+diff --git a/python/PyQt6/core/auto_generated/annotations/qgsannotationrectitem.sip.in b/python/PyQt6/core/auto_generated/annotations/qgsannotationrectitem.sip.in
+index 65b1d714efae..75dd04866edc 100644
+--- a/python/PyQt6/core/auto_generated/annotations/qgsannotationrectitem.sip.in
++++ b/python/PyQt6/core/auto_generated/annotations/qgsannotationrectitem.sip.in
+@@ -9,6 +9,7 @@
+ 
+ 
+ 
++
+ class QgsAnnotationRectItem : QgsAnnotationItem
+ {
+ %Docstring(signature="appended")
+@@ -137,6 +138,65 @@ Sets the ``unit`` to use for fixed item sizes, when the
+ .. seealso:: :py:func:`setFixedSize`
+ %End
+ 
++    double rotation() const;
++%Docstring
++Returns the rotation of the item, in degrees clockwise.
++
++.. seealso:: :py:func:`setRotation`
++
++.. versionadded:: 4.4
++%End
++
++    void setRotation( double rotation );
++%Docstring
++Sets the ``rotation`` of the item, in degrees clockwise.
++
++.. seealso:: :py:func:`rotation`
++
++.. versionadded:: 4.4
++%End
++
++    Qgis::SymbolRotationMode rotationMode() const;
++%Docstring
++Returns the method used to render the item with respect to the rotation
++of the map.
++
++.. seealso:: :py:func:`setRotationMode`
++
++.. versionadded:: 4.4
++%End
++
++    void setRotationMode( Qgis::SymbolRotationMode mode );
++%Docstring
++Sets the ``mode`` used to render the item with respect to the rotation
++of the map.
++
++.. seealso:: :py:func:`rotationMode`
++
++.. versionadded:: 4.4
++%End
++
++    double appliedRotation( double mapRotation ) const;
++%Docstring
++Returns the effective on-screen rotation of the item, in degrees
++clockwise.
++
++This is the item's own :py:func:`~QgsAnnotationRectItem.rotation`, to
++which ``mapRotation`` (the current map rotation, in degrees clockwise)
++is added when the item's :py:func:`~QgsAnnotationRectItem.rotationMode`
++is :py:class:`Qgis`.SymbolRotationMode.RespectMapRotation and its
++placement mode is not
++:py:class:`Qgis`.AnnotationPlacementMode.RelativeToMapFrame.
++
++.. seealso:: :py:func:`rotation`
++
++.. seealso:: :py:func:`rotationMode`
++
++.. versionadded:: 4.4
++%End
++
++
++
+     bool backgroundEnabled() const;
+ %Docstring
+ Returns ``True`` if the item's background should be rendered.
+diff --git a/src/core/annotations/qgsannotationrectitem.cpp b/src/core/annotations/qgsannotationrectitem.cpp
+index b40207a940f9..41b0096c1c9a 100644
+--- a/src/core/annotations/qgsannotationrectitem.cpp
++++ b/src/core/annotations/qgsannotationrectitem.cpp
+@@ -64,6 +64,74 @@ Qgis::AnnotationItemFlags QgsAnnotationRectItem::flags() const
+   BUILTIN_UNREACHABLE
+ }
+ 
++double QgsAnnotationRectItem::appliedRotation( double mapRotation ) const
++{
++  double angle = mRotation;
++  if ( mRotationMode == Qgis::SymbolRotationMode::RespectMapRotation && mPlacementMode != Qgis::AnnotationPlacementMode::RelativeToMapFrame )
++    angle += mapRotation;
++  return angle;
++}
++
++QgsGeometry QgsAnnotationRectItem::rotatedRepresentativeGeometry( const QgsRectangle &layerBounds, const QgsAnnotationItemEditContext &context ) const
++{
++  return rotatedBoundsGeometry( layerBounds, context.renderContext() );
++}
++
++QgsGeometry QgsAnnotationRectItem::rotatedBoundsGeometry( const QgsRectangle &layerBounds, const QgsRenderContext &renderContext ) const
++{
++  const double angle = appliedRotation( renderContext.mapToPixel().mapRotation() );
++  if ( qgsDoubleNear( angle, 0 ) )
++    return QgsGeometry::fromRect( layerBounds );
++
++  // Rotate in painter coordinates, then convert back to layer coordinates so
++  // the preview matches the rendered item.
++  QgsRectangle mapBounds = layerBounds;
++  if ( renderContext.coordinateTransform().isValid() )
++  {
++    try
++    {
++      mapBounds = renderContext.coordinateTransform().transformBoundingBox( layerBounds );
++    }
++    catch ( QgsCsException & )
++    {
++      return QgsGeometry::fromRect( layerBounds );
++    }
++  }
++
++  QPointF center = mapBounds.center().toQPointF();
++  renderContext.mapToPixel().transformInPlace( center.rx(), center.ry() );
++  const double mupp = renderContext.mapToPixel().mapUnitsPerPixel();
++  const double widthPixels = mapBounds.width() / mupp;
++  const double heightPixels = mapBounds.height() / mupp;
++  const QRectF painterBounds( center.x() - widthPixels * 0.5, center.y() - heightPixels * 0.5, widthPixels, heightPixels );
++
++  QTransform transform;
++  transform.translate( center.x(), center.y() );
++  transform.rotate( angle );
++  transform.translate( -center.x(), -center.y() );
++
++  QVector< QgsPointXY > points;
++  points.reserve( 5 );
++  for ( const QPointF &corner : { painterBounds.topLeft(), painterBounds.topRight(), painterBounds.bottomRight(), painterBounds.bottomLeft() } )
++    points.append( QgsPointXY( transform.map( corner ) ) );
++  points.append( points.constFirst() );
++
++  QgsGeometry geometry( new QgsPolygon( new QgsLineString( points ) ) );
++  geometry.transform( renderContext.mapToPixel().transform().inverted() );
++  if ( renderContext.coordinateTransform().isValid() )
++    geometry.transform( renderContext.coordinateTransform(), Qgis::TransformDirection::Reverse );
++  return geometry;
++}
++
++QgsRectangle QgsAnnotationRectItem::boundsFromPixelRect( const QgsMapToPixel *mapToPixel, const QPointF &centerPixel, double widthPixels, double heightPixels )
++{
++  const QgsPointXY centerMap = mapToPixel->toMapCoordinates( centerPixel.x(), centerPixel.y() );
++  const double mupp = mapToPixel->mapUnitsPerPixel();
++  const double halfWidthMap = 0.5 * widthPixels * mupp;
++  const double halfHeightMap = 0.5 * heightPixels * mupp;
++  return QgsRectangle( centerMap.x() - halfWidthMap, centerMap.y() - halfHeightMap, centerMap.x() + halfWidthMap, centerMap.y() + halfHeightMap );
++}
++
+ void QgsAnnotationRectItem::render( QgsRenderContext &context, QgsFeedback *feedback )
+ {
+   QgsRectangle bounds = mBounds;
+@@ -84,8 +152,17 @@ void QgsAnnotationRectItem::render( QgsRenderContext &context, QgsFeedback *feed
+   switch ( mPlacementMode )
+   {
+     case Qgis::AnnotationPlacementMode::SpatialBounds:
+-      painterBounds = context.mapToPixel().transformBounds( bounds.toRectF() );
++    {
++      // Use the unrotated pixel size around the transformed center, not the
++      // axis-aligned bbox, so the size stays correct when the map is rotated.
++      QPointF center = bounds.center().toQPointF();
++      context.mapToPixel().transformInPlace( center.rx(), center.ry() );
++      const double mupp = context.mapToPixel().mapUnitsPerPixel();
++      const double widthPixels = bounds.width() / mupp;
++      const double heightPixels = bounds.height() / mupp;
++      painterBounds = QRectF( center.x() - widthPixels * 0.5, center.y() - heightPixels * 0.5, widthPixels, heightPixels );
+       break;
++    }
+ 
+     case Qgis::AnnotationPlacementMode::FixedSize:
+     {
+@@ -140,17 +217,35 @@ void QgsAnnotationRectItem::render( QgsRenderContext &context, QgsFeedback *feed
+   if ( painterBounds.width() < 1 || painterBounds.height() < 1 )
+     return;
+ 
++  QPainter *painter = context.painter();
++  double angle = appliedRotation( context.mapToPixel().mapRotation() );
++  const bool rotated = !qgsDoubleNear( angle, 0 );
++  const QPointF rotationCenter = painterBounds.center();
++
+   if ( mDrawBackground && mBackgroundSymbol )
+   {
++    if ( rotated )
++    {
++      painter->save();
++      rotatePainterAroundPoint( painter, rotationCenter, angle );
++    }
+     mBackgroundSymbol->startRender( context );
+     mBackgroundSymbol->renderPolygon( painterBounds, nullptr, nullptr, context );
+     mBackgroundSymbol->stopRender( context );
++    if ( rotated )
++      painter->restore();
+   }
+ 
+   if ( mPlacementMode != Qgis::AnnotationPlacementMode::RelativeToMapFrame && callout() )
+   {
+     QgsCallout::QgsCalloutContext calloutContext;
+-    renderCallout( context, painterBounds, 0, calloutContext, feedback );
++    renderCallout( context, painterBounds, angle, calloutContext, feedback );
++  }
++
++  if ( rotated )
++  {
++    painter->save();
++    rotatePainterAroundPoint( painter, rotationCenter, angle );
+   }
+ 
+   renderInBounds( context, painterBounds, feedback );
+@@ -161,6 +256,9 @@ void QgsAnnotationRectItem::render( QgsRenderContext &context, QgsFeedback *feed
+     mFrameSymbol->renderPolygon( painterBounds, nullptr, nullptr, context );
+     mFrameSymbol->stopRender( context );
+   }
++
++  if ( rotated )
++    painter->restore();
+ }
+ 
+ QList<QgsAnnotationItemNode> QgsAnnotationRectItem::nodesV2( const QgsAnnotationItemEditContext &context ) const
+@@ -322,9 +420,21 @@ Qgis::AnnotationItemEditOperationResult QgsAnnotationRectItem::applyEditV2( QgsA
+       return Qgis::AnnotationItemEditOperationResult::Success;
+     }
+ 
++    case QgsAbstractAnnotationItemEditOperation::Type::RotateItem:
++    {
++      QgsAnnotationItemEditOperationRotateItem *rotateOperation = qgis::down_cast< QgsAnnotationItemEditOperationRotateItem * >( operation );
++      mRotation = std::fmod( mRotation + rotateOperation->angle(), 360.0 );
++      return Qgis::AnnotationItemEditOperationResult::Success;
++    }
++
++    case QgsAbstractAnnotationItemEditOperation::Type::SetItemBounds:
++    {
++      mBounds = qgis::down_cast< QgsAnnotationItemEditOperationSetItemBounds * >( operation )->bounds();
++      return Qgis::AnnotationItemEditOperationResult::Success;
++    }
++
+     case QgsAbstractAnnotationItemEditOperation::Type::DeleteNode:
+     case QgsAbstractAnnotationItemEditOperation::Type::AddNode:
+-    case QgsAbstractAnnotationItemEditOperation::Type::RotateItem:
+       break;
+   }
+   return Qgis::AnnotationItemEditOperationResult::Invalid;
+@@ -365,13 +475,13 @@ QgsAnnotationItemEditOperationTransientResults *QgsAnnotationRectItem::transient
+               default:
+                 break;
+             }
+-            return new QgsAnnotationItemEditOperationTransientResults( QgsGeometry::fromRect( modifiedBounds ) );
++            return new QgsAnnotationItemEditOperationTransientResults( rotatedRepresentativeGeometry( modifiedBounds, context ) );
+           }
+           case Qgis::AnnotationPlacementMode::FixedSize:
+           {
+             const QgsRectangle currentBounds = context.currentItemBounds();
+             const QgsRectangle newBounds = QgsRectangle::fromCenterAndSize( moveOperation->after(), currentBounds.width(), currentBounds.height() );
+-            return new QgsAnnotationItemEditOperationTransientResults( QgsGeometry::fromRect( newBounds ) );
++            return new QgsAnnotationItemEditOperationTransientResults( rotatedRepresentativeGeometry( newBounds, context ) );
+           }
+           case Qgis::AnnotationPlacementMode::RelativeToMapFrame:
+           {
+@@ -402,7 +512,7 @@ QgsAnnotationItemEditOperationTransientResults *QgsAnnotationRectItem::transient
+             mBounds.xMaximum() + moveOperation->translationX(),
+             mBounds.yMaximum() + moveOperation->translationY()
+           );
+-          return new QgsAnnotationItemEditOperationTransientResults( QgsGeometry::fromRect( modifiedBounds ) );
++          return new QgsAnnotationItemEditOperationTransientResults( rotatedRepresentativeGeometry( modifiedBounds, context ) );
+         }
+ 
+         case Qgis::AnnotationPlacementMode::FixedSize:
+@@ -452,7 +562,7 @@ QgsAnnotationItemEditOperationTransientResults *QgsAnnotationRectItem::transient
+             const QgsRectangle currentBounds = context.currentItemBounds();
+             const QgsRectangle newBounds
+               = QgsRectangle::fromCenterAndSize( mBounds.center() + QgsVector( moveOperation->translationX(), moveOperation->translationY() ), currentBounds.width(), currentBounds.height() );
+-            return new QgsAnnotationItemEditOperationTransientResults( QgsGeometry::fromRect( newBounds ) );
++            return new QgsAnnotationItemEditOperationTransientResults( rotatedRepresentativeGeometry( newBounds, context ) );
+           }
+         }
+ 
+@@ -467,6 +577,12 @@ QgsAnnotationItemEditOperationTransientResults *QgsAnnotationRectItem::transient
+       break;
+     }
+ 
++    case QgsAbstractAnnotationItemEditOperation::Type::SetItemBounds:
++    {
++      const QgsRectangle newBounds = qgis::down_cast< QgsAnnotationItemEditOperationSetItemBounds * >( operation )->bounds();
++      return new QgsAnnotationItemEditOperationTransientResults( rotatedRepresentativeGeometry( newBounds, context ) );
++    }
++
+     case QgsAbstractAnnotationItemEditOperation::Type::RotateItem:
+     case QgsAbstractAnnotationItemEditOperation::Type::DeleteNode:
+     case QgsAbstractAnnotationItemEditOperation::Type::AddNode:
+@@ -641,6 +757,8 @@ void QgsAnnotationRectItem::copyCommonProperties( const QgsAnnotationItem *other
+     setPlacementMode( otherRect->mPlacementMode );
+     setFixedSize( otherRect->mFixedSize );
+     setFixedSizeUnit( otherRect->mFixedSizeUnit );
++    setRotation( otherRect->mRotation );
++    setRotationMode( otherRect->mRotationMode );
+ 
+     setBackgroundEnabled( otherRect->mDrawBackground );
+     if ( otherRect->mBackgroundSymbol )
+@@ -664,6 +782,8 @@ bool QgsAnnotationRectItem::writeCommonProperties( QDomElement &element, QDomDoc
+   element.setAttribute( u"fixedWidth"_s, qgsDoubleToString( mFixedSize.width() ) );
+   element.setAttribute( u"fixedHeight"_s, qgsDoubleToString( mFixedSize.height() ) );
+   element.setAttribute( u"fixedSizeUnit"_s, QgsUnitTypes::encodeUnit( mFixedSizeUnit ) );
++  element.setAttribute( u"rotation"_s, qgsDoubleToString( mRotation ) );
++  element.setAttribute( u"rotationMode"_s, qgsEnumValueToKey( mRotationMode ) );
+ 
+   element.setAttribute( u"backgroundEnabled"_s, mDrawBackground ? u"1"_s : u"0"_s );
+   if ( mBackgroundSymbol )
+@@ -695,6 +815,8 @@ bool QgsAnnotationRectItem::readCommonProperties( const QDomElement &element, co
+ 
+   mFixedSize = QSizeF( element.attribute( u"fixedWidth"_s ).toDouble(), element.attribute( u"fixedHeight"_s ).toDouble() );
+   mFixedSizeUnit = QgsUnitTypes::decodeRenderUnit( element.attribute( u"fixedSizeUnit"_s ) );
++  mRotation = element.attribute( u"rotation"_s ).toDouble();
++  mRotationMode = qgsEnumKeyToValue( element.attribute( u"rotationMode"_s ), Qgis::SymbolRotationMode::IgnoreMapRotation );
+ 
+   mDrawBackground = element.attribute( u"backgroundEnabled"_s, u"0"_s ).toInt();
+   const QDomElement backgroundSymbolElem = element.firstChildElement( u"backgroundSymbol"_s ).firstChildElement();
+diff --git a/src/core/annotations/qgsannotationrectitem.h b/src/core/annotations/qgsannotationrectitem.h
+index f50f49c4969a..dc62b62db990 100644
+--- a/src/core/annotations/qgsannotationrectitem.h
++++ b/src/core/annotations/qgsannotationrectitem.h
+@@ -22,6 +22,8 @@
+ #include "qgis_sip.h"
+ #include "qgsannotationitem.h"
+ 
++class QgsMapToPixel;
++
+ /**
+  * \ingroup core
+  * \brief Abstract base class for annotation items which render annotations in a rectangular shape.
+@@ -122,6 +124,70 @@ class CORE_EXPORT QgsAnnotationRectItem : public QgsAnnotationItem
+      */
+     void setFixedSizeUnit( Qgis::RenderUnit unit );
+ 
++    /**
++     * Returns the rotation of the item, in degrees clockwise.
++     *
++     * \see setRotation()
++     * \since QGIS 4.4
++     */
++    double rotation() const { return mRotation; }
++
++    /**
++     * Sets the \a rotation of the item, in degrees clockwise.
++     *
++     * \see rotation()
++     * \since QGIS 4.4
++     */
++    void setRotation( double rotation ) { mRotation = rotation; }
++
++    /**
++     * Returns the method used to render the item with respect to the rotation of the map.
++     *
++     * \see setRotationMode()
++     * \since QGIS 4.4
++     */
++    Qgis::SymbolRotationMode rotationMode() const { return mRotationMode; }
++
++    /**
++     * Sets the \a mode used to render the item with respect to the rotation of the map.
++     *
++     * \see rotationMode()
++     * \since QGIS 4.4
++     */
++    void setRotationMode( Qgis::SymbolRotationMode mode ) { mRotationMode = mode; }
++
++    /**
++     * Returns the effective on-screen rotation of the item, in degrees clockwise.
++     *
++     * This is the item's own rotation(), to which \a mapRotation (the current map
++     * rotation, in degrees clockwise) is added when the item's rotationMode() is
++     * Qgis::SymbolRotationMode::RespectMapRotation and its placement mode is not
++     * Qgis::AnnotationPlacementMode::RelativeToMapFrame.
++     *
++     * \see rotation()
++     * \see rotationMode()
++     * \since QGIS 4.4
++     */
++    double appliedRotation( double mapRotation ) const;
++
++    /**
++     * Returns the polygon geometry (in layer coordinates) for the item occupying the given
++     * \a layerBounds, rotated to match how the item is rendered in \a renderContext.
++     *
++     * \note Not available in Python bindings
++     * \since QGIS 4.4
++     */
++    QgsGeometry rotatedBoundsGeometry( const QgsRectangle &layerBounds, const QgsRenderContext &renderContext ) const SIP_SKIP;
++
++    /**
++     * Returns the axis-aligned bounds, in map coordinates, of a rectangle centered on \a centerPixel
++     * with size \a widthPixels by \a heightPixels, using \a mapToPixel for the pixel to map conversion.
++     *
++     * \note Not available in Python bindings
++     * \since QGIS 4.4
++     */
++    static QgsRectangle boundsFromPixelRect( const QgsMapToPixel *mapToPixel, const QPointF &centerPixel, double widthPixels, double heightPixels ) SIP_SKIP;
++
+     /**
+      * Returns TRUE if the item's background should be rendered.
+      *
+@@ -207,11 +273,19 @@ class CORE_EXPORT QgsAnnotationRectItem : public QgsAnnotationItem
+     virtual void renderInBounds( QgsRenderContext &context, const QRectF &painterRect, QgsFeedback *feedback ) = 0;
+ 
+   private:
++    /**
++     * Returns a representative geometry (in layer coordinates) for the item occupying the given
++     * \a layerBounds, rotated to match how the item is rendered. Used to build edit previews so
++     * they align with the rotated item.
++     */
++    QgsGeometry rotatedRepresentativeGeometry( const QgsRectangle &layerBounds, const QgsAnnotationItemEditContext &context ) const;
++
+     Qgis::AnnotationPlacementMode mPlacementMode = Qgis::AnnotationPlacementMode::SpatialBounds;
+     QgsRectangle mBounds;
+-
+     QSizeF mFixedSize;
+     Qgis::RenderUnit mFixedSizeUnit = Qgis::RenderUnit::Millimeters;
++    double mRotation = 0;
++    Qgis::SymbolRotationMode mRotationMode = Qgis::SymbolRotationMode::IgnoreMapRotation;
+     bool mDrawBackground = false;
+     std::unique_ptr< QgsFillSymbol > mBackgroundSymbol;
+     bool mDrawFrame = false;
+
+From 914d36755fe2d6954b5008a051ff6dc0f2f9360c Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Wed, 1 Jul 2026 00:16:24 +0200
+Subject: [PATCH 04/10] rotate annotation callouts via shared painter helper
+
+---
+ .../annotations/qgsannotationitem.sip.in      |  1 +
+ src/core/annotations/qgsannotationitem.cpp    | 31 ++++++++++++++++++-
+ src/core/annotations/qgsannotationitem.h      |  6 ++++
+ 3 files changed, 37 insertions(+), 1 deletion(-)
+
+diff --git a/python/PyQt6/core/auto_generated/annotations/qgsannotationitem.sip.in b/python/PyQt6/core/auto_generated/annotations/qgsannotationitem.sip.in
+index 7a987a3a4520..fe96bd875782 100644
+--- a/python/PyQt6/core/auto_generated/annotations/qgsannotationitem.sip.in
++++ b/python/PyQt6/core/auto_generated/annotations/qgsannotationitem.sip.in
+@@ -454,6 +454,7 @@ The item must have valid :py:func:`~QgsAnnotationItem.callout` set.
+ .. versionadded:: 3.40
+ %End
+ 
++
+   private:
+     QgsAnnotationItem( const QgsAnnotationItem &other );
+ };
+diff --git a/src/core/annotations/qgsannotationitem.cpp b/src/core/annotations/qgsannotationitem.cpp
+index 925591aacd04..69139c6ffbc3 100644
+--- a/src/core/annotations/qgsannotationitem.cpp
++++ b/src/core/annotations/qgsannotationitem.cpp
+@@ -24,7 +24,9 @@
+ #include "qgssymbollayerutils.h"
+ #include "qgsunittypes.h"
+ 
++#include <QPainter>
+ #include <QString>
++#include <QTransform>
+ 
+ using namespace Qt::StringLiterals;
+ 
+@@ -183,9 +185,36 @@ void QgsAnnotationItem::renderCallout( QgsRenderContext &context, const QRectF &
+   }
+   anchor.transform( context.mapToPixel().transform() );
+ 
++  // Rotate the painter with the item, but counter-rotate the anchor so the
++  // callout still points to its anchor on screen.
++  QPainter *painter = context.painter();
++  const bool rotated = !qgsDoubleNear( angle, 0 );
++  if ( rotated )
++  {
++    const QPointF center = rect.center();
++    QTransform anchorTransform;
++    anchorTransform.translate( center.x(), center.y() );
++    anchorTransform.rotate( -angle );
++    anchorTransform.translate( -center.x(), -center.y() );
++    anchor.transform( anchorTransform );
++
++    painter->save();
++    rotatePainterAroundPoint( painter, center, angle );
++  }
++
+   mCallout->startRender( context );
+-  mCallout->render( context, rect, angle, anchor, calloutContext );
++  mCallout->render( context, rect, 0, anchor, calloutContext );
+   mCallout->stopRender( context );
++
++  if ( rotated )
++    painter->restore();
++}
++
++void QgsAnnotationItem::rotatePainterAroundPoint( QPainter *painter, const QPointF &point, double angle )
++{
++  painter->translate( point.x(), point.y() );
++  painter->rotate( angle );
++  painter->translate( -point.x(), -point.y() );
+ }
+ 
+ Qgis::RenderUnit QgsAnnotationItem::offsetFromCalloutUnit() const
+diff --git a/src/core/annotations/qgsannotationitem.h b/src/core/annotations/qgsannotationitem.h
+index 885412716f89..21d1271f1613 100644
+--- a/src/core/annotations/qgsannotationitem.h
++++ b/src/core/annotations/qgsannotationitem.h
+@@ -37,6 +37,7 @@ class QgsAbstractAnnotationItemEditOperation;
+ class QgsAnnotationItemEditOperationTransientResults;
+ class QgsRenderContext;
+ class QgsReadWriteContext;
++class QPainter;
+ 
+ /**
+  * \ingroup core
+@@ -421,6 +422,11 @@ class CORE_EXPORT QgsAnnotationItem
+      */
+     void renderCallout( QgsRenderContext &context, const QRectF &rect, double angle, QgsCallout::QgsCalloutContext &calloutContext, QgsFeedback *feedback );
+ 
++    /**
++     * Rotates \a painter by \a angle degrees around \a point.
++     */
++    static void rotatePainterAroundPoint( QPainter *painter, const QPointF &point, double angle ) SIP_SKIP;
++
+   private:
+     int mZIndex = 0;
+     bool mEnabled = true;
+
+From 8b9963c6f751846f2cc881a4c63c78335d9fb08b Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Wed, 1 Jul 2026 00:16:36 +0200
+Subject: [PATCH 05/10] add rotation configuration to annotation item widgets
+
+---
+ .../auto_additions/qgsannotationitemwidget.py |  1 +
+ .../qgsannotationitemwidget.sip.in            |  9 ++++
+ .../annotations/qgsannotationitemwidget.cpp   |  8 ++++
+ src/gui/annotations/qgsannotationitemwidget.h |  9 ++++
+ .../qgsannotationitemwidget_impl.cpp          | 25 ++++++++++-
+ .../qgsannotationpicturewidgetbase.ui         | 41 +++++++++++++++++++
+ .../qgsannotationrectangulartextwidgetbase.ui | 41 +++++++++++++++++++
+ 7 files changed, 132 insertions(+), 2 deletions(-)
+
+diff --git a/python/PyQt6/gui/auto_additions/qgsannotationitemwidget.py b/python/PyQt6/gui/auto_additions/qgsannotationitemwidget.py
+index 6b7fcd3d59e0..48dd12eea3a8 100644
+--- a/python/PyQt6/gui/auto_additions/qgsannotationitemwidget.py
++++ b/python/PyQt6/gui/auto_additions/qgsannotationitemwidget.py
+@@ -1,6 +1,7 @@
+ # The following has been generated automatically from src/gui/annotations/qgsannotationitemwidget.h
+ try:
+     QgsAnnotationItemBaseWidget.__attribute_docs__ = {'itemChanged': 'Emitted when the annotation item definition in the widget is changed by\nthe user.\n'}
++    QgsAnnotationItemBaseWidget.populateRotationModeComboBox = staticmethod(QgsAnnotationItemBaseWidget.populateRotationModeComboBox)
+     QgsAnnotationItemBaseWidget.__virtual_methods__ = ['setLayer', 'setContext', 'focusDefaultWidget', 'setNewItem']
+     QgsAnnotationItemBaseWidget.__abstract_methods__ = ['createItem', 'updateItem']
+     QgsAnnotationItemBaseWidget.__group__ = ['annotations']
+diff --git a/python/PyQt6/gui/auto_generated/annotations/qgsannotationitemwidget.sip.in b/python/PyQt6/gui/auto_generated/annotations/qgsannotationitemwidget.sip.in
+index 76127a884db2..cf427dfb8772 100644
+--- a/python/PyQt6/gui/auto_generated/annotations/qgsannotationitemwidget.sip.in
++++ b/python/PyQt6/gui/auto_generated/annotations/qgsannotationitemwidget.sip.in
+@@ -45,6 +45,15 @@ the widget has been updated to match ``item``'s properties.
+ 
+ If ``False`` is returned, then the widget could not be successfully
+ updated to show the properties of ``item``.
++%End
++
++    static void populateRotationModeComboBox( QComboBox *comboBox );
++%Docstring
++Populates a ``comboBox`` with the available options for rendering an
++item with respect to the rotation of the map (see
++:py:class:`Qgis`.SymbolRotationMode).
++
++.. versionadded:: 4.4
+ %End
+ 
+     virtual void setLayer( QgsAnnotationLayer *layer );
+diff --git a/src/gui/annotations/qgsannotationitemwidget.cpp b/src/gui/annotations/qgsannotationitemwidget.cpp
+index 1f3ba5f0f588..ede41123157a 100644
+--- a/src/gui/annotations/qgsannotationitemwidget.cpp
++++ b/src/gui/annotations/qgsannotationitemwidget.cpp
+@@ -21,6 +21,8 @@
+ #include "qgsrendereditemdetails.h"
+ #include "qgsrendereditemresults.h"
+ 
++#include <QComboBox>
++
+ #include "moc_qgsannotationitemwidget.cpp"
+ 
+ QgsAnnotationItemBaseWidget::QgsAnnotationItemBaseWidget( QWidget *parent )
+@@ -32,6 +34,12 @@ bool QgsAnnotationItemBaseWidget::setItem( QgsAnnotationItem *item )
+   return setNewItem( item );
+ }
+ 
++void QgsAnnotationItemBaseWidget::populateRotationModeComboBox( QComboBox *comboBox )
++{
++  comboBox->addItem( tr( "Ignore Map Rotation" ), QVariant::fromValue( Qgis::SymbolRotationMode::IgnoreMapRotation ) );
++  comboBox->addItem( tr( "Rotate With Map" ), QVariant::fromValue( Qgis::SymbolRotationMode::RespectMapRotation ) );
++}
++
+ void QgsAnnotationItemBaseWidget::setLayer( QgsAnnotationLayer *layer )
+ {
+   mLayer = layer;
+diff --git a/src/gui/annotations/qgsannotationitemwidget.h b/src/gui/annotations/qgsannotationitemwidget.h
+index c05606d8a1ac..ee4746267aa0 100644
+--- a/src/gui/annotations/qgsannotationitemwidget.h
++++ b/src/gui/annotations/qgsannotationitemwidget.h
+@@ -23,6 +23,7 @@
+ class QgsAnnotationItem;
+ class QgsAnnotationLayer;
+ class QgsRenderedAnnotationItemDetails;
++class QComboBox;
+ 
+ /**
+  * \class QgsAnnotationItemBaseWidget
+@@ -64,6 +65,14 @@ class GUI_EXPORT QgsAnnotationItemBaseWidget : public QgsPanelWidget
+      */
+     bool setItem( QgsAnnotationItem *item );
+ 
++    /**
++     * Populates a \a comboBox with the available options for rendering an item
++     * with respect to the rotation of the map (see Qgis::SymbolRotationMode).
++     *
++     * \since QGIS 4.4
++     */
++    static void populateRotationModeComboBox( QComboBox *comboBox );
++
+     /**
+      * Sets the associated annotation map \a layer.
+      *
+diff --git a/src/gui/annotations/qgsannotationitemwidget_impl.cpp b/src/gui/annotations/qgsannotationitemwidget_impl.cpp
+index d0b5906b553e..d7787ca67a70 100644
+--- a/src/gui/annotations/qgsannotationitemwidget_impl.cpp
++++ b/src/gui/annotations/qgsannotationitemwidget_impl.cpp
+@@ -325,8 +325,7 @@ QgsAnnotationPointTextItemWidget::QgsAnnotationPointTextItemWidget( QWidget *par
+ 
+   mSpinTextAngle->setClearValue( 0 );
+ 
+-  mRotationModeCombo->addItem( tr( "Ignore Map Rotation" ), QVariant::fromValue( Qgis::SymbolRotationMode::IgnoreMapRotation ) );
+-  mRotationModeCombo->addItem( tr( "Rotate With Map" ), QVariant::fromValue( Qgis::SymbolRotationMode::RespectMapRotation ) );
++  populateRotationModeComboBox( mRotationModeCombo );
+ 
+   mAlignmentComboBox->setAvailableAlignments( Qt::AlignLeft | Qt::AlignHCenter | Qt::AlignRight );
+ 
+@@ -595,6 +594,8 @@ QgsAnnotationRectangleTextItemWidget::QgsAnnotationRectangleTextItemWidget( QWid
+   mSizeModeCombo->addItem( tr( "Fixed Size" ), QVariant::fromValue( Qgis::AnnotationPlacementMode::FixedSize ) );
+   mSizeModeCombo->addItem( tr( "Relative to Map" ), QVariant::fromValue( Qgis::AnnotationPlacementMode::RelativeToMapFrame ) );
+ 
++  populateRotationModeComboBox( mRotationModeCombo );
++
+   mSizeUnitWidget->setUnits(
+     QgsUnitTypes::RenderUnitList() << Qgis::RenderUnit::Pixels << Qgis::RenderUnit::Millimeters << Qgis::RenderUnit::Points << Qgis::RenderUnit::Inches << Qgis::RenderUnit::Percentage
+   );
+@@ -647,6 +648,9 @@ QgsAnnotationRectangleTextItemWidget::QgsAnnotationRectangleTextItemWidget( QWid
+   connect( mHeightSpinBox, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &QgsAnnotationRectangleTextItemWidget::setHeight );
+ 
+   connect( mSizeModeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &QgsAnnotationRectangleTextItemWidget::sizeModeChanged );
++  connect( mRotationModeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &QgsAnnotationRectangleTextItemWidget::onWidgetChanged );
++  mSpinAngle->setClearValue( 0 );
++  connect( mSpinAngle, qOverload<double>( &QgsDoubleSpinBox::valueChanged ), this, &QgsAnnotationRectangleTextItemWidget::onWidgetChanged );
+   mWidgetFixedSize->hide();
+   sizeModeChanged();
+ }
+@@ -672,6 +676,9 @@ void QgsAnnotationRectangleTextItemWidget::updateItem( QgsAnnotationItem *item )
+     rectTextItem->setFixedSize( QSizeF( mWidthSpinBox->value(), mHeightSpinBox->value() ) );
+     rectTextItem->setFixedSizeUnit( mSizeUnitWidget->unit() );
+ 
++    rectTextItem->setRotation( mSpinAngle->value() );
++    rectTextItem->setRotationMode( mRotationModeCombo->currentData().value<Qgis::SymbolRotationMode>() );
++
+     rectTextItem->setBackgroundEnabled( mBackgroundCheckbox->isChecked() );
+     rectTextItem->setFrameEnabled( mFrameCheckbox->isChecked() );
+     rectTextItem->setBackgroundSymbol( mBackgroundSymbolButton->clonedSymbol<QgsFillSymbol>() );
+@@ -759,6 +766,8 @@ bool QgsAnnotationRectangleTextItemWidget::setNewItem( QgsAnnotationItem *item )
+   mHeightSpinBox->setValue( textItem->fixedSize().height() );
+   mSizeUnitWidget->setUnit( textItem->fixedSizeUnit() );
+   mSizeModeCombo->setCurrentIndex( mSizeModeCombo->findData( QVariant::fromValue( textItem->placementMode() ) ) );
++  mRotationModeCombo->setCurrentIndex( mRotationModeCombo->findData( QVariant::fromValue( textItem->rotationMode() ) ) );
++  mSpinAngle->setValue( textItem->rotation() );
+ 
+   mBlockChangedSignal = false;
+ 
+@@ -874,6 +883,8 @@ QgsAnnotationPictureItemWidget::QgsAnnotationPictureItemWidget( QWidget *parent
+   mSizeModeCombo->addItem( tr( "Fixed Size" ), QVariant::fromValue( Qgis::AnnotationPlacementMode::FixedSize ) );
+   mSizeModeCombo->addItem( tr( "Relative to Map" ), QVariant::fromValue( Qgis::AnnotationPlacementMode::RelativeToMapFrame ) );
+ 
++  populateRotationModeComboBox( mRotationModeCombo );
++
+   mSizeUnitWidget->setUnits(
+     QgsUnitTypes::RenderUnitList() << Qgis::RenderUnit::Pixels << Qgis::RenderUnit::Millimeters << Qgis::RenderUnit::Points << Qgis::RenderUnit::Inches << Qgis::RenderUnit::Percentage
+   );
+@@ -892,6 +903,11 @@ QgsAnnotationPictureItemWidget::QgsAnnotationPictureItemWidget( QWidget *parent
+ 
+   connect( mSizeModeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &QgsAnnotationPictureItemWidget::sizeModeChanged );
+ 
++  connect( mRotationModeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &QgsAnnotationPictureItemWidget::onWidgetChanged );
++
++  mSpinAngle->setClearValue( 0 );
++  connect( mSpinAngle, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &QgsAnnotationPictureItemWidget::onWidgetChanged );
++
+   connect( mRadioSVG, &QRadioButton::toggled, this, &QgsAnnotationPictureItemWidget::modeChanged );
+   connect( mRadioRaster, &QRadioButton::toggled, this, &QgsAnnotationPictureItemWidget::modeChanged );
+   connect( mSourceLineEdit, &QgsPictureSourceLineEditBase::sourceChanged, this, [this]( const QString &source ) {
+@@ -948,6 +964,9 @@ void QgsAnnotationPictureItemWidget::updateItem( QgsAnnotationItem *item )
+     pictureItem->setFixedSize( QSizeF( mWidthSpinBox->value(), mHeightSpinBox->value() ) );
+     pictureItem->setFixedSizeUnit( mSizeUnitWidget->unit() );
+ 
++    pictureItem->setRotation( mSpinAngle->value() );
++    pictureItem->setRotationMode( mRotationModeCombo->currentData().value<Qgis::SymbolRotationMode>() );
++
+     pictureItem->setBackgroundEnabled( mBackgroundCheckbox->isChecked() );
+     pictureItem->setFrameEnabled( mFrameCheckbox->isChecked() );
+     pictureItem->setBackgroundSymbol( mBackgroundSymbolButton->clonedSymbol<QgsFillSymbol>() );
+@@ -1031,6 +1050,8 @@ bool QgsAnnotationPictureItemWidget::setNewItem( QgsAnnotationItem *item )
+   mWidthSpinBox->setValue( pictureItem->fixedSize().width() );
+   mHeightSpinBox->setValue( pictureItem->fixedSize().height() );
+   mSizeModeCombo->setCurrentIndex( mSizeModeCombo->findData( QVariant::fromValue( pictureItem->placementMode() ) ) );
++  mSpinAngle->setValue( pictureItem->rotation() );
++  mRotationModeCombo->setCurrentIndex( mRotationModeCombo->findData( QVariant::fromValue( pictureItem->rotationMode() ) ) );
+   sizeModeChanged();
+ 
+   mBlockChangedSignal = false;
+diff --git a/src/ui/annotations/qgsannotationpicturewidgetbase.ui b/src/ui/annotations/qgsannotationpicturewidgetbase.ui
+index 0f552e9c798c..30e01b60cfcd 100644
+--- a/src/ui/annotations/qgsannotationpicturewidgetbase.ui
++++ b/src/ui/annotations/qgsannotationpicturewidgetbase.ui
+@@ -98,6 +98,47 @@
+    <item row="2" column="0">
+     <widget class="QComboBox" name="mSizeModeCombo"/>
+    </item>
++   <item row="6" column="0">
++    <widget class="QGroupBox" name="mRotationGroupBox">
++     <property name="title">
++      <string>Rotation</string>
++     </property>
++     <layout class="QGridLayout" name="gridLayout_7">
++      <item row="0" column="0" colspan="2">
++       <widget class="QComboBox" name="mRotationModeCombo"/>
++      </item>
++      <item row="1" column="0">
++       <widget class="QLabel" name="labelAngle">
++        <property name="text">
++         <string>Angle</string>
++        </property>
++       </widget>
++      </item>
++      <item row="1" column="1">
++       <widget class="QgsDoubleSpinBox" name="mSpinAngle">
++        <property name="wrapping">
++         <bool>true</bool>
++        </property>
++        <property name="suffix">
++         <string> °</string>
++        </property>
++        <property name="decimals">
++         <number>2</number>
++        </property>
++        <property name="minimum">
++         <double>-360.000000000000000</double>
++        </property>
++        <property name="maximum">
++         <double>360.000000000000000</double>
++        </property>
++        <property name="singleStep">
++         <double>0.500000000000000</double>
++        </property>
++       </widget>
++      </item>
++     </layout>
++    </widget>
++   </item>
+    <item row="8" column="0">
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+diff --git a/src/ui/annotations/qgsannotationrectangulartextwidgetbase.ui b/src/ui/annotations/qgsannotationrectangulartextwidgetbase.ui
+index b2b45f1dbadf..74a5fb70d2e4 100644
+--- a/src/ui/annotations/qgsannotationrectangulartextwidgetbase.ui
++++ b/src/ui/annotations/qgsannotationrectangulartextwidgetbase.ui
+@@ -122,6 +122,47 @@
+    <item row="0" column="0" colspan="2">
+     <widget class="QComboBox" name="mSizeModeCombo"/>
+    </item>
++   <item row="8" column="0" colspan="2">
++    <widget class="QGroupBox" name="mRotationGroupBox">
++     <property name="title">
++      <string>Rotation</string>
++     </property>
++     <layout class="QGridLayout" name="gridLayout_6">
++      <item row="0" column="0" colspan="2">
++       <widget class="QComboBox" name="mRotationModeCombo"/>
++      </item>
++      <item row="1" column="0">
++       <widget class="QLabel" name="labelAngle">
++        <property name="text">
++         <string>Angle</string>
++        </property>
++       </widget>
++      </item>
++      <item row="1" column="1">
++       <widget class="QgsDoubleSpinBox" name="mSpinAngle">
++        <property name="wrapping">
++         <bool>true</bool>
++        </property>
++        <property name="suffix">
++         <string> °</string>
++        </property>
++        <property name="decimals">
++         <number>2</number>
++        </property>
++        <property name="minimum">
++         <double>-360.000000000000000</double>
++        </property>
++        <property name="maximum">
++         <double>360.000000000000000</double>
++        </property>
++        <property name="singleStep">
++         <double>0.500000000000000</double>
++        </property>
++       </widget>
++      </item>
++     </layout>
++    </widget>
++   </item>
+    <item row="6" column="1">
+     <widget class="QgsAlignmentComboBox" name="mVerticalAlignmentComboBox"/>
+    </item>
+
+From fbb0a1c58be00cdfa29cb77922046112015e3203 Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Wed, 1 Jul 2026 00:16:40 +0200
+Subject: [PATCH 06/10] reload annotation properties widget when item changes
+ on canvas
+
+---
+ .../qgsannotationitempropertieswidget.cpp      | 18 ++++++++++++++++++
+ .../qgsannotationitempropertieswidget.h        |  2 ++
+ 2 files changed, 20 insertions(+)
+
+diff --git a/src/app/annotations/qgsannotationitempropertieswidget.cpp b/src/app/annotations/qgsannotationitempropertieswidget.cpp
+index 590f8cc68f53..ca41db7237cb 100644
+--- a/src/app/annotations/qgsannotationitempropertieswidget.cpp
++++ b/src/app/annotations/qgsannotationitempropertieswidget.cpp
+@@ -71,10 +71,15 @@ void QgsAnnotationItemPropertiesWidget::syncToLayer( QgsMapLayer *layer )
+   if ( layer == mLayer )
+     return;
+ 
++  if ( mLayer )
++    disconnect( mLayer, &QgsAnnotationLayer::itemsChanged, this, &QgsAnnotationItemPropertiesWidget::onLayerItemsChanged );
++
+   mLayer = qobject_cast<QgsAnnotationLayer *>( layer );
+   if ( !mLayer )
+     return;
+ 
++  connect( mLayer, &QgsAnnotationLayer::itemsChanged, this, &QgsAnnotationItemPropertiesWidget::onLayerItemsChanged );
++
+   // opacity and blend modes
+   mBlockLayerUpdates = true;
+   mBlendModeComboBox->setShowClippingModes( QgsProjectUtils::layerIsContainedInGroupLayer( QgsProject::instance(), mLayer ) );
+@@ -146,12 +151,25 @@ void QgsAnnotationItemPropertiesWidget::onChanged()
+     std::unique_ptr<QgsAnnotationItem> newItem( existingItem->clone() );
+     mItemWidget->updateItem( newItem.get() );
+ 
++    mBlockItemUpdates = true;
+     mLayer->replaceItem( mMapLayerConfigWidgetContext.annotationId(), newItem.release() );
++    mBlockItemUpdates = false;
+   }
+ 
+   emit widgetChanged();
+ }
+ 
++void QgsAnnotationItemPropertiesWidget::onLayerItemsChanged()
++{
++  if ( mBlockItemUpdates || !mLayer || !mItemWidget )
++    return;
++
++  if ( QgsAnnotationItem *item = mLayer->item( mMapLayerConfigWidgetContext.annotationId() ) )
++  {
++    mItemWidget->setItem( item );
++  }
++}
++
+ void QgsAnnotationItemPropertiesWidget::onLayerPropertyChanged()
+ {
+   if ( mBlockLayerUpdates )
+diff --git a/src/app/annotations/qgsannotationitempropertieswidget.h b/src/app/annotations/qgsannotationitempropertieswidget.h
+index 813b8d501fd6..07a32b8486c4 100644
+--- a/src/app/annotations/qgsannotationitempropertieswidget.h
++++ b/src/app/annotations/qgsannotationitempropertieswidget.h
+@@ -48,6 +48,7 @@ class QgsAnnotationItemPropertiesWidget : public QgsMapLayerConfigWidget, public
+ 
+     void onChanged();
+     void onLayerPropertyChanged();
++    void onLayerItemsChanged();
+ 
+   private:
+     void setItemId( const QString &itemId );
+@@ -57,6 +58,7 @@ class QgsAnnotationItemPropertiesWidget : public QgsMapLayerConfigWidget, public
+     QPointer<QgsAnnotationItemBaseWidget> mItemWidget;
+     QWidget *mPageNoItem = nullptr;
+     bool mBlockLayerUpdates = false;
++    bool mBlockItemUpdates = false;
+ 
+     std::unique_ptr<QgsPaintEffect> mPaintEffect;
+ };
+
+From 62233cd080e45980bf3bdd5fdcaefb1babe8e410 Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Wed, 1 Jul 2026 00:16:51 +0200
+Subject: [PATCH 07/10] support rotated resize in annotation modify tool
+
+---
+ .../qgsmaptoolmodifyannotation.cpp            | 239 ++++++++++++++----
+ .../annotations/qgsmaptoolmodifyannotation.h  |  25 ++
+ 2 files changed, 220 insertions(+), 44 deletions(-)
+
+diff --git a/src/gui/annotations/qgsmaptoolmodifyannotation.cpp b/src/gui/annotations/qgsmaptoolmodifyannotation.cpp
+index 605e89db8869..8cb6d5681af9 100644
+--- a/src/gui/annotations/qgsmaptoolmodifyannotation.cpp
++++ b/src/gui/annotations/qgsmaptoolmodifyannotation.cpp
+@@ -16,12 +16,16 @@
+ 
+ #include "qgsmaptoolmodifyannotation.h"
+ 
++#include <cmath>
++
+ #include "RTree.h"
+ #include "qgsannotationitem.h"
+ #include "qgsannotationitemeditoperation.h"
+ #include "qgsannotationitemnode.h"
+ #include "qgsannotationlayer.h"
++#include "qgsannotationrectitem.h"
+ #include "qgsmapcanvas.h"
++#include "qgsmaptopixel.h"
+ #include "qgsproject.h"
+ #include "qgsrenderedannotationitemdetails.h"
+ #include "qgsrendereditemdetails.h"
+@@ -84,6 +88,58 @@ class QgsAnnotationItemNodesSpatialIndex : public RTree<int, float, 2, float>
+ ///@endcond
+ 
+ 
++QgsRectangle QgsMapToolModifyAnnotation::reconstructRotatedResizeBounds( const QgsMapToPixel *mapToPixel, double angle, const QgsPointXY &fixedMapPoint, const QgsPointXY &cursorMapPoint )
++{
++  const QgsPointXY fixedPixel = mapToPixel->transform( fixedMapPoint );
++  const QgsPointXY cursorPixel = mapToPixel->transform( cursorMapPoint );
++
++  // Un-rotating the diagonal between the fixed and dragged corners
++  QTransform unrotate;
++  unrotate.rotate( -angle );
++  const QPointF diagonal = unrotate.map( QPointF( cursorPixel.x() - fixedPixel.x(), cursorPixel.y() - fixedPixel.y() ) );
++  const double widthPixels = std::fabs( diagonal.x() );
++  const double heightPixels = std::fabs( diagonal.y() );
++  const QPointF centerPixel( ( fixedPixel.x() + cursorPixel.x() ) / 2.0, ( fixedPixel.y() + cursorPixel.y() ) / 2.0 );
++
++  return QgsAnnotationRectItem::boundsFromPixelRect( mapToPixel, centerPixel, widthPixels, heightPixels );
++}
++
++QgsPointXY QgsMapToolModifyAnnotation::oppositeVertexMapPoint( const QList<QgsAnnotationItemNode> &nodes, int draggedVertex, bool &found )
++{
++  found = false;
++  const int fixedVertex = ( draggedVertex + 2 ) % 4;
++  for ( const QgsAnnotationItemNode &node : nodes )
++  {
++    if ( node.id().part == 0 && node.id().vertex == fixedVertex )
++    {
++      found = true;
++      return node.point();
++    }
++  }
++  return QgsPointXY();
++}
++
++std::optional<QgsRectangle> QgsMapToolModifyAnnotation::rotatedResizeLayerBounds( const QgsAnnotationRectItem *rectItem, QgsAnnotationLayer *layer, const QgsPointXY &cursorMapPoint )
++{
++  const int draggedVertex = mTargetNode.id().vertex;
++  const double angle = rectItem->appliedRotation( canvas()->mapSettings().rotation() );
++  if ( rectItem->placementMode() != Qgis::AnnotationPlacementMode::SpatialBounds || mTargetNode.id().part != 0 || draggedVertex < 0 || draggedVertex >= 4 || qgsDoubleNear( angle, 0 ) )
++    return std::nullopt;
++
++  bool foundFixed = false;
++  const QgsPointXY fixedMapPoint = oppositeVertexMapPoint( mHoveredItemNodes, draggedVertex, foundFixed );
++  if ( !foundFixed )
++    return std::nullopt;
++
++  const QgsRectangle newMapBounds = reconstructRotatedResizeBounds( canvas()->getCoordinateTransform(), angle, fixedMapPoint, cursorMapPoint );
++  const QgsRectangle newLayerBounds = toLayerCoordinates( layer, newMapBounds );
++  if ( qgsDoubleNear( newLayerBounds.width(), 0 ) || qgsDoubleNear( newLayerBounds.height(), 0 ) )
++    return std::nullopt;
++
++  return newLayerBounds;
++}
++
++
+ QgsMapToolModifyAnnotation::QgsMapToolModifyAnnotation( QgsMapCanvas *canvas, QgsAdvancedDigitizingDockWidget *cadDockWidget )
+   : QgsAnnotationMapTool( canvas, cadDockWidget )
+   , mSnapIndicator( new QgsSnapIndicator( canvas ) )
+@@ -151,26 +207,44 @@ void QgsMapToolModifyAnnotation::cadCanvasMoveEvent( QgsMapMouseEvent *event )
+     {
+       if ( QgsAnnotationItem *item = annotationItemFromId( mSelectedItemLayerId, mSelectedItemId ) )
+       {
+-        const QgsPointXY endPointLayer = toLayerCoordinates( layer, event->mapPoint() );
+-        QgsAnnotationItemEditOperationMoveNode operation(
+-          mSelectedItemId,
+-          mTargetNode.id(),
+-          QgsPoint( mTargetNode.point() ),
+-          QgsPoint( endPointLayer ),
+-          event->pixelPoint().x() - mMoveStartPointPixels.x(),
+-          event->pixelPoint().y() - mMoveStartPointPixels.y()
+-        );
+-        std::unique_ptr<QgsAnnotationItemEditOperationTransientResults> operationResults( item->transientEditResultsV2( &operation, context ) );
+-        if ( operationResults )
++        bool previewDone = false;
++
++        if ( const QgsAnnotationRectItem *rectItem = dynamic_cast<const QgsAnnotationRectItem *>( item ) )
+         {
+-          mTemporaryRubberBand = make_qobject_unique<QgsRubberBand>( mCanvas, operationResults->representativeGeometry().type() );
+-          const double scaleFactor = canvas()->fontMetrics().xHeight() * .2;
+-          mTemporaryRubberBand->setWidth( scaleFactor );
+-          mTemporaryRubberBand->setToGeometry( operationResults->representativeGeometry(), layer->crs() );
++          if ( const std::optional<QgsRectangle> newLayerBounds = rotatedResizeLayerBounds( rectItem, layer, event->mapPoint() ) )
++          {
++            const QgsGeometry preview = rectItem->rotatedBoundsGeometry( *newLayerBounds, context.renderContext() );
++            mTemporaryRubberBand = make_qobject_unique<QgsRubberBand>( mCanvas, preview.type() );
++            const double scaleFactor = canvas()->fontMetrics().xHeight() * .2;
++            mTemporaryRubberBand->setWidth( scaleFactor );
++            mTemporaryRubberBand->setToGeometry( preview, layer->crs() );
++            previewDone = true;
++          }
+         }
+-        else
++
++        if ( !previewDone )
+         {
+-          mTemporaryRubberBand.reset();
++          const QgsPointXY endPointLayer = toLayerCoordinates( layer, event->mapPoint() );
++          QgsAnnotationItemEditOperationMoveNode operation(
++            mSelectedItemId,
++            mTargetNode.id(),
++            QgsPoint( mTargetNode.point() ),
++            QgsPoint( endPointLayer ),
++            event->pixelPoint().x() - mMoveStartPointPixels.x(),
++            event->pixelPoint().y() - mMoveStartPointPixels.y()
++          );
++          std::unique_ptr<QgsAnnotationItemEditOperationTransientResults> operationResults( item->transientEditResultsV2( &operation, context ) );
++          if ( operationResults )
++          {
++            mTemporaryRubberBand = make_qobject_unique<QgsRubberBand>( mCanvas, operationResults->representativeGeometry().type() );
++            const double scaleFactor = canvas()->fontMetrics().xHeight() * .2;
++            mTemporaryRubberBand->setWidth( scaleFactor );
++            mTemporaryRubberBand->setToGeometry( operationResults->representativeGeometry(), layer->crs() );
++          }
++          else
++          {
++            mTemporaryRubberBand.reset();
++          }
+         }
+       }
+       break;
+@@ -314,25 +388,45 @@ void QgsMapToolModifyAnnotation::cadCanvasPressEvent( QgsMapMouseEvent *event )
+       {
+         if ( layer )
+         {
+-          const QgsPointXY endPointLayer = toLayerCoordinates( layer, event->mapPoint() );
+-          QgsAnnotationItemEditOperationMoveNode operation(
+-            mSelectedItemId,
+-            mTargetNode.id(),
+-            QgsPoint( mTargetNode.point() ),
+-            QgsPoint( endPointLayer ),
+-            event->pixelPoint().x() - mMoveStartPointPixels.x(),
+-            event->pixelPoint().y() - mMoveStartPointPixels.y()
+-          );
+-          switch ( layer->applyEditV2( &operation, context ) )
++          bool handled = false;
++
++          const QgsAnnotationItem *resizedItem = annotationItemFromId( mSelectedItemLayerId, mSelectedItemId );
++          if ( const QgsAnnotationRectItem *rectItem = dynamic_cast<const QgsAnnotationRectItem *>( resizedItem ) )
+           {
+-            case Qgis::AnnotationItemEditOperationResult::Success:
+-              QgsProject::instance()->setDirty( true );
+-              mRefreshSelectedItemAfterRedraw = true;
+-              break;
++            if ( const std::optional<QgsRectangle> newLayerBounds = rotatedResizeLayerBounds( rectItem, layer, event->mapPoint() ) )
++            {
++              QgsAnnotationItemEditOperationSetItemBounds operation( mSelectedItemId, *newLayerBounds );
++              if ( layer->applyEditV2( &operation, context ) == Qgis::AnnotationItemEditOperationResult::Success )
++              {
++                handled = true;
++                QgsProject::instance()->setDirty( true );
++                mRefreshSelectedItemAfterRedraw = true;
++              }
++            }
++          }
+ 
+-            case Qgis::AnnotationItemEditOperationResult::Invalid:
+-            case Qgis::AnnotationItemEditOperationResult::ItemCleared:
+-              break;
++          if ( !handled )
++          {
++            const QgsPointXY endPointLayer = toLayerCoordinates( layer, event->mapPoint() );
++            QgsAnnotationItemEditOperationMoveNode operation(
++              mSelectedItemId,
++              mTargetNode.id(),
++              QgsPoint( mTargetNode.point() ),
++              QgsPoint( endPointLayer ),
++              event->pixelPoint().x() - mMoveStartPointPixels.x(),
++              event->pixelPoint().y() - mMoveStartPointPixels.y()
++            );
++            switch ( layer->applyEditV2( &operation, context ) )
++            {
++              case Qgis::AnnotationItemEditOperationResult::Success:
++                QgsProject::instance()->setDirty( true );
++                mRefreshSelectedItemAfterRedraw = true;
++                break;
++
++              case Qgis::AnnotationItemEditOperationResult::Invalid:
++              case Qgis::AnnotationItemEditOperationResult::ItemCleared:
++                break;
++            }
+           }
+         }
+ 
+@@ -569,19 +663,54 @@ void QgsMapToolModifyAnnotation::setHoveredItem( const QgsRenderedAnnotationItem
+ 
+   mHoverRubberBand->show();
+ 
+-  mHoverRubberBand->reset( Qgis::GeometryType::Line );
+-  mHoverRubberBand->addPoint( QgsPointXY( itemMapBounds.xMinimum(), itemMapBounds.yMinimum() ) );
+-  mHoverRubberBand->addPoint( QgsPointXY( itemMapBounds.xMaximum(), itemMapBounds.yMinimum() ) );
+-  mHoverRubberBand->addPoint( QgsPointXY( itemMapBounds.xMaximum(), itemMapBounds.yMaximum() ) );
+-  mHoverRubberBand->addPoint( QgsPointXY( itemMapBounds.xMinimum(), itemMapBounds.yMaximum() ) );
+-  mHoverRubberBand->addPoint( QgsPointXY( itemMapBounds.xMinimum(), itemMapBounds.yMinimum() ) );
+-
+-  QgsAnnotationLayer *layer = annotationLayerFromId( item->layerId() );
+   const QgsAnnotationItem *annotationItem = annotationItemFromId( item->layerId(), item->itemId() );
+-  if ( !annotationItem )
++  QgsAnnotationLayer *layer = annotationLayerFromId( item->layerId() );
++  if ( !annotationItem || !layer )
++  {
++    // fall back to a plain axis-aligned hover rectangle
++    mHoverRubberBand->reset( Qgis::GeometryType::Line );
++    mHoverRubberBand->addPoint( QgsPointXY( itemMapBounds.xMinimum(), itemMapBounds.yMinimum() ) );
++    mHoverRubberBand->addPoint( QgsPointXY( itemMapBounds.xMaximum(), itemMapBounds.yMinimum() ) );
++    mHoverRubberBand->addPoint( QgsPointXY( itemMapBounds.xMaximum(), itemMapBounds.yMaximum() ) );
++    mHoverRubberBand->addPoint( QgsPointXY( itemMapBounds.xMinimum(), itemMapBounds.yMaximum() ) );
++    mHoverRubberBand->addPoint( QgsPointXY( itemMapBounds.xMinimum(), itemMapBounds.yMinimum() ) );
+     return;
++  }
++
++  const QgsCoordinateTransform layerToMapTransform = QgsCoordinateTransform( layer->crs(), canvas()->mapSettings().destinationCrs(), canvas()->mapSettings().transformContext() );
+ 
+-  QgsCoordinateTransform layerToMapTransform = QgsCoordinateTransform( layer->crs(), canvas()->mapSettings().destinationCrs(), canvas()->mapSettings().transformContext() );
++  // Rotate corners around the center in pixel space. Node points already went
++  // through mapToPixel (which includes map rotation), so only the item's own
++  // rotation is added here. The callout anchor is fixed and never rotated.
++  const QgsAnnotationRectItem *rectItem = dynamic_cast<const QgsAnnotationRectItem *>( annotationItem );
++  const double mapRotation = canvas()->mapSettings().rotation();
++  const double frameRotation = rectItem ? rectItem->appliedRotation( mapRotation ) - mapRotation : 0;
++  const QgsMapToPixel *mapToPixel = canvas()->getCoordinateTransform();
++  const bool rotated = rectItem && !qgsDoubleNear( frameRotation, 0 );
++
++  QTransform rotationTransform;
++  if ( rotated )
++  {
++    QgsPointXY centerMap = itemMapBounds.center();
++    try
++    {
++      centerMap = layerToMapTransform.transform( rectItem->bounds().center() );
++    }
++    catch ( QgsCsException & )
++    {}
++    const QgsPointXY centerPixel = mapToPixel->transform( centerMap );
++    rotationTransform.translate( centerPixel.x(), centerPixel.y() );
++    rotationTransform.rotate( frameRotation );
++    rotationTransform.translate( -centerPixel.x(), -centerPixel.y() );
++  }
++
++  auto rotateMapPoint = [&]( const QgsPointXY &p ) -> QgsPointXY {
++    if ( !rotated )
++      return p;
++    const QgsPointXY pPixel = mapToPixel->transform( p );
++    const QPointF r = rotationTransform.map( QPointF( pPixel.x(), pPixel.y() ) );
++    return mapToPixel->toMapCoordinates( r.x(), r.y() );
++  };
+ 
+   const double scaleFactor = canvas()->fontMetrics().xHeight() * .2;
+ 
+@@ -609,6 +738,7 @@ void QgsMapToolModifyAnnotation::setHoveredItem( const QgsRenderedAnnotationItem
+   int index = 0;
+   mHoveredItemNodes.clear();
+   mHoveredItemNodes.reserve( itemNodes.size() );
++  QVector<QgsPointXY> vertexFramePoints;
+   for ( const QgsAnnotationItemNode &node : itemNodes )
+   {
+     QgsPointXY nodeMapPoint;
+@@ -624,7 +754,10 @@ void QgsMapToolModifyAnnotation::setHoveredItem( const QgsRenderedAnnotationItem
+     switch ( node.type() )
+     {
+       case Qgis::AnnotationItemNodeType::VertexHandle:
++        // vertex handles rotate together with the item body
++        nodeMapPoint = rotateMapPoint( nodeMapPoint );
+         vertexNodeBand->addPoint( nodeMapPoint );
++        vertexFramePoints.append( nodeMapPoint );
+         break;
+ 
+       case Qgis::AnnotationItemNodeType::CalloutHandle:
+@@ -643,6 +776,24 @@ void QgsMapToolModifyAnnotation::setHoveredItem( const QgsRenderedAnnotationItem
+ 
+   mHoveredItemNodeRubberBands.emplace_back( vertexNodeBand );
+   mHoveredItemNodeRubberBands.emplace_back( calloutNodeBand );
++
++  // Draw the hover frame. For spatial-bounds rectangles it follows the four
++  // (rotated) corner handles; other modes use the axis-aligned bounds.
++  mHoverRubberBand->reset( Qgis::GeometryType::Line );
++  if ( rectItem && rectItem->placementMode() == Qgis::AnnotationPlacementMode::SpatialBounds && vertexFramePoints.size() == 4 )
++  {
++    for ( const QgsPointXY &framePoint : vertexFramePoints )
++      mHoverRubberBand->addPoint( framePoint );
++    mHoverRubberBand->addPoint( vertexFramePoints.constFirst() );
++  }
++  else
++  {
++    mHoverRubberBand->addPoint( QgsPointXY( itemMapBounds.xMinimum(), itemMapBounds.yMinimum() ) );
++    mHoverRubberBand->addPoint( QgsPointXY( itemMapBounds.xMaximum(), itemMapBounds.yMinimum() ) );
++    mHoverRubberBand->addPoint( QgsPointXY( itemMapBounds.xMaximum(), itemMapBounds.yMaximum() ) );
++    mHoverRubberBand->addPoint( QgsPointXY( itemMapBounds.xMinimum(), itemMapBounds.yMaximum() ) );
++    mHoverRubberBand->addPoint( QgsPointXY( itemMapBounds.xMinimum(), itemMapBounds.yMinimum() ) );
++  }
+ }
+ 
+ QSizeF QgsMapToolModifyAnnotation::deltaForKeyEvent( QgsAnnotationLayer *layer, const QgsPointXY &originalCanvasPoint, QKeyEvent *event )
+diff --git a/src/gui/annotations/qgsmaptoolmodifyannotation.h b/src/gui/annotations/qgsmaptoolmodifyannotation.h
+index e14b3dc62a2b..a727f0093539 100644
+--- a/src/gui/annotations/qgsmaptoolmodifyannotation.h
++++ b/src/gui/annotations/qgsmaptoolmodifyannotation.h
+@@ -17,6 +17,8 @@
+ #ifndef QGSMAPTOOLMODIFYANNOTATION_H
+ #define QGSMAPTOOLMODIFYANNOTATION_H
+ 
++#include <optional>
++
+ #include "qgis_gui.h"
+ #include "qgis_sip.h"
+ #include "qgsannotationitemnode.h"
+@@ -31,8 +33,10 @@ class QgsRubberBand;
+ class QgsRenderedAnnotationItemDetails;
+ class QgsAnnotationItem;
+ class QgsAnnotationLayer;
++class QgsAnnotationRectItem;
+ class QgsAnnotationItemNodesSpatialIndex;
+ class QgsSnapIndicator;
++class QgsMapToPixel;
+ 
+ 
+ /**
+@@ -96,6 +100,27 @@ class GUI_EXPORT QgsMapToolModifyAnnotation : public QgsAnnotationMapTool
+      */
+     QSizeF deltaForKeyEvent( QgsAnnotationLayer *layer, const QgsPointXY &originalCanvasPoint, QKeyEvent *event );
+ 
++    /**
++     * Reconstructs the new (unrotated) bounds, in map coordinates, for a rotated rectangle whose
++     * corner is being dragged. The diagonally-opposite corner (at \a fixedMapPoint) stays anchored
++     * on screen while the dragged corner follows \a cursorMapPoint. \a angle is the applied rotation
++     * in degrees clockwise on screen.
++     */
++    static QgsRectangle reconstructRotatedResizeBounds( const QgsMapToPixel *mapToPixel, double angle, const QgsPointXY &fixedMapPoint, const QgsPointXY &cursorMapPoint );
++
++    /**
++     * Returns the current on-screen (rotated) map position of the vertex diagonally opposite to
++     * \a draggedVertex, searching \a nodes. Sets \a found accordingly.
++     */
++    static QgsPointXY oppositeVertexMapPoint( const QList<QgsAnnotationItemNode> &nodes, int draggedVertex, bool &found );
++
++    /**
++     * Returns the new bounds, in \a layer coordinates, for the rotated \a rectItem whose corner
++     * is currently being dragged towards \a cursorMapPoint, or nothing if the current node drag is
++     * not a rotated resize.
++     */
++    std::optional<QgsRectangle> rotatedResizeLayerBounds( const QgsAnnotationRectItem *rectItem, QgsAnnotationLayer *layer, const QgsPointXY &cursorMapPoint );
++
+     Action mCurrentAction = Action::NoAction;
+ 
+     std::unique_ptr<QgsSnapIndicator> mSnapIndicator;
+
+From 4a34768547165aae834a56f19fe42ec72ae25ea1 Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Wed, 1 Jul 2026 00:16:54 +0200
+Subject: [PATCH 08/10] rotate selection band for rotated annotations
+
+---
+ .../qgsmaptoolselectannotation.cpp            | 216 +++++++++++++-----
+ 1 file changed, 165 insertions(+), 51 deletions(-)
+
+diff --git a/src/gui/annotations/qgsmaptoolselectannotation.cpp b/src/gui/annotations/qgsmaptoolselectannotation.cpp
+index 1636e17394ad..d921f27de92b 100644
+--- a/src/gui/annotations/qgsmaptoolselectannotation.cpp
++++ b/src/gui/annotations/qgsmaptoolselectannotation.cpp
+@@ -16,14 +16,22 @@
+ 
+ #include "qgsmaptoolselectannotation.h"
+ 
++#include <algorithm>
++#include <limits>
++
+ #include "qgsannotationitem.h"
+ #include "qgsannotationitemeditoperation.h"
+ #include "qgsannotationitemnode.h"
+ #include "qgsannotationlayer.h"
++#include "qgsannotationrectitem.h"
+ #include "qgsapplication.h"
++#include "qgscoordinatetransform.h"
++#include "qgsgeometry.h"
+ #include "qgsmapcanvas.h"
+ #include "qgsmaptoolselectannotationmousehandles.h"
++#include "qgsmaptopixel.h"
+ #include "qgsproject.h"
++#include "qgsrendercontext.h"
+ #include "qgsrenderedannotationitemdetails.h"
+ #include "qgsrendereditemdetails.h"
+ #include "qgsrendereditemresults.h"
+@@ -75,11 +83,83 @@ void QgsAnnotationItemRubberBand::updateBoundingBox( const QgsRectangle &boundin
+   mNeedsUpdatedBoundingBox = annotationItem && ( annotationItem->flags() & Qgis::AnnotationItemFlag::ScaleDependentBoundingBox );
+ 
+   reset( Qgis::GeometryType::Line );
+-  addPoint( QgsPointXY( boundingBox.xMinimum(), boundingBox.yMinimum() ) );
+-  addPoint( QgsPointXY( boundingBox.xMaximum(), boundingBox.yMinimum() ) );
+-  addPoint( QgsPointXY( boundingBox.xMaximum(), boundingBox.yMaximum() ) );
+-  addPoint( QgsPointXY( boundingBox.xMinimum(), boundingBox.yMaximum() ) );
+-  addPoint( QgsPointXY( boundingBox.xMinimum(), boundingBox.yMinimum() ) );
++
++  const QgsMapToPixel *transform = mMapCanvas->getCoordinateTransform();
++
++  const QgsAnnotationRectItem *rectItem = dynamic_cast< const QgsAnnotationRectItem * >( annotationItem );
++  const double mapRotation = mMapCanvas->mapSettings().rotation();
++  const double frameRotation = rectItem ? rectItem->appliedRotation( mapRotation ) - mapRotation : 0;
++
++  if ( rectItem && !qgsDoubleNear( frameRotation, 0 ) )
++  {
++    double minX = std::numeric_limits<double>::max();
++    double minY = std::numeric_limits<double>::max();
++    double maxX = std::numeric_limits<double>::lowest();
++    double maxY = std::numeric_limits<double>::lowest();
++    auto includePixel = [&]( const QPointF &p ) {
++      minX = std::min( minX, p.x() );
++      minY = std::min( minY, p.y() );
++      maxX = std::max( maxX, p.x() );
++      maxY = std::max( maxY, p.y() );
++    };
++
++    // rotated item corners, as drawn on screen
++    if ( QgsAnnotationLayer *lyr = layer() )
++    {
++      const QgsCoordinateTransform layerToMap( lyr->crs(), mMapCanvas->mapSettings().destinationCrs(), mMapCanvas->mapSettings().transformContext() );
++      const QgsRenderContext renderContext = QgsRenderContext::fromMapSettings( mMapCanvas->mapSettings() );
++      const QPolygonF corners = rectItem->rotatedBoundsGeometry( rectItem->bounds(), renderContext ).asQPolygonF();
++      for ( const QPointF &corner : corners )
++      {
++        QgsPointXY mapPoint( corner.x(), corner.y() );
++        try
++        {
++          mapPoint = layerToMap.transform( mapPoint );
++        }
++        catch ( QgsCsException & )
++        {}
++        includePixel( toCanvasCoordinates( mapPoint ) );
++      }
++    }
++
++    // callout anchor and everything else reported by the incoming bounding box
++    const QgsPointXY bboxCorners[4] = {
++      QgsPointXY( boundingBox.xMinimum(), boundingBox.yMinimum() ),
++      QgsPointXY( boundingBox.xMaximum(), boundingBox.yMinimum() ),
++      QgsPointXY( boundingBox.xMaximum(), boundingBox.yMaximum() ),
++      QgsPointXY( boundingBox.xMinimum(), boundingBox.yMaximum() ),
++    };
++    for ( const QgsPointXY &corner : bboxCorners )
++      includePixel( toCanvasCoordinates( corner ) );
++
++    const QgsPointXY topLeft = transform->toMapCoordinates( minX, minY );
++    const QgsPointXY topRight = transform->toMapCoordinates( maxX, minY );
++    const QgsPointXY bottomRight = transform->toMapCoordinates( maxX, maxY );
++    const QgsPointXY bottomLeft = transform->toMapCoordinates( minX, maxY );
++    addPoint( topLeft );
++    addPoint( topRight );
++    addPoint( bottomRight );
++    addPoint( bottomLeft );
++    addPoint( topLeft );
++  }
++  else
++  {
++    // Build the rubber band as a screen-aligned rectangle matching the item's
++    // on-screen size.
++    const QPointF centerCanvas = toCanvasCoordinates( boundingBox.center() );
++    const double mupp = mMapCanvas->mapSettings().mapUnitsPerPixel();
++    const double halfWidth = 0.5 * boundingBox.width() / mupp;
++    const double halfHeight = 0.5 * boundingBox.height() / mupp;
++    const QgsPointXY topLeft = transform->toMapCoordinates( centerCanvas.x() - halfWidth, centerCanvas.y() - halfHeight );
++    const QgsPointXY topRight = transform->toMapCoordinates( centerCanvas.x() + halfWidth, centerCanvas.y() - halfHeight );
++    const QgsPointXY bottomRight = transform->toMapCoordinates( centerCanvas.x() + halfWidth, centerCanvas.y() + halfHeight );
++    const QgsPointXY bottomLeft = transform->toMapCoordinates( centerCanvas.x() - halfWidth, centerCanvas.y() + halfHeight );
++    addPoint( topLeft );
++    addPoint( topRight );
++    addPoint( bottomRight );
++    addPoint( bottomLeft );
++    addPoint( topLeft );
++  }
+ 
+   show();
+   setSelected( true );
+@@ -96,6 +176,11 @@ QgsMapToolSelectAnnotation::QgsMapToolSelectAnnotation( QgsMapCanvas *canvas, Qg
+ {
+   connect( QgsMapToolSelectAnnotation::canvas(), &QgsMapCanvas::mapCanvasRefreshed, this, &QgsMapToolSelectAnnotation::onCanvasRefreshed );
+ 
++  connect( QgsMapToolSelectAnnotation::canvas(), &QgsMapCanvas::rotationChanged, this, [this] {
++    for ( std::unique_ptr<QgsAnnotationItemRubberBand> &selectedItem : mSelectedItems )
++      selectedItem->updateBoundingBox( selectedItem->boundingBox() );
++  } );
++
+   setAdvancedDigitizingAllowed( false );
+ }
+ 
+@@ -415,29 +500,30 @@ void QgsMapToolSelectAnnotation::onCanvasRefreshed()
+     return;
+   }
+ 
++  const bool interactiveOperation = mMouseHandles && ( mMouseHandles->isDragging() || mMouseHandles->isResizing() || mMouseHandles->isRotating() );
++
+   const QList<QgsRenderedItemDetails *> items = renderedItemResults->renderedItems();
+   bool needsSelectedItemsUpdate = false;
+   for ( std::unique_ptr<QgsAnnotationItemRubberBand> &selectedItem : mSelectedItems )
+   {
+-    if ( selectedItem->needsUpdatedBoundingBox() )
+-    {
+-      needsSelectedItemsUpdate = true;
++    if ( interactiveOperation && !selectedItem->needsUpdatedBoundingBox() )
++      continue;
+ 
+-      auto it = std::find_if( items.begin(), items.end(), [&selectedItem]( const QgsRenderedItemDetails *item ) {
+-        if ( const QgsRenderedAnnotationItemDetails *annotationItem = dynamic_cast<const QgsRenderedAnnotationItemDetails *>( item ) )
++    auto it = std::find_if( items.begin(), items.end(), [&selectedItem]( const QgsRenderedItemDetails *item ) {
++      if ( const QgsRenderedAnnotationItemDetails *annotationItem = dynamic_cast<const QgsRenderedAnnotationItemDetails *>( item ) )
++      {
++        if ( annotationItem->itemId() == selectedItem->itemId() && annotationItem->layerId() == selectedItem->layerId() )
+         {
+-          if ( annotationItem->itemId() == selectedItem->itemId() && annotationItem->layerId() == selectedItem->layerId() )
+-          {
+-            return true;
+-          }
++          return true;
+         }
+-        return false;
+-      } );
+-
+-      if ( it != items.end() )
+-      {
+-        selectedItem->updateBoundingBox( ( *it )->boundingBox() );
+       }
++      return false;
++    } );
++
++    if ( it != items.end() )
++    {
++      needsSelectedItemsUpdate = true;
++      selectedItem->updateBoundingBox( ( *it )->boundingBox() );
+     }
+   }
+ 
+@@ -594,8 +680,11 @@ void QgsMapToolSelectAnnotation::attemptMoveBy( QgsAnnotationItemRubberBand *ann
+   if ( QgsAnnotationItem *annotationItem = annotationItemRubberBand->item() )
+   {
+     QgsRectangle boundingBox = annotationItemRubberBand->boundingBox();
+-    const double mupp = mCanvas->mapSettings().mapUnitsPerPixel();
+-    QgsVector translation( deltaX * mupp, -deltaY * mupp );
++    // take map rotation into account in translation
++    const QgsMapToPixel *transform = mCanvas->getCoordinateTransform();
++    const QgsPointXY mapOrigin = transform->toMapCoordinates( 0.0, 0.0 );
++    const QgsPointXY mapMoved = transform->toMapCoordinates( deltaX, deltaY );
++    const QgsVector translation( mapMoved.x() - mapOrigin.x(), mapMoved.y() - mapOrigin.y() );
+     QgsAnnotationLayer *annotationLayer = annotationItemRubberBand->layer();
+ 
+     QgsAnnotationItemEditContext context;
+@@ -653,41 +742,66 @@ void QgsMapToolSelectAnnotation::attemptRotateBy( QgsAnnotationItemRubberBand *a
+ 
+ void QgsMapToolSelectAnnotation::attemptSetSceneRect( QgsAnnotationItemRubberBand *annotationItemRubberBand, const QRectF &rect )
+ {
+-  if ( QgsAnnotationItem *annotationItem = annotationItemRubberBand->item() )
++  QgsAnnotationItem *annotationItem = annotationItemRubberBand->item();
++  if ( !annotationItem )
++    return;
++
++  QgsAnnotationLayer *annotationLayer = annotationItemRubberBand->layer();
++  if ( !annotationLayer )
++    return;
++
++  // on-screen rotation = the item's own rotation plus the map rotation when
++  // the item follows it.
++  double rotation = 0;
++  if ( const QgsAnnotationRectItem *rectItem = dynamic_cast<const QgsAnnotationRectItem *>( annotationItem ) )
+   {
+-    const double widthRatio = rect.width() / annotationItemRubberBand->boundingRect().width();
+-    const double heightRatio = rect.height() / annotationItemRubberBand->boundingRect().height();
+-    const double deltaX = rect.x() - annotationItemRubberBand->x() + 1;
+-    const double deltaY = rect.y() - annotationItemRubberBand->y() + 1;
+-    attemptMoveBy( annotationItemRubberBand, deltaX, deltaY );
++    rotation = rectItem->appliedRotation( mCanvas->mapSettings().rotation() );
++  }
+ 
+-    QgsAnnotationLayer *annotationLayer = annotationItemRubberBand->layer();
+-    const QgsRectangle boundingBox = mCanvas->mapSettings().mapToLayerCoordinates( annotationLayer, annotationItemRubberBand->boundingBox() );
+-    const QgsRectangle
+-      modifiedBoundingBox( boundingBox.xMinimum(), boundingBox.yMaximum() - boundingBox.height() * heightRatio, boundingBox.xMinimum() + boundingBox.width() * widthRatio, boundingBox.yMaximum() );
++  // Rebuild the unrotated (screen-aligned) rectangle so that, after rotating
++  // around its center, the dragged corner stays where the user placed it.
++  const double w = rect.width();
++  const double h = rect.height();
++  const QPointF halfDiagonal( w / 2.0, h / 2.0 );
++  QTransform itemRotation;
++  itemRotation.rotate( rotation );
++  const QPointF unrotatedTopLeftScene = rect.topLeft() + itemRotation.map( halfDiagonal ) - halfDiagonal;
++  const QRectF newSceneRect( unrotatedTopLeftScene, QSizeF( w, h ) );
+ 
+-    QgsAnnotationItemEditContext context;
+-    context.setCurrentItemBounds( boundingBox );
+-    context.setRenderContext( QgsRenderContext::fromMapSettings( mCanvas->mapSettings() ) );
++  // Derive the bounds from the center and pixel size, which stays correct
++  // when the map is rotated.
++  const QgsMapToPixel *transform = mCanvas->getCoordinateTransform();
++  const QgsRectangle newMapBounds = QgsAnnotationRectItem::boundsFromPixelRect( transform, newSceneRect.center(), w, h );
+ 
+-    const QList<QgsAnnotationItemNode> itemNodes = annotationItem->nodesV2( context );
+-    for ( const QgsAnnotationItemNode &node : itemNodes )
++  const QgsRectangle oldBounds = mCanvas->mapSettings().mapToLayerCoordinates( annotationLayer, annotationItemRubberBand->boundingBox() );
++  const QgsRectangle newBounds = mCanvas->mapSettings().mapToLayerCoordinates( annotationLayer, newMapBounds );
++
++  if ( oldBounds.width() == 0 || oldBounds.height() == 0 )
++    return;
++
++  QgsAnnotationItemEditContext context;
++  context.setCurrentItemBounds( oldBounds );
++  context.setRenderContext( QgsRenderContext::fromMapSettings( mCanvas->mapSettings() ) );
++
++  const QList<QgsAnnotationItemNode> itemNodes = annotationItem->nodesV2( context );
++  for ( const QgsAnnotationItemNode &node : itemNodes )
++  {
++    const double modifiedX = newBounds.xMinimum() + newBounds.width() * ( ( node.point().x() - oldBounds.xMinimum() ) / oldBounds.width() );
++    const double modifiedY = newBounds.yMaximum() - newBounds.height() * ( ( oldBounds.yMaximum() - node.point().y() ) / oldBounds.height() );
++    QgsPointXY modifiedPoint( modifiedX, modifiedY );
++    QgsAnnotationItemEditOperationMoveNode operation( annotationItemRubberBand->itemId(), node.id(), QgsPoint( node.point() ), QgsPoint( modifiedPoint ) );
++    switch ( annotationLayer->applyEditV2( &operation, context ) )
+     {
+-      const double modifiedX = modifiedBoundingBox.xMinimum() + modifiedBoundingBox.width() * ( ( node.point().x() - boundingBox.xMinimum() ) / boundingBox.width() );
+-      const double modifiedY = modifiedBoundingBox.yMaximum() - modifiedBoundingBox.height() * ( ( boundingBox.yMaximum() - node.point().y() ) / boundingBox.height() );
+-      QgsPointXY modifiedPoint( modifiedX, modifiedY );
+-      QgsAnnotationItemEditOperationMoveNode operation( annotationItemRubberBand->itemId(), node.id(), QgsPoint( node.point() ), QgsPoint( modifiedPoint ) );
+-      switch ( annotationLayer->applyEditV2( &operation, context ) )
+-      {
+-        case Qgis::AnnotationItemEditOperationResult::Success:
+-          QgsProject::instance()->setDirty( true );
+-          annotationItemRubberBand->setNeedsUpdatedBoundingBox( true );
+-          break;
++      case Qgis::AnnotationItemEditOperationResult::Success:
++        QgsProject::instance()->setDirty( true );
++        annotationItemRubberBand->setNeedsUpdatedBoundingBox( true );
++        break;
+ 
+-        case Qgis::AnnotationItemEditOperationResult::Invalid:
+-        case Qgis::AnnotationItemEditOperationResult::ItemCleared:
+-          break;
+-      }
++      case Qgis::AnnotationItemEditOperationResult::Invalid:
++      case Qgis::AnnotationItemEditOperationResult::ItemCleared:
++        break;
+     }
+   }
++
++  annotationItemRubberBand->updateBoundingBox( newMapBounds );
+ }
+
+From f388182db3a17ade09ac96c96bf9d08e8cafdaf3 Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Wed, 1 Jul 2026 00:16:56 +0200
+Subject: [PATCH 09/10] keep annotation preview rectangle screen-aligned
+
+---
+ .../qgscreateannotationitemmaptool_impl.cpp   | 34 ++++++++++++-------
+ 1 file changed, 22 insertions(+), 12 deletions(-)
+
+diff --git a/src/gui/annotations/qgscreateannotationitemmaptool_impl.cpp b/src/gui/annotations/qgscreateannotationitemmaptool_impl.cpp
+index cb8f3a650b32..414e2e417e9c 100644
+--- a/src/gui/annotations/qgscreateannotationitemmaptool_impl.cpp
++++ b/src/gui/annotations/qgscreateannotationitemmaptool_impl.cpp
+@@ -354,14 +354,19 @@ void QgsCreatePictureItemMapTool::cadCanvasMoveEvent( QgsMapMouseEvent *event )
+   if ( !mRubberBand )
+     return;
+ 
+-  const QgsPointXY mapPoint = event->snapPoint();
+-  mRect.setBottomRight( mapPoint.toQPointF() );
++  // Keep the preview rectangle aligned to the screen, matching the placed item
++  // which ignores map rotation by default.
++  const QgsPointXY firstCanvasPoint = toCanvasCoordinates( mFirstPoint );
++  const QgsPointXY currentCanvasPoint = toCanvasCoordinates( event->snapPoint() );
++
++  const QgsMapToPixel *transform = mCanvas->getCoordinateTransform();
++  const QgsPointXY topLeft = transform->toMapCoordinates( firstCanvasPoint.x(), firstCanvasPoint.y() );
++  const QgsPointXY topRight = transform->toMapCoordinates( currentCanvasPoint.x(), firstCanvasPoint.y() );
++  const QgsPointXY bottomRight = transform->toMapCoordinates( currentCanvasPoint.x(), currentCanvasPoint.y() );
++  const QgsPointXY bottomLeft = transform->toMapCoordinates( firstCanvasPoint.x(), currentCanvasPoint.y() );
+ 
+   mRubberBand->reset( Qgis::GeometryType::Polygon );
+-  mRubberBand->addPoint( mRect.bottomLeft(), false );
+-  mRubberBand->addPoint( mRect.bottomRight(), false );
+-  mRubberBand->addPoint( mRect.topRight(), false );
+-  mRubberBand->addPoint( mRect.topLeft(), true );
++  mRubberBand->setToGeometry( QgsGeometry::fromPolygonXY( { { bottomLeft, bottomRight, topRight, topLeft } } ) );
+ }
+ 
+ void QgsCreatePictureItemMapTool::keyPressEvent( QKeyEvent *event )
+@@ -456,14 +461,19 @@ void QgsCreateRectangleTextItemMapTool::cadCanvasMoveEvent( QgsMapMouseEvent *ev
+   if ( !mRubberBand )
+     return;
+ 
+-  const QgsPointXY mapPoint = event->snapPoint();
+-  mRect.setBottomRight( mapPoint.toQPointF() );
++  // Keep the preview rectangle aligned to the screen, matching the placed item
++  // which ignores map rotation by default.
++  const QgsPointXY firstCanvasPoint = toCanvasCoordinates( mFirstPoint );
++  const QgsPointXY currentCanvasPoint = toCanvasCoordinates( event->snapPoint() );
++
++  const QgsMapToPixel *transform = mCanvas->getCoordinateTransform();
++  const QgsPointXY topLeft = transform->toMapCoordinates( firstCanvasPoint.x(), firstCanvasPoint.y() );
++  const QgsPointXY topRight = transform->toMapCoordinates( currentCanvasPoint.x(), firstCanvasPoint.y() );
++  const QgsPointXY bottomRight = transform->toMapCoordinates( currentCanvasPoint.x(), currentCanvasPoint.y() );
++  const QgsPointXY bottomLeft = transform->toMapCoordinates( firstCanvasPoint.x(), currentCanvasPoint.y() );
+ 
+   mRubberBand->reset( Qgis::GeometryType::Polygon );
+-  mRubberBand->addPoint( mRect.bottomLeft(), false );
+-  mRubberBand->addPoint( mRect.bottomRight(), false );
+-  mRubberBand->addPoint( mRect.topRight(), false );
+-  mRubberBand->addPoint( mRect.topLeft(), true );
++  mRubberBand->setToGeometry( QgsGeometry::fromPolygonXY( { { bottomLeft, bottomRight, topRight, topLeft } } ) );
+ }
+ 
+ void QgsCreateRectangleTextItemMapTool::keyPressEvent( QKeyEvent *event )
+
+From 4e8344c9b1bdc52dbefcb3c0f60755c243ea674e Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Wed, 1 Jul 2026 00:16:58 +0200
+Subject: [PATCH 10/10] add tests for annotation rotation, move and resize
+
+---
+ .../app/testqgsmaptoolselectannotation.cpp    | 195 +++++++++++++++
+ .../python/test_qgsannotationpictureitem.py   | 225 ++++++++++++++++++
+ 2 files changed, 420 insertions(+)
+
+diff --git a/tests/src/app/testqgsmaptoolselectannotation.cpp b/tests/src/app/testqgsmaptoolselectannotation.cpp
+index 18c3916ee2c8..6d64bd554325 100644
+--- a/tests/src/app/testqgsmaptoolselectannotation.cpp
++++ b/tests/src/app/testqgsmaptoolselectannotation.cpp
+@@ -16,6 +16,7 @@
+ #include "qgsadvanceddigitizingdockwidget.h"
+ #include "qgsannotationlayer.h"
+ #include "qgsannotationpolygonitem.h"
++#include "qgsannotationrectangletextitem.h"
+ #include "qgsapplication.h"
+ #include "qgsguiutils.h"
+ #include "qgslinestring.h"
+@@ -51,6 +52,9 @@ class TestQgsMapToolSelectAnnotation : public QObject
+     void testSelectItem();
+     void testDeleteItem();
+     void testMoveItem();
++    void testMoveItemRotatedCanvas();
++    void testRotateItem();
++    void testResizeRotatedItem();
+ };
+ 
+ void TestQgsMapToolSelectAnnotation::initTestCase()
+@@ -328,5 +332,196 @@ void TestQgsMapToolSelectAnnotation::testMoveItem()
+ }
+ 
+ 
++void TestQgsMapToolSelectAnnotation::testMoveItemRotatedCanvas()
++{
++  QgsProject::instance()->clear();
++  QgsMapCanvas canvas;
++  canvas.setDestinationCrs( QgsCoordinateReferenceSystem( u"EPSG:4326"_s ) );
++  canvas.setFrameStyle( QFrame::NoFrame );
++  canvas.resize( 600, 600 );
++  canvas.setExtent( QgsRectangle( 0, 0, 10, 10 ) );
++  // rotate the map canvas: a screen-space drag must still translate the item
++  // correctly, taking the canvas rotation into account.
++  canvas.setRotation( 90 );
++  canvas.show(); // to make the canvas resize
++
++  QgsAnnotationLayer *layer = new QgsAnnotationLayer( u"test"_s, QgsAnnotationLayer::LayerOptions( QgsProject::instance()->transformContext() ) );
++  QVERIFY( layer->isValid() );
++  QgsProject::instance()->addMapLayers( { layer } );
++
++  QgsAnnotationPolygonItem *item1 = new QgsAnnotationPolygonItem(
++    new QgsPolygon( new QgsLineString( QVector<QgsPoint> { QgsPoint( 1, 1 ), QgsPoint( 5, 1 ), QgsPoint( 5, 5 ), QgsPoint( 1, 5 ), QgsPoint( 1, 1 ) } ) )
++  );
++  item1->setZIndex( 1 );
++  const QString i1id = layer->addItem( item1 );
++  QCOMPARE( qgis::down_cast<QgsAnnotationPolygonItem *>( layer->item( i1id ) )->geometry()->asWkt(), u"Polygon ((1 1, 5 1, 5 5, 1 5, 1 1))"_s );
++
++  layer->setCrs( QgsCoordinateReferenceSystem( u"EPSG:4326"_s ) );
++
++  canvas.setLayers( { layer } );
++  while ( !canvas.isDrawing() )
++  {
++    QgsApplication::processEvents();
++  }
++  canvas.waitWhileRendering();
++  QCOMPARE( canvas.renderedItemResults()->renderedItems().size(), 1 );
++
++  QgsAdvancedDigitizingDockWidget cadDock( &canvas );
++  QgsMapToolSelectAnnotation tool( &canvas, &cadDock );
++  canvas.setMapTool( &tool );
++
++  QSignalSpy spy( &tool, &QgsMapToolSelectAnnotation::singleItemSelected );
++  TestQgsMapToolUtils utils( &tool );
++
++  // click on item to select it
++  utils.mouseMove( 1.5, 1.5 );
++  utils.mouseClick( 1.5, 1.5, Qt::LeftButton, Qt::KeyboardModifiers(), true );
++  QCOMPARE( spy.count(), 1 );
++  QCOMPARE( spy.at( 0 ).at( 1 ).toString(), i1id );
++
++  // a mouse press on the item will start moving the item
++  utils.mouseClick( 1.5, 1.5, Qt::LeftButton, Qt::KeyboardModifiers(), true );
++
++  // drag from map (1.5, 1.5) to map (4.5, 4.5): despite the 90 degree canvas
++  // rotation, the item should follow the cursor and move by (3, 3) in map units.
++  utils.mouseMove( 4.5, 4.5, Qt::LeftButton );
++  utils.mouseMove( 4.5, 4.5, Qt::LeftButton );
++  utils.mouseClick( 4.5, 4.5, Qt::LeftButton, Qt::KeyboardModifiers(), true );
++  while ( !canvas.isDrawing() )
++  {
++    QgsApplication::processEvents();
++  }
++  canvas.waitWhileRendering();
++  QCOMPARE( canvas.renderedItemResults()->renderedItems().size(), 1 );
++
++  // check that the item was moved by (3, 3) in map units
++  QCOMPARE( qgis::down_cast<QgsAnnotationPolygonItem *>( layer->item( i1id ) )->geometry()->asWkt( 0 ), u"Polygon ((4 4, 8 4, 8 8, 4 8, 4 4))"_s );
++}
++
++
++void TestQgsMapToolSelectAnnotation::testRotateItem()
++{
++  QgsProject::instance()->clear();
++  QgsMapCanvas canvas;
++  canvas.setDestinationCrs( QgsCoordinateReferenceSystem( u"EPSG:4326"_s ) );
++  canvas.setFrameStyle( QFrame::NoFrame );
++  canvas.resize( 600, 600 );
++  canvas.setExtent( QgsRectangle( 0, 0, 10, 10 ) );
++  canvas.show(); // to make the canvas resize
++
++  QgsAnnotationLayer *layer = new QgsAnnotationLayer( u"test"_s, QgsAnnotationLayer::LayerOptions( QgsProject::instance()->transformContext() ) );
++  QVERIFY( layer->isValid() );
++  QgsProject::instance()->addMapLayers( { layer } );
++
++  QgsAnnotationRectangleTextItem *item1 = new QgsAnnotationRectangleTextItem( u"test"_s, QgsRectangle( 2, 2, 6, 6 ) );
++  item1->setZIndex( 1 );
++  const QString i1id = layer->addItem( item1 );
++  QCOMPARE( qgis::down_cast<QgsAnnotationRectangleTextItem *>( layer->item( i1id ) )->rotation(), 0.0 );
++
++  layer->setCrs( QgsCoordinateReferenceSystem( u"EPSG:4326"_s ) );
++
++  canvas.setLayers( { layer } );
++  while ( !canvas.isDrawing() )
++  {
++    QgsApplication::processEvents();
++  }
++  canvas.waitWhileRendering();
++  QCOMPARE( canvas.renderedItemResults()->renderedItems().size(), 1 );
++
++  QgsAdvancedDigitizingDockWidget cadDock( &canvas );
++  QgsMapToolSelectAnnotation tool( &canvas, &cadDock );
++  canvas.setMapTool( &tool );
++
++  QSignalSpy spy( &tool, &QgsMapToolSelectAnnotation::singleItemSelected );
++  TestQgsMapToolUtils utils( &tool );
++
++  // click on the item to select it
++  utils.mouseMove( 4, 4 );
++  utils.mouseClick( 4, 4, Qt::LeftButton, Qt::KeyboardModifiers(), true );
++  QCOMPARE( spy.count(), 1 );
++  QCOMPARE( spy.at( 0 ).at( 1 ).toString(), i1id );
++
++  QList<QgsAnnotationItemRubberBand *> selected = tool.selectedItems();
++  QCOMPARE( selected.size(), 1 );
++
++  // rotating the rubber band via its handles rotates the underlying item
++  tool.attemptRotateBy( selected.first(), 30 );
++  QCOMPARE( qgis::down_cast<QgsAnnotationRectangleTextItem *>( layer->item( i1id ) )->rotation(), 30.0 );
++
++  // a further rotation accumulates
++  tool.attemptRotateBy( selected.first(), 20 );
++  QCOMPARE( qgis::down_cast<QgsAnnotationRectangleTextItem *>( layer->item( i1id ) )->rotation(), 50.0 );
++
++  // the item bounds (center and size) are unchanged by rotation
++  const QgsRectangle bounds = qgis::down_cast<QgsAnnotationRectangleTextItem *>( layer->item( i1id ) )->bounds();
++  QGSCOMPARENEAR( bounds.xMinimum(), 2.0, 0.001 );
++  QGSCOMPARENEAR( bounds.yMinimum(), 2.0, 0.001 );
++  QGSCOMPARENEAR( bounds.xMaximum(), 6.0, 0.001 );
++  QGSCOMPARENEAR( bounds.yMaximum(), 6.0, 0.001 );
++}
++
++
++void TestQgsMapToolSelectAnnotation::testResizeRotatedItem()
++{
++  QgsProject::instance()->clear();
++  QgsMapCanvas canvas;
++  canvas.setDestinationCrs( QgsCoordinateReferenceSystem( u"EPSG:4326"_s ) );
++  canvas.setFrameStyle( QFrame::NoFrame );
++  canvas.resize( 600, 600 );
++  canvas.setExtent( QgsRectangle( 0, 0, 10, 10 ) );
++  canvas.show(); // to make the canvas resize
++
++  QgsAnnotationLayer *layer = new QgsAnnotationLayer( u"test"_s, QgsAnnotationLayer::LayerOptions( QgsProject::instance()->transformContext() ) );
++  QVERIFY( layer->isValid() );
++  QgsProject::instance()->addMapLayers( { layer } );
++
++  QgsAnnotationRectangleTextItem *item1 = new QgsAnnotationRectangleTextItem( u"test"_s, QgsRectangle( 2, 2, 6, 6 ) );
++  item1->setZIndex( 1 );
++  // rotate the item: resizing must keep the dragged corner anchored, so the
++  // reconstructed (unrotated) bounds are shifted accordingly.
++  item1->setRotation( 90 );
++  const QString i1id = layer->addItem( item1 );
++
++  layer->setCrs( QgsCoordinateReferenceSystem( u"EPSG:4326"_s ) );
++
++  canvas.setLayers( { layer } );
++  while ( !canvas.isDrawing() )
++  {
++    QgsApplication::processEvents();
++  }
++  canvas.waitWhileRendering();
++  QCOMPARE( canvas.renderedItemResults()->renderedItems().size(), 1 );
++
++  QgsAdvancedDigitizingDockWidget cadDock( &canvas );
++  QgsMapToolSelectAnnotation tool( &canvas, &cadDock );
++  canvas.setMapTool( &tool );
++
++  TestQgsMapToolUtils utils( &tool );
++
++  // click on the item to select it
++  utils.mouseMove( 4, 4 );
++  utils.mouseClick( 4, 4, Qt::LeftButton, Qt::KeyboardModifiers(), true );
++
++  QList<QgsAnnotationItemRubberBand *> selected = tool.selectedItems();
++  QCOMPARE( selected.size(), 1 );
++
++  // map (2,2)-(6,6) maps to the scene rectangle (120,240)-(360,480) with the
++  // 600x600 canvas covering the 10x10 extent. The new scene rectangle is 300x240
++  // pixels (5x4 map units). Because the item is rotated 90 degrees, the dragged
++  // corner is kept anchored: the resulting unrotated bounds are recentred.
++  tool.attemptSetSceneRect( selected.first(), QRectF( 120, 240, 300, 240 ) );
++
++  const QgsRectangle bounds = qgis::down_cast<QgsAnnotationRectangleTextItem *>( layer->item( i1id ) )->bounds();
++  // the resized bounds keep the new pixel size (5 x 4 map units) ...
++  QGSCOMPARENEAR( bounds.width(), 5.0, 0.01 );
++  QGSCOMPARENEAR( bounds.height(), 4.0, 0.01 );
++  // ... recentred to anchor the rotated corner
++  QGSCOMPARENEAR( bounds.xMinimum(), -2.5, 0.01 );
++  QGSCOMPARENEAR( bounds.yMinimum(), 1.5, 0.01 );
++  QGSCOMPARENEAR( bounds.xMaximum(), 2.5, 0.01 );
++  QGSCOMPARENEAR( bounds.yMaximum(), 5.5, 0.01 );
++}
++
++
+ QGSTEST_MAIN( TestQgsMapToolSelectAnnotation )
+ #include "testqgsmaptoolselectannotation.moc"
+diff --git a/tests/src/python/test_qgsannotationpictureitem.py b/tests/src/python/test_qgsannotationpictureitem.py
+index 34931ae15cf2..ba0ed372767e 100644
+--- a/tests/src/python/test_qgsannotationpictureitem.py
++++ b/tests/src/python/test_qgsannotationpictureitem.py
+@@ -16,6 +16,7 @@
+     QgsAnnotationItemEditOperationAddNode,
+     QgsAnnotationItemEditOperationDeleteNode,
+     QgsAnnotationItemEditOperationMoveNode,
++    QgsAnnotationItemEditOperationRotateItem,
+     QgsAnnotationItemEditOperationTranslateItem,
+     QgsAnnotationItemNode,
+     QgsAnnotationPictureItem,
+@@ -72,6 +73,10 @@ def testBasic(self):
+             item.placementMode(), Qgis.AnnotationPlacementMode.SpatialBounds
+         )
+ 
++        # rotation defaults
++        self.assertEqual(item.rotation(), 0)
++        self.assertEqual(item.rotationMode(), Qgis.SymbolRotationMode.IgnoreMapRotation)
++
+         item.setBounds(QgsRectangle(100, 200, 300, 400))
+         item.setZIndex(11)
+         item.setPath(
+@@ -85,6 +90,8 @@ def testBasic(self):
+         item.setFixedSizeUnit(Qgis.RenderUnit.Inches)
+         item.setOffsetFromCallout(QSizeF(13.6, 17.2))
+         item.setOffsetFromCalloutUnit(Qgis.RenderUnit.Inches)
++        item.setRotation(45)
++        item.setRotationMode(Qgis.SymbolRotationMode.RespectMapRotation)
+ 
+         self.assertEqual(item.bounds().toString(3), "100.000,200.000 : 300.000,400.000")
+         self.assertEqual(
+@@ -100,6 +107,10 @@ def testBasic(self):
+         self.assertEqual(item.fixedSizeUnit(), Qgis.RenderUnit.Inches)
+         self.assertEqual(item.offsetFromCallout(), QSizeF(13.6, 17.2))
+         self.assertEqual(item.offsetFromCalloutUnit(), Qgis.RenderUnit.Inches)
++        self.assertEqual(item.rotation(), 45)
++        self.assertEqual(
++            item.rotationMode(), Qgis.SymbolRotationMode.RespectMapRotation
++        )
+ 
+         item.setBackgroundSymbol(
+             QgsFillSymbol.createSimple(
+@@ -114,6 +125,30 @@ def testBasic(self):
+         self.assertEqual(item.backgroundSymbol()[0].color(), QColor(200, 100, 100))
+         self.assertEqual(item.frameSymbol()[0].color(), QColor(100, 200, 250))
+ 
++    def test_applied_rotation(self):
++        item = QgsAnnotationPictureItem(
++            Qgis.PictureFormat.Raster,
++            self.get_test_data_path("rgb256x256.png").as_posix(),
++            QgsRectangle(10, 20, 30, 40),
++        )
++        item.setRotation(30)
++
++        # IgnoreMapRotation (default): map rotation is ignored
++        self.assertEqual(item.rotationMode(), Qgis.SymbolRotationMode.IgnoreMapRotation)
++        self.assertEqual(item.appliedRotation(0), 30)
++        self.assertEqual(item.appliedRotation(45), 30)
++
++        # RespectMapRotation: map rotation is added to the item rotation
++        item.setRotationMode(Qgis.SymbolRotationMode.RespectMapRotation)
++        self.assertEqual(item.appliedRotation(0), 30)
++        self.assertEqual(item.appliedRotation(45), 75)
++        self.assertEqual(item.appliedRotation(-10), 20)
++
++        # RespectMapRotation is ignored when the item is relative to the map frame
++        item.setPlacementMode(Qgis.AnnotationPlacementMode.RelativeToMapFrame)
++        self.assertEqual(item.appliedRotation(0), 30)
++        self.assertEqual(item.appliedRotation(45), 30)
++
+     def test_nodes_spatial_bounds(self):
+         """
+         Test nodes for item, spatial bounds mode
+@@ -223,6 +258,46 @@ def test_translate_spatial_bounds(self):
+         )
+         self.assertEqual(item.bounds().toString(3), "110.000,220.000 : 130.000,240.000")
+ 
++    def test_apply_rotate(self):
++        item = QgsAnnotationPictureItem(
++            Qgis.PictureFormat.Raster,
++            self.get_test_data_path("rgb256x256.png").as_posix(),
++            QgsRectangle(10, 20, 30, 40),
++        )
++        self.assertEqual(item.rotation(), 0)
++
++        # a rotate operation accumulates onto the item's rotation
++        self.assertEqual(
++            item.applyEditV2(
++                QgsAnnotationItemEditOperationRotateItem("", 30),
++                QgsAnnotationItemEditContext(),
++            ),
++            Qgis.AnnotationItemEditOperationResult.Success,
++        )
++        self.assertEqual(item.rotation(), 30)
++
++        self.assertEqual(
++            item.applyEditV2(
++                QgsAnnotationItemEditOperationRotateItem("", 20),
++                QgsAnnotationItemEditContext(),
++            ),
++            Qgis.AnnotationItemEditOperationResult.Success,
++        )
++        self.assertEqual(item.rotation(), 50)
++
++        # rotation wraps around at 360 degrees
++        self.assertEqual(
++            item.applyEditV2(
++                QgsAnnotationItemEditOperationRotateItem("", 350),
++                QgsAnnotationItemEditContext(),
++            ),
++            Qgis.AnnotationItemEditOperationResult.Success,
++        )
++        self.assertEqual(item.rotation(), 40)
++
++        # the bounds are not affected by a rotation
++        self.assertEqual(item.bounds().toString(3), "10.000,20.000 : 30.000,40.000")
++
+     def test_translate_fixed_size(self):
+         item = QgsAnnotationPictureItem(
+             Qgis.PictureFormat.Raster,
+@@ -273,6 +348,38 @@ def test_translate_fixed_size_with_callout_anchor(self):
+         self.assertEqual(item.offsetFromCallout(), QSizeF(9, 5))
+         self.assertEqual(item.offsetFromCalloutUnit(), Qgis.RenderUnit.Millimeters)
+ 
++    def test_translate_spatial_bounds_rotated_preview(self):
++        """
++        The transient (rubber band) geometry used while dragging a rotated item must
++        be rotated to match how the item is rendered, otherwise the move preview shows
++        an axis-aligned rectangle with the wrong angle.
++        """
++        item = QgsAnnotationPictureItem(
++            Qgis.PictureFormat.Raster,
++            self.get_test_data_path("rgb256x256.png").as_posix(),
++            # 40 wide, 10 tall, centered on (100, 100)
++            QgsRectangle(80, 95, 120, 105),
++        )
++        item.setRotation(90)
++
++        settings = QgsMapSettings()
++        settings.setExtent(QgsRectangle(0, 0, 200, 200))
++        settings.setOutputSize(QSize(200, 200))
++        context = QgsAnnotationItemEditContext()
++        context.setRenderContext(QgsRenderContext.fromMapSettings(settings))
++
++        res = item.transientEditResultsV2(
++            QgsAnnotationItemEditOperationTranslateItem("", 20, 30), context
++        )
++        self.assertIsNotNone(res)
++        bounds = res.representativeGeometry().boundingBox()
++        # a 90 degree rotation swaps the footprint: 40x10 becomes 10x40, centered on
++        # the translated center (120, 130)
++        self.assertAlmostEqual(bounds.width(), 10, delta=0.5)
++        self.assertAlmostEqual(bounds.height(), 40, delta=0.5)
++        self.assertAlmostEqual(bounds.center().x(), 120, delta=0.5)
++        self.assertAlmostEqual(bounds.center().y(), 130, delta=0.5)
++
+     def test_translate_relative_to_map(self):
+         item = QgsAnnotationPictureItem(
+             Qgis.PictureFormat.Raster,
+@@ -668,6 +775,8 @@ def testReadWriteXml(self):
+         item.setCallout(QgsBalloonCallout())
+         item.setOffsetFromCallout(QSizeF(13.6, 17.2))
+         item.setOffsetFromCalloutUnit(Qgis.RenderUnit.Inches)
++        item.setRotation(45)
++        item.setRotationMode(Qgis.SymbolRotationMode.RespectMapRotation)
+ 
+         self.assertTrue(item.writeXml(elem, doc, QgsReadWriteContext()))
+ 
+@@ -692,6 +801,8 @@ def testReadWriteXml(self):
+         self.assertIsInstance(s2.callout(), QgsBalloonCallout)
+         self.assertEqual(s2.offsetFromCallout(), QSizeF(13.6, 17.2))
+         self.assertEqual(s2.offsetFromCalloutUnit(), Qgis.RenderUnit.Inches)
++        self.assertEqual(s2.rotation(), 45)
++        self.assertEqual(s2.rotationMode(), Qgis.SymbolRotationMode.RespectMapRotation)
+ 
+     def testClone(self):
+         item = QgsAnnotationPictureItem(
+@@ -720,6 +831,8 @@ def testClone(self):
+         item.setCallout(QgsBalloonCallout())
+         item.setOffsetFromCallout(QSizeF(13.6, 17.2))
+         item.setOffsetFromCalloutUnit(Qgis.RenderUnit.Inches)
++        item.setRotation(45)
++        item.setRotationMode(Qgis.SymbolRotationMode.RespectMapRotation)
+ 
+         s2 = item.clone()
+         self.assertEqual(s2.bounds().toString(3), "10.000,20.000 : 30.000,40.000")
+@@ -740,6 +853,8 @@ def testClone(self):
+         self.assertIsInstance(s2.callout(), QgsBalloonCallout)
+         self.assertEqual(s2.offsetFromCallout(), QSizeF(13.6, 17.2))
+         self.assertEqual(s2.offsetFromCalloutUnit(), Qgis.RenderUnit.Inches)
++        self.assertEqual(s2.rotation(), 45)
++        self.assertEqual(s2.rotationMode(), Qgis.SymbolRotationMode.RespectMapRotation)
+ 
+     def testRenderRasterLockedAspect(self):
+         item = QgsAnnotationPictureItem(
+@@ -952,6 +1067,116 @@ def testRenderCallout(self):
+ 
+         self.assertTrue(self.image_check("picture_callout", "picture_callout", image))
+ 
++    def test_render_rotated_callout(self):
++        """
++        Test that a callout connects to the rotated item rather than to the
++        unrotated bounds (the callout rotates its rectangle around the top-left
++        corner and with the opposite sign to QPainter, so the item must
++        compensate for its center rotation).
++        """
++        item = QgsAnnotationPictureItem(
++            Qgis.PictureFormat.Raster,
++            self.get_test_data_path("rgb256x256.png").as_posix(),
++            # non-square bounds so the rotation pivot matters
++            QgsRectangle(80, 95, 120, 105),
++        )
++        item.setRotation(90)
++
++        callout = QgsSimpleLineCallout()
++        callout.lineSymbol().setColor(QColor(0, 255, 0))
++        callout.lineSymbol().setWidth(1)
++        item.setCallout(callout)
++        # anchor straight above the item center
++        item.setCalloutAnchor(QgsGeometry.fromWkt("Point(100 160)"))
++
++        settings = QgsMapSettings()
++        # 1 map unit == 1 pixel, y flipped: pixel = (x, 200 - y)
++        settings.setExtent(QgsRectangle(0, 0, 200, 200))
++        settings.setOutputSize(QSize(200, 200))
++        settings.setFlag(QgsMapSettings.Flag.Antialiasing, False)
++
++        rc = QgsRenderContext.fromMapSettings(settings)
++        image = QImage(200, 200, QImage.Format.Format_ARGB32)
++        image.setDotsPerMeterX(int(96 / 25.4 * 1000))
++        image.setDotsPerMeterY(int(96 / 25.4 * 1000))
++        image.fill(QColor(255, 255, 255))
++        painter = QPainter(image)
++        rc.setPainter(painter)
++
++        try:
++            item.render(rc, None)
++        finally:
++            painter.end()
++
++        # The 40x10 item rotated 90 degrees around its center (100, 100) covers
++        # the screen region x in [95, 105], y in [80, 120]. The callout therefore
++        # leaves the rotated item at its top edge middle (100, 80) and runs up to
++        # the anchor at (100, 40): a vertical green line at x == 100. Without the
++        # rotation compensation the callout would attach near (90, 55) instead.
++        on_line = image.pixelColor(100, 60)
++        self.assertGreater(on_line.green(), 200)
++        self.assertLess(on_line.red(), 100)
++        self.assertLess(on_line.blue(), 100)
++
++        # the buggy attachment location must remain background (white)
++        off_line = image.pixelColor(115, 55)
++        self.assertEqual(off_line, QColor(255, 255, 255))
++
++    def test_render_rotated_balloon_callout(self):
++        """
++        Test that a balloon callout is rotated together with the item body. The
++        balloon shape itself ignores the angle argument, so the whole callout must
++        be rendered through a rotated painter; otherwise an axis-aligned balloon is
++        drawn around the unrotated bounds and pokes out beside the rotated item.
++        """
++        item = QgsAnnotationPictureItem(
++            Qgis.PictureFormat.Raster,
++            self.get_test_data_path("rgb256x256.png").as_posix(),
++            # wide and short, so after a 90 degree rotation it becomes tall and narrow
++            QgsRectangle(70, 96, 130, 104),
++        )
++        item.setRotation(90)
++
++        callout = QgsBalloonCallout()
++        callout.fillSymbol().setColor(QColor(0, 0, 255))
++        # no margins by default: the balloon body is hidden behind the opaque image,
++        # only the wedge pointing to the anchor is visible
++        item.setCallout(callout)
++        item.setCalloutAnchor(QgsGeometry.fromWkt("Point(100 160)"))
++
++        settings = QgsMapSettings()
++        # 1 map unit == 1 pixel, y flipped: pixel = (x, 200 - y)
++        settings.setExtent(QgsRectangle(0, 0, 200, 200))
++        settings.setOutputSize(QSize(200, 200))
++        settings.setFlag(QgsMapSettings.Flag.Antialiasing, False)
++
++        rc = QgsRenderContext.fromMapSettings(settings)
++        image = QImage(200, 200, QImage.Format.Format_ARGB32)
++        image.setDotsPerMeterX(int(96 / 25.4 * 1000))
++        image.setDotsPerMeterY(int(96 / 25.4 * 1000))
++        image.fill(QColor(255, 255, 255))
++        painter = QPainter(image)
++        rc.setPainter(painter)
++
++        try:
++            item.render(rc, None)
++        finally:
++            painter.end()
++
++        # The rotated item covers the screen region x in [96, 104], y in [70, 130].
++        # The balloon wedge therefore leaves the item top edge (around 100, 70) and
++        # runs up towards the anchor at (100, 40): probe a point on that wedge.
++        on_wedge = image.pixelColor(100, 55)
++        self.assertGreater(on_wedge.blue(), 200)
++        self.assertLess(on_wedge.red(), 100)
++        self.assertLess(on_wedge.green(), 100)
++
++        # If the balloon were not rotated, an axis-aligned balloon around the
++        # unrotated bounds (x in [70, 130], y in [96, 104]) would fill this point,
++        # which lies beside the rotated item and must stay background.
++        beside_item = image.pixelColor(80, 100)
++        self.assertEqual(beside_item, QColor(255, 255, 255))
++
+     def testRenderFixedSizeRaster(self):
+         item = QgsAnnotationPictureItem(
+             Qgis.PictureFormat.Raster,

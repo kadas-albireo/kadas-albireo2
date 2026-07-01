@@ -1,9 +1,9 @@
 string(REPLACE "." "_" TAG ${VERSION})
 
 # set(QGIS_REF final-${TAG})
-set(QGIS_REF 7a8d78b0a6e382474300d0d64d6d08f2dfcc8460)
+set(QGIS_REF 9e439cdbb9ba5501046600b97a0526c933bdd03d)
 set(QGIS_SHA512
-    7765d655cd3761e5a1f2a9db183b1e54dca204730955e32481818a56d645fed3a2680ac7746b9019d8576d5a3cc20fccc40347630f47765b421d36715f524141
+    439fe564da17eee80f98fe5811bee05f0dba66a8a0552a5e368bf7db2dd61a6a380e75a0d81f8bb2152ef6e75b226eac7558dd1435b5fc423b5ccbde80b1235a
 )
 
 vcpkg_from_github(
@@ -25,11 +25,12 @@ vcpkg_from_github(
   crssync.patch
   mesh.patch
   qgis-debug.patch
-  3dfrustumfix.patch
   3dchunkloaderconcurrency.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1278
   mac_install_images.patch
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
+  annotation-item-rotation.patch # https://github.com/qgis/QGIS/pull/66610
+  # rotation for rectangle-based annotations (images + text)
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
