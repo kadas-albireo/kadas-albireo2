@@ -25,6 +25,7 @@ class QComboBox;
 class QDoubleSpinBox;
 class QFontComboBox;
 class QLineEdit;
+class QPlainTextEdit;
 class QSpinBox;
 class QgsAnnotationItem;
 class QgsColorButton;
@@ -93,7 +94,12 @@ class KadasPinStyleEditor : public KadasAnnotationStyleEditor
     void loadFromItem( const QgsAnnotationItem *item ) override;
     void applyToItem( QgsAnnotationItem *item ) const override;
 
+  protected:
+    bool eventFilter( QObject *watched, QEvent *event ) override;
+
   private:
+    QLineEdit *mTitleEdit = nullptr;
+    QPlainTextEdit *mDescriptionEdit = nullptr;
     QSpinBox *mSizeSpin = nullptr;
     QgsColorButton *mFillColorBtn = nullptr;
 };

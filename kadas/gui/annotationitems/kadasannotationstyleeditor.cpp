@@ -18,6 +18,7 @@
 #include <QCheckBox>
 #include <QDir>
 #include <QDoubleSpinBox>
+#include <QEvent>
 #include <QFileDialog>
 #include <QFile>
 #include <QFileInfo>
@@ -36,6 +37,7 @@
 #include <QNetworkRequest>
 #include <QPainter>
 #include <QPixmap>
+#include <QPlainTextEdit>
 #include <QPushButton>
 #include <QSignalBlocker>
 #include <QSpinBox>
@@ -63,6 +65,7 @@
 
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadaspictureannotationcontroller.h"
+#include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 
 namespace
 {
@@ -251,6 +254,16 @@ KadasPinStyleEditor::KadasPinStyleEditor( QWidget *parent )
   form->setContentsMargins( 0, 0, 0, 0 );
   form->setFieldGrowthPolicy( QFormLayout::AllNonFixedFieldsGrow );
 
+  mTitleEdit = new QLineEdit();
+  mTitleEdit->setToolTip( tr( "Pin title" ) );
+  form->addRow( tr( "Title" ), mTitleEdit );
+
+  mDescriptionEdit = new QPlainTextEdit();
+  mDescriptionEdit->setToolTip( tr( "Pin description" ) );
+  mDescriptionEdit->setTabChangesFocus( true );
+  mDescriptionEdit->setFixedHeight( 60 );
+  form->addRow( tr( "Description" ), mDescriptionEdit );
+
   mSizeSpin = new QSpinBox();
   mSizeSpin->setRange( 1, 200 );
   mSizeSpin->setToolTip( tr( "Pin size" ) );
@@ -261,12 +274,31 @@ KadasPinStyleEditor::KadasPinStyleEditor( QWidget *parent )
   mFillColorBtn->setToolTip( tr( "Pin color" ) );
   form->addRow( tr( "Color" ), mFillColorBtn );
 
+  connect( mTitleEdit, &QLineEdit::textChanged, this, &KadasAnnotationStyleEditor::previewChanged );
+  connect( mTitleEdit, &QLineEdit::editingFinished, this, &KadasAnnotationStyleEditor::committed );
+  connect( mDescriptionEdit, &QPlainTextEdit::textChanged, this, &KadasAnnotationStyleEditor::previewChanged );
+  mDescriptionEdit->installEventFilter( this );
   connect( mSizeSpin, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
   connect( mFillColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
 }
 
+bool KadasPinStyleEditor::eventFilter( QObject *watched, QEvent *event )
+{
+  // QPlainTextEdit has no editingFinished signal; finalize (push history +
+  // persist) when the description loses focus, mirroring QLineEdit semantics.
+  if ( watched == mDescriptionEdit && event->type() == QEvent::FocusOut )
+    emit committed();
+  return KadasAnnotationStyleEditor::eventFilter( watched, event );
+}
+
 void KadasPinStyleEditor::loadFromItem( const QgsAnnotationItem *item )
 {
+  if ( const auto *pin = dynamic_cast<const KadasPinAnnotationItem *>( item ) )
+  {
+    const QSignalBlocker bt( mTitleEdit ), bd( mDescriptionEdit );
+    mTitleEdit->setText( pin->name() );
+    mDescriptionEdit->setPlainText( pin->remarks() );
+  }
   const auto *marker = dynamic_cast<const QgsAnnotationMarkerItem *>( item );
   if ( !marker || !marker->symbol() || marker->symbol()->symbolLayerCount() == 0 )
     return;
@@ -280,6 +312,11 @@ void KadasPinStyleEditor::loadFromItem( const QgsAnnotationItem *item )
 
 void KadasPinStyleEditor::applyToItem( QgsAnnotationItem *item ) const
 {
+  if ( auto *pin = dynamic_cast<KadasPinAnnotationItem *>( item ) )
+  {
+    pin->setName( mTitleEdit->text() );
+    pin->setRemarks( mDescriptionEdit->toPlainText() );
+  }
   auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item );
   if ( !marker || !marker->symbol() || marker->symbol()->symbolLayerCount() == 0 )
     return;
