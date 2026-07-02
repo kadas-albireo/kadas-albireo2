@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <cmath>
+
 #include <QAction>
 #include <QDir>
 #include <QFileDialog>
@@ -41,6 +43,7 @@
 #include <qgis/qgsrectangle.h>
 #include <qgis/qgssymbol.h>
 
+#include "kadas/gui/annotationitems/kadasannotationrotation.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadaspictureannotationcontroller.h"
@@ -62,11 +65,29 @@ namespace
   constexpr int kPartAnchor = 0;
   constexpr int kPartFrame = 1;
   constexpr int kPartCorner = 2;
+  constexpr int kPartRotate = 3;
   // Corner order matches frameCornersScreen().
   constexpr int kCornerTL = 0;
   constexpr int kCornerTR = 1;
   constexpr int kCornerBR = 2;
   constexpr int kCornerBL = 3;
+
+  // Pixels above the frame's top edge where the rotation handle sits.
+  constexpr double kRotationHandleOffsetPx = 30.0;
+
+  // Rotate a screen point around \a center by \a deg degrees clockwise (matching
+  // QPainter::rotate in screen space, where Y points down).
+  QPointF rotatePointScreen( const QPointF &p, const QPointF &center, double deg )
+  {
+    if ( qgsDoubleNear( deg, 0.0 ) )
+      return p;
+    const double rad = deg * M_PI / 180.0;
+    const double c = std::cos( rad );
+    const double s = std::sin( rad );
+    const double dx = p.x() - center.x();
+    const double dy = p.y() - center.y();
+    return QPointF( center.x() + dx * c - dy * s, center.y() + dx * s + dy * c );
+  }
 
   QgsPointXY pictureAnchorItem( const QgsAnnotationPictureItem *pic )
   {
@@ -130,6 +151,35 @@ namespace
     if ( !r.isValid() )
       return {};
     return { r.topLeft(), r.topRight(), r.bottomRight(), r.bottomLeft() };
+  }
+
+  // Frame corners rotated around the frame center by the item's rotation, so the
+  // handles track the rendered (rotated) image.
+  QVector<QPointF> frameCornersScreenRotated( const QgsAnnotationPictureItem *pic, const QgsMapSettings &ms, const QgsCoordinateTransform &xform )
+  {
+    const QRectF r = frameScreenRect( pic, ms, xform );
+    if ( !r.isValid() )
+      return {};
+    const QPointF center = r.center();
+    const double rot = pic->rotation();
+    return { rotatePointScreen( r.topLeft(), center, rot ), rotatePointScreen( r.topRight(), center, rot ), rotatePointScreen( r.bottomRight(), center, rot ), rotatePointScreen( r.bottomLeft(), center, rot ) };
+  }
+
+  // Screen position of the rotation handle: above the (rotated) top edge midpoint.
+  QPointF rotationHandleScreen( const QRectF &frame, double rot )
+  {
+    const QPointF center = frame.center();
+    const QPointF topMid( center.x(), frame.top() - kRotationHandleOffsetPx );
+    return rotatePointScreen( topMid, center, rot );
+  }
+
+  // Item rotation (degrees clockwise) that places the handle/top edge towards a
+  // screen cursor relative to the frame center. Up (0,-1) maps to rotation 0.
+  double rotationFromHandleScreen( const QPointF &centerPx, const QPointF &cursorPx )
+  {
+    const double dx = cursorPx.x() - centerPx.x();
+    const double dy = cursorPx.y() - centerPx.y();
+    return std::atan2( dx, -dy ) * 180.0 / M_PI;
   }
 
   Qgis::PictureFormat formatFromPath( const QString &path )
@@ -302,9 +352,14 @@ QList<KadasNode> KadasPictureAnnotationController::nodes( const QgsAnnotationIte
   if ( isCalloutVisible( pic ) )
     result.append( { toMapPos( pictureAnchorItem( pic ), ctx ) } );
   const QgsCoordinateTransform xform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
-  const QVector<QPointF> corners = frameCornersScreen( pic, ctx.mapSettings(), xform );
+  const QRectF frame = frameScreenRect( pic, ctx.mapSettings(), xform );
+  if ( !frame.isValid() )
+    return result;
+  const QVector<QPointF> corners = frameCornersScreenRotated( pic, ctx.mapSettings(), xform );
   for ( const QPointF &c : corners )
     result.append( { ctx.mapSettings().mapToPixel().toMapCoordinates( c.toPoint() ) } );
+  const QPointF handlePx = rotationHandleScreen( frame, pic->rotation() );
+  result.append( { ctx.mapSettings().mapToPixel().toMapCoordinates( handlePx.toPoint() ), []( QPainter *p, const QPointF &pt, int size ) { KadasAnnotationRotation::renderHandle( p, pt, size ); } } );
   return result;
 }
 
@@ -368,8 +423,10 @@ KadasEditContext KadasPictureAnnotationController::getEditContext( const QgsAnno
   const QgsAnnotationPictureItem *pic = asPicture( item );
   const QgsCoordinateTransform xform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
 
+  const QRectF frameRect = frameScreenRect( pic, ctx.mapSettings(), xform );
+
   // Corner handles win over anchor/frame (they sit on the outline).
-  const QVector<QPointF> corners = frameCornersScreen( pic, ctx.mapSettings(), xform );
+  const QVector<QPointF> corners = frameCornersScreenRotated( pic, ctx.mapSettings(), xform );
   for ( int i = 0; i < corners.size(); ++i )
   {
     const QgsPointXY cornerMap = ctx.mapSettings().mapToPixel().toMapCoordinates( corners[i].toPoint() );
@@ -380,17 +437,34 @@ KadasEditContext KadasPictureAnnotationController::getEditContext( const QgsAnno
     }
   }
 
+  // Rotation handle.
+  if ( frameRect.isValid() )
+  {
+    const QPointF handlePx = rotationHandleScreen( frameRect, pic->rotation() );
+    const QgsPointXY handleMap = ctx.mapSettings().mapToPixel().toMapCoordinates( handlePx.toPoint() );
+    if ( pos.sqrDist( handleMap ) < pickTolSqr( ctx ) )
+    {
+      KadasAttribDefs rotAttribs;
+      rotAttribs.insert( AttrAngle, KadasNumericAttribute { "angle", KadasNumericAttribute::Type::TypeAngle } );
+      return KadasEditContext( QgsVertexId( kPartRotate, 0, 0 ), handleMap, rotAttribs, Qt::CrossCursor );
+    }
+  }
+
   // Anchor handle wins within pick tolerance even inside the frame; skipped when the callout is hidden (handle also hidden in nodes()).
   const QgsPointXY anchorMap = toMapPos( pictureAnchorItem( pic ), ctx );
   if ( isCalloutVisible( pic ) && pos.sqrDist( anchorMap ) < pickTolSqr( ctx ) )
     return KadasEditContext( QgsVertexId( kPartAnchor, 0, 0 ), anchorMap, drawAttribs() );
-  const QRectF frameRect = frameScreenRect( pic, ctx.mapSettings(), xform );
-  const QPointF screenPos = ctx.mapSettings().mapToPixel().transform( pos ).toQPointF();
-  if ( frameRect.isValid() && frameRect.contains( screenPos ) )
+  if ( frameRect.isValid() )
   {
-    // pos = image visual center, so edit() receives newPoint == desired new center.
-    const QgsPointXY centerMap = imageCenterMap( pic, ctx.mapSettings(), xform );
-    return KadasEditContext( QgsVertexId( kPartFrame, 0, 0 ), centerMap, KadasAttribDefs(), Qt::SizeAllCursor );
+    const QPointF screenPos = ctx.mapSettings().mapToPixel().transform( pos ).toQPointF();
+    // Un-rotate the cursor into the frame's local (axis-aligned) space before the contains() test.
+    const QPointF localPos = rotatePointScreen( screenPos, frameRect.center(), -pic->rotation() );
+    if ( frameRect.contains( localPos ) )
+    {
+      // pos = image visual center, so edit() receives newPoint == desired new center.
+      const QgsPointXY centerMap = imageCenterMap( pic, ctx.mapSettings(), xform );
+      return KadasEditContext( QgsVertexId( kPartFrame, 0, 0 ), centerMap, KadasAttribDefs(), Qt::SizeAllCursor );
+    }
   }
   return KadasEditContext();
 }
@@ -398,6 +472,18 @@ KadasEditContext KadasPictureAnnotationController::getEditContext( const QgsAnno
 void KadasPictureAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
   QgsAnnotationPictureItem *pic = asPicture( item );
+
+  if ( editContext.vidx.isValid() && editContext.vidx.part == kPartRotate )
+  {
+    const QgsCoordinateTransform xform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
+    const QRectF frame = frameScreenRect( pic, ctx.mapSettings(), xform );
+    if ( !frame.isValid() )
+      return;
+    const QPointF cursorPx = ctx.mapSettings().mapToPixel().transform( newPoint ).toQPointF();
+    const double angle = rotationFromHandleScreen( frame.center(), cursorPx );
+    pic->setRotation( KadasAnnotationRotation::snapAngle( angle, ctx.modifiers() & Qt::ShiftModifier ) );
+    return;
+  }
 
   if ( editContext.vidx.isValid() && editContext.vidx.part == kPartCorner )
   {
@@ -409,7 +495,10 @@ void KadasPictureAnnotationController::edit( QgsAnnotationItem *item, const Kada
       return;
     // Diagonal opposite: TL<->BR (0<->2), TR<->BL (1<->3).
     const QPointF fixedPx = corners[( idx + 2 ) % 4];
-    const QPointF cursorPx = ctx.mapSettings().mapToPixel().transform( newPoint ).toQPointF();
+    // Resize math works in the unrotated frame: un-rotate the cursor around the
+    // (unrotated) frame center so the dragged corner maps back to local axes.
+    const QRectF frame = frameScreenRect( pic, ctx.mapSettings(), xform );
+    const QPointF cursorPx = rotatePointScreen( ctx.mapSettings().mapToPixel().transform( newPoint ).toQPointF(), frame.center(), -pic->rotation() );
     double newW = std::abs( cursorPx.x() - fixedPx.x() );
     double newH = std::abs( cursorPx.y() - fixedPx.y() );
     constexpr double kMinSizePx = 16.0;
@@ -505,24 +594,77 @@ void KadasPictureAnnotationController::edit( QgsAnnotationItem *item, const Kada
     return;
   }
 
-  // Anchor drag: move bounds+anchor together, keep the offset.
+  // Anchor drag.
+  // Callout hidden: no wedge to stretch, so move the image with the anchor (keep offset).
+  if ( !isCalloutVisible( pic ) )
+  {
+    const QgsPointXY ip = toItemPos( newPoint, ctx );
+    pic->setBounds( QgsRectangle( ip.x(), ip.y(), ip.x(), ip.y() ) );
+    pic->setCalloutAnchor( QgsGeometry( new QgsPoint( ip.x(), ip.y() ) ) );
+    return;
+  }
+
+  // Callout visible: move only the anchor (wedge tip). Keep the balloon image
+  // fixed on screen by re-deriving the offset, so the wedge stretches.
+  const QgsCoordinateTransform xform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
+  const QRectF frame = frameScreenRect( pic, ctx.mapSettings(), xform );
   const QgsPointXY ip = toItemPos( newPoint, ctx );
   pic->setBounds( QgsRectangle( ip.x(), ip.y(), ip.x(), ip.y() ) );
   pic->setCalloutAnchor( QgsGeometry( new QgsPoint( ip.x(), ip.y() ) ) );
+  if ( frame.isValid() )
+  {
+    const QPointF newAnchorPx = ctx.mapSettings().mapToPixel().transform( newPoint ).toQPointF();
+    const QPointF offsetPx = frame.topLeft() - newAnchorPx;
+    pic->setOffsetFromCallout( QSizeF( offsetPx.x(), offsetPx.y() ) );
+    pic->setOffsetFromCalloutUnit( Qgis::RenderUnit::Pixels );
+  }
 }
 
 void KadasPictureAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
 {
+  if ( editContext.vidx.isValid() && editContext.vidx.part == kPartRotate )
+  {
+    asPicture( item )->setRotation( values[AttrAngle] );
+    return;
+  }
   edit( item, editContext, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
 
-KadasAttribValues KadasPictureAnnotationController::editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
+KadasAttribValues KadasPictureAnnotationController::editAttribsFromPosition(
+  const QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx
+) const
 {
+  if ( editContext.vidx.isValid() && editContext.vidx.part == kPartRotate )
+  {
+    const QgsAnnotationPictureItem *pic = asPicture( item );
+    const QgsCoordinateTransform xform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
+    const QRectF frame = frameScreenRect( pic, ctx.mapSettings(), xform );
+    KadasAttribValues values;
+    if ( frame.isValid() )
+    {
+      const QPointF cursorPx = ctx.mapSettings().mapToPixel().transform( pos ).toQPointF();
+      values.insert( AttrAngle, rotationFromHandleScreen( frame.center(), cursorPx ) );
+    }
+    return values;
+  }
   return drawAttribsFromPosition( item, pos, ctx );
 }
 
-QgsPointXY KadasPictureAnnotationController::positionFromEditAttribs( const QgsAnnotationItem *item, const KadasEditContext &, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const
+QgsPointXY KadasPictureAnnotationController::positionFromEditAttribs(
+  const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx
+) const
 {
+  if ( editContext.vidx.isValid() && editContext.vidx.part == kPartRotate )
+  {
+    const QgsAnnotationPictureItem *pic = asPicture( item );
+    const QgsCoordinateTransform xform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
+    const QRectF frame = frameScreenRect( pic, ctx.mapSettings(), xform );
+    if ( frame.isValid() )
+    {
+      const QPointF handlePx = rotationHandleScreen( frame, values[AttrAngle] );
+      return ctx.mapSettings().mapToPixel().toMapCoordinates( handlePx.toPoint() );
+    }
+  }
   return positionFromDrawAttribs( item, values, ctx );
 }
 
@@ -553,7 +695,7 @@ QgsGeometry KadasPictureAnnotationController::representativeGeometry( const QgsA
   const QRectF screenRect = frameScreenRect( pic, ctx.mapSettings(), xform );
   if ( !screenRect.isValid() )
     return KadasAnnotationItemController::representativeGeometry( item, ctx );
-  const QVector<QPointF> cornersPx = { screenRect.topLeft(), screenRect.topRight(), screenRect.bottomRight(), screenRect.bottomLeft() };
+  const QVector<QPointF> cornersPx = frameCornersScreenRotated( pic, ctx.mapSettings(), xform );
   QVector<QgsPointXY> ring;
   ring.reserve( 5 );
   for ( const QPointF &px : cornersPx )
@@ -595,6 +737,16 @@ void KadasPictureAnnotationController::populateContextMenu( QgsAnnotationItem *i
     if ( layerPtr )
       layerPtr->triggerRepaint();
   } );
+
+  if ( !qgsDoubleNear( pic->rotation(), 0.0 ) )
+  {
+    QAction *resetRotationAction = menu->addAction( QObject::tr( "Reset rotation" ) );
+    QObject::connect( resetRotationAction, &QAction::triggered, resetRotationAction, [pic, layerPtr]() {
+      pic->setRotation( 0.0 );
+      if ( layerPtr )
+        layerPtr->triggerRepaint();
+    } );
+  }
 
   // Offer "Reset balloon" only when the offset differs from centered (-size/2).
   const QSizeF off = pic->offsetFromCallout();

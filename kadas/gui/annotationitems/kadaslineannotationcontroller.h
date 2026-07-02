@@ -17,6 +17,10 @@
 #ifndef KADASLINEANNOTATIONCONTROLLER_H
 #define KADASLINEANNOTATIONCONTROLLER_H
 
+#include <QVector>
+
+#include <qgis/qgspointxy.h>
+
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 
 /**
@@ -75,8 +79,16 @@ class KADAS_GUI_EXPORT KadasLineAnnotationController : public KadasAnnotationIte
     enum AttribIds
     {
       AttrX,
-      AttrY
+      AttrY,
+      AttrAngle
     };
+
+    // Per-drag rotation state, captured when the rotation handle is grabbed:
+    // the line vertices in map coords, the fixed pivot, and the handle's
+    // reference angle. Lets edit() rotate the original (no drift).
+    mutable QVector<QgsPointXY> mRotateOrigMap;
+    mutable QgsPointXY mRotateCenterMap;
+    mutable double mRotateRefAngle = 0.0;
 };
 
 #endif // KADASLINEANNOTATIONCONTROLLER_H

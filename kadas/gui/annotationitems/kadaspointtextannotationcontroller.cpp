@@ -14,9 +14,13 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QAction>
+#include <QMenu>
 #include <QObject>
+#include <QPointer>
 #include <QTextStream>
 
+#include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationpointtextitem.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgscoordinatetransform.h>
@@ -27,6 +31,7 @@
 #include <qgis/qgstextformat.h>
 
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
+#include "kadas/gui/annotationitems/kadasannotationrotation.h"
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadaspointtextannotationcontroller.h"
 
@@ -74,7 +79,10 @@ QgsAnnotationItem *KadasPointTextAnnotationController::createItem() const
 
 QList<KadasNode> KadasPointTextAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
 {
-  return { { toMapPos( asText( item )->point(), ctx ) } };
+  const QgsPointXY anchor = toMapPos( asText( item )->point(), ctx );
+  const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
+  const QgsPointXY handle = KadasAnnotationRotation::handlePos( anchor, asText( item )->angle(), off );
+  return { { anchor }, { handle, []( QPainter *p, const QPointF &pt, int sz ) { KadasAnnotationRotation::renderHandle( p, pt, sz ); } } };
 }
 
 bool KadasPointTextAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
@@ -131,6 +139,15 @@ KadasEditContext KadasPointTextAnnotationController::getEditContext( const QgsAn
     return KadasEditContext( QgsVertexId( 0, 0, 0 ), testPos, drawAttribs() );
   }
 
+  const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
+  const QgsPointXY handle = KadasAnnotationRotation::handlePos( testPos, asText( item )->angle(), off );
+  if ( pos.sqrDist( handle ) < pickTolSqr( ctx ) )
+  {
+    KadasAttribDefs rot;
+    rot.insert( AttrAngle, KadasNumericAttribute { "angle", KadasNumericAttribute::Type::TypeAngle } );
+    return KadasEditContext( QgsVertexId( 0, 0, RotationHandleVertex ), handle, rot, Qt::CrossCursor );
+  }
+
   QgsRenderContext rc = QgsRenderContext::fromMapSettings( ctx.mapSettings() );
   QgsRectangle bbox = item->boundingBox( rc );
   bbox.grow( 4 * ctx.mapSettings().mapUnitsPerPixel() );
@@ -141,24 +158,63 @@ KadasEditContext KadasPointTextAnnotationController::getEditContext( const QgsAn
   return KadasEditContext();
 }
 
-void KadasPointTextAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
+void KadasPointTextAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
+  if ( editContext.vidx.vertex == RotationHandleVertex )
+  {
+    const QgsPointXY center = toMapPos( asText( item )->point(), ctx );
+    const double angle = KadasAnnotationRotation::angleFromHandle( center, newPoint );
+    asText( item )->setAngle( KadasAnnotationRotation::snapAngle( angle, ctx.modifiers() & Qt::ShiftModifier ) );
+    return;
+  }
   asText( item )->setPoint( toItemPos( newPoint, ctx ) );
 }
 
 void KadasPointTextAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
 {
+  if ( editContext.vidx.vertex == RotationHandleVertex )
+  {
+    asText( item )->setAngle( values[AttrAngle] );
+    return;
+  }
   edit( item, editContext, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
 
-KadasAttribValues KadasPointTextAnnotationController::editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
+KadasAttribValues KadasPointTextAnnotationController::editAttribsFromPosition(
+  const QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx
+) const
 {
+  if ( editContext.vidx.vertex == RotationHandleVertex )
+  {
+    const QgsPointXY center = toMapPos( asText( item )->point(), ctx );
+    KadasAttribValues v;
+    v.insert( AttrAngle, KadasAnnotationRotation::angleFromHandle( center, pos ) );
+    return v;
+  }
   return drawAttribsFromPosition( item, pos, ctx );
 }
 
-QgsPointXY KadasPointTextAnnotationController::positionFromEditAttribs( const QgsAnnotationItem *item, const KadasEditContext &, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const
+QgsPointXY KadasPointTextAnnotationController::positionFromEditAttribs(
+  const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx
+) const
 {
+  if ( editContext.vidx.vertex == RotationHandleVertex )
+    return asText( item )->point();
   return positionFromDrawAttribs( item, values, ctx );
+}
+
+void KadasPointTextAnnotationController::populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &, const QgsPointXY &, const KadasAnnotationItemContext &ctx )
+{
+  QgsAnnotationPointTextItem *text = asText( item );
+  if ( text->angle() == 0.0 )
+    return;
+  QPointer<QgsAnnotationLayer> layerPtr( ctx.layer() );
+  QAction *reset = menu->addAction( QObject::tr( "Reset rotation" ) );
+  QObject::connect( reset, &QAction::triggered, reset, [text, layerPtr]() {
+    text->setAngle( 0.0 );
+    if ( layerPtr )
+      layerPtr->triggerRepaint();
+  } );
 }
 
 QgsPointXY KadasPointTextAnnotationController::position( const QgsAnnotationItem *item ) const

@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QObject>
+#include <QPainter>
 #include <QTextStream>
 #include <memory>
 
@@ -27,12 +28,14 @@
 #include <qgis/qgsfillsymbollayer.h>
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgslinestring.h>
+#include <qgis/qgsmapsettings.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgspointxy.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettingsentryimpl.h>
 
+#include "kadas/gui/annotationitems/kadasannotationrotation.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadaspolygonannotationcontroller.h"
@@ -63,6 +66,9 @@ namespace
     Q_ASSERT( item && item->type() == QLatin1String( "polygon" ) );
     return static_cast<const QgsAnnotationPolygonItem *>( item );
   }
+
+  // vidx.part sentinel for the rotation handle (real vertices use part 0).
+  constexpr int kPartRotate = 1;
 
   //! Returns the mutable exterior LineString of the polygon, cloning it via setGeometry() for in-place edits.
   QgsLineString *takeMutableExterior( QgsAnnotationPolygonItem *item )
@@ -117,6 +123,14 @@ QList<KadasNode> KadasPolygonAnnotationController::nodes( const QgsAnnotationIte
   {
     const QgsPoint p = ring->vertexAt( QgsVertexId( 0, 0, i ) );
     result.append( { toMapPos( QgsPointXY( p.x(), p.y() ), ctx ) } );
+  }
+  // Rotation handle above the bounding-box centre (needs a real polygon).
+  if ( last >= 3 )
+  {
+    const QgsPointXY centerMap = toMapPos( poly->boundingBox().center(), ctx );
+    const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
+    const QgsPointXY handle = KadasAnnotationRotation::handlePos( centerMap, 0.0, off );
+    result.append( { handle, []( QPainter *p, const QPointF &pt, int sz ) { KadasAnnotationRotation::renderHandle( p, pt, sz ); } } );
   }
   return result;
 }
@@ -221,6 +235,28 @@ KadasEditContext KadasPolygonAnnotationController::getEditContext( const QgsAnno
       return KadasEditContext( QgsVertexId( 0, 0, i ), mp, drawAttribs() );
     }
   }
+  // Rotation handle: snapshot the ring (map coords) and pivot for a drift-free drag.
+  if ( last >= 3 )
+  {
+    const QgsPointXY centerMap = toMapPos( poly->boundingBox().center(), ctx );
+    const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
+    const QgsPointXY handle = KadasAnnotationRotation::handlePos( centerMap, 0.0, off );
+    if ( pos.sqrDist( handle ) < pickTolSqr( ctx ) )
+    {
+      mRotateOrigMap.clear();
+      mRotateOrigMap.reserve( n );
+      for ( int i = 0; i < n; ++i )
+      {
+        const QgsPoint p = ring->vertexAt( QgsVertexId( 0, 0, i ) );
+        mRotateOrigMap.append( toMapPos( QgsPointXY( p.x(), p.y() ), ctx ) );
+      }
+      mRotateCenterMap = centerMap;
+      mRotateRefAngle = KadasAnnotationRotation::angleFromHandle( centerMap, handle );
+      KadasAttribDefs rot;
+      rot.insert( AttrAngle, KadasNumericAttribute { "angle", KadasNumericAttribute::Type::TypeAngle } );
+      return KadasEditContext( QgsVertexId( kPartRotate, 0, 0 ), handle, rot, Qt::CrossCursor );
+    }
+  }
   // Fall back: a click inside the polygon body selects it for whole-geometry
   // move. Use actual containment, not bbox (a U-shaped polygon's bbox covers
   // the empty gap between its arms).
@@ -241,6 +277,24 @@ KadasEditContext KadasPolygonAnnotationController::getEditContext( const QgsAnno
 
 void KadasPolygonAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
+  if ( editContext.vidx.part == kPartRotate )
+  {
+    if ( mRotateOrigMap.isEmpty() )
+      return;
+    const double target = KadasAnnotationRotation::angleFromHandle( mRotateCenterMap, newPoint );
+    const double delta = KadasAnnotationRotation::snapAngle( target - mRotateRefAngle, ctx.modifiers() & Qt::ShiftModifier );
+    QgsLineString *ring = takeMutableExterior( asPolygon( item ) );
+    if ( !ring || ring->numPoints() != mRotateOrigMap.size() )
+      return;
+    for ( int i = 0; i < mRotateOrigMap.size(); ++i )
+    {
+      const QgsPointXY rotated = KadasAnnotationRotation::rotatePoint( mRotateOrigMap[i], mRotateCenterMap, delta );
+      const QgsPointXY ip = toItemPos( rotated, ctx );
+      ring->moveVertex( QgsVertexId( 0, 0, i ), QgsPoint( ip.x(), ip.y() ) );
+    }
+    return;
+  }
+
   QgsLineString *ring = takeMutableExterior( asPolygon( item ) );
   if ( !ring )
     return;
@@ -273,16 +327,47 @@ void KadasPolygonAnnotationController::edit( QgsAnnotationItem *item, const Kada
 
 void KadasPolygonAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
 {
+  if ( editContext.vidx.part == kPartRotate )
+  {
+    if ( mRotateOrigMap.isEmpty() )
+      return;
+    const double delta = KadasAnnotationRotation::snapAngle( values[AttrAngle], false );
+    QgsLineString *ring = takeMutableExterior( asPolygon( item ) );
+    if ( !ring || ring->numPoints() != mRotateOrigMap.size() )
+      return;
+    for ( int i = 0; i < mRotateOrigMap.size(); ++i )
+    {
+      const QgsPointXY rotated = KadasAnnotationRotation::rotatePoint( mRotateOrigMap[i], mRotateCenterMap, delta );
+      const QgsPointXY ip = toItemPos( rotated, ctx );
+      ring->moveVertex( QgsVertexId( 0, 0, i ), QgsPoint( ip.x(), ip.y() ) );
+    }
+    return;
+  }
   edit( item, editContext, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
 
-KadasAttribValues KadasPolygonAnnotationController::editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
+KadasAttribValues KadasPolygonAnnotationController::editAttribsFromPosition(
+  const QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx
+) const
 {
+  if ( editContext.vidx.part == kPartRotate )
+  {
+    KadasAttribValues v;
+    v.insert( AttrAngle, KadasAnnotationRotation::angleFromHandle( mRotateCenterMap, pos ) - mRotateRefAngle );
+    return v;
+  }
   return drawAttribsFromPosition( item, pos, ctx );
 }
 
-QgsPointXY KadasPolygonAnnotationController::positionFromEditAttribs( const QgsAnnotationItem *item, const KadasEditContext &, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const
+QgsPointXY KadasPolygonAnnotationController::positionFromEditAttribs(
+  const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx
+) const
 {
+  if ( editContext.vidx.part == kPartRotate )
+  {
+    const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
+    return KadasAnnotationRotation::handlePos( mRotateCenterMap, mRotateRefAngle + values[AttrAngle], off );
+  }
   return positionFromDrawAttribs( item, values, ctx );
 }
 

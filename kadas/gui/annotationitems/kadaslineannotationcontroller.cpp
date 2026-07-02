@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QObject>
+#include <QPainter>
 #include <QTextStream>
 #include <memory>
 
@@ -26,11 +27,13 @@
 #include <qgis/qgslinestring.h>
 #include <qgis/qgslinesymbol.h>
 #include <qgis/qgslinesymbollayer.h>
+#include <qgis/qgsmapsettings.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgspointxy.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettingsentryimpl.h>
 
+#include "kadas/gui/annotationitems/kadasannotationrotation.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadaslineannotationcontroller.h"
@@ -57,6 +60,9 @@ namespace
     Q_ASSERT( dynamic_cast<const QgsAnnotationLineItem *>( item ) );
     return static_cast<const QgsAnnotationLineItem *>( item );
   }
+
+  // vidx.part sentinel for the rotation handle (real vertices use part 0).
+  constexpr int kPartRotate = 1;
 
   //! Returns a mutable QgsLineString backing the item, cloning it via setGeometry() for in-place edits.
   QgsLineString *takeMutableLine( QgsAnnotationLineItem *item )
@@ -104,6 +110,14 @@ QList<KadasNode> KadasLineAnnotationController::nodes( const QgsAnnotationItem *
   {
     const QgsPoint p = curve->vertexAt( QgsVertexId( 0, 0, i ) );
     result.append( { toMapPos( QgsPointXY( p.x(), p.y() ), ctx ) } );
+  }
+  // Rotation handle above the bounding-box centre (needs at least a segment).
+  if ( n >= 2 )
+  {
+    const QgsPointXY centerMap = toMapPos( curve->boundingBox().center(), ctx );
+    const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
+    const QgsPointXY handle = KadasAnnotationRotation::handlePos( centerMap, 0.0, off );
+    result.append( { handle, []( QPainter *p, const QPointF &pt, int sz ) { KadasAnnotationRotation::renderHandle( p, pt, sz ); } } );
   }
   return result;
 }
@@ -197,6 +211,28 @@ KadasEditContext KadasLineAnnotationController::getEditContext( const QgsAnnotat
       return KadasEditContext( QgsVertexId( 0, 0, i ), mp, drawAttribs() );
     }
   }
+  // Rotation handle: snapshot the line (map coords) and pivot for a drift-free drag.
+  if ( n >= 2 )
+  {
+    const QgsPointXY centerMap = toMapPos( curve->boundingBox().center(), ctx );
+    const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
+    const QgsPointXY handle = KadasAnnotationRotation::handlePos( centerMap, 0.0, off );
+    if ( pos.sqrDist( handle ) < pickTolSqr( ctx ) )
+    {
+      mRotateOrigMap.clear();
+      mRotateOrigMap.reserve( n );
+      for ( int i = 0; i < n; ++i )
+      {
+        const QgsPoint p = curve->vertexAt( QgsVertexId( 0, 0, i ) );
+        mRotateOrigMap.append( toMapPos( QgsPointXY( p.x(), p.y() ), ctx ) );
+      }
+      mRotateCenterMap = centerMap;
+      mRotateRefAngle = KadasAnnotationRotation::angleFromHandle( centerMap, handle );
+      KadasAttribDefs rot;
+      rot.insert( AttrAngle, KadasNumericAttribute { "angle", KadasNumericAttribute::Type::TypeAngle } );
+      return KadasEditContext( QgsVertexId( kPartRotate, 0, 0 ), handle, rot, Qt::CrossCursor );
+    }
+  }
   // Fall back: a hit close to any segment selects the whole line for
   // translation, anchored at the first vertex. A bbox check would be wrong
   // (a diagonal line's bbox covers vast empty space), so require a segment hit.
@@ -229,6 +265,23 @@ KadasEditContext KadasLineAnnotationController::getEditContext( const QgsAnnotat
 void KadasLineAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
   QgsAnnotationLineItem *line = asLine( item );
+  if ( editContext.vidx.part == kPartRotate )
+  {
+    if ( mRotateOrigMap.isEmpty() )
+      return;
+    const double target = KadasAnnotationRotation::angleFromHandle( mRotateCenterMap, newPoint );
+    const double delta = KadasAnnotationRotation::snapAngle( target - mRotateRefAngle, ctx.modifiers() & Qt::ShiftModifier );
+    QgsLineString *ls = takeMutableLine( line );
+    if ( !ls || ls->numPoints() != mRotateOrigMap.size() )
+      return;
+    for ( int i = 0; i < mRotateOrigMap.size(); ++i )
+    {
+      const QgsPointXY rotated = KadasAnnotationRotation::rotatePoint( mRotateOrigMap[i], mRotateCenterMap, delta );
+      const QgsPointXY ip = toItemPos( rotated, ctx );
+      ls->moveVertex( QgsVertexId( 0, 0, i ), QgsPoint( ip.x(), ip.y() ) );
+    }
+    return;
+  }
   QgsLineString *ls = takeMutableLine( line );
   const int n = ls->numPoints();
   if ( editContext.vidx.vertex >= 0 && editContext.vidx.vertex < n )
@@ -255,16 +308,45 @@ void KadasLineAnnotationController::edit( QgsAnnotationItem *item, const KadasEd
 
 void KadasLineAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
 {
+  if ( editContext.vidx.part == kPartRotate )
+  {
+    if ( mRotateOrigMap.isEmpty() )
+      return;
+    const double delta = KadasAnnotationRotation::snapAngle( values[AttrAngle], false );
+    QgsLineString *ls = takeMutableLine( asLine( item ) );
+    if ( !ls || ls->numPoints() != mRotateOrigMap.size() )
+      return;
+    for ( int i = 0; i < mRotateOrigMap.size(); ++i )
+    {
+      const QgsPointXY rotated = KadasAnnotationRotation::rotatePoint( mRotateOrigMap[i], mRotateCenterMap, delta );
+      const QgsPointXY ip = toItemPos( rotated, ctx );
+      ls->moveVertex( QgsVertexId( 0, 0, i ), QgsPoint( ip.x(), ip.y() ) );
+    }
+    return;
+  }
   edit( item, editContext, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
 
-KadasAttribValues KadasLineAnnotationController::editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
+KadasAttribValues KadasLineAnnotationController::editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
 {
+  if ( editContext.vidx.part == kPartRotate )
+  {
+    KadasAttribValues v;
+    v.insert( AttrAngle, KadasAnnotationRotation::angleFromHandle( mRotateCenterMap, pos ) - mRotateRefAngle );
+    return v;
+  }
   return drawAttribsFromPosition( item, pos, ctx );
 }
 
-QgsPointXY KadasLineAnnotationController::positionFromEditAttribs( const QgsAnnotationItem *item, const KadasEditContext &, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const
+QgsPointXY KadasLineAnnotationController::positionFromEditAttribs(
+  const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx
+) const
 {
+  if ( editContext.vidx.part == kPartRotate )
+  {
+    const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
+    return KadasAnnotationRotation::handlePos( mRotateCenterMap, mRotateRefAngle + values[AttrAngle], off );
+  }
   return positionFromDrawAttribs( item, values, ctx );
 }
 

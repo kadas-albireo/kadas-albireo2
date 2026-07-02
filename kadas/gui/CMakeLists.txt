@@ -29,6 +29,7 @@ set(kadas_gui_SRC
     annotationitems/kadasannotationlayerhelpers.cpp
     annotationitems/kadasannotationlayerregistry.cpp
     annotationitems/kadasannotationprojectintegration.cpp
+    annotationitems/kadasannotationrotation.cpp
     annotationitems/kadasannotationstyleeditor.cpp
     annotationitems/kadascircleannotationcontroller.cpp
     annotationitems/kadascircleannotationitem.cpp
@@ -109,6 +110,7 @@ set(kadas_gui_HDR
     annotationitems/kadasannotationlayerhelpers.h
     annotationitems/kadasannotationlayerregistry.h
     annotationitems/kadasannotationprojectintegration.h
+    annotationitems/kadasannotationrotation.h
     annotationitems/kadasannotationshadow.h
     annotationitems/kadasannotationstyleeditor.h
     annotationitems/kadasannotationzindex.h

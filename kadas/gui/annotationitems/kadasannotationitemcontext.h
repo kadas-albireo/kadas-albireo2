@@ -46,9 +46,14 @@ class KADAS_GUI_EXPORT KadasAnnotationItemContext
     //! CRS of the item, i.e. the parent annotation layer's CRS.
     QgsCoordinateReferenceSystem itemCrs() const { return mLayer ? mLayer->crs() : QgsCoordinateReferenceSystem(); }
 
+    //! Keyboard modifiers active during the current edit (e.g. Shift for angle snapping).
+    Qt::KeyboardModifiers modifiers() const { return mModifiers; }
+    void setModifiers( Qt::KeyboardModifiers modifiers ) { mModifiers = modifiers; }
+
   private:
     QgsAnnotationLayer *mLayer = nullptr;
     QgsMapSettings mMapSettings;
+    Qt::KeyboardModifiers mModifiers = Qt::NoModifier;
 };
 
 #endif // KADASANNOTATIONITEMCONTEXT_H

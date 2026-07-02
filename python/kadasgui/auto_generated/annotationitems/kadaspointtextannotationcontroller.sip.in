@@ -70,6 +70,9 @@ Controller for stock :py:class:`QgsAnnotationPointTextItem` (type id
     virtual void translate( QgsAnnotationItem *item, double dx, double dy );
 
 
+    virtual void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx );
+
+
     virtual bool liveRepaintOnEdit() const;
 %Docstring
 Re-render the layer live while dragging (the outline band is a poor

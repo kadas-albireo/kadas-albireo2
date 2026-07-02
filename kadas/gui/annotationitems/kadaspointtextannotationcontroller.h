@@ -52,6 +52,8 @@ class KADAS_GUI_EXPORT KadasPointTextAnnotationController : public KadasAnnotati
     void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos ) override;
     void translate( QgsAnnotationItem *item, double dx, double dy ) override;
 
+    void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx ) override;
+
     //! Re-render the layer live while dragging (the outline band is a poor stand-in for the text).
     bool liveRepaintOnEdit() const override { return true; }
 
@@ -74,8 +76,12 @@ class KADAS_GUI_EXPORT KadasPointTextAnnotationController : public KadasAnnotati
     enum AttribIds
     {
       AttrX,
-      AttrY
+      AttrY,
+      AttrAngle
     };
+
+    //! Vertex 1 is the rotation handle; vertex 0 is the anchor point.
+    static constexpr int RotationHandleVertex = 1;
 };
 
 #endif // KADASPOINTTEXTANNOTATIONCONTROLLER_H

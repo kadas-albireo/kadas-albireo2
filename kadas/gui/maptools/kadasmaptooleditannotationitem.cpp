@@ -430,6 +430,7 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
   }
 
   KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
+  ctx.setModifiers( e->modifiers() );
   const QgsPointXY pos = e->mapPoint();
 
   if ( mAllowCreate && mDrawState == DrawState::InProgress )
@@ -692,23 +693,27 @@ void KadasMapToolEditAnnotationItem::setupStyleEditor()
   mBottomBar->addRow( mStyleEditor );
 
   connect( mStyleEditor, &KadasAnnotationStyleEditor::previewChanged, this, [this] {
-    if ( !mItem || !mLayer )
+    QgsAnnotationItem *item = mLayer ? mLayer->item( mItemId ) : nullptr;
+    if ( !item )
       return;
-    mStyleEditor->applyToItem( mItem );
+    mItem = item;
+    mStyleEditor->applyToItem( item );
     mLayer->triggerRepaint();
     if ( mTempRubberBand )
       updateTempRubberBand();
   } );
 
   connect( mStyleEditor, &KadasAnnotationStyleEditor::committed, this, [this] {
-    if ( !mItem || !mLayer )
+    QgsAnnotationItem *item = mLayer ? mLayer->item( mItemId ) : nullptr;
+    if ( !item )
       return;
-    mStyleEditor->applyToItem( mItem );
+    mItem = item;
+    mStyleEditor->applyToItem( item );
     mLayer->triggerRepaint();
     if ( mTempRubberBand )
       updateTempRubberBand();
     if ( mController )
-      mController->persistStyle( mItem );
+      mController->persistStyle( item );
     pushState();
   } );
 }
@@ -899,6 +904,13 @@ void KadasMapToolEditAnnotationItem::showContextMenu( QgsAnnotationLayer *layer,
   forward->setEnabled( hasHigher );
   backward->setEnabled( hasLower );
   toBack->setEnabled( curZ > minZ );
+
+  if ( mController && target == mItem )
+  {
+    KadasAnnotationItemContext ctx( layer, canvas()->mapSettings() );
+    menu.addSeparator();
+    mController->populateContextMenu( target, &menu, mEditContext, QgsPointXY(), ctx );
+  }
 
   QAction *chosen = menu.exec( globalPos );
   if ( !chosen )
