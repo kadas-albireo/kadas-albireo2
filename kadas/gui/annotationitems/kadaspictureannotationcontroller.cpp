@@ -398,8 +398,16 @@ QList<KadasNode> KadasPictureAnnotationController::nodes( const QgsAnnotationIte
   if ( !frame.isValid() )
     return result;
   const QVector<QPointF> corners = frameCornersScreenRotated( pic, ctx.mapSettings(), xform );
+  const double cornerRotation = pic->rotation();
   for ( const QPointF &c : corners )
-    result.append( { ctx.mapSettings().mapToPixel().toMapCoordinates( c.toPoint() ) } );
+    result.append( { ctx.mapSettings().mapToPixel().toMapCoordinates( c.toPoint() ), [cornerRotation]( QPainter *p, const QPointF &pt, int size ) {
+                      p->save();
+                      p->setRenderHint( QPainter::Antialiasing, true );
+                      p->translate( pt );
+                      p->rotate( cornerRotation );
+                      p->drawRect( QRectF( -0.5 * size, -0.5 * size, size, size ) );
+                      p->restore();
+                    } } );
   const QPointF handlePx = rotationHandleScreen( frame, pic->rotation() );
   result.append( { ctx.mapSettings().mapToPixel().toMapCoordinates( handlePx.toPoint() ), []( QPainter *p, const QPointF &pt, int size ) { KadasAnnotationRotation::renderHandle( p, pt, size ); } } );
   return result;
