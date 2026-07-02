@@ -61,6 +61,7 @@
 #include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgssvgselectorwidget.h>
 #include <qgis/qgstextformat.h>
 
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
@@ -324,6 +325,65 @@ void KadasPinStyleEditor::applyToItem( QgsAnnotationItem *item ) const
   auto *sl = dynamic_cast<QgsSvgMarkerSymbolLayer *>( sym->symbolLayer( 0 ) );
   if ( !sl )
     return;
+  sl->setSize( mSizeSpin->value() );
+  sl->setFillColor( mFillColorBtn->color() );
+  marker->setSymbol( sym.release() );
+}
+
+
+// ----- Custom SVG marker ------------------------------------------------
+
+KadasSvgMarkerStyleEditor::KadasSvgMarkerStyleEditor( QWidget *parent )
+  : KadasAnnotationStyleEditor( parent )
+{
+  auto *form = new QFormLayout( this );
+  form->setContentsMargins( 0, 0, 0, 0 );
+  form->setFieldGrowthPolicy( QFormLayout::AllNonFixedFieldsGrow );
+
+  mSvgSelector = new QgsSvgSelectorWidget();
+  form->addRow( mSvgSelector );
+
+  mSizeSpin = new QSpinBox();
+  mSizeSpin->setRange( 1, 200 );
+  mSizeSpin->setToolTip( tr( "Marker size" ) );
+  form->addRow( tr( "Size" ), mSizeSpin );
+
+  mFillColorBtn = new QgsColorButton();
+  mFillColorBtn->setAllowOpacity( true );
+  mFillColorBtn->setToolTip( tr( "Fill color (SVGs with a fill parameter)" ) );
+  form->addRow( tr( "Color" ), mFillColorBtn );
+
+  connect( mSvgSelector, &QgsSvgSelectorWidget::svgSelected, this, &KadasAnnotationStyleEditor::committed );
+  connect( mSizeSpin, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
+  connect( mFillColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
+}
+
+void KadasSvgMarkerStyleEditor::loadFromItem( const QgsAnnotationItem *item )
+{
+  const auto *marker = dynamic_cast<const QgsAnnotationMarkerItem *>( item );
+  if ( !marker || !marker->symbol() || marker->symbol()->symbolLayerCount() == 0 )
+    return;
+  const auto *sl = dynamic_cast<const QgsSvgMarkerSymbolLayer *>( marker->symbol()->symbolLayer( 0 ) );
+  if ( !sl )
+    return;
+  const QSignalBlocker b1( mSvgSelector ), b2( mSizeSpin ), b3( mFillColorBtn );
+  mSvgSelector->setSvgPath( sl->path() );
+  mSizeSpin->setValue( static_cast<int>( std::round( sl->size() ) ) );
+  mFillColorBtn->setColor( sl->fillColor() );
+}
+
+void KadasSvgMarkerStyleEditor::applyToItem( QgsAnnotationItem *item ) const
+{
+  auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item );
+  if ( !marker || !marker->symbol() || marker->symbol()->symbolLayerCount() == 0 )
+    return;
+  std::unique_ptr<QgsMarkerSymbol> sym( marker->symbol()->clone() );
+  auto *sl = dynamic_cast<QgsSvgMarkerSymbolLayer *>( sym->symbolLayer( 0 ) );
+  if ( !sl )
+    return;
+  const QString path = mSvgSelector->currentSvgPath();
+  if ( !path.isEmpty() )
+    sl->setPath( path );
   sl->setSize( mSizeSpin->value() );
   sl->setFillColor( mFillColorBtn->color() );
   marker->setSymbol( sym.release() );

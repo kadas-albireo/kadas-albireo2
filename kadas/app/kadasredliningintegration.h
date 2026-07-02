@@ -65,6 +65,7 @@ class KadasRedliningIntegration : public QObject
     QAction *actionNewCircle() const { return mActionNewCircle; }
     QAction *actionNewText() const { return mActionNewText; }
     QAction *actionNewCoordinateCross() const { return mActionNewCoordCross; }
+    QAction *actionNewCustomSvg() const { return mActionNewCustomSvg; }
 
   private:
     //! The set of annotation-item kinds the redlining toolbar can create.
@@ -76,6 +77,7 @@ class KadasRedliningIntegration : public QObject
       MarkerDiamond,
       MarkerStar,
       MarkerCross,
+      MarkerCustomSvg,
       Line,
       Rectangle,
       Polygon,
@@ -92,6 +94,7 @@ class KadasRedliningIntegration : public QObject
     QAction *mActionNewDiamond = nullptr;
     QAction *mActionNewStar = nullptr;
     QAction *mActionNewCross = nullptr;
+    QAction *mActionNewCustomSvg = nullptr;
     QAction *mActionNewLine = nullptr;
     QAction *mActionNewRectangle = nullptr;
     QAction *mActionNewPolygon = nullptr;
@@ -106,6 +109,9 @@ class KadasRedliningIntegration : public QObject
 
     QAction *createToolAction( const QIcon &icon, const QString &text, const QString &objectName, AnnotationVariant variant );
     void toggleAnnotation( bool active, AnnotationVariant variant );
+
+    //! Refreshes the custom-SVG-marker tile icon to the last-used SVG (or the question-mark placeholder).
+    void updateCustomSvgActionIcon();
 };
 
 #endif // KADASREDLININGINTEGRATION_H

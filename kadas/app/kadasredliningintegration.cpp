@@ -35,6 +35,8 @@
 #include "kadas/gui/annotationitems/kadascoordcrossannotationitem.h"
 #include "kadas/gui/annotationitems/kadasmarkerannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadasrectangleannotationitem.h"
+#include "kadas/gui/annotationitems/kadassvgmarkerannotationcontroller.h"
+#include "kadas/gui/annotationitems/kadassvgmarkerannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 
 #include "kadasapplication.h"
@@ -75,7 +77,9 @@ KadasRedliningIntegration::KadasRedliningIntegration( QObject *parent )
   mActionNewDiamond = createToolAction( QIcon( ":/kadas/icons/draw_diamond" ), tr( "Diamond" ), QStringLiteral( "draw-marker-diamond" ), V::MarkerDiamond );
   mActionNewStar = createToolAction( QIcon( ":/kadas/icons/draw_star" ), tr( "Star" ), QStringLiteral( "draw-marker-star" ), V::MarkerStar );
   mActionNewCross = createToolAction( QIcon( ":/kadas/icons/draw_coordcross" ), tr( "Cross" ), QStringLiteral( "draw-marker-cross" ), V::MarkerCross );
-  mMarkerActions = { mActionNewPoint, mActionNewSquare, mActionNewTriangle, mActionNewDiamond, mActionNewStar, mActionNewCross };
+  mActionNewCustomSvg = createToolAction( QIcon( KadasSvgMarkerAnnotationItem::placeholderIconPath() ), tr( "Custom SVG" ), QStringLiteral( "draw-marker-svg" ), V::MarkerCustomSvg );
+  updateCustomSvgActionIcon();
+  mMarkerActions = { mActionNewPoint, mActionNewSquare, mActionNewTriangle, mActionNewDiamond, mActionNewStar, mActionNewCross, mActionNewCustomSvg };
 
   // Shapes: lines and polygons.
   mActionNewLine = createToolAction( QIcon( ":/kadas/icons/draw_line" ), tr( "Line" ), QStringLiteral( "draw-line" ), V::Line );
@@ -159,6 +163,9 @@ void KadasRedliningIntegration::toggleAnnotation( bool active, AnnotationVariant
       typeId = QStringLiteral( "marker" );
       KadasMarkerAnnotationController::settingsShape->setValue( static_cast<int>( Qgis::MarkerShape::Cross ) );
       break;
+    case AnnotationVariant::MarkerCustomSvg:
+      typeId = KadasSvgMarkerAnnotationItem::itemTypeId();
+      break;
     case AnnotationVariant::Line:
       typeId = QStringLiteral( "linestring" );
       break;
@@ -205,7 +212,23 @@ void KadasRedliningIntegration::toggleAnnotation( bool active, AnnotationVariant
   // keep its action unchecked so the owning split button reflects it.
   connect( tool, &QgsMapTool::deactivated, action, [action] { action->setChecked( false ); } );
 
+  // Once a custom-SVG marker has been placed/edited, the last-used SVG is
+  // persisted; reflect it on the ribbon tile so it becomes the visible default.
+  if ( variant == AnnotationVariant::MarkerCustomSvg )
+    connect( tool, &QgsMapTool::deactivated, this, [this] { updateCustomSvgActionIcon(); } );
+
   kApp->mainWindow()->layerTreeView()->setCurrentLayer( layer );
   kApp->mainWindow()->layerTreeView()->setLayerVisible( layer, true );
   canvas->setMapTool( tool );
+}
+
+void KadasRedliningIntegration::updateCustomSvgActionIcon()
+{
+  if ( !mActionNewCustomSvg )
+    return;
+  const QString path = KadasSvgMarkerAnnotationController::settingsSvgPath->value();
+  QIcon icon( path );
+  if ( path.isEmpty() || icon.isNull() )
+    icon = QIcon( KadasSvgMarkerAnnotationItem::placeholderIconPath() );
+  mActionNewCustomSvg->setIcon( icon );
 }

@@ -29,6 +29,7 @@ class QPlainTextEdit;
 class QSpinBox;
 class QgsAnnotationItem;
 class QgsColorButton;
+class QgsSvgSelectorWidget;
 
 /**
  * \ingroup gui
@@ -100,6 +101,25 @@ class KadasPinStyleEditor : public KadasAnnotationStyleEditor
   private:
     QLineEdit *mTitleEdit = nullptr;
     QPlainTextEdit *mDescriptionEdit = nullptr;
+    QSpinBox *mSizeSpin = nullptr;
+    QgsColorButton *mFillColorBtn = nullptr;
+};
+
+/**
+ * \brief Style editor for the custom SVG marker (QGIS SVG picker, size, fill color).
+ */
+class KadasSvgMarkerStyleEditor : public KadasAnnotationStyleEditor
+{
+    Q_OBJECT
+
+  public:
+    explicit KadasSvgMarkerStyleEditor( QWidget *parent = nullptr );
+
+    void loadFromItem( const QgsAnnotationItem *item ) override;
+    void applyToItem( QgsAnnotationItem *item ) const override;
+
+  private:
+    QgsSvgSelectorWidget *mSvgSelector = nullptr;
     QSpinBox *mSizeSpin = nullptr;
     QgsColorButton *mFillColorBtn = nullptr;
 };

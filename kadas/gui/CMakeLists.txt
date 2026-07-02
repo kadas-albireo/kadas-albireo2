@@ -50,6 +50,8 @@ set(kadas_gui_SRC
     annotationitems/kadaspointtextannotationcontroller.cpp
     annotationitems/kadaspolygonannotationcontroller.cpp
     annotationitems/kadasrectangleannotationcontroller.cpp
+    annotationitems/kadassvgmarkerannotationcontroller.cpp
+    annotationitems/kadassvgmarkerannotationitem.cpp
     annotationitems/kadasrectangleannotationitem.cpp
     maptools/kadasmaptooldeleteitems.cpp
     maptools/kadasmaptooleditannotationitem.cpp
@@ -134,6 +136,8 @@ set(kadas_gui_HDR
     annotationitems/kadaspolygonannotationcontroller.h
     annotationitems/kadasrectangleannotationcontroller.h
     annotationitems/kadasrectangleannotationitem.h
+    annotationitems/kadassvgmarkerannotationcontroller.h
+    annotationitems/kadassvgmarkerannotationitem.h
     maptools/kadasmaptooldeleteitems.h
     maptools/kadasmaptooleditannotationitem.h
     maptools/kadasmaptoolheightprofile.h
