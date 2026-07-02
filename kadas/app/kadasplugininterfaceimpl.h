@@ -160,6 +160,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual bool unregisterMainWindowAction( QAction *action ) override;
 
     // Unsupported QGIS interface
+    virtual void showPluginManager( int tabIndex = -1, const QString &searchTerm = QString() ) override {}
     virtual QMap<QString, QVariant> defaultStyleSheetOptions() override { return QMap<QString, QVariant>(); }
     virtual QFont defaultStyleSheetFont() override { return QFont(); }
     virtual void buildStyleSheet( const QMap<QString, QVariant> &opts ) override {}
