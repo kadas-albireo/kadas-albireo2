@@ -160,7 +160,7 @@ Kadas3DMapConfigWidget::Kadas3DMapConfigWidget( Qgs3DMapSettings *map, QgsMapCan
   }
 
   spinCameraFieldOfView->setValue( mMap->fieldOfView() );
-  cboCameraProjectionType->setCurrentIndex( cboCameraProjectionType->findData( mMap->projectionType() ) );
+  cboCameraProjectionType->setCurrentIndex( cboCameraProjectionType->findData( QVariant::fromValue( mMap->projectionType() ) ) );
   mCameraNavigationModeCombo->setCurrentIndex( mCameraNavigationModeCombo->findData( QVariant::fromValue( mMap->cameraNavigationMode() ) ) );
   mCameraMovementSpeed->setValue( mMap->cameraMovementSpeed() );
   spinTerrainScale->setValue( mMap->terrainSettings()->verticalScale() );
@@ -360,7 +360,7 @@ void Kadas3DMapConfigWidget::apply()
   }
 
   mMap->setFieldOfView( spinCameraFieldOfView->value() );
-  mMap->setProjectionType( cboCameraProjectionType->currentData().value<Qt3DRender::QCameraLens::ProjectionType>() );
+  mMap->setProjectionType( cboCameraProjectionType->currentData().value<Qgis::Map3DProjectionType>() );
   mMap->setCameraNavigationMode( mCameraNavigationModeCombo->currentData().value<Qgis::NavigationMode>() );
   mMap->setCameraMovementSpeed( mCameraMovementSpeed->value() );
   mMap->setShowLabels( chkShowLabels->isChecked() );

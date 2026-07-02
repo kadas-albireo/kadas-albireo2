@@ -196,7 +196,7 @@ Kadas3DMapCanvasWidget *Kadas3DIntegration::createNewMapCanvas3D( const QString 
   map->setCameraNavigationMode( defaultNavMode );
 
   map->setCameraMovementSpeed( settings.value( QStringLiteral( "map3d/defaultMovementSpeed" ), 5, QgsSettings::App ).toDouble() );
-  const Qt3DRender::QCameraLens::ProjectionType defaultProjection = settings.enumValue( QStringLiteral( "map3d/defaultProjection" ), Qt3DRender::QCameraLens::PerspectiveProjection, QgsSettings::App );
+  const Qgis::Map3DProjectionType defaultProjection = settings.enumValue( QStringLiteral( "map3d/defaultProjection" ), Qgis::Map3DProjectionType::Perspective, QgsSettings::App );
   map->setProjectionType( defaultProjection );
   map->setFieldOfView( settings.value( QStringLiteral( "map3d/defaultFieldOfView" ), 45, QgsSettings::App ).toInt() );
 
