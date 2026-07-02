@@ -36,7 +36,7 @@
 #include "kadasambientocclusionsettingswidget.h"
 #include "qgs3dmapcanvas.h"
 #include "qgsterraingenerator.h"
-#include "qgsphongmaterialsettings.h"
+#include <qgis/qgsphongmaterialsettings.h>
 #include "qgstiledscenelayer.h"
 
 Kadas3DMapConfigWidget::Kadas3DMapConfigWidget( Qgs3DMapSettings *map, QgsMapCanvas *mainCanvas, Qgs3DMapCanvas *mapCanvas3D, QWidget *parent )
