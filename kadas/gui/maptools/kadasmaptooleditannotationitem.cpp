@@ -41,10 +41,33 @@
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
+#include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 #include "kadas/gui/kadassidepanel.h"
 #include "kadas/gui/kadasfeaturepicker.h"
 #include "kadas/gui/kadasfloatinginputwidget.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
+
+namespace
+{
+  //! Composes an HTML tooltip from a pin's title/description and stores it on
+  //! the annotation layer so the map-item tooltip surfaces it on hover.
+  void updatePinTooltip( QgsAnnotationLayer *layer, const QString &itemId, const QgsAnnotationItem *item )
+  {
+    const auto *pin = dynamic_cast<const KadasPinAnnotationItem *>( item );
+    if ( !pin )
+      return;
+    QString html;
+    if ( !pin->name().isEmpty() )
+      html += QStringLiteral( "<b>%1</b>" ).arg( pin->name().toHtmlEscaped() );
+    if ( !pin->remarks().isEmpty() )
+    {
+      if ( !html.isEmpty() )
+        html += QStringLiteral( "<br>" );
+      html += pin->remarks().toHtmlEscaped().replace( '\n', QStringLiteral( "<br>" ) );
+    }
+    KadasAnnotationLayerHelpers::setTooltip( layer, itemId, html );
+  }
+} // namespace
 
 
 class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
@@ -714,6 +737,7 @@ void KadasMapToolEditAnnotationItem::setupStyleEditor()
       updateTempRubberBand();
     if ( mController )
       mController->persistStyle( item );
+    updatePinTooltip( mLayer, mItemId, item );
     pushState();
   } );
 }
