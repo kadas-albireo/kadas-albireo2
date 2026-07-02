@@ -400,6 +400,7 @@ void KadasMarkerAnnotationController::persistStyle( const QgsAnnotationItem *ite
   const auto *sl = dynamic_cast<const QgsSimpleMarkerSymbolLayer *>( marker->symbol()->symbolLayer( 0 ) );
   if ( !sl )
     return;
+  settingsShape->setValue( static_cast<int>( sl->shape() ) );
   settingsSize->setValue( static_cast<int>( std::round( sl->size() ) ) );
   settingsStrokeWidth->setValue( sl->strokeWidth() );
   settingsFillColor->setValue( sl->fillColor() );

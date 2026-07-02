@@ -33,6 +33,7 @@
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
 #include "kadas/gui/annotationitems/kadascircleannotationitem.h"
 #include "kadas/gui/annotationitems/kadascoordcrossannotationitem.h"
+#include "kadas/gui/annotationitems/kadasmarkerannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadasrectangleannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 
@@ -136,27 +137,27 @@ void KadasRedliningIntegration::toggleAnnotation( bool active, AnnotationVariant
   {
     case AnnotationVariant::MarkerCircle:
       typeId = QStringLiteral( "marker" );
-      factory = [] { return makeShapedMarker( Qgis::MarkerShape::Circle ); };
+      KadasMarkerAnnotationController::settingsShape->setValue( static_cast<int>( Qgis::MarkerShape::Circle ) );
       break;
     case AnnotationVariant::MarkerSquare:
       typeId = QStringLiteral( "marker" );
-      factory = [] { return makeShapedMarker( Qgis::MarkerShape::Square ); };
+      KadasMarkerAnnotationController::settingsShape->setValue( static_cast<int>( Qgis::MarkerShape::Square ) );
       break;
     case AnnotationVariant::MarkerTriangle:
       typeId = QStringLiteral( "marker" );
-      factory = [] { return makeShapedMarker( Qgis::MarkerShape::Triangle ); };
+      KadasMarkerAnnotationController::settingsShape->setValue( static_cast<int>( Qgis::MarkerShape::Triangle ) );
       break;
     case AnnotationVariant::MarkerDiamond:
       typeId = QStringLiteral( "marker" );
-      factory = [] { return makeShapedMarker( Qgis::MarkerShape::Diamond ); };
+      KadasMarkerAnnotationController::settingsShape->setValue( static_cast<int>( Qgis::MarkerShape::Diamond ) );
       break;
     case AnnotationVariant::MarkerStar:
       typeId = QStringLiteral( "marker" );
-      factory = [] { return makeShapedMarker( Qgis::MarkerShape::Star ); };
+      KadasMarkerAnnotationController::settingsShape->setValue( static_cast<int>( Qgis::MarkerShape::Star ) );
       break;
     case AnnotationVariant::MarkerCross:
       typeId = QStringLiteral( "marker" );
-      factory = [] { return makeShapedMarker( Qgis::MarkerShape::Cross ); };
+      KadasMarkerAnnotationController::settingsShape->setValue( static_cast<int>( Qgis::MarkerShape::Cross ) );
       break;
     case AnnotationVariant::Line:
       typeId = QStringLiteral( "linestring" );
@@ -176,6 +177,14 @@ void KadasRedliningIntegration::toggleAnnotation( bool active, AnnotationVariant
     case AnnotationVariant::CoordCross:
       typeId = KadasCoordCrossAnnotationItem::itemTypeId();
       break;
+  }
+
+  // Marker variants share one factory that honours the last-used shape (set by
+  // the ribbon button above and updated by style edits), so a newly placed
+  // marker keeps the most recently used shape.
+  if ( typeId == QLatin1String( "marker" ) )
+  {
+    factory = [] { return makeShapedMarker( static_cast<Qgis::MarkerShape>( KadasMarkerAnnotationController::settingsShape->value() ) ); };
   }
 
   KadasAnnotationItemController *controller = KadasAnnotationControllerRegistry::instance()->controllerFor( typeId );
