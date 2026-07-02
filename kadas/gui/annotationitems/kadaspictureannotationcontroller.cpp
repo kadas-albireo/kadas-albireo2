@@ -28,12 +28,14 @@
 #include <qgis/qgis.h>
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationpictureitem.h>
+#include <qgis/qgsapplication.h>
 #include <qgis/qgscallout.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsfillsymbol.h>
 #include <qgis/qgsfillsymbollayer.h>
 #include <qgis/qgsgeometry.h>
+#include <qgis/qgsimagecache.h>
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgsrendercontext.h>
 #include <qgis/qgsmaptopixel.h>
@@ -41,6 +43,7 @@
 #include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrectangle.h>
+#include <qgis/qgssvgcache.h>
 #include <qgis/qgssymbol.h>
 
 #include "kadas/gui/annotationitems/kadasannotationrotation.h"
@@ -199,6 +202,31 @@ namespace
       return Qgis::PictureFormat::Raster;
     return Qgis::PictureFormat::Unknown;
   }
+
+  // Native aspect ratio (height / width) of the source image, or 0 if unknown.
+  double sourceAspectRatio( const QString &path, Qgis::PictureFormat format )
+  {
+    switch ( format )
+    {
+      case Qgis::PictureFormat::SVG:
+      {
+        const QSizeF vb = QgsApplication::svgCache()->svgViewboxSize( path, 100, QColor(), QColor(), 1.0, 1.0 );
+        if ( vb.width() > 0 && vb.height() > 0 )
+          return vb.height() / vb.width();
+        break;
+      }
+      case Qgis::PictureFormat::Raster:
+      {
+        const QSize s = QgsApplication::imageCache()->originalSize( path );
+        if ( s.width() > 0 && s.height() > 0 )
+          return static_cast<double>( s.height() ) / s.width();
+        break;
+      }
+      case Qgis::PictureFormat::Unknown:
+        break;
+    }
+    return 0.0;
+  }
 } // namespace
 
 
@@ -216,7 +244,21 @@ void KadasPictureAnnotationController::setPath( QgsAnnotationPictureItem *item, 
 {
   if ( !item )
     return;
-  item->setPath( formatFromPath( path ), path );
+  const Qgis::PictureFormat format = formatFromPath( path );
+  item->setPath( format, path );
+  // Match the frame aspect to the image so the balloon/frame (and the edit
+  // handles drawn on its corners) tightly wrap the picture. Otherwise the image
+  // is letterboxed inside the frame and the corner handles look misaligned,
+  // which is especially obvious once the item is rotated.
+  if ( lockAspectRatio() )
+  {
+    const double aspect = sourceAspectRatio( path, format );
+    if ( aspect > 0.0 )
+    {
+      const double width = item->fixedSize().width() > 0 ? item->fixedSize().width() : 200.0;
+      item->setFixedSize( QSizeF( width, width * aspect ) );
+    }
+  }
 }
 
 void KadasPictureAnnotationController::ensureBalloon( QgsAnnotationPictureItem *pic )
