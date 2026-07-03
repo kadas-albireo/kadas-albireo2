@@ -43,6 +43,10 @@ class KADAS_GUI_EXPORT KadasCoordCrossAnnotationController : public KadasMarkerA
     //! The cross is drawn in render() over a hidden symbol; never adopt or write the shared point style.
     void applyPersistedStyle( QgsAnnotationItem * ) const override {}
     void persistStyle( const QgsAnnotationItem * ) const override {}
+
+  protected:
+    //! A symmetric cross has no meaningful orientation, so no rotation handle.
+    bool hasRotationHandle() const override { return false; }
 };
 
 #endif // KADASCOORDCROSSANNOTATIONCONTROLLER_H

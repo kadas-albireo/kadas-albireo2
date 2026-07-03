@@ -77,6 +77,10 @@ class KADAS_GUI_EXPORT KadasMarkerAnnotationController : public KadasAnnotationI
     static const QgsSettingsEntryInteger *settingsStrokeStyle;
 #endif
 
+  protected:
+    //! Whether this marker type exposes a rotation handle (drawn node + hit-test). Symmetric markers like the coordinate cross have none.
+    virtual bool hasRotationHandle() const { return true; }
+
   private:
     enum AttribIds
     {

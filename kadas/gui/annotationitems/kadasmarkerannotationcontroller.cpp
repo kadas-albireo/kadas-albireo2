@@ -98,6 +98,8 @@ QList<KadasNode> KadasMarkerAnnotationController::nodes( const QgsAnnotationItem
 {
   const QgsPointXY p = asMarker( item )->geometry();
   const QgsPointXY anchor = toMapPos( QgsPointXY( p.x(), p.y() ), ctx );
+  if ( !hasRotationHandle() )
+    return { { anchor } };
   const QgsMarkerSymbol *sym = asMarker( item )->symbol();
   const double angle = sym ? sym->angle() : 0.0;
   const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
@@ -157,15 +159,18 @@ KadasEditContext KadasMarkerAnnotationController::getEditContext( const QgsAnnot
   const QgsPointXY geom = asMarker( item )->geometry();
   const QgsPointXY testPos = toMapPos( geom, ctx );
 
-  const QgsMarkerSymbol *sym0 = asMarker( item )->symbol();
-  const double curAngle = sym0 ? sym0->angle() : 0.0;
-  const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
-  const QgsPointXY handle = KadasAnnotationRotation::handlePos( testPos, curAngle, off );
-  if ( pos.sqrDist( handle ) < pickTolSqr( ctx ) )
+  if ( hasRotationHandle() )
   {
-    KadasAttribDefs rot;
-    rot.insert( AttrAngle, KadasNumericAttribute { "angle", KadasNumericAttribute::Type::TypeAngle } );
-    return KadasEditContext( QgsVertexId( 0, 0, RotationHandleVertex ), handle, rot, Qt::CrossCursor );
+    const QgsMarkerSymbol *sym0 = asMarker( item )->symbol();
+    const double curAngle = sym0 ? sym0->angle() : 0.0;
+    const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
+    const QgsPointXY handle = KadasAnnotationRotation::handlePos( testPos, curAngle, off );
+    if ( pos.sqrDist( handle ) < pickTolSqr( ctx ) )
+    {
+      KadasAttribDefs rot;
+      rot.insert( AttrAngle, KadasNumericAttribute { "angle", KadasNumericAttribute::Type::TypeAngle } );
+      return KadasEditContext( QgsVertexId( 0, 0, RotationHandleVertex ), handle, rot, Qt::CrossCursor );
+    }
   }
 
   // Hit-test against the rendered symbol footprint, not just the anchor:
