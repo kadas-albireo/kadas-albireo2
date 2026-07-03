@@ -88,6 +88,7 @@
         <file alias="icons/draw_coordcross">icons/draw_coordcross.svg</file>
         <file alias="icons/draw_star">icons/draw_star.svg</file>
         <file alias="icons/draw_pin">icons/draw_pin.svg</file>
+        <file alias="icons/draw_svgmarker">icons/draw_svgmarker.svg</file>
         <file alias="icons/redlining_circle">icons/redlining_circle.svg</file>
         <file alias="icons/redlining_line">icons/redlining_line.svg</file>
         <file alias="icons/redlining_point">icons/redlining_point.svg</file>
