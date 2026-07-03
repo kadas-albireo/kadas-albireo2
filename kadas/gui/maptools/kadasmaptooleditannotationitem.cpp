@@ -272,8 +272,14 @@ void KadasMapToolEditAnnotationItem::activate()
   } );
   connect( mLayer.data(), &QgsMapLayer::repaintRequested, this, &KadasMapToolEditAnnotationItem::refreshHandles );
 
-  mBottomBar->adjustSize();
-  mBottomBar->show();
+  // Items without any configurable style (e.g. the coordinate cross) don't need
+  // the side panel at all — an empty Draw/Edit panel with only undo/redo is just
+  // noise, so keep it hidden unless there's something to configure.
+  if ( mStyleEditor || mExtraTopWidget )
+  {
+    mBottomBar->adjustSize();
+    mBottomBar->show();
+  }
 }
 
 void KadasMapToolEditAnnotationItem::refreshHandles()
