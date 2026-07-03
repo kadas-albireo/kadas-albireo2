@@ -168,136 +168,136 @@ Möglicherweise möchten Sie den Detailierungsgrad heruntersetzen oder die Limit
 <context>
     <name>Kadas3DMapConfigWidget</name>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="57"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="58"/>
         <source>Terrain Based</source>
         <translation>Geländebasiert</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="58"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="59"/>
         <source>Walk Mode (First Person)</source>
         <translation>Gehmodus (erste Person)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="78"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="79"/>
         <source>Perspective Projection</source>
         <translation>Perspektivische Projektion</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="79"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="80"/>
         <source>Orthogonal Projection</source>
         <translation>Orthogonale Projektion</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="101"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="102"/>
         <source>Flat Terrain</source>
         <translation>Flaches Gelände</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="102"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="103"/>
         <source>DEM (Raster Layer)</source>
         <translation>Digitales Höhenmodell (Raster)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="103"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="104"/>
         <source>Online</source>
         <translation>Online</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="104"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="105"/>
         <source>Mesh</source>
         <translation>Mesh</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="105"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="106"/>
         <source>Quantized Mesh</source>
         <translation>Quantisiertes Mesh</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="219"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="220"/>
         <source>Coordinate Reference System</source>
         <translation>Koordinatenreferenzsystem</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="220"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="221"/>
         <source>Cube</source>
         <translation>Kubus</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="222"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="223"/>
         <source>Left</source>
         <translation>Links</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="223"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="224"/>
         <source>Center</source>
         <translation>Mittig ausrichten</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="224"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="225"/>
         <source>Right</source>
         <translation>Rechts</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="226"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="227"/>
         <source>Top</source>
         <translation>Oben</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="227"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="228"/>
         <source>Middle</source>
         <translation>Mitte</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="228"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="229"/>
         <source>Bottom</source>
         <translation>Unten</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="246"/>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="251"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="247"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="252"/>
         <source>Top Left</source>
         <translation>Oben links</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="247"/>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="252"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="248"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="253"/>
         <source>Top Right</source>
         <translation>Oben rechts</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="248"/>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="253"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="249"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="254"/>
         <source>Bottom Left</source>
         <translation>Unten links</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="249"/>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="254"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="250"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="255"/>
         <source>Bottom Right</source>
         <translation>Unten rechts</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="277"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="278"/>
         <source>Show in 2D map view</source>
         <translation>In 2D Kartenansicht anzeigen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="483"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="484"/>
         <source>An elevation layer must be selected for a DEM terrain</source>
         <translation>Eine Höhenebene (DHM) muss für das Gelände ausgewählt sein</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="491"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="492"/>
         <source>An elevation layer must be selected for a mesh terrain</source>
         <translation>Eine Höhenebene muss für ein Mesh-Gelände zuerst ausgewählt werden. </translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="499"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="500"/>
         <source>An elevation layer must be selected for a quantized mesh terrain</source>
         <translation>quantisiertes Netz</translation>
     </message>
     <message>
-        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="510"/>
+        <location filename="../kadas/app/3d/kadas3dmapconfigwidget.cpp" line="511"/>
         <source>No lights exist in the scene</source>
         <translation>Keine Beleuchtung in dieser Szene vorhanden</translation>
     </message>
@@ -7441,113 +7441,113 @@ bewegen</translation>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="202"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="203"/>
         <source>Error loading style</source>
         <translation>Styl konnte nicht geladen werden</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="205"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="206"/>
         <source>Error loading layer metadata</source>
         <translation>Fehler beim Lader der Ebenenmetadaten</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="354"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1142"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="355"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1143"/>
         <source>Remote layer</source>
         <translation>Ferne Ebene</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="354"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1142"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="355"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1143"/>
         <source>loading %1, please wait …</source>
         <translation>%1 wird geladen...</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="426"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="549"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1078"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1405"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="427"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="550"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1079"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1406"/>
         <source>%1 is not a valid or recognized data source.</source>
         <translation>%1 ist keine gültige oder bekannte Datenquelle.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="430"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="440"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="495"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="550"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1079"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1406"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="431"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="441"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="496"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="551"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1080"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1407"/>
         <source>Invalid Data Source</source>
         <translation>Ungültige Datenquelle</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="430"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="431"/>
         <source>Download with &quot;Protocol&quot; source type has failed, do you want to try the &quot;File&quot; source type?</source>
         <translation>Der Download mit dem Quellentyp &quot;Protokoll&quot; ist fehlgeschlagen, möchten Sie es mit dem Quellentyp &quot;Datei&quot; versuchen?</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="494"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="495"/>
         <source>%1 is not a valid or recognized data source, error: &quot;%2&quot;</source>
         <translation>%1 ist keine gültige oder bekannte Datenquelle, Fehler: &quot;%2&quot;</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1076"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1077"/>
         <source>Unable to load %1</source>
         <translation>%1 konnte nicht geladen werden</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1190"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1191"/>
         <source>%1 is not a supported raster data source</source>
         <translation>%1 ist keine unterstützte Rasterdatenquelle</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1194"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1195"/>
         <source>Unsupported Data Source</source>
         <translation>Nicht unterstützte Datenquelle</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1216"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1217"/>
         <source>The layer is not a valid layer and can not be added to the map</source>
         <translation>Die Ebene ist keine gültige Ebene und kann nicht zur Karte hinzugefügt werden</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1217"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1218"/>
         <source>Layer is not valid</source>
         <translation>Ungültige Ebenen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1268"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1269"/>
         <source>Error loading layer definition</source>
         <translation>Fehler beim Lader der Ebenendefinition</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1331"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1332"/>
         <source>%1 is an invalid layer - not loaded</source>
         <translation>%1 ist keine gültige ebene - nicht geladen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1332"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1333"/>
         <source>%1 is an invalid layer and cannot be loaded.</source>
         <translation>%1 ist keine gültige ebene und konnte nicht geladen werden.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1675"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1676"/>
         <source>layer &apos;%1&apos; requires layer &apos;%2&apos; to be loaded but &apos;%2&apos; could not be found, please load it manually if possible.</source>
         <translation>Ebene &apos;%1&apos; erfordert, dass Ebene &apos;%2&apos; geladen wird, aber &apos;%2&apos; konnte nicht gefunden werden, bitte laden Sie sie manuell, wenn möglich.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1676"/>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1682"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1677"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1683"/>
         <source>Missing layer form dependency</source>
         <translation>Fehlendes Formular für die Ebene</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1682"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1683"/>
         <source>Layer dependency &apos;%2&apos; required by &apos;%1&apos; was automatically loaded.</source>
         <translation>Die von &apos;%1&apos; benötigte Ebenenabhängigkeit &apos;%2&apos; wurde automatisch geladen.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1713"/>
+        <location filename="../kadas/app/kadasapplayerhandling.cpp" line="1714"/>
         <source>Invalid relationship %1</source>
         <translation>Ungültige Beziehung %1</translation>
     </message>
