@@ -476,16 +476,10 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
     return;
   }
 
-  if ( mAllowCreate && !mMultipart && mDrawState == DrawState::Finished )
-  {
-    if ( mEditContext.isValid() )
-    {
-      mEditContext = KadasEditContext();
-      setCursor( Qt::ArrowCursor );
-      clearNumericInput();
-    }
-    return;
-  }
+  // For a finished single-part item in create mode we still hit-test the item's
+  // handles (so the just-placed marker can be rotated/moved). Clicking empty
+  // space instead places a new marker (handled in canvasPressEvent, where an
+  // invalid edit context falls through to addPoint()).
 
   if ( e->buttons() == Qt::LeftButton )
   {
