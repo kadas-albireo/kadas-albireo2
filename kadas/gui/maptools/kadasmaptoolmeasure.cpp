@@ -477,6 +477,10 @@ void KadasMapToolMeasure::recomputeReadout()
   if ( parts.isEmpty() )
   {
     mReadoutLabel->setText( QStringLiteral( "<b>—</b>" ) );
+    // Nothing is being measured: release the width floor so the panel returns
+    // to its natural size for the next measurement.
+    if ( mBottomBar )
+      mBottomBar->setMinimumWidth( 0 );
     if ( mLabelsOverlay )
       mLabelsOverlay->setLabels( {} );
     return;
@@ -525,7 +529,16 @@ void KadasMapToolMeasure::recomputeReadout()
   text += QStringLiteral( "</pre>" );
   mReadoutLabel->setText( text );
   if ( mBottomBar )
-    mBottomBar->adjustSize();
+  {
+    // The live readout changes length on every mouse move (the distance value
+    // grows and shrinks). Letting the panel shrink-and-grow each frame reflows
+    // the canvas continuously and looks glitchy. Pin a width floor that only
+    // ever grows to fit the widest readout so shrinking frames become no-ops;
+    // it is released once the measurement is cleared (see the empty branch).
+    const int hintWidth = mBottomBar->sizeHint().width();
+    if ( hintWidth > mBottomBar->minimumWidth() )
+      mBottomBar->setMinimumWidth( hintWidth );
+  }
 
   updateCanvasLabels( parts );
 }
