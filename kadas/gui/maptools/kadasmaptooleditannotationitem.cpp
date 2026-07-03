@@ -26,6 +26,7 @@
 
 #include <qgis/qgsannotationitem.h>
 #include <qgis/qgsannotationlayer.h>
+#include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapcanvasitem.h>
@@ -87,8 +88,22 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
 
     void updateRect() { setRect( mMapCanvas->mapSettings().visibleExtent() ); }
 
+    //! Optional callback that renders a live preview of the edited item straight
+    //! into the overlay painter (in scene coordinates), so an in-progress edit
+    //! can appear without waiting for the asynchronous canvas layer repaint.
+    void setPreviewRenderer( std::function<void( QPainter * )> renderer ) { mPreviewRenderer = std::move( renderer ); }
+
     void paint( QPainter *painter ) override
     {
+      if ( mPreviewRenderer )
+      {
+        painter->save();
+        // The overlay painter is in item-local coordinates while the item renders
+        // in scene coordinates; undo the item's scene offset so it lands correctly.
+        painter->translate( -mapToScene( QPointF( 0, 0 ) ) );
+        mPreviewRenderer( painter );
+        painter->restore();
+      }
       paintMeasurementLabels( painter );
       paintHandles( painter );
     }
@@ -164,8 +179,8 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
 
     NodesProvider mNodesProvider;
     LabelsProvider mLabelsProvider;
+    std::function<void( QPainter * )> mPreviewRenderer;
 };
-
 
 struct KadasMapToolEditAnnotationItem::ToolState : KadasStateHistory::State
 {
@@ -286,6 +301,31 @@ void KadasMapToolEditAnnotationItem::refreshHandles()
 {
   if ( mHandles )
     mHandles->update();
+}
+
+void KadasMapToolEditAnnotationItem::renderItemPreview( QPainter *painter )
+{
+  if ( !mItem || !mLayer || !canvas() )
+    return;
+  // Render at a device pixel ratio of 1 because the overlay painter works in
+  // logical (scene) pixels, matching how the handles are drawn.
+  QgsMapSettings ms = canvas()->mapSettings();
+  ms.setDevicePixelRatio( 1.0 );
+  QgsRenderContext ctx = QgsRenderContext::fromMapSettings( ms );
+  ctx.setPainter( painter );
+  ctx.setCoordinateTransform( QgsCoordinateTransform( mLayer->crs(), ms.destinationCrs(), ms.transformContext() ) );
+  QgsFeedback feedback;
+  mItem->render( ctx, &feedback );
+}
+
+void KadasMapToolEditAnnotationItem::setLivePreviewEnabled( bool enabled )
+{
+  if ( !mHandles )
+    return;
+  if ( enabled )
+    mHandles->setPreviewRenderer( [this]( QPainter *painter ) { renderItemPreview( painter ); } );
+  else
+    mHandles->setPreviewRenderer( nullptr );
 }
 
 void KadasMapToolEditAnnotationItem::updateTempRubberBand()
@@ -489,7 +529,16 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
       mController->edit( mItem, mEditContext, adjusted, ctx );
       if ( mController->liveRepaintOnEdit() )
       {
-        mLayer->triggerRepaint();
+        // Draw the edited item synchronously in the overlay so the drag stays
+        // smooth instead of chasing the asynchronous layer repaint. Hide the
+        // real item once (a single repaint) to avoid a lagging duplicate.
+        if ( !mEditItemHidden )
+        {
+          mEditItemHidden = true;
+          mItem->setEnabled( false );
+          setLivePreviewEnabled( true );
+          mLayer->triggerRepaint();
+        }
       }
       else if ( !mEditItemHidden )
       {
@@ -550,6 +599,7 @@ void KadasMapToolEditAnnotationItem::canvasReleaseEvent( QgsMapMouseEvent *e )
       mEditItemHidden = false;
       mItem->setEnabled( true );
     }
+    setLivePreviewEnabled( false );
     clearTempRubberBand();
     if ( mLayer )
       mLayer->triggerRepaint();

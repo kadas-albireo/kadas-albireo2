@@ -129,6 +129,11 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     void refreshHandles();
     void updateTempRubberBand();
     void clearTempRubberBand();
+    //! Renders the currently edited item straight into \a painter (scene
+    //! coordinates), used for the live in-drag preview of live-repaint items.
+    void renderItemPreview( QPainter *painter );
+    //! Enables/disables the synchronous overlay preview of the edited item.
+    void setLivePreviewEnabled( bool enabled );
     void pushState();
     void deleteItem();
     void setupNumericInput();
