@@ -89,6 +89,10 @@ class KADAS_GUI_EXPORT KadasLineAnnotationController : public KadasAnnotationIte
     mutable QVector<QgsPointXY> mRotateOrigMap;
     mutable QgsPointXY mRotateCenterMap;
     mutable double mRotateRefAngle = 0.0;
+    // While a rotation drag is active, the handle is drawn at this angle so it
+    // tracks the cursor instead of snapping back above the bounding box centre.
+    mutable bool mRotateActive = false;
+    mutable double mRotateCurrentAngle = 0.0;
 };
 
 #endif // KADASLINEANNOTATIONCONTROLLER_H
