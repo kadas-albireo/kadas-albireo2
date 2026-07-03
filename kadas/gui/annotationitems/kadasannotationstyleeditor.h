@@ -27,6 +27,8 @@ class QFontComboBox;
 class QLineEdit;
 class QPlainTextEdit;
 class QSpinBox;
+class QToolButton;
+class QButtonGroup;
 class QgsAnnotationItem;
 class QgsColorButton;
 class QgsSvgSelectorWidget;
@@ -177,13 +179,25 @@ class KadasPointTextStyleEditor : public KadasAnnotationStyleEditor
     void loadFromItem( const QgsAnnotationItem *item ) override;
     void applyToItem( QgsAnnotationItem *item ) const override;
 
+  protected:
+    bool eventFilter( QObject *watched, QEvent *event ) override;
+
   private:
-    QLineEdit *mTextEdit = nullptr;
+    QPlainTextEdit *mTextEdit = nullptr;
     QFontComboBox *mFontCombo = nullptr;
     QDoubleSpinBox *mSizeSpin = nullptr;
+    QToolButton *mBoldBtn = nullptr;
+    QToolButton *mItalicBtn = nullptr;
+    QToolButton *mUnderlineBtn = nullptr;
+    QToolButton *mStrikeBtn = nullptr;
+    QToolButton *mAlignLeftBtn = nullptr;
+    QToolButton *mAlignCenterBtn = nullptr;
+    QToolButton *mAlignRightBtn = nullptr;
+    QButtonGroup *mAlignGroup = nullptr;
     QgsColorButton *mColorBtn = nullptr;
     QgsColorButton *mBufferColorBtn = nullptr;
     QDoubleSpinBox *mBufferWidthSpin = nullptr;
+    QgsColorButton *mBackgroundColorBtn = nullptr;
 };
 
 
