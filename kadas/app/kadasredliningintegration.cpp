@@ -27,6 +27,7 @@
 #include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgssymbollayerutils.h>
 
 #include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
@@ -229,9 +230,18 @@ void KadasRedliningIntegration::updateCustomSvgActionIcon()
 {
   if ( !mActionNewCustomSvg )
     return;
-  const QString path = KadasSvgMarkerAnnotationController::settingsSvgPath->value();
-  QIcon icon( path );
-  if ( path.isEmpty() || icon.isNull() )
+  QString path = KadasSvgMarkerAnnotationController::settingsSvgPath->value();
+  if ( path.isEmpty() )
+    path = KadasSvgMarkerAnnotationItem::placeholderIconPath();
+
+  // Render through a real marker symbol so parametrized SVG fills (param(fill))
+  // are resolved with the persisted colour; a bare QIcon(path) would leave such
+  // SVGs transparent and the tile would look empty.
+  auto *layer = new QgsSvgMarkerSymbolLayer( path, KadasSvgMarkerAnnotationController::settingsSvgSize->value() );
+  layer->setFillColor( KadasSvgMarkerAnnotationController::settingsSvgFillColor->value() );
+  std::unique_ptr<QgsMarkerSymbol> symbol( new QgsMarkerSymbol( QgsSymbolLayerList() << layer ) );
+  QIcon icon = QgsSymbolLayerUtils::symbolPreviewIcon( symbol.get(), QSize( 24, 24 ) );
+  if ( icon.isNull() )
     icon = QIcon( KadasSvgMarkerAnnotationItem::placeholderIconPath() );
   mActionNewCustomSvg->setIcon( icon );
 }
