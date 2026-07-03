@@ -54,6 +54,13 @@ void KadasRibbonSplitButton::addAction( QAction *action )
       }
     } );
   }
+
+  // Keep the main button's icon in sync when the current tool's icon changes at
+  // runtime (e.g. the custom SVG marker updates its icon after picking an SVG).
+  connect( action, &QAction::changed, this, [this, action] {
+    if ( action == mCurrentAction )
+      mButton->setIcon( action->icon().isNull() ? mFallbackIcon : action->icon() );
+  } );
 }
 
 void KadasRibbonSplitButton::finish()

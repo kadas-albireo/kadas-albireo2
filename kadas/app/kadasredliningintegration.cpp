@@ -23,11 +23,12 @@
 
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationmarkeritem.h>
+#include <qgis/qgsapplication.h>
 #include <qgis/qgsmarkersymbol.h>
 #include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
-#include <qgis/qgssymbollayerutils.h>
+#include <qgis/qgssvgcache.h>
 
 #include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
@@ -238,13 +239,14 @@ void KadasRedliningIntegration::updateCustomSvgActionIcon()
   if ( path.isEmpty() )
     path = KadasSvgMarkerAnnotationItem::placeholderIconPath();
 
-  // Render through a real marker symbol so parametrized SVG fills (param(fill))
-  // are resolved with the persisted colour; a bare QIcon(path) would leave such
-  // SVGs transparent and the tile would look empty.
-  auto *layer = new QgsSvgMarkerSymbolLayer( path, KadasSvgMarkerAnnotationController::settingsSvgSize->value() );
-  layer->setFillColor( KadasSvgMarkerAnnotationController::settingsSvgFillColor->value() );
-  std::unique_ptr<QgsMarkerSymbol> symbol( new QgsMarkerSymbol( QgsSymbolLayerList() << layer ) );
-  QIcon icon = QgsSymbolLayerUtils::symbolPreviewIcon( symbol.get(), QSize( 24, 24 ) );
+  // Render the SVG to a square thumbnail that fully fits the tile. Rendering a
+  // real marker symbol would clip, since its size is expressed in map units and
+  // easily overflows a small icon canvas.
+  bool fitsInCache = false;
+  const QImage img = QgsApplication::svgCache()->svgAsImage( path, 64, KadasSvgMarkerAnnotationController::settingsSvgFillColor->value(), QColor( 0, 0, 0 ), 0.0, 1.0, fitsInCache );
+  QIcon icon;
+  if ( !img.isNull() )
+    icon = QIcon( QPixmap::fromImage( img ) );
   if ( icon.isNull() )
     icon = QIcon( KadasSvgMarkerAnnotationItem::placeholderIconPath() );
   mActionNewCustomSvg->setIcon( icon );
