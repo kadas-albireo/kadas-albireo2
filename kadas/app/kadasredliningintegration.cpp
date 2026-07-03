@@ -215,7 +215,10 @@ void KadasRedliningIntegration::toggleAnnotation( bool active, AnnotationVariant
   // Once a custom-SVG marker has been placed/edited, the last-used SVG is
   // persisted; reflect it on the ribbon tile so it becomes the visible default.
   if ( variant == AnnotationVariant::MarkerCustomSvg )
+  {
     connect( tool, &QgsMapTool::deactivated, this, [this] { updateCustomSvgActionIcon(); } );
+    connect( tool, &KadasMapToolEditAnnotationItem::stylePersisted, this, [this] { updateCustomSvgActionIcon(); } );
+  }
 
   kApp->mainWindow()->layerTreeView()->setCurrentLayer( layer );
   kApp->mainWindow()->layerTreeView()->setLayerVisible( layer, true );

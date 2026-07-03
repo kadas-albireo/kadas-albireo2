@@ -739,6 +739,7 @@ void KadasMapToolEditAnnotationItem::setupStyleEditor()
       mController->persistStyle( item );
     updatePinTooltip( mLayer, mItemId, item );
     pushState();
+    emit stylePersisted();
   } );
 }
 

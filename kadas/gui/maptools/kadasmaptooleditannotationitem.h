@@ -79,6 +79,8 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     void partFinished();
     //! Create-mode: emitted after a fresh item replaces the previous one.
     void cleared();
+    //! Emitted after a committed style edit has been persisted to settings.
+    void stylePersisted();
 
   private:
     enum class DrawState
