@@ -120,11 +120,24 @@ void KadasRibbonActionGallery::addActionTile( QAction *action )
 
   // Monochrome tile icon: white while idle, brand yellow with a black outline
   // when the tool is active (the tile mirrors the checkable action's state).
-  const QPixmap base = action->icon().pixmap( mTileIconSize, tile->devicePixelRatioF() );
-  QIcon tileIcon;
-  tileIcon.addPixmap( tintedIcon( base, QColor( 255, 255, 255 ), false ), QIcon::Normal, QIcon::Off );
-  tileIcon.addPixmap( tintedIcon( base, QColor( 0xFF, 0xCC, 0x00 ), true ), QIcon::Normal, QIcon::On );
-  tile->setIcon( tileIcon );
+  // Full-colour tiles (e.g. the custom SVG marker) instead show the action's
+  // real icon and refresh live whenever that icon changes.
+  const bool fullColor = action->property( "kadasFullColorIcon" ).toBool();
+  auto refreshIcon = [this, tile, action, fullColor] {
+    const QPixmap base = action->icon().pixmap( mTileIconSize, tile->devicePixelRatioF() );
+    if ( fullColor )
+    {
+      tile->setIcon( QIcon( base ) );
+    }
+    else
+    {
+      QIcon tileIcon;
+      tileIcon.addPixmap( tintedIcon( base, QColor( 255, 255, 255 ), false ), QIcon::Normal, QIcon::Off );
+      tileIcon.addPixmap( tintedIcon( base, QColor( 0xFF, 0xCC, 0x00 ), true ), QIcon::Normal, QIcon::On );
+      tile->setIcon( tileIcon );
+    }
+  };
+  refreshIcon();
 
   // Clicking the tile runs the underlying action; the tile's highlight follows
   // the action's checked state so it clears when the tool is deactivated or a
@@ -146,7 +159,11 @@ void KadasRibbonActionGallery::addActionTile( QAction *action )
     connect( tile, &QToolButton::clicked, action, [action] { action->trigger(); } );
   }
   connect( action, &QAction::toggled, tile, &QToolButton::setChecked );
-  connect( action, &QAction::changed, tile, [tile, action] { tile->setEnabled( action->isEnabled() ); } );
+  connect( action, &QAction::changed, tile, [tile, action, refreshIcon, fullColor] {
+    tile->setEnabled( action->isEnabled() );
+    if ( fullColor )
+      refreshIcon();
+  } );
   connect( action, &QAction::triggered, this, [this, action] { emit actionTriggered( action ); } );
 
   mGrid->addWidget( tile, mRow, mCol );

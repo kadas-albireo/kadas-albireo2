@@ -79,6 +79,10 @@ KadasRedliningIntegration::KadasRedliningIntegration( QObject *parent )
   mActionNewStar = createToolAction( QIcon( ":/kadas/icons/draw_star" ), tr( "Star" ), QStringLiteral( "draw-marker-star" ), V::MarkerStar );
   mActionNewCross = createToolAction( QIcon( ":/kadas/icons/draw_coordcross" ), tr( "Cross" ), QStringLiteral( "draw-marker-cross" ), V::MarkerCross );
   mActionNewCustomSvg = createToolAction( QIcon( KadasSvgMarkerAnnotationItem::placeholderIconPath() ), tr( "Custom SVG" ), QStringLiteral( "draw-marker-svg" ), V::MarkerCustomSvg );
+  // Show the actual SVG (in colour) on the ribbon tile and gallery, and keep it
+  // live-updated as the user picks a different SVG, rather than a monochrome
+  // silhouette shared by the built-in marker shapes.
+  mActionNewCustomSvg->setProperty( "kadasFullColorIcon", true );
   updateCustomSvgActionIcon();
   mMarkerActions = { mActionNewPoint, mActionNewSquare, mActionNewTriangle, mActionNewDiamond, mActionNewStar, mActionNewCross, mActionNewCustomSvg };
 
