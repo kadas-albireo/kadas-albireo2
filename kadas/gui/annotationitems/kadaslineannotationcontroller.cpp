@@ -114,12 +114,18 @@ QList<KadasNode> KadasLineAnnotationController::nodes( const QgsAnnotationItem *
   // Rotation handle above the bounding-box centre (needs at least a segment).
   if ( n >= 2 )
   {
-    const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
-    // While rotating, keep the handle on the pivot used for the drag and follow
-    // the cursor angle; at rest it sits straight above the bounding-box centre.
-    const QgsPointXY centerMap = mRotateActive ? mRotateCenterMap : toMapPos( curve->boundingBox().center(), ctx );
-    const double angle = mRotateActive ? mRotateCurrentAngle : 0.0;
-    const QgsPointXY handle = KadasAnnotationRotation::handlePos( centerMap, angle, off );
+    QgsPointXY handle;
+    if ( mRotateActive )
+    {
+      // Follow the cursor while rotating.
+      handle = mRotateHandleMap;
+    }
+    else
+    {
+      const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
+      const QgsPointXY centerMap = toMapPos( curve->boundingBox().center(), ctx );
+      handle = KadasAnnotationRotation::handlePos( centerMap, 0.0, off );
+    }
     result.append( { handle, []( QPainter *p, const QPointF &pt, int sz ) { KadasAnnotationRotation::renderHandle( p, pt, sz ); } } );
   }
   return result;
@@ -278,7 +284,7 @@ void KadasLineAnnotationController::edit( QgsAnnotationItem *item, const KadasEd
     const double target = KadasAnnotationRotation::angleFromHandle( mRotateCenterMap, newPoint );
     const double delta = KadasAnnotationRotation::snapAngle( target - mRotateRefAngle, ctx.modifiers() & Qt::ShiftModifier );
     mRotateActive = true;
-    mRotateCurrentAngle = mRotateRefAngle + delta;
+    mRotateHandleMap = newPoint;
     QgsLineString *ls = takeMutableLine( line );
     if ( !ls || ls->numPoints() != mRotateOrigMap.size() )
       return;
@@ -322,7 +328,8 @@ void KadasLineAnnotationController::edit( QgsAnnotationItem *item, const KadasEd
       return;
     const double delta = KadasAnnotationRotation::snapAngle( values[AttrAngle], false );
     mRotateActive = true;
-    mRotateCurrentAngle = mRotateRefAngle + delta;
+    const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
+    mRotateHandleMap = KadasAnnotationRotation::handlePos( mRotateCenterMap, mRotateRefAngle + delta, off );
     QgsLineString *ls = takeMutableLine( asLine( item ) );
     if ( !ls || ls->numPoints() != mRotateOrigMap.size() )
       return;

@@ -91,6 +91,10 @@ class KADAS_GUI_EXPORT KadasPolygonAnnotationController : public KadasAnnotation
     mutable QVector<QgsPointXY> mRotateOrigMap;
     mutable QgsPointXY mRotateCenterMap;
     mutable double mRotateRefAngle = 0.0;
+    // While a rotation drag is active, the handle is drawn at this map position
+    // (the cursor) so it tracks the mouse instead of snapping back above centre.
+    mutable bool mRotateActive = false;
+    mutable QgsPointXY mRotateHandleMap;
 };
 
 #endif // KADASPOLYGONANNOTATIONCONTROLLER_H
