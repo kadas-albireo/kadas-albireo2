@@ -24,6 +24,7 @@
 class QComboBox;
 class QDoubleSpinBox;
 class QFontComboBox;
+class QFormLayout;
 class QLineEdit;
 class QPlainTextEdit;
 class QSpinBox;
@@ -32,6 +33,7 @@ class QButtonGroup;
 class QgsAnnotationItem;
 class QgsColorButton;
 class QgsSvgSelectorWidget;
+class QgsTextFormat;
 
 /**
  * \ingroup gui
@@ -167,9 +169,59 @@ class KadasPolygonStyleEditor : public KadasAnnotationStyleEditor
 };
 
 /**
+ * \ingroup gui
+ * \brief Shared base for text style editors backed by a QgsTextFormat.
+ *
+ * Builds the common rows (text, font+size, bold/italic/underline/strike,
+ * color, buffer) and maps them to/from a QgsTextFormat, so concrete editors
+ * only assemble the rows in their preferred order and add their own extras
+ * (e.g. alignment/background for point text, offset for line text).
+ */
+class KadasTextStyleEditorBase : public KadasAnnotationStyleEditor
+{
+    Q_OBJECT
+
+  public:
+    using KadasAnnotationStyleEditor::KadasAnnotationStyleEditor;
+
+  protected:
+    //! Row builders: each creates the widget(s) and appends a labelled row to \a form.
+    void addTextRow( QFormLayout *form );
+    void addFontRow( QFormLayout *form );
+    void addStyleRow( QFormLayout *form );
+    void addColorRow( QFormLayout *form );
+    void addBufferRow( QFormLayout *form );
+
+    //! Wires the common widgets to previewChanged()/committed() and installs the focus-out filter.
+    void connectCommonSignals();
+
+    //! Pushes \a text and the shared fields of \a fmt into the widgets (signals blocked).
+    void loadCommon( const QString &text, const QgsTextFormat &fmt );
+
+    //! Current text-edit contents.
+    QString textValue() const;
+
+    //! Writes the shared widgets' state back into \a fmt (font, size, color, buffer).
+    void applyTextFormat( QgsTextFormat &fmt ) const;
+
+    bool eventFilter( QObject *watched, QEvent *event ) override;
+
+    QPlainTextEdit *mTextEdit = nullptr;
+    QFontComboBox *mFontCombo = nullptr;
+    QDoubleSpinBox *mSizeSpin = nullptr;
+    QToolButton *mBoldBtn = nullptr;
+    QToolButton *mItalicBtn = nullptr;
+    QToolButton *mUnderlineBtn = nullptr;
+    QToolButton *mStrikeBtn = nullptr;
+    QgsColorButton *mColorBtn = nullptr;
+    QgsColorButton *mBufferColorBtn = nullptr;
+    QDoubleSpinBox *mBufferWidthSpin = nullptr;
+};
+
+/**
  * \brief Style editor for QgsAnnotationPointTextItem (text, font, color, buffer).
  */
-class KadasPointTextStyleEditor : public KadasAnnotationStyleEditor
+class KadasPointTextStyleEditor : public KadasTextStyleEditorBase
 {
     Q_OBJECT
 
@@ -179,24 +231,11 @@ class KadasPointTextStyleEditor : public KadasAnnotationStyleEditor
     void loadFromItem( const QgsAnnotationItem *item ) override;
     void applyToItem( QgsAnnotationItem *item ) const override;
 
-  protected:
-    bool eventFilter( QObject *watched, QEvent *event ) override;
-
   private:
-    QPlainTextEdit *mTextEdit = nullptr;
-    QFontComboBox *mFontCombo = nullptr;
-    QDoubleSpinBox *mSizeSpin = nullptr;
-    QToolButton *mBoldBtn = nullptr;
-    QToolButton *mItalicBtn = nullptr;
-    QToolButton *mUnderlineBtn = nullptr;
-    QToolButton *mStrikeBtn = nullptr;
     QToolButton *mAlignLeftBtn = nullptr;
     QToolButton *mAlignCenterBtn = nullptr;
     QToolButton *mAlignRightBtn = nullptr;
     QButtonGroup *mAlignGroup = nullptr;
-    QgsColorButton *mColorBtn = nullptr;
-    QgsColorButton *mBufferColorBtn = nullptr;
-    QDoubleSpinBox *mBufferWidthSpin = nullptr;
     QgsColorButton *mBackgroundColorBtn = nullptr;
 };
 
@@ -207,7 +246,7 @@ class KadasPointTextStyleEditor : public KadasAnnotationStyleEditor
  * Like the point-text editor but without alignment/background (not meaningful
  * along a curve) and with an offset-from-line control instead.
  */
-class KadasLineTextStyleEditor : public KadasAnnotationStyleEditor
+class KadasLineTextStyleEditor : public KadasTextStyleEditorBase
 {
     Q_OBJECT
 
@@ -217,20 +256,7 @@ class KadasLineTextStyleEditor : public KadasAnnotationStyleEditor
     void loadFromItem( const QgsAnnotationItem *item ) override;
     void applyToItem( QgsAnnotationItem *item ) const override;
 
-  protected:
-    bool eventFilter( QObject *watched, QEvent *event ) override;
-
   private:
-    QPlainTextEdit *mTextEdit = nullptr;
-    QFontComboBox *mFontCombo = nullptr;
-    QDoubleSpinBox *mSizeSpin = nullptr;
-    QToolButton *mBoldBtn = nullptr;
-    QToolButton *mItalicBtn = nullptr;
-    QToolButton *mUnderlineBtn = nullptr;
-    QToolButton *mStrikeBtn = nullptr;
-    QgsColorButton *mColorBtn = nullptr;
-    QgsColorButton *mBufferColorBtn = nullptr;
-    QDoubleSpinBox *mBufferWidthSpin = nullptr;
     QDoubleSpinBox *mOffsetSpin = nullptr;
 };
 
