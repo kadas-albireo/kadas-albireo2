@@ -289,11 +289,18 @@ void KadasMapToolEditAnnotationItem::activate()
 
   // Items without any configurable style (e.g. the coordinate cross) don't need
   // the side panel at all — an empty Draw/Edit panel with only undo/redo is just
-  // noise, so keep it hidden unless there's something to configure.
+  // noise. The panel docks into its host on construction, so merely leaving it
+  // hidden would still reserve an empty strip beside the canvas; drop it entirely
+  // so the host collapses.
   if ( mStyleEditor || mExtraTopWidget )
   {
     mBottomBar->adjustSize();
     mBottomBar->show();
+  }
+  else
+  {
+    delete mBottomBar;
+    mBottomBar = nullptr;
   }
 }
 
