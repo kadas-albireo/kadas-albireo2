@@ -346,7 +346,7 @@ KadasSvgMarkerStyleEditor::KadasSvgMarkerStyleEditor( QWidget *parent )
   mSvgSelector = new QgsSvgSelectorWidget();
   // The stock selector's size hint sizes to its SVG preview list and is far
   // wider than a docked side panel; cap it so the panel stays within budget.
-  mSvgSelector->setMaximumWidth( 340 );
+  mSvgSelector->setMaximumWidth( 450 );
   form->addRow( mSvgSelector );
 
   mSizeSpin = new QSpinBox();

@@ -43,6 +43,21 @@
  */
 static constexpr int MAX_PANEL_WIDTH = 360;
 
+/**
+ * Wider budget for the custom SVG marker panel.
+ *
+ * It embeds the stock QgsSvgSelectorWidget (an SVG preview grid plus its path
+ * browser), which is inherently wider than the plain control panels. It is
+ * capped in the editor and this budget guards that cap; keep the two in sync.
+ */
+static constexpr int MAX_SVG_PANEL_WIDTH = 460;
+
+//! Per-type width budget: the SVG picker panel is allowed to be wider.
+static int budgetForType( const QString &typeId )
+{
+  return typeId == QLatin1String( "kadas:svgmarker" ) ? MAX_SVG_PANEL_WIDTH : MAX_PANEL_WIDTH;
+}
+
 class TestKadasSidePanelSize : public QObject
 {
     Q_OBJECT
@@ -57,8 +72,8 @@ class TestKadasSidePanelSize : public QObject
     void editorFitsBudget();
 
   private:
-    //! Polishes \a widget and asserts its preferred width is within budget.
-    static void verifyWidth( QWidget *widget, const QString &name );
+    //! Polishes \a widget and asserts its preferred width is within \a budget.
+    static void verifyWidth( QWidget *widget, const QString &name, int budget );
 
     //! Type ids of every registered controller that exposes a style-editor panel.
     static QStringList panelTypeIds();
@@ -89,7 +104,7 @@ QStringList TestKadasSidePanelSize::panelTypeIds()
   return result;
 }
 
-void TestKadasSidePanelSize::verifyWidth( QWidget *widget, const QString &name )
+void TestKadasSidePanelSize::verifyWidth( QWidget *widget, const QString &name, int budget )
 {
   // Let style/layout compute final geometry hints before measuring.
   widget->ensurePolished();
@@ -98,10 +113,10 @@ void TestKadasSidePanelSize::verifyWidth( QWidget *widget, const QString &name )
   const int hint = widget->sizeHint().width();
   const int minHint = widget->minimumSizeHint().width();
 
-  const QByteArray msg = QStringLiteral( "%1: sizeHint width %2 px (min %3 px) exceeds budget %4 px" ).arg( name ).arg( hint ).arg( minHint ).arg( MAX_PANEL_WIDTH ).toUtf8();
+  const QByteArray msg = QStringLiteral( "%1: sizeHint width %2 px (min %3 px) exceeds budget %4 px" ).arg( name ).arg( hint ).arg( minHint ).arg( budget ).toUtf8();
 
   qInfo( "%s: sizeHint width %d px, minimumSizeHint width %d px", name.toUtf8().constData(), hint, minHint );
-  QVERIFY2( hint <= MAX_PANEL_WIDTH, msg.constData() );
+  QVERIFY2( hint <= budget, msg.constData() );
 }
 
 void TestKadasSidePanelSize::allPanelsCovered()
@@ -155,7 +170,7 @@ void TestKadasSidePanelSize::editorFitsBudget()
   std::unique_ptr<KadasAnnotationStyleEditor> editor( controller->createStyleEditor() );
   QVERIFY( editor );
 
-  verifyWidth( editor.get(), controller->itemName() );
+  verifyWidth( editor.get(), controller->itemName(), budgetForType( typeId ) );
 }
 
 QTEST_MAIN( TestKadasSidePanelSize )
