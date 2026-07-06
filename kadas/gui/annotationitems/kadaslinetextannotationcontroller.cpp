@@ -14,12 +14,16 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QAction>
+#include <QMenu>
 #include <QObject>
 #include <QPainter>
+#include <QPointer>
 #include <QTextStream>
 #include <cmath>
 #include <memory>
 
+#include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationlinetextitem.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgscoordinatetransform.h>
@@ -397,6 +401,27 @@ QgsPointXY KadasLineTextAnnotationController::positionFromEditAttribs(
     return mRotation.handleForAngle( values[AttrAngle], off );
   }
   return positionFromDrawAttribs( item, values, ctx );
+}
+
+void KadasLineTextAnnotationController::populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &, const QgsPointXY &, const KadasAnnotationItemContext &ctx )
+{
+  QgsAnnotationLineTextItem *line = asLineText( item );
+  const QgsCurve *curve = line->geometry();
+  if ( !curve || curve->numPoints() < 2 )
+    return;
+  // The text follows the line direction, so it renders upside down when the line
+  // runs right-to-left. Reversing the geometry flips the text upright (and is its
+  // own inverse, so a second reversal restores the original).
+  QPointer<QgsAnnotationLayer> layerPtr( ctx.layer() );
+  QAction *reverse = menu->addAction( QObject::tr( "Reverse text direction" ) );
+  QObject::connect( reverse, &QAction::triggered, reverse, [line, layerPtr]() {
+    const QgsCurve *c = line->geometry();
+    if ( !c )
+      return;
+    line->setGeometry( c->reversed() );
+    if ( layerPtr )
+      layerPtr->triggerRepaint();
+  } );
 }
 
 QgsPointXY KadasLineTextAnnotationController::position( const QgsAnnotationItem *item ) const
