@@ -201,6 +201,40 @@ class KadasPointTextStyleEditor : public KadasAnnotationStyleEditor
 };
 
 
+/**
+ * \brief Style editor for QgsAnnotationLineTextItem (text rendered along a line).
+ *
+ * Like the point-text editor but without alignment/background (not meaningful
+ * along a curve) and with an offset-from-line control instead.
+ */
+class KadasLineTextStyleEditor : public KadasAnnotationStyleEditor
+{
+    Q_OBJECT
+
+  public:
+    explicit KadasLineTextStyleEditor( QWidget *parent = nullptr );
+
+    void loadFromItem( const QgsAnnotationItem *item ) override;
+    void applyToItem( QgsAnnotationItem *item ) const override;
+
+  protected:
+    bool eventFilter( QObject *watched, QEvent *event ) override;
+
+  private:
+    QPlainTextEdit *mTextEdit = nullptr;
+    QFontComboBox *mFontCombo = nullptr;
+    QDoubleSpinBox *mSizeSpin = nullptr;
+    QToolButton *mBoldBtn = nullptr;
+    QToolButton *mItalicBtn = nullptr;
+    QToolButton *mUnderlineBtn = nullptr;
+    QToolButton *mStrikeBtn = nullptr;
+    QgsColorButton *mColorBtn = nullptr;
+    QgsColorButton *mBufferColorBtn = nullptr;
+    QDoubleSpinBox *mBufferWidthSpin = nullptr;
+    QDoubleSpinBox *mOffsetSpin = nullptr;
+};
+
+
 class QCheckBox;
 class QPushButton;
 class QToolButton;

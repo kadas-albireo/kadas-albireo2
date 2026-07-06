@@ -48,6 +48,7 @@
 #include <memory>
 
 #include <qgis/qgsannotationlineitem.h>
+#include <qgis/qgsannotationlinetextitem.h>
 #include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgsannotationpictureitem.h>
 #include <qgis/qgsannotationpointtextitem.h>
@@ -344,8 +345,6 @@ KadasSvgMarkerStyleEditor::KadasSvgMarkerStyleEditor( QWidget *parent )
   form->setFieldGrowthPolicy( QFormLayout::AllNonFixedFieldsGrow );
 
   mSvgSelector = new QgsSvgSelectorWidget();
-  // The stock selector's size hint sizes to its SVG preview list and is far
-  // wider than a docked side panel; cap it so the panel stays within budget.
   mSvgSelector->setMaximumWidth( 450 );
   form->addRow( mSvgSelector );
 
@@ -787,6 +786,186 @@ void KadasPointTextStyleEditor::applyToItem( QgsAnnotationItem *item ) const
 }
 
 bool KadasPointTextStyleEditor::eventFilter( QObject *watched, QEvent *event )
+{
+  // QPlainTextEdit has no editingFinished signal; finalize (push history +
+  // persist) when the text box loses focus, mirroring QLineEdit semantics.
+  if ( watched == mTextEdit && event->type() == QEvent::FocusOut )
+    emit committed();
+  return KadasAnnotationStyleEditor::eventFilter( watched, event );
+}
+
+
+// ----- Text along line --------------------------------------------------
+
+KadasLineTextStyleEditor::KadasLineTextStyleEditor( QWidget *parent )
+  : KadasAnnotationStyleEditor( parent )
+{
+  auto *form = new QFormLayout( this );
+  form->setContentsMargins( 0, 0, 0, 0 );
+  form->setFieldGrowthPolicy( QFormLayout::AllNonFixedFieldsGrow );
+
+  mTextEdit = new QPlainTextEdit();
+  mTextEdit->setPlaceholderText( tr( "Enter text" ) );
+  mTextEdit->setTabChangesFocus( true );
+  mTextEdit->setFixedHeight( QFontMetrics( mTextEdit->font() ).lineSpacing() * 3 + 12 );
+  form->addRow( tr( "Text" ), mTextEdit );
+
+  mFontCombo = new QFontComboBox();
+  mFontCombo->setToolTip( tr( "Font family" ) );
+  // Otherwise the combo sizes itself to the longest installed font name,
+  // blowing the side-panel width budget. It still expands to fill the row.
+  mFontCombo->setSizeAdjustPolicy( QComboBox::AdjustToMinimumContentsLengthWithIcon );
+  mFontCombo->setMinimumContentsLength( 10 );
+
+  mSizeSpin = new QDoubleSpinBox();
+  mSizeSpin->setRange( 1.0, 200.0 );
+  mSizeSpin->setDecimals( 1 );
+  mSizeSpin->setSingleStep( 0.5 );
+  mSizeSpin->setSuffix( QStringLiteral( " pt" ) );
+  mSizeSpin->setToolTip( tr( "Font size" ) );
+
+  auto *fontRow = new QHBoxLayout();
+  fontRow->setContentsMargins( 0, 0, 0, 0 );
+  fontRow->addWidget( mFontCombo, 1 );
+  fontRow->addWidget( mSizeSpin );
+  form->addRow( tr( "Font" ), fontRow );
+
+  // Character-style toggles (bold / italic / underline / strikethrough).
+  const auto makeStyleButton = []( const QString &label, const QString &tip, auto styler ) {
+    auto *btn = new QToolButton();
+    btn->setCheckable( true );
+    btn->setText( label );
+    btn->setToolTip( tip );
+    QFont f = btn->font();
+    styler( f );
+    btn->setFont( f );
+    return btn;
+  };
+  mBoldBtn = makeStyleButton( tr( "B" ), tr( "Bold" ), []( QFont &f ) { f.setBold( true ); } );
+  mItalicBtn = makeStyleButton( tr( "I" ), tr( "Italic" ), []( QFont &f ) { f.setItalic( true ); } );
+  mUnderlineBtn = makeStyleButton( tr( "U" ), tr( "Underline" ), []( QFont &f ) { f.setUnderline( true ); } );
+  mStrikeBtn = makeStyleButton( tr( "S" ), tr( "Strikethrough" ), []( QFont &f ) { f.setStrikeOut( true ); } );
+
+  auto *styleRow = new QHBoxLayout();
+  styleRow->setContentsMargins( 0, 0, 0, 0 );
+  styleRow->setSpacing( 2 );
+  styleRow->addWidget( mBoldBtn );
+  styleRow->addWidget( mItalicBtn );
+  styleRow->addWidget( mUnderlineBtn );
+  styleRow->addWidget( mStrikeBtn );
+  styleRow->addStretch( 1 );
+  form->addRow( tr( "Style" ), styleRow );
+
+  mColorBtn = new QgsColorButton();
+  mColorBtn->setAllowOpacity( true );
+  mColorBtn->setToolTip( tr( "Text color" ) );
+  form->addRow( tr( "Color" ), mColorBtn );
+
+  mBufferColorBtn = new QgsColorButton();
+  mBufferColorBtn->setAllowOpacity( true );
+  mBufferColorBtn->setShowNoColor( true );
+  mBufferColorBtn->setToolTip( tr( "Buffer (halo) color" ) );
+
+  mBufferWidthSpin = new QDoubleSpinBox();
+  mBufferWidthSpin->setRange( 0.0, 10.0 );
+  mBufferWidthSpin->setDecimals( 1 );
+  mBufferWidthSpin->setSingleStep( 0.1 );
+  mBufferWidthSpin->setSuffix( QStringLiteral( " mm" ) );
+  mBufferWidthSpin->setToolTip( tr( "Buffer (halo) width" ) );
+
+  auto *bufferRow = new QHBoxLayout();
+  bufferRow->setContentsMargins( 0, 0, 0, 0 );
+  bufferRow->addWidget( mBufferColorBtn );
+  bufferRow->addWidget( mBufferWidthSpin );
+  form->addRow( tr( "Buffer" ), bufferRow );
+
+  mOffsetSpin = new QDoubleSpinBox();
+  mOffsetSpin->setRange( -50.0, 50.0 );
+  mOffsetSpin->setDecimals( 1 );
+  mOffsetSpin->setSingleStep( 0.5 );
+  mOffsetSpin->setSuffix( QStringLiteral( " mm" ) );
+  mOffsetSpin->setToolTip( tr( "Distance of the text from the line" ) );
+  form->addRow( tr( "Offset" ), mOffsetSpin );
+
+  // Live preview while typing; commit on focus-out.
+  connect( mTextEdit, &QPlainTextEdit::textChanged, this, &KadasAnnotationStyleEditor::previewChanged );
+  mTextEdit->installEventFilter( this );
+
+  connect( mFontCombo, &QFontComboBox::currentFontChanged, this, &KadasAnnotationStyleEditor::committed );
+  connect( mSizeSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
+  connect( mBoldBtn, &QToolButton::toggled, this, &KadasAnnotationStyleEditor::committed );
+  connect( mItalicBtn, &QToolButton::toggled, this, &KadasAnnotationStyleEditor::committed );
+  connect( mUnderlineBtn, &QToolButton::toggled, this, &KadasAnnotationStyleEditor::committed );
+  connect( mStrikeBtn, &QToolButton::toggled, this, &KadasAnnotationStyleEditor::committed );
+  connect( mColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
+  connect( mBufferColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
+  connect( mBufferWidthSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
+  connect( mOffsetSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
+}
+
+void KadasLineTextStyleEditor::loadFromItem( const QgsAnnotationItem *item )
+{
+  const auto *lt = dynamic_cast<const QgsAnnotationLineTextItem *>( item );
+  if ( !lt )
+    return;
+  const QgsTextFormat fmt = lt->format();
+  const QFont font = fmt.font();
+  const QSignalBlocker b0( mTextEdit );
+  const QSignalBlocker b1( mFontCombo ), b2( mSizeSpin ), b3( mColorBtn );
+  const QSignalBlocker b4( mBufferColorBtn ), b5( mBufferWidthSpin );
+  const QSignalBlocker b6( mBoldBtn ), b7( mItalicBtn ), b8( mUnderlineBtn ), b9( mStrikeBtn );
+  const QSignalBlocker b10( mOffsetSpin );
+  if ( mTextEdit->toPlainText() != lt->text() )
+    mTextEdit->setPlainText( lt->text() );
+  mTextEdit->setFocus();
+  mTextEdit->selectAll();
+  mFontCombo->setCurrentFont( font );
+  mSizeSpin->setValue( fmt.size() );
+  mColorBtn->setColor( fmt.color() );
+  mBoldBtn->setChecked( font.bold() );
+  mItalicBtn->setChecked( font.italic() );
+  mUnderlineBtn->setChecked( font.underline() );
+  mStrikeBtn->setChecked( font.strikeOut() );
+
+  const QgsTextBufferSettings buf = fmt.buffer();
+  mBufferColorBtn->setColor( buf.enabled() ? buf.color() : QColor( 0, 0, 0, 0 ) );
+  mBufferWidthSpin->setValue( buf.enabled() ? buf.size() : 0.0 );
+
+  mOffsetSpin->setValue( lt->offsetFromLine() );
+}
+
+void KadasLineTextStyleEditor::applyToItem( QgsAnnotationItem *item ) const
+{
+  auto *lt = dynamic_cast<QgsAnnotationLineTextItem *>( item );
+  if ( !lt )
+    return;
+  lt->setText( mTextEdit->toPlainText() );
+  QgsTextFormat fmt = lt->format();
+  QFont font = mFontCombo->currentFont();
+  font.setBold( mBoldBtn->isChecked() );
+  font.setItalic( mItalicBtn->isChecked() );
+  font.setUnderline( mUnderlineBtn->isChecked() );
+  font.setStrikeOut( mStrikeBtn->isChecked() );
+  fmt.setFont( font );
+  fmt.setSize( mSizeSpin->value() );
+  fmt.setSizeUnit( Qgis::RenderUnit::Points );
+  fmt.setColor( mColorBtn->color() );
+
+  QgsTextBufferSettings buf = fmt.buffer();
+  const double bw = mBufferWidthSpin->value();
+  const QColor bc = mBufferColorBtn->color();
+  buf.setEnabled( bw > 0.0 && bc.alpha() > 0 );
+  buf.setColor( bc );
+  buf.setSize( bw );
+  buf.setSizeUnit( Qgis::RenderUnit::Millimeters );
+  fmt.setBuffer( buf );
+  lt->setFormat( fmt );
+
+  lt->setOffsetFromLine( mOffsetSpin->value() );
+  lt->setOffsetFromLineUnit( Qgis::RenderUnit::Millimeters );
+}
+
+bool KadasLineTextStyleEditor::eventFilter( QObject *watched, QEvent *event )
 {
   // QPlainTextEdit has no editingFinished signal; finalize (push history +
   // persist) when the text box loses focus, mirroring QLineEdit semantics.

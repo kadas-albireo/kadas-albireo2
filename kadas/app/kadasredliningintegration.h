@@ -64,6 +64,7 @@ class KadasRedliningIntegration : public QObject
     QAction *actionNewPolygon() const { return mActionNewPolygon; }
     QAction *actionNewCircle() const { return mActionNewCircle; }
     QAction *actionNewText() const { return mActionNewText; }
+    QAction *actionNewTextAlongLine() const { return mActionNewTextAlongLine; }
     QAction *actionNewCoordinateCross() const { return mActionNewCoordCross; }
     QAction *actionNewCustomSvg() const { return mActionNewCustomSvg; }
 
@@ -83,6 +84,7 @@ class KadasRedliningIntegration : public QObject
       Polygon,
       Circle,
       Text,
+      TextAlongLine,
       CoordCross,
     };
 
@@ -100,6 +102,7 @@ class KadasRedliningIntegration : public QObject
     QAction *mActionNewPolygon = nullptr;
     QAction *mActionNewCircle = nullptr;
     QAction *mActionNewText = nullptr;
+    QAction *mActionNewTextAlongLine = nullptr;
     QAction *mActionNewCoordCross = nullptr;
 
     QList<QAction *> mMarkerActions;

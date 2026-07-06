@@ -788,6 +788,7 @@ void KadasMainWindow::configureButtons()
   othersSplit->addAction( mActionPin );
   othersSplit->addAction( actionAddImage );
   othersSplit->addAction( mRedliningIntegration->actionNewText() );
+  othersSplit->addAction( mRedliningIntegration->actionNewTextAlongLine() );
   othersSplit->addAction( mRedliningIntegration->actionNewCoordinateCross() );
   othersSplit->finish();
 

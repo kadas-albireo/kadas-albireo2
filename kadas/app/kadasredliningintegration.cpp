@@ -105,6 +105,9 @@ KadasRedliningIntegration::KadasRedliningIntegration( QObject *parent )
   mActionNewText = createToolAction( QIcon( ":/kadas/icons/draw_text" ), tr( "Text" ), QStringLiteral( "draw-text" ), V::Text );
   connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_T ), kApp->mainWindow() ), &QShortcut::activated, mActionNewText, &QAction::trigger );
 
+  mActionNewTextAlongLine = createToolAction( QIcon( ":/kadas/icons/draw_text" ), tr( "Text along Line" ), QStringLiteral( "draw-linetext" ), V::TextAlongLine );
+  connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_E ), kApp->mainWindow() ), &QShortcut::activated, mActionNewTextAlongLine, &QAction::trigger );
+
   // CoordinateCross has no annotation-item equivalent yet; keep it on the legacy tool.
   mActionNewCoordCross = createToolAction( QIcon( ":/kadas/icons/draw_coordcross" ), tr( "Coordinate Cross" ), QStringLiteral( "draw-coordcross" ), V::CoordCross );
   connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_O ), kApp->mainWindow() ), &QShortcut::activated, mActionNewCoordCross, &QAction::trigger );
@@ -186,6 +189,9 @@ void KadasRedliningIntegration::toggleAnnotation( bool active, AnnotationVariant
       break;
     case AnnotationVariant::Text:
       typeId = QStringLiteral( "pointtext" );
+      break;
+    case AnnotationVariant::TextAlongLine:
+      typeId = QStringLiteral( "linetext" );
       break;
     case AnnotationVariant::CoordCross:
       typeId = KadasCoordCrossAnnotationItem::itemTypeId();

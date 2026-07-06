@@ -29,6 +29,7 @@
 #include "kadas/gui/annotationitems/kadasgpxwaypointannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadasgpxwaypointannotationitem.h"
 #include "kadas/gui/annotationitems/kadaslineannotationcontroller.h"
+#include "kadas/gui/annotationitems/kadaslinetextannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadasmarkerannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
@@ -57,6 +58,7 @@ void KadasAnnotationItemControllers::registerBuiltins()
   registry->addController( new KadasPolygonAnnotationController() );
   registry->addController( new KadasPictureAnnotationController() );
   registry->addController( new KadasPointTextAnnotationController() );
+  registry->addController( new KadasLineTextAnnotationController() );
 
   registry->addController( new KadasCircleAnnotationController() );
   registry->addController( new KadasRectangleAnnotationController() );
