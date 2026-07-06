@@ -22,6 +22,8 @@
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationrotation.h"
 
+class QgsCurvePolygon;
+
 /**
  * \ingroup gui
  * \brief Controller for stock \c QgsAnnotationPolygonItem (type id \c "polygon").
@@ -87,6 +89,10 @@ class KADAS_GUI_EXPORT KadasPolygonAnnotationController : public KadasAnnotation
     // Per-drag rotation state, captured when the rotation handle is grabbed.
     // Shared with the line controller so rotation behaves identically.
     mutable KadasAnnotationRotation::VertexRotationState mRotation;
+
+    // Rest position of the rotation handle: due north of the centroid but lifted
+    // clear of the polygon's northmost extent so it never overlaps the shape.
+    QgsPointXY restHandleMap( const QgsCurvePolygon *poly, const KadasAnnotationItemContext &ctx ) const;
 };
 
 #endif // KADASPOLYGONANNOTATIONCONTROLLER_H

@@ -17,6 +17,7 @@
 #include <QObject>
 #include <QPainter>
 #include <QTextStream>
+#include <algorithm>
 #include <memory>
 
 #include <qgis/qgsannotationpolygonitem.h>
@@ -135,13 +136,30 @@ QList<KadasNode> KadasPolygonAnnotationController::nodes( const QgsAnnotationIte
     }
     else
     {
-      const QgsPointXY centerMap = centroidMap( poly, ctx );
-      const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
-      handle = KadasAnnotationRotation::VertexRotationState::restHandle( centerMap, off );
+      handle = restHandleMap( poly, ctx );
     }
     result.append( { handle, []( QPainter *p, const QPointF &pt, int sz ) { KadasAnnotationRotation::renderHandle( p, pt, sz ); } } );
   }
   return result;
+}
+
+QgsPointXY KadasPolygonAnnotationController::restHandleMap( const QgsCurvePolygon *poly, const KadasAnnotationItemContext &ctx ) const
+{
+  const QgsPointXY centerMap = centroidMap( poly, ctx );
+  const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
+  // Lift the handle above the polygon's northmost extent (not just the centroid)
+  // so it always sits clear of the shape, then a fixed gap further out.
+  double topMapY = centerMap.y();
+  if ( const QgsCurve *ring = poly->exteriorRing() )
+  {
+    const int n = ring->numPoints();
+    for ( int i = 0; i < n; ++i )
+    {
+      const QgsPoint p = ring->vertexAt( QgsVertexId( 0, 0, i ) );
+      topMapY = std::max( topMapY, toMapPos( QgsPointXY( p.x(), p.y() ), ctx ).y() );
+    }
+  }
+  return QgsPointXY( centerMap.x(), topMapY + off );
 }
 
 bool KadasPolygonAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
@@ -251,8 +269,7 @@ KadasEditContext KadasPolygonAnnotationController::getEditContext( const QgsAnno
   if ( last >= 3 )
   {
     const QgsPointXY centerMap = centroidMap( poly, ctx );
-    const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
-    const QgsPointXY handle = KadasAnnotationRotation::VertexRotationState::restHandle( centerMap, off );
+    const QgsPointXY handle = restHandleMap( poly, ctx );
     if ( pos.sqrDist( handle ) < pickTolSqr( ctx ) )
     {
       QVector<QgsPointXY> verticesMap;
