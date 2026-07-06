@@ -230,6 +230,25 @@ void KadasRibbonButton::paintEvent( QPaintEvent * /*e*/ )
       }
     }
 
+    // If the wrapped label would extend past the button's bottom edge, work out
+    // how far the whole text block must move up so its last line remains visible
+    // (the button height is fixed, so a tall 3-line label would clip otherwise).
+    double textBlockShift = 0;
+    if ( !textLines.isEmpty() )
+    {
+      const int last = textLines.size() - 1;
+      double lastY = iconBottomY + fm.boundingRect( textLines.at( last ) ).height() * ( last + 1 );
+      if ( smallIcon )
+      {
+        lastY += 10;
+      }
+      const double maxBottom = height() - 2;
+      if ( lastY > maxBottom )
+      {
+        textBlockShift = lastY - maxBottom;
+      }
+    }
+
     for ( int i = 0; i < textLines.size(); ++i )
     {
       QString textLine = textLines.at( i );
@@ -241,6 +260,11 @@ void KadasRibbonButton::paintEvent( QPaintEvent * /*e*/ )
       {
         textY += 10;
       }
+      // Bottom-anchor a label that would otherwise run past the fixed button
+      // height (e.g. a 3-line tool name): shift the whole block up so its last
+      // line stays visible. One- and two-line labels never overflow, so this
+      // leaves their placement untouched.
+      textY -= textBlockShift;
       p.drawText( textX, textY, textLine );
     }
   }
