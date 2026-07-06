@@ -42,6 +42,12 @@ class KADAS_GUI_EXPORT KadasLineTextAnnotationController : public KadasAnnotatio
 
     QList<KadasNode> nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const override;
 
+#ifndef SIP_RUN
+    //! The item renders only text along the line; expose the underlying polyline
+    //! as a dashed guide so the line is visible (and pickable) while editing.
+    QList<QList<QgsPointXY>> editGuide( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const override;
+#endif
+
     bool startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx ) override;
     bool startPart( QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) override;
     void setCurrentPoint( QgsAnnotationItem *item, const QgsPointXY &p, const KadasAnnotationItemContext &ctx ) override;

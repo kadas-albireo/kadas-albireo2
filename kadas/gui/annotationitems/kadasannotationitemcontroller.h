@@ -105,6 +105,18 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
 
     virtual QList<KadasNode> nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const = 0;
 
+#ifndef SIP_RUN
+    //! Optional dashed guide polylines (map CRS) drawn under the edit handles for
+    //! items whose own rendering does not reveal their geometry (e.g. text along a
+    //! line). Each inner list is one polyline. Empty by default.
+    virtual QList<QList<QgsPointXY>> editGuide( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
+    {
+      Q_UNUSED( item );
+      Q_UNUSED( ctx );
+      return {};
+    }
+#endif
+
     // ----- Draw state machine ---------------------------------------------
 
     //! Begins a new part at \a firstPoint. Returns true if the item is ready to receive subsequent points.

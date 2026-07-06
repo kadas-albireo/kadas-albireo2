@@ -76,11 +76,13 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
   public:
     using NodesProvider = std::function<QList<KadasNode>()>;
     using LabelsProvider = std::function<QList<KadasAnnotationMeasurementLabel>()>;
+    using GuideProvider = std::function<QList<QList<QgsPointXY>>()>;
 
-    HandlesOverlay( QgsMapCanvas *canvas, NodesProvider nodesProvider, LabelsProvider labelsProvider )
+    HandlesOverlay( QgsMapCanvas *canvas, NodesProvider nodesProvider, LabelsProvider labelsProvider, GuideProvider guideProvider )
       : QgsMapCanvasItem( canvas )
       , mNodesProvider( std::move( nodesProvider ) )
       , mLabelsProvider( std::move( labelsProvider ) )
+      , mGuideProvider( std::move( guideProvider ) )
     {
       setZValue( std::numeric_limits<double>::max() );
       updateRect();
@@ -104,11 +106,41 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
         mPreviewRenderer( painter );
         painter->restore();
       }
+      paintGuide( painter );
       paintMeasurementLabels( painter );
       paintHandles( painter );
     }
 
   private:
+    void paintGuide( QPainter *painter )
+    {
+      if ( !mGuideProvider )
+        return;
+      const QList<QList<QgsPointXY>> polylines = mGuideProvider();
+      if ( polylines.isEmpty() )
+        return;
+      painter->save();
+      painter->setRenderHint( QPainter::Antialiasing, true );
+      painter->setBrush( Qt::NoBrush );
+      // White underlay + dark dashes, so the guide reads on any background.
+      for ( const QList<QgsPointXY> &polyline : polylines )
+      {
+        if ( polyline.size() < 2 )
+          continue;
+        QPolygonF screen;
+        screen.reserve( polyline.size() );
+        for ( const QgsPointXY &p : polyline )
+          screen.append( toCanvasCoordinates( p ) );
+        painter->setPen( QPen( QColor( 255, 255, 255, 180 ), 3 ) );
+        painter->drawPolyline( screen );
+        QPen dash( QColor( 50, 50, 50, 220 ), 1, Qt::DashLine );
+        dash.setDashPattern( { 4.0, 4.0 } );
+        painter->setPen( dash );
+        painter->drawPolyline( screen );
+      }
+      painter->restore();
+    }
+
     void paintHandles( QPainter *painter )
     {
       if ( !mNodesProvider )
@@ -179,6 +211,7 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
 
     NodesProvider mNodesProvider;
     LabelsProvider mLabelsProvider;
+    GuideProvider mGuideProvider;
     std::function<void( QPainter * )> mPreviewRenderer;
 };
 
@@ -276,6 +309,12 @@ void KadasMapToolEditAnnotationItem::activate()
         return {};
       KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
       return mController->measurementLabels( mItem, ctx );
+    },
+    [this]() -> QList<QList<QgsPointXY>> {
+      if ( !mItem || !mController || !mLayer )
+        return {};
+      KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
+      return mController->editGuide( mItem, ctx );
     }
   );
   connect( canvas(), &QgsMapCanvas::extentsChanged, this, [this] {

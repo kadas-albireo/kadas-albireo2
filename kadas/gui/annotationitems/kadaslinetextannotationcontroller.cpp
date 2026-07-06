@@ -143,6 +143,22 @@ QList<KadasNode> KadasLineTextAnnotationController::nodes( const QgsAnnotationIt
   return result;
 }
 
+QList<QList<QgsPointXY>> KadasLineTextAnnotationController::editGuide( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
+{
+  const QgsCurve *curve = asLineText( item )->geometry();
+  if ( !curve || curve->numPoints() < 2 )
+    return {};
+  QList<QgsPointXY> polyline;
+  const int n = curve->numPoints();
+  polyline.reserve( n );
+  for ( int i = 0; i < n; ++i )
+  {
+    const QgsPoint p = curve->vertexAt( QgsVertexId( 0, 0, i ) );
+    polyline.append( toMapPos( QgsPointXY( p.x(), p.y() ), ctx ) );
+  }
+  return { polyline };
+}
+
 bool KadasLineTextAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
 {
   const QgsPointXY ip = toItemPos( firstPoint, ctx );
