@@ -31,6 +31,7 @@ vcpkg_from_github(
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
   annotation-item-rotation.patch # https://github.com/qgis/QGIS/pull/66610
   # rotation for rectangle-based annotations (images + text)
+  oauth2NoEmptyClientSecret.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
