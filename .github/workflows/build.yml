@@ -31,3 +31,10 @@ jobs:
     with:
       docs-artifact-name: kadas-docs-html
     secrets: inherit
+
+  linux:
+    needs: docs
+    uses: ./.github/workflows/build-linux.yml
+    with:
+      docs-artifact-name: kadas-docs-html
+    secrets: inherit
