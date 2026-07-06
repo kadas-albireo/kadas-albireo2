@@ -17,6 +17,7 @@
 #include <QObject>
 #include <QPainter>
 #include <QTextStream>
+#include <cmath>
 #include <memory>
 
 #include <qgis/qgsannotationlinetextitem.h>
@@ -29,6 +30,7 @@
 #include <qgis/qgspoint.h>
 #include <qgis/qgspointxy.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsrendercontext.h>
 #include <qgis/qgssettingsentryimpl.h>
 #include <qgis/qgstextformat.h>
 
@@ -275,7 +277,17 @@ KadasEditContext KadasLineTextAnnotationController::getEditContext( const QgsAnn
   // (a diagonal line's bbox covers vast empty space), so require a segment hit.
   if ( n >= 2 )
   {
-    const double tolSqr = pickTolSqr( ctx );
+    // Widen the pick band perpendicular to the line so the rendered text
+    // (which runs along, and may be offset from, the invisible line) is itself
+    // clickable, not just the hairline geometry beneath it.
+    QgsRenderContext rc = QgsRenderContext::fromMapSettings( ctx.mapSettings() );
+    const double dpr = std::max( 1.0, static_cast<double>( rc.devicePixelRatio() ) );
+    const QgsTextFormat fmt = asLineText( item )->format();
+    const double fontPx = rc.convertToPainterUnits( fmt.size(), fmt.sizeUnit() ) / dpr;
+    const double offsetPx = rc.convertToPainterUnits( asLineText( item )->offsetFromLine(), asLineText( item )->offsetFromLineUnit() ) / dpr;
+    const double bandTol = ( 0.5 * fontPx + std::abs( offsetPx ) ) * ctx.mapSettings().mapUnitsPerPixel();
+    const double tol = std::max( std::sqrt( pickTolSqr( ctx ) ), bandTol );
+    const double tolSqr = tol * tol;
     for ( int i = 1; i < n; ++i )
     {
       const QgsPoint a = curve->vertexAt( QgsVertexId( 0, 0, i - 1 ) );
