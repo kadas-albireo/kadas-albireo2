@@ -344,6 +344,9 @@ KadasSvgMarkerStyleEditor::KadasSvgMarkerStyleEditor( QWidget *parent )
   form->setFieldGrowthPolicy( QFormLayout::AllNonFixedFieldsGrow );
 
   mSvgSelector = new QgsSvgSelectorWidget();
+  // The stock selector's size hint sizes to its SVG preview list and is far
+  // wider than a docked side panel; cap it so the panel stays within budget.
+  mSvgSelector->setMaximumWidth( 340 );
   form->addRow( mSvgSelector );
 
   mSizeSpin = new QSpinBox();
@@ -572,6 +575,10 @@ KadasPointTextStyleEditor::KadasPointTextStyleEditor( QWidget *parent )
 
   mFontCombo = new QFontComboBox();
   mFontCombo->setToolTip( tr( "Font family" ) );
+  // Otherwise the combo sizes itself to the longest installed font name,
+  // blowing the side-panel width budget. It still expands to fill the row.
+  mFontCombo->setSizeAdjustPolicy( QComboBox::AdjustToMinimumContentsLengthWithIcon );
+  mFontCombo->setMinimumContentsLength( 10 );
 
   mSizeSpin = new QDoubleSpinBox();
   mSizeSpin->setRange( 1.0, 200.0 );
