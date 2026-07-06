@@ -287,11 +287,6 @@ void KadasMapToolEditAnnotationItem::activate()
   } );
   connect( mLayer.data(), &QgsMapLayer::repaintRequested, this, &KadasMapToolEditAnnotationItem::refreshHandles );
 
-  // Items without any configurable style (e.g. the coordinate cross) don't need
-  // the side panel at all — an empty Draw/Edit panel with only undo/redo is just
-  // noise. The panel docks into its host on construction, so merely leaving it
-  // hidden would still reserve an empty strip beside the canvas; drop it entirely
-  // so the host collapses.
   if ( mStyleEditor || mExtraTopWidget )
   {
     mBottomBar->adjustSize();
