@@ -71,3 +71,52 @@ void KadasAnnotationRotation::renderHandle( QPainter *painter, const QPointF &pt
   painter->drawLine( QPointF( pt.x(), pt.y() - 0.4 * r ), QPointF( pt.x(), pt.y() + 0.4 * r ) );
   painter->restore();
 }
+
+QgsPointXY KadasAnnotationRotation::VertexRotationState::restHandle( const QgsPointXY &centerMap, double offsetMap )
+{
+  return handlePos( centerMap, 0.0, offsetMap );
+}
+
+void KadasAnnotationRotation::VertexRotationState::begin( const QVector<QgsPointXY> &verticesMap, const QgsPointXY &centerMap, const QgsPointXY &handleMap )
+{
+  mOrig = verticesMap;
+  mCenter = centerMap;
+  mHandle = handleMap;
+  mRefAngle = angleFromHandle( centerMap, handleMap );
+  mActive = false;
+}
+
+QVector<QgsPointXY> KadasAnnotationRotation::VertexRotationState::dragTo( const QgsPointXY &cursorMap, bool snap )
+{
+  const double target = angleFromHandle( mCenter, cursorMap );
+  const double delta = snapAngle( target - mRefAngle, snap );
+  mActive = true;
+  mHandle = cursorMap;
+  QVector<QgsPointXY> out;
+  out.reserve( mOrig.size() );
+  for ( const QgsPointXY &p : mOrig )
+    out.append( rotatePoint( p, mCenter, delta ) );
+  return out;
+}
+
+QVector<QgsPointXY> KadasAnnotationRotation::VertexRotationState::applyAngle( double deltaDeg, double offsetMap )
+{
+  const double delta = snapAngle( deltaDeg, false );
+  mActive = true;
+  mHandle = handlePos( mCenter, mRefAngle + delta, offsetMap );
+  QVector<QgsPointXY> out;
+  out.reserve( mOrig.size() );
+  for ( const QgsPointXY &p : mOrig )
+    out.append( rotatePoint( p, mCenter, delta ) );
+  return out;
+}
+
+double KadasAnnotationRotation::VertexRotationState::angleFromCursor( const QgsPointXY &cursorMap ) const
+{
+  return angleFromHandle( mCenter, cursorMap ) - mRefAngle;
+}
+
+QgsPointXY KadasAnnotationRotation::VertexRotationState::handleForAngle( double deltaDeg, double offsetMap ) const
+{
+  return handlePos( mCenter, mRefAngle + deltaDeg, offsetMap );
+}

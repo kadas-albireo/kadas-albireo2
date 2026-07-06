@@ -17,11 +17,10 @@
 #ifndef KADASPOLYGONANNOTATIONCONTROLLER_H
 #define KADASPOLYGONANNOTATIONCONTROLLER_H
 
-#include <QVector>
-
 #include <qgis/qgspointxy.h>
 
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
+#include "kadas/gui/annotationitems/kadasannotationrotation.h"
 
 /**
  * \ingroup gui
@@ -85,16 +84,9 @@ class KADAS_GUI_EXPORT KadasPolygonAnnotationController : public KadasAnnotation
       AttrAngle
     };
 
-    // Per-drag rotation state, captured when the rotation handle is grabbed:
-    // the exterior ring vertices in map coords, the fixed pivot, and the
-    // handle's reference angle. Lets edit() rotate the original (no drift).
-    mutable QVector<QgsPointXY> mRotateOrigMap;
-    mutable QgsPointXY mRotateCenterMap;
-    mutable double mRotateRefAngle = 0.0;
-    // While a rotation drag is active, the handle is drawn at this map position
-    // (the cursor) so it tracks the mouse instead of snapping back above centre.
-    mutable bool mRotateActive = false;
-    mutable QgsPointXY mRotateHandleMap;
+    // Per-drag rotation state, captured when the rotation handle is grabbed.
+    // Shared with the line controller so rotation behaves identically.
+    mutable KadasAnnotationRotation::VertexRotationState mRotation;
 };
 
 #endif // KADASPOLYGONANNOTATIONCONTROLLER_H
