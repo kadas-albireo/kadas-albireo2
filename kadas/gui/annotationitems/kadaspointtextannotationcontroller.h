@@ -57,6 +57,9 @@ class KADAS_GUI_EXPORT KadasPointTextAnnotationController : public KadasAnnotati
     //! Re-render the layer live while dragging (the outline band is a poor stand-in for the text).
     bool liveRepaintOnEdit() const override { return true; }
 
+    //! A text item with no (non-whitespace) content is empty and gets discarded if left untouched.
+    bool isEmpty( const QgsAnnotationItem *item ) const override;
+
 #ifndef SIP_RUN
     QString asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &renderContext, QuaZip *kmzZip = nullptr ) const override;
 #endif

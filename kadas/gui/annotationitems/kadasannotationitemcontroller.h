@@ -142,6 +142,13 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     //! When TRUE, the edit tool re-renders the layer on every drag step (e.g. pictures) rather than only on release.
     virtual bool liveRepaintOnEdit() const { return false; }
 
+    //! When TRUE, \a item carries no meaningful content yet (e.g. a text item with no text); the create tool discards such items if the user leaves them untouched.
+    virtual bool isEmpty( const QgsAnnotationItem *item ) const
+    {
+      Q_UNUSED( item );
+      return false;
+    }
+
     // ----- Position helpers ----------------------------------------------
 
     virtual QgsPointXY position( const QgsAnnotationItem *item ) const = 0;

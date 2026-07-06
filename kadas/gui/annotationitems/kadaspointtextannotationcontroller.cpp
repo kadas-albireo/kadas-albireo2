@@ -77,6 +77,11 @@ QgsAnnotationItem *KadasPointTextAnnotationController::createItem() const
   return item;
 }
 
+bool KadasPointTextAnnotationController::isEmpty( const QgsAnnotationItem *item ) const
+{
+  return asText( item )->text().trimmed().isEmpty();
+}
+
 QList<KadasNode> KadasPointTextAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
 {
   const QgsPointXY anchor = toMapPos( asText( item )->point(), ctx );

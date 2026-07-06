@@ -384,6 +384,10 @@ void KadasMapToolEditAnnotationItem::deactivate()
   }
   if ( mAllowCreate && mDrawState != DrawState::Finished )
     clearInProgressItem();
+  else if ( mAllowCreate && mItem && mController && mController->isEmpty( mItem ) )
+    // A freshly created item the user never gave content to (e.g. a text item
+    // with no text): discard it instead of leaving an invisible empty item.
+    clearInProgressItem();
   clearTempRubberBand();
   if ( mLayer )
     mLayer->triggerRepaint();
@@ -476,6 +480,10 @@ void KadasMapToolEditAnnotationItem::addPoint( const QgsPointXY &pos )
     case DrawState::Finished:
       if ( !mMultipart )
       {
+        // Drop the just-finished item if it never received content (e.g. a text
+        // item left blank) rather than accumulating empty items on the layer.
+        if ( mItem && mController->isEmpty( mItem ) && !mItemId.isEmpty() )
+          mLayer->removeItem( mItemId );
         mItem = nullptr;
         mItemId.clear();
         createInitialItem();
