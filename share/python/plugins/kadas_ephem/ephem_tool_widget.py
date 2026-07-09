@@ -2,8 +2,19 @@ import math
 import os
 
 from kadas.kadascore import KadasCoordinateUtils
-from kadas.kadasgui import KadasBottomBar, KadasItemPos, KadasSymbolItem
-from qgis.core import QgsCoordinateFormatter, QgsCoordinateReferenceSystem
+from kadas.kadasgui import KadasBottomBar
+from qgis.core import (
+    Qgis,
+    QgsAnnotationLayer,
+    QgsAnnotationMarkerItem,
+    QgsCoordinateFormatter,
+    QgsCoordinateReferenceSystem,
+    QgsMapLayer,
+    QgsMarkerSymbol,
+    QgsPoint,
+    QgsProject,
+    QgsSvgMarkerSymbolLayer,
+)
 from qgis.PyQt.QtCore import QDateTime, QEventLoop, Qt, pyqtSignal
 from qgis.PyQt.QtGui import QIcon, QPixmap
 from qgis.PyQt.QtWidgets import QApplication, QLabel, QSizePolicy
@@ -59,17 +70,39 @@ class EphemToolWidget(KadasBottomBar):
         self.wgsPos = None
         self.mrcPos = None
 
-        self.sunAzIcon = KadasSymbolItem(QgsCoordinateReferenceSystem("EPSG:4326"))
-        self.sunAzIcon.setup(os.path.join(os.path.dirname(__file__), "icons/az_sun.svg"), 0.5, 1.0)
-        self.sunAzIcon.setVisible(False)
-        # TODO: port to QgsAnnotationLayer.
-
-        self.moonAzIcon = KadasSymbolItem(QgsCoordinateReferenceSystem("EPSG:4326"))
-        self.moonAzIcon.setup(
-            os.path.join(os.path.dirname(__file__), "icons/az_moon.svg"), 0.5, 1.0
+        self.azLayer = QgsAnnotationLayer(
+            "azLayer", QgsAnnotationLayer.LayerOptions(QgsProject.instance().transformContext())
         )
-        # TODO: port moonAzIcon overlay to QgsAnnotationLayer.
-        self.moonAzIcon.setVisible(False)
+
+        self.azLayer.setCrs(QgsCoordinateReferenceSystem("EPSG:4326"))
+        QgsProject.instance().addMapLayer(self.azLayer)
+
+        self.azLayer.setFlags(self.azLayer.flags() | QgsMapLayer.Private)
+
+        sunAzIcon = QgsAnnotationMarkerItem(QgsPoint(0, 0))
+
+        az_sun_svg_path = os.path.join(os.path.dirname(__file__), "icons/az_sun.svg")
+        sunAzSymbolLayer = QgsSvgMarkerSymbolLayer(az_sun_svg_path)
+        sunAzSymbolLayer.setSize(8)
+        sunAzSymbolLayer.setAngle(0)
+        sunAzSymbolLayer.setHorizontalAnchorPoint(Qgis.HorizontalAnchorPoint.Center)
+        sunAzSymbolLayer.setVerticalAnchorPoint(Qgis.VerticalAnchorPoint.Bottom)
+
+        sunAzIcon.setSymbol(QgsMarkerSymbol([sunAzSymbolLayer]))
+        self.sunAzIconId = self.azLayer.addItem(sunAzIcon)
+
+        moonAzIcon = QgsAnnotationMarkerItem(QgsPoint(0, 0))
+
+        az_moon_svg_path = os.path.join(os.path.dirname(__file__), "icons/az_moon.svg")
+        moonAzSymbolLayer = QgsSvgMarkerSymbolLayer(az_moon_svg_path)
+        moonAzSymbolLayer.setSize(8)
+        moonAzSymbolLayer.setAngle(0)
+        moonAzSymbolLayer.setHorizontalAnchorPoint(Qgis.HorizontalAnchorPoint.Center)
+        moonAzSymbolLayer.setVerticalAnchorPoint(Qgis.VerticalAnchorPoint.Bottom)
+
+        moonAzIcon.setSymbol(QgsMarkerSymbol([moonAzSymbolLayer]))
+        moonAzIcon.setEnabled(False)
+        self.monAzIconId = self.azLayer.addItem(moonAzIcon)
 
         self.ephemRecomputeTask = EphemComputeTask(self)
         self.ephemRecomputeTask.finished.connect(self.recomputeFinished)
@@ -85,13 +118,13 @@ class EphemToolWidget(KadasBottomBar):
             self.ephemRecomputeTask.wait()
             QApplication.restoreOverrideCursor()
 
-        # TODO: port to QgsAnnotationLayer.
-        self.sunAzIcon = None
-        self.moonAzIcon = None
+        QgsProject.instance().removeMapLayer(self.azLayer)
+        del self.azLayer
+        self.iface.mapCanvas().refresh()
 
     def recompute(self):
-        self.sunAzIcon.setVisible(False)
-        self.moonAzIcon.setVisible(False)
+        self.azLayer.item(self.sunAzIconId).setEnabled(False)
+        self.azLayer.item(self.monAzIconId).setEnabled(False)
 
         if not self.wgsPos:
             return
@@ -138,7 +171,7 @@ class EphemToolWidget(KadasBottomBar):
         result = self.ephemRecomputeTask.getResult()
 
         if result.celestialBody == EphemComputeTask.CelestialBody.SUN:
-            azIcon = self.sunAzIcon
+            azIcon = self.azLayer.item(self.sunAzIconId)
 
             self.ui.labelAzimuthElevationValue.setText(result.azimuthElevationValueText)
             self.ui.labelSunRiseValue.setText(result.riseValueText)
@@ -146,7 +179,7 @@ class EphemToolWidget(KadasBottomBar):
             self.ui.labelZenithValue.setText(result.zenithValueText)
 
         else:
-            azIcon = self.moonAzIcon
+            azIcon = self.azLayer.item(self.monAzIconId)
 
             self.ui.labelMoonAzimuthElevationValue.setText(result.azimuthElevationValueText)
             self.ui.labelMoonRiseValue.setText(result.riseValueText)
@@ -161,9 +194,12 @@ class EphemToolWidget(KadasBottomBar):
             )
             self.ui.labelMoonPhaseValue.setText("%.2f%%" % result.moonPhase)
 
-        azIcon.setVisible(result.azimuthVisible)
-        azIcon.setPosition(KadasItemPos.fromPoint(result.position))
-        azIcon.setAngle(result.angle)
+        azIcon.setGeometry(QgsPoint(result.position))
+        azIcon.symbol().setAngle(result.angle)
+        azIcon.setEnabled(result.azimuthVisible)
+
+        self.azLayer.triggerRepaint()
+        self.iface.mapCanvas().refresh()
 
         self.busyOverlay.setVisible(False)
         self.ui.tabWidgetOutput.setEnabled(True)
