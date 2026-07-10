@@ -55,7 +55,7 @@ static QString resolveDataPath()
   QFile file( QDir( QApplication::applicationDirPath() ).absoluteFilePath( "kadassourcedir.txt" ) );
   if ( file.open( QIODevice::ReadOnly ) )
   {
-    return QDir( file.readAll().trimmed() ).absoluteFilePath( "data" );
+    return QDir( file.readAll().trimmed() ).absoluteFilePath( "share" );
   }
   else
   {
