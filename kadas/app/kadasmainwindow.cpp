@@ -377,7 +377,7 @@ void KadasMainWindow::init()
     const QgsMimeDataUtils::UriList list = QgsMimeDataUtils::decodeUriList( event->mimeData() );
     if ( !list.isEmpty() )
     {
-      addCatalogLayer( list.front(), event->mimeData()->property( "metadataUrl" ).toString(), event->mimeData()->property( "sublayers" ).toList() );
+      addCatalogLayer( list.front(), event->mimeData()->property( "metadataUrl" ).toString(), event->mimeData()->property( "sublayers" ).toList(), true );
     }
   } );
   connect( mMapCanvas, &QgsMapCanvas::layersChanged, this, &KadasMainWindow::updateBgLayerZoomResolutions );
@@ -429,7 +429,9 @@ void KadasMainWindow::init()
   }
 
   connect( mRefreshCatalogButton, &QToolButton::clicked, mCatalogBrowser, &KadasCatalogBrowser::reload );
-  connect( mCatalogBrowser, &KadasCatalogBrowser::layerSelected, this, &KadasMainWindow::addCatalogLayer );
+  connect( mCatalogBrowser, &KadasCatalogBrowser::layerSelected, this, [this]( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers ) {
+    addCatalogLayer( uri, metadataUrl, sublayers );
+  } );
   // Dragging a catalog entry: reveal the layer tree so it can serve as drop target.
   connect( mCatalogBrowser, &KadasCatalogBrowser::dragStarted, this, [this] {
     mLayersTabButton->setChecked( true );
@@ -1313,7 +1315,7 @@ void KadasMainWindow::showFavoriteContextMenu( const QPoint &pos )
   }
 }
 
-void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers )
+void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers, bool atInsertionPoint )
 {
   QString adjustedUri = uri.uri;
 
@@ -1482,7 +1484,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
   }
   else
   {
-    QgsRasterLayer *layer = kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey );
+    QgsRasterLayer *layer = kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey, false, 0, !atInsertionPoint );
     if ( layer )
     {
       layer->serverProperties()->setMetadataUrls( { QgsServerMetadataUrlProperties::MetadataUrl( metadataUrl ) } );

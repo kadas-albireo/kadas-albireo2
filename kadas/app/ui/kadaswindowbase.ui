@@ -436,7 +436,7 @@
                <number>0</number>
               </property>
               <item>
-               <widget class="QgsLayerTreeView" name="mLayerTreeView">
+               <widget class="KadasLayerTreeView" name="mLayerTreeView">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -775,9 +775,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QgsLayerTreeView</class>
+   <class>KadasLayerTreeView</class>
    <extends>QTreeView</extends>
-   <header location="global">qgis/qgslayertreeview.h</header>
+   <header location="global">kadas/app/layertree/kadaslayertreeview.h</header>
   </customwidget>
   <customwidget>
    <class>QgsMapCanvas</class>

@@ -57,6 +57,7 @@ set(kadas_SRC
     kml/kadaskmlimport.cpp
     kml/kadaskmlintegration.cpp
     kml/kadaskmllabeling.cpp
+    layertree/kadaslayertreeview.cpp
     layertree/kadaslayertreeviewmenuprovider.cpp
     layertree/kadaslayertreeviewtemporalindicator.cpp
     mapgrid/kadasmapgridlayer.cpp
@@ -125,6 +126,7 @@ set(kadas_HDR
     kml/kadaskmlimport.h
     kml/kadaskmlintegration.h
     kml/kadaskmllabeling.h
+    layertree/kadaslayertreeview.h
     layertree/kadaslayertreeviewmenuprovider.h
     layertree/kadaslayertreeviewtemporalindicator.h
     mapgrid/kadasmapgridlayer.h

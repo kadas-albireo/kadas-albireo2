@@ -123,7 +123,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void zoomToLayerExtent();
 
   private slots:
-    void addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers );
+    void addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers, bool atInsertionPoint = false );
     void checkLayerProjection( QgsMapLayer *layer );
     void checkLayerTemporalCapabilities( QgsMapLayer *layer );
     void checkWMSLayerIgnoreReportedExtents( QgsMapLayer *layer );
