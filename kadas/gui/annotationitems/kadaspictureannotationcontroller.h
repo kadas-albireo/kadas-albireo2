@@ -99,7 +99,8 @@ class KADAS_GUI_EXPORT KadasPictureAnnotationController : public KadasAnnotation
     enum AttribIds
     {
       AttrX,
-      AttrY
+      AttrY,
+      AttrAngle
     };
 };
 

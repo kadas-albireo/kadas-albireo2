@@ -30,6 +30,7 @@
 
 class QMenu;
 class QWidget;
+class QgsAbstractGeometry;
 class QgsAnnotationItem;
 class QgsCoordinateReferenceSystem;
 class QgsGeometry;
@@ -104,6 +105,18 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
 
     virtual QList<KadasNode> nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const = 0;
 
+#ifndef SIP_RUN
+    //! Optional dashed guide polylines (map CRS) drawn under the edit handles for
+    //! items whose own rendering does not reveal their geometry (e.g. text along a
+    //! line). Each inner list is one polyline. Empty by default.
+    virtual QList<QList<QgsPointXY>> editGuide( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
+    {
+      Q_UNUSED( item );
+      Q_UNUSED( ctx );
+      return {};
+    }
+#endif
+
     // ----- Draw state machine ---------------------------------------------
 
     //! Begins a new part at \a firstPoint. Returns true if the item is ready to receive subsequent points.
@@ -140,6 +153,13 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
 
     //! When TRUE, the edit tool re-renders the layer on every drag step (e.g. pictures) rather than only on release.
     virtual bool liveRepaintOnEdit() const { return false; }
+
+    //! When TRUE, \a item carries no meaningful content yet (e.g. a text item with no text); the create tool discards such items if the user leaves them untouched.
+    virtual bool isEmpty( const QgsAnnotationItem *item ) const
+    {
+      Q_UNUSED( item );
+      return false;
+    }
 
     // ----- Position helpers ----------------------------------------------
 
@@ -227,6 +247,11 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     static QgsRectangle toItemRect( const QgsRectangle &mapRect, const KadasAnnotationItemContext &ctx );
     static QgsRectangle toMapRect( const QgsRectangle &itemRect, const KadasAnnotationItemContext &ctx );
     static double pickTolSqr( const KadasAnnotationItemContext &ctx );
+
+#ifndef SIP_RUN
+    //! Geometric centroid of \a geom (item CRS) expressed in map coords; the natural rotation pivot for vertex geometries.
+    static QgsPointXY centroidMap( const QgsAbstractGeometry *geom, const KadasAnnotationItemContext &ctx );
+#endif
 
 #ifndef SIP_RUN
     // Honor the shared "/kadas/measure_decimals" setting.

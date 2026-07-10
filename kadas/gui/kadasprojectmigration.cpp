@@ -1952,7 +1952,26 @@ bool KadasProjectMigration::migrateLegacyKadasItemLayers( QDomDocument &doc, QDo
       for ( QgsAnnotationItem *a : annos )
       {
         translated.append( a );
-        tooltips.append( tooltip );
+        // Pins render their tooltip from the current title/description
+        // (see KadasMapToolEditAnnotationItem), so synthesize it here
+        // rather than importing 2.x's frozen position/height HTML.
+        if ( const auto *pin = dynamic_cast<const KadasPinAnnotationItem *>( a ) )
+        {
+          QString html;
+          if ( !pin->name().isEmpty() )
+            html += QStringLiteral( "<b>%1</b>" ).arg( pin->name().toHtmlEscaped() );
+          if ( !pin->remarks().isEmpty() )
+          {
+            if ( !html.isEmpty() )
+              html += QStringLiteral( "<br>" );
+            html += pin->remarks().toHtmlEscaped().replace( '\n', QStringLiteral( "<br>" ) );
+          }
+          tooltips.append( html );
+        }
+        else
+        {
+          tooltips.append( tooltip );
+        }
       }
     }
 

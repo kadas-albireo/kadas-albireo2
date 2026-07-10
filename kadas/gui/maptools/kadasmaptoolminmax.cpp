@@ -41,7 +41,7 @@
 #include "kadas/analysis/kadasninecellfilter.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
-#include "kadas/gui/kadasbottombar.h"
+#include "kadas/gui/kadassidepanel.h"
 #include "kadas/gui/kadasfeaturepicker.h"
 #include "kadas/gui/maptools/kadasmaptoolminmax.h"
 
@@ -80,17 +80,9 @@ void KadasMapToolMinMax::activate()
 {
   KadasShapeCaptureMapTool::activate();
 
-  mBottomBar = new KadasBottomBar( canvas() );
-  QHBoxLayout *layout = new QHBoxLayout( mBottomBar );
-  layout->setContentsMargins( 8, 4, 8, 4 );
-
-  QLabel *label = new QLabel( tr( "Compute min/max" ) );
-  QFont font = label->font();
-  font.setBold( true );
-  label->setFont( font );
-  layout->addWidget( label );
-
-  layout->addWidget( new QLabel( tr( "Select area by:" ) ) );
+  mBottomBar = new KadasSidePanel( canvas() );
+  mBottomBar->setTitle( tr( "Compute min/max" ) );
+  connect( mBottomBar, &KadasSidePanel::closeRequested, this, [this] { canvas()->unsetMapTool( this ); } );
 
   mFilterTypeCombo = new QComboBox();
   mFilterTypeCombo->addItem( tr( "Rectangle" ), QVariant::fromValue( FilterType::FilterRect ) );
@@ -98,21 +90,14 @@ void KadasMapToolMinMax::activate()
   mFilterTypeCombo->addItem( tr( "Circle" ), QVariant::fromValue( FilterType::FilterCircle ) );
   mFilterTypeCombo->setCurrentIndex( mFilterTypeCombo->findData( QVariant::fromValue( mFilterType ) ) );
   connect( mFilterTypeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, [this]( int ) { setFilterType( mFilterTypeCombo->currentData().value<FilterType>() ); } );
-  layout->addWidget( mFilterTypeCombo );
+  mBottomBar->addRow( tr( "Select area by:" ), mFilterTypeCombo );
 
   QToolButton *pickButton = new QToolButton();
   pickButton->setIcon( QIcon( ":/kadas/icons/select" ) );
   pickButton->setToolTip( tr( "Pick existing geometry" ) );
   connect( pickButton, &QToolButton::clicked, this, &KadasMapToolMinMax::requestPick );
-  layout->addWidget( pickButton );
+  mBottomBar->addRow( pickButton );
 
-  QPushButton *closeButton = new QPushButton();
-  closeButton->setIcon( QIcon( ":/kadas/icons/close" ) );
-  closeButton->setToolTip( tr( "Close" ) );
-  connect( closeButton, &QPushButton::clicked, this, [this] { canvas()->unsetMapTool( this ); } );
-  layout->addWidget( closeButton );
-
-  mBottomBar->setLayout( layout );
   mBottomBar->adjustSize();
   mBottomBar->show();
 }

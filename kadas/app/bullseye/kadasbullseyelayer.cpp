@@ -105,9 +105,12 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
         }
       }
 
-      // Draw axes
+      // Draw axes. axesStep is taken as an integer because the bearing loop
+      // counter is an int; a zero (or sub-degree) interval would otherwise leave
+      // "bearing += interval" stuck at 0 and hang the render thread.
+      const int axesStep = static_cast<int>( mRenderBullseyeConfig.axesInterval );
       double axisRadiusMeters = mRenderBullseyeConfig.interval * ( mRenderBullseyeConfig.rings + 1 ) * intervalUnit2meters;
-      for ( int bearing = 0; bearing < 360; bearing += mRenderBullseyeConfig.axesInterval )
+      for ( int bearing = 0; axesStep >= 1 && bearing < 360; bearing += axesStep )
       {
         QgsPointXY wgsPoint = mDa.computeSpheroidProject( wgsCenter, axisRadiusMeters, bearing / 180. * M_PI );
         GeographicLib::GeodesicLine line = mGeod.InverseLine( wgsCenter.y(), wgsCenter.x(), wgsPoint.y(), wgsPoint.x() );
@@ -150,7 +153,7 @@ class KadasBullseyeLayer::Renderer : public QgsMapLayerRenderer
         for ( int iRing = 0; iRing < mRenderBullseyeConfig.rings; ++iRing )
         {
           double r = mRenderBullseyeConfig.interval * ( 0.5 + iRing ) * intervalUnit2meters;
-          for ( int bearing = 0; bearing < 360; bearing += mRenderBullseyeConfig.axesInterval )
+          for ( int bearing = 0; axesStep >= 1 && bearing < 360; bearing += axesStep )
           {
             double a = bearing + 0.5 * mRenderBullseyeConfig.axesInterval;
             QgsPointXY wgsPoint = mDa.computeSpheroidProject( wgsCenter, r, a / 180. * M_PI );

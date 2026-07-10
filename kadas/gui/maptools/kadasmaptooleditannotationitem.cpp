@@ -26,6 +26,7 @@
 
 #include <qgis/qgsannotationitem.h>
 #include <qgis/qgsannotationlayer.h>
+#include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapcanvasitem.h>
@@ -41,10 +42,33 @@
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
-#include "kadas/gui/kadasbottombar.h"
+#include "kadas/gui/annotationitems/kadaspinannotationitem.h"
+#include "kadas/gui/kadassidepanel.h"
 #include "kadas/gui/kadasfeaturepicker.h"
 #include "kadas/gui/kadasfloatinginputwidget.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
+
+namespace
+{
+  //! Composes an HTML tooltip from a pin's title/description and stores it on
+  //! the annotation layer so the map-item tooltip surfaces it on hover.
+  void updatePinTooltip( QgsAnnotationLayer *layer, const QString &itemId, const QgsAnnotationItem *item )
+  {
+    const auto *pin = dynamic_cast<const KadasPinAnnotationItem *>( item );
+    if ( !pin )
+      return;
+    QString html;
+    if ( !pin->name().isEmpty() )
+      html += QStringLiteral( "<b>%1</b>" ).arg( pin->name().toHtmlEscaped() );
+    if ( !pin->remarks().isEmpty() )
+    {
+      if ( !html.isEmpty() )
+        html += QStringLiteral( "<br>" );
+      html += pin->remarks().toHtmlEscaped().replace( '\n', QStringLiteral( "<br>" ) );
+    }
+    KadasAnnotationLayerHelpers::setTooltip( layer, itemId, html );
+  }
+} // namespace
 
 
 class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
@@ -52,11 +76,13 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
   public:
     using NodesProvider = std::function<QList<KadasNode>()>;
     using LabelsProvider = std::function<QList<KadasAnnotationMeasurementLabel>()>;
+    using GuideProvider = std::function<QList<QList<QgsPointXY>>()>;
 
-    HandlesOverlay( QgsMapCanvas *canvas, NodesProvider nodesProvider, LabelsProvider labelsProvider )
+    HandlesOverlay( QgsMapCanvas *canvas, NodesProvider nodesProvider, LabelsProvider labelsProvider, GuideProvider guideProvider )
       : QgsMapCanvasItem( canvas )
       , mNodesProvider( std::move( nodesProvider ) )
       , mLabelsProvider( std::move( labelsProvider ) )
+      , mGuideProvider( std::move( guideProvider ) )
     {
       setZValue( std::numeric_limits<double>::max() );
       updateRect();
@@ -64,13 +90,57 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
 
     void updateRect() { setRect( mMapCanvas->mapSettings().visibleExtent() ); }
 
+    //! Optional callback that renders a live preview of the edited item straight
+    //! into the overlay painter (in scene coordinates), so an in-progress edit
+    //! can appear without waiting for the asynchronous canvas layer repaint.
+    void setPreviewRenderer( std::function<void( QPainter * )> renderer ) { mPreviewRenderer = std::move( renderer ); }
+
     void paint( QPainter *painter ) override
     {
+      if ( mPreviewRenderer )
+      {
+        painter->save();
+        // The overlay painter is in item-local coordinates while the item renders
+        // in scene coordinates; undo the item's scene offset so it lands correctly.
+        painter->translate( -mapToScene( QPointF( 0, 0 ) ) );
+        mPreviewRenderer( painter );
+        painter->restore();
+      }
+      paintGuide( painter );
       paintMeasurementLabels( painter );
       paintHandles( painter );
     }
 
   private:
+    void paintGuide( QPainter *painter )
+    {
+      if ( !mGuideProvider )
+        return;
+      const QList<QList<QgsPointXY>> polylines = mGuideProvider();
+      if ( polylines.isEmpty() )
+        return;
+      painter->save();
+      painter->setRenderHint( QPainter::Antialiasing, true );
+      painter->setBrush( Qt::NoBrush );
+      // White underlay + dark dashes, so the guide reads on any background.
+      for ( const QList<QgsPointXY> &polyline : polylines )
+      {
+        if ( polyline.size() < 2 )
+          continue;
+        QPolygonF screen;
+        screen.reserve( polyline.size() );
+        for ( const QgsPointXY &p : polyline )
+          screen.append( toCanvasCoordinates( p ) );
+        painter->setPen( QPen( QColor( 255, 255, 255, 180 ), 3 ) );
+        painter->drawPolyline( screen );
+        QPen dash( QColor( 50, 50, 50, 220 ), 1, Qt::DashLine );
+        dash.setDashPattern( { 4.0, 4.0 } );
+        painter->setPen( dash );
+        painter->drawPolyline( screen );
+      }
+      painter->restore();
+    }
+
     void paintHandles( QPainter *painter )
     {
       if ( !mNodesProvider )
@@ -141,8 +211,9 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
 
     NodesProvider mNodesProvider;
     LabelsProvider mLabelsProvider;
+    GuideProvider mGuideProvider;
+    std::function<void( QPainter * )> mPreviewRenderer;
 };
-
 
 struct KadasMapToolEditAnnotationItem::ToolState : KadasStateHistory::State
 {
@@ -208,48 +279,22 @@ void KadasMapToolEditAnnotationItem::activate()
   mStateHistory->push( new ToolState( mItem->clone(), mDrawState ) );
   connect( mStateHistory, &KadasStateHistory::stateChanged, this, &KadasMapToolEditAnnotationItem::stateChanged );
 
-  mBottomBar = new KadasBottomBar( canvas() );
-  auto *outer = new QVBoxLayout();
-  outer->setContentsMargins( 8, 4, 8, 4 );
-  mBottomBar->setLayout( outer );
+  mBottomBar = new KadasSidePanel( canvas() );
+  mBottomBar->setTitle( ( mAllowCreate ? tr( "Draw %1" ) : tr( "Edit %1" ) ).arg( mController->itemName() ) );
+  connect( mBottomBar, &KadasSidePanel::closeRequested, this, [this] { canvas()->unsetMapTool( this ); } );
 
-  auto *topRow = new QHBoxLayout();
-  outer->addLayout( topRow );
-
-  QLabel *label = new QLabel( ( mAllowCreate ? tr( "Draw %1" ) : tr( "Edit %1" ) ).arg( mController->itemName() ) );
-  QFont font = label->font();
-  font.setBold( true );
-  label->setFont( font );
-  topRow->addWidget( label );
-
-  QPushButton *undoButton = new QPushButton();
-  undoButton->setIcon( QIcon( ":/kadas/icons/undo" ) );
-  undoButton->setToolTip( tr( "Undo" ) );
-  undoButton->setEnabled( false );
-  connect( undoButton, &QPushButton::clicked, this, [this] { mStateHistory->undo(); } );
-  connect( mStateHistory, &KadasStateHistory::canUndoChanged, undoButton, &QPushButton::setEnabled );
-  topRow->addWidget( undoButton );
-
-  QPushButton *redoButton = new QPushButton();
-  redoButton->setIcon( QIcon( ":/kadas/icons/redo" ) );
-  redoButton->setToolTip( tr( "Redo" ) );
-  redoButton->setEnabled( false );
-  connect( redoButton, &QPushButton::clicked, this, [this] { mStateHistory->redo(); } );
-  connect( mStateHistory, &KadasStateHistory::canRedoChanged, redoButton, &QPushButton::setEnabled );
-  topRow->addWidget( redoButton );
-
-  QPushButton *closeButton = new QPushButton();
-  closeButton->setIcon( QIcon( ":/kadas/icons/close" ) );
-  closeButton->setToolTip( tr( "Close" ) );
-  connect( closeButton, &QPushButton::clicked, this, [this] { canvas()->unsetMapTool( this ); } );
-  topRow->addWidget( closeButton );
+  mBottomBar->addUndoRedoRow();
+  connect( mBottomBar, &KadasSidePanel::undoRequested, this, [this] { mStateHistory->undo(); } );
+  connect( mBottomBar, &KadasSidePanel::redoRequested, this, [this] { mStateHistory->redo(); } );
+  connect( mStateHistory, &KadasStateHistory::canUndoChanged, mBottomBar, &KadasSidePanel::setCanUndo );
+  connect( mStateHistory, &KadasStateHistory::canRedoChanged, mBottomBar, &KadasSidePanel::setCanRedo );
 
   if ( mExtraTopWidget )
   {
-    topRow->insertWidget( 1, mExtraTopWidget );
+    mBottomBar->addRow( mExtraTopWidget );
   }
 
-  setupStyleEditor( outer );
+  setupStyleEditor();
 
   mHandles = new HandlesOverlay(
     canvas(),
@@ -264,6 +309,12 @@ void KadasMapToolEditAnnotationItem::activate()
         return {};
       KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
       return mController->measurementLabels( mItem, ctx );
+    },
+    [this]() -> QList<QList<QgsPointXY>> {
+      if ( !mItem || !mController || !mLayer )
+        return {};
+      KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
+      return mController->editGuide( mItem, ctx );
     }
   );
   connect( canvas(), &QgsMapCanvas::extentsChanged, this, [this] {
@@ -275,14 +326,47 @@ void KadasMapToolEditAnnotationItem::activate()
   } );
   connect( mLayer.data(), &QgsMapLayer::repaintRequested, this, &KadasMapToolEditAnnotationItem::refreshHandles );
 
-  mBottomBar->adjustSize();
-  mBottomBar->show();
+  if ( mStyleEditor || mExtraTopWidget )
+  {
+    mBottomBar->adjustSize();
+    mBottomBar->show();
+  }
+  else
+  {
+    delete mBottomBar;
+    mBottomBar = nullptr;
+  }
 }
 
 void KadasMapToolEditAnnotationItem::refreshHandles()
 {
   if ( mHandles )
     mHandles->update();
+}
+
+void KadasMapToolEditAnnotationItem::renderItemPreview( QPainter *painter )
+{
+  if ( !mItem || !mLayer || !canvas() )
+    return;
+  // Render at a device pixel ratio of 1 because the overlay painter works in
+  // logical (scene) pixels, matching how the handles are drawn.
+  QgsMapSettings ms = canvas()->mapSettings();
+  ms.setDevicePixelRatio( 1.0 );
+  QgsRenderContext ctx = QgsRenderContext::fromMapSettings( ms );
+  ctx.setPainter( painter );
+  ctx.setCoordinateTransform( QgsCoordinateTransform( mLayer->crs(), ms.destinationCrs(), ms.transformContext() ) );
+  QgsFeedback feedback;
+  mItem->render( ctx, &feedback );
+}
+
+void KadasMapToolEditAnnotationItem::setLivePreviewEnabled( bool enabled )
+{
+  if ( !mHandles )
+    return;
+  if ( enabled )
+    mHandles->setPreviewRenderer( [this]( QPainter *painter ) { renderItemPreview( painter ); } );
+  else
+    mHandles->setPreviewRenderer( nullptr );
 }
 
 void KadasMapToolEditAnnotationItem::updateTempRubberBand()
@@ -339,6 +423,10 @@ void KadasMapToolEditAnnotationItem::deactivate()
   }
   if ( mAllowCreate && mDrawState != DrawState::Finished )
     clearInProgressItem();
+  else if ( mAllowCreate && mItem && mController && mController->isEmpty( mItem ) )
+    // A freshly created item the user never gave content to (e.g. a text item
+    // with no text): discard it instead of leaving an invisible empty item.
+    clearInProgressItem();
   clearTempRubberBand();
   if ( mLayer )
     mLayer->triggerRepaint();
@@ -374,7 +462,7 @@ void KadasMapToolEditAnnotationItem::canvasPressEvent( QgsMapMouseEvent *e )
     }
     const PickedItem hit = pickItemAt( e->mapPoint() );
     if ( !hit.isEmpty() )
-      showContextMenu( hit.layer, hit.itemId, e->globalPosition().toPoint() );
+      showContextMenu( hit.layer, hit.itemId, e->mapPoint(), e->globalPosition().toPoint() );
     else
       canvas()->unsetMapTool( this );
     return;
@@ -431,6 +519,10 @@ void KadasMapToolEditAnnotationItem::addPoint( const QgsPointXY &pos )
     case DrawState::Finished:
       if ( !mMultipart )
       {
+        // Drop the just-finished item if it never received content (e.g. a text
+        // item left blank) rather than accumulating empty items on the layer.
+        if ( mItem && mController->isEmpty( mItem ) && !mItemId.isEmpty() )
+          mLayer->removeItem( mItemId );
         mItem = nullptr;
         mItemId.clear();
         createInitialItem();
@@ -456,6 +548,7 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
   }
 
   KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
+  ctx.setModifiers( e->modifiers() );
   const QgsPointXY pos = e->mapPoint();
 
   if ( mAllowCreate && mDrawState == DrawState::InProgress )
@@ -472,16 +565,10 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
     return;
   }
 
-  if ( mAllowCreate && !mMultipart && mDrawState == DrawState::Finished )
-  {
-    if ( mEditContext.isValid() )
-    {
-      mEditContext = KadasEditContext();
-      setCursor( Qt::ArrowCursor );
-      clearNumericInput();
-    }
-    return;
-  }
+  // For a finished single-part item in create mode we still hit-test the item's
+  // handles (so the just-placed marker can be rotated/moved). Clicking empty
+  // space instead places a new marker (handled in canvasPressEvent, where an
+  // invalid edit context falls through to addPoint()).
 
   if ( e->buttons() == Qt::LeftButton )
   {
@@ -491,7 +578,16 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
       mController->edit( mItem, mEditContext, adjusted, ctx );
       if ( mController->liveRepaintOnEdit() )
       {
-        mLayer->triggerRepaint();
+        // Draw the edited item synchronously in the overlay so the drag stays
+        // smooth instead of chasing the asynchronous layer repaint. Hide the
+        // real item once (a single repaint) to avoid a lagging duplicate.
+        if ( !mEditItemHidden )
+        {
+          mEditItemHidden = true;
+          mItem->setEnabled( false );
+          setLivePreviewEnabled( true );
+          mLayer->triggerRepaint();
+        }
       }
       else if ( !mEditItemHidden )
       {
@@ -552,6 +648,7 @@ void KadasMapToolEditAnnotationItem::canvasReleaseEvent( QgsMapMouseEvent *e )
       mEditItemHidden = false;
       mItem->setEnabled( true );
     }
+    setLivePreviewEnabled( false );
     clearTempRubberBand();
     if ( mLayer )
       mLayer->triggerRepaint();
@@ -707,7 +804,7 @@ void KadasMapToolEditAnnotationItem::inputChanged()
   pushState();
 }
 
-void KadasMapToolEditAnnotationItem::setupStyleEditor( QBoxLayout *outer )
+void KadasMapToolEditAnnotationItem::setupStyleEditor()
 {
   if ( !mController )
     return;
@@ -715,27 +812,33 @@ void KadasMapToolEditAnnotationItem::setupStyleEditor( QBoxLayout *outer )
   if ( !mStyleEditor )
     return;
   mStyleEditor->loadFromItem( mItem );
-  outer->addWidget( mStyleEditor );
+  mBottomBar->addRow( mStyleEditor );
 
   connect( mStyleEditor, &KadasAnnotationStyleEditor::previewChanged, this, [this] {
-    if ( !mItem || !mLayer )
+    QgsAnnotationItem *item = mLayer ? mLayer->item( mItemId ) : nullptr;
+    if ( !item )
       return;
-    mStyleEditor->applyToItem( mItem );
+    mItem = item;
+    mStyleEditor->applyToItem( item );
     mLayer->triggerRepaint();
     if ( mTempRubberBand )
       updateTempRubberBand();
   } );
 
   connect( mStyleEditor, &KadasAnnotationStyleEditor::committed, this, [this] {
-    if ( !mItem || !mLayer )
+    QgsAnnotationItem *item = mLayer ? mLayer->item( mItemId ) : nullptr;
+    if ( !item )
       return;
-    mStyleEditor->applyToItem( mItem );
+    mItem = item;
+    mStyleEditor->applyToItem( item );
     mLayer->triggerRepaint();
     if ( mTempRubberBand )
       updateTempRubberBand();
     if ( mController )
-      mController->persistStyle( mItem );
+      mController->persistStyle( item );
+    updatePinTooltip( mLayer, mItemId, item );
     pushState();
+    emit stylePersisted();
   } );
 }
 
@@ -873,7 +976,7 @@ void KadasMapToolEditAnnotationItem::switchToItem( QgsAnnotationLayer *layer, co
   canvas()->setMapTool( new KadasMapToolEditAnnotationItem( canvas(), layer, itemId ) );
 }
 
-void KadasMapToolEditAnnotationItem::showContextMenu( QgsAnnotationLayer *layer, const QString &itemId, const QPoint &globalPos )
+void KadasMapToolEditAnnotationItem::showContextMenu( QgsAnnotationLayer *layer, const QString &itemId, const QgsPointXY &mapPos, const QPoint &globalPos )
 {
   if ( !layer )
     return;
@@ -925,6 +1028,13 @@ void KadasMapToolEditAnnotationItem::showContextMenu( QgsAnnotationLayer *layer,
   forward->setEnabled( hasHigher );
   backward->setEnabled( hasLower );
   toBack->setEnabled( curZ > minZ );
+
+  if ( mController && target == mItem )
+  {
+    KadasAnnotationItemContext ctx( layer, canvas()->mapSettings() );
+    menu.addSeparator();
+    mController->populateContextMenu( target, &menu, mEditContext, mapPos, ctx );
+  }
 
   QAction *chosen = menu.exec( globalPos );
   if ( !chosen )

@@ -25,12 +25,12 @@
 
 #include "ui_kadaswindowbase.h"
 #include "ui_kadastopwidget.h"
-#include "ui_kadasstatuswidget.h"
 
 class QSplashScreen;
 class QgsDecorationGrid;
 class QgsLayerTreeMapCanvasBridge;
 class QgsMessageBar;
+class QToolButton;
 class KadasCoordinateDisplayer;
 class KadasGpsIntegration;
 class KadasGpxIntegration;
@@ -41,10 +41,12 @@ class KadasMapWidgetManager;
 class KadasProjectTemplateSelectionDialog;
 class KadasPluginManager;
 class KadasRedliningIntegration;
+class KadasStatusBar;
 class KadasTemporalController;
+class KadasSidePanelHost;
 
 
-class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private Ui::KadasTopWidget, private Ui::KadasStatusWidget
+class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private Ui::KadasTopWidget
 {
     Q_OBJECT
 
@@ -58,7 +60,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QgsLayerTreeView *layerTreeView() const { return mLayerTreeView; }
     QgsLayerTreeMapCanvasBridge *layerTreeMapCanvasBridge() const { return mLayerTreeCanvasBridge; }
     KadasMapWidgetManager *mapWidgetManager() const { return mMapWidgetManager; }
-    void resetMagnification() { mMagnifierSpinBox->clear(); }
+    void resetMagnification();
     int messageTimeout() const;
 
     QWidget *addRibbonTab( const QString &name );
@@ -180,7 +182,10 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     KadasRedliningIntegration *mRedliningIntegration = nullptr;
     KadasTemporalController *mKadasTemporalController = nullptr;
     KadasPluginManager *mPluginManager = nullptr;
+    KadasSidePanelHost *mRightPanelHost = nullptr;
     QToolButton *mPluginsToolButton = nullptr;
+
+    KadasStatusBar *mStatusBar = nullptr;
     QAction *mActionShowPythonConsole = nullptr;
     KadasProjectTemplateSelectionDialog *mProjectTemplateDialog = nullptr;
 

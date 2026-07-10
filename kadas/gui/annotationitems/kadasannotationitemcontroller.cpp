@@ -160,6 +160,18 @@ double KadasAnnotationItemController::pickTolSqr( const KadasAnnotationItemConte
   return 25 * mupp * mupp;
 }
 
+QgsPointXY KadasAnnotationItemController::centroidMap( const QgsAbstractGeometry *geom, const KadasAnnotationItemContext &ctx )
+{
+  if ( !geom )
+    return QgsPointXY();
+  // Rotate around the geometric centroid (centre of mass), not the bounding-box
+  // centre: the latter drifts off the visual centre for asymmetric shapes and
+  // makes the item appear to swing rather than spin in place.
+  const QgsGeometry g( geom->clone() );
+  const QgsPointXY centroidItem = g.centroid().asPoint();
+  return toMapPos( centroidItem, ctx );
+}
+
 // ----- Measurement formatting helpers --------------------------------------
 
 QString KadasAnnotationItemController::formatLengthMeters( double meters )

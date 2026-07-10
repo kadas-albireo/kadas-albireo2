@@ -14,7 +14,10 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QAction>
+#include <QMenu>
 #include <QObject>
+#include <QPointer>
 #include <QTextStream>
 #include <cmath>
 #include <memory>
@@ -32,6 +35,7 @@
 #include <qgis/qgssymbollayerutils.h>
 
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
+#include "kadas/gui/annotationitems/kadasannotationrotation.h"
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadasmarkerannotationcontroller.h"
 
@@ -93,7 +97,14 @@ QgsAnnotationItem *KadasMarkerAnnotationController::createItem() const
 QList<KadasNode> KadasMarkerAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
 {
   const QgsPointXY p = asMarker( item )->geometry();
-  return { { toMapPos( QgsPointXY( p.x(), p.y() ), ctx ) } };
+  const QgsPointXY anchor = toMapPos( QgsPointXY( p.x(), p.y() ), ctx );
+  if ( !hasRotationHandle() )
+    return { { anchor } };
+  const QgsMarkerSymbol *sym = asMarker( item )->symbol();
+  const double angle = sym ? sym->angle() : 0.0;
+  const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
+  const QgsPointXY handle = KadasAnnotationRotation::handlePos( anchor, angle, off );
+  return { { anchor }, { handle, []( QPainter *p, const QPointF &pt, int sz ) { KadasAnnotationRotation::renderHandle( p, pt, sz ); } } };
 }
 
 bool KadasMarkerAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
@@ -148,6 +159,20 @@ KadasEditContext KadasMarkerAnnotationController::getEditContext( const QgsAnnot
   const QgsPointXY geom = asMarker( item )->geometry();
   const QgsPointXY testPos = toMapPos( geom, ctx );
 
+  if ( hasRotationHandle() )
+  {
+    const QgsMarkerSymbol *sym0 = asMarker( item )->symbol();
+    const double curAngle = sym0 ? sym0->angle() : 0.0;
+    const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
+    const QgsPointXY handle = KadasAnnotationRotation::handlePos( testPos, curAngle, off );
+    if ( pos.sqrDist( handle ) < pickTolSqr( ctx ) )
+    {
+      KadasAttribDefs rot;
+      rot.insert( AttrAngle, KadasNumericAttribute { "angle", KadasNumericAttribute::Type::TypeAngle } );
+      return KadasEditContext( QgsVertexId( 0, 0, RotationHandleVertex ), handle, rot, Qt::CrossCursor );
+    }
+  }
+
   // Hit-test against the rendered symbol footprint, not just the anchor:
   // SVG markers (e.g. the Kadas pin) are anchored at their bottom tip.
   if ( const QgsMarkerSymbol *symRaw = asMarker( item )->symbol() )
@@ -178,24 +203,62 @@ KadasEditContext KadasMarkerAnnotationController::getEditContext( const QgsAnnot
   return KadasEditContext();
 }
 
-void KadasMarkerAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
+void KadasMarkerAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
+  if ( editContext.vidx.vertex == RotationHandleVertex )
+  {
+    if ( const QgsMarkerSymbol *sym = asMarker( item )->symbol() )
+    {
+      const QgsPointXY center = toMapPos( asMarker( item )->geometry(), ctx );
+      const double angle = KadasAnnotationRotation::angleFromHandle( center, newPoint );
+      std::unique_ptr<QgsMarkerSymbol> clone( sym->clone() );
+      clone->setAngle( KadasAnnotationRotation::snapAngle( angle, ctx.modifiers() & Qt::ShiftModifier ) );
+      asMarker( item )->setSymbol( clone.release() );
+    }
+    return;
+  }
   const QgsPointXY ip = toItemPos( newPoint, ctx );
   asMarker( item )->setGeometry( QgsPoint( ip.x(), ip.y() ) );
 }
 
 void KadasMarkerAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
 {
+  if ( editContext.vidx.vertex == RotationHandleVertex )
+  {
+    if ( const QgsMarkerSymbol *sym = asMarker( item )->symbol() )
+    {
+      std::unique_ptr<QgsMarkerSymbol> clone( sym->clone() );
+      clone->setAngle( values[AttrAngle] );
+      asMarker( item )->setSymbol( clone.release() );
+    }
+    return;
+  }
   edit( item, editContext, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
 
-KadasAttribValues KadasMarkerAnnotationController::editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
+KadasAttribValues KadasMarkerAnnotationController::editAttribsFromPosition(
+  const QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx
+) const
 {
+  if ( editContext.vidx.vertex == RotationHandleVertex )
+  {
+    const QgsPointXY center = toMapPos( asMarker( item )->geometry(), ctx );
+    KadasAttribValues v;
+    v.insert( AttrAngle, KadasAnnotationRotation::angleFromHandle( center, pos ) );
+    return v;
+  }
   return drawAttribsFromPosition( item, pos, ctx );
 }
 
-QgsPointXY KadasMarkerAnnotationController::positionFromEditAttribs( const QgsAnnotationItem *item, const KadasEditContext &, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const
+QgsPointXY KadasMarkerAnnotationController::positionFromEditAttribs(
+  const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx
+) const
 {
+  if ( editContext.vidx.vertex == RotationHandleVertex )
+  {
+    const QgsPointXY p = asMarker( item )->geometry();
+    return QgsPointXY( p.x(), p.y() );
+  }
   return positionFromDrawAttribs( item, values, ctx );
 }
 
@@ -215,6 +278,25 @@ void KadasMarkerAnnotationController::translate( QgsAnnotationItem *item, double
   QgsAnnotationMarkerItem *marker = asMarker( item );
   const QgsPointXY p = marker->geometry();
   marker->setGeometry( QgsPoint( p.x() + dx, p.y() + dy ) );
+}
+
+void KadasMarkerAnnotationController::populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &, const QgsPointXY &, const KadasAnnotationItemContext &ctx )
+{
+  QgsAnnotationMarkerItem *marker = asMarker( item );
+  if ( !marker->symbol() || marker->symbol()->angle() == 0.0 )
+    return;
+  QPointer<QgsAnnotationLayer> layerPtr( ctx.layer() );
+  QAction *reset = menu->addAction( QObject::tr( "Reset rotation" ) );
+  QObject::connect( reset, &QAction::triggered, reset, [marker, layerPtr]() {
+    if ( marker->symbol() )
+    {
+      std::unique_ptr<QgsMarkerSymbol> clone( marker->symbol()->clone() );
+      clone->setAngle( 0.0 );
+      marker->setSymbol( clone.release() );
+    }
+    if ( layerPtr )
+      layerPtr->triggerRepaint();
+  } );
 }
 
 QString KadasMarkerAnnotationController::asKml( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs, const QgsRenderContext &, QuaZip * ) const
@@ -297,9 +379,21 @@ void KadasMarkerAnnotationController::applyPersistedStyle( QgsAnnotationItem *it
   QColor fill = settingsFillColor->value();
   if ( fill.alpha() == 0 )
     fill.setAlpha( 255 );
-  sl->setColor( fill );
+  sl->setFillColor( fill );
   sl->setStrokeColor( settingsStrokeColor->value() );
   sl->setStrokeStyle( static_cast<Qt::PenStyle>( settingsStrokeStyle->value() ) );
+  // Non-filled shapes (cross, line, arrow) are drawn from their stroke alone:
+  // the stroke colour set above is what shows, and the fill is ignored. A
+  // NoPen style or zero outline width (both fine for filled shapes, which
+  // still show their fill) would otherwise leave them invisible, so coerce the
+  // outline to something drawable.
+  if ( !QgsSimpleMarkerSymbolLayerBase::shapeIsFilled( sl->shape() ) )
+  {
+    if ( sl->strokeStyle() == Qt::NoPen )
+      sl->setStrokeStyle( Qt::SolidLine );
+    if ( sl->strokeWidth() <= 0.0 )
+      sl->setStrokeWidth( std::max( 0.4, size * 0.15 ) );
+  }
   marker->setSymbol( sym.release() );
 }
 
@@ -311,9 +405,10 @@ void KadasMarkerAnnotationController::persistStyle( const QgsAnnotationItem *ite
   const auto *sl = dynamic_cast<const QgsSimpleMarkerSymbolLayer *>( marker->symbol()->symbolLayer( 0 ) );
   if ( !sl )
     return;
+  settingsShape->setValue( static_cast<int>( sl->shape() ) );
   settingsSize->setValue( static_cast<int>( std::round( sl->size() ) ) );
   settingsStrokeWidth->setValue( sl->strokeWidth() );
-  settingsFillColor->setValue( sl->color() );
+  settingsFillColor->setValue( sl->fillColor() );
   settingsStrokeColor->setValue( sl->strokeColor() );
   settingsStrokeStyle->setValue( static_cast<int>( sl->strokeStyle() ) );
 }

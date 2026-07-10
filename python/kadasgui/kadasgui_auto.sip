@@ -71,5 +71,7 @@
 %Include auto_generated/kadaslayerselectionwidget.sip
 %Include auto_generated/kadasmapwidget.sip
 %Include auto_generated/kadasbottombar.sip
+%Include auto_generated/kadassidepanelhost.sip
+%Include auto_generated/kadassidepanel.sip
 %Include auto_generated/kadasprojecttemplateselectiondialog.sip
 %Include auto_generated/kadasattributetypes.sip

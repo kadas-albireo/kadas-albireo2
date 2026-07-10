@@ -16,9 +16,12 @@
 
 #include <QDrag>
 #include <QFileDialog>
+#include <QHBoxLayout>
 #include <QImageReader>
+#include <QActionGroup>
 #include <QMenu>
 #include <QMessageBox>
+#include <QMimeData>
 #include <QRegularExpression>
 #include <QShortcut>
 #include <QUrlQuery>
@@ -27,6 +30,7 @@
 
 #include <qgis/qgsgui.h>
 #include <qgis/qgsblockingnetworkrequest.h>
+#include <qgis/qgsdoublespinbox.h>
 #include <qgis/qgsfloatingwidget.h>
 #include <qgis/qgslayertree.h>
 #include <qgis/qgslayertreemodel.h>
@@ -42,6 +46,7 @@
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsrasterlayer.h>
+#include <qgis/qgsscalecombobox.h>
 #include <qgis/qgssnappingutils.h>
 #include <qgis/qgssourceselectproviderregistry.h>
 #include <qgis/qgssourceselectprovider.h>
@@ -51,6 +56,8 @@
 #include "kadas/core/kadassettingstree.h"
 #include "kadas/gui/kadasclipboard.h"
 #include "kadas/gui/kadascoordinatedisplayer.h"
+#include "kadas/gui/kadascrsselection.h"
+#include "kadas/gui/kadassidepanelhost.h"
 #include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
@@ -97,6 +104,8 @@
 #include "kadaspythonintegration.h"
 #include "kadas3dintegration.h"
 #include "kadasredliningintegration.h"
+#include "kadasribbonsplitbutton.h"
+#include "kadasstatusbar.h"
 #include "auth/kadasportalauth.h"
 #include "bullseye/kadasmaptoolbullseye.h"
 #include "guidegrid/kadasmaptoolguidegrid.h"
@@ -106,9 +115,29 @@
 #include "milx/kadasmilxintegration.h"
 
 
+static bool clipboardHasPastableContent()
+{
+  // Paste only handles raster images and SVG (see KadasApplication::paste),
+  // so enable the action solely for those - not for plain text or other data.
+  const QMimeData *mimeData = KadasClipboard::instance()->mimeData();
+  return mimeData && ( mimeData->hasImage() || mimeData->hasFormat( "image/svg+xml" ) );
+}
+
 KadasMainWindow::KadasMainWindow()
 {
   KadasWindowBase::setupUi( this );
+
+  // Wrap the map canvas in a horizontal layout so that reflow side panels
+  // (which push the canvas rather than overlay it) can be docked beside it.
+  verticalLayoutCentralWidget->removeWidget( mMapCanvas );
+  QHBoxLayout *canvasRow = new QHBoxLayout();
+  canvasRow->setContentsMargins( 0, 0, 0, 0 );
+  canvasRow->setSpacing( 0 );
+  canvasRow->addWidget( mMapCanvas, 1 );
+  mRightPanelHost = new KadasSidePanelHost( KadasSidePanelHost::Edge::Right );
+  mRightPanelHost->setMapCanvas( mMapCanvas );
+  canvasRow->addWidget( mRightPanelHost, 0 );
+  verticalLayoutCentralWidget->insertLayout( 0, canvasRow );
 }
 
 KadasMainWindow::~KadasMainWindow()
@@ -129,9 +158,8 @@ void KadasMainWindow::init()
   KadasTopWidget::setupUi( topWidget );
   setMenuWidget( topWidget );
 
-  QWidget *statusWidget = new QWidget();
-  KadasStatusWidget::setupUi( statusWidget );
-  statusBar()->addPermanentWidget( statusWidget, 0 );
+  mStatusBar = new KadasStatusBar();
+  statusBar()->addPermanentWidget( mStatusBar, 0 );
 
   mMapCanvas->setFlags( Qgis::MapCanvasFlag::ShowMainAnnotationLayer );
   mMapCanvas->setCanvasColor( Qt::transparent );
@@ -147,7 +175,7 @@ void KadasMainWindow::init()
   mProjectTemplateDialog = new KadasProjectTemplateSelectionDialog( this );
   connect( mProjectTemplateDialog, &KadasProjectTemplateSelectionDialog::templateSelected, kApp, &KadasApplication::projectCreateFromTemplate );
 
-  mGpsIntegration = new KadasGpsIntegration( this, mGpsToolButton, mActionEnableGPS, mActionMoveWithGPS );
+  mGpsIntegration = new KadasGpsIntegration( this, mStatusBar->gpsButton(), mActionEnableGPS, mActionMoveWithGPS );
   mMapWidgetManager = new KadasMapWidgetManager( mMapCanvas, this );
 
   QgsLocatorWidget *lw = new QgsLocatorWidget( mMapCanvas );
@@ -217,24 +245,26 @@ void KadasMainWindow::init()
   mMapCanvas->installEventFilter( this );
   mLayersWidgetResizeHandle->installEventFilter( this );
 
-  mCoordinateDisplayer = new KadasCoordinateDisplayer( mDisplayCRSButton, mCoordinateLineEdit, mHeightLineEdit, mHeightUnitCombo, mMapCanvas, this );
-  mCRSSelectionButton->setMapCanvas( mMapCanvas );
-  mMagnifierSpinBox->setDecimals( 0 );
-  mMagnifierSpinBox->setRange( 100 * QgsGuiUtils::CANVAS_MAGNIFICATION_MIN, 100 * QgsGuiUtils::CANVAS_MAGNIFICATION_MAX );
-  mMagnifierSpinBox->setValue( 100 );
-  mMagnifierSpinBox->setWrapping( false );
-  mMagnifierSpinBox->setSingleStep( 10 );
-  mMagnifierSpinBox->setToolTip( tr( "Magnifier level" ) );
-  mMagnifierSpinBox->setClearValueMode( QgsDoubleSpinBox::CustomValue );
-  mMagnifierSpinBox->setClearValue( 100 * QgsSettings().value( QStringLiteral( "qgis/magnifier_factor_default" ), 1.0 ).toDouble() );
+  QgsDoubleSpinBox *magnifierSpinBox = mStatusBar->magnifierSpinBox();
+  mCoordinateDisplayer = new KadasCoordinateDisplayer( mStatusBar->displayCrsButton(), mStatusBar->coordinateEdit(), mStatusBar->heightEdit(), mHeightUnitCombo, mMapCanvas, this );
+  mStatusBar->crsSelectionButton()->setMapCanvas( mMapCanvas );
+  magnifierSpinBox->setDecimals( 0 );
+  magnifierSpinBox->setRange( 100 * QgsGuiUtils::CANVAS_MAGNIFICATION_MIN, 100 * QgsGuiUtils::CANVAS_MAGNIFICATION_MAX );
+  magnifierSpinBox->setValue( 100 );
+  magnifierSpinBox->setWrapping( false );
+  magnifierSpinBox->setSingleStep( 10 );
+  magnifierSpinBox->setToolTip( tr( "Magnifier level" ) );
+  magnifierSpinBox->setClearValueMode( QgsDoubleSpinBox::CustomValue );
+  magnifierSpinBox->setClearValue( 100 * QgsSettings().value( QStringLiteral( "qgis/magnifier_factor_default" ), 1.0 ).toDouble() );
 
-  connect( mScaleComboBox, &QgsScaleComboBox::scaleChanged, this, &KadasMainWindow::setMapScale );
-  connect( mScaleLockButton, &QToolButton::toggled, this, &KadasMainWindow::toggleScaleLock );
-  connect( mMagnifierSpinBox, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasMainWindow::setMapMagnifier );
+  connect( mStatusBar->scaleCombo(), &QgsScaleComboBox::scaleChanged, this, &KadasMainWindow::setMapScale );
+  connect( mStatusBar->scaleLockButton(), &QToolButton::toggled, this, &KadasMainWindow::toggleScaleLock );
+  connect( magnifierSpinBox, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasMainWindow::setMapMagnifier );
   connect( mMapCanvas, &QgsMapCanvas::magnificationChanged, [this]( double value ) {
-    mMagnifierSpinBox->blockSignals( true );
-    mMagnifierSpinBox->setValue( value * 100 );
-    mMagnifierSpinBox->blockSignals( false );
+    QgsDoubleSpinBox *spinBox = mStatusBar->magnifierSpinBox();
+    spinBox->blockSignals( true );
+    spinBox->setValue( value * 100 );
+    spinBox->blockSignals( false );
   } );
 
   mNumericInputCheckbox->setChecked( KadasSettingsTree::settingsShowNumericInput->value() );
@@ -265,7 +295,7 @@ void KadasMainWindow::init()
   mKmlIntegration = new KadasKmlIntegration( mKMLButton, this );
 
   // Redlining
-  mRedliningIntegration = new KadasRedliningIntegration( mToolButtonRedliningNewObject, this );
+  mRedliningIntegration = new KadasRedliningIntegration( this );
 
   // GPX routes
   mGpxIntegration = new KadasGpxIntegration( mActionDrawWaypoint, mActionDrawRoute, mActionExportGPX, mActionImportGPX, this );
@@ -329,7 +359,7 @@ void KadasMainWindow::init()
   connect( mZoomInButton, &QPushButton::clicked, this, &KadasMainWindow::zoomIn );
   connect( mZoomOutButton, &QPushButton::clicked, this, &KadasMainWindow::zoomOut );
   connect( mHomeButton, &QPushButton::clicked, this, &KadasMainWindow::zoomFull );
-  connect( KadasClipboard::instance(), &KadasClipboard::dataChanged, [this] { mActionPaste->setEnabled( !KadasClipboard::instance()->isEmpty() ); } );
+  connect( KadasClipboard::instance(), &KadasClipboard::dataChanged, [this] { mActionPaste->setEnabled( clipboardHasPastableContent() ); } );
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerProjection );
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerTemporalCapabilities );
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkWMSLayerIgnoreReportedExtents );
@@ -696,14 +726,71 @@ void KadasMainWindow::configureButtons()
   } );
 
   // Draw tab
-  setActionToButton( mActionPin, mPinButton, QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_M ), [this] { return addPinTool(); } );
+  // Three split buttons: Markers, Shapes, Others. Each remembers its last
+  // used tool (persisted) and exposes the remaining tools in a drop-down menu.
+  static const QgsSettingsEntryString sLastMarkerTool( QStringLiteral( "draw-last-marker-tool" ), KadasSettingsTree::sTreeKadas, QStringLiteral( "draw-marker-circle" ) );
+  static const QgsSettingsEntryString sLastShapeTool( QStringLiteral( "draw-last-shape-tool" ), KadasSettingsTree::sTreeKadas, QStringLiteral( "draw-line" ) );
+  static const QgsSettingsEntryString sLastOtherTool( QStringLiteral( "draw-last-other-tool" ), KadasSettingsTree::sTreeKadas, QStringLiteral( "mActionPin" ) );
 
-  QMenu *addImageMenu = new QMenu( mAddImageButton );
-  addImageMenu->addAction( tr( "Choose file..." ), QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_I ), this, &KadasMainWindow::addLocalPicture );
-  addImageMenu->addAction( tr( "Enter URL..." ), QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_U ), this, &KadasMainWindow::addRemotePicture );
-  mAddImageButton->setMenu( addImageMenu );
-  mAddImageButton->setPopupMode( QToolButton::InstantPopup );
-  mAddImageButton->setIcon( QIcon( ":/kadas/icons/picture" ) );
+  KadasRibbonSplitButton *markersSplit = new KadasRibbonSplitButton( mToolButtonMarkers, tr( "Markers" ), QIcon( ":/kadas/icons/draw_point" ), &sLastMarkerTool, this );
+  const QList<QAction *> markerActions = mRedliningIntegration->markerActions();
+  for ( QAction *action : markerActions )
+    markersSplit->addAction( action );
+  markersSplit->finish();
+
+  KadasRibbonSplitButton *shapesSplit = new KadasRibbonSplitButton( mToolButtonShapes, tr( "Shapes" ), QIcon( ":/kadas/icons/draw_polygon" ), &sLastShapeTool, this );
+  const QList<QAction *> shapeActions = mRedliningIntegration->shapeActions();
+  for ( QAction *action : shapeActions )
+    shapesSplit->addAction( action );
+  shapesSplit->finish();
+
+  // Pin tool: checkable, mutually exclusive with the redlining tools.
+  mActionPin->setObjectName( QStringLiteral( "mActionPin" ) );
+  mRedliningIntegration->actionGroup()->addAction( mActionPin );
+  connect( mActionPin, &QAction::toggled, this, [this]( bool active ) {
+    if ( active )
+    {
+      mMapCanvas->unsetMapTool( mapCanvas()->mapTool() );
+      QgsMapTool *tool = addPinTool();
+      if ( tool )
+      {
+        tool->setAction( mActionPin );
+        connect( tool, &QgsMapTool::deactivated, mActionPin, [this] { mActionPin->setChecked( false ); } );
+        mMapCanvas->setMapTool( tool );
+      }
+      else
+      {
+        mActionPin->setChecked( false );
+      }
+    }
+    else if ( mMapCanvas->mapTool() && mMapCanvas->mapTool()->action() == mActionPin )
+    {
+      mMapCanvas->unsetMapTool( mapCanvas()->mapTool() );
+    }
+  } );
+  connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_M ), this ), &QShortcut::activated, mActionPin, &QAction::trigger );
+
+  // Image: opens a sub-menu offering "From file" / "From URL". It is a one-shot
+  // command (not a checkable tool), so it never becomes the split button's
+  // remembered tool nor leaves it stuck in an activated state when the file
+  // dialog is cancelled. The sub-menu lives at the gallery-tile level, so the
+  // ribbon keeps a single drop-down arrow.
+  QAction *actionAddImage = new QAction( QIcon( ":/kadas/icons/picture" ), tr( "Image" ), this );
+  actionAddImage->setObjectName( QStringLiteral( "draw-image" ) );
+  QMenu *imageMenu = new QMenu( this );
+  imageMenu->addAction( tr( "From file…" ), this, &KadasMainWindow::addLocalPicture );
+  imageMenu->addAction( tr( "From URL…" ), this, &KadasMainWindow::addRemotePicture );
+  actionAddImage->setMenu( imageMenu );
+  connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_I ), this ), &QShortcut::activated, this, &KadasMainWindow::addLocalPicture );
+  connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_U ), this ), &QShortcut::activated, this, &KadasMainWindow::addRemotePicture );
+
+  KadasRibbonSplitButton *othersSplit = new KadasRibbonSplitButton( mToolButtonOthers, tr( "Others" ), QIcon( ":/kadas/icons/draw_pin" ), &sLastOtherTool, this );
+  othersSplit->addAction( mActionPin );
+  othersSplit->addAction( actionAddImage );
+  othersSplit->addAction( mRedliningIntegration->actionNewText() );
+  othersSplit->addAction( mRedliningIntegration->actionNewTextAlongLine() );
+  othersSplit->addAction( mRedliningIntegration->actionNewCoordinateCross() );
+  othersSplit->finish();
 
   setActionToButton( mActionGuideGrid, mGuideGridButton, QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_G ), [this] {
     return new KadasMapToolGuideGrid( mMapCanvas, mLayerTreeView, mLayerTreeView->currentLayer() );
@@ -714,7 +801,7 @@ void KadasMainWindow::configureButtons()
   } );
 
   setActionToButton( mActionPaste, mPasteButton, QKeySequence( Qt::CTRL | Qt::Key_V ), [] { return kApp->paste(); } );
-  mActionPaste->setEnabled( !KadasClipboard::instance()->isEmpty() );
+  mActionPaste->setEnabled( clipboardHasPastableContent() );
 
   setActionToButton( mActionDeleteItems, mDeleteItemsButton, QKeySequence(), [this] { return new KadasMapToolDeleteItems( mapCanvas() ); } );
 
@@ -993,41 +1080,41 @@ void KadasMainWindow::checkOnTheFlyProjection()
 void KadasMainWindow::zoomFull()
 {
   // Block scale combobox signals, as the scale changed signals redundantly changes the map extent
-  mScaleComboBox->blockSignals( true );
+  mStatusBar->scaleCombo()->blockSignals( true );
   mMapCanvas->zoomToFullExtent();
-  mScaleComboBox->blockSignals( false );
+  mStatusBar->scaleCombo()->blockSignals( false );
 }
 
 void KadasMainWindow::zoomIn()
 {
   // Block scale combobox signals, as the scale changed signals redundantly changes the map extent
-  mScaleComboBox->blockSignals( true );
+  mStatusBar->scaleCombo()->blockSignals( true );
   mMapCanvas->zoomIn();
-  mScaleComboBox->blockSignals( false );
+  mStatusBar->scaleCombo()->blockSignals( false );
 }
 
 void KadasMainWindow::zoomNext()
 {
   // Block scale combobox signals, as the scale changed signals redundantly changes the map extent
-  mScaleComboBox->blockSignals( true );
+  mStatusBar->scaleCombo()->blockSignals( true );
   mMapCanvas->zoomToNextExtent();
-  mScaleComboBox->blockSignals( false );
+  mStatusBar->scaleCombo()->blockSignals( false );
 }
 
 void KadasMainWindow::zoomOut()
 {
   // Block scale combobox signals, as the scale changed signals redundantly changes the map extent
-  mScaleComboBox->blockSignals( true );
+  mStatusBar->scaleCombo()->blockSignals( true );
   mMapCanvas->zoomOut();
-  mScaleComboBox->blockSignals( false );
+  mStatusBar->scaleCombo()->blockSignals( false );
 }
 
 void KadasMainWindow::zoomPrev()
 {
   // Block scale combobox signals, as the scale changed signals redundantly changes the map extent
-  mScaleComboBox->blockSignals( true );
+  mStatusBar->scaleCombo()->blockSignals( true );
   mMapCanvas->zoomToPreviousExtent();
-  mScaleComboBox->blockSignals( false );
+  mStatusBar->scaleCombo()->blockSignals( false );
 }
 
 void KadasMainWindow::zoomToLayerExtent()
@@ -1078,14 +1165,14 @@ void KadasMainWindow::showSourceSelectDialog( const QString &providerName )
 
 void KadasMainWindow::setMapScale()
 {
-  mMapCanvas->zoomScale( mScaleComboBox->scale() );
+  mMapCanvas->zoomScale( mStatusBar->scaleCombo()->scale() );
 }
 
 void KadasMainWindow::toggleScaleLock( bool active )
 {
-  mScaleLockButton->setIcon( active ? QgsApplication::getThemeIcon( "/locked.svg" ) : QgsApplication::getThemeIcon( "/unlocked.svg" ) );
-  mMapCanvas->setScaleLocked( mScaleLockButton->isChecked() );
-  mScaleComboBox->setEnabled( !mScaleLockButton->isChecked() );
+  mStatusBar->scaleLockButton()->setIcon( active ? QgsApplication::getThemeIcon( "/locked.svg" ) : QgsApplication::getThemeIcon( "/unlocked.svg" ) );
+  mMapCanvas->setScaleLocked( mStatusBar->scaleLockButton()->isChecked() );
+  mStatusBar->scaleCombo()->setEnabled( !mStatusBar->scaleLockButton()->isChecked() );
 }
 
 void KadasMainWindow::setMapMagnifier( double value )
@@ -1095,9 +1182,14 @@ void KadasMainWindow::setMapMagnifier( double value )
   mMapCanvas->blockSignals( false );
 }
 
+void KadasMainWindow::resetMagnification()
+{
+  mStatusBar->magnifierSpinBox()->clear();
+}
+
 void KadasMainWindow::showScale( double scale )
 {
-  mScaleComboBox->setScale( scale );
+  mStatusBar->scaleCombo()->setScale( scale );
 }
 
 void KadasMainWindow::switchToTabForTool( QgsMapTool *tool )
@@ -1451,6 +1543,12 @@ QgsMapTool *KadasMainWindow::addPinTool()
 
 void KadasMainWindow::addLocalPicture()
 {
+  // Choosing Image switches intent away from the previous tool: deactivate it
+  // now so that cancelling the dialog leaves no tool active (a map click then
+  // does nothing instead of, e.g., dropping another pin).
+  if ( QgsMapTool *tool = mMapCanvas->mapTool() )
+    mMapCanvas->unsetMapTool( tool );
+
   QString lastDir = QgsSettings().value( "/UI/lastImportExportDir", "." ).toString();
   QSet<QString> formats;
   for ( const QByteArray &format : QImageReader::supportedImageFormats() )
@@ -1473,6 +1571,11 @@ void KadasMainWindow::addLocalPicture()
 
 void KadasMainWindow::addRemotePicture()
 {
+  // See addLocalPicture(): deactivate the previous tool so cancelling leaves no
+  // active tool.
+  if ( QgsMapTool *tool = mMapCanvas->mapTool() )
+    mMapCanvas->unsetMapTool( tool );
+
   QDialog dialog;
   QGridLayout *layout = new QGridLayout();
   dialog.setLayout( layout );
@@ -1613,11 +1716,11 @@ void KadasMainWindow::updateBgLayerZoomResolutions() const
       double scale = resolution / refRes;
       scales.append( QgsScaleComboBox::toString( scale ) );
     }
-    mScaleComboBox->updateScales( scales );
+    mStatusBar->scaleCombo()->updateScales( scales );
   }
   else
   {
-    mScaleComboBox->updateScales( QStringList() ); // default scales
+    mStatusBar->scaleCombo()->updateScales( QStringList() ); // default scales
   }
 }
 

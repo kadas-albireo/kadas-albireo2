@@ -50,6 +50,7 @@ class KadasAnnotationZIndex
 
     // Text / labels paint above everything else.
     static constexpr int PointText = 40000;
+    static constexpr int LineText = PointText;
 };
 
 #endif // KADASANNOTATIONZINDEX_H

@@ -19,7 +19,7 @@
 
 #include <qgis/qgsmaptool.h>
 
-#include "kadas/gui/kadasbottombar.h"
+#include "kadas/gui/kadassidepanel.h"
 #include "ui_kadasbullseyewidgetbase.h"
 
 class QgsLayerTreeView;
@@ -47,7 +47,7 @@ class KadasMapToolBullseye : public QgsMapTool
 };
 
 
-class KadasBullseyeWidget : public KadasBottomBar
+class KadasBullseyeWidget : public KadasSidePanel
 {
     Q_OBJECT
 

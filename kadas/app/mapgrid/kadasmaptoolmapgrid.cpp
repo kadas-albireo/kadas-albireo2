@@ -77,22 +77,14 @@ void KadasMapToolMapGrid::keyReleaseEvent( QKeyEvent *e )
 
 
 KadasMapGridWidget::KadasMapGridWidget( QgsMapCanvas *canvas, QgsLayerTreeView *layerTreeView, QgsMapLayer *layer )
-  : KadasBottomBar( canvas )
+  : KadasSidePanel( canvas )
 {
-  setLayout( new QHBoxLayout );
-  layout()->setSpacing( 10 );
+  setTitle( tr( "Map grid" ) );
+  connect( this, &KadasSidePanel::closeRequested, this, &KadasMapGridWidget::close );
 
   QWidget *base = new QWidget();
   ui.setupUi( base );
-  layout()->addWidget( base );
-
-  QPushButton *closeButton = new QPushButton();
-  closeButton->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
-  closeButton->setIcon( QIcon( ":/kadas/icons/close" ) );
-  closeButton->setToolTip( tr( "Close" ) );
-  connect( closeButton, &QPushButton::clicked, this, &KadasMapGridWidget::close );
-  layout()->addWidget( closeButton );
-  layout()->setAlignment( closeButton, Qt::AlignTop );
+  addRow( base );
 
   auto layerFilter = []( QgsMapLayer *layer ) { return dynamic_cast<KadasMapGridLayer *>( layer ) != nullptr; };
   auto layerCreator = [this]( const QString &name ) { return createLayer( name ); };

@@ -30,7 +30,7 @@
 
 class KadasAnnotationItemController;
 class KadasAnnotationStyleEditor;
-class KadasBottomBar;
+class KadasSidePanel;
 class KadasFloatingInputWidget;
 class QBoxLayout;
 class QgsAnnotationItem;
@@ -79,6 +79,8 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     void partFinished();
     //! Create-mode: emitted after a fresh item replaces the previous one.
     void cleared();
+    //! Emitted after a committed style edit has been persisted to settings.
+    void stylePersisted();
 
   private:
     enum class DrawState
@@ -111,7 +113,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     Qt::MouseButton mPressedButton = Qt::NoButton;
     bool mEditItemHidden = false;
 
-    KadasBottomBar *mBottomBar = nullptr;
+    KadasSidePanel *mBottomBar = nullptr;
     KadasStateHistory *mStateHistory = nullptr;
     KadasFloatingInputWidget *mInputWidget = nullptr;
     bool mIgnoreNextMoveEvent = false;
@@ -127,13 +129,18 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     void refreshHandles();
     void updateTempRubberBand();
     void clearTempRubberBand();
+    //! Renders the currently edited item straight into \a painter (scene
+    //! coordinates), used for the live in-drag preview of live-repaint items.
+    void renderItemPreview( QPainter *painter );
+    //! Enables/disables the synchronous overlay preview of the edited item.
+    void setLivePreviewEnabled( bool enabled );
     void pushState();
     void deleteItem();
     void setupNumericInput();
     void clearNumericInput();
     KadasAttribValues collectAttributeValues() const;
 
-    void setupStyleEditor( QBoxLayout *outer );
+    void setupStyleEditor();
 
     void createInitialItem();
     void clearInProgressItem();
@@ -149,7 +156,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     };
     PickedItem pickItemAt( const QgsPointXY &mapPos ) const;
     void switchToItem( QgsAnnotationLayer *layer, const QString &itemId );
-    void showContextMenu( QgsAnnotationLayer *layer, const QString &itemId, const QPoint &globalPos );
+    void showContextMenu( QgsAnnotationLayer *layer, const QString &itemId, const QgsPointXY &mapPos, const QPoint &globalPos );
 
   private slots:
     void stateChanged( KadasStateHistory::ChangeType, KadasStateHistory::State *state, KadasStateHistory::State *prevState );

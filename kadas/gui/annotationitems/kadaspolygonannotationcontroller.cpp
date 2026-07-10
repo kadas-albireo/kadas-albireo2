@@ -15,7 +15,9 @@
  ***************************************************************************/
 
 #include <QObject>
+#include <QPainter>
 #include <QTextStream>
+#include <algorithm>
 #include <memory>
 
 #include <qgis/qgsannotationpolygonitem.h>
@@ -27,12 +29,14 @@
 #include <qgis/qgsfillsymbollayer.h>
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgslinestring.h>
+#include <qgis/qgsmapsettings.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgspointxy.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettingsentryimpl.h>
 
+#include "kadas/gui/annotationitems/kadasannotationrotation.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadaspolygonannotationcontroller.h"
@@ -63,6 +67,9 @@ namespace
     Q_ASSERT( item && item->type() == QLatin1String( "polygon" ) );
     return static_cast<const QgsAnnotationPolygonItem *>( item );
   }
+
+  // vidx.part sentinel for the rotation handle (real vertices use part 0).
+  constexpr int kPartRotate = 1;
 
   //! Returns the mutable exterior LineString of the polygon, cloning it via setGeometry() for in-place edits.
   QgsLineString *takeMutableExterior( QgsAnnotationPolygonItem *item )
@@ -118,7 +125,41 @@ QList<KadasNode> KadasPolygonAnnotationController::nodes( const QgsAnnotationIte
     const QgsPoint p = ring->vertexAt( QgsVertexId( 0, 0, i ) );
     result.append( { toMapPos( QgsPointXY( p.x(), p.y() ), ctx ) } );
   }
+  // Rotation handle above the geometric centroid (needs a real polygon).
+  if ( last >= 3 )
+  {
+    QgsPointXY handle;
+    if ( mRotation.active() )
+    {
+      // Follow the cursor while rotating.
+      handle = mRotation.handle();
+    }
+    else
+    {
+      handle = restHandleMap( poly, ctx );
+    }
+    result.append( { handle, []( QPainter *p, const QPointF &pt, int sz ) { KadasAnnotationRotation::renderHandle( p, pt, sz ); } } );
+  }
   return result;
+}
+
+QgsPointXY KadasPolygonAnnotationController::restHandleMap( const QgsCurvePolygon *poly, const KadasAnnotationItemContext &ctx ) const
+{
+  const QgsPointXY centerMap = centroidMap( poly, ctx );
+  const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
+  // Lift the handle above the polygon's northmost extent (not just the centroid)
+  // so it always sits clear of the shape, then a fixed gap further out.
+  double topMapY = centerMap.y();
+  if ( const QgsCurve *ring = poly->exteriorRing() )
+  {
+    const int n = ring->numPoints();
+    for ( int i = 0; i < n; ++i )
+    {
+      const QgsPoint p = ring->vertexAt( QgsVertexId( 0, 0, i ) );
+      topMapY = std::max( topMapY, toMapPos( QgsPointXY( p.x(), p.y() ), ctx ).y() );
+    }
+  }
+  return QgsPointXY( centerMap.x(), topMapY + off );
 }
 
 bool KadasPolygonAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
@@ -210,6 +251,9 @@ KadasEditContext KadasPolygonAnnotationController::getEditContext( const QgsAnno
   const QgsCurve *ring = poly->exteriorRing();
   if ( !ring )
     return KadasEditContext();
+  // Any hover hit-test means we are no longer mid-rotation; draw the handle at
+  // rest again (a drag never calls getEditContext, it goes straight to edit()).
+  mRotation.deactivate();
   const int n = ring->numPoints();
   const int last = ( n > 1 && ring->vertexAt( QgsVertexId( 0, 0, 0 ) ) == ring->vertexAt( QgsVertexId( 0, 0, n - 1 ) ) ) ? n - 1 : n;
   for ( int i = 0; i < last; ++i )
@@ -219,6 +263,26 @@ KadasEditContext KadasPolygonAnnotationController::getEditContext( const QgsAnno
     if ( pos.sqrDist( mp ) < pickTolSqr( ctx ) )
     {
       return KadasEditContext( QgsVertexId( 0, 0, i ), mp, drawAttribs() );
+    }
+  }
+  // Rotation handle: snapshot the ring (map coords) and pivot for a drift-free drag.
+  if ( last >= 3 )
+  {
+    const QgsPointXY centerMap = centroidMap( poly, ctx );
+    const QgsPointXY handle = restHandleMap( poly, ctx );
+    if ( pos.sqrDist( handle ) < pickTolSqr( ctx ) )
+    {
+      QVector<QgsPointXY> verticesMap;
+      verticesMap.reserve( n );
+      for ( int i = 0; i < n; ++i )
+      {
+        const QgsPoint p = ring->vertexAt( QgsVertexId( 0, 0, i ) );
+        verticesMap.append( toMapPos( QgsPointXY( p.x(), p.y() ), ctx ) );
+      }
+      mRotation.begin( verticesMap, centerMap, handle );
+      KadasAttribDefs rot;
+      rot.insert( AttrAngle, KadasNumericAttribute { "angle", KadasNumericAttribute::Type::TypeAngle } );
+      return KadasEditContext( QgsVertexId( kPartRotate, 0, 0 ), handle, rot, Qt::CrossCursor );
     }
   }
   // Fall back: a click inside the polygon body selects it for whole-geometry
@@ -241,6 +305,22 @@ KadasEditContext KadasPolygonAnnotationController::getEditContext( const QgsAnno
 
 void KadasPolygonAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
+  if ( editContext.vidx.part == kPartRotate )
+  {
+    if ( !mRotation.hasSnapshot() )
+      return;
+    QgsLineString *ring = takeMutableExterior( asPolygon( item ) );
+    if ( !ring || ring->numPoints() != mRotation.vertexCount() )
+      return;
+    const QVector<QgsPointXY> rotated = mRotation.dragTo( newPoint, ctx.modifiers() & Qt::ShiftModifier );
+    for ( int i = 0; i < rotated.size(); ++i )
+    {
+      const QgsPointXY ip = toItemPos( rotated[i], ctx );
+      ring->moveVertex( QgsVertexId( 0, 0, i ), QgsPoint( ip.x(), ip.y() ) );
+    }
+    return;
+  }
+
   QgsLineString *ring = takeMutableExterior( asPolygon( item ) );
   if ( !ring )
     return;
@@ -273,16 +353,47 @@ void KadasPolygonAnnotationController::edit( QgsAnnotationItem *item, const Kada
 
 void KadasPolygonAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
 {
+  if ( editContext.vidx.part == kPartRotate )
+  {
+    if ( !mRotation.hasSnapshot() )
+      return;
+    QgsLineString *ring = takeMutableExterior( asPolygon( item ) );
+    if ( !ring || ring->numPoints() != mRotation.vertexCount() )
+      return;
+    const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
+    const QVector<QgsPointXY> rotated = mRotation.applyAngle( values[AttrAngle], off );
+    for ( int i = 0; i < rotated.size(); ++i )
+    {
+      const QgsPointXY ip = toItemPos( rotated[i], ctx );
+      ring->moveVertex( QgsVertexId( 0, 0, i ), QgsPoint( ip.x(), ip.y() ) );
+    }
+    return;
+  }
   edit( item, editContext, QgsPointXY( values[AttrX], values[AttrY] ), ctx );
 }
 
-KadasAttribValues KadasPolygonAnnotationController::editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
+KadasAttribValues KadasPolygonAnnotationController::editAttribsFromPosition(
+  const QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx
+) const
 {
+  if ( editContext.vidx.part == kPartRotate )
+  {
+    KadasAttribValues v;
+    v.insert( AttrAngle, mRotation.angleFromCursor( pos ) );
+    return v;
+  }
   return drawAttribsFromPosition( item, pos, ctx );
 }
 
-QgsPointXY KadasPolygonAnnotationController::positionFromEditAttribs( const QgsAnnotationItem *item, const KadasEditContext &, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const
+QgsPointXY KadasPolygonAnnotationController::positionFromEditAttribs(
+  const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx
+) const
 {
+  if ( editContext.vidx.part == kPartRotate )
+  {
+    const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
+    return mRotation.handleForAngle( values[AttrAngle], off );
+  }
   return positionFromDrawAttribs( item, values, ctx );
 }
 

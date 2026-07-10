@@ -36,7 +36,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 
-#include "kadas/gui/kadasbottombar.h"
+#include "kadas/gui/kadassidepanel.h"
 #include "kadas/gui/kadasfeaturepicker.h"
 #include "kadas/gui/maptools/kadasmaptoolmeasure.h"
 
@@ -173,17 +173,7 @@ void KadasMapToolMeasure::activate()
 
   mLabelsOverlay = new KadasMeasureLabelsOverlay( canvas() );
 
-  mBottomBar = new KadasBottomBar( canvas() );
-  QHBoxLayout *layout = new QHBoxLayout( mBottomBar );
-  layout->setContentsMargins( 8, 4, 8, 4 );
-  layout->setSpacing( 2 );
-
-  QGridLayout *gridLayout = new QGridLayout();
-  gridLayout->setContentsMargins( 0, 0, 0, 0 );
-  gridLayout->setSpacing( 2 );
-  QWidget *grid = new QWidget();
-  grid->setLayout( gridLayout );
-  layout->addWidget( grid );
+  mBottomBar = new KadasSidePanel( canvas() );
 
   QString toolLabel;
   switch ( mMeasureMode )
@@ -198,13 +188,13 @@ void KadasMapToolMeasure::activate()
       toolLabel = tr( "Measure circle" );
       break;
   }
-  mTitleLabel = new QLabel( QString( "<b>%1</b>" ).arg( toolLabel ) );
-  gridLayout->addWidget( mTitleLabel, 0, 0 );
+  mBottomBar->setTitle( toolLabel );
+  connect( mBottomBar, &KadasSidePanel::closeRequested, this, [this] { canvas()->unsetMapTool( this ); } );
 
   mReadoutLabel = new QLabel();
   mReadoutLabel->setTextInteractionFlags( Qt::TextSelectableByMouse );
   mReadoutLabel->setAlignment( Qt::AlignVCenter | Qt::AlignRight );
-  gridLayout->addWidget( mReadoutLabel, 0, 1 );
+  mBottomBar->addRow( tr( "Result" ), mReadoutLabel );
 
   mUnitComboBox = new QComboBox();
   mUnitComboBox->addItem( tr( "Metric" ), static_cast<int>( Qgis::DistanceUnit::Meters ) );
@@ -216,7 +206,7 @@ void KadasMapToolMeasure::activate()
     QgsSettings().setValue( "/kadas/last_measure_unit", mUnitComboBox->currentData().toInt() );
     recomputeReadout();
   } );
-  gridLayout->addWidget( mUnitComboBox, 0, 2 );
+  mBottomBar->addRow( tr( "Unit" ), mUnitComboBox );
 
   if ( mMeasureMode == MeasureMode::MeasureLine )
   {
@@ -228,7 +218,7 @@ void KadasMapToolMeasure::activate()
       mAngleUnitComboBox->setEnabled( enabled );
       recomputeReadout();
     } );
-    gridLayout->addWidget( mAzimuthCheckbox, 1, 0 );
+    mBottomBar->addRow( mAzimuthCheckbox );
 
     mNorthComboBox = new QComboBox();
     mNorthComboBox->addItem( tr( "Geographic north" ), QVariant::fromValue( AzimuthNorth::AzimuthGeoNorth ) );
@@ -239,7 +229,7 @@ void KadasMapToolMeasure::activate()
       settingsLastAzimuthNorth->setValue( mNorthComboBox->currentData().value<AzimuthNorth>() );
       recomputeReadout();
     } );
-    gridLayout->addWidget( mNorthComboBox, 1, 1 );
+    mBottomBar->addRow( tr( "North" ), mNorthComboBox );
 
     mAngleUnitComboBox = new QComboBox();
     mAngleUnitComboBox->addItem( tr( "Degrees" ), static_cast<int>( Qgis::AngleUnit::Degrees ) );
@@ -253,14 +243,18 @@ void KadasMapToolMeasure::activate()
       QgsSettings().setValue( "/kadas/last_azimuth_unit", mAngleUnitComboBox->currentData().toInt() );
       recomputeReadout();
     } );
-    gridLayout->addWidget( mAngleUnitComboBox, 1, 2 );
+    mBottomBar->addRow( tr( "Angle unit" ), mAngleUnitComboBox );
   }
+
+  QHBoxLayout *buttonRow = new QHBoxLayout();
+  buttonRow->setContentsMargins( 0, 0, 0, 0 );
+  buttonRow->setSpacing( 2 );
 
   QToolButton *pickButton = new QToolButton();
   pickButton->setIcon( QIcon( ":/kadas/icons/select" ) );
   pickButton->setToolTip( tr( "Pick existing geometry" ) );
   connect( pickButton, &QToolButton::clicked, this, &KadasMapToolMeasure::requestPick );
-  layout->addWidget( pickButton );
+  buttonRow->addWidget( pickButton );
 
   QToolButton *clearButton = new QToolButton();
   clearButton->setIcon( QIcon( ":/kadas/icons/clear" ) );
@@ -270,15 +264,10 @@ void KadasMapToolMeasure::activate()
     clear();
     recomputeReadout();
   } );
-  layout->addWidget( clearButton );
+  buttonRow->addWidget( clearButton );
+  buttonRow->addStretch( 1 );
+  mBottomBar->addRow( buttonRow );
 
-  QPushButton *closeButton = new QPushButton();
-  closeButton->setIcon( QIcon( ":/kadas/icons/close" ) );
-  closeButton->setToolTip( tr( "Close" ) );
-  connect( closeButton, &QPushButton::clicked, this, [this] { canvas()->unsetMapTool( this ); } );
-  layout->addWidget( closeButton );
-
-  mBottomBar->setLayout( layout );
   mBottomBar->adjustSize();
   mBottomBar->show();
 
@@ -291,7 +280,6 @@ void KadasMapToolMeasure::deactivate()
   mBottomBar = nullptr;
   delete mLabelsOverlay;
   mLabelsOverlay = nullptr;
-  mTitleLabel = nullptr;
   mReadoutLabel = nullptr;
   mUnitComboBox = nullptr;
   mAngleUnitComboBox = nullptr;
@@ -489,6 +477,10 @@ void KadasMapToolMeasure::recomputeReadout()
   if ( parts.isEmpty() )
   {
     mReadoutLabel->setText( QStringLiteral( "<b>—</b>" ) );
+    // Nothing is being measured: release the width floor so the panel returns
+    // to its natural size for the next measurement.
+    if ( mBottomBar )
+      mBottomBar->setMinimumWidth( 0 );
     if ( mLabelsOverlay )
       mLabelsOverlay->setLabels( {} );
     return;
@@ -537,7 +529,16 @@ void KadasMapToolMeasure::recomputeReadout()
   text += QStringLiteral( "</pre>" );
   mReadoutLabel->setText( text );
   if ( mBottomBar )
-    mBottomBar->adjustSize();
+  {
+    // The live readout changes length on every mouse move (the distance value
+    // grows and shrinks). Letting the panel shrink-and-grow each frame reflows
+    // the canvas continuously and looks glitchy. Pin a width floor that only
+    // ever grows to fit the widest readout so shrinking frames become no-ops;
+    // it is released once the measurement is cleared (see the empty branch).
+    const int hintWidth = mBottomBar->sizeHint().width();
+    if ( hintWidth > mBottomBar->minimumWidth() )
+      mBottomBar->setMinimumWidth( hintWidth );
+  }
 
   updateCanvasLabels( parts );
 }

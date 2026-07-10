@@ -1,6 +1,8 @@
 set(kadas_gui_SRC
     kadasattributetabledialog.cpp
     kadasbottombar.cpp
+    kadassidepanel.cpp
+    kadassidepanelhost.cpp
     kadascatalogbrowser.cpp
     kadascatalogprovider.cpp
     kadasclipboard.cpp
@@ -27,6 +29,7 @@ set(kadas_gui_SRC
     annotationitems/kadasannotationlayerhelpers.cpp
     annotationitems/kadasannotationlayerregistry.cpp
     annotationitems/kadasannotationprojectintegration.cpp
+    annotationitems/kadasannotationrotation.cpp
     annotationitems/kadasannotationstyleeditor.cpp
     annotationitems/kadascircleannotationcontroller.cpp
     annotationitems/kadascircleannotationitem.cpp
@@ -37,6 +40,7 @@ set(kadas_gui_SRC
     annotationitems/kadasgpxwaypointannotationcontroller.cpp
     annotationitems/kadasgpxwaypointannotationitem.cpp
     annotationitems/kadaslineannotationcontroller.cpp
+    annotationitems/kadaslinetextannotationcontroller.cpp
     annotationitems/kadasmarkerannotationcontroller.cpp
     annotationitems/kadasmilxannotationcontroller.cpp
     annotationitems/kadasmilxannotationitem.cpp
@@ -47,6 +51,8 @@ set(kadas_gui_SRC
     annotationitems/kadaspointtextannotationcontroller.cpp
     annotationitems/kadaspolygonannotationcontroller.cpp
     annotationitems/kadasrectangleannotationcontroller.cpp
+    annotationitems/kadassvgmarkerannotationcontroller.cpp
+    annotationitems/kadassvgmarkerannotationitem.cpp
     annotationitems/kadasrectangleannotationitem.cpp
     maptools/kadasmaptooldeleteitems.cpp
     maptools/kadasmaptooleditannotationitem.cpp
@@ -78,6 +84,8 @@ set(kadas_gui_SRC
 set(kadas_gui_HDR
     kadasattributetabledialog.h
     kadasbottombar.h
+    kadassidepanel.h
+    kadassidepanelhost.h
     kadascatalogbrowser.h
     kadascatalogprovider.h
     kadasclipboard.h
@@ -105,6 +113,7 @@ set(kadas_gui_HDR
     annotationitems/kadasannotationlayerhelpers.h
     annotationitems/kadasannotationlayerregistry.h
     annotationitems/kadasannotationprojectintegration.h
+    annotationitems/kadasannotationrotation.h
     annotationitems/kadasannotationshadow.h
     annotationitems/kadasannotationstyleeditor.h
     annotationitems/kadasannotationzindex.h
@@ -117,6 +126,7 @@ set(kadas_gui_HDR
     annotationitems/kadasgpxwaypointannotationcontroller.h
     annotationitems/kadasgpxwaypointannotationitem.h
     annotationitems/kadaslineannotationcontroller.h
+    annotationitems/kadaslinetextannotationcontroller.h
     annotationitems/kadasmarkerannotationcontroller.h
     annotationitems/kadasmilxannotationcontroller.h
     annotationitems/kadasmilxannotationitem.h
@@ -128,6 +138,8 @@ set(kadas_gui_HDR
     annotationitems/kadaspolygonannotationcontroller.h
     annotationitems/kadasrectangleannotationcontroller.h
     annotationitems/kadasrectangleannotationitem.h
+    annotationitems/kadassvgmarkerannotationcontroller.h
+    annotationitems/kadassvgmarkerannotationitem.h
     maptools/kadasmaptooldeleteitems.h
     maptools/kadasmaptooleditannotationitem.h
     maptools/kadasmaptoolheightprofile.h

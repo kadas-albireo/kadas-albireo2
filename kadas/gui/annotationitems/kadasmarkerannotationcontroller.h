@@ -55,6 +55,8 @@ class KADAS_GUI_EXPORT KadasMarkerAnnotationController : public KadasAnnotationI
     void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos ) override;
     void translate( QgsAnnotationItem *item, double dx, double dy ) override;
 
+    void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx ) override;
+
     //! Re-render the layer live while dragging (the outline band is a poor stand-in for the symbol).
     bool liveRepaintOnEdit() const override { return true; }
 
@@ -75,12 +77,20 @@ class KADAS_GUI_EXPORT KadasMarkerAnnotationController : public KadasAnnotationI
     static const QgsSettingsEntryInteger *settingsStrokeStyle;
 #endif
 
+  protected:
+    //! Whether this marker type exposes a rotation handle (drawn node + hit-test). Symmetric markers like the coordinate cross have none.
+    virtual bool hasRotationHandle() const { return true; }
+
   private:
     enum AttribIds
     {
       AttrX,
-      AttrY
+      AttrY,
+      AttrAngle
     };
+
+    //! Vertex 1 is the rotation handle; vertex 0 is the anchor point.
+    static constexpr int RotationHandleVertex = 1;
 };
 
 #endif // KADASMARKERANNOTATIONCONTROLLER_H

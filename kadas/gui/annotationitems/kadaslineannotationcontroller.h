@@ -17,7 +17,10 @@
 #ifndef KADASLINEANNOTATIONCONTROLLER_H
 #define KADASLINEANNOTATIONCONTROLLER_H
 
+#include <qgis/qgspointxy.h>
+
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
+#include "kadas/gui/annotationitems/kadasannotationrotation.h"
 
 /**
  * \ingroup gui
@@ -75,8 +78,13 @@ class KADAS_GUI_EXPORT KadasLineAnnotationController : public KadasAnnotationIte
     enum AttribIds
     {
       AttrX,
-      AttrY
+      AttrY,
+      AttrAngle
     };
+
+    // Per-drag rotation state, captured when the rotation handle is grabbed.
+    // Shared with the polygon controller so rotation behaves identically.
+    mutable KadasAnnotationRotation::VertexRotationState mRotation;
 };
 
 #endif // KADASLINEANNOTATIONCONTROLLER_H
