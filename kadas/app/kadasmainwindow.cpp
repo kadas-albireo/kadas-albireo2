@@ -19,6 +19,7 @@
 #include <QHBoxLayout>
 #include <QImageReader>
 #include <QActionGroup>
+#include <QButtonGroup>
 #include <QMenu>
 #include <QMessageBox>
 #include <QMimeData>
@@ -115,6 +116,9 @@
 #include "milx/kadasmilxintegration.h"
 
 
+static const QgsSettingsEntryInteger sSettingsLayersWidgetWidth( QStringLiteral( "layers-widget-width" ), KadasSettingsTree::sTreeKadas, 200, QStringLiteral( "Width of the layers side panel." ) );
+static const QgsSettingsEntryInteger sSettingsLayersWidgetTab( QStringLiteral( "layers-widget-tab" ), KadasSettingsTree::sTreeKadas, 0, QStringLiteral( "Last-selected layers panel tab." ) );
+
 static bool clipboardHasPastableContent()
 {
   // Paste only handles raster images and SVG (see KadasApplication::paste),
@@ -133,6 +137,9 @@ KadasMainWindow::KadasMainWindow()
   QHBoxLayout *canvasRow = new QHBoxLayout();
   canvasRow->setContentsMargins( 0, 0, 0, 0 );
   canvasRow->setSpacing( 0 );
+  mLeftPanelHost = new KadasSidePanelHost( KadasSidePanelHost::Edge::Left );
+  mLeftPanelHost->setMapCanvas( mMapCanvas );
+  canvasRow->addWidget( mLeftPanelHost, 0 );
   canvasRow->addWidget( mMapCanvas, 1 );
   mRightPanelHost = new KadasSidePanelHost( KadasSidePanelHost::Edge::Right );
   mRightPanelHost->setMapCanvas( mMapCanvas );
@@ -185,9 +192,21 @@ void KadasMainWindow::init()
   mLocatorLayout->insertWidget( 0, lw );
 
   mLayersWidget->setVisible( false );
-  mLayersWidget->resize( std::max( 10, std::min( 800, QgsSettings().value( "/kadas/layersWidgetWidth", 200 ).toInt() ) ), mLayersWidget->height() );
-  mGeodataBox->setCollapsed( false );
-  mLayersBox->setCollapsed( false );
+  mLayersWidget->setFixedWidth( std::clamp( sSettingsLayersWidgetWidth.value(), 10, 800 ) );
+
+  QButtonGroup *layersTabGroup = new QButtonGroup( this );
+  layersTabGroup->setExclusive( true );
+  layersTabGroup->addButton( mLayersTabButton, 0 );
+  layersTabGroup->addButton( mGeodataTabButton, 1 );
+  connect( layersTabGroup, &QButtonGroup::idClicked, this, [this]( int id ) {
+    mLayersStack->setCurrentIndex( id );
+    sSettingsLayersWidgetTab.setValue( id );
+  } );
+  const int layersTab = std::clamp( sSettingsLayersWidgetTab.value(), 0, 1 );
+  mLayersStack->setCurrentIndex( layersTab );
+  ( layersTab == 0 ? mLayersTabButton : mGeodataTabButton )->setChecked( true );
+  QShortcut *layerTreeShortcut = new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_L ), this );
+  connect( layerTreeShortcut, &QShortcut::activated, this, &KadasMainWindow::toggleLayerTree );
 
   // The MilX integration enables the tab, if connection to the MilX server succeeds
   mRibbonWidget->setTabEnabled( mRibbonWidget->indexOf( mMssTab ), false );
@@ -448,6 +467,9 @@ bool KadasMainWindow::eventFilter( QObject *obj, QEvent *ev )
     if ( e->button() == Qt::LeftButton )
     {
       mResizePressPos = e->pos();
+      // Freeze the map under a snapshot for the whole drag; a single
+      // re-render happens on release.
+      mLeftPanelHost->beginPanelResize();
     }
   }
   else if ( obj == mLayersWidgetResizeHandle && ev->type() == QEvent::MouseMove )
@@ -456,9 +478,16 @@ bool KadasMainWindow::eventFilter( QObject *obj, QEvent *ev )
     if ( e->buttons() == Qt::LeftButton )
     {
       QPoint delta = e->pos() - mResizePressPos;
-      mLayersWidget->resize( std::max( 10, std::min( 800, mLayersWidget->width() + delta.x() ) ), mLayersWidget->height() );
-      QgsSettings().setValue( "/kadas/layersWidgetWidth", mLayersWidget->width() );
-      mLayerTreeViewButton->move( mLayersWidget->width(), mLayerTreeViewButton->y() );
+      mLayersWidget->setFixedWidth( std::clamp( mLayersWidget->width() + delta.x(), 10, 800 ) );
+    }
+  }
+  else if ( obj == mLayersWidgetResizeHandle && ev->type() == QEvent::MouseButtonRelease )
+  {
+    QMouseEvent *e = static_cast<QMouseEvent *>( ev );
+    if ( e->button() == Qt::LeftButton )
+    {
+      mLeftPanelHost->endPanelResize();
+      sSettingsLayersWidgetWidth.setValue( mLayersWidget->width() );
     }
   }
   return false;
@@ -472,14 +501,6 @@ void KadasMainWindow::updateWidgetPositions()
   mZoomInOutFrame->move( mMapCanvas->width() - distanceToRightBorder - mZoomInOutFrame->width(), distanceToTop );
 
   mHomeButton->move( mMapCanvas->width() - distanceToRightBorder - mHomeButton->height(), distanceToTop + 90 );
-
-  // Resize mLayersWidget and reposition mLayerTreeViewButton
-  int distanceToTopBottom = 40;
-  int layerTreeHeight = mMapCanvas->height() - 2 * distanceToTopBottom;
-  int buttonY = mLayersWidget->isVisible() ? distanceToTopBottom : 0.5 * mMapCanvas->height() - 40;
-  int buttonHeight = mLayersWidget->isVisible() ? layerTreeHeight : 80;
-  mLayerTreeViewButton->setGeometry( mLayerTreeViewButton->pos().x(), buttonY, mLayerTreeViewButton->width(), buttonHeight );
-  mLayersWidget->setGeometry( mLayersWidget->pos().x(), distanceToTopBottom, mLayersWidget->width(), layerTreeHeight );
 
   // Reposition mRibbonbarButton
   mRibbonbarButton->move( 0.5 * mMapCanvas->width() - 0.5 * mRibbonbarButton->width(), 0 );
@@ -1008,24 +1029,20 @@ QMenu *KadasMainWindow::pluginsMenu()
 
 void KadasMainWindow::toggleLayerTree()
 {
-  bool visible = mLayersWidget->isVisible();
-  mLayersWidget->setVisible( !visible );
-
-  if ( !visible )
+  if ( mLayersWidget->isVisible() )
   {
-    mLayerTreeViewButton->setIcon( QIcon( ":/kadas/icons/layertree_unfolded" ) );
-    mLayerTreeViewButton->move( mLayersWidget->size().width(), mLayerTreeViewButton->y() );
+    mLeftPanelHost->removePanel( mLayersWidget );
+    mLayersWidget->setVisible( false );
+    mLayerTreeViewButton->setIcon( QIcon( ":/kadas/icons/layertree_folded" ) );
+    mLayerTreeViewButton->setFixedSize( 40, 40 );
   }
   else
   {
-    mLayerTreeViewButton->setIcon( QIcon( ":/kadas/icons/layertree_folded" ) );
-    mLayerTreeViewButton->move( 0, mLayerTreeViewButton->y() );
+    mLeftPanelHost->addPanel( mLayersWidget );
+    mLayersWidget->setVisible( true );
+    mLayerTreeViewButton->setIcon( QIcon( ":/kadas/icons/leftarrow" ) );
+    mLayerTreeViewButton->setFixedSize( 20, 40 );
   }
-  int distanceToTopBottom = 40;
-  int layerTreeHeight = mMapCanvas->height() - 2 * distanceToTopBottom;
-  int buttonY = mLayersWidget->isVisible() ? distanceToTopBottom : 0.5 * mMapCanvas->height() - 40;
-  int buttonHeight = mLayersWidget->isVisible() ? layerTreeHeight : 80;
-  mLayerTreeViewButton->setGeometry( mLayerTreeViewButton->pos().x(), buttonY, mLayerTreeViewButton->width(), buttonHeight );
 }
 
 void KadasMainWindow::toggleFullscreen()

@@ -182,6 +182,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     KadasRedliningIntegration *mRedliningIntegration = nullptr;
     KadasTemporalController *mKadasTemporalController = nullptr;
     KadasPluginManager *mPluginManager = nullptr;
+    KadasSidePanelHost *mLeftPanelHost = nullptr;
     KadasSidePanelHost *mRightPanelHost = nullptr;
     QToolButton *mPluginsToolButton = nullptr;
 

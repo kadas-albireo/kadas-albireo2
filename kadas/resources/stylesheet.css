@@ -104,11 +104,6 @@ KadasRibbonActionGallery QToolButton:checked {
 
 
 /** Layer tree view, catalog */
-QgsCollapsibleGroupBox#mLayersBox,
-QgsCollapsibleGroupBox#mGeodataBox {
-    font-size: 14px;
-}
-
 QPushButton#mLayerTreeViewButton {
   background-color: #263B4E;
   border-top-right-radius: 2px;
