@@ -141,6 +141,26 @@ class KadasCatalogBrowser::CatalogModel : public QStandardItemModel
     QStringList mimeTypes() const override { return QStringList() << "text/uri-list" << "application/x-vnd.qgis.qgis.uri"; }
 };
 
+//! Tree view which announces drag starts, so the drop target can be revealed.
+class KadasCatalogBrowser::CatalogTreeView : public QTreeView
+{
+  public:
+    explicit CatalogTreeView( KadasCatalogBrowser *browser )
+      : QTreeView( browser )
+      , mBrowser( browser )
+    {}
+
+  protected:
+    void startDrag( Qt::DropActions supportedActions ) override
+    {
+      emit mBrowser->dragStarted();
+      QTreeView::startDrag( supportedActions );
+    }
+
+  private:
+    KadasCatalogBrowser *mBrowser = nullptr;
+};
+
 class KadasCatalogBrowser::TreeFilterProxyModel : public QSortFilterProxyModel
 {
   public:
@@ -198,7 +218,7 @@ KadasCatalogBrowser::KadasCatalogBrowser( QWidget *parent )
   layout()->addWidget( mFilterLineEdit );
   connect( mFilterLineEdit, &QgsFilterLineEdit::textChanged, this, &KadasCatalogBrowser::filterChanged );
 
-  mTreeView = new QTreeView( this );
+  mTreeView = new CatalogTreeView( this );
   mTreeView->setFrameShape( QTreeView::NoFrame );
   mTreeView->setEditTriggers( QTreeView::NoEditTriggers );
   mTreeView->setDragEnabled( true );

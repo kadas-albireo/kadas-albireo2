@@ -371,6 +371,15 @@ void KadasMainWindow::init()
   connect( mMapCanvas, &QgsMapCanvas::mapCanvasRefreshed, &mLoadingTimer, &QTimer::stop );
   connect( mMapCanvas, &QgsMapCanvas::mapCanvasRefreshed, mLoadingLabel, &QLabel::hide );
   connect( mMapCanvas, &QgsMapCanvas::currentLayerChanged, mLayerTreeView, &QgsLayerTreeView::setCurrentLayer );
+  // The layer tree view accepts dataset (e.g. catalog entry) drops itself and
+  // just announces them; add the dropped layer like a window-level drop.
+  connect( mLayerTreeView, &QgsLayerTreeView::datasetsDropped, this, [this]( QDropEvent *event ) {
+    const QgsMimeDataUtils::UriList list = QgsMimeDataUtils::decodeUriList( event->mimeData() );
+    if ( !list.isEmpty() )
+    {
+      addCatalogLayer( list.front(), event->mimeData()->property( "metadataUrl" ).toString(), event->mimeData()->property( "sublayers" ).toList() );
+    }
+  } );
   connect( mMapCanvas, &QgsMapCanvas::layersChanged, this, &KadasMainWindow::updateBgLayerZoomResolutions );
   connect( mMapCanvas, &QgsMapCanvas::destinationCrsChanged, this, &KadasMainWindow::updateBgLayerZoomResolutions );
   connect( &mLoadingTimer, &QTimer::timeout, mLoadingLabel, &QLabel::show );
@@ -421,6 +430,11 @@ void KadasMainWindow::init()
 
   connect( mRefreshCatalogButton, &QToolButton::clicked, mCatalogBrowser, &KadasCatalogBrowser::reload );
   connect( mCatalogBrowser, &KadasCatalogBrowser::layerSelected, this, &KadasMainWindow::addCatalogLayer );
+  // Dragging a catalog entry: reveal the layer tree so it can serve as drop target.
+  connect( mCatalogBrowser, &KadasCatalogBrowser::dragStarted, this, [this] {
+    mLayersTabButton->setChecked( true );
+    mLayersStack->setCurrentIndex( 0 );
+  } );
 
   const QList<QgsLocatorFilter *> filters = lw->locator()->filters();
   for ( QgsLocatorFilter *filter : filters )

@@ -49,9 +49,13 @@ class KADAS_GUI_EXPORT KadasCatalogBrowser : public QWidget
   signals:
     void layerSelected( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers );
 
+    //! Emitted when the user starts dragging a catalog entry (e.g. towards the layer tree).
+    void dragStarted();
+
   private:
     class CatalogModel;
     class CatalogItem;
+    class CatalogTreeView;
     class TreeFilterProxyModel;
 
     QgsFilterLineEdit *mFilterLineEdit;
