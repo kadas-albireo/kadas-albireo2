@@ -156,7 +156,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     };
     PickedItem pickItemAt( const QgsPointXY &mapPos ) const;
     void switchToItem( QgsAnnotationLayer *layer, const QString &itemId );
-    void showContextMenu( QgsAnnotationLayer *layer, const QString &itemId, const QPoint &globalPos );
+    void showContextMenu( QgsAnnotationLayer *layer, const QString &itemId, const QgsPointXY &mapPos, const QPoint &globalPos );
 
   private slots:
     void stateChanged( KadasStateHistory::ChangeType, KadasStateHistory::State *state, KadasStateHistory::State *prevState );

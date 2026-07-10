@@ -462,7 +462,7 @@ void KadasMapToolEditAnnotationItem::canvasPressEvent( QgsMapMouseEvent *e )
     }
     const PickedItem hit = pickItemAt( e->mapPoint() );
     if ( !hit.isEmpty() )
-      showContextMenu( hit.layer, hit.itemId, e->globalPosition().toPoint() );
+      showContextMenu( hit.layer, hit.itemId, e->mapPoint(), e->globalPosition().toPoint() );
     else
       canvas()->unsetMapTool( this );
     return;
@@ -976,7 +976,7 @@ void KadasMapToolEditAnnotationItem::switchToItem( QgsAnnotationLayer *layer, co
   canvas()->setMapTool( new KadasMapToolEditAnnotationItem( canvas(), layer, itemId ) );
 }
 
-void KadasMapToolEditAnnotationItem::showContextMenu( QgsAnnotationLayer *layer, const QString &itemId, const QPoint &globalPos )
+void KadasMapToolEditAnnotationItem::showContextMenu( QgsAnnotationLayer *layer, const QString &itemId, const QgsPointXY &mapPos, const QPoint &globalPos )
 {
   if ( !layer )
     return;
@@ -1033,7 +1033,7 @@ void KadasMapToolEditAnnotationItem::showContextMenu( QgsAnnotationLayer *layer,
   {
     KadasAnnotationItemContext ctx( layer, canvas()->mapSettings() );
     menu.addSeparator();
-    mController->populateContextMenu( target, &menu, mEditContext, QgsPointXY(), ctx );
+    mController->populateContextMenu( target, &menu, mEditContext, mapPos, ctx );
   }
 
   QAction *chosen = menu.exec( globalPos );
