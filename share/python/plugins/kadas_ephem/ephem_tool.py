@@ -30,7 +30,7 @@ class EphemTool(QgsMapTool):
         self.pin = QgsRubberBand(self.iface.mapCanvas(), QgsWkbTypes.PointGeometry)
         self.pin.setIcon(QgsRubberBand.IconType.ICON_SVG)
         self.pin.setSvgIcon(":/kadas/icons/pin_blue", QPoint(-32, -64))
-        self.pin.setEnabled(False)
+        self.pin.setVisible(False)
 
         QgsMapTool.activate(self)
 
@@ -40,8 +40,6 @@ class EphemTool(QgsMapTool):
             self.widget = None
 
         self.pin.reset()
-        del self.pin
-        self.pin = None
 
         self.iface.mapCanvas().refresh()
         QgsMapTool.deactivate(self)
@@ -62,7 +60,7 @@ class EphemTool(QgsMapTool):
     def positionPicked(self, pos):
         self.pin.reset()
         self.pin.setToGeometry(QgsGeometry.fromPointXY(pos))
-        self.pin.setEnabled(True)
+        self.pin.setVisible(True)
         self.pin.update()
         self.iface.mapCanvas().refresh()
         mapCrs = self.iface.mapCanvas().mapSettings().destinationCrs()

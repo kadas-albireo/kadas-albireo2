@@ -102,7 +102,7 @@ class EphemToolWidget(KadasBottomBar):
 
         moonAzIcon.setSymbol(QgsMarkerSymbol([moonAzSymbolLayer]))
         moonAzIcon.setEnabled(False)
-        self.monAzIconId = self.azLayer.addItem(moonAzIcon)
+        self.moonAzIconId = self.azLayer.addItem(moonAzIcon)
 
         self.ephemRecomputeTask = EphemComputeTask(self)
         self.ephemRecomputeTask.finished.connect(self.recomputeFinished)
@@ -124,7 +124,7 @@ class EphemToolWidget(KadasBottomBar):
 
     def recompute(self):
         self.azLayer.item(self.sunAzIconId).setEnabled(False)
-        self.azLayer.item(self.monAzIconId).setEnabled(False)
+        self.azLayer.item(self.moonAzIconId).setEnabled(False)
 
         if not self.wgsPos:
             return
@@ -179,7 +179,7 @@ class EphemToolWidget(KadasBottomBar):
             self.ui.labelZenithValue.setText(result.zenithValueText)
 
         else:
-            azIcon = self.azLayer.item(self.monAzIconId)
+            azIcon = self.azLayer.item(self.moonAzIconId)
 
             self.ui.labelMoonAzimuthElevationValue.setText(result.azimuthElevationValueText)
             self.ui.labelMoonRiseValue.setText(result.riseValueText)
@@ -195,7 +195,10 @@ class EphemToolWidget(KadasBottomBar):
             self.ui.labelMoonPhaseValue.setText("%.2f%%" % result.moonPhase)
 
         azIcon.setGeometry(QgsPoint(result.position))
-        azIcon.symbol().setAngle(result.angle)
+
+        s = azIcon.symbol().clone()
+        s.setAngle(result.angle)
+        azIcon.setSymbol(s)
         azIcon.setEnabled(result.azimuthVisible)
 
         self.azLayer.triggerRepaint()
