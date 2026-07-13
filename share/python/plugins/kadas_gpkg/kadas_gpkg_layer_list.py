@@ -1,7 +1,7 @@
 import os
 import re
 
-from qgis.core import QgsIconUtils, QgsLayerTree, QgsLayerTreeModel, QgsMapLayerType, QgsProject
+from qgis.core import Qgis, QgsIconUtils, QgsLayerTree, QgsLayerTreeModel, QgsProject
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import (
@@ -20,11 +20,11 @@ _LAYER_ID_ROLE = Qt.ItemDataRole.UserRole + 1
 
 # Map from QGIS project XML layer type strings to QgsMapLayerType enum values
 _LAYER_TYPE_MAP = {
-    "vector": QgsMapLayerType.VectorLayer,
-    "raster": QgsMapLayerType.RasterLayer,
-    "mesh": QgsMapLayerType.MeshLayer,
-    "vector-tile": QgsMapLayerType.VectorTileLayer,
-    "point-cloud": QgsMapLayerType.PointCloudLayer,
+    "vector": Qgis.LayerType.VectorLayer,
+    "raster": Qgis.LayerType.RasterLayer,
+    "mesh": Qgis.LayerType.MeshLayer,
+    "vector-tile": Qgis.LayerType.VectorTileLayer,
+    "point-cloud": Qgis.LayerType.PointCloudLayer,
 }
 
 

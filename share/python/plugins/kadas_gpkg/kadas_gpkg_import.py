@@ -10,7 +10,6 @@ from qgis.core import (
     QgsApplication,
     QgsMapLayer,
     QgsMapLayerFactory,
-    QgsMapLayerType,
     QgsMeshLayer,
     QgsPathResolver,
     QgsProject,
@@ -238,15 +237,15 @@ class KadasGpkgImport(QObject):
             return False
 
         mapLayer = None
-        if layerType == QgsMapLayerType.VectorLayer:
+        if layerType == Qgis.LayerType.VectorLayer:
             mapLayer = QgsVectorLayer()
-        elif layerType == QgsMapLayerType.RasterLayer:
+        elif layerType == Qgis.LayerType.RasterLayer:
             mapLayer = QgsRasterLayer()
-        elif layerType == QgsMapLayerType.MeshLayer:
+        elif layerType == Qgis.LayerType.MeshLayer:
             mapLayer = QgsMeshLayer()
-        elif layerType == QgsMapLayerType.VectorTileLayer:
+        elif layerType == Qgis.LayerType.VectorTileLayer:
             mapLayer = QgsVectorTileLayer()
-        elif layerType == QgsMapLayerType.PluginLayer:
+        elif layerType == Qgis.LayerType.PluginLayer:
             typeName = maplayerEl.attribute("name")
             mapLayer = QgsApplication.pluginLayerRegistry().createLayer(typeName)
 
