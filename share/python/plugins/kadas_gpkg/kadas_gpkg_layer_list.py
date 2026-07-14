@@ -1,7 +1,7 @@
 import os
 import re
 
-from qgis.core import Qgis, QgsIconUtils, QgsLayerTree, QgsLayerTreeModel, QgsProject
+from qgis.core import QgsIconUtils, QgsLayerTree, QgsLayerTreeModel, QgsMapLayerFactory, QgsProject
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import (
@@ -17,15 +17,6 @@ from qgis.PyQt.QtXml import QDomDocument
 
 # Role used to store the layer id on leaf items
 _LAYER_ID_ROLE = Qt.ItemDataRole.UserRole + 1
-
-# Map from QGIS project XML layer type strings to QgsMapLayerType enum values
-_LAYER_TYPE_MAP = {
-    "vector": Qgis.LayerType.VectorLayer,
-    "raster": Qgis.LayerType.RasterLayer,
-    "mesh": Qgis.LayerType.MeshLayer,
-    "vector-tile": Qgis.LayerType.VectorTileLayer,
-    "point-cloud": Qgis.LayerType.PointCloudLayer,
-}
 
 
 class KadasGpkgLayersListBase(QWidget):
@@ -463,8 +454,8 @@ class KadasGpkgImportLayersList(KadasGpkgLayersListBase):
 
     def _icon_for_type(self, layer_type_str):
         """Return a QIcon for a layer type string from the project XML."""
-        qgs_type = _LAYER_TYPE_MAP.get(layer_type_str.lower())
-        if qgs_type is not None:
+        qgs_type, ok = QgsMapLayerFactory.typeFromString(layer_type_str.lower())
+        if ok:
             try:
                 return QgsIconUtils.iconForLayerType(qgs_type)
             except Exception:
