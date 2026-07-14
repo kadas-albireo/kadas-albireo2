@@ -108,8 +108,6 @@ class KadasGpkgImport(QObject):
 
                 if self.addProjectLayer(maplayer.toElement(), context):
                     addedLayers.append(layerid)
-                elif self.addAnnotationLayer(layername, maplayer.toElement(), context):
-                    addedLayers.append(layerid)
                 else:
                     failed.append(layername)
 
@@ -251,6 +249,12 @@ class KadasGpkgImport(QObject):
             mapLayer = QgsMeshLayer()
         elif layerType == Qgis.LayerType.VectorTileLayer:
             mapLayer = QgsVectorTileLayer()
+        elif layerType == Qgis.LayerType.AnnotationLayer:
+            layerName = maplayerEl.attribute("layername")
+            mapLayer = QgsAnnotationLayer(
+                layerName,
+                QgsAnnotationLayer.LayerOptions(QgsProject.instance().transformContext()),
+            )
         elif layerType == Qgis.LayerType.Mesh:
             mapLayer = QgsMeshLayer()
         elif layerType == Qgis.LayerType.PointCloud:
@@ -263,22 +267,6 @@ class KadasGpkgImport(QObject):
 
         if mapLayer is None:
             return False
-
-        mapLayer.readLayerXml(maplayerEl, context, QgsMapLayer.ReadFlags())
-        if not mapLayer.isValid():
-            return False
-        QgsProject.instance().addMapLayer(mapLayer)
-        return True
-
-    def addAnnotationLayer(self, layerName, maplayerEl, context):
-        layerType, ok = QgsMapLayerFactory.typeFromString(maplayerEl.attribute("type"))
-        if not ok or layerType != Qgis.LayerType.AnnotationLayer:
-            # Invalid layer or not an annotation layer
-            return False
-
-        mapLayer = QgsAnnotationLayer(
-            layerName, QgsAnnotationLayer.LayerOptions(QgsProject.instance().transformContext())
-        )
 
         mapLayer.readLayerXml(maplayerEl, context, QgsMapLayer.ReadFlags())
         if not mapLayer.isValid():
