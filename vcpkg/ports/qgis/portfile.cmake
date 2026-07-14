@@ -23,6 +23,7 @@ vcpkg_from_github(
   link-appkit.patch
   libxml2.patch
   crssync.patch
+  markersymbol_rubberband.patch
   mesh.patch
   qgis-debug.patch
   3dfrustumfix.patch

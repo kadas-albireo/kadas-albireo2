@@ -1,0 +1,79 @@
+From f56ac363fa19b053066579c184cfe2a3e40cf278 Mon Sep 17 00:00:00 2001
+From: Valentin Buira <valentin.buira@gmail.com>
+Date: Tue, 14 Jul 2026 12:52:47 +0200
+Subject: [PATCH] Support QgsMarkerSymbol with QgsRubberBand::setSymbol
+
+---
+ .../gui/auto_generated/qgsrubberband.sip.in   |  4 ----
+ src/gui/qgsrubberband.cpp                     | 19 +++++++++++++++++++
+ src/gui/qgsrubberband.h                       |  2 --
+ 3 files changed, 19 insertions(+), 6 deletions(-)
+
+diff --git a/python/PyQt6/gui/auto_generated/qgsrubberband.sip.in b/python/PyQt6/gui/auto_generated/qgsrubberband.sip.in
+index a9101a2f302..349fcd3a18e 100644
+--- a/python/PyQt6/gui/auto_generated/qgsrubberband.sip.in
++++ b/python/PyQt6/gui/auto_generated/qgsrubberband.sip.in
+@@ -391,10 +391,6 @@ Sets the ``symbol`` used for rendering the rubberband.
+ 
+ Ownership of ``symbol`` is transferred to the rubberband.
+ 
+-.. warning::
+-
+-   Only line and fill symbols are currently supported.
+-
+ .. note::
+ 
+    Setting a symbol for the rubberband overrides any other appearance setting,
+diff --git a/src/gui/qgsrubberband.cpp b/src/gui/qgsrubberband.cpp
+index 29a4b1cb2bd..c06d6a15048 100644
+--- a/src/gui/qgsrubberband.cpp
++++ b/src/gui/qgsrubberband.cpp
+@@ -21,6 +21,7 @@
+ #include "qgslinesymbol.h"
+ #include "qgslogger.h"
+ #include "qgsmapcanvas.h"
++#include "qgsmarkersymbol.h"
+ #include "qgsproject.h"
+ #include "qgsrectangle.h"
+ #include "qgsrendercontext.h"
+@@ -495,6 +496,24 @@ void QgsRubberBand::paint( QPainter *p )
+     }
+     fillSymbol->stopRender( context );
+   }
++  else if ( QgsMarkerSymbol *markerSymbol = dynamic_cast<QgsMarkerSymbol *>( mSymbol.get() ) )
++  {
++    QgsRenderContext context( QgsRenderContext::fromQPainter( p ) );
++    context.setFlag( Qgis::RenderContextFlag::Antialiasing, true );
++
++    markerSymbol->startRender( context );
++    for ( const QVector<QPolygonF> &shape : std::as_const( shapes ) )
++    {
++      for ( const QPolygonF &ring : shape )
++      {
++        for ( const QPointF &point : ring )
++        {
++          markerSymbol->renderPoint( point, nullptr, context );
++        }
++      }
++    }
++    markerSymbol->stopRender( context );
++  }
+   else
+   {
+     int iterations = mSecondaryPen.color().isValid() ? 2 : 1;
+diff --git a/src/gui/qgsrubberband.h b/src/gui/qgsrubberband.h
+index a23aa34f826..00950512379 100644
+--- a/src/gui/qgsrubberband.h
++++ b/src/gui/qgsrubberband.h
+@@ -406,8 +406,6 @@ class GUI_EXPORT QgsRubberBand : public QgsMapCanvasItem
+      *
+      * Ownership of \a symbol is transferred to the rubberband.
+      *
+-     * \warning Only line and fill symbols are currently supported.
+-     *
+      * \note Setting a symbol for the rubberband overrides any other appearance setting,
+      * such as the strokeColor() or width().
+      *
+-- 
+2.51.0
+
