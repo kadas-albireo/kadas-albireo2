@@ -65,23 +65,10 @@ void KadasLayerTreeView::dropEvent( QDropEvent *event )
     {
       QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( target.group, target.row ) );
     }
-    // Track the layers added while the drop is handled, to select them afterwards
-    QgsMapLayer *addedLayer = nullptr;
-    const QMetaObject::Connection connection
-      = connect( QgsProject::instance()->layerTreeRegistryBridge(), &QgsLayerTreeRegistryBridge::addedLayersToLayerTree, this, [&addedLayer]( const QList<QgsMapLayer *> &layers ) {
-          if ( !layers.isEmpty() )
-          {
-            addedLayer = layers.last();
-          }
-        } );
     // Emits datasetsDropped(), whose (direct) handler adds the layer at the
-    // insertion point set above and resets the insertion point afterwards.
+    // insertion point set above, resets the insertion point and selects the
+    // added layer.
     QgsLayerTreeView::dropEvent( event );
-    disconnect( connection );
-    if ( addedLayer )
-    {
-      setCurrentLayer( addedLayer );
-    }
     return;
   }
   clearDropIndicator();

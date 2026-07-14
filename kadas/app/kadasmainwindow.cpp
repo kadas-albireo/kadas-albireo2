@@ -1317,6 +1317,16 @@ void KadasMainWindow::showFavoriteContextMenu( const QPoint &pos )
 
 void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers, bool atInsertionPoint )
 {
+  // Track the layers added below, to select the last one afterwards
+  QgsMapLayer *addedLayer = nullptr;
+  const QMetaObject::Connection addedConnection
+    = connect( QgsProject::instance()->layerTreeRegistryBridge(), &QgsLayerTreeRegistryBridge::addedLayersToLayerTree, this, [&addedLayer]( const QList<QgsMapLayer *> &layers ) {
+        if ( !layers.isEmpty() )
+        {
+          addedLayer = layers.last();
+        }
+      } );
+
   QString adjustedUri = uri.uri;
 
   // Adjust layer CRS to project CRS
@@ -1492,6 +1502,12 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
   }
   // Reset insertion point
   QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( mLayerTreeView->layerTreeModel()->rootGroup(), 0 ) );
+
+  disconnect( addedConnection );
+  if ( addedLayer )
+  {
+    mLayerTreeView->setCurrentLayer( addedLayer );
+  }
 }
 
 void KadasMainWindow::checkLayerProjection( QgsMapLayer *layer )
