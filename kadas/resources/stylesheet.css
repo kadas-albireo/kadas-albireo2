@@ -147,20 +147,6 @@ QPushButton#mRibbonbarButton:pressed
     background: #16232f;
 }
 
-/* Center the icon + menu arrow as a whole in the add layer buttons */
-#mOpenLayerButton,
-#mAddServiceButton {
-  padding-right: 10px;
-}
-
-#mOpenLayerButton::menu-indicator,
-#mAddServiceButton::menu-indicator {
-  subcontrol-origin: padding;
-  subcontrol-position: center right;
-  width: 8px;
-  right: 2px;
-}
-
 
 /** Separator between favorites and ribbon tab widget **/
 #mSeparatorFrame {

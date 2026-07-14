@@ -310,12 +310,12 @@
               <number>4</number>
              </property>
              <property name="bottomMargin">
-              <number>8</number>
+              <number>4</number>
              </property>
              <item>
-              <widget class="KadasRibbonButton" name="mLayersTabButton">
+              <widget class="KadasRibbonButton" name="mOpenLayerButton">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -328,19 +328,19 @@
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>96</width>
+                 <width>56</width>
                  <height>56</height>
                 </size>
                </property>
                <property name="toolTip">
-                <string>Layers</string>
+                <string>Add Local Layer</string>
                </property>
                <property name="text">
-                <string>Layers</string>
+                <string>File</string>
                </property>
                <property name="icon">
                 <iconset resource="../../resources/resources.qrc">
-                 <normaloff>:/kadas/icons/layertree</normaloff>:/kadas/icons/layertree</iconset>
+                 <normaloff>:/kadas/icons/add_local</normaloff>:/kadas/icons/add_local</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -348,18 +348,15 @@
                  <height>24</height>
                 </size>
                </property>
-               <property name="checkable">
-                <bool>true</bool>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
+               <property name="popupMode">
+                <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="KadasRibbonButton" name="mGeodataTabButton">
+              <widget class="KadasRibbonButton" name="mAddServiceButton">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -372,7 +369,48 @@
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>96</width>
+                 <width>56</width>
+                 <height>56</height>
+                </size>
+               </property>
+               <property name="toolTip">
+                <string>Add Service Layer</string>
+               </property>
+               <property name="text">
+                <string>Service</string>
+               </property>
+               <property name="icon">
+                <iconset resource="../../resources/resources.qrc">
+                 <normaloff>:/kadas/icons/add_service</normaloff>:/kadas/icons/add_service</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>24</width>
+                 <height>24</height>
+                </size>
+               </property>
+               <property name="popupMode">
+                <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="KadasRibbonButton" name="mGeodataTabButton">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>56</width>
+                 <height>56</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>56</width>
                  <height>56</height>
                 </size>
                </property>
@@ -384,7 +422,7 @@
                </property>
                <property name="icon">
                 <iconset resource="../../resources/resources.qrc">
-                 <normaloff>:/kadas/icons/add_layer</normaloff>:/kadas/icons/add_layer</iconset>
+                 <normaloff>:/kadas/icons/catalog</normaloff>:/kadas/icons/catalog</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -427,7 +465,7 @@
                <number>0</number>
               </property>
               <property name="topMargin">
-               <number>0</number>
+               <number>4</number>
               </property>
               <property name="rightMargin">
                <number>0</number>
@@ -473,6 +511,9 @@
           </widget>
             <widget class="QWidget" name="mGeodataPage">
              <layout class="QVBoxLayout" name="mGeodataPageLayout">
+              <property name="spacing">
+               <number>0</number>
+              </property>
               <property name="leftMargin">
                <number>0</number>
               </property>
@@ -495,71 +536,14 @@
                 <number>4</number>
                </property>
                <property name="topMargin">
-                <number>4</number>
+                <number>0</number>
                </property>
                <property name="rightMargin">
                 <number>4</number>
                </property>
                <property name="bottomMargin">
-                <number>4</number>
+                <number>0</number>
                </property>
-               <item>
-                <widget class="QToolButton" name="mOpenLayerButton">
-                 <property name="minimumSize">
-                  <size>
-                   <width>36</width>
-                   <height>36</height>
-                  </size>
-                 </property>
-                 <property name="toolTip">
-                  <string>Add Local Layer</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="../../resources/resources.qrc">
-                   <normaloff>:/kadas/icons/open</normaloff>:/kadas/icons/open</iconset>
-                 </property>
-                 <property name="popupMode">
-                  <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QToolButton" name="mAddServiceButton">
-                 <property name="minimumSize">
-                  <size>
-                   <width>36</width>
-                   <height>36</height>
-                  </size>
-                 </property>
-                 <property name="toolTip">
-                  <string>Add Service Layer</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="../../resources/resources.qrc">
-                   <normaloff>:/kadas/icons/globe</normaloff>:/kadas/icons/globe</iconset>
-                 </property>
-                 <property name="popupMode">
-                  <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QToolButton" name="mRefreshCatalogButton">
-                 <property name="minimumSize">
-                  <size>
-                   <width>36</width>
-                   <height>36</height>
-                  </size>
-                 </property>
-                 <property name="toolTip">
-                  <string>Refresh Catalog</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="../../resources/resources.qrc">
-                   <normaloff>:/kadas/icons/refresh</normaloff>:/kadas/icons/refresh</iconset>
-                 </property>
-                </widget>
-               </item>
                <item>
                 <widget class="QToolButton" name="mLoginButton">
                  <property name="minimumSize">

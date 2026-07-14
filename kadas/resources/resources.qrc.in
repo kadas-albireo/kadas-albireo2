@@ -115,6 +115,9 @@
         <file alias="icons/plugin_w">icons/plugin_w.png</file>
         <file alias="icons/add">icons/add.svg</file>
         <file alias="icons/add_layer">icons/add_layer.svg</file>
+        <file alias="icons/add_local">icons/add_local.svg</file>
+        <file alias="icons/add_service">icons/add_service.svg</file>
+        <file alias="icons/catalog">icons/catalog.svg</file>
         <file alias="icons/leftarrow">icons/leftarrow.svg</file>
         <file alias="icons/remove">icons/remove.svg</file>
         <file alias="icons/download">icons/download.svg</file>

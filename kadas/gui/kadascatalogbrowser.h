@@ -29,6 +29,7 @@
 
 class KadasCatalogProvider;
 class QgsFilterLineEdit;
+class QToolButton;
 class QTreeView;
 
 
@@ -42,6 +43,9 @@ class KADAS_GUI_EXPORT KadasCatalogBrowser : public QWidget
     KadasCatalogBrowser( QWidget *parent = 0 );
     void addProvider( KadasCatalogProvider *provider ) { mProviders.append( provider ); }
     QStandardItem *addItem( QStandardItem *parent, QString text, int sortIndex, bool isLeaf = false, QMimeData *mimeData = nullptr );
+
+    //! Button which reloads the catalog, shown next to the filter field.
+    QToolButton *refreshButton() const { return mRefreshButton; }
 
   public slots:
     void reload();
@@ -59,6 +63,7 @@ class KADAS_GUI_EXPORT KadasCatalogBrowser : public QWidget
     class TreeFilterProxyModel;
 
     QgsFilterLineEdit *mFilterLineEdit;
+    QToolButton *mRefreshButton;
     QTreeView *mTreeView;
     CatalogModel *mCatalogModel;
     QStandardItemModel *mLoadingModel;

@@ -19,7 +19,6 @@
 #include <QHBoxLayout>
 #include <QImageReader>
 #include <QActionGroup>
-#include <QButtonGroup>
 #include <QMenu>
 #include <QMessageBox>
 #include <QMimeData>
@@ -194,17 +193,14 @@ void KadasMainWindow::init()
   mLayersWidget->setVisible( false );
   mLayersWidget->setFixedWidth( std::clamp( sSettingsLayersWidgetWidth.value(), 10, 800 ) );
 
-  QButtonGroup *layersTabGroup = new QButtonGroup( this );
-  layersTabGroup->setExclusive( true );
-  layersTabGroup->addButton( mLayersTabButton, 0 );
-  layersTabGroup->addButton( mGeodataTabButton, 1 );
-  connect( layersTabGroup, &QButtonGroup::idClicked, this, [this]( int id ) {
-    mLayersStack->setCurrentIndex( id );
-    sSettingsLayersWidgetTab.setValue( id );
+  // The catalog button toggles between the layer tree (unchecked) and the catalog (checked)
+  connect( mGeodataTabButton, &QAbstractButton::toggled, this, [this]( bool checked ) {
+    mLayersStack->setCurrentIndex( checked ? 1 : 0 );
+    sSettingsLayersWidgetTab.setValue( checked ? 1 : 0 );
   } );
   const int layersTab = std::clamp( sSettingsLayersWidgetTab.value(), 0, 1 );
   mLayersStack->setCurrentIndex( layersTab );
-  ( layersTab == 0 ? mLayersTabButton : mGeodataTabButton )->setChecked( true );
+  mGeodataTabButton->setChecked( layersTab == 1 );
   QShortcut *layerTreeShortcut = new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_L ), this );
   connect( layerTreeShortcut, &QShortcut::activated, this, &KadasMainWindow::toggleLayerTree );
 
@@ -335,8 +331,15 @@ void KadasMainWindow::init()
   mMilxIntegration = new KadasMilxIntegration( milxUi, this );
 
   // IAM Auth
-  KadasIamAuth *iamAuth = new KadasIamAuth( mLoginButton, mLogoutButton, mRefreshCatalogButton, this );
+  KadasIamAuth *iamAuth = new KadasIamAuth( mLoginButton, mLogoutButton, mCatalogBrowser->refreshButton(), this );
   Q_UNUSED( iamAuth );
+  // The catalog login toolbar only carries the (hidden unless login is configured)
+  // login/logout buttons and username label; collapse it entirely when unused so
+  // it does not reserve empty space above the catalog filter.
+  if ( mLoginButton->isHidden() && mLogoutButton->isHidden() )
+  {
+    mGeodataToolbar->hide();
+  }
 
   Kadas3DIntegration *my3Dintegration = new Kadas3DIntegration( mAction3D, mMapCanvas, this );
 
@@ -428,15 +431,13 @@ void KadasMainWindow::init()
     }
   }
 
-  connect( mRefreshCatalogButton, &QToolButton::clicked, mCatalogBrowser, &KadasCatalogBrowser::reload );
   connect( mCatalogBrowser, &KadasCatalogBrowser::layerSelected, this, [this]( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers ) {
     addCatalogLayer( uri, metadataUrl, sublayers );
+    // Reveal the layer tree so the freshly added (and selected) layer is visible
+    mGeodataTabButton->setChecked( false );
   } );
   // Dragging a catalog entry: reveal the layer tree so it can serve as drop target.
-  connect( mCatalogBrowser, &KadasCatalogBrowser::dragStarted, this, [this] {
-    mLayersTabButton->setChecked( true );
-    mLayersStack->setCurrentIndex( 0 );
-  } );
+  connect( mCatalogBrowser, &KadasCatalogBrowser::dragStarted, this, [this] { mGeodataTabButton->setChecked( false ); } );
 
   const QList<QgsLocatorFilter *> filters = lw->locator()->filters();
   for ( QgsLocatorFilter *filter : filters )
