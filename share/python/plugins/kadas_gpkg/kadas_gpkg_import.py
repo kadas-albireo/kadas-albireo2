@@ -7,14 +7,17 @@ import tempfile
 from kadas.kadasgui import KadasProjectMigration
 from qgis.core import (
     Qgis,
+    QgsAnnotationLayer,
     QgsApplication,
     QgsMapLayer,
     QgsMapLayerFactory,
     QgsMeshLayer,
     QgsPathResolver,
+    QgsPointCloudLayer,
     QgsProject,
     QgsRasterLayer,
     QgsReadWriteContext,
+    QgsTiledSceneLayer,
     QgsVectorLayer,
     QgsVectorTileLayer,
 )
@@ -102,10 +105,13 @@ class KadasGpkgImport(QObject):
                     continue
                 if layerid not in layerIds:
                     continue
-                if not self.addProjectLayer(maplayer.toElement(), context):
-                    failed.append(layername)
-                else:
+
+                if self.addProjectLayer(maplayer.toElement(), context):
                     addedLayers.append(layerid)
+                elif self.addAnnotationLayer(layername, maplayer.toElement(), context):
+                    addedLayers.append(layerid)
+                else:
+                    failed.append(layername)
 
             # Legacy MapCanvasItems import disabled: KadasMapCanvasItemManager was
             # removed alongside KadasItemLayer demolition. Items embedded in GPKG
@@ -245,12 +251,34 @@ class KadasGpkgImport(QObject):
             mapLayer = QgsMeshLayer()
         elif layerType == Qgis.LayerType.VectorTileLayer:
             mapLayer = QgsVectorTileLayer()
+        elif layerType == Qgis.LayerType.Mesh:
+            mapLayer = QgsMeshLayer()
+        elif layerType == Qgis.LayerType.PointCloud:
+            mapLayer = QgsPointCloudLayer()
+        elif layerType == Qgis.LayerType.TiledScene:
+            mapLayer = QgsTiledSceneLayer()
         elif layerType == Qgis.LayerType.PluginLayer:
             typeName = maplayerEl.attribute("name")
             mapLayer = QgsApplication.pluginLayerRegistry().createLayer(typeName)
 
         if mapLayer is None:
             return False
+
+        mapLayer.readLayerXml(maplayerEl, context, QgsMapLayer.ReadFlags())
+        if not mapLayer.isValid():
+            return False
+        QgsProject.instance().addMapLayer(mapLayer)
+        return True
+
+    def addAnnotationLayer(self, layerName, maplayerEl, context):
+        layerType, ok = QgsMapLayerFactory.typeFromString(maplayerEl.attribute("type"))
+        if not ok or layerType != Qgis.LayerType.AnnotationLayer:
+            # Invalid layer or not an annotation layer
+            return False
+
+        mapLayer = QgsAnnotationLayer(
+            layerName, QgsAnnotationLayer.LayerOptions(QgsProject.instance().transformContext())
+        )
 
         mapLayer.readLayerXml(maplayerEl, context, QgsMapLayer.ReadFlags())
         if not mapLayer.isValid():
