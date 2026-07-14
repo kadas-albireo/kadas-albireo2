@@ -85,15 +85,14 @@ void KadasBookmarksMenu::addBookmarkAction( Bookmark *bookmark )
 
   // insert alphabetically
   const QList<QAction *> constMenuActions = actions();
-  QList<QAction *>::const_iterator it = constMenuActions.constBegin();
   QAction *before = nullptr;
-  for ( ; it != constMenuActions.constEnd(); it++ )
-  {
-    if ( bookmark->name.compare( ( *it )->property( "name" ).toString(), Qt::CaseSensitivity::CaseInsensitive ) > 0 )
-    {
-      before = *std::next( it );
+  for ( QAction *action : constMenuActions ) {
+    if ( action->property( "name" ).toString().compare( bookmark->name, Qt::CaseSensitivity::CaseInsensitive ) > 0 ) {
+      before = action;
+      break;
     }
   }
+
   if ( before )
     insertAction( before, widgetAction );
   else
