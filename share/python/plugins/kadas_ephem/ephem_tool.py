@@ -1,9 +1,9 @@
 from qgis.core import (
+    Qgis,
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
     QgsGeometry,
     QgsProject,
-    QgsWkbTypes,
 )
 from qgis.gui import QgsMapTool, QgsRubberBand
 from qgis.PyQt.QtCore import QPoint, Qt
@@ -27,7 +27,7 @@ class EphemTool(QgsMapTool):
         self.widget = EphemToolWidget(self.iface)
         self.widget.close.connect(self.close)
         self.widget.setVisible(True)
-        self.pin = QgsRubberBand(self.iface.mapCanvas(), QgsWkbTypes.PointGeometry)
+        self.pin = QgsRubberBand(self.iface.mapCanvas(), Qgis.GeometryType.Point)
         self.pin.setIcon(QgsRubberBand.IconType.ICON_SVG)
         self.pin.setSvgIcon(":/kadas/icons/pin_blue", QPoint(-32, -64))
         self.pin.setVisible(False)

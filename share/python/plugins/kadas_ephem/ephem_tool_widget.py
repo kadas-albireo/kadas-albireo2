@@ -14,7 +14,6 @@ from qgis.core import (
     QgsMarkerSymbol,
     QgsProject,
     QgsSvgMarkerSymbolLayer,
-    QgsWkbTypes,
 )
 from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtCore import QDateTime, QEventLoop, Qt, pyqtSignal
@@ -81,7 +80,7 @@ class EphemToolWidget(KadasBottomBar):
 
         self.azLayer.setFlags(self.azLayer.flags() | QgsMapLayer.Private)
 
-        self.sunAzIcon = QgsRubberBand(self.iface.mapCanvas(), QgsWkbTypes.PointGeometry)
+        self.sunAzIcon = QgsRubberBand(self.iface.mapCanvas(), Qgis.GeometryType.Point)
 
         az_sun_svg_path = os.path.join(os.path.dirname(__file__), "icons/az_sun.svg")
         sunAzSymbolLayer = QgsSvgMarkerSymbolLayer(az_sun_svg_path)
@@ -93,7 +92,7 @@ class EphemToolWidget(KadasBottomBar):
         self.sunAzIcon.setSymbol(QgsMarkerSymbol([sunAzSymbolLayer]))
         self.sunAzIcon.setVisible(False)
 
-        self.moonAzIcon = QgsRubberBand(self.iface.mapCanvas(), QgsWkbTypes.PointGeometry)
+        self.moonAzIcon = QgsRubberBand(self.iface.mapCanvas(), Qgis.GeometryType.Point)
 
         az_moon_svg_path = os.path.join(os.path.dirname(__file__), "icons/az_moon.svg")
         moonAzSymbolLayer = QgsSvgMarkerSymbolLayer(az_moon_svg_path)
