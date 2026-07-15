@@ -17,7 +17,7 @@ from qgis.core import (
     QgsWkbTypes,
 )
 from qgis.gui import QgsRubberBand
-from qgis.PyQt.QtCore import QDateTime, QEventLoop, QPoint, Qt, pyqtSignal
+from qgis.PyQt.QtCore import QDateTime, QEventLoop, Qt, pyqtSignal
 from qgis.PyQt.QtGui import QIcon, QPixmap
 from qgis.PyQt.QtWidgets import QApplication, QLabel, QSizePolicy
 from qgis.PyQt.uic import loadUiType
@@ -82,8 +82,6 @@ class EphemToolWidget(KadasBottomBar):
         self.azLayer.setFlags(self.azLayer.flags() | QgsMapLayer.Private)
 
         self.sunAzIcon = QgsRubberBand(self.iface.mapCanvas(), QgsWkbTypes.PointGeometry)
-        self.sunAzIcon.setIcon(QgsRubberBand.IconType.ICON_SVG)
-        self.sunAzIcon.setSvgIcon(":/kadas/icons/pin_blue", QPoint(-32, -64))
 
         az_sun_svg_path = os.path.join(os.path.dirname(__file__), "icons/az_sun.svg")
         sunAzSymbolLayer = QgsSvgMarkerSymbolLayer(az_sun_svg_path)
@@ -96,8 +94,6 @@ class EphemToolWidget(KadasBottomBar):
         self.sunAzIcon.setVisible(False)
 
         self.moonAzIcon = QgsRubberBand(self.iface.mapCanvas(), QgsWkbTypes.PointGeometry)
-        self.moonAzIcon.setIcon(QgsRubberBand.IconType.ICON_SVG)
-        self.moonAzIcon.setSvgIcon(":/kadas/icons/pin_red", QPoint(-32, -64))
 
         az_moon_svg_path = os.path.join(os.path.dirname(__file__), "icons/az_moon.svg")
         moonAzSymbolLayer = QgsSvgMarkerSymbolLayer(az_moon_svg_path)
@@ -209,10 +205,9 @@ class EphemToolWidget(KadasBottomBar):
         point_geom.transform(ct)
         azIcon.setToGeometry(point_geom)
 
-        if azIcon.symbol() is not None:
-            s = azIcon.symbol().clone()
-            s.setAngle(result.angle)
-            azIcon.setSymbol(s)
+        s = azIcon.symbol().clone()
+        s.setAngle(result.angle)
+        azIcon.setSymbol(s)
 
         azIcon.setVisible(result.azimuthVisible)
 
