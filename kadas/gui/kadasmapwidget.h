@@ -49,6 +49,7 @@ class KADAS_GUI_EXPORT KadasMapWidget : public QDockWidget
     QgsElevationControllerWidget *elevationController() { return mElevationController; }
     void setElevationController();
     void removeElevationController();
+    static void moveElevationControllerLabelsToLeft( QgsElevationControllerWidget *controller );
 
     bool getLocked() const;
     void setLocked( bool locked );

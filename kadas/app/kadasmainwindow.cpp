@@ -1718,6 +1718,7 @@ void KadasMainWindow::setElevationControllerRangeFromHeightmap()
   if ( !mElevationController )
   {
     mElevationController = new QgsElevationControllerWidget( this );
+    KadasMapWidget::moveElevationControllerLabelsToLeft( mElevationController );
     connect( mElevationController, &QgsElevationControllerWidget::rangeChanged, this, &KadasMainWindow::setCanvasZRange );
     mElevationControllerFrame->layout()->addWidget( mElevationController );
   }
