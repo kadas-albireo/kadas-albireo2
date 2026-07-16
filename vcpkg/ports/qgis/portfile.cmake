@@ -33,6 +33,9 @@ vcpkg_from_github(
   annotation-item-rotation.patch # https://github.com/qgis/QGIS/pull/66610
   # rotation for rectangle-based annotations (images + text)
   oauth2NoEmptyClientSecret.patch # https://github.com/qgis/QGIS/pull/66777
+  elevation_controller_range.patch # https://github.com/qgis/QGIS/pull/66427
+  # elevation controller range locking + raster elevation surface z-range from
+  # band statistics
   nestedSpriteExpression.patch # https://github.com/qgis/QGIS/pull/66810
 )
 
