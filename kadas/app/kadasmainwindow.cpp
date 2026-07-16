@@ -1444,6 +1444,12 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       }
       if ( entry->leaf )
       {
+        // This block builds the group hierarchy itself and sets an explicit
+        // insertion point for every leaf, so the add*Layer() calls below pass
+        // adjustInsertionPoint = false to honor it instead of recomputing the
+        // default offset. The drop position (atInsertionPoint) is likewise not
+        // threaded here: a multi-sublayer service is placed as its own group,
+        // not at a single drop row.
         QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( parent, parent == rootGroup ? rootInsCount++ : parent->children().count() ) );
 
         QgsMapLayer *layer = nullptr;
