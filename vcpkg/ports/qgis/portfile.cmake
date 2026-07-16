@@ -33,6 +33,7 @@ vcpkg_from_github(
   annotation-item-rotation.patch # https://github.com/qgis/QGIS/pull/66610
   # rotation for rectangle-based annotations (images + text)
   oauth2NoEmptyClientSecret.patch # https://github.com/qgis/QGIS/pull/66777
+  nestedSpriteExpression.patch # https://github.com/qgis/QGIS/pull/66810
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
