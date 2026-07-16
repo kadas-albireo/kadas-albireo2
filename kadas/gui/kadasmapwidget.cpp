@@ -30,6 +30,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 #include <qgis/qgselevationcontrollerwidget.h>
+#include <qgis/qgsrangeslider.h>
 #include <qgis/qgsrasterlayer.h>
 
 
@@ -159,6 +160,58 @@ void KadasMapWidget::setMapExtent( const QgsRectangle &extent )
   mMapCanvas->refresh();
 }
 
+void KadasMapWidget::moveElevationControllerLabelsToLeft( QgsElevationControllerWidget *controller )
+{
+  if ( !controller )
+    return;
+
+  // By default the elevation controller lays out the slider on the left and
+  // its labels on the right. In kadas the controller sits on the right edge of
+  // the canvas, so the labels read better on the left of the slider. Instead of
+  // patching QGIS, reorder the two widgets in their shared layout at runtime.
+  QgsRangeSlider *slider = controller->slider();
+  if ( !slider )
+    return;
+
+  QBoxLayout *sliderLayout = nullptr;
+  if ( QLayout *rootLayout = controller->layout() )
+  {
+    for ( int i = 0; i < rootLayout->count(); ++i )
+    {
+      QLayout *childLayout = rootLayout->itemAt( i )->layout();
+      if ( childLayout && childLayout->indexOf( slider ) >= 0 )
+      {
+        sliderLayout = qobject_cast<QBoxLayout *>( childLayout );
+        break;
+      }
+    }
+  }
+  if ( !sliderLayout )
+    return;
+
+  // The labels are the other widget sharing the layout with the slider.
+  QWidget *labels = nullptr;
+  for ( int i = 0; i < sliderLayout->count(); ++i )
+  {
+    QWidget *widget = sliderLayout->itemAt( i )->widget();
+    if ( widget && widget != slider )
+    {
+      labels = widget;
+      break;
+    }
+  }
+  if ( !labels )
+    return;
+
+  if ( sliderLayout->indexOf( labels ) < sliderLayout->indexOf( slider ) )
+    return; // already reordered
+
+  sliderLayout->removeWidget( labels );
+  sliderLayout->removeWidget( slider );
+  sliderLayout->insertWidget( 0, labels );
+  sliderLayout->insertWidget( 1, slider, 1 );
+}
+
 void KadasMapWidget::setElevationController()
 {
   QString layerid = QgsProject::instance()->readEntry( "Heightmap", "layer" );
@@ -172,6 +225,7 @@ void KadasMapWidget::setElevationController()
   if ( !mElevationController )
   {
     mElevationController = new QgsElevationControllerWidget( this );
+    moveElevationControllerLabelsToLeft( mElevationController );
     connect( mElevationController, &QgsElevationControllerWidget::rangeChanged, mMapCanvas, &QgsMapCanvas::setZRange );
     mMapCanvas->addOverlayWidget( mElevationController, Qt::Edge::RightEdge );
   }

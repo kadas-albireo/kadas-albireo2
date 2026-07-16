@@ -34,10 +34,6 @@ vcpkg_from_github(
   # rotation for rectangle-based annotations (images + text)
   oauth2NoEmptyClientSecret.patch # https://github.com/qgis/QGIS/pull/66777
   nestedSpriteExpression.patch # https://github.com/qgis/QGIS/pull/66810
-  invert_label_elevation_widget.patch # elevation widget in QGIS is on the left
-                                      # while on kadas it's on the right, this
-                                      # patch inverts the positions of the
-                                      # labels
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
