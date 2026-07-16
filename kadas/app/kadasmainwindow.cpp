@@ -1366,7 +1366,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       QgsDataSourceUri dataSource( adjustedUri );
       dataSource.removeParam( "layer" );
       dataSource.setParam( "layer", QString::number( sublayer["id"].toInt() ) );
-      layer = kApp->addRasterLayer( dataSource.uri( false ), uri.name, uri.providerKey, false, 0, false );
+      layer = kApp->addRasterLayer( dataSource.uri( false ), uri.name, uri.providerKey, false, 0, !atInsertionPoint );
     }
     else if ( uri.providerKey == "arcgisfeatureserver" )
     {
@@ -1374,16 +1374,16 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       QString urlParameter = QString( "%1/%2" ).arg( dataSource.param( "url" ) ).arg( sublayer["id"].toInt() );
       dataSource.removeParam( "url" );
       dataSource.setParam( "url", urlParameter );
-      layer = kApp->addVectorLayer( dataSource.uri( false ), uri.name, uri.providerKey, false, 0, false );
+      layer = kApp->addVectorLayer( dataSource.uri( false ), uri.name, uri.providerKey, false, 0, !atInsertionPoint );
     }
     else if ( uri.providerKey == "arcgisvectortileservice" )
     {
-      layer = kApp->addVectorTileLayer( adjustedUri, uri.name, false );
+      layer = kApp->addVectorTileLayer( adjustedUri, uri.name, false, true, 0, !atInsertionPoint );
     }
     else if ( uri.providerKey == "wms" )
     {
       adjustedUri.replace( QRegularExpression( "layers=[^&]*" ), "layers=" + sublayer["id"].toString() );
-      layer = kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey, false, 0, false );
+      layer = kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey, false, 0, !atInsertionPoint );
     }
 
     if ( layer )
@@ -1464,7 +1464,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
         }
         else if ( uri.providerKey == "arcgisvectortileservice" )
         {
-          layer = kApp->addVectorTileLayer( adjustedUri, entry->name, false );
+          layer = kApp->addVectorTileLayer( adjustedUri, entry->name, false, true, 0, false );
         }
         else if ( uri.providerKey == "wms" )
         {
@@ -1487,7 +1487,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
   }
   else if ( uri.providerKey == "arcgisvectortileservice" )
   {
-    QgsVectorTileLayer *layer = kApp->addVectorTileLayer( adjustedUri, uri.name, false );
+    QgsVectorTileLayer *layer = kApp->addVectorTileLayer( adjustedUri, uri.name, false, true, 0, !atInsertionPoint );
     if ( layer )
     {
       layer->serverProperties()->setMetadataUrls( { QgsServerMetadataUrlProperties::MetadataUrl( metadataUrl ) } );
