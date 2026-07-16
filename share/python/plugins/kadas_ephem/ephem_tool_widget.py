@@ -5,12 +5,10 @@ from kadas.kadascore import KadasCoordinateUtils
 from kadas.kadasgui import KadasBottomBar
 from qgis.core import (
     Qgis,
-    QgsAnnotationLayer,
     QgsCoordinateFormatter,
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
     QgsGeometry,
-    QgsMapLayer,
     QgsMarkerSymbol,
     QgsProject,
     QgsSvgMarkerSymbolLayer,
@@ -71,15 +69,6 @@ class EphemToolWidget(KadasBottomBar):
         self.wgsPos = None
         self.mrcPos = None
 
-        self.azLayer = QgsAnnotationLayer(
-            "azLayer", QgsAnnotationLayer.LayerOptions(QgsProject.instance().transformContext())
-        )
-
-        self.azLayer.setCrs(QgsCoordinateReferenceSystem("EPSG:4326"))
-        QgsProject.instance().addMapLayer(self.azLayer)
-
-        self.azLayer.setFlags(self.azLayer.flags() | QgsMapLayer.Private)
-
         self.sunAzIcon = QgsRubberBand(self.iface.mapCanvas(), Qgis.GeometryType.Point)
 
         az_sun_svg_path = os.path.join(os.path.dirname(__file__), "icons/az_sun.svg")
@@ -116,9 +105,6 @@ class EphemToolWidget(KadasBottomBar):
             self.ephemRecomputeTask.cancel()
             self.ephemRecomputeTask.wait()
             QApplication.restoreOverrideCursor()
-
-        QgsProject.instance().removeMapLayer(self.azLayer)
-        del self.azLayer
 
         self.sunAzIcon.reset()
         self.moonAzIcon.reset()
@@ -210,7 +196,6 @@ class EphemToolWidget(KadasBottomBar):
 
         azIcon.setVisible(result.azimuthVisible)
 
-        self.azLayer.triggerRepaint()
         self.iface.mapCanvas().refresh()
 
         self.busyOverlay.setVisible(False)
