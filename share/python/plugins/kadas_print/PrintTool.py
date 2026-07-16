@@ -24,6 +24,7 @@ from qgis.core import (
     QgsProject,
     QgsReadWriteContext,
     QgsRectangle,
+    QgsSettingsEntryBool,
     QgsSettingsEntryDouble,
     QgsSettingsEntryString,
     QgsUnitTypes,
@@ -41,7 +42,6 @@ from qgis.PyQt.QtCore import (
     QXmlStreamReader,
 )
 from qgis.PyQt.QtGui import QDoubleValidator
-from qgis.PyQt.QtPrintSupport import QPrintDialog, QPrinter, QPrinterInfo
 from qgis.PyQt.QtWidgets import (
     QApplication,
     QComboBox,
@@ -65,6 +65,7 @@ Ui_PrintDialog, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "ui",
 LAST_FORMAT = QgsSettingsEntryString("lastformat", _node, "PDF")
 LAST_SCALE = QgsSettingsEntryDouble("lastscale", _node, 0)
 LAST_LAYOUT_SIZE = QgsSettingsEntryString("lastlayoutsize", _node, "")
+LAST_GRID_ENABLED = QgsSettingsEntryBool("lastgridenabled", _node, False)
 
 
 class PrintTool(KadasMapToolSelectRect):
@@ -75,7 +76,6 @@ class PrintTool(KadasMapToolSelectRect):
 
         self.iface = iface
         self.layoutManager = QgsProject.instance().layoutManager()
-        self.printer = None
 
         self.fixedSizeMode = True
         self.mapitem = None
@@ -87,9 +87,6 @@ class PrintTool(KadasMapToolSelectRect):
         self.dialogui.setupUi(self.dialog)
         self.exportButton = self.dialogui.buttonBox.addButton(
             self.tr("Export"), QDialogButtonBox.ButtonRole.ActionRole
-        )
-        self.printButton = self.dialogui.buttonBox.addButton(
-            self.tr("Print"), QDialogButtonBox.ButtonRole.ActionRole
         )
         self.advancedButton = self.dialogui.buttonBox.addButton(
             self.tr("Advanced"), QDialogButtonBox.ButtonRole.HelpRole
@@ -152,7 +149,6 @@ class PrintTool(KadasMapToolSelectRect):
         self.dialogui.spinBox_intervaly.valueChanged.connect(self.__intervalYChanged)
         self.dialogui.groupBox_grid.setChecked(False)
         self.exportButton.clicked.connect(self.__export)
-        self.printButton.clicked.connect(self.__print)
         self.advancedButton.clicked.connect(self.__advanced)
         self.dialog.finished.connect(self.close)
         self.dialogui.groupBox_grid.toggled.connect(self.__setupGrid)
@@ -271,18 +267,19 @@ class PrintTool(KadasMapToolSelectRect):
         if not self.grid:
             self.dialogui.groupBox_grid.setEnabled(False)
         else:
+            self.dialogui.groupBox_grid.setChecked(LAST_GRID_ENABLED.value())
             self.__setupGrid()
         cartoucheItem = self.__layoutItem("mapcartouche", QgsLayoutItemGroup)
         if not cartoucheItem:
             self.dialogui.checkBox_mapCartouche.setEnabled(False)
         else:
             self.dialogui.checkBox_mapCartouche.setChecked(cartoucheItem.isVisible())
-        self.dialogui.groupBox_grid.setChecked(self.mapitem.grid().enabled())
 
     def close(self):
         LAST_FORMAT.setValue(self.dialogui.comboBox_fileformat.currentText())
         LAST_SCALE.setValue(self.dialogui.comboBox_scale.scale())
         LAST_LAYOUT_SIZE.setValue(self.dialogui.comboBox_printlayouts.currentText())
+        LAST_GRID_ENABLED.setValue(self.dialogui.groupBox_grid.isChecked())
         self.iface.mapCanvas().unsetMapTool(self)
 
     def activate(self):
@@ -732,41 +729,6 @@ class PrintTool(KadasMapToolSelectRect):
         QApplication.restoreOverrideCursor()
         self.printing = False
 
-    def __print(self):
-        if not QPrinterInfo.availablePrinterNames():
-            QMessageBox.warning(
-                self.dialog, self.tr("No Printers"), self.tr("No printers were found.")
-            )
-        else:
-            if not self.printer:
-                self.printer = QPrinter()
-            exporter = QgsLayoutExporter(self.printLayout)
-            if self.printLayout.pageCollection().pageCount() > 0:
-                self.printer.setPageLayout(self.printLayout.pageCollection().page(0).pageLayout())
-            printdialog = QPrintDialog(self.printer)
-
-            if printdialog.exec() != QDialog.DialogCode.Accepted:
-                return
-
-            self.printing = True
-            QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
-            self.dialogui.previewGraphic.setUpdatesEnabled(False)
-            self.dialog.setEnabled(False)
-
-            success = exporter.print(self.printer, QgsLayoutExporter.PrintExportSettings())
-
-            self.dialog.setEnabled(True)
-            self.dialogui.previewGraphic.setUpdatesEnabled(True)
-            QApplication.restoreOverrideCursor()
-            self.printing = False
-
-            if success != 0:
-                QMessageBox.warning(
-                    self.iface.mainWindow(),
-                    self.tr("Print Failed"),
-                    self.tr("Failed to print the layout."),
-                )
-
     def __setUiEnabled(self, enabled):
         self.dialogui.lineEdit_title.setEnabled(enabled)
         self.dialogui.comboBox_scale.setEnabled(enabled)
@@ -778,7 +740,6 @@ class PrintTool(KadasMapToolSelectRect):
         self.dialogui.groupBox_grid.setEnabled(enabled)
         self.dialogui.comboBox_fileformat.setEnabled(enabled)
         self.dialogui.checkBox_mapCartouche.setEnabled(enabled)
-        self.printButton.setEnabled(enabled)
         self.advancedButton.setEnabled(enabled)
         self.exportButton.setEnabled(enabled)
         self.__setVariableExtentUiVisibile(enabled and not self.fixedSizeMode)
