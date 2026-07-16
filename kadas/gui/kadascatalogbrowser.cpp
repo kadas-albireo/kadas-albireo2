@@ -14,8 +14,11 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QHBoxLayout>
+#include <QIcon>
 #include <QSortFilterProxyModel>
 #include <QStandardItem>
+#include <QToolButton>
 #include <QTreeView>
 #include <QVBoxLayout>
 
@@ -141,6 +144,26 @@ class KadasCatalogBrowser::CatalogModel : public QStandardItemModel
     QStringList mimeTypes() const override { return QStringList() << "text/uri-list" << "application/x-vnd.qgis.qgis.uri"; }
 };
 
+//! Tree view which announces drag starts, so the drop target can be revealed.
+class KadasCatalogBrowser::CatalogTreeView : public QTreeView
+{
+  public:
+    explicit CatalogTreeView( KadasCatalogBrowser *browser )
+      : QTreeView( browser )
+      , mBrowser( browser )
+    {}
+
+  protected:
+    void startDrag( Qt::DropActions supportedActions ) override
+    {
+      emit mBrowser->dragStarted();
+      QTreeView::startDrag( supportedActions );
+    }
+
+  private:
+    KadasCatalogBrowser *mBrowser = nullptr;
+};
+
 class KadasCatalogBrowser::TreeFilterProxyModel : public QSortFilterProxyModel
 {
   public:
@@ -194,11 +217,29 @@ KadasCatalogBrowser::KadasCatalogBrowser( QWidget *parent )
   mFilterLineEdit = new QgsFilterLineEdit( this );
   mFilterLineEdit->setPlaceholderText( tr( "Filter catalog..." ) );
   mFilterLineEdit->setObjectName( "mCatalogBrowserLineEdit" );
-  mFilterLineEdit->setStyleSheet( "QLineEdit { border-style: solid; border-color: #e4e4e4; border-width: 1px 0px 1px 0px; }" );
-  layout()->addWidget( mFilterLineEdit );
+  mFilterLineEdit->setFixedHeight( 40 );
+  mFilterLineEdit->setStyleSheet( "QLineEdit { border: 1px solid #b0b0b0; border-right: 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px; padding-left: 4px; background: white; }" );
   connect( mFilterLineEdit, &QgsFilterLineEdit::textChanged, this, &KadasCatalogBrowser::filterChanged );
 
-  mTreeView = new QTreeView( this );
+  mRefreshButton = new QToolButton( this );
+  mRefreshButton->setObjectName( "mCatalogBrowserRefreshButton" );
+  mRefreshButton->setIcon( QIcon( ":/kadas/icons/refresh" ) );
+  mRefreshButton->setToolTip( tr( "Refresh catalog" ) );
+  mRefreshButton->setFixedSize( 40, 40 );
+  mRefreshButton->setStyleSheet(
+    "QToolButton { border: 1px solid #263B4E; border-top-right-radius: 4px; border-bottom-right-radius: 4px; background: #263B4E; } QToolButton:pressed { background: #16232f; }"
+  );
+  connect( mRefreshButton, &QToolButton::clicked, this, &KadasCatalogBrowser::reload );
+
+  QWidget *filterRow = new QWidget( this );
+  QHBoxLayout *filterRowLayout = new QHBoxLayout( filterRow );
+  filterRowLayout->setContentsMargins( 6, 6, 6, 6 );
+  filterRowLayout->setSpacing( 0 );
+  filterRowLayout->addWidget( mFilterLineEdit );
+  filterRowLayout->addWidget( mRefreshButton );
+  layout()->addWidget( filterRow );
+
+  mTreeView = new CatalogTreeView( this );
   mTreeView->setFrameShape( QTreeView::NoFrame );
   mTreeView->setEditTriggers( QTreeView::NoEditTriggers );
   mTreeView->setDragEnabled( true );

@@ -82,7 +82,7 @@ class KadasApplication : public QgsApplication
     QgsVectorLayer *addVectorLayer( const QString &uri, const QString &layerName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;
     void addVectorLayers( const QStringList &layerUris, const QString &enc, const QString &dataSourceType, bool quiet = false ) const;
     void addRasterLayers( const QStringList &layerUris, bool quiet = false ) const;
-    QgsVectorTileLayer *addVectorTileLayer( const QString &url, const QString &baseName, bool quiet = false, bool forceUpdateUriSources = true );
+    QgsVectorTileLayer *addVectorTileLayer( const QString &url, const QString &baseName, bool quiet = false, bool forceUpdateUriSources = true, int insOffset = 0, bool adjustInsertionPoint = true );
     QgsPointCloudLayer *addPointCloudLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false );
     QPair<QString, QgsAnnotationLayer *> addImageItem( const QString &filename ) const;
     bool askUserForDatumTransform( const QgsCoordinateReferenceSystem &sourceCrs, const QgsCoordinateReferenceSystem &destinationCrs, const QgsMapLayer *layer );

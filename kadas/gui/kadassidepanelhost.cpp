@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QEvent>
+#include <QLabel>
 #include <QLayout>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -90,6 +91,72 @@ void KadasSidePanelHost::removePanel( QWidget *panel )
     return;
   scheduleReflow();
   mLayout->removeWidget( panel );
+}
+
+void KadasSidePanelHost::beginPanelResize()
+{
+  if ( !mCanvas || mResizeOverlay )
+    return;
+
+  mResizeAnchor = captureCanvasAnchor();
+  // No rendering while dragging: freeze the canvas and cover it with a
+  // snapshot pinned to the anchored edge, so the map appears fixed while the
+  // panel edge slides over (or away from) it.
+  mCanvas->freeze( true );
+  mResizeSnapshot = mCanvas->grab();
+  mResizeOverlay = new QLabel( mCanvas );
+  mResizeOverlay->setAlignment( ( mEdge == Edge::Left ? Qt::AlignRight : Qt::AlignLeft ) | Qt::AlignTop );
+  // Fill the strip uncovered when the panel shrinks with the canvas
+  // background instead of leaving stale pixels.
+  mResizeOverlay->setAutoFillBackground( true );
+  QPalette pal = mResizeOverlay->palette();
+  pal.setColor( QPalette::Window, mCanvas->canvasColor() );
+  mResizeOverlay->setPalette( pal );
+  updateResizeOverlay();
+  mResizeOverlay->show();
+  mResizeOverlay->raise();
+}
+
+void KadasSidePanelHost::updateResizeOverlay()
+{
+  if ( !mResizeOverlay || !mCanvas )
+    return;
+
+  mResizeOverlay->setGeometry( mCanvas->rect() );
+
+  // QLabel anchors an overflowing pixmap to its left edge regardless of the
+  // alignment, so crop the side hidden behind the growing panel ourselves to
+  // keep the visible part pinned to the anchored edge.
+  QPixmap pixmap = mResizeSnapshot;
+  const qreal dpr = pixmap.devicePixelRatio();
+  const int availableWidth = qRound( mCanvas->width() * dpr );
+  if ( availableWidth < pixmap.width() )
+  {
+    const int x = mEdge == Edge::Left ? pixmap.width() - availableWidth : 0;
+    pixmap = pixmap.copy( x, 0, availableWidth, pixmap.height() );
+    pixmap.setDevicePixelRatio( dpr );
+  }
+  mResizeOverlay->setPixmap( pixmap );
+}
+
+void KadasSidePanelHost::endPanelResize()
+{
+  if ( !mResizeOverlay )
+    return;
+
+  delete mResizeOverlay;
+  mResizeOverlay = nullptr;
+  mResizeSnapshot = QPixmap();
+
+  // Re-anchor the extent at the final width, then render once.
+  armCanvasAnchor( mResizeAnchor );
+  mResizeAnchor = CanvasAnchor();
+  if ( !mArmedAnchor.valid && mCanvas )
+  {
+    // No valid anchor was captured; just thaw.
+    mCanvas->freeze( false );
+    mCanvas->refresh();
+  }
 }
 
 void KadasSidePanelHost::scheduleReflow()
@@ -181,10 +248,19 @@ void KadasSidePanelHost::armCanvasAnchor( const CanvasAnchor &anchor )
 
 bool KadasSidePanelHost::eventFilter( QObject *watched, QEvent *event )
 {
-  if ( watched == mCanvas && event->type() == QEvent::Resize && mArmedAnchor.valid && !mApplying )
+  if ( watched == mCanvas && event->type() == QEvent::Resize )
   {
-    // Re-anchor after QGIS has handled the resize and updated the output size.
-    QMetaObject::invokeMethod( this, &KadasSidePanelHost::applyArmedAnchor, Qt::QueuedConnection );
+    if ( mResizeOverlay )
+    {
+      // Track the canvas while the drag resizes it; the snapshot is re-cropped
+      // so it stays pinned to the anchored edge.
+      updateResizeOverlay();
+    }
+    else if ( mArmedAnchor.valid && !mApplying )
+    {
+      // Re-anchor after QGIS has handled the resize and updated the output size.
+      QMetaObject::invokeMethod( this, &KadasSidePanelHost::applyArmedAnchor, Qt::QueuedConnection );
+    }
   }
   return QWidget::eventFilter( watched, event );
 }

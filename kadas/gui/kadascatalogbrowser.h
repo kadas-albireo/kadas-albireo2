@@ -29,6 +29,7 @@
 
 class KadasCatalogProvider;
 class QgsFilterLineEdit;
+class QToolButton;
 class QTreeView;
 
 
@@ -43,18 +44,26 @@ class KADAS_GUI_EXPORT KadasCatalogBrowser : public QWidget
     void addProvider( KadasCatalogProvider *provider ) { mProviders.append( provider ); }
     QStandardItem *addItem( QStandardItem *parent, QString text, int sortIndex, bool isLeaf = false, QMimeData *mimeData = nullptr );
 
+    //! Button which reloads the catalog, shown next to the filter field.
+    QToolButton *refreshButton() const { return mRefreshButton; }
+
   public slots:
     void reload();
 
   signals:
     void layerSelected( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers );
 
+    //! Emitted when the user starts dragging a catalog entry (e.g. towards the layer tree).
+    void dragStarted();
+
   private:
     class CatalogModel;
     class CatalogItem;
+    class CatalogTreeView;
     class TreeFilterProxyModel;
 
     QgsFilterLineEdit *mFilterLineEdit;
+    QToolButton *mRefreshButton;
     QTreeView *mTreeView;
     CatalogModel *mCatalogModel;
     QStandardItemModel *mLoadingModel;

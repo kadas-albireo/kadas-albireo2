@@ -89,7 +89,7 @@ KadasRibbonActionGallery QToolButton {
   color: #FFFFFF;
   background-color: #5D7081;
   border: 1px solid #5D7081;
-  border-radius: 2px;
+  border-radius: 3px;
   padding: 2px;
 }
 
@@ -104,23 +104,18 @@ KadasRibbonActionGallery QToolButton:checked {
 
 
 /** Layer tree view, catalog */
-QgsCollapsibleGroupBox#mLayersBox,
-QgsCollapsibleGroupBox#mGeodataBox {
-    font-size: 14px;
-}
-
 QPushButton#mLayerTreeViewButton {
   background-color: #263B4E;
-  border-top-right-radius: 2px;
-  border-bottom-right-radius: 2px;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
   border-top-left-radius: 0px;
   border-bottom-left-radius: 0px;
 }
 
 QPushButton#mRibbonbarButton {
   background-color: #263B4E;
-  border-bottom-left-radius: 2px;
-  border-bottom-right-radius: 2px;
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
   border-top-left-radius: 0px;
   border-top-right-radius: 0px;
 }
@@ -136,11 +131,15 @@ QPushButton#mRibbonbarButton:pressed
   border: 1px solid #263B4E;
 }
 
+#mGeodataToolbar {
+  background-color: #FFFFFF;
+}
+
 #mGeodataToolbar QToolButton {
   color: #FFFFFF;
   padding: 1px 4px 1px 4px;
   border: 1px solid #1b2a37;
-  border-radius: 2px;
+  border-radius: 3px;
   background-color: #263B4E;
 }
 
@@ -201,7 +200,7 @@ QPushButton#mRibbonbarButton:pressed
   color: #FFFFFF;
   padding: 1px 4px 1px 4px;
   border: 1px solid #5D7081;
-  border-radius: 2px;
+  border-radius: 3px;
 }
 
 #mRibbonWidget > QWidget > QWidget > QComboBox:disabled,
@@ -420,11 +419,22 @@ QPushButton#mZoomOutButton {
   border-width: 0;
 }
 
+/* Round the outer corners of the zoom button stack, matching the ribbon buttons */
+QPushButton#mZoomInButton {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+QPushButton#mZoomOutButton {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
 QPushButton#mHomeButton {
   background-color: #263B4E;
   color: #FFFFFF;
-  border: 1px solid #737373;
-  border-radius: 2px;
+  border: 1px solid #FFFFFF;
+  border-radius: 3px;
 }
 
 QPushButton#mZoomInButton:pressed,
@@ -435,8 +445,9 @@ QPushButton#mHomeButton:pressed {
 
 
 QFrame#mZoomInOutFrame {
-    border: 1px solid #737373;
-    border-radius: 2px;
+    border: 1px solid #FFFFFF;
+    border-radius: 3px;
+    background-color: #FFFFFF;
 }
 
 QFrame#mZoomBackgroundFrame {

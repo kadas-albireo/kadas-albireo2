@@ -115,6 +115,9 @@
 #include "milx/kadasmilxintegration.h"
 
 
+static const QgsSettingsEntryInteger sSettingsLayersWidgetWidth( QStringLiteral( "layers-widget-width" ), KadasSettingsTree::sTreeKadas, 200, QStringLiteral( "Width of the layers side panel." ) );
+static const QgsSettingsEntryInteger sSettingsLayersWidgetTab( QStringLiteral( "layers-widget-tab" ), KadasSettingsTree::sTreeKadas, 0, QStringLiteral( "Last-selected layers panel tab." ) );
+
 static bool clipboardHasPastableContent()
 {
   // Paste only handles raster images and SVG (see KadasApplication::paste),
@@ -133,6 +136,9 @@ KadasMainWindow::KadasMainWindow()
   QHBoxLayout *canvasRow = new QHBoxLayout();
   canvasRow->setContentsMargins( 0, 0, 0, 0 );
   canvasRow->setSpacing( 0 );
+  mLeftPanelHost = new KadasSidePanelHost( KadasSidePanelHost::Edge::Left );
+  mLeftPanelHost->setMapCanvas( mMapCanvas );
+  canvasRow->addWidget( mLeftPanelHost, 0 );
   canvasRow->addWidget( mMapCanvas, 1 );
   mRightPanelHost = new KadasSidePanelHost( KadasSidePanelHost::Edge::Right );
   mRightPanelHost->setMapCanvas( mMapCanvas );
@@ -185,9 +191,18 @@ void KadasMainWindow::init()
   mLocatorLayout->insertWidget( 0, lw );
 
   mLayersWidget->setVisible( false );
-  mLayersWidget->resize( std::max( 10, std::min( 800, QgsSettings().value( "/kadas/layersWidgetWidth", 200 ).toInt() ) ), mLayersWidget->height() );
-  mGeodataBox->setCollapsed( false );
-  mLayersBox->setCollapsed( false );
+  mLayersWidget->setFixedWidth( std::clamp( sSettingsLayersWidgetWidth.value(), 10, 800 ) );
+
+  // The catalog button toggles between the layer tree (unchecked) and the catalog (checked)
+  connect( mGeodataTabButton, &QAbstractButton::toggled, this, [this]( bool checked ) {
+    mLayersStack->setCurrentIndex( checked ? 1 : 0 );
+    sSettingsLayersWidgetTab.setValue( checked ? 1 : 0 );
+  } );
+  const int layersTab = std::clamp( sSettingsLayersWidgetTab.value(), 0, 1 );
+  mLayersStack->setCurrentIndex( layersTab );
+  mGeodataTabButton->setChecked( layersTab == 1 );
+  QShortcut *layerTreeShortcut = new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_L ), this );
+  connect( layerTreeShortcut, &QShortcut::activated, this, &KadasMainWindow::toggleLayerTree );
 
   // The MilX integration enables the tab, if connection to the MilX server succeeds
   mRibbonWidget->setTabEnabled( mRibbonWidget->indexOf( mMssTab ), false );
@@ -316,8 +331,15 @@ void KadasMainWindow::init()
   mMilxIntegration = new KadasMilxIntegration( milxUi, this );
 
   // IAM Auth
-  KadasIamAuth *iamAuth = new KadasIamAuth( mLoginButton, mLogoutButton, mRefreshCatalogButton, this );
+  KadasIamAuth *iamAuth = new KadasIamAuth( mLoginButton, mLogoutButton, mCatalogBrowser->refreshButton(), this );
   Q_UNUSED( iamAuth );
+  // The catalog login toolbar only carries the (hidden unless login is configured)
+  // login/logout buttons and username label; collapse it entirely when unused so
+  // it does not reserve empty space above the catalog filter.
+  if ( mLoginButton->isHidden() && mLogoutButton->isHidden() )
+  {
+    mGeodataToolbar->hide();
+  }
 
   Kadas3DIntegration *my3Dintegration = new Kadas3DIntegration( mAction3D, mMapCanvas, this );
 
@@ -352,6 +374,15 @@ void KadasMainWindow::init()
   connect( mMapCanvas, &QgsMapCanvas::mapCanvasRefreshed, &mLoadingTimer, &QTimer::stop );
   connect( mMapCanvas, &QgsMapCanvas::mapCanvasRefreshed, mLoadingLabel, &QLabel::hide );
   connect( mMapCanvas, &QgsMapCanvas::currentLayerChanged, mLayerTreeView, &QgsLayerTreeView::setCurrentLayer );
+  // The layer tree view accepts dataset (e.g. catalog entry) drops itself and
+  // just announces them; add the dropped layer like a window-level drop.
+  connect( mLayerTreeView, &QgsLayerTreeView::datasetsDropped, this, [this]( QDropEvent *event ) {
+    const QgsMimeDataUtils::UriList list = QgsMimeDataUtils::decodeUriList( event->mimeData() );
+    if ( !list.isEmpty() )
+    {
+      addCatalogLayer( list.front(), event->mimeData()->property( "metadataUrl" ).toString(), event->mimeData()->property( "sublayers" ).toList(), true );
+    }
+  } );
   connect( mMapCanvas, &QgsMapCanvas::layersChanged, this, &KadasMainWindow::updateBgLayerZoomResolutions );
   connect( mMapCanvas, &QgsMapCanvas::destinationCrsChanged, this, &KadasMainWindow::updateBgLayerZoomResolutions );
   connect( &mLoadingTimer, &QTimer::timeout, mLoadingLabel, &QLabel::show );
@@ -400,8 +431,13 @@ void KadasMainWindow::init()
     }
   }
 
-  connect( mRefreshCatalogButton, &QToolButton::clicked, mCatalogBrowser, &KadasCatalogBrowser::reload );
-  connect( mCatalogBrowser, &KadasCatalogBrowser::layerSelected, this, &KadasMainWindow::addCatalogLayer );
+  connect( mCatalogBrowser, &KadasCatalogBrowser::layerSelected, this, [this]( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers ) {
+    addCatalogLayer( uri, metadataUrl, sublayers );
+    // Reveal the layer tree so the freshly added (and selected) layer is visible
+    mGeodataTabButton->setChecked( false );
+  } );
+  // Dragging a catalog entry: reveal the layer tree so it can serve as drop target.
+  connect( mCatalogBrowser, &KadasCatalogBrowser::dragStarted, this, [this] { mGeodataTabButton->setChecked( false ); } );
 
   const QList<QgsLocatorFilter *> filters = lw->locator()->filters();
   for ( QgsLocatorFilter *filter : filters )
@@ -448,6 +484,9 @@ bool KadasMainWindow::eventFilter( QObject *obj, QEvent *ev )
     if ( e->button() == Qt::LeftButton )
     {
       mResizePressPos = e->pos();
+      // Freeze the map under a snapshot for the whole drag; a single
+      // re-render happens on release.
+      mLeftPanelHost->beginPanelResize();
     }
   }
   else if ( obj == mLayersWidgetResizeHandle && ev->type() == QEvent::MouseMove )
@@ -456,9 +495,16 @@ bool KadasMainWindow::eventFilter( QObject *obj, QEvent *ev )
     if ( e->buttons() == Qt::LeftButton )
     {
       QPoint delta = e->pos() - mResizePressPos;
-      mLayersWidget->resize( std::max( 10, std::min( 800, mLayersWidget->width() + delta.x() ) ), mLayersWidget->height() );
-      QgsSettings().setValue( "/kadas/layersWidgetWidth", mLayersWidget->width() );
-      mLayerTreeViewButton->move( mLayersWidget->width(), mLayerTreeViewButton->y() );
+      mLayersWidget->setFixedWidth( std::clamp( mLayersWidget->width() + delta.x(), 10, 800 ) );
+    }
+  }
+  else if ( obj == mLayersWidgetResizeHandle && ev->type() == QEvent::MouseButtonRelease )
+  {
+    QMouseEvent *e = static_cast<QMouseEvent *>( ev );
+    if ( e->button() == Qt::LeftButton )
+    {
+      mLeftPanelHost->endPanelResize();
+      sSettingsLayersWidgetWidth.setValue( mLayersWidget->width() );
     }
   }
   return false;
@@ -472,14 +518,6 @@ void KadasMainWindow::updateWidgetPositions()
   mZoomInOutFrame->move( mMapCanvas->width() - distanceToRightBorder - mZoomInOutFrame->width(), distanceToTop );
 
   mHomeButton->move( mMapCanvas->width() - distanceToRightBorder - mHomeButton->height(), distanceToTop + 90 );
-
-  // Resize mLayersWidget and reposition mLayerTreeViewButton
-  int distanceToTopBottom = 40;
-  int layerTreeHeight = mMapCanvas->height() - 2 * distanceToTopBottom;
-  int buttonY = mLayersWidget->isVisible() ? distanceToTopBottom : 0.5 * mMapCanvas->height() - 40;
-  int buttonHeight = mLayersWidget->isVisible() ? layerTreeHeight : 80;
-  mLayerTreeViewButton->setGeometry( mLayerTreeViewButton->pos().x(), buttonY, mLayerTreeViewButton->width(), buttonHeight );
-  mLayersWidget->setGeometry( mLayersWidget->pos().x(), distanceToTopBottom, mLayersWidget->width(), layerTreeHeight );
 
   // Reposition mRibbonbarButton
   mRibbonbarButton->move( 0.5 * mMapCanvas->width() - 0.5 * mRibbonbarButton->width(), 0 );
@@ -1008,24 +1046,20 @@ QMenu *KadasMainWindow::pluginsMenu()
 
 void KadasMainWindow::toggleLayerTree()
 {
-  bool visible = mLayersWidget->isVisible();
-  mLayersWidget->setVisible( !visible );
-
-  if ( !visible )
+  if ( mLayersWidget->isVisible() )
   {
-    mLayerTreeViewButton->setIcon( QIcon( ":/kadas/icons/layertree_unfolded" ) );
-    mLayerTreeViewButton->move( mLayersWidget->size().width(), mLayerTreeViewButton->y() );
+    mLeftPanelHost->removePanel( mLayersWidget );
+    mLayersWidget->setVisible( false );
+    mLayerTreeViewButton->setIcon( QIcon( ":/kadas/icons/layertree_folded" ) );
+    mLayerTreeViewButton->setFixedSize( 40, 40 );
   }
   else
   {
-    mLayerTreeViewButton->setIcon( QIcon( ":/kadas/icons/layertree_folded" ) );
-    mLayerTreeViewButton->move( 0, mLayerTreeViewButton->y() );
+    mLeftPanelHost->addPanel( mLayersWidget );
+    mLayersWidget->setVisible( true );
+    mLayerTreeViewButton->setIcon( QIcon( ":/kadas/icons/leftarrow" ) );
+    mLayerTreeViewButton->setFixedSize( 20, 40 );
   }
-  int distanceToTopBottom = 40;
-  int layerTreeHeight = mMapCanvas->height() - 2 * distanceToTopBottom;
-  int buttonY = mLayersWidget->isVisible() ? distanceToTopBottom : 0.5 * mMapCanvas->height() - 40;
-  int buttonHeight = mLayersWidget->isVisible() ? layerTreeHeight : 80;
-  mLayerTreeViewButton->setGeometry( mLayerTreeViewButton->pos().x(), buttonY, mLayerTreeViewButton->width(), buttonHeight );
 }
 
 void KadasMainWindow::toggleFullscreen()
@@ -1282,8 +1316,18 @@ void KadasMainWindow::showFavoriteContextMenu( const QPoint &pos )
   }
 }
 
-void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers )
+void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers, bool atInsertionPoint )
 {
+  // Track the layers added below, to select the last one afterwards
+  QgsMapLayer *addedLayer = nullptr;
+  const QMetaObject::Connection addedConnection
+    = connect( QgsProject::instance()->layerTreeRegistryBridge(), &QgsLayerTreeRegistryBridge::addedLayersToLayerTree, this, [&addedLayer]( const QList<QgsMapLayer *> &layers ) {
+        if ( !layers.isEmpty() )
+        {
+          addedLayer = layers.last();
+        }
+      } );
+
   QString adjustedUri = uri.uri;
 
   // Adjust layer CRS to project CRS
@@ -1322,7 +1366,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       QgsDataSourceUri dataSource( adjustedUri );
       dataSource.removeParam( "layer" );
       dataSource.setParam( "layer", QString::number( sublayer["id"].toInt() ) );
-      layer = kApp->addRasterLayer( dataSource.uri( false ), uri.name, uri.providerKey, false, 0, false );
+      layer = kApp->addRasterLayer( dataSource.uri( false ), uri.name, uri.providerKey, false, 0, !atInsertionPoint );
     }
     else if ( uri.providerKey == "arcgisfeatureserver" )
     {
@@ -1330,16 +1374,16 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       QString urlParameter = QString( "%1/%2" ).arg( dataSource.param( "url" ) ).arg( sublayer["id"].toInt() );
       dataSource.removeParam( "url" );
       dataSource.setParam( "url", urlParameter );
-      layer = kApp->addVectorLayer( dataSource.uri( false ), uri.name, uri.providerKey, false, 0, false );
+      layer = kApp->addVectorLayer( dataSource.uri( false ), uri.name, uri.providerKey, false, 0, !atInsertionPoint );
     }
     else if ( uri.providerKey == "arcgisvectortileservice" )
     {
-      layer = kApp->addVectorTileLayer( adjustedUri, uri.name, false );
+      layer = kApp->addVectorTileLayer( adjustedUri, uri.name, false, true, 0, !atInsertionPoint );
     }
     else if ( uri.providerKey == "wms" )
     {
       adjustedUri.replace( QRegularExpression( "layers=[^&]*" ), "layers=" + sublayer["id"].toString() );
-      layer = kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey, false, 0, false );
+      layer = kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey, false, 0, !atInsertionPoint );
     }
 
     if ( layer )
@@ -1400,6 +1444,12 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       }
       if ( entry->leaf )
       {
+        // This block builds the group hierarchy itself and sets an explicit
+        // insertion point for every leaf, so the add*Layer() calls below pass
+        // adjustInsertionPoint = false to honor it instead of recomputing the
+        // default offset. The drop position (atInsertionPoint) is likewise not
+        // threaded here: a multi-sublayer service is placed as its own group,
+        // not at a single drop row.
         QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( parent, parent == rootGroup ? rootInsCount++ : parent->children().count() ) );
 
         QgsMapLayer *layer = nullptr;
@@ -1420,7 +1470,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
         }
         else if ( uri.providerKey == "arcgisvectortileservice" )
         {
-          layer = kApp->addVectorTileLayer( adjustedUri, entry->name, false );
+          layer = kApp->addVectorTileLayer( adjustedUri, entry->name, false, true, 0, false );
         }
         else if ( uri.providerKey == "wms" )
         {
@@ -1443,7 +1493,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
   }
   else if ( uri.providerKey == "arcgisvectortileservice" )
   {
-    QgsVectorTileLayer *layer = kApp->addVectorTileLayer( adjustedUri, uri.name, false );
+    QgsVectorTileLayer *layer = kApp->addVectorTileLayer( adjustedUri, uri.name, false, true, 0, !atInsertionPoint );
     if ( layer )
     {
       layer->serverProperties()->setMetadataUrls( { QgsServerMetadataUrlProperties::MetadataUrl( metadataUrl ) } );
@@ -1451,7 +1501,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
   }
   else
   {
-    QgsRasterLayer *layer = kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey );
+    QgsRasterLayer *layer = kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey, false, 0, !atInsertionPoint );
     if ( layer )
     {
       layer->serverProperties()->setMetadataUrls( { QgsServerMetadataUrlProperties::MetadataUrl( metadataUrl ) } );
@@ -1459,6 +1509,12 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
   }
   // Reset insertion point
   QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( mLayerTreeView->layerTreeModel()->rootGroup(), 0 ) );
+
+  disconnect( addedConnection );
+  if ( addedLayer )
+  {
+    mLayerTreeView->setCurrentLayer( addedLayer );
+  }
 }
 
 void KadasMainWindow::checkLayerProjection( QgsMapLayer *layer )

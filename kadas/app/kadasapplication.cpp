@@ -597,9 +597,22 @@ void KadasApplication::addRasterLayers( const QStringList &layerUris, bool quiet
   KadasAppLayerHandling::addGdalRasterLayers( layerUris, ok, !quiet );
 }
 
-QgsVectorTileLayer *KadasApplication::addVectorTileLayer( const QString &url, const QString &baseName, bool quiet, bool forceUpdateUriSources )
+QgsVectorTileLayer *KadasApplication::addVectorTileLayer( const QString &url, const QString &baseName, bool quiet, bool forceUpdateUriSources, int insOffset, bool adjustInsertionPoint )
 {
-  return KadasAppLayerHandling::addVectorTileLayer( url, baseName, !quiet );
+  if ( adjustInsertionPoint )
+  {
+    QgsLayerTreeGroup *rootGroup = mMainWindow->layerTreeView()->layerTreeModel()->rootGroup();
+    insOffset += computeLayerGroupInsertionOffset( rootGroup );
+    QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( rootGroup, insOffset ) );
+  }
+
+  QgsVectorTileLayer *layer = KadasAppLayerHandling::addVectorTileLayer( url, baseName, !quiet, forceUpdateUriSources );
+
+  if ( adjustInsertionPoint )
+  {
+    QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( mMainWindow->layerTreeView()->layerTreeModel()->rootGroup(), 0 ) );
+  }
+  return layer;
 }
 
 QgsPointCloudLayer *KadasApplication::addPointCloudLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet )

@@ -17,11 +17,13 @@
 #ifndef KADASSIDEPANELHOST_H
 #define KADASSIDEPANELHOST_H
 
+#include <QPixmap>
 #include <QWidget>
 
 #include "kadas/gui/kadas_gui.h"
 
 class QEvent;
+class QLabel;
 class QTimer;
 class QVBoxLayout;
 class QgsMapCanvas;
@@ -66,6 +68,18 @@ class KADAS_GUI_EXPORT KadasSidePanelHost : public QWidget
     //! Removes a panel from the host, collapsing the host if it becomes empty.
     void removePanel( QWidget *panel );
 
+    /**
+     * Starts an interactive panel resize (e.g. a drag handle). The canvas is
+     * frozen and covered with a snapshot pinned to its anchored edge, so the
+     * map appears fixed and no re-rendering happens while dragging. Call
+     * endPanelResize() when the drag finishes.
+     */
+    void beginPanelResize();
+
+    //! Ends an interactive panel resize: re-anchors the extent at the final
+    //! width, removes the snapshot and triggers a single re-render.
+    void endPanelResize();
+
   protected:
     //! Watches the canvas for the reflow-driven resizes that follow a toggle.
     bool eventFilter( QObject *watched, QEvent *event ) override;
@@ -95,6 +109,8 @@ class KADAS_GUI_EXPORT KadasSidePanelHost : public QWidget
     void applyArmedAnchor();
     //! Thaws the canvas and disarms once the reflow has settled.
     void finishCanvasAnchor();
+    //! Resizes the snapshot overlay and re-crops it against the anchored edge.
+    void updateResizeOverlay();
 
     Edge mEdge;
     QVBoxLayout *mLayout = nullptr;
@@ -109,6 +125,12 @@ class KADAS_GUI_EXPORT KadasSidePanelHost : public QWidget
     QTimer *mSettleTimer = nullptr;
     //! Re-entrancy guard so re-anchoring does not recurse through resizes.
     bool mApplying = false;
+    //! Snapshot shown over the canvas during an interactive panel resize.
+    QLabel *mResizeOverlay = nullptr;
+    //! Uncropped canvas snapshot captured when the interactive resize started.
+    QPixmap mResizeSnapshot;
+    //! Anchor captured when the interactive resize started.
+    CanvasAnchor mResizeAnchor;
 };
 
 #endif // KADASSIDEPANELHOST_H
