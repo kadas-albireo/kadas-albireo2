@@ -1,0 +1,244 @@
+From 768852831760f036b583d728c38d6e378503347c Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Thu, 16 Jul 2026 19:42:58 +0200
+Subject: [PATCH 1/2] [vector tiles] fix nested expression for images
+
+---
+ .../vectortile/qgsmapboxglstyleconverter.cpp  | 67 +++++++++++++------
+ tests/src/python/test_qgsmapboxglconverter.py | 24 +++++++
+ 2 files changed, 70 insertions(+), 21 deletions(-)
+
+diff --git a/src/core/vectortile/qgsmapboxglstyleconverter.cpp b/src/core/vectortile/qgsmapboxglstyleconverter.cpp
+index d50a956375b4..952cc7a5101b 100644
+--- a/src/core/vectortile/qgsmapboxglstyleconverter.cpp
++++ b/src/core/vectortile/qgsmapboxglstyleconverter.cpp
+@@ -4224,35 +4224,60 @@ QString QgsMapBoxGlStyleConverter::retrieveSpriteAsBase64WithProperties(
+               break;
+           }
+ 
+-          const QImage sprite = retrieveSprite( matchValue.toString(), context, spriteSize );
+-          spritePath = prepareBase64( sprite );
++          QString valuePathExpression;
++          QString valueSizeExpression;
++          if ( matchValue.userType() == QMetaType::Type::QVariantList || matchValue.userType() == QMetaType::Type::QStringList )
++          {
++            // nested expression (e.g. a nested "match"/"step"/"case") -- resolve recursively
++            QSize nestedSize;
++            QString nestedProperty;
++            QString nestedSizeProperty;
++            const QString nestedPath = retrieveSpriteAsBase64WithProperties( matchValue, context, nestedSize, nestedProperty, nestedSizeProperty );
++            valuePathExpression = nestedProperty.isEmpty() ? u"'%1'"_s.arg( nestedPath ) : nestedProperty;
++            valueSizeExpression = nestedSizeProperty.isEmpty() ? QString::number( nestedSize.width() ) : nestedSizeProperty;
++            spritePath = nestedPath;
++            spriteSize = nestedSize;
++          }
++          else
++          {
++            const QImage sprite = retrieveSprite( matchValue.toString(), context, spriteSize );
++            spritePath = prepareBase64( sprite );
++            valuePathExpression = u"'%1'"_s.arg( spritePath );
++            valueSizeExpression = QString::number( spriteSize.width() );
++          }
+ 
+-          spriteProperty += QStringLiteral(
+-                              " WHEN %1 IN (%2) "
+-                              "THEN '%3'"
+-          )
+-                              .arg( attribute, matchString, spritePath );
+-
+-          spriteSizeProperty += QStringLiteral(
+-                                  " WHEN %1 IN (%2) "
+-                                  "THEN %3"
+-          )
+-                                  .arg( attribute, matchString )
+-                                  .arg( spriteSize.width() );
++          spriteProperty += u" WHEN %1 IN (%2) THEN %3"_s.arg( attribute, matchString, valuePathExpression );
++          spriteSizeProperty += u" WHEN %1 IN (%2) THEN %3"_s.arg( attribute, matchString, valueSizeExpression );
+         }
+ 
+-        if ( !json.constLast().toString().isEmpty() )
++        const QVariant defaultValue = json.constLast();
++        if ( defaultValue.userType() == QMetaType::Type::QVariantList || defaultValue.userType() == QMetaType::Type::QStringList )
+         {
+-          const QImage sprite = retrieveSprite( json.constLast().toString(), context, spriteSize );
+-          spritePath = prepareBase64( sprite );
++          // default is a nested expression (e.g. a nested "match"/"step"/"case") -- resolve recursively
++          QSize nestedSize;
++          QString nestedProperty;
++          QString nestedSizeProperty;
++          const QString nestedPath = retrieveSpriteAsBase64WithProperties( defaultValue, context, nestedSize, nestedProperty, nestedSizeProperty );
++          spriteProperty += u" ELSE %1 END"_s.arg( nestedProperty.isEmpty() ? u"'%1'"_s.arg( nestedPath ) : nestedProperty );
++          spriteSizeProperty += u" ELSE %1 END"_s.arg( nestedSizeProperty.isEmpty() ? QString::number( nestedSize.width() ) : nestedSizeProperty );
++          spritePath = nestedPath;
++          spriteSize = nestedSize;
+         }
+         else
+         {
+-          spritePath = QString();
+-        }
++          if ( !defaultValue.toString().isEmpty() )
++          {
++            const QImage sprite = retrieveSprite( defaultValue.toString(), context, spriteSize );
++            spritePath = prepareBase64( sprite );
++          }
++          else
++          {
++            spritePath = QString();
++          }
+ 
+-        spriteProperty += u" ELSE '%1' END"_s.arg( spritePath );
+-        spriteSizeProperty += u" ELSE %3 END"_s.arg( spriteSize.width() );
++          spriteProperty += u" ELSE '%1' END"_s.arg( spritePath );
++          spriteSizeProperty += u" ELSE %3 END"_s.arg( spriteSize.width() );
++        }
+         break;
+       }
+       else if ( method == "step"_L1 )
+diff --git a/tests/src/python/test_qgsmapboxglconverter.py b/tests/src/python/test_qgsmapboxglconverter.py
+index 8dfce4cab71a..7cf7f4e38e60 100644
+--- a/tests/src/python/test_qgsmapboxglconverter.py
++++ b/tests/src/python/test_qgsmapboxglconverter.py
+@@ -3028,6 +3028,30 @@ def strip_base64(s):
+         expected = "CASE WHEN \"class\" IN ('sinkhole') THEN 'base64:[snip]' WHEN \"class\" IN ('sinkhole_rock','sinkhole_scree') THEN 'base64:[snip]' WHEN \"class\" IN ('sinkhole_ice','sinkhole_water') THEN 'base64:[snip]' ELSE '' END"
+         self.assertEqual(strip_base64(sprite_property), expected)
+ 
++        # nested match: outer match on "class" with a nested match on "subclass"
++        icon_image = [
++            "match",
++            ["get", "class"],
++            "sinkhole",
++            "arrow_brown",
++            [
++                "match",
++                ["get", "subclass"],
++                "sinkhole_rock",
++                "arrow_grey",
++                "arrow_blue",
++            ],
++        ]
++        sprite, size, sprite_property, sprite_size_property = (
++            QgsMapBoxGlStyleConverter.retrieveSpriteAsBase64WithProperties(
++                icon_image, context
++            )
++        )
++        expected = "CASE WHEN \"class\" IN ('sinkhole') THEN 'base64:[snip]' ELSE CASE WHEN \"subclass\" IN ('sinkhole_rock') THEN 'base64:[snip]' ELSE 'base64:[snip]' END END"
++        self.assertEqual(strip_base64(sprite_property), expected)
++        # the representative sprite must be resolved (not empty)
++        self.assertTrue(sprite.startswith("base64:"))
++
+         # swisstopo - lightbasemap - place_village
+         icon_image = [
+             "step",
+
+From 322f7a648f1b8309928ef2b20a2c45653c799c7d Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Thu, 16 Jul 2026 20:00:34 +0200
+Subject: [PATCH 2/2] fix default category for sprites
+
+---
+ .../vectortile/qgsmapboxglstyleconverter.cpp  |  6 ++-
+ src/core/vectortile/qgsvectortileutils.cpp    |  2 +-
+ tests/src/python/test_qgsmapboxglconverter.py | 46 +++++++++++++++++++
+ 3 files changed, 52 insertions(+), 2 deletions(-)
+
+diff --git a/src/core/vectortile/qgsmapboxglstyleconverter.cpp b/src/core/vectortile/qgsmapboxglstyleconverter.cpp
+index 952cc7a5101b..9586655e08b5 100644
+--- a/src/core/vectortile/qgsmapboxglstyleconverter.cpp
++++ b/src/core/vectortile/qgsmapboxglstyleconverter.cpp
+@@ -4018,7 +4018,11 @@ QImage QgsMapBoxGlStyleConverter::retrieveSprite( const QString &name, QgsMapBox
+ 
+   if ( category.isEmpty() )
+   {
+-    spriteImage = context.spriteImage();
++    // Images referenced without a category prefix belong to the sprite source with
++    // the id "default" (if present), otherwise the single unnamed sprite sheet.
++    if ( context.spriteCategories().contains( "default"_L1 ) )
++      category = u"default"_s;
++    spriteImage = context.spriteImage( category );
+   }
+ 
+   if ( spriteImage.isNull() )
+diff --git a/src/core/vectortile/qgsvectortileutils.cpp b/src/core/vectortile/qgsvectortileutils.cpp
+index 87bc3d269634..6169a4b66e13 100644
+--- a/src/core/vectortile/qgsvectortileutils.cpp
++++ b/src/core/vectortile/qgsvectortileutils.cpp
+@@ -431,7 +431,7 @@ void QgsVectorTileUtils::loadSprites( const QVariantMap &styleDefinition, QgsMap
+             break;
+         }
+ 
+-        if ( !context.spriteDefinitions().isEmpty() )
++        if ( !context.spriteDefinitions( spritesIterator.key() ).isEmpty() )
+           break;
+       }
+ 
+diff --git a/tests/src/python/test_qgsmapboxglconverter.py b/tests/src/python/test_qgsmapboxglconverter.py
+index 7cf7f4e38e60..f2c0325202d1 100644
+--- a/tests/src/python/test_qgsmapboxglconverter.py
++++ b/tests/src/python/test_qgsmapboxglconverter.py
+@@ -11,6 +11,7 @@
+ __copyright__ = "Copyright 2020, The QGIS Project"
+ 
+ import json
++import os
+ import unittest
+ 
+ from qgis.core import (
+@@ -24,6 +25,7 @@
+     QgsRasterPipe,
+     QgsSymbol,
+     QgsSymbolLayer,
++    QgsVectorTileUtils,
+     QgsWkbTypes,
+     qgsDoubleNear,
+ )
+@@ -3145,6 +3147,50 @@ def strip_base64(s):
+         expected = "CASE WHEN \"class\" IN ('sinkhole') THEN 'base64:[snip]' WHEN \"class\" IN ('sinkhole_rock','sinkhole_scree') THEN 'base64:[snip]' WHEN \"class\" IN ('sinkhole_ice','sinkhole_water') THEN 'base64:[snip]' ELSE '' END"
+         self.assertEqual(strip_base64(sprite_property), expected)
+ 
++    def testLoadSpritesMultipleSheets(self):
++        """
++        Test QgsVectorTileUtils.loadSprites with the multi-sheet "sprite"
++        array form. A sprite source with the id "default" is registered under
++        the "default" category, and image names referenced in the style
++        without a prefix resolve against it, while other sprite ids are
++        registered under (and referenced via) their own category.
++        """
++
++        sprite_base = os.path.join(
++            TEST_DATA_DIR, "vector_tile", "sprites", "swisstopo-sprite"
++        )
++
++        # a sprite source with id "default" -> registered under "default"
++        style = {"sprite": [{"id": "default", "url": sprite_base}]}
++        context = QgsMapBoxGlStyleConversionContext()
++        QgsVectorTileUtils.loadSprites(style, context, "file://")
++        self.assertEqual(context.spriteCategories(), ["default"])
++        self.assertFalse(context.spriteImage("default").isNull())
++        self.assertIn("scree_large_1", context.spriteDefinitions("default"))
++
++        # an unprefixed image name resolves against the default sheet,
++        # with a valid (non-empty) sprite and a positive size
++        sprite, size, sprite_property, sprite_size_property = (
++            QgsMapBoxGlStyleConverter.retrieveSpriteAsBase64WithProperties(
++                "scree_large_1", context
++            )
++        )
++        self.assertTrue(sprite.startswith("base64:"))
++        self.assertGreater(size.width(), 0)
++
++        # a sprite source with a non-default id -> registered under that category
++        style = {"sprite": [{"id": "extra", "url": sprite_base}]}
++        context = QgsMapBoxGlStyleConversionContext()
++        QgsVectorTileUtils.loadSprites(style, context, "file://")
++        self.assertEqual(context.spriteCategories(), ["extra"])
++        # names must be prefixed with the category id to resolve
++        sprite, size, sprite_property, sprite_size_property = (
++            QgsMapBoxGlStyleConverter.retrieveSpriteAsBase64WithProperties(
++                "extra:scree_large_1", context
++            )
++        )
++        self.assertTrue(sprite.startswith("base64:"))
++
+     def testSymbolSpacingNumeric(self):
+         """Test symbol-spacing with a simple numeric value"""
+         context = QgsMapBoxGlStyleConversionContext()
