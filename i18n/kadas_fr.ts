@@ -755,27 +755,27 @@ Veuillez annuler ces tâches et réessayer.</translation>
         <translation>Supprimer un signet</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="105"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="106"/>
         <source>Create Bookmark</source>
         <translation>Créer un signet</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="105"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="106"/>
         <source>Enter bookmark name</source>
         <translation>Nom du signet</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="119"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="120"/>
         <source>Replace Bookmark</source>
         <translation>Remplacer un signet</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="119"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="120"/>
         <source>Are you sure you want to replace the existing bookmark “%1”?</source>
         <translation>Voulez-vous vraiment remplacer le signet existant &quot;%1 &quot; ?</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="215"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="216"/>
         <source>Some layers stored in the bookmark don&apos;t exist</source>
         <translation>Certaines couches stockées dans le signet n&apos;existent pas</translation>
     </message>

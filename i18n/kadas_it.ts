@@ -755,27 +755,27 @@ Annullare queste attività e riprovare.</translation>
         <translation>Elimina segnalibro</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="105"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="106"/>
         <source>Create Bookmark</source>
         <translation>Crea segnalibro</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="105"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="106"/>
         <source>Enter bookmark name</source>
         <translation>Nome del segnalibro</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="119"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="120"/>
         <source>Replace Bookmark</source>
         <translation>Sostituisci Segnalibro</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="119"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="120"/>
         <source>Are you sure you want to replace the existing bookmark “%1”?</source>
         <translation>Sei sicuro di voler sostituire il segnalibro esistente “%1”?</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="215"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="216"/>
         <source>Some layers stored in the bookmark don&apos;t exist</source>
         <translation>Alcuni layer memorizzati nel segnalibro non esistono</translation>
     </message>

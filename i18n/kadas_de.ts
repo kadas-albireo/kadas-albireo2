@@ -756,27 +756,27 @@ Bitte brechen Sie diese Aufgaben ab und versuchen Sie es erneut.</translation>
         <translation>Lesezeichen löschen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="105"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="106"/>
         <source>Create Bookmark</source>
         <translation>Lesezeichen erstellen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="105"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="106"/>
         <source>Enter bookmark name</source>
         <translation>Name des Lesezeichens</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="119"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="120"/>
         <source>Replace Bookmark</source>
         <translation>Lesezeichen ersetzen</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="119"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="120"/>
         <source>Are you sure you want to replace the existing bookmark “%1”?</source>
         <translation>Soll das bestehende Lesezeichen &apos;%1&apos; wirklich ersetzt werden?</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="215"/>
+        <location filename="../kadas/app/kadasbookmarksmenu.cpp" line="216"/>
         <source>Some layers stored in the bookmark don&apos;t exist</source>
         <translation>Einige im Lesezeichen gespeicherte Ebenen existieren nicht</translation>
     </message>
