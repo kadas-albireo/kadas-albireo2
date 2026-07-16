@@ -28,6 +28,7 @@ class QStackedWidget;
 class QToolButton;
 class QgsMapCanvas;
 class QgsRectangle;
+class QgsElevationControllerWidget;
 
 
 class KADAS_GUI_EXPORT KadasMapWidget : public QDockWidget
@@ -44,6 +45,10 @@ class KADAS_GUI_EXPORT KadasMapWidget : public QDockWidget
 
     QgsRectangle getMapExtent() const;
     void setMapExtent( const QgsRectangle &extent );
+
+    QgsElevationControllerWidget *elevationController() { return mElevationController; }
+    void setElevationController();
+    void removeElevationController();
 
     bool getLocked() const;
     void setLocked( bool locked );
@@ -70,6 +75,8 @@ class KADAS_GUI_EXPORT KadasMapWidget : public QDockWidget
     QgsMapCanvas *mMapCanvas;
     QStringList mInitialLayers;
     bool mUnsetFixedSize = true;
+    QgsElevationControllerWidget *mElevationController = nullptr;
+
 
   private slots:
     void setCanvasLocked( bool locked );

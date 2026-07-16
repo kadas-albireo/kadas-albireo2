@@ -1,0 +1,15 @@
+diff --git a/src/gui/elevation/qgselevationcontrollerwidget.cpp b/src/gui/elevation/qgselevationcontrollerwidget.cpp
+index f9e022e41e11..9ccdc7f383a6 100644
+--- a/src/gui/elevation/qgselevationcontrollerwidget.cpp
++++ b/src/gui/elevation/qgselevationcontrollerwidget.cpp
+@@ -74,8 +74,8 @@ QgsElevationControllerWidget::QgsElevationControllerWidget( QWidget *parent )
+   QHBoxLayout *hlSlider = new QHBoxLayout();
+   hlSlider->setContentsMargins( 0, 0, 0, 0 );
+   hlSlider->setSpacing( 2 );
+-  hlSlider->addWidget( mSlider );
+-  hlSlider->addWidget( mSliderLabels, 1 );
++  hlSlider->addWidget( mSliderLabels );
++  hlSlider->addWidget( mSlider, 1 );
+   hlSlider->addStretch();
+   vl->addLayout( hlSlider );
+ 

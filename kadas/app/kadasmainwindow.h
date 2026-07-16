@@ -29,6 +29,7 @@
 class QSplashScreen;
 class QgsDecorationGrid;
 class QgsLayerTreeMapCanvasBridge;
+class QgsElevationControllerWidget;
 class QgsMessageBar;
 class QToolButton;
 class KadasCoordinateDisplayer;
@@ -105,6 +106,9 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     KadasGpxIntegration *gpxIntegration() { return mGpxIntegration; }
     KadasCatalogBrowser *catalogBrowser() { return mCatalogBrowser; }
     KadasPluginManager *pluginManager() { return mPluginManager; }
+    QgsElevationControllerWidget *elevationController() { return mElevationController; } // TO DELETE ?
+    void setElevationControllerRangeFromHeightmap();
+    void removeElevationControllers();
 
     void addCustomDropHandler( QgsCustomDropHandler *handler );
     void removeCustomDropHandler( QgsCustomDropHandler *handler );
@@ -151,6 +155,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void showNewsletter();
     void showFeedback();
     void toggleIgnoreDpiScale();
+    void setCanvasZRange( const QgsDoubleRange &range );
 
   private:
     bool eventFilter( QObject *obj, QEvent *ev ) override;
@@ -179,6 +184,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     KadasKmlIntegration *mKmlIntegration = nullptr;
     KadasMilxIntegration *mMilxIntegration = nullptr;
     KadasMapWidgetManager *mMapWidgetManager = nullptr;
+    QgsElevationControllerWidget *KadasElevationController = nullptr;
     KadasRedliningIntegration *mRedliningIntegration = nullptr;
     KadasTemporalController *mKadasTemporalController = nullptr;
     KadasPluginManager *mPluginManager = nullptr;
@@ -189,6 +195,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     KadasStatusBar *mStatusBar = nullptr;
     QAction *mActionShowPythonConsole = nullptr;
     KadasProjectTemplateSelectionDialog *mProjectTemplateDialog = nullptr;
+    QgsElevationControllerWidget *mElevationController = nullptr;
 
     QTimer mLoadingTimer;
     QPoint mResizePressPos;
