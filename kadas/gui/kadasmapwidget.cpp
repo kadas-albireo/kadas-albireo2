@@ -30,6 +30,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 #include <qgis/qgselevationcontrollerwidget.h>
+#include <qgis/qgselevationutils.h>
 #include <qgis/qgsrangeslider.h>
 #include <qgis/qgsrasterlayer.h>
 
@@ -230,11 +231,15 @@ void KadasMapWidget::setElevationController()
     mMapCanvas->addOverlayWidget( mElevationController, Qt::Edge::RightEdge );
   }
 
-  QgsRasterLayer *rl = qobject_cast< QgsRasterLayer * >( layer );
-  QgsRasterBandStats stats = rl->dataProvider()->bandStatistics( 1, Qgis::RasterBandStatistic::Min | Qgis::RasterBandStatistic::Max );
-
-  mElevationController->setRangeLimits( QgsDoubleRange( stats.minimumValue, stats.maximumValue ) );
-  mElevationController->setRange( QgsDoubleRange( stats.minimumValue, stats.maximumValue ) );
+  // Use QGIS' elevation utils as the single source of truth for the range. For
+  // a raster elevation surface this samples the band statistics rather than
+  // reading every pixel.
+  const QgsDoubleRange range = QgsElevationUtils::calculateZRangeForLayers( { layer } );
+  if ( !range.isInfinite() && !range.isEmpty() )
+  {
+    mElevationController->setRangeLimits( range );
+    mElevationController->setRange( range );
+  }
 }
 
 void KadasMapWidget::removeElevationController()

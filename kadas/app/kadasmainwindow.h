@@ -106,9 +106,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     KadasGpxIntegration *gpxIntegration() { return mGpxIntegration; }
     KadasCatalogBrowser *catalogBrowser() { return mCatalogBrowser; }
     KadasPluginManager *pluginManager() { return mPluginManager; }
-    QgsElevationControllerWidget *elevationController() { return mElevationController; } // TO DELETE ?
     void setElevationControllerRangeFromHeightmap();
-    void removeElevationControllers();
 
     void addCustomDropHandler( QgsCustomDropHandler *handler );
     void removeCustomDropHandler( QgsCustomDropHandler *handler );
@@ -184,7 +182,6 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     KadasKmlIntegration *mKmlIntegration = nullptr;
     KadasMilxIntegration *mMilxIntegration = nullptr;
     KadasMapWidgetManager *mMapWidgetManager = nullptr;
-    QgsElevationControllerWidget *KadasElevationController = nullptr;
     KadasRedliningIntegration *mRedliningIntegration = nullptr;
     KadasTemporalController *mKadasTemporalController = nullptr;
     KadasPluginManager *mPluginManager = nullptr;

@@ -120,22 +120,8 @@ void KadasAppLayerHandling::postProcessAddedLayer( QgsMapLayer *layer )
       layer->loadDefaultStyle( ok );
       layer->loadDefaultMetadata( ok );
 
-
-      /*
-      * Use an heuristic to find is the raster layer looks like a DEM, and if so set the elevation properties accordingly
-      */
-
-
-      QList<Qgis::DataType> allowedDataType = QList<Qgis::DataType>()
-                                              << Qgis::DataType::Int8
-                                              << Qgis::DataType::UInt16
-                                              << Qgis::DataType::Int16
-                                              << Qgis::DataType::UInt32
-                                              << Qgis::DataType::Int32
-                                              << Qgis::DataType::Float64
-                                              << Qgis::DataType::Float32;
-
-      // if ( rasterLayer->bandCount() == 1 && !rasterLayer->attributeTable( 1 ) && allowedDataType.contains(rasterLayer->dataProvider()->dataType( 1 ))  )
+      // Use QGIS' heuristic to detect whether the raster looks like a DEM, and
+      // if so enable its elevation properties so it can be used as a heightmap.
       if ( QgsRasterLayerElevationProperties::layerLooksLikeDem( rasterLayer ) )
       {
         qgis::down_cast<QgsRasterLayerElevationProperties *>( rasterLayer->elevationProperties() )->setEnabled( true );

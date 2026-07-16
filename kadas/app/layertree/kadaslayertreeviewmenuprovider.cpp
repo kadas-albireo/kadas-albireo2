@@ -23,6 +23,7 @@
 #include <qgis/qgslayertreeviewdefaultactions.h>
 #include <qgis/qgspluginlayerregistry.h>
 #include <qgis/qgsrasterlayer.h>
+#include <qgis/qgsrasterlayerelevationproperties.h>
 #include <qgis/qgsrasterrenderer.h>
 #include <qgis/qgsvectorlayer.h>
 
@@ -277,6 +278,19 @@ void KadasLayerTreeViewMenuProvider::setLayerUseAsHeightmap( bool enabled )
   if ( layer )
   {
     QgsProject::instance()->writeEntry( "Heightmap", "layer", enabled ? layer->id() : "" );
+
+    // Align the kadas heightmap with QGIS' elevation model so the elevation
+    // controller and QgsElevationUtils treat it as an elevation surface.
+    if ( enabled )
+    {
+      if ( QgsRasterLayer *rasterLayer = qobject_cast<QgsRasterLayer *>( layer ) )
+      {
+        QgsRasterLayerElevationProperties *elevationProperties = qgis::down_cast<QgsRasterLayerElevationProperties *>( rasterLayer->elevationProperties() );
+        elevationProperties->setEnabled( true );
+        elevationProperties->setMode( Qgis::RasterElevationMode::RepresentsElevationSurface );
+      }
+    }
+
     kApp->mainWindow()->setElevationControllerRangeFromHeightmap();
   }
 }
