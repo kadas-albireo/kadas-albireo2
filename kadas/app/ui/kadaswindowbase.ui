@@ -745,6 +745,42 @@
         </size>
        </property>
       </widget>
+      <widget class="QFrame" name="mElevationControllerFrame">
+       <property name="geometry">
+        <rect>
+         <x>400</x>
+         <y>170</y>
+         <width>71</width>
+         <height>421</height>
+        </rect>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::Shape::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Shadow::Plain</enum>
+       </property>
+       <layout class="QVBoxLayout" name="mElevationControllerLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="sizeConstraint">
+         <enum>QLayout::SizeConstraint::SetNoConstraint</enum>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
