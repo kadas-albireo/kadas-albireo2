@@ -1,0 +1,387 @@
+diff --git a/python/PyQt6/core/auto_additions/qgselevationutils.py b/python/PyQt6/core/auto_additions/qgselevationutils.py
+index 5aeccbad99f..fa6a1ca842f 100644
+--- a/python/PyQt6/core/auto_additions/qgselevationutils.py
++++ b/python/PyQt6/core/auto_additions/qgselevationutils.py
+@@ -1,6 +1,7 @@
+ # The following has been generated automatically from src/core/qgselevationutils.h
+ try:
+     QgsElevationUtils.calculateZRangeForProject = staticmethod(QgsElevationUtils.calculateZRangeForProject)
++    QgsElevationUtils.calculateZRangeForLayers = staticmethod(QgsElevationUtils.calculateZRangeForLayers)
+     QgsElevationUtils.significantZValuesForProject = staticmethod(QgsElevationUtils.significantZValuesForProject)
+     QgsElevationUtils.significantZValuesForLayers = staticmethod(QgsElevationUtils.significantZValuesForLayers)
+     QgsElevationUtils.canEnableElevationForLayer = staticmethod(QgsElevationUtils.canEnableElevationForLayer)
+diff --git a/python/PyQt6/core/auto_generated/qgselevationutils.sip.in b/python/PyQt6/core/auto_generated/qgselevationutils.sip.in
+index 8fda20ab57d..e28cdb07efd 100644
+--- a/python/PyQt6/core/auto_generated/qgselevationutils.sip.in
++++ b/python/PyQt6/core/auto_generated/qgselevationutils.sip.in
+@@ -29,6 +29,17 @@ Calculates the elevation range for a ``project``.
+ This method considers the elevation (or z) range available from layers
+ contained within the project and returns the maximal combined elevation
+ range of these layers.
++%End
++
++    static QgsDoubleRange calculateZRangeForLayers( const QList< QgsMapLayer * > &layers );
++%Docstring
++Calculates the elevation range for the specified ``layers``.
++
++This method considers the elevation (or z) range available from each of
++the ``layers`` and returns the maximal combined elevation range of these
++layers.
++
++.. versionadded:: 4.4
+ %End
+ 
+     static QList< double > significantZValuesForProject( QgsProject *project );
+diff --git a/python/PyQt6/gui/auto_additions/qgselevationcontrollerwidget.py b/python/PyQt6/gui/auto_additions/qgselevationcontrollerwidget.py
+index 773505c8723..8b879495207 100644
+--- a/python/PyQt6/gui/auto_additions/qgselevationcontrollerwidget.py
++++ b/python/PyQt6/gui/auto_additions/qgselevationcontrollerwidget.py
+@@ -7,6 +7,7 @@ try:
+ except (NameError, AttributeError):
+     pass
+ try:
++    QgsElevationControllerSettingsAction.__overridden_methods__ = ['eventFilter']
+     QgsElevationControllerSettingsAction.__group__ = ['elevation']
+ except (NameError, AttributeError):
+     pass
+diff --git a/python/PyQt6/gui/auto_generated/elevation/qgselevationcontrollerwidget.sip.in b/python/PyQt6/gui/auto_generated/elevation/qgselevationcontrollerwidget.sip.in
+index d3fbfebee0e..cfb38cbe013 100644
+--- a/python/PyQt6/gui/auto_generated/elevation/qgselevationcontrollerwidget.sip.in
++++ b/python/PyQt6/gui/auto_generated/elevation/qgselevationcontrollerwidget.sip.in
+@@ -22,6 +22,11 @@ class QgsElevationControllerSettingsAction : QWidgetAction
+     QgsElevationControllerSettingsAction( QWidget *parent = 0 );
+ 
+     QgsDoubleSpinBox *sizeSpin();
++    QToolButton *lockButton();
++
++  protected:
++    virtual bool eventFilter( QObject *watched, QEvent *event );
++
+ 
+ };
+ 
+diff --git a/src/app/canvas/qgsappcanvasfiltering.cpp b/src/app/canvas/qgsappcanvasfiltering.cpp
+index f11befa4c7d..889be647129 100644
+--- a/src/app/canvas/qgsappcanvasfiltering.cpp
++++ b/src/app/canvas/qgsappcanvasfiltering.cpp
+@@ -20,9 +20,13 @@
+ #include "qgselevationutils.h"
+ #include "qgsmapcanvas.h"
+ #include "qgsmaplayerelevationproperties.h"
++#include "qgsmessagebar.h"
++#include "qgsproject.h"
+ #include "qgsprojectelevationproperties.h"
+ 
+ #include <QInputDialog>
++#include <QMenu>
++#include <QPointer>
+ 
+ #include "moc_qgsappcanvasfiltering.cpp"
+ 
+@@ -56,6 +60,54 @@ void QgsAppCanvasFiltering::createElevationController( QAction *senderAction, Qg
+   QAction *setProjectLimitsAction = new QAction( tr( "Set Elevation Range…" ), controller );
+   controller->menu()->addAction( setProjectLimitsAction );
+   connect( setProjectLimitsAction, &QAction::triggered, QgisApp::instance(), [] { QgisApp::instance()->showProjectProperties( tr( "Elevation" ) ); } );
++
++  QMenu *setLimitsFromMenu = new QMenu( tr( "Set Slider Limits From" ), controller->menu() );
++  controller->menu()->addMenu( setLimitsFromMenu );
++
++  QAction *limitsFromProjectRangeAction = setLimitsFromMenu->addAction( tr( "Project Elevation Range" ) );
++  connect( limitsFromProjectRangeAction, &QAction::triggered, controller, [controller] {
++    const QgsDoubleRange range = QgsProject::instance()->elevationProperties()->elevationRange();
++    if ( range.isInfinite() )
++      return;
++    controller->setRangeLimits( range );
++    controller->setRange( range );
++  } );
++  // the project elevation range can be defined or cleared at any time, so refresh availability when the menu opens
++  connect( setLimitsFromMenu, &QMenu::aboutToShow, limitsFromProjectRangeAction, [limitsFromProjectRangeAction] {
++    limitsFromProjectRangeAction->setEnabled( !QgsProject::instance()->elevationProperties()->elevationRange().isInfinite() );
++  } );
++
++  QAction *limitsFromProjectAction = setLimitsFromMenu->addAction( tr( "Project Layers" ) );
++  connect( limitsFromProjectAction, &QAction::triggered, controller, [controller] {
++    const QgsDoubleRange range = QgsElevationUtils::calculateZRangeForProject( QgsProject::instance() );
++    if ( range.isInfinite() || range.isEmpty() )
++    {
++      QgisApp::instance()->messageBar()->pushWarning( tr( "Elevation Range" ), tr( "Could not determine an elevation range from the project layers." ) );
++      return;
++    }
++    controller->setRangeLimits( range );
++    controller->setRange( range );
++  } );
++
++  QPointer<QgsMapCanvas> canvasPointer( canvas );
++  QAction *limitsFromVisibleAction = setLimitsFromMenu->addAction( tr( "Visible Layers" ) );
++  connect( limitsFromVisibleAction, &QAction::triggered, controller, [controller, canvasPointer] {
++    if ( !canvasPointer )
++      return;
++    const QgsDoubleRange range = QgsElevationUtils::calculateZRangeForLayers( canvasPointer->layers( true ) );
++    if ( range.isInfinite() || range.isEmpty() )
++    {
++      QgisApp::instance()->messageBar()->pushWarning( tr( "Elevation Range" ), tr( "Could not determine an elevation range from the visible layers." ) );
++      return;
++    }
++    controller->setRangeLimits( range );
++    controller->setRange( range );
++  } );
++
++  QAction *saveRangeAction = new QAction( tr( "Save Current Range to Project" ), controller );
++  controller->menu()->addAction( saveRangeAction );
++  connect( saveRangeAction, &QAction::triggered, controller, [controller] { QgsProject::instance()->elevationProperties()->setElevationRange( controller->rangeLimits() ); } );
++
+   QAction *disableAction = new QAction( tr( "Disable Elevation Filter" ), controller );
+   controller->menu()->addAction( disableAction );
+   connect( disableAction, &QAction::triggered, senderAction, [senderAction] { senderAction->setChecked( false ); } );
+@@ -94,6 +146,18 @@ QgsCanvasElevationControllerBridge::QgsCanvasElevationControllerBridge( QgsEleva
+ 
+   connect( mCanvas, &QgsMapCanvas::layersChanged, this, &QgsCanvasElevationControllerBridge::canvasLayersChanged );
+ 
++  // if the project doesn't define an explicit elevation range, initialize the controller
++  // limits using the range calculated from the canvas layers so the slider is immediately usable
++  if ( QgsProject::instance()->elevationProperties()->elevationRange().isInfinite() )
++  {
++    const QgsDoubleRange layerRange = QgsElevationUtils::calculateZRangeForLayers( mCanvas->layers( true ) );
++    if ( !layerRange.isInfinite() && !layerRange.isEmpty() )
++    {
++      mController->setRangeLimits( layerRange );
++      mController->setRange( layerRange );
++    }
++  }
++
+   canvasLayersChanged();
+ }
+ 
+diff --git a/src/core/qgselevationutils.cpp b/src/core/qgselevationutils.cpp
+index b1c00eb1cc3..f55e3faccde 100644
+--- a/src/core/qgselevationutils.cpp
++++ b/src/core/qgselevationutils.cpp
+@@ -22,15 +22,24 @@
+ QgsDoubleRange QgsElevationUtils::calculateZRangeForProject( QgsProject *project )
+ {
+   const QMap<QString, QgsMapLayer *> &mapLayers = project->mapLayers();
+-  QgsMapLayer *currentLayer = nullptr;
++  QList< QgsMapLayer * > layers;
++  layers.reserve( mapLayers.size() );
++  for ( QMap<QString, QgsMapLayer *>::const_iterator it = mapLayers.constBegin(); it != mapLayers.constEnd(); ++it )
++  {
++    if ( it.value() )
++      layers << it.value();
++  }
+ 
++  return calculateZRangeForLayers( layers );
++}
++
++QgsDoubleRange QgsElevationUtils::calculateZRangeForLayers( const QList< QgsMapLayer * > &layers )
++{
+   double min = std::numeric_limits<double>::quiet_NaN();
+   double max = std::numeric_limits<double>::quiet_NaN();
+ 
+-  for ( QMap<QString, QgsMapLayer *>::const_iterator it = mapLayers.constBegin(); it != mapLayers.constEnd(); ++it )
++  for ( QgsMapLayer *currentLayer : layers )
+   {
+-    currentLayer = it.value();
+-
+     if ( !currentLayer->elevationProperties() || !currentLayer->elevationProperties()->hasElevation() )
+       continue;
+ 
+diff --git a/src/core/qgselevationutils.h b/src/core/qgselevationutils.h
+index f18bab79a46..4611615fff4 100644
+--- a/src/core/qgselevationutils.h
++++ b/src/core/qgselevationutils.h
+@@ -40,6 +40,16 @@ class CORE_EXPORT QgsElevationUtils
+      */
+     static QgsDoubleRange calculateZRangeForProject( QgsProject *project );
+ 
++    /**
++     * Calculates the elevation range for the specified \a layers.
++     *
++     * This method considers the elevation (or z) range available from each of the \a layers and
++     * returns the maximal combined elevation range of these layers.
++     *
++     * \since QGIS 4.4
++     */
++    static QgsDoubleRange calculateZRangeForLayers( const QList< QgsMapLayer * > &layers );
++
+     /**
+      * Returns a list of significant elevation/z-values for the specified \a project, using
+      * the values from layers contained by the project.
+diff --git a/src/core/raster/qgsrasterlayerelevationproperties.cpp b/src/core/raster/qgsrasterlayerelevationproperties.cpp
+index c9b9666bb61..b6f310ff641 100644
+--- a/src/core/raster/qgsrasterlayerelevationproperties.cpp
++++ b/src/core/raster/qgsrasterlayerelevationproperties.cpp
+@@ -357,8 +357,24 @@ QgsDoubleRange QgsRasterLayerElevationProperties::calculateZRange( QgsMapLayer *
+     }
+ 
+     case Qgis::RasterElevationMode::RepresentsElevationSurface:
+-      // TODO -- determine actual z range from raster statistics
++    {
++      if ( QgsRasterLayer *rl = qobject_cast< QgsRasterLayer * >( layer ) )
++      {
++        if ( QgsRasterDataProvider *provider = rl->dataProvider() )
++        {
++          if ( mBandNumber > 0 && mBandNumber <= provider->bandCount() )
++          {
++            const QgsRasterBandStats stats
++              = provider->bandStatistics( mBandNumber, Qgis::RasterBandStatistic::Min | Qgis::RasterBandStatistic::Max, provider->extent(), static_cast< int >( QgsRasterLayer::SAMPLE_SIZE ) );
++            if ( stats.statsGathered.testFlags( Qgis::RasterBandStatistic::Min | Qgis::RasterBandStatistic::Max ) && stats.minimumValue <= stats.maximumValue )
++            {
++              return QgsDoubleRange( stats.minimumValue * mZScale + mZOffset, stats.maximumValue * mZScale + mZOffset );
++            }
++          }
++        }
++      }
+       return QgsDoubleRange();
++    }
+   }
+   BUILTIN_UNREACHABLE
+ }
+diff --git a/src/gui/elevation/qgselevationcontrollerwidget.cpp b/src/gui/elevation/qgselevationcontrollerwidget.cpp
+index f9e022e41e1..68180306285 100644
+--- a/src/gui/elevation/qgselevationcontrollerwidget.cpp
++++ b/src/gui/elevation/qgselevationcontrollerwidget.cpp
+@@ -26,6 +26,7 @@
+ 
+ #include <QEvent>
+ #include <QHBoxLayout>
++#include <QKeyEvent>
+ #include <QLabel>
+ #include <QMenu>
+ #include <QMouseEvent>
+@@ -61,8 +62,24 @@ QgsElevationControllerWidget::QgsElevationControllerWidget( QWidget *parent )
+   mInvertDirectionAction->setCheckable( true );
+   mMenu->addAction( mInvertDirectionAction );
+ 
+-  mSettingsAction->sizeSpin()->clear();
+-  connect( mSettingsAction->sizeSpin(), qOverload<double>( &QgsDoubleSpinBox::valueChanged ), this, [this]( double size ) { setFixedRangeSize( size < 0 ? -1 : size ); } );
++  connect( mSettingsAction->sizeSpin(), qOverload<double>( &QgsDoubleSpinBox::valueChanged ), this, [this]( double size ) {
++    if ( mSettingsAction->sizeSpin()->isCleared() )
++    {
++      setFixedRangeSize( -1 );
++      setRange( rangeLimits() );
++      whileBlocking( mSettingsAction->sizeSpin() )->setValue( rangeLimits().upper() - rangeLimits().lower() );
++    }
++    else if ( mSettingsAction->lockButton()->isChecked() )
++    {
++      setFixedRangeSize( size );
++    }
++  } );
++  connect( mSettingsAction->lockButton(), &QToolButton::toggled, this, [this]( bool locked ) {
++    if ( locked )
++      setFixedRangeSize( mSettingsAction->sizeSpin()->value() );
++    else
++      setFixedRangeSize( -1 );
++  } );
+ 
+   mMenu->addSeparator();
+ 
+@@ -100,6 +117,14 @@ QgsElevationControllerWidget::QgsElevationControllerWidget( QWidget *parent )
+     mSliderLabels->setRange( range() );
+   } );
+ 
++  connect( mMenu, &QMenu::aboutToShow, this, [this]() {
++    if ( !mSettingsAction->lockButton()->isChecked() )
++    {
++      const QSignalBlocker blocker( mSettingsAction->sizeSpin() );
++      mSettingsAction->sizeSpin()->setValue( range().upper() - range().lower() );
++    }
++  } );
++
+   connect( mInvertDirectionAction, &QAction::toggled, this, [this]() {
+     mSlider->setFlippedDirection( !mInvertDirectionAction->isChecked() );
+     mSliderLabels->setInverted( mInvertDirectionAction->isChecked() );
+@@ -233,8 +258,17 @@ void QgsElevationControllerWidget::setFixedRangeSize( double size )
+   {
+     mSlider->setFixedRangeSize( static_cast<int>( std::round( mFixedRangeSize * mSliderPrecision ) ) );
+   }
+-  if ( mFixedRangeSize != mSettingsAction->sizeSpin()->value() )
++
++  {
++    const QSignalBlocker blockLock( mSettingsAction->lockButton() );
++    mSettingsAction->lockButton()->setChecked( mFixedRangeSize >= 0 );
++  }
++  if ( mFixedRangeSize >= 0 )
++  {
++    const QSignalBlocker blockSpin( mSettingsAction->sizeSpin() );
+     mSettingsAction->sizeSpin()->setValue( mFixedRangeSize );
++  }
++
+   emit fixedRangeSizeChanged( mFixedRangeSize );
+ }
+ 
+@@ -441,19 +475,27 @@ QgsElevationControllerSettingsAction::QgsElevationControllerSettingsAction( QWid
+   QGridLayout *gLayout = new QGridLayout();
+   gLayout->setContentsMargins( 3, 2, 3, 2 );
+ 
+-  QLabel *label = new QLabel( tr( "Fixed Range Size" ) );
++  QLabel *label = new QLabel( tr( "Visible Range Size" ) );
+   gLayout->addWidget( label, 0, 0 );
+ 
+   mSizeSpin = new QgsDoubleSpinBox();
+   mSizeSpin->setDecimals( 4 );
+-  mSizeSpin->setMinimum( -1.0 );
++  mSizeSpin->setMinimum( 0.0 );
+   mSizeSpin->setMaximum( 999999999.0 );
+-  mSizeSpin->setClearValue( -1, tr( "Not set" ) );
++  mSizeSpin->setClearValue( 0, tr( "Full Range" ) );
+   mSizeSpin->setKeyboardTracking( false );
+-  mSizeSpin->setToolTip( tr( "Limit elevation range to a fixed size" ) );
++  mSizeSpin->setToolTip( tr( "Currently visible elevation range" ) );
++  mSizeSpin->installEventFilter( this );
+ 
+   gLayout->addWidget( mSizeSpin, 0, 1 );
+ 
++  mLockButton = new QToolButton();
++  mLockButton->setIcon( QgsApplication::getThemeIcon( u"/cadtools/lock.svg"_s ) );
++  mLockButton->setCheckable( true );
++  mLockButton->setToolTip( tr( "Lock the elevation range to a fixed size" ) );
++
++  gLayout->addWidget( mLockButton, 0, 2 );
++
+   QWidget *w = new QWidget();
+   w->setLayout( gLayout );
+   setDefaultWidget( w );
+@@ -464,4 +506,24 @@ QgsDoubleSpinBox *QgsElevationControllerSettingsAction::sizeSpin()
+   return mSizeSpin;
+ }
+ 
++QToolButton *QgsElevationControllerSettingsAction::lockButton()
++{
++  return mLockButton;
++}
++
++bool QgsElevationControllerSettingsAction::eventFilter( QObject *watched, QEvent *event )
++{
++  if ( watched == mSizeSpin && event->type() == QEvent::KeyPress )
++  {
++    const QKeyEvent *keyEvent = static_cast<QKeyEvent *>( event );
++    if ( keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter )
++    {
++      mSizeSpin->interpretText();
++      if ( !mSizeSpin->isCleared() )
++        mLockButton->setChecked( true );
++    }
++  }
++  return QWidgetAction::eventFilter( watched, event );
++}
++
+ ///@endcond PRIVATE
+diff --git a/src/gui/elevation/qgselevationcontrollerwidget.h b/src/gui/elevation/qgselevationcontrollerwidget.h
+index 5b50340df2f..86a4a495c70 100644
+--- a/src/gui/elevation/qgselevationcontrollerwidget.h
++++ b/src/gui/elevation/qgselevationcontrollerwidget.h
+@@ -61,9 +61,14 @@ class GUI_EXPORT QgsElevationControllerSettingsAction : public QWidgetAction
+     QgsElevationControllerSettingsAction( QWidget *parent = nullptr );
+ 
+     QgsDoubleSpinBox *sizeSpin();
++    QToolButton *lockButton();
++
++  protected:
++    bool eventFilter( QObject *watched, QEvent *event ) override;
+ 
+   private:
+     QgsDoubleSpinBox *mSizeSpin = nullptr;
++    QToolButton *mLockButton = nullptr;
+ };
+ 
+ 
