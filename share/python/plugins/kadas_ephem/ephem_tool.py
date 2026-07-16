@@ -1,7 +1,12 @@
-from kadas.kadasgui import KadasItemPos, KadasSymbolItem
-from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
-from qgis.gui import QgsMapTool
-from qgis.PyQt.QtCore import Qt
+from qgis.core import (
+    Qgis,
+    QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
+    QgsGeometry,
+    QgsProject,
+)
+from qgis.gui import QgsMapTool, QgsRubberBand
+from qgis.PyQt.QtCore import QPoint, Qt
 
 from .ephem_tool_widget import EphemToolWidget
 
@@ -22,10 +27,10 @@ class EphemTool(QgsMapTool):
         self.widget = EphemToolWidget(self.iface)
         self.widget.close.connect(self.close)
         self.widget.setVisible(True)
-        self.pin = KadasSymbolItem(self.iface.mapCanvas().mapSettings().destinationCrs())
-        self.pin.setup(":/kadas/icons/pin_blue", 0.5, 1.0)
+        self.pin = QgsRubberBand(self.iface.mapCanvas(), Qgis.GeometryType.Point)
+        self.pin.setIcon(QgsRubberBand.IconType.ICON_SVG)
+        self.pin.setSvgIcon(":/kadas/icons/pin_blue", QPoint(-32, -64))
         self.pin.setVisible(False)
-        # TODO: port pin overlay to QgsAnnotationLayer (KadasMapCanvasItemManager removed).
 
         QgsMapTool.activate(self)
 
@@ -33,8 +38,10 @@ class EphemTool(QgsMapTool):
         if self.widget:
             self.widget.cleanup()
             self.widget = None
-        # TODO: port pin overlay to QgsAnnotationLayer.
-        self.pin = None
+
+        self.pin.reset()
+
+        self.iface.mapCanvas().refresh()
         QgsMapTool.deactivate(self)
 
     def close(self):
@@ -51,8 +58,11 @@ class EphemTool(QgsMapTool):
             self.iface.mapCanvas().unsetMapTool(self)
 
     def positionPicked(self, pos):
-        self.pin.setPosition(KadasItemPos.fromPoint(pos))
+        self.pin.reset()
+        self.pin.setToGeometry(QgsGeometry.fromPointXY(pos))
         self.pin.setVisible(True)
+        self.pin.update()
+        self.iface.mapCanvas().refresh()
         mapCrs = self.iface.mapCanvas().mapSettings().destinationCrs()
         wgsCrs = QgsCoordinateReferenceSystem("EPSG:4326")
         mrcCrs = QgsCoordinateReferenceSystem("EPSG:3857")

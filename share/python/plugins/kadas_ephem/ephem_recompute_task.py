@@ -93,7 +93,7 @@ class EphemComputeTask(QThread):
                     self.formatDMS(sun.az),
                     self.formatDMS(sun.alt, True),
                 )
-                self.result.angle = -self.azDec(sun.az)
+                self.result.angle = self.azDec(sun.az)
 
                 # Compute sunrise and sunset taking relief into account
                 try:
@@ -168,7 +168,7 @@ class EphemComputeTask(QThread):
                     self.formatDMS(moon.az),
                     self.formatDMS(moon.alt, True),
                 )
-                self.result.angle = -self.azDec(moon.az)
+                self.result.angle = self.azDec(moon.az)
 
                 # Compute moonrise and moonset taking relief into account
                 try:

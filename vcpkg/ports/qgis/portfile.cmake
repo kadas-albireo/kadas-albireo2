@@ -23,6 +23,7 @@ vcpkg_from_github(
   link-appkit.patch
   libxml2.patch
   crssync.patch
+  markersymbol_rubberband.patch
   mesh.patch
   qgis-debug.patch
   3dchunkloaderconcurrency.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1278

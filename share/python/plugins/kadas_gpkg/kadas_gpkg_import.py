@@ -7,15 +7,17 @@ import tempfile
 from kadas.kadasgui import KadasProjectMigration
 from qgis.core import (
     Qgis,
+    QgsAnnotationLayer,
     QgsApplication,
     QgsMapLayer,
     QgsMapLayerFactory,
-    QgsMapLayerType,
     QgsMeshLayer,
     QgsPathResolver,
+    QgsPointCloudLayer,
     QgsProject,
     QgsRasterLayer,
     QgsReadWriteContext,
+    QgsTiledSceneLayer,
     QgsVectorLayer,
     QgsVectorTileLayer,
 )
@@ -103,10 +105,11 @@ class KadasGpkgImport(QObject):
                     continue
                 if layerid not in layerIds:
                     continue
-                if not self.addProjectLayer(maplayer.toElement(), context):
-                    failed.append(layername)
-                else:
+
+                if self.addProjectLayer(maplayer.toElement(), context):
                     addedLayers.append(layerid)
+                else:
+                    failed.append(layername)
 
             # Legacy MapCanvasItems import disabled: KadasMapCanvasItemManager was
             # removed alongside KadasItemLayer demolition. Items embedded in GPKG
@@ -238,15 +241,27 @@ class KadasGpkgImport(QObject):
             return False
 
         mapLayer = None
-        if layerType == QgsMapLayerType.VectorLayer:
+        if layerType == Qgis.LayerType.VectorLayer:
             mapLayer = QgsVectorLayer()
-        elif layerType == QgsMapLayerType.RasterLayer:
+        elif layerType == Qgis.LayerType.RasterLayer:
             mapLayer = QgsRasterLayer()
-        elif layerType == QgsMapLayerType.MeshLayer:
+        elif layerType == Qgis.LayerType.MeshLayer:
             mapLayer = QgsMeshLayer()
-        elif layerType == QgsMapLayerType.VectorTileLayer:
+        elif layerType == Qgis.LayerType.VectorTileLayer:
             mapLayer = QgsVectorTileLayer()
-        elif layerType == QgsMapLayerType.PluginLayer:
+        elif layerType == Qgis.LayerType.AnnotationLayer:
+            layerName = maplayerEl.attribute("layername")
+            mapLayer = QgsAnnotationLayer(
+                layerName,
+                QgsAnnotationLayer.LayerOptions(QgsProject.instance().transformContext()),
+            )
+        elif layerType == Qgis.LayerType.Mesh:
+            mapLayer = QgsMeshLayer()
+        elif layerType == Qgis.LayerType.PointCloud:
+            mapLayer = QgsPointCloudLayer()
+        elif layerType == Qgis.LayerType.TiledScene:
+            mapLayer = QgsTiledSceneLayer()
+        elif layerType == Qgis.LayerType.PluginLayer:
             typeName = maplayerEl.attribute("name")
             mapLayer = QgsApplication.pluginLayerRegistry().createLayer(typeName)
 

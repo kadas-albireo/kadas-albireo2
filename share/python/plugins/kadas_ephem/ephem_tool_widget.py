@@ -2,8 +2,18 @@ import math
 import os
 
 from kadas.kadascore import KadasCoordinateUtils
-from kadas.kadasgui import KadasBottomBar, KadasItemPos, KadasSymbolItem
-from qgis.core import QgsCoordinateFormatter, QgsCoordinateReferenceSystem
+from kadas.kadasgui import KadasBottomBar
+from qgis.core import (
+    Qgis,
+    QgsCoordinateFormatter,
+    QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
+    QgsGeometry,
+    QgsMarkerSymbol,
+    QgsProject,
+    QgsSvgMarkerSymbolLayer,
+)
+from qgis.gui import QgsRubberBand
 from qgis.PyQt.QtCore import QDateTime, QEventLoop, Qt, pyqtSignal
 from qgis.PyQt.QtGui import QIcon, QPixmap
 from qgis.PyQt.QtWidgets import QApplication, QLabel, QSizePolicy
@@ -59,16 +69,28 @@ class EphemToolWidget(KadasBottomBar):
         self.wgsPos = None
         self.mrcPos = None
 
-        self.sunAzIcon = KadasSymbolItem(QgsCoordinateReferenceSystem("EPSG:4326"))
-        self.sunAzIcon.setup(os.path.join(os.path.dirname(__file__), "icons/az_sun.svg"), 0.5, 1.0)
-        self.sunAzIcon.setVisible(False)
-        # TODO: port to QgsAnnotationLayer.
+        self.sunAzIcon = QgsRubberBand(self.iface.mapCanvas(), Qgis.GeometryType.Point)
 
-        self.moonAzIcon = KadasSymbolItem(QgsCoordinateReferenceSystem("EPSG:4326"))
-        self.moonAzIcon.setup(
-            os.path.join(os.path.dirname(__file__), "icons/az_moon.svg"), 0.5, 1.0
-        )
-        # TODO: port moonAzIcon overlay to QgsAnnotationLayer.
+        az_sun_svg_path = os.path.join(os.path.dirname(__file__), "icons/az_sun.svg")
+        sunAzSymbolLayer = QgsSvgMarkerSymbolLayer(az_sun_svg_path)
+        sunAzSymbolLayer.setSize(8)
+        sunAzSymbolLayer.setAngle(0)
+        sunAzSymbolLayer.setHorizontalAnchorPoint(Qgis.HorizontalAnchorPoint.Center)
+        sunAzSymbolLayer.setVerticalAnchorPoint(Qgis.VerticalAnchorPoint.Bottom)
+
+        self.sunAzIcon.setSymbol(QgsMarkerSymbol([sunAzSymbolLayer]))
+        self.sunAzIcon.setVisible(False)
+
+        self.moonAzIcon = QgsRubberBand(self.iface.mapCanvas(), Qgis.GeometryType.Point)
+
+        az_moon_svg_path = os.path.join(os.path.dirname(__file__), "icons/az_moon.svg")
+        moonAzSymbolLayer = QgsSvgMarkerSymbolLayer(az_moon_svg_path)
+        moonAzSymbolLayer.setSize(8)
+        moonAzSymbolLayer.setAngle(0)
+        moonAzSymbolLayer.setHorizontalAnchorPoint(Qgis.HorizontalAnchorPoint.Center)
+        moonAzSymbolLayer.setVerticalAnchorPoint(Qgis.VerticalAnchorPoint.Bottom)
+
+        self.moonAzIcon.setSymbol(QgsMarkerSymbol([moonAzSymbolLayer]))
         self.moonAzIcon.setVisible(False)
 
         self.ephemRecomputeTask = EphemComputeTask(self)
@@ -79,15 +101,15 @@ class EphemToolWidget(KadasBottomBar):
         self.mrcPos = mrcPos
 
     def cleanup(self):
-
         if self.ephemRecomputeTask.isRunning():
             self.ephemRecomputeTask.cancel()
             self.ephemRecomputeTask.wait()
             QApplication.restoreOverrideCursor()
 
-        # TODO: port to QgsAnnotationLayer.
-        self.sunAzIcon = None
-        self.moonAzIcon = None
+        self.sunAzIcon.reset()
+        self.moonAzIcon.reset()
+
+        self.iface.mapCanvas().refresh()
 
     def recompute(self):
         self.sunAzIcon.setVisible(False)
@@ -161,9 +183,20 @@ class EphemToolWidget(KadasBottomBar):
             )
             self.ui.labelMoonPhaseValue.setText("%.2f%%" % result.moonPhase)
 
+        src_crs = QgsCoordinateReferenceSystem("EPSG:4326")
+        dest_crs = self.iface.mapCanvas().mapSettings().destinationCrs()
+        ct = QgsCoordinateTransform(src_crs, dest_crs, QgsProject.instance())
+        point_geom = QgsGeometry.fromPointXY(result.position)
+        point_geom.transform(ct)
+        azIcon.setToGeometry(point_geom)
+
+        s = azIcon.symbol().clone()
+        s.setAngle(result.angle)
+        azIcon.setSymbol(s)
+
         azIcon.setVisible(result.azimuthVisible)
-        azIcon.setPosition(KadasItemPos.fromPoint(result.position))
-        azIcon.setAngle(result.angle)
+
+        self.iface.mapCanvas().refresh()
 
         self.busyOverlay.setVisible(False)
         self.ui.tabWidgetOutput.setEnabled(True)
