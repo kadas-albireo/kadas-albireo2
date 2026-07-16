@@ -52,6 +52,7 @@
 #include <qgis/qgssourceselectprovider.h>
 #include <qgis/qgsvectortilelayer.h>
 #include <qgis/qgselevationcontrollerwidget.h>
+#include <qgis/qgselevationutils.h>
 #include <qgis/qgsrasterlayerelevationproperties.h>
 
 #include "kadas/core/kadas.h"
@@ -298,7 +299,6 @@ void KadasMainWindow::init()
 
   mLayerTreeView->setModel( model );
   mLayerTreeView->setMenuProvider( new KadasLayerTreeViewMenuProvider( mLayerTreeView ) );
-  //connect( QgsProject::instance(), &QgsProject::layersRemoved, this, &KadasLayerSelectionWidget::repopulateLayers );
   connect( mLayerTreeView, &QAbstractItemView::doubleClicked, this, &KadasMainWindow::layerTreeViewDoubleClicked );
 
   QgsSnappingConfig snappingConfig;
@@ -359,9 +359,6 @@ void KadasMainWindow::init()
   mPluginManager = new KadasPluginManager( mapCanvas(), mActionPluginManager );
   mPluginManager->hide();
 
-  setElevationControllerRangeFromHeightmap();
-
-
   configureButtons();
 
   restoreFavoriteButton( mFavoriteButton1 );
@@ -401,7 +398,7 @@ void KadasMainWindow::init()
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerProjection );
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkLayerTemporalCapabilities );
   connect( QgsProject::instance(), &QgsProject::layerWasAdded, this, &KadasMainWindow::checkWMSLayerIgnoreReportedExtents );
-  connect( QgsProject::instance(), &QgsProject::layersRemoved, this, &KadasMainWindow::removeElevationControllers );
+  connect( QgsProject::instance(), &QgsProject::layersRemoved, this, &KadasMainWindow::setElevationControllerRangeFromHeightmap );
   connect( mLayerTreeViewButton, &QPushButton::clicked, this, &KadasMainWindow::toggleLayerTree );
   connect( mRibbonbarButton, &QPushButton::clicked, this, &KadasMainWindow::toggleFullscreen );
   connect( mRibbonWidget, &QTabWidget::tabBarClicked, this, &KadasMainWindow::endFullscreen );
@@ -1724,39 +1721,14 @@ void KadasMainWindow::setElevationControllerRangeFromHeightmap()
   }
 
 
-  QgsRasterLayer *rl = qobject_cast< QgsRasterLayer * >( layer );
-  QgsRasterBandStats stats = rl->dataProvider()->bandStatistics( 1, Qgis::RasterBandStatistic::Min | Qgis::RasterBandStatistic::Max );
-
-  mElevationController->setRangeLimits( QgsDoubleRange( stats.minimumValue, stats.maximumValue ) );
-  mElevationController->setRange( QgsDoubleRange( stats.minimumValue, stats.maximumValue ) );
-}
-
-void KadasMainWindow::removeElevationControllers()
-{
-  bool toRemove = false;
-  QgsLayerTree *rootNode = QgsProject::instance()->layerTreeRoot();
-  for ( QgsMapLayer *layer : rootNode->layerOrder() )
+  // Use QGIS' elevation utils as the single source of truth for the range. For
+  // a raster elevation surface this samples the band statistics rather than
+  // reading every pixel.
+  const QgsDoubleRange range = QgsElevationUtils::calculateZRangeForLayers( { layer } );
+  if ( !range.isInfinite() && !range.isEmpty() )
   {
-    QgsRasterLayer *rasterLayer = qobject_cast<QgsRasterLayer *>( layer );
-    if ( rasterLayer )
-    {
-      if ( rasterLayer->elevationProperties()->hasElevation() )
-      {
-        toRemove = true;
-        break;
-      }
-    }
-  }
-
-
-  if ( mElevationController )
-  {
-    delete mElevationController;
-    mElevationController = nullptr;
-  }
-  for ( KadasMapWidget *mapWidget : mMapWidgetManager->mapWidgets() )
-  {
-    mapWidget->removeElevationController();
+    mElevationController->setRangeLimits( range );
+    mElevationController->setRange( range );
   }
 }
 
