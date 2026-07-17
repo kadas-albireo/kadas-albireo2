@@ -35,6 +35,13 @@ QCheckBox::indicator:unchecked
   image: url(:/kadas/icons/unchecked);
 }
 
+QTreeView::indicator:indeterminate,
+QListView::indicator:indeterminate,
+QCheckBox::indicator:indeterminate
+{
+  image: url(:/kadas/icons/partial);
+}
+
 QMenu, QComboBox QAbstractItemView  {
     background-color: white;
     border: 1px solid #959697;
