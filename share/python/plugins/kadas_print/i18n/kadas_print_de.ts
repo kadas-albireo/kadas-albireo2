@@ -287,103 +287,88 @@
     </message>
     <message>
         <location filename="../PrintTool.py" line="91"/>
-        <source>Print</source>
-        <translation>Drucken</translation>
-    </message>
-    <message>
-        <location filename="../PrintTool.py" line="94"/>
         <source>Advanced</source>
         <translation>Fortgeschritten</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="104"/>
+        <location filename="../PrintTool.py" line="101"/>
         <source>PDF Document (*.pdf);;</source>
         <translation>PDF Dokument (*.pdf);;</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="105"/>
+        <location filename="../PrintTool.py" line="102"/>
         <source>GeoPDF Document (*.geopdf);;</source>
         <translation>GeoPDF Dokument (*.geopdf);;</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="108"/>
+        <location filename="../PrintTool.py" line="105"/>
         <source>JPG Image (*.jpg);;</source>
         <translation>JPG Bild (*.jpg);;</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="109"/>
+        <location filename="../PrintTool.py" line="106"/>
         <source>BMP Image (*.bmp);;</source>
         <translation>BMP Bild (*.bmp);;</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="110"/>
+        <location filename="../PrintTool.py" line="107"/>
         <source>PNG Image (*.png);;</source>
         <translation>PNG Bild (*.png);;</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="421"/>
+        <location filename="../PrintTool.py" line="418"/>
         <source>Hidden</source>
         <translation>Unsichtbar</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="421"/>
+        <location filename="../PrintTool.py" line="418"/>
         <source>Visible without layer legend</source>
         <translation>Sichtbar, ohne Ebenenlegende</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="421"/>
+        <location filename="../PrintTool.py" line="418"/>
         <source>Visible with layer legend</source>
         <translation>Sichtbar, mit Ebenenlegende</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="439"/>
+        <location filename="../PrintTool.py" line="436"/>
         <source>Configure legend</source>
         <translation>Legende anpassen</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="441"/>
+        <location filename="../PrintTool.py" line="438"/>
         <source>Select layers to display in legend:</source>
         <translation>Ebenen auswählen, die in der Legende erscheinen sollen:</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="594"/>
+        <location filename="../PrintTool.py" line="591"/>
         <source>Invalid layout</source>
         <translation>Ungültige Druckzusammenstellung</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="594"/>
+        <location filename="../PrintTool.py" line="591"/>
         <source>The layout must have exactly one map item.</source>
         <translation>Die Zusammenstellung muss genau ein Kartenelement haben.</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="663"/>
+        <location filename="../PrintTool.py" line="660"/>
         <source>Paper size: %.2f cm x %.2f cm</source>
         <translation>Papierformat: %.2f cm x %.2f cm</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="688"/>
+        <location filename="../PrintTool.py" line="685"/>
         <source>Print Layout</source>
         <translation>Vorlage</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="764"/>
+        <location filename="../PrintTool.py" line="721"/>
         <source>Print Failed</source>
         <translation>Druck gescheitert</translation>
     </message>
     <message>
-        <location filename="../PrintTool.py" line="764"/>
+        <location filename="../PrintTool.py" line="721"/>
         <source>Failed to print the layout.</source>
         <translation>Die Zusammenstellung konnte nicht gedruckt werden.</translation>
-    </message>
-    <message>
-        <location filename="../PrintTool.py" line="737"/>
-        <source>No Printers</source>
-        <translation>Keine Drucker</translation>
-    </message>
-    <message>
-        <location filename="../PrintTool.py" line="737"/>
-        <source>No printers were found.</source>
-        <translation>Keine Drucker wurden gefunden.</translation>
     </message>
 </context>
 </TS>

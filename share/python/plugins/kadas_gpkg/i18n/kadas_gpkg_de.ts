@@ -176,27 +176,27 @@
 <context>
     <name>KadasGpkgImport</name>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="120"/>
+        <location filename="../kadas_gpkg_import.py" line="123"/>
         <source>Import Errors</source>
         <translation>Importfehler</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="120"/>
+        <location filename="../kadas_gpkg_import.py" line="123"/>
         <source>The following layers could not be imported:%s</source>
         <translation>Folgende Ebenen konnten nicht importiert werden:%s</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="129"/>
+        <location filename="../kadas_gpkg_import.py" line="132"/>
         <source>Save project?</source>
         <translation>Projekt speichern?</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="129"/>
+        <location filename="../kadas_gpkg_import.py" line="132"/>
         <source>The project has unsaved changes. Do you want to save them before proceeding?</source>
         <translation>Das Projekt enthält enthält nicht gespeicherte Änderungen. Soll es gespeichert werden?</translation>
     </message>
     <message>
-        <location filename="../kadas_gpkg_import.py" line="180"/>
+        <location filename="../kadas_gpkg_import.py" line="183"/>
         <source>GPKG import completed</source>
         <translation>GPKG Import abgeschlossen</translation>
     </message>
@@ -204,7 +204,7 @@
 <context>
     <name>KadasGpkgImportLayersList</name>
     <message>
-        <location filename="../kadas_gpkg_layer_list.py" line="459"/>
+        <location filename="../kadas_gpkg_layer_list.py" line="450"/>
         <source>Layer is already loaded from this GeoPackage</source>
         <translation type="unfinished"/>
     </message>
@@ -212,12 +212,12 @@
 <context>
     <name>KadasGpkgLayersList</name>
     <message>
-        <location filename="../kadas_gpkg_layer_list.py" line="289"/>
+        <location filename="../kadas_gpkg_layer_list.py" line="280"/>
         <source>Layer size is unknown or larger than 50 MB – deselected by default</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas_gpkg_layer_list.py" line="282"/>
+        <location filename="../kadas_gpkg_layer_list.py" line="273"/>
         <source>Layer is already part of the output GeoPackage</source>
         <translation type="unfinished"/>
     </message>
@@ -225,12 +225,12 @@
 <context>
     <name>KadasGpkgLayersListBase</name>
     <message>
-        <location filename="../kadas_gpkg_layer_list.py" line="76"/>
+        <location filename="../kadas_gpkg_layer_list.py" line="67"/>
         <source>Select All</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas_gpkg_layer_list.py" line="77"/>
+        <location filename="../kadas_gpkg_layer_list.py" line="68"/>
         <source>Deselect All</source>
         <translation type="unfinished"/>
     </message>
