@@ -8,6 +8,7 @@ docs_dir         = "docs/de"
 site_dir         = "share/docs/html/de"
 
 extra_javascript = ["../assets/extra.js"]
+extra_css        = ["../assets/extra.css"]
 
 nav = [
   {"Allgemeines"              = "index.md"},
@@ -43,3 +44,6 @@ nav = [
 [project.theme]
 variant  = "classic"
 language = "de"
+logo = "../images/logo.png"
+favicon = "../images/logo.png"
+palette.primary = "custom"

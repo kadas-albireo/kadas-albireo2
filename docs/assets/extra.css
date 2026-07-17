@@ -1,0 +1,4 @@
+/* KADAS Albireo brand color for the header / sidebar banner */
+:root > * {
+  --md-primary-fg-color:        #263B4E;
+}
