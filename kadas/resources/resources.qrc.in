@@ -64,6 +64,7 @@
         <file alias="icons/layertree_folded">icons/layertree_folded.png</file>
         <file alias="icons/pin">icons/pin.png</file>
         <file alias="icons/checked">icons/checked.png</file>
+        <file alias="icons/partial">icons/partial.png</file>
         <file alias="icons/kml_import">icons/kml_import.png</file>
         <file alias="icons/line">icons/line.png</file>
         <file alias="icons/azimuth">icons/azimuth.png</file>
