@@ -1,3 +1,86 @@
+diff --git a/python/PyQt6/core/auto_generated/qgslayerrenderingsettings.sip.in b/python/PyQt6/core/auto_generated/qgslayerrenderingsettings.sip.in
+new file mode 100644
+index 00000000000..998639bb04c
+--- /dev/null
++++ b/python/PyQt6/core/auto_generated/qgslayerrenderingsettings.sip.in
+@@ -0,0 +1,77 @@
++/************************************************************************
++ * This file has been generated automatically from                      *
++ *                                                                      *
++ * src/core/qgslayerrenderingsettings.h                                 *
++ *                                                                      *
++ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
++ ************************************************************************/
++
++
++class QgsLayerRenderingSettings
++{
++%Docstring(signature="appended")
++Stores layer-level rendering settings supplied by data providers.
++
++These settings are intended for layer-wide rendering behavior (such as
++opacity and scale based visibility)
++
++.. versionadded:: 4.4
++%End
++
++%TypeHeaderCode
++#include "qgslayerrenderingsettings.h"
++%End
++  public:
++    void setLayerOpacity( double opacity );
++%Docstring
++Sets layer opacity in the range [0, 1].
++%End
++
++    bool hasLayerOpacity() const;
++%Docstring
++Returns ``True`` if layer opacity is set.
++%End
++
++    double layerOpacity() const;
++%Docstring
++Returns layer opacity in the range [0, 1].
++%End
++
++    void setMinimumScale( double scale );
++%Docstring
++Sets minimum scale denominator for visibility.
++%End
++
++    bool hasMinimumScale() const;
++%Docstring
++Returns ``True`` if minimum scale is set.
++%End
++
++    double minimumScale() const;
++%Docstring
++Returns minimum scale denominator.
++%End
++
++    void setMaximumScale( double scale );
++%Docstring
++Sets maximum scale denominator for visibility.
++%End
++
++    bool hasMaximumScale() const;
++%Docstring
++Returns ``True`` if maximum scale is set.
++%End
++
++    double maximumScale() const;
++%Docstring
++Returns maximum scale denominator.
++%End
++
++};
++/************************************************************************
++ * This file has been generated automatically from                      *
++ *                                                                      *
++ * src/core/qgslayerrenderingsettings.h                                 *
++ *                                                                      *
++ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
++ ************************************************************************/
 diff --git a/python/PyQt6/core/auto_generated/vector/qgsvectordataprovider.sip.in b/python/PyQt6/core/auto_generated/vector/qgsvectordataprovider.sip.in
 index 91ed4763b88..44e570f53f1 100644
 --- a/python/PyQt6/core/auto_generated/vector/qgsvectordataprovider.sip.in
@@ -18,6 +101,18 @@ index 91ed4763b88..44e570f53f1 100644
      static QVariant convertValue( QMetaType::Type type, const QString &value );
  %Docstring
  Convert ``value`` to ``type``
+diff --git a/python/PyQt6/core/core_auto.sip b/python/PyQt6/core/core_auto.sip
+index 87d9b375ae3..4c3a62cbce5 100644
+--- a/python/PyQt6/core/core_auto.sip
++++ b/python/PyQt6/core/core_auto.sip
+@@ -92,6 +92,7 @@
+ %Include auto_generated/qgsinterval.sip
+ %Include auto_generated/qgsjsonutils.sip
+ %Include auto_generated/qgslayerdefinition.sip
++%Include auto_generated/qgslayerrenderingsettings.sip
+ %Include auto_generated/qgslayernotesutils.sip
+ %Include auto_generated/qgslegendrenderer.sip
+ %Include auto_generated/qgslegendsettings.sip
 diff --git a/src/core/CMakeLists.txt b/src/core/CMakeLists.txt
 index 0a85466eece..7cffd142ccf 100644
 --- a/src/core/CMakeLists.txt
