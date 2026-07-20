@@ -7,7 +7,7 @@ La finestra di dialogo _Proprietà layer_ fornisce informazioni sul vettore, sul
 
 ![](../../images/vector_general_menu.png)
 
-## Menu Stile
+## Menu Stile { #style-menu }
 
 Con il menu Stile puoi modificare lo stile e la visualizzazione dei vettori. Puoi usare sia lo strumento _Visualizzazione del layer ‣_, comune a tutti i tipi di vettori, sia simbologie specifiche in funzione del tipo di vettore.
 
@@ -58,7 +58,7 @@ END
 
 Il visualizzatore Categorizzato viene usato per visualizzare tutti gli elementi di un vettore, dove il colore di un simbolo singolo riflette i valori di un determinato attributo. Il menu _Stile_ ti permette di scegliere:
 
-- L’attributo (usa la lista Colonna o l’espressione ![](../../images/mIconExpressionEditorOpen.png) _Imposta espressione_, vedi [_Expressions_](expression.md#vector-expressions))
+- L’attributo (usa la lista Colonna o l’espressione ![](../../images/mIconExpressionEditorOpen.png) _Imposta espressione_, vedi [_Expressions_](expression.md#expressions))
 - Il simbolo (Simbolo)
 - I colori (usando la lista gradiente di colore)
 
@@ -192,7 +192,7 @@ Lo strumento ![](../../images/mActionLabeling.png) _Etichette_ ti dà la possibi
 
 Ecco come puoi usare il nuovo menu delle etichette con varie tipologie di vettori.
 
-**Etichettare vettore di punti**
+### Etichettare vettore di punti
 
 Avvia KADAS e carica un vettore di punti. Attiva il vettore nella legenda e clicca sull’icona ![](../../images/mActionLabeling.png) _Opzioni per le etichette dei layer_ nella barra degli strumenti.
 
@@ -218,7 +218,7 @@ Nel menu _Visualizzazione_ puoi impostare opzioni relative alle etichette e agli
 
 ![](../../images/label_points.png)
 
-**Etichettare vettore di linee**
+### Etichettare vettore di linee
 
 Per prima cosa, dalla scheda _Impostazioni delle etichette_ spunta la casella di controllo ![](../../images/checkbox.png) _Etichetta questo vettore con_ e seleziona un attributo fra quelli disponibili. Clicca su ![](../../images/mIconExpressionEditorOpen.png) se vuoi usare un’espressione per le etichette.
 
@@ -242,7 +242,7 @@ Il menu _Visualizzazione_ ha praticamente le stesse voci dei vettori di punti. D
 
 ![](../../images/label_line.png)
 
-**Etichettare vettore di poligoni**
+### Etichettare vettore di poligoni
 
 Per prima cosa spunta la casella di controllo ![](../../images/checkbox.png) _Etichetta questo vettore con_ e seleziona un attributo fra quelli disponibili. Clicca su ![](../../images/mIconExpressionEditorOpen.png) se vuoi usare un’espressione per definire le etichette - vedi
 
@@ -268,7 +268,7 @@ Le voci nel menu _Visualizzazione_ sono le stesse dei vettori di linee. Puoi anc
 
 ![](../../images/label_area.png)
 
-**Definisci le etichette usando un’espressione**
+### Definisci le etichette usando un’espressione
 
 KADAS ti permette di usare delle espressioni per etichettare i vettori. Clicca sull’icona ![](../../images/mIconExpressionEditorOpen.png) nel menu ![](../../images/mActionLabeling.png) _Etichette_. La seguente figura mostra un esempio di espressione per etichettare la regione dell’Alaska con il nome e la dimensione dell’area. Sono stati scelti il campo ‘NAME\_2’, un breve testo descrittivo e la funzione ‘$area()’ combinata con ‘format\_number()’ per una visualizzazione ottimale.
 
@@ -309,7 +309,7 @@ KADAS ti permette di usare delle espressioni per etichettare i vettori. Clicca s
 
 Come potete vedere nel costruttore di espressioni, avete a disposizione centinaia di funzioni per creare espressioni semplici e molto complesse per etichettare i vostri dati in QGIS.
 
-**Usare le opzioni definite dai dati sovrascrive le impostazioni dell’etichettatura**
+### Usare le opzioni definite dai dati sovrascrive le impostazioni dell’etichettatura**
 
 La funzione **definito dai dati** sovrascrive tutte le impostazioni delle etichette e usa le voci presenti nella tabella degli attributii. Usa il tasto destro del mouse per attivare/disattivare questa funzione. Trascinado il mouse sopra il simbolo vedrai quali sono le informazioni usate per etichettare i dati. Ti mostriamo ora un esempio per la funzione ![](../../images/mActionMoveLabel.png)_Muovi etichetta_.
 
@@ -433,7 +433,7 @@ Ci sono diversi esempi presenti nella finestra di dialogo. Puoi caricarli clicca
 
 **Definire le azioni**
 
-Puoi definire le azioni dalla finestra di dialogo _Proprietà layer_. Per definire un’azione, apri questa finestra e clicca sul menu _Azioni_. Dal sottomenu _Proprietà azione_ scegli ‘Generico’ come tipo e inserisci un nome per l’azione. L’azione deve contenere il nome dell’applicazione che verrà eseguita quando lancerai l’azione. Puoi aggiungere uno o più campi come argomenti per l’applicazione. L’azione inizierà sempre con il carattere `%` seguito dal nome del campo che verrà sostituito dal valore del campo stesso. I caratteri speciali %% verranno sostituiti dal valore del campo che hai scelto dalla tabella degli attributi. Puoi usare le doppie virgolette, “ per raggruppare il testo in un singolo argomento per il programma, script o comando. Le doppie virgolette saranno ignorate se precedute dal carattere [``](#id1)[``](#id3).
+Puoi definire le azioni dalla finestra di dialogo _Proprietà layer_. Per definire un’azione, apri questa finestra e clicca sul menu _Azioni_. Dal sottomenu _Proprietà azione_ scegli ‘Generico’ come tipo e inserisci un nome per l’azione. L’azione deve contenere il nome dell’applicazione che verrà eseguita quando lancerai l’azione. Puoi aggiungere uno o più campi come argomenti per l’applicazione. L’azione inizierà sempre con il carattere `%` seguito dal nome del campo che verrà sostituito dal valore del campo stesso. I caratteri speciali %% verranno sostituiti dal valore del campo che hai scelto dalla tabella degli attributi. Puoi usare le doppie virgolette, “ per raggruppare il testo in un singolo argomento per il programma, script o comando. Le doppie virgolette saranno ignorate se precedute dal carattere backslash.
 
 Se si hanno nomi di campo che sono sottostringhe di altri nomi di campo (ad esempio, `col1` e `col10`), si dovrebbe indicare che circondando il nome del campo (e il carattere %) con parentesi quadre (ad esempio, `[%col10]`). Ciò impedirà che il nome del campo `%col10` venga scambiato per il nome del campo `%col1` con un `0` alla fine. Le parentesi saranno rimosse da KADAS quando sostituisce nel valore del campo. Se volete che il campo sostituito sia circondato da parentesi quadre, usate un secondo set come questo: [[%col10]]`.
 
@@ -594,7 +594,7 @@ Ecco un esempio di creazione di un diagramma di testo delle temperature sovrappo
 
 Ricordati che puoi usare anche l’opzione _Posizione definita da attributo_ per posizionare i diagrammi. Inoltre puoi anche impostare la visibilità dei diagrammi in funzione di determinate scale dalla scheda _Aspetto_.
 
-Le dimensioni e gli attributi possono anche essere un’espressione. Usa il pulsante ![](../../images/mIconExpressionEditorOpen.png) per aggiungere un’espressione. Vedi il capitolo [_Expressions_](expression.md#vector-expressions) per ulteriori informazioni ed esempi.
+Le dimensioni e gli attributi possono anche essere un’espressione. Usa il pulsante ![](../../images/mIconExpressionEditorOpen.png) per aggiungere un’espressione. Vedi il capitolo [_Expressions_](expression.md#expressions) per ulteriori informazioni ed esempi.
 
 ## Menu Metadati
 
