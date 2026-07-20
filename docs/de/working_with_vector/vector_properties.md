@@ -13,7 +13,7 @@ Das Menü Stil stellt Ihnen ein umfassendes Werkzeug zum Darstellen und symbolis
 
 ### Darstellungen
 
-Der Renderer ist dafür verantwortlich ein Objekt zusammen mit dem richtigen Symbol zu zeichnen. Es gibt vier Arten von Renderern: Einzelsymbol, Kategorisiert, Abgestuft, Regelbasierend und Punktverdrängung. Es gibt keinen kontinuirliche Farbe Renderer da es in der Tat einfach ein spezieller Fall des Abgestuft Renderers ist. Die Kategorisiert und Abgestuft Renderer können erstellt werden indem ein Symbol und ein Farbverlauf festgelegt werden - Sie werden die Farben für Symbole angemessen einsetzen. Für Punktlayer ist ein Punktverdrängung Renderer erhältlich. Für jeden Datentyp (Punkte, Linien und Polygone) sind Symbollayertypen erhältlich. Abhängig vom ausgesuchten Renderer gibt es im Menü _Stil_ verschiedene zusätzliche Bereiche. Im rechten unteren Teil des Symbologie Dialogs gibt es einen **[Symbol]** Knopf der den Zugang zum Stilmanager ermöglicht (siehe Abschnitt [vector\_style\_manager\_](#id2)). Mit dem Stilmanager können Sie bestehende Symbole bearbeiten und entfernen als auch neue Symbole hinzufügen.
+Der Renderer ist dafür verantwortlich ein Objekt zusammen mit dem richtigen Symbol zu zeichnen. Es gibt vier Arten von Renderern: Einzelsymbol, Kategorisiert, Abgestuft, Regelbasierend und Punktverdrängung. Es gibt keinen kontinuirliche Farbe Renderer da es in der Tat einfach ein spezieller Fall des Abgestuft Renderers ist. Die Kategorisiert und Abgestuft Renderer können erstellt werden indem ein Symbol und ein Farbverlauf festgelegt werden - Sie werden die Farben für Symbole angemessen einsetzen. Für Punktlayer ist ein Punktverdrängung Renderer erhältlich. Für jeden Datentyp (Punkte, Linien und Polygone) sind Symbollayertypen erhältlich. Abhängig vom ausgesuchten Renderer gibt es im Menü _Stil_ verschiedene zusätzliche Bereiche. Im rechten unteren Teil des Symbologie Dialogs gibt es einen **[Symbol]** Knopf der den Zugang zum Stilmanager ermöglicht (siehe _vector\_style\_manager_). Mit dem Stilmanager können Sie bestehende Symbole bearbeiten und entfernen als auch neue Symbole hinzufügen.
 
 Nachdem alle nötigen Veränderungen vorgenommen wurden kann das Symbol zur Liste der aktuellen Stilsymbole hinzugefügt werden (indem Sie **[Symbol]** ![](../../images/selectstring.png) _Speichern_ verwenden) und dann kann es auf einfache Weise später benutzt werden. Darüberhinaus können Sie den **[Stil speichern ...]** ![](../../images/selectstring.png) Knopf um das Symbol als QGIS-Layerstildatei (.qml) oder SLD-Datei (.sld) zu speichern benutzen. SLDs können von jedem Darstellungstyp - Einzelsymbol, Kategorisiert, Abgestuft oder Regelbasierend - exportiert werden, aber wenn Sie ein SLD importieren wird entweder nur Einzelsymbol oder oder Regelbasierend erstellt. Das heisst dass Kategorisierte oder Abgestufte Stile nach Regelbasierend konvertiert werden. Wenn Sie diese Darstellungsarten beibehalten wollen müssen Sie zum QML-Format greifen. Auf der anderen Seite kann es sehr nützlich sein diese einfache Art, Stile nach Regelbasierend zu konvertieren, anzuwenden.
 
@@ -58,7 +58,7 @@ END
 
 Der Kategorisiert Renderer wird verwendet um alle Objekte eines Layers darzustellen indem man ein einfaches benutzerdefiniertes Symbol, dessen Farbe den Wert des ausgewählten Attributs des Objekts wiedergibt. Im _Stil_ Menü können Sie folgendes auswählen:
 
-- Das Attribut (indem Sie die Spalten Listbox oder die ![](../../images/mIconExpressionEditorOpen.png) _Spaltenausdruck einstellen_ Funktion benutzen, siehe [_Ausdrücke_](expression.md#vector-expressions))
+- Das Attribut (indem Sie die Spalten Listbox oder die ![](../../images/mIconExpressionEditorOpen.png) _Spaltenausdruck einstellen_ Funktion benutzen, siehe [_Ausdrücke_](expression.md#expressions))
 - Das Symbol (über die Auswahl Symbol)
 - Die Farben (indem Sie die Farbverlauf Listbox verwenden)
 
@@ -84,7 +84,7 @@ Wie beim Kategorisiert Renderer können Sie mit dem Abgestuft Renderer die Drehu
 
 Genauso können Sie -analog zum Kategorisierten Renderer - im Menü _Stil_ auswählen:
 
-- Das Attribut (indem Sie die Spalten Listbox oder die ![](../../images/mIconExpressionEditorOpen.png) _Spaltenausdruck einstellen_ Funktion benutzen, siehe das [_Ausdrücke_](expression.md#vector-expressions) Kapitel)
+- Das Attribut (indem Sie die Spalten Listbox oder die ![](../../images/mIconExpressionEditorOpen.png) _Spaltenausdruck einstellen_ Funktion benutzen, siehe das [_Ausdrücke_](expression.md#expressions) Kapitel)
 - Das Symbol (über die Auswahl Symbol)
 - Die Farben (indem man die Farbverlaufsliste verwendet)
 
@@ -193,7 +193,7 @@ Die ![](../../images/mActionLabeling.png) _Beschriftungen_ Kernanwendung stellt 
 
 Lassen Sie uns sehen wie die Menüs für verschiedene Vektorlayer benutzt werden können.
 
-**Punktlayer beschriften**
+### Punktlayer beschriften { #labeling-point-layers }
 
 Starten Sie KADAS und laden Sie einen Punktlayer. Aktivieren Sie den Layer in der Legende und klicken Sie auf das ![](../../images/mActionLabeling.png) _Layerbeschriftungseinstellungen_ Icon in der KADAS Werkzeugleiste.
 
@@ -219,7 +219,7 @@ Im Menü _Darstellung_ können sie Beschriftungs- und Objektoptionen definieren.
 
 ![](../../images/label_points.png)
 
-**Linienlayer beschriften**
+### Linienlayer beschriften
 
 Der erste Schritt ist es das ![](../../images/checkbox.png) _Layer beschriften mit_ Kontrollkästchen im _Beschriftungen_ Menü zu aktivieren und eine Attributspalte für das Beschriften auszuwählen. Klicken Sie ![](../../images/mIconExpressionEditorOpen.png) wenn Sie ausdrucksbasierte Beschriftungen definieren wollen.
 
@@ -243,7 +243,7 @@ Das _Darstellung_ Menü hat fast die gleichen Einträge wie das bei Punktlayern.
 
 ![](../../images/label_line.png)
 
-**Polygonlayer beschriften**
+### Polygonlayer beschriften
 
 Der erste Schritt ist es das ![](../../images/checkbox.png) _Layer beschriften mit_ Kontrollkästchen zu aktivieren und eine Attributspalte für das Beschriften auszuwählen. Klicken Sie ![](../../images/mIconExpressionEditorOpen.png) wenn Sie ausdrucksbasierte Beschriftungen definieren wollen.
 
@@ -269,7 +269,7 @@ Die Einträge in das Menü _Darstellung_ sind die gleichen wie für Linienlayer.
 
 ![](../../images/label_area.png)
 
-**Ausdrucksbasierte Beschriftungen definieren**
+### Ausdrucksbasierte Beschriftungen definieren
 
 Mit KADAS können Sie Ausdrücke benutzen um Objekte zu beschriften. Klicken Sie einfach das ![](../../images/mIconExpressionEditorOpen.png) Icon im Menü ![](../../images/mActionLabeling.png) _Beschriftungen_ des Eigenschaften Dialogs. Im folgenden Bild sehen Sie einen Beispielausdruck um die Alaska Regionen mit Namen- und Flächengröße, abhängig vom Feld ‘NAME\_2’, etwas beschreibenden Text und die Funktion ‘$area()’ in Kombination mit ‘format\_number()’ damit sie besser aussieht.
 
@@ -310,7 +310,7 @@ Mit dem ausdrucksbasierten Beschriften können Sie auf einfache Art und Weise ar
 
 Wie Sie im Expression Builder sehen können, stehen Ihnen Hunderte von Funktionen zur Verfügung, um einfache und sehr komplexe Ausdrücke zu erstellen, mit denen Sie Ihre Daten in QGIS beschriften können.
 
-**Datendefinierte Übersteuerung für das Beschriften**
+### Datendefinierte Übersteuerung für das Beschriften
 
 Mit der datendefinierten Übersteuerung werden die Einstellungen für das Beschriften von Einträgen in der Attributtabelle überschrieben. Sie können die Funktion mit dem Rechte-Maus-Knopf aktivieren und deaktivieren. Fahren Sie über das Symbol und Sie sehen die Information über die datendefinierte Übersteuerung einschließlich des aktuellen Definitionsfeldes. Wir beschreiben jetzt ein Beispiel indem wir die datendefinierte Übersteuerungsfunktion für die ![](../../images/mActionMoveLabel.png)_Beschriftung verschieben_ Funktion verwenden.
 
@@ -336,7 +336,7 @@ Innerhalb des Menüs _Felder_ finden Sie auch eine **Bearbeitungselement** Spalt
 
 - **Kontrollkästchen**: Gibt ein Kontrollkästchen wieder und Sie können definieren welches Attribut der Spalte hinzugefügt wird wenn das Kontrollkästchen aktiviert ist oder nicht.
 - **Klassifikation**: Auswahlliste mit den Attributwerten, die im Menü _Stil_ als Legendentyp Eindeutiger Wert für die Klassifikation benutzt werden.
-- [\*\*](#id1)Farbe\*: Stellt einen Farbknopf dar, der es dem Anwender ermöglicht eine Farbe von einem Farbdialogfenster auszuwählen.
+- **Farbe**: Stellt einen Farbknopf dar, der es dem Anwender ermöglicht eine Farbe von einem Farbdialogfenster auszuwählen.
 - **Datum/Zeit**: Zeigt ein Zeilenfeld an, das ein Kalender-Widget öffnen kann, um ein Datum, eine Uhrzeit oder beides einzugeben. Die Spaltenart muss Text sein. Sie können ein benutzerdefiniertes Format auswählen, einen Kalender öffnen usw.
 - **Aufzählung**: Öffnet eine Kombobox mit Werten die innerhalb eines Spaltentyps benutzt werden können. Dieses wird aktuell nur vom PostgreSQL Provider untersützt.
 - **Dateiname**: Vereinfacht die Dateiauswahl durch einen Dateiauswahldialog.
@@ -595,7 +595,7 @@ Wir werden ein Beispiel zeigen und dem Alaskagrenzlayer ein Textdiagramm das Tem
 
 Behalten Sie im Hinterkopf dass im Reiter _Position_ eine _Datendefinierte Position_ der Diagramme möglich ist. Sie können hier Attribute verwenden um die Position des Diagramms zu definieren. Sie können auch eine maßstabsabhängige Sichtbarkeit im _Darstellung_ Reiter einstellen.
 
-Die Größe und die Attribute können auch ein Ausdruck sein. Verwenden Sie den ![](../../images/mIconExpressionEditorOpen.png) Knopf um einen Ausdrück einzufügen. Siehe Kapitel [_Ausdrücke_](expression.md#vector-expressions) für weitere Informationen und Beispiele.
+Die Größe und die Attribute können auch ein Ausdruck sein. Verwenden Sie den ![](../../images/mIconExpressionEditorOpen.png) Knopf um einen Ausdrück einzufügen. Siehe Kapitel [_Ausdrücke_](expression.md#expressions) für weitere Informationen und Beispiele.
 
 ## Menü Metadaten
 
