@@ -97,7 +97,7 @@ In the right block, _Generate new color map_ allows you to create newly categori
 
 For every _Band rendering_, a _Color rendering_ is possible.
 
-You can also achieve special rendering effects for your raster file(s) using one of the blending modes (see [_The Vector Properties Dialog_](../working_with_vector/vector_properties.md#vector-properties-dialog)).
+You can also achieve special rendering effects for your raster file(s) using one of the blending modes (see [_The Vector Properties Dialog_](../working_with_vector/vector_properties.md#style-menu)).
 
 Further settings can be made in modifiying the _Brightness_, the _Saturation_ and the _Contrast_. You can also use a _Grayscale_ option, where you can choose between ‘By lightness’, ‘By luminosity’ and ‘By average’. For one hue in the color table, you can modify the ‘Strength’.
 
