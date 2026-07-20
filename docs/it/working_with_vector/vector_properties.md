@@ -192,7 +192,7 @@ Lo strumento ![](../../images/mActionLabeling.png) _Etichette_ ti dà la possibi
 
 Ecco come puoi usare il nuovo menu delle etichette con varie tipologie di vettori.
 
-### Etichettare vettore di punti
+### Etichettare vettore di punti { #labeling-point-layers }
 
 Avvia KADAS e carica un vettore di punti. Attiva il vettore nella legenda e clicca sull’icona ![](../../images/mActionLabeling.png) _Opzioni per le etichette dei layer_ nella barra degli strumenti.
 
