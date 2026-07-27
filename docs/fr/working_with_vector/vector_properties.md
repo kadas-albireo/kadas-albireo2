@@ -190,7 +190,7 @@ Le moteur d’![](../../images/mActionLabeling.png) _Étiquettes_ fournit un sys
 
 Voyons ce que l'on peut faire avec les nouveaux onglets pour chaque type de couche.
 
-### Étiqueter une couche de points
+### Étiqueter une couche de points { #labeling-point-layers }
 
 Lancez KADAS et chargez une couche vectorielle de points. Sélectionnez la couche dans la légende et cliquez sur le bouton ![](../../images/mActionLabeling.png) _Paramètres d'étiquetage de la couche_ de la barre d'outils KADAS.
 
@@ -216,7 +216,7 @@ Dans le menu _Rendu_, vous pouvez définir des options d'étiquettes et d'entit�
 
 ![](../../images/label_points.png)
 
-### Étiqueter une couche de lignes { #labeling-point-layers }
+### Étiqueter une couche de lignes
 
 La première étape consiste à cocher la case ![](../../images/checkbox.png) _Etiqueter cette couche avec_ dans l'onglet _Étiquettes_ et à sélectionner un champ attributaire à utiliser pour l'étiquette. Cliquez sur ![](../../images/mIconExpressionEditorOpen.png) si vous souhaitez définir les étiquettes en vous basant sur des expressions.
 
@@ -266,7 +266,7 @@ Le sous-menu _Rendu_ propose les mêmes fonctions que celles définies pour les 
 
 ![](../../images/label_area.png)
 
-### Défini des étiquettes basées sur des expressions
+### Définir des étiquettes basées sur des expressions
 
 QGIS permet d'utiliser des expressions pour étiqueter les entités. Cliquez sur l'icône ![](../../images/mIconExpressionEditorOpen.png) dans le menu _Étiquettes_ ![](../../images/mActionLabeling.png) de la boîte de dialogue Propriétés. Dans la figure ci-dessous vous pouvez voir un exemple d'expression pour étiqueter les régions de l'Alaska avec leur nom et leur superficie, en se basant sur le champ _NAME\_2_, un texte de description et la fonction _$area()_ en combinaison avec _format\_number()_ pour améliorer l'affichage numérique.
 
