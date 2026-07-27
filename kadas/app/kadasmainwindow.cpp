@@ -98,6 +98,7 @@
 #include "kadasgpsintegration.h"
 #include "kadasgpxintegration.h"
 #include "kadaslayertreeviewmenuprovider.h"
+#include "kadaslayertreeviewnonremovableindicator.h"
 #include "kadaslayertreeviewtemporalindicator.h"
 #include "kadasmainwindow.h"
 #include "kadasmapwidgetmanager.h"
@@ -354,6 +355,10 @@ void KadasMainWindow::init()
   mKadasTemporalController = new KadasTemporalController( mapCanvas() );
   mKadasTemporalController->hide();
   new KadasLayerTreeViewTemporalIndicator( mLayerTreeView, mKadasTemporalController ); // gets parented to the layer view
+
+  // Private layer tree indicator
+  new KadasLayerTreeViewNonRemovableIndicatorProvider( mLayerTreeView ); // gets parented to the layer view
+
 
   // Plugin manager
   mPluginManager = new KadasPluginManager( mapCanvas(), mActionPluginManager );
