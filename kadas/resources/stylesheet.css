@@ -47,6 +47,10 @@ QMenu, QComboBox QAbstractItemView  {
     border: 1px solid #959697;
 }
 
+QMenu::item {
+  padding: 4px 20px 4px 8px;
+}
+
 QMenu::item::disabled,
 QMenu::item:selected::disabled,
 QAbstractItemView::item::disabled,
