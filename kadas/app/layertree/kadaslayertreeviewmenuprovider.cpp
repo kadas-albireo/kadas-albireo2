@@ -249,6 +249,7 @@ QAction *KadasLayerTreeViewMenuProvider::actionLockLayer( QMenu *parent )
 
   lockAction->setChecked( isLocked );
   lockAction->setText( isLocked ? tr( "Unlock Layer" ) : tr( "Lock Layer" ) );
+  lockAction->setIcon( isLocked ? QgsApplication::getThemeIcon( "/unlocked.svg" ) : QgsApplication::getThemeIcon( "/locked.svg" ) );
 
   connect( lockAction, &QAction::toggled, this, &KadasLayerTreeViewMenuProvider::setLayerLock );
   return lockAction;
