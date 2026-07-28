@@ -48,6 +48,7 @@ set(kadas_SRC
     bullseye/kadasmaptoolbullseye.cpp
     devtools/kadasdevelopertoolsdockwidget.cpp
     external/qgis/app/qgslayertreeviewindicatorprovider.cpp
+    external/qgis/app/qgslayertreeviewnonremovableindicator.cpp
     external/qgis/app/3d/qgsmaterialpreviewwidget.cpp
     guidegrid/kadasguidegridlayer.cpp
     guidegrid/kadasmaptoolguidegrid.cpp
@@ -116,6 +117,7 @@ set(kadas_HDR
     bullseye/kadasmaptoolbullseye.h
     devtools/kadasdevelopertoolsdockwidget.h
     external/qgis/app/qgslayertreeviewindicatorprovider.h
+    external/qgis/app/qgslayertreeviewnonremovableindicator.h
     external/qgis/app/3d/qgsmaterial3dhandler.h
     external/qgis/app/3d/qgsmaterialpreviewwidget.h
     guidegrid/kadasguidegridlayer.h
