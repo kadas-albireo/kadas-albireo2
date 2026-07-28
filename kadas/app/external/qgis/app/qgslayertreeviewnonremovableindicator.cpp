@@ -1,9 +1,9 @@
 /***************************************************************************
-  kadaslayertreeviewnonremovableindicator.cpp
+  qgslayertreeviewnonremovableindicator.cpp
   --------------------------------------
-  Date                 : July 2026
-  Copyright            : (C) 2026 by Valentin Buira
-  Email                : valentin at opengis dot ch
+  Date                 : Sep 2018
+  Copyright            : (C) 2018 by Martin Dobias
+  Email                : wonder dot sk at gmail dot com
  ***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -13,51 +13,48 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "qgslayertreeviewnonremovableindicator.h"
 
 #include "qgslayertree.h"
 #include "qgslayertreemodel.h"
 #include "qgslayertreeutils.h"
 #include "qgslayertreeview.h"
 
-#include "kadaslayertreeviewnonremovableindicator.h"
-
 #include <QString>
 
+#include "moc_qgslayertreeviewnonremovableindicator.cpp"
 
 using namespace Qt::StringLiterals;
 
-/**
- * Forked from https://github.com/ValentinBuira/QGIS/blob/8c9806d/src/app/qgslayertreeviewnonremovableindicator.cpp 
- */
-KadasLayerTreeViewNonRemovableIndicatorProvider::KadasLayerTreeViewNonRemovableIndicatorProvider( QgsLayerTreeView *view )
+QgsLayerTreeViewNonRemovableIndicatorProvider::QgsLayerTreeViewNonRemovableIndicatorProvider( QgsLayerTreeView *view )
   : QgsLayerTreeViewIndicatorProvider( view )
 {}
 
-QString KadasLayerTreeViewNonRemovableIndicatorProvider::iconName( QgsMapLayer *layer )
+QString QgsLayerTreeViewNonRemovableIndicatorProvider::iconName( QgsMapLayer *layer )
 {
   Q_UNUSED( layer )
   return u"/mIndicatorNonRemovable.svg"_s;
 }
 
-QString KadasLayerTreeViewNonRemovableIndicatorProvider::tooltipText( QgsMapLayer *layer )
+QString QgsLayerTreeViewNonRemovableIndicatorProvider::tooltipText( QgsMapLayer *layer )
 {
   Q_UNUSED( layer )
   return tr( "Layer required by the project" );
 }
 
-bool KadasLayerTreeViewNonRemovableIndicatorProvider::acceptLayer( QgsMapLayer *layer )
+bool QgsLayerTreeViewNonRemovableIndicatorProvider::acceptLayer( QgsMapLayer *layer )
 {
   return !layer->flags().testFlag( QgsMapLayer::LayerFlag::Removable );
 }
 
-void KadasLayerTreeViewNonRemovableIndicatorProvider::connectSignals( QgsMapLayer *layer )
+void QgsLayerTreeViewNonRemovableIndicatorProvider::connectSignals( QgsMapLayer *layer )
 {
   QgsLayerTreeViewIndicatorProvider::connectSignals( layer );
-  connect( layer, &QgsMapLayer::flagsChanged, this, &KadasLayerTreeViewNonRemovableIndicatorProvider::onLayerChanged );
+  connect( layer, &QgsMapLayer::flagsChanged, this, &QgsLayerTreeViewNonRemovableIndicatorProvider::onLayerChanged );
 }
 
-void KadasLayerTreeViewNonRemovableIndicatorProvider::disconnectSignals( QgsMapLayer *layer )
+void QgsLayerTreeViewNonRemovableIndicatorProvider::disconnectSignals( QgsMapLayer *layer )
 {
   QgsLayerTreeViewIndicatorProvider::disconnectSignals( layer );
-  disconnect( layer, &QgsMapLayer::flagsChanged, this, &KadasLayerTreeViewNonRemovableIndicatorProvider::onLayerChanged );
+  disconnect( layer, &QgsMapLayer::flagsChanged, this, &QgsLayerTreeViewNonRemovableIndicatorProvider::onLayerChanged );
 }

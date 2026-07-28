@@ -48,6 +48,7 @@ set(kadas_SRC
     bullseye/kadasmaptoolbullseye.cpp
     devtools/kadasdevelopertoolsdockwidget.cpp
     external/qgis/app/qgslayertreeviewindicatorprovider.cpp
+    external/qgis/app/qgslayertreeviewnonremovableindicator.cpp
     external/qgis/app/3d/qgsmaterialpreviewwidget.cpp
     guidegrid/kadasguidegridlayer.cpp
     guidegrid/kadasmaptoolguidegrid.cpp
@@ -59,7 +60,6 @@ set(kadas_SRC
     kml/kadaskmllabeling.cpp
     layertree/kadaslayertreeview.cpp
     layertree/kadaslayertreeviewmenuprovider.cpp
-    layertree/kadaslayertreeviewnonremovableindicator.cpp
     layertree/kadaslayertreeviewtemporalindicator.cpp
     mapgrid/kadasmapgridlayer.cpp
     mapgrid/kadasmapgridlayerrenderer.cpp
@@ -117,6 +117,7 @@ set(kadas_HDR
     bullseye/kadasmaptoolbullseye.h
     devtools/kadasdevelopertoolsdockwidget.h
     external/qgis/app/qgslayertreeviewindicatorprovider.h
+    external/qgis/app/qgslayertreeviewnonremovableindicator.h
     external/qgis/app/3d/qgsmaterial3dhandler.h
     external/qgis/app/3d/qgsmaterialpreviewwidget.h
     guidegrid/kadasguidegridlayer.h
@@ -129,7 +130,6 @@ set(kadas_HDR
     kml/kadaskmllabeling.h
     layertree/kadaslayertreeview.h
     layertree/kadaslayertreeviewmenuprovider.h
-    layertree/kadaslayertreeviewnonremovableindicator.h
     layertree/kadaslayertreeviewtemporalindicator.h
     mapgrid/kadasmapgridlayer.h
     mapgrid/kadasmapgridlayerrenderer.h

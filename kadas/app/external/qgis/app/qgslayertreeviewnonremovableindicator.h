@@ -1,9 +1,9 @@
 /***************************************************************************
   qgslayertreeviewnonremovableindicator.h
   --------------------------------------
-  Date                 : July 2026
-  Copyright            : (C) 2026 by Valentin Buira
-  Email                : valentin dot buira at opengis dot ch
+  Date                 : Sep 2018
+  Copyright            : (C) 2018 by Martin Dobias
+  Email                : wonder dot sk at gmail dot com
  ***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -13,24 +13,20 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef KADASLAYERTREEVIEWNONREMOVABLEINDICATOR_H
-#define KADASLAYERTREEVIEWNONREMOVABLEINDICATOR_H
+#ifndef QGSLAYERTREEVIEWNONREMOVABLEINDICATOR_H
+#define QGSLAYERTREEVIEWNONREMOVABLEINDICATOR_H
 
 #include <memory>
 
-#include "external/qgis/app/qgslayertreeviewindicatorprovider.h"
-
+#include "qgslayertreeviewindicatorprovider.h"
 
 #include <QSet>
 
-/**
- * Forked from https://github.com/ValentinBuira/QGIS/blob/8c9806d/src/app/qgslayertreeviewnonremovableindicator.cpp 
- */
-class KadasLayerTreeViewNonRemovableIndicatorProvider : public QgsLayerTreeViewIndicatorProvider
+class QgsLayerTreeViewNonRemovableIndicatorProvider : public QgsLayerTreeViewIndicatorProvider
 {
     Q_OBJECT
   public:
-    explicit KadasLayerTreeViewNonRemovableIndicatorProvider( QgsLayerTreeView *view );
+    explicit QgsLayerTreeViewNonRemovableIndicatorProvider( QgsLayerTreeView *view );
 
   private:
     QString iconName( QgsMapLayer *layer ) override;
@@ -43,4 +39,4 @@ class KadasLayerTreeViewNonRemovableIndicatorProvider : public QgsLayerTreeViewI
 };
 
 
-#endif // KADASLAYERTREEVIEWNONREMOVABLEINDICATOR_H
+#endif // QGSLAYERTREEVIEWNONREMOVABLEINDICATOR_H

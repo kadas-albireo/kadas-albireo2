@@ -55,6 +55,8 @@
 #include <qgis/qgselevationutils.h>
 #include <qgis/qgsrasterlayerelevationproperties.h>
 
+#include "external/qgis/app/qgslayertreeviewnonremovableindicator.h"
+
 #include "kadas/core/kadas.h"
 #include "kadas/core/kadassettingstree.h"
 #include "kadas/gui/kadasclipboard.h"
@@ -98,7 +100,6 @@
 #include "kadasgpsintegration.h"
 #include "kadasgpxintegration.h"
 #include "kadaslayertreeviewmenuprovider.h"
-#include "kadaslayertreeviewnonremovableindicator.h"
 #include "kadaslayertreeviewtemporalindicator.h"
 #include "kadasmainwindow.h"
 #include "kadasmapwidgetmanager.h"
@@ -357,7 +358,7 @@ void KadasMainWindow::init()
   new KadasLayerTreeViewTemporalIndicator( mLayerTreeView, mKadasTemporalController ); // gets parented to the layer view
 
   // Private layer tree indicator
-  new KadasLayerTreeViewNonRemovableIndicatorProvider( mLayerTreeView ); // gets parented to the layer view
+  new QgsLayerTreeViewNonRemovableIndicatorProvider( mLayerTreeView ); // gets parented to the layer view
 
 
   // Plugin manager
