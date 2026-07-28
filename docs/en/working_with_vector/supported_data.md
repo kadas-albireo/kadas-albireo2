@@ -35,7 +35,7 @@ Selecting a shapefile from the list and clicking **[Open]** loads it into KADAS.
 
 When you add a layer to the map, it is assigned a random color. When adding more than one layer at a time, different colors are assigned to each layer.
 
-Once a shapefile is loaded, you can zoom around it using the map navigation tools. To change the style of a layer, open the _Layer Properties_ dialog by double clicking on the layer name or by right-clicking on the name in the legend and choosing _Properties_ from the context menu. See section [_Style Menu_](vector_properties.md#vector-style-menu) for more information on setting symbology of vector layers.
+Once a shapefile is loaded, you can zoom around it using the map navigation tools. To change the style of a layer, open the _Layer Properties_ dialog by double clicking on the layer name or by right-clicking on the name in the legend and choosing _Properties_ from the context menu. See section [_Style Menu_](vector_properties.md#style-menu) for more information on setting symbology of vector layers.
 
 ### Improving Performance for Shapefiles
 

@@ -1,7 +1,7 @@
 <!-- Recovered from: docs_old/html/it/it/working_with_vector/expression/index.html -->
 <!-- Language: it | Section: working_with_vector/expression -->
 
-# Espressioni
+# Espressioni { #expressions }
 
 La funzione **Espressioni** è disponibile tramite il calcolatore di campo o il pulsante per aggiungere una nuova colonna nella tabella degli attributi o nella scheda Campo nelle proprietà del livello; tramite il rendering graduato, categorizzato e basato su regole nella scheda Stile delle proprietà del livello; tramite l'etichettatura basata sulle espressioni ![](../../images/browsebutton.png) nell'applicazione principale _Etichettatura_ ![](../../images/mActionLabeling.png); tramite la selezione delle funzioni e tramite la scheda diagramma delle proprietà del livello, nonché le proprietà principali dell'elemento etichetta e la scheda generazione di _Atlante_ nel Compositore di stampa.
 

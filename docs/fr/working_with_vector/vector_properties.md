@@ -190,7 +190,7 @@ Le moteur d’![](../../images/mActionLabeling.png) _Étiquettes_ fournit un sys
 
 Voyons ce que l'on peut faire avec les nouveaux onglets pour chaque type de couche.
 
-**Étiqueter une couche de points**
+### Étiqueter une couche de points { #labeling-point-layers }
 
 Lancez KADAS et chargez une couche vectorielle de points. Sélectionnez la couche dans la légende et cliquez sur le bouton ![](../../images/mActionLabeling.png) _Paramètres d'étiquetage de la couche_ de la barre d'outils KADAS.
 
@@ -216,7 +216,7 @@ Dans le menu _Rendu_, vous pouvez définir des options d'étiquettes et d'entit�
 
 ![](../../images/label_points.png)
 
-**Étiqueter une couche de lignes**
+### Étiqueter une couche de lignes
 
 La première étape consiste à cocher la case ![](../../images/checkbox.png) _Etiqueter cette couche avec_ dans l'onglet _Étiquettes_ et à sélectionner un champ attributaire à utiliser pour l'étiquette. Cliquez sur ![](../../images/mIconExpressionEditorOpen.png) si vous souhaitez définir les étiquettes en vous basant sur des expressions.
 
@@ -240,7 +240,7 @@ Le menu _Rendu_ offre presque les mêmes fonctions que celles définies pour les
 
 ![](../../images/label_line.png)
 
-**Étiqueter une couche de polygones**
+### Étiqueter une couche de polygones
 
 La première étape consiste à cocher la case ![](../../images/checkbox.png) _Etiqueter cette couche avec_ et à sélectionner un champ attributaire à utiliser pour l'étiquette. Cliquez sur ![](../../images/mIconExpressionEditorOpen.png) si vous souhaitez définir les étiquettes en vous basant sur des expressions.
 
@@ -266,7 +266,7 @@ Le sous-menu _Rendu_ propose les mêmes fonctions que celles définies pour les 
 
 ![](../../images/label_area.png)
 
-**Défini des étiquettes basées sur des expressions**
+### Définir des étiquettes basées sur des expressions
 
 QGIS permet d'utiliser des expressions pour étiqueter les entités. Cliquez sur l'icône ![](../../images/mIconExpressionEditorOpen.png) dans le menu _Étiquettes_ ![](../../images/mActionLabeling.png) de la boîte de dialogue Propriétés. Dans la figure ci-dessous vous pouvez voir un exemple d'expression pour étiqueter les régions de l'Alaska avec leur nom et leur superficie, en se basant sur le champ _NAME\_2_, un texte de description et la fonction _$area()_ en combinaison avec _format\_number()_ pour améliorer l'affichage numérique.
 
@@ -305,9 +305,9 @@ L'étiquetage basé sur des expressions est simple à utiliser. Tout ce dont vou
 -> This place is a town
 ```
 
-Comme vous pouvez le constater dans le constructeur d'expressions, vous avez à votre disposition une centaine de fonctions pour créer des expressions simples ou très complexes afin d'étiqueter vos données avec KADAS. Voir [_Expressions_](expression.md#vector-expressions) pour plus d'informations et des exemples d'expressions.
+Comme vous pouvez le constater dans le constructeur d'expressions, vous avez à votre disposition une centaine de fonctions pour créer des expressions simples ou très complexes afin d'étiqueter vos données avec KADAS. Voir [_Expressions_](expression.md#expressions) pour plus d'informations et des exemples d'expressions.
 
-**Utiliser des valeurs de paramètres définies par les données pour l'étiquetage**
+### Utiliser des valeurs de paramètres définies par les données pour l'étiquetage
 
 Avec les fonctions de remplacement défini par les données, les paramètres de l'étiquetage sont remplacées par les entrées de la table d'attributs. Vous pouvez activer et désactiver cette fonction avec le bouton droit de la souris. Survolez le symbole et vous verrez les informations sur le remplacement des données définies, y compris le domaine de la définition actuelle. Nous décrivons maintenant un exemple d'utilisation de la fonction de correction de données défini pour la fonction ![](../../images/mActionMoveLabel.png) déplacement d'étiquette.
 
@@ -589,7 +589,7 @@ Nous allons vous montrer un exemple en superposant aux frontières de l'Alaska d
 
 N'oubliez pas que, dans l'onglet _Position_, en cochant la case ![](../../images/checkbox.png) _Source de définition de la position_, vous pouvez utiliser des valeurs d'attributs pour choisir l'emplacement des diagrammes. Par ailleurs, dans l'onglet _Apparence_, vous pouvez définir la visibilité en fonction de l'échelle.
 
-La taille et les attributs peuvent aussi être une expression. Utilisez le bouton ![](../../images/mIconExpressionEditorOpen.png) pour ajouter une expression. Voir [_Expressions_](expression.md#vector-expressions) pour plus d'informations et des exemples.
+La taille et les attributs peuvent aussi être une expression. Utilisez le bouton ![](../../images/mIconExpressionEditorOpen.png) pour ajouter une expression. Voir [_Expressions_](expression.md#expressions) pour plus d'informations et des exemples.
 
 ## Onglet Métadonnées
 

@@ -5,7 +5,7 @@ Build KADAS Albireo documentation for all 4 languages.
 Each language is a separate Zensical project (isolated nav + search index).
 Shared assets (media/, images/, assets/) live in docs/ and are copied once
 into share/docs/html/ after all language builds complete.
-The root redirect (docs/index.md → share/docs/html/index.html) is also
+The root redirect (docs/index.md -> share/docs/html/index.html) is also
 copied once at the end.
 
 Usage:
@@ -62,13 +62,20 @@ def find_zensical() -> Path:
     return Path("zensical")
 
 
-def build_lang(lang: str, zensical: Path) -> None:
+def build_lang(lang: str, zensical: Path, strict: bool) -> None:
     config = CONFIGS[lang]
     print(f"\n{'='*60}")
     print(f"  Building: {lang.upper()}  ({config.name})")
     print(f"{'='*60}")
+
+    comamnd = [str(zensical), "build"]
+    if strict:
+        comamnd.append("--strict")
+    comamnd.append("--config-file")
+    comamnd.append(str(config))
+
     result = subprocess.run(
-        [str(zensical), "build", "--config-file", str(config)],
+        comamnd,
         cwd=REPO_ROOT,
     )
     if result.returncode != 0:
@@ -83,7 +90,7 @@ def copy_shared_assets() -> None:
     per-language site_dir, resolving to share/docs/html/{name}/.
     """
     print(f"\n{'='*60}")
-    print("  Copying shared assets → share/docs/html/")
+    print("  Copying shared assets -> share/docs/html/")
     print(f"{'='*60}")
     OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
     for src in SHARED_ASSET_DIRS:
@@ -94,7 +101,7 @@ def copy_shared_assets() -> None:
         if dst.exists():
             shutil.rmtree(dst)
         shutil.copytree(src, dst)
-        print(f"  COPY  docs/{src.name}/ → share/docs/html/{src.name}/")
+        print(f"  COPY  docs/{src.name}/ -> share/docs/html/{src.name}/")
 
 
 def copy_root_redirect() -> None:
@@ -108,11 +115,11 @@ def copy_root_redirect() -> None:
     dst = OUTPUT_ROOT / "index.html"
     if src.exists():
         shutil.copy2(src, dst)
-        print(f"  COPY  root index.html → share/docs/html/index.html")
+        print(f"  COPY  root index.html -> share/docs/html/index.html")
     elif root_md.exists():
         # docs/index.md is a bare HTML snippet — copy as-is.
         shutil.copy2(root_md, dst)
-        print(f"  COPY  docs/index.md → share/docs/html/index.html")
+        print(f"  COPY  docs/index.md -> share/docs/html/index.html")
     else:
         print("  WARN  No root index found; writing a minimal redirect.")
         dst.write_text(
@@ -128,6 +135,12 @@ def copy_root_redirect() -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
+
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Treat warnings as errors during documentation build"
+    )
     parser.add_argument(
         "--lang",
         choices=list(CONFIGS.keys()),
@@ -139,7 +152,7 @@ def main() -> None:
     langs = [args.lang] if args.lang else list(CONFIGS.keys())
 
     for lang in langs:
-        build_lang(lang, zensical)
+        build_lang(lang, zensical, args.strict)
 
     # Shared assets and root redirect are only written when doing a full build
     # (or when the caller explicitly requests it for a single-lang rebuild).

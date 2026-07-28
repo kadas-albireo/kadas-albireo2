@@ -24,7 +24,7 @@
       });
     }
 
-    // ── External links → new tab ─────────────────────────────────────────────
+    // ── External links -> new tab ─────────────────────────────────────────────
     // Any anchor whose href points to a different origin gets
     // target="_blank" + rel="noopener noreferrer".
     document.querySelectorAll("a[href]").forEach(function (a) {

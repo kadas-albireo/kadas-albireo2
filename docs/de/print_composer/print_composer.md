@@ -264,7 +264,7 @@ Der _Elementeigenschaften_ Reiter eines Beschriftungselements stellt die folgend
 
 ### Darstellung
 
-- Definieren Sie _Schrift_ indem Sie auf den [\*\*](#id1)[Schriftart ...] Knopf klicken oder eine _Schriftfarbe_ indem Sie eine Farbe mit Hilfe des Farbauswahlwerkzeuges auswählen.
+- Definieren Sie _Schrift_ indem Sie auf den **[Schriftart ...]** Knopf klicken oder eine _Schriftfarbe_ indem Sie eine Farbe mit Hilfe des Farbauswahlwerkzeuges auswählen.
 - Sie können verschiedene horizontale und vertikale Ränder in mm angeben. Dies ist der Rand vom Rand des Komponistenelements. Das Etikett kann außerhalb der Grenzen des Etiketts positioniert werden, z.B. um Etikettenelemente mit anderen Elementen auszurichten. In diesem Fall müssen Sie für die Marge negative Werte verwenden.
 - Die Verwendung der _Ausrichtung_ ist eine weitere Möglichkeit, Ihr Etikett zu positionieren. Beachten Sie, dass z.B. bei Verwendung der _Horizontalen Ausrichtung_ in ![radiobuttonon](../../images/radiobuttonon.png) _Mitte_, die Positionierung der _Horizontale Randfunktion_ deaktiviert ist.
 

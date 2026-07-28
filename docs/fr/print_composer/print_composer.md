@@ -763,8 +763,6 @@ Lorsque vous voulez donner un titre au-dessus de la carte au centre de la page, 
 
 Pour tous les autres éléments du composeur, vous pouvez définir la position de façon similaire de sorte qu'ils soient correctement positionnés lorsque la page est automatiquement tournée en portrait ou paysage.
 
-Les informations fournies sont tirées de l'excellent blog (en anglais et portugais) sur les options de Valeurs définies par des données [Multiple\_format\_map\_series\_using\_QGIS\_2.6\_](#id8) .
-
 Ceci est seulement un exemple de comment vous pouvez utiliser les Valeurs de définies par des données.
 
 ## Aperçu

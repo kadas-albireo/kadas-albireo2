@@ -58,7 +58,7 @@ END
 
 The Categorized Renderer is used to render all features from a layer, using a single user-defined symbol whose color reflects the value of a selected feature's attribute. The _Style_ menu allows you to select:
 
-- The attribute (using the Column listbox or the ![](../../images/mIconExpressionEditorOpen.png) _Set column expression_ function, see [_Expressions_](expression.md#vector-expressions))
+- The attribute (using the Column listbox or the ![](../../images/mIconExpressionEditorOpen.png) _Set column expression_ function, see [_Expressions_](expression.md#expressions))
 - The symbol (using the Symbol dialog)
 - The colors (using the color Ramp listbox)
 
@@ -82,7 +82,7 @@ Like the Categorized Renderer, the Graduated Renderer allows you to define rotat
 
 Also, analogous to the Categorized Renderer, the _Style_ tab allows you to select:
 
-- The attribute (using the Column listbox or the ![](../../images/mIconExpressionEditorOpen.png) _Set column expression_ function, see [_Expressions_](expression.md#vector-expressions) chapter)
+- The attribute (using the Column listbox or the ![](../../images/mIconExpressionEditorOpen.png) _Set column expression_ function, see [_Expressions_](expression.md#expressions) chapter)
 - The symbol (using the Symbol Properties button)
 - The colors (using the color Ramp list)
 
@@ -193,7 +193,7 @@ The ![](../../images/mActionLabeling.png) _Labels_ core application provides sma
 
 Let us see how the new menus can be used for various vector layers.
 
-**Labeling point layers**
+### Labeling point layers
 
 Start KADAS and load a vector point layer. Activate the layer in the legend and click on the ![](../../images/mActionLabeling.png) _Layer Labeling Options_ icon in the KADAS toolbar menu.
 
@@ -219,7 +219,7 @@ In the _Rendering_ menu, you can define label and feature options. Under _Label 
 
 ![](../../images/label_points.png)
 
-**Labeling line layers**
+### Labeling line layers
 
 The first step is to activate the ![](../../images/checkbox.png) _Label this layer_ checkbox in the _Label settings_ tab and select an attribute column to use for labeling. Click ![](../../images/mIconExpressionEditorOpen.png) if you want to define labels based on expressions.
 
@@ -243,7 +243,7 @@ The _Rendering_ menu has nearly the same entries as for point layers. In the _Fe
 
 ![](../../images/label_line.png)
 
-**Labeling polygon layers**
+### Labeling polygon layers
 
 The first step is to activate the ![](../../images/checkbox.png) _Label this layer_ checkbox and select an attribute column to use for labeling. Click ![](../../images/mIconExpressionEditorOpen.png) if you want to define labels based on expressions.
 
@@ -269,7 +269,7 @@ The entries in the _Rendering_ menu are the same as for line layers. You can als
 
 ![](../../images/label_area.png)
 
-**Define labels based on expressions**
+### Define labels based on expressions
 
 QGIS allows to use expressions to label features. Just click the ![](../../images/mIconExpressionEditorOpen.png) icon in the ![](../../images/mActionLabeling.png) _Labels_ menu of the properties dialog.
 
@@ -308,9 +308,9 @@ Expression based labeling is easy to work with. All you have to take care of is,
 -> This place is a town
 ```
 
-As you can see in the expression builder, you have hundreds of functions available to create simple and very complex expressions to label your data in QGIS. See [_Expressions_](expression.md#vector-expressions) chapter for more information and examples on expressions.
+As you can see in the expression builder, you have hundreds of functions available to create simple and very complex expressions to label your data in QGIS. See [_Expressions_](expression.md#expressions) chapter for more information and examples on expressions.
 
-**Using data-defined override for labeling**
+### Using data-defined override for labeling
 
 With the data-defined override functions, the settings for the labeling are overridden by entries in the attribute table. You can activate and deactivate the function with the right-mouse button. Hover over the symbol and you see the information about the data-defined override, including the current definition field. We now describe an example using the data-defined override function for the ![](../../images/mActionMoveLabel.png)_Move label_ function.
 
@@ -594,7 +594,7 @@ We will demonstrate an example and overlay on the Alaska boundary layer a text d
 
 Remember that in the _Position_ tab, a ![](../../images/checkbox.png) _Data defined position_ of the diagrams is possible. Here, you can use attributes to define the position of the diagram. You can also set a scale-dependent visibility in the _Appearance_ tab.
 
-The size and the attributes can also be an expression. Use the ![](../../images/mIconExpressionEditorOpen.png) button to add an expression. See [_Expressions_](expression.md#vector-expressions) chapter for more information and example.
+The size and the attributes can also be an expression. Use the ![](../../images/mIconExpressionEditorOpen.png) button to add an expression. See [_Expressions_](expression.md#expressions) chapter for more information and example.
 
 ## Metadata Menu
 

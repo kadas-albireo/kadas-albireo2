@@ -35,7 +35,7 @@ Selezionando un shapefile dalla lista e cliccando **[Apri]** lo carica in KADAS.
 
 Quando aggiungi un vettore alla mappa, gli viene assegnato un colore casuale. Se aggiungi più vettori in una sola volta, ciascuno avrà un colore diverso.
 
-Una volta caricato lo shapefile, puoi interagire con la mappa usando gli strumenti di navigazione. Per cambiare lo stile di un vettore, apri la finestra di dialogo _Proprietà layer_ facendo doppio click sul nome del vettore oppure cliccando con il tasto destro sul nome del vettore e scegliendo _Proprietà_. Vedi la sezione [_Menu Stile_](vector_properties.md#vector-style-menu) per ulteriori informazioni su come impostare la simbologia dei vettori.
+Una volta caricato lo shapefile, puoi interagire con la mappa usando gli strumenti di navigazione. Per cambiare lo stile di un vettore, apri la finestra di dialogo _Proprietà layer_ facendo doppio click sul nome del vettore oppure cliccando con il tasto destro sul nome del vettore e scegliendo _Proprietà_. Vedi la sezione [_Menu Stile_](vector_properties.md#style-menu) per ulteriori informazioni su come impostare la simbologia dei vettori.
 
 ### Ottimizzare le prestazioni per gli shapefile
 
