@@ -150,6 +150,11 @@ bool KadasMilxClientWorker::initialize()
   }
   if ( !mTcpSocket || mTcpSocket->state() != QTcpSocket::ConnectedState )
   {
+    if ( mLastError.isEmpty() )
+    {
+      mLastError = tr( "Could not connect to milxserver at %1:%2 (timed out)" ).arg( addr.toString() ).arg( port );
+    }
+    qWarning() << mLastError;
     if ( mTcpSocket )
       mTcpSocket->abort();
     cleanup();
@@ -223,6 +228,11 @@ bool KadasMilxClientWorker::processRequest( const QByteArray &request, QByteArra
 
     if ( !mLastError.isEmpty() || !mTcpSocket->isValid() )
     {
+      if ( mLastError.isEmpty() )
+      {
+        mLastError = tr( "Connection to milxserver became invalid" );
+      }
+      qWarning() << mLastError;
       return false;
     }
     response += mTcpSocket->readAll();
@@ -240,11 +250,13 @@ bool KadasMilxClientWorker::processRequest( const QByteArray &request, QByteArra
   if ( replycmd == MILX_REPLY_ERROR )
   {
     ostream >> mLastError;
+    qWarning() << QStringLiteral( "milxserver returned an error: %1" ).arg( mLastError );
     return false;
   }
   else if ( replycmd != expectedReply )
   {
     mLastError = tr( "Unexpected reply" );
+    qWarning() << QStringLiteral( "milxserver returned unexpected reply %1 (expected %2)" ).arg( static_cast<int>( replycmd ) ).arg( static_cast<int>( expectedReply ) );
     return false;
   }
   return true;
