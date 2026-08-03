@@ -150,10 +150,7 @@ bool KadasMilxClientWorker::initialize()
   }
   if ( !mTcpSocket || mTcpSocket->state() != QTcpSocket::ConnectedState )
   {
-    if ( mLastError.isEmpty() )
-    {
-      mLastError = tr( "Could not connect to milxserver at %1:%2 (timed out)" ).arg( addr.toString() ).arg( port );
-    }
+    mLastError = tr( "Could not connect to milxserver at %1:%2 (timed out)" ).arg( addr.toString() ).arg( port );
     qWarning() << mLastError;
     if ( mTcpSocket )
       mTcpSocket->abort();
@@ -226,12 +223,9 @@ bool KadasMilxClientWorker::processRequest( const QByteArray &request, QByteArra
       }
     }
 
-    if ( !mLastError.isEmpty() || !mTcpSocket->isValid() )
+    if ( !mTcpSocket->isValid() )
     {
-      if ( mLastError.isEmpty() )
-      {
-        mLastError = tr( "Connection to milxserver became invalid" );
-      }
+      mLastError = tr( "Connection to milxserver became invalid" );
       qWarning() << mLastError;
       return false;
     }
