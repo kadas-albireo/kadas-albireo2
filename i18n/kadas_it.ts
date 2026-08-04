@@ -5161,32 +5161,42 @@ Radius: %2</source>
         <translation>Impossibile determinare la porta del processo</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="196"/>
+        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="153"/>
+        <source>Could not connect to milxserver at %1:%2 (timed out)</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="198"/>
         <source>Connection failed</source>
         <translation>Connessione non riuscita</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="247"/>
+        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="228"/>
+        <source>Connection to milxserver became invalid</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="252"/>
         <source>Unexpected reply</source>
         <translation>Risposta inattesa</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="264"/>
+        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="270"/>
         <source>Connection closed</source>
         <translation>Conessione chiusa</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="267"/>
+        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="273"/>
         <source>Could not find specified host</source>
         <translation>Impossibile trovare il host specificato</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="270"/>
+        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="276"/>
         <source>Connection refused</source>
         <translation>Connessione rifiutata</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="273"/>
+        <location filename="../kadas/gui/milx/kadasmilxclient.cpp" line="279"/>
         <source>An error occured: %1</source>
         <translation>Si è verificato un errore: %1</translation>
     </message>
