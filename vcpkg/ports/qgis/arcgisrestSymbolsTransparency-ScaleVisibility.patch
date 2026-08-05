@@ -1,0 +1,549 @@
+diff --git a/python/PyQt6/core/auto_generated/qgslayerrenderingsettings.sip.in b/python/PyQt6/core/auto_generated/qgslayerrenderingsettings.sip.in
+new file mode 100644
+index 00000000000..998639bb04c
+--- /dev/null
++++ b/python/PyQt6/core/auto_generated/qgslayerrenderingsettings.sip.in
+@@ -0,0 +1,77 @@
++/************************************************************************
++ * This file has been generated automatically from                      *
++ *                                                                      *
++ * src/core/qgslayerrenderingsettings.h                                 *
++ *                                                                      *
++ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
++ ************************************************************************/
++
++
++class QgsLayerRenderingSettings
++{
++%Docstring(signature="appended")
++Stores layer-level rendering settings supplied by data providers.
++
++These settings are intended for layer-wide rendering behavior (such as
++opacity and scale based visibility)
++
++.. versionadded:: 4.4
++%End
++
++%TypeHeaderCode
++#include "qgslayerrenderingsettings.h"
++%End
++  public:
++    void setLayerOpacity( double opacity );
++%Docstring
++Sets layer opacity in the range [0, 1].
++%End
++
++    bool hasLayerOpacity() const;
++%Docstring
++Returns ``True`` if layer opacity is set.
++%End
++
++    double layerOpacity() const;
++%Docstring
++Returns layer opacity in the range [0, 1].
++%End
++
++    void setMinimumScale( double scale );
++%Docstring
++Sets minimum scale denominator for visibility.
++%End
++
++    bool hasMinimumScale() const;
++%Docstring
++Returns ``True`` if minimum scale is set.
++%End
++
++    double minimumScale() const;
++%Docstring
++Returns minimum scale denominator.
++%End
++
++    void setMaximumScale( double scale );
++%Docstring
++Sets maximum scale denominator for visibility.
++%End
++
++    bool hasMaximumScale() const;
++%Docstring
++Returns ``True`` if maximum scale is set.
++%End
++
++    double maximumScale() const;
++%Docstring
++Returns maximum scale denominator.
++%End
++
++};
++/************************************************************************
++ * This file has been generated automatically from                      *
++ *                                                                      *
++ * src/core/qgslayerrenderingsettings.h                                 *
++ *                                                                      *
++ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
++ ************************************************************************/
+diff --git a/python/PyQt6/core/auto_generated/vector/qgsvectordataprovider.sip.in b/python/PyQt6/core/auto_generated/vector/qgsvectordataprovider.sip.in
+index 91ed4763b88..44e570f53f1 100644
+--- a/python/PyQt6/core/auto_generated/vector/qgsvectordataprovider.sip.in
++++ b/python/PyQt6/core/auto_generated/vector/qgsvectordataprovider.sip.in
+@@ -10,6 +10,7 @@
+ 
+ 
+ 
++
+ typedef QHash<int, QString> QgsAttrPalIndexNameHash;
+ 
+ 
+@@ -586,6 +587,7 @@ labeling settings. Other providers will return ``None``.
+ .. versionadded:: 3.6
+ %End
+ 
++
+     static QVariant convertValue( QMetaType::Type type, const QString &value );
+ %Docstring
+ Convert ``value`` to ``type``
+diff --git a/python/PyQt6/core/core_auto.sip b/python/PyQt6/core/core_auto.sip
+index 87d9b375ae3..4c3a62cbce5 100644
+--- a/python/PyQt6/core/core_auto.sip
++++ b/python/PyQt6/core/core_auto.sip
+@@ -92,6 +92,7 @@
+ %Include auto_generated/qgsinterval.sip
+ %Include auto_generated/qgsjsonutils.sip
+ %Include auto_generated/qgslayerdefinition.sip
++%Include auto_generated/qgslayerrenderingsettings.sip
+ %Include auto_generated/qgslayernotesutils.sip
+ %Include auto_generated/qgslegendrenderer.sip
+ %Include auto_generated/qgslegendsettings.sip
+diff --git a/src/core/CMakeLists.txt b/src/core/CMakeLists.txt
+index 0a85466eece..7cffd142ccf 100644
+--- a/src/core/CMakeLists.txt
++++ b/src/core/CMakeLists.txt
+@@ -1268,6 +1268,7 @@ set(QGIS_CORE_HDRS
+   qgsinterval.h
+   qgsjsonutils.h
+   qgslayerdefinition.h
++  qgslayerrenderingsettings.h
+   qgslayernotesutils.h
+   qgslegendrenderer.h
+   qgslegendsettings.h
+diff --git a/src/core/providers/arcgis/qgsarcgisrestutils.cpp b/src/core/providers/arcgis/qgsarcgisrestutils.cpp
+index 3efc1b555cb..bfc4a0fb104 100644
+--- a/src/core/providers/arcgis/qgsarcgisrestutils.cpp
++++ b/src/core/providers/arcgis/qgsarcgisrestutils.cpp
+@@ -826,6 +826,7 @@ void QgsArcGisRestUtils::applyVisualVariables( const QVariantMap &rendererData,
+ std::unique_ptr< QgsFeatureRenderer > QgsArcGisRestUtils::convertRenderer( const QVariantMap &rendererData, QgsSymbolConverterContext &context )
+ {
+   const QString type = rendererData.value( u"type"_s ).toString();
++
+   if ( type == "simple"_L1 )
+   {
+     const QVariantMap symbolProps = rendererData.value( u"symbol"_s ).toMap();
+@@ -884,7 +885,6 @@ std::unique_ptr< QgsFeatureRenderer > QgsArcGisRestUtils::convertRenderer( const
+     {
+       // Apply visual variables (e.g., rotation) to the symbol
+       applyVisualVariables( rendererData, defaultSymbol.get(), context );
+-
+       categoryList.append( QgsRendererCategory( QVariant(), defaultSymbol.release(), rendererData.value( u"defaultLabel"_s ).toString() ) );
+     }
+ 
+@@ -916,10 +916,6 @@ std::unique_ptr< QgsFeatureRenderer > QgsArcGisRestUtils::convertRenderer( const
+     if ( !symbol )
+       return nullptr;
+ 
+-    const double transparency = rendererData.value( u"transparency"_s ).toDouble();
+-    const double opacity = ( 100.0 - transparency ) / 100.0;
+-    symbol->setOpacity( opacity );
+-
+     const QVariantList visualVariablesData = rendererData.value( u"visualVariables"_s ).toList();
+ 
+     for ( const QVariant &visualVariable : visualVariablesData )
+diff --git a/src/core/qgslayerrenderingsettings.h b/src/core/qgslayerrenderingsettings.h
+new file mode 100644
+index 00000000000..af008cc0dae
+--- /dev/null
++++ b/src/core/qgslayerrenderingsettings.h
+@@ -0,0 +1,78 @@
++/***************************************************************************
++  qgslayerrenderingsettings.h
++  --------------------------------------
++  Date                 : July 2026
++  Copyright            : (C) 2026 by Damiano Lombardi
++  Email                : damiano at opengis dot ch
++ ***************************************************************************
++ *                                                                         *
++ *   This program is free software; you can redistribute it and/or modify  *
++ *   it under the terms of the GNU General Public License as published by  *
++ *   the Free Software Foundation; either version 2 of the License, or     *
++ *   (at your option) any later version.                                   *
++ *                                                                         *
++ ***************************************************************************/
++
++
++/**
++ * \ingroup core
++ * \brief Stores layer-level rendering settings supplied by data providers.
++ *
++ * These settings are intended for layer-wide rendering behavior (such as opacity
++ * and scale based visibility)
++ *
++ * \since QGIS 4.4
++ */
++class CORE_EXPORT QgsLayerRenderingSettings
++{
++  public:
++    /**
++     * Sets layer opacity in the range [0, 1].
++     */
++    void setLayerOpacity( double opacity ) { mLayerOpacity = opacity; }
++
++    /**
++     * Returns TRUE if layer opacity is set.
++     */
++    bool hasLayerOpacity() const { return mLayerOpacity.has_value(); }
++
++    /**
++     * Returns layer opacity in the range [0, 1].
++     */
++    double layerOpacity() const { return mLayerOpacity.value_or( 1.0 ); }
++
++    /**
++     * Sets minimum scale denominator for visibility.
++     */
++    void setMinimumScale( double scale ) { mMinimumScale = scale; }
++
++    /**
++     * Returns TRUE if minimum scale is set.
++     */
++    bool hasMinimumScale() const { return mMinimumScale.has_value(); }
++
++    /**
++     * Returns minimum scale denominator.
++     */
++    double minimumScale() const { return mMinimumScale.value_or( 0 ); }
++
++    /**
++     * Sets maximum scale denominator for visibility.
++     */
++    void setMaximumScale( double scale ) { mMaximumScale = scale; }
++
++    /**
++     * Returns TRUE if maximum scale is set.
++     */
++    bool hasMaximumScale() const { return mMaximumScale.has_value(); }
++
++    /**
++     * Returns maximum scale denominator.
++     */
++    double maximumScale() const { return mMaximumScale.value_or( 0 ); }
++
++  private:
++    std::optional<double> mLayerOpacity;
++    std::optional<double> mMinimumScale;
++    std::optional<double> mMaximumScale;
++};
+diff --git a/src/core/vector/qgsvectordataprovider.cpp b/src/core/vector/qgsvectordataprovider.cpp
+index 79a01fb244f..daea99c3590 100644
+--- a/src/core/vector/qgsvectordataprovider.cpp
++++ b/src/core/vector/qgsvectordataprovider.cpp
+@@ -879,6 +879,13 @@ QgsAbstractVectorLayerLabeling *QgsVectorDataProvider::createLabeling( const QVa
+   return nullptr;
+ }
+ 
++const QgsLayerRenderingSettings *QgsVectorDataProvider::renderingSettings( const QVariantMap & ) const
++{
++  QGIS_PROTECT_QOBJECT_THREAD_ACCESS
++
++  return nullptr;
++}
++
+ void QgsVectorDataProvider::pushError( const QString &msg ) const
+ {
+   QGIS_PROTECT_QOBJECT_THREAD_ACCESS
+diff --git a/src/core/vector/qgsvectordataprovider.h b/src/core/vector/qgsvectordataprovider.h
+index 10f7e27b7b8..5feecc55ac4 100644
+--- a/src/core/vector/qgsvectordataprovider.h
++++ b/src/core/vector/qgsvectordataprovider.h
+@@ -17,6 +17,8 @@
+ 
+ class QTextCodec;
+ 
++#include <optional>
++
+ #include "qgis_core.h"
+ 
+ #include <QHash>
+@@ -45,6 +47,7 @@ class QgsTransaction;
+ class QgsFeedback;
+ class QgsFeatureRenderer;
+ class QgsAbstractVectorLayerLabeling;
++class QgsLayerRenderingSettings;
+ 
+ 
+ /**
+@@ -543,6 +546,20 @@ class CORE_EXPORT QgsVectorDataProvider : public QgsDataProvider, public QgsFeat
+      */
+     virtual QgsAbstractVectorLayerLabeling *createLabeling( const QVariantMap &configuration = QVariantMap() ) const SIP_FACTORY;
+ 
++    /**
++     * Returns layer-level rendering settings, using provider backend specific information.
++     *
++     * The \a configuration map can be used to pass provider-specific configuration maps to the provider to
++     * allow customization of the returned settings. Support and format of \a configuration varies by provider.
++     *
++     * When called with an empty \a configuration map the provider's default rendering settings will be returned.
++     *
++     * Providers which do not support this should return nullptr.
++     *
++     * \since QGIS 4.4
++     */
++    virtual const QgsLayerRenderingSettings *renderingSettings( const QVariantMap &configuration = QVariantMap() ) const SIP_SKIP;
++
+     /**
+      * Convert \a value to \a type
+      */
+diff --git a/src/core/vector/qgsvectorlayer.cpp b/src/core/vector/qgsvectorlayer.cpp
+index a25186dc312..b692e79ef78 100644
+--- a/src/core/vector/qgsvectorlayer.cpp
++++ b/src/core/vector/qgsvectorlayer.cpp
+@@ -48,6 +48,7 @@
+ #include "qgsgeometry.h"
+ #include "qgsgeometryoptions.h"
+ #include "qgslayermetadataformatter.h"
++#include "qgslayerrenderingsettings.h"
+ #include "qgslogger.h"
+ #include "qgsmaplayerfactory.h"
+ #include "qgsmaplayerlegend.h"
+@@ -2153,6 +2154,8 @@ void QgsVectorLayer::setDataSourcePrivate( const QString &dataSource, const QStr
+       {
+         defaultLoadedFlag = true;
+         setRenderer( defaultRenderer.release() );
++
++        applyRendererSettings();
+       }
+     }
+ 
+@@ -2228,6 +2231,9 @@ QString QgsVectorLayer::loadDefaultStyle( bool &resultFlag )
+     {
+       resultFlag = true;
+       setRenderer( defaultRenderer.release() );
++
++      applyRendererSettings();
++
+       return QString();
+     }
+   }
+@@ -5362,6 +5368,26 @@ void QgsVectorLayer::clearEditBuffer()
+   mEditBuffer = nullptr;
+ }
+ 
++void QgsVectorLayer::applyRendererSettings()
++{
++  const QgsLayerRenderingSettings *providerRenderingSettings = mDataProvider->renderingSettings();
++
++  if ( !providerRenderingSettings )
++    return;
++
++  if ( providerRenderingSettings->hasLayerOpacity() )
++    setOpacity( providerRenderingSettings->layerOpacity() );
++  if ( providerRenderingSettings->hasMaximumScale() )
++    setMaximumScale( providerRenderingSettings->maximumScale() );
++  if ( providerRenderingSettings->hasMinimumScale() )
++    setMinimumScale( providerRenderingSettings->minimumScale() );
++  if ( providerRenderingSettings->hasMaximumScale() || providerRenderingSettings->hasMinimumScale() )
++    setScaleBasedVisibility(
++      ( providerRenderingSettings->hasMaximumScale() && providerRenderingSettings->maximumScale() != 0 )
++      || ( providerRenderingSettings->hasMinimumScale() && providerRenderingSettings->minimumScale() != 0 )
++    );
++}
++
+ QVariant QgsVectorLayer::aggregate(
+   Qgis::Aggregate aggregate,
+   const QString &fieldOrExpression,
+diff --git a/src/core/vector/qgsvectorlayer.h b/src/core/vector/qgsvectorlayer.h
+index 503087165d9..99548ac663a 100644
+--- a/src/core/vector/qgsvectorlayer.h
++++ b/src/core/vector/qgsvectorlayer.h
+@@ -2932,6 +2932,9 @@ class CORE_EXPORT QgsVectorLayer : public QgsMapLayer,
+     void createEditBuffer();
+     void clearEditBuffer();
+ 
++    //! Apply render settings from data provider
++    void applyRendererSettings();
++
+     QgsConditionalLayerStyles *mConditionalStyles = nullptr;
+     QgsVectorDataProvider *mDataProvider = nullptr;
+     QgsVectorLayerSelectionProperties *mSelectionProperties = nullptr;
+diff --git a/src/providers/arcgisrest/qgsafsprovider.cpp b/src/providers/arcgisrest/qgsafsprovider.cpp
+index f06334f32cf..e1305d548c0 100644
+--- a/src/providers/arcgisrest/qgsafsprovider.cpp
++++ b/src/providers/arcgisrest/qgsafsprovider.cpp
+@@ -337,7 +337,28 @@ QgsAfsProvider::QgsAfsProvider( const QString &uri, const ProviderOptions &optio
+   const QVariant transparency = layerData.value( u"drawingInfo"_s ).toMap().value( u"transparency"_s );
+   if ( transparency.isValid() )
+   {
+-    mRendererDataMap.insert( u"transparency"_s, transparency );
++    bool ok = false;
++    const double transparencyValue = transparency.toDouble( &ok );
++    if ( ok )
++      mRenderingSettings.setLayerOpacity( ( 100.0 - transparencyValue ) / 100.0 );
++  }
++
++  const QVariant minScale = layerData.value( u"minScale"_s );
++  if ( minScale.isValid() )
++  {
++    bool ok = false;
++    const double minScaleValue = minScale.toDouble( &ok );
++    if ( ok )
++      mRenderingSettings.setMinimumScale( minScaleValue );
++  }
++
++  const QVariant maxScale = layerData.value( u"maxScale"_s );
++  if ( maxScale.isValid() )
++  {
++    bool ok = false;
++    const double maxScaleValue = maxScale.toDouble( &ok );
++    if ( ok )
++      mRenderingSettings.setMaximumScale( maxScaleValue );
+   }
+ 
+   mValid = true;
+@@ -797,6 +818,11 @@ QgsAbstractVectorLayerLabeling *QgsAfsProvider::createLabeling( const QVariantMa
+   return QgsArcGisRestUtils::convertLabeling( mLabelingDataList ).release();
+ }
+ 
++const QgsLayerRenderingSettings *QgsAfsProvider::renderingSettings( const QVariantMap & ) const
++{
++  return &mRenderingSettings;
++}
++
+ bool QgsAfsProvider::renderInPreview( const QgsDataProvider::PreviewContext & )
+ {
+   // these servers can be sloooooooow, and unpredictable. The previous preview job may have been fast to render,
+diff --git a/src/providers/arcgisrest/qgsafsprovider.h b/src/providers/arcgisrest/qgsafsprovider.h
+index 554bbb99f69..1fa59fa7403 100644
+--- a/src/providers/arcgisrest/qgsafsprovider.h
++++ b/src/providers/arcgisrest/qgsafsprovider.h
+@@ -26,6 +26,7 @@
+ #include "qgsfields.h"
+ #include "qgshttpheaders.h"
+ #include "qgslayermetadata.h"
++#include "qgslayerrenderingsettings.h"
+ #include "qgsprovidermetadata.h"
+ #include "qgssettings.h"
+ #include "qgssettingsentryimpl.h"
+@@ -90,6 +91,7 @@ class QgsAfsProvider : public QgsVectorDataProvider
+     QString dataComment() const override;
+     QgsFeatureRenderer *createRenderer( const QVariantMap &configuration = QVariantMap() ) const override;
+     QgsAbstractVectorLayerLabeling *createLabeling( const QVariantMap &configuration = QVariantMap() ) const override;
++    const QgsLayerRenderingSettings *renderingSettings( const QVariantMap &configuration = QVariantMap() ) const override;
+     bool renderInPreview( const QgsDataProvider::PreviewContext &context ) override;
+ 
+     static QString providerKey();
+@@ -105,6 +107,7 @@ class QgsAfsProvider : public QgsVectorDataProvider
+     QgsLayerMetadata mLayerMetadata;
+     QVariantMap mRendererDataMap;
+     QVariantList mLabelingDataList;
++    QgsLayerRenderingSettings mRenderingSettings;
+     QgsHttpHeaders mRequestHeaders;
+     bool mServerSupportsCurvedUpdates = false;
+     QString mAdminUrl;
+diff --git a/tests/src/core/testqgsarcgisrestutils.cpp b/tests/src/core/testqgsarcgisrestutils.cpp
+index 23383a29102..c43c2313d91 100644
+--- a/tests/src/core/testqgsarcgisrestutils.cpp
++++ b/tests/src/core/testqgsarcgisrestutils.cpp
+@@ -68,6 +68,7 @@ class TestQgsArcGisRestUtils : public QObject
+     void testParsePictureFillSymbolNullOutline();
+     void testParseRendererSimple();
+     void testParseRendererCategorized();
++    void testRendererTransparency();
+     void testVisualVariableRotationGeographic();
+     void testVisualVariableRotationArithmetic();
+     void testVisualVariableRotationDefaultsToGeographic();
+@@ -733,6 +734,88 @@ void TestQgsArcGisRestUtils::testParseRendererCategorized()
+   QVERIFY( catRenderer->categories().at( 1 ).symbol() );
+ }
+ 
++void TestQgsArcGisRestUtils::testRendererTransparency()
++{
++  // transparency at drawingInfo level is now a layer-level rendering setting,
++  // and should not be baked into individual symbol opacity
++  // simple renderer
++  {
++    const QVariantMap map = jsonStringToMap(
++      "{"
++      "\"type\": \"simple\","
++      "\"symbol\": "
++      "{\"color\":[0,0,128,255],\"size\":15,\"angle\":0,\"xoffset\":0,\"yoffset\":0,\"type\":\"esriSMS\",\"style\":\"esriSMSCircle\",\"outline\":{\"color\":[0,0,128,255],\"width\":1,\"type\":"
++      "\"esriSLS\",\"style\":\"esriSLSSolid\"}},"
++      "\"transparency\": 70"
++      "}"
++    );
++    QgsReadWriteContext rwContext;
++    QgsSymbolConverterContext context( rwContext );
++    const std::unique_ptr<QgsFeatureRenderer> renderer( QgsArcGisRestUtils::convertRenderer( map, context ) );
++    const QgsSingleSymbolRenderer *ssRenderer = dynamic_cast<QgsSingleSymbolRenderer *>( renderer.get() );
++    QVERIFY( ssRenderer );
++    QVERIFY( ssRenderer->symbol() );
++    QCOMPARE( ssRenderer->symbol()->opacity(), 1.0 );
++  }
++
++  // uniqueValue renderer
++  {
++    const QVariantMap map = jsonStringToMap(
++      "{"
++      "\"type\": \"uniqueValue\","
++      "\"field1\": \"TYPE\","
++      "\"uniqueValueInfos\": ["
++      "{"
++      "\"value\": \"A\","
++      "\"symbol\": "
++      "{\"color\":[255,0,0,255],\"size\":8,\"angle\":0,\"xoffset\":0,\"yoffset\":0,\"type\":\"esriSMS\",\"style\":\"esriSMSCircle\",\"outline\":{\"color\":[0,0,0,255],\"width\":1,\"type\":"
++      "\"esriSLS\",\"style\":\"esriSLSSolid\"}},"
++      "\"label\": \"A\""
++      "}"
++      "],"
++      "\"transparency\": 50"
++      "}"
++    );
++    QgsReadWriteContext rwContext;
++    QgsSymbolConverterContext context( rwContext );
++    const std::unique_ptr<QgsFeatureRenderer> renderer( QgsArcGisRestUtils::convertRenderer( map, context ) );
++    const QgsCategorizedSymbolRenderer *catRenderer = dynamic_cast<QgsCategorizedSymbolRenderer *>( renderer.get() );
++    QVERIFY( catRenderer );
++    QCOMPARE( catRenderer->categories().count(), 1 );
++    QVERIFY( catRenderer->categories().at( 0 ).symbol() );
++    QCOMPARE( catRenderer->categories().at( 0 ).symbol()->opacity(), 1.0 );
++  }
++
++  // classBreaks renderer
++  {
++    const QVariantMap map = jsonStringToMap(
++      "{"
++      "\"type\": \"classBreaks\","
++      "\"field\": \"POP\","
++      "\"minValue\": 0,"
++      "\"classBreakInfos\": ["
++      "{"
++      "\"classMaxValue\": 1000,"
++      "\"symbol\": "
++      "{\"color\":[255,0,0,255],\"size\":8,\"angle\":0,\"xoffset\":0,\"yoffset\":0,\"type\":\"esriSMS\",\"style\":\"esriSMSCircle\",\"outline\":{\"color\":[0,0,0,255],\"width\":1,\"type\":"
++      "\"esriSLS\",\"style\":\"esriSLSSolid\"}},"
++      "\"label\": \"< 1000\""
++      "}"
++      "],"
++      "\"transparency\": 25"
++      "}"
++    );
++    QgsReadWriteContext rwContext;
++    QgsSymbolConverterContext context( rwContext );
++    const std::unique_ptr<QgsFeatureRenderer> renderer( QgsArcGisRestUtils::convertRenderer( map, context ) );
++    const QgsGraduatedSymbolRenderer *gradRenderer = dynamic_cast<QgsGraduatedSymbolRenderer *>( renderer.get() );
++    QVERIFY( gradRenderer );
++    QVERIFY( !gradRenderer->ranges().isEmpty() );
++    QVERIFY( gradRenderer->ranges().at( 0 ).symbol() );
++    QCOMPARE( gradRenderer->ranges().at( 0 ).symbol()->opacity(), 1.0 );
++  }
++}
++
+ void TestQgsArcGisRestUtils::testVisualVariableRotationGeographic()
+ {
+   // Geographic rotation: 0° = North, clockwise — maps directly to a field property

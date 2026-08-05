@@ -37,6 +37,7 @@ vcpkg_from_github(
   # elevation controller range locking + raster elevation surface z-range from
   # band statistics
   nestedSpriteExpression.patch # https://github.com/qgis/QGIS/pull/66810
+  arcgisrestSymbolsTransparency-ScaleVisibility.patch # https://github.com/qgis/QGIS/pull/66707
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
