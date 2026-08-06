@@ -7,4 +7,17 @@
                   Arguments="--clearsettings"
                   WorkingDirectory="CM_DP_bin"/>
     </CPackWiXFragment>
+    
+    <CPackWiXFragment Id="CM_CP_bin.kadas.exe">
+        <RegistryKey Root="HKCR" Key="Applications\kadas.exe" ForceDeleteOnUninstall="yes">
+            <RegistryValue Name="FriendlyAppName" Type="string" Value="KADAS Albireo"/>
+            <RegistryKey Key="shell\open\command">
+                <RegistryValue Type="string" Value="&quot;[#CM_FP_bin.kadas.exe]&quot; &quot;%1&quot;"/>
+            </RegistryKey>
+            <RegistryKey Key="SupportedTypes">
+                <RegistryValue Name=".qgz" Type="string" Value=""/>
+                <RegistryValue Name=".qgs" Type="string" Value=""/>
+            </RegistryKey>
+        </RegistryKey>
+    </CPackWiXFragment>
 </CPackWiXPatch>
