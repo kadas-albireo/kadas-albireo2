@@ -34,6 +34,7 @@
 
 #include "kadas/app/kadasapplication.h"
 #include "kadas/app/auth/kadasappauthrequesthandler.h"
+#include "kadas/core/kadasjsonutils.h"
 
 
 const QgsSettingsEntryString *KadasPortalAuth::settingsPortalTokenUrl
@@ -53,6 +54,15 @@ const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2TokenUrl
   = new QgsSettingsEntryString( QStringLiteral( "token-url" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Token URL." ) );
 const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2ClientId
   = new QgsSettingsEntryString( QStringLiteral( "client-id" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Client ID." ) );
+const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2ClientIdUrl(
+  QStringLiteral( "client-id-url" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "URL to retrieve ESRI portal TOKEN from. Used only if client-id settings is empty." )
+);
+const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2ClientIdJsonPath(
+  QStringLiteral( "client-id-json-path" ),
+  KadasPortalAuth::sTreePortalOAuth2,
+  QString(),
+  QStringLiteral( "JSON-Path to find the ClientId inside the file returned by client-id-url. Example: $.features[0].attributes.client_id" )
+);
 const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2ClientSecret
   = new QgsSettingsEntryString( QStringLiteral( "client-secret" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Client Secret." ) );
 
@@ -88,8 +98,19 @@ void KadasPortalAuth::setupAuthentication()
   const QString tokenUrl = settingsPortalTokenUrl->value();
   if ( settingsOAuth2Enabled->value() )
   {
+    QString clientId = settingsOAuth2ClientId->value();
+
+    // ClientId retrival by URL
+    if ( clientId.isEmpty() )
+    {
+      clientId = retrieveOAuthClientId( settingsOAuth2ClientIdUrl->value(), settingsOAuth2ClientIdJsonPath->value() );
+
+      if ( clientId.isEmpty() )
+        return;
+    }
+
     // Authentication via OAuth2
-    createOAuth2Auth( settingsOAuth2RequestUrl->value(), settingsOAuth2TokenUrl->value(), settingsOAuth2ClientId->value(), settingsOAuth2ClientSecret->value() );
+    createOAuth2Auth( settingsOAuth2RequestUrl->value(), settingsOAuth2TokenUrl->value(), clientId, settingsOAuth2ClientSecret->value() );
   }
   else if ( !tokenUrl.isEmpty() )
   {
@@ -103,7 +124,6 @@ void KadasPortalAuth::setupAuthentication()
     QNetworkRequest req = QNetworkRequest( QUrl( tokenUrl ) );
     QgsNetworkReplyContent content = QgsNetworkAccessManager::instance()->blockingGet( req );
 
-    QString token;
     if ( content.error() == QNetworkReply::NoError )
     {
       QJsonParseError err;
@@ -113,7 +133,7 @@ void KadasPortalAuth::setupAuthentication()
         QJsonObject obj = doc.object();
         if ( obj.contains( QStringLiteral( "token" ) ) )
         {
-          token = obj[QStringLiteral( "token" )].toString();
+          QString token = obj[QStringLiteral( "token" )].toString();
           QgsDebugMsgLevel( QString( "ESRI Token found" ), 1 );
           if ( settingsTokenCreateCookies->value() )
           {
@@ -225,4 +245,34 @@ void KadasPortalAuth::createOAuth2Auth( const QString &requestUrl, const QString
   {
     QgsDebugMsgLevel( QString( "Failed to create OAuth2 auth config with id %1" ).arg( ESRI_AUTH_CFG_ID ), 1 );
   }
+}
+
+QString KadasPortalAuth::retrieveOAuthClientId( const QString &clientIdUrl, const QString &clientIdJsonPath )
+{
+  QgsDebugMsgLevel( QStringLiteral( "Extracting OAuth2 ClientId from %1" ).arg( clientIdUrl ), 1 );
+
+  QNetworkRequest req = QNetworkRequest( QUrl( clientIdUrl ) );
+  QgsNetworkReplyContent content = QgsNetworkAccessManager::instance()->blockingGet( req );
+
+  if ( content.error() != QNetworkReply::NoError )
+  {
+    QgsDebugMsgLevel( QString( "error fetching token: %1" ).arg( content.errorString() ), 1 );
+    return;
+  }
+
+  QJsonParseError err;
+  QJsonDocument doc = QJsonDocument::fromJson( content.content(), &err );
+  if ( doc.isNull() )
+  {
+    QgsDebugMsgLevel( QString( "could not parse JSON from response: %1" ).arg( err.errorString() ), 1 );
+    return;
+  }
+
+  // Extract ClientId from JSON
+  const QString clientId = KadasJsonUtils::jsonPathToString( doc, clientIdJsonPath );
+  if ( clientId.isEmpty() )
+  {
+    QgsDebugMsgLevel( QStringLiteral( "could not extract ClientId using JSON path %1" ).arg( clientIdJsonPath ), 1 );
+  }
+  return clientId;
 }
