@@ -44,8 +44,6 @@ inline QString KadasJsonUtils::jsonPathToString( const QJsonValue &value, const 
   QJsonValue current = value;
   int pos = 1;
 
-  auto fail = []() -> QString { return QString(); };
-
   while ( pos < jsonPath.size() )
   {
     const QChar ch = jsonPath.at( pos );
@@ -61,11 +59,11 @@ inline QString KadasJsonUtils::jsonPathToString( const QJsonValue &value, const 
         ++pos;
       }
       if ( pos == keyStart || !current.isObject() )
-        return fail();
+        return QString();
 
       current = current.toObject().value( jsonPath.mid( keyStart, pos - keyStart ) );
       if ( current.isUndefined() )
-        return fail();
+        return QString();
     }
     else if ( ch == QLatin1Char( '[' ) )
     {
@@ -74,23 +72,23 @@ inline QString KadasJsonUtils::jsonPathToString( const QJsonValue &value, const 
       while ( pos < jsonPath.size() && jsonPath.at( pos ).isDigit() )
         ++pos;
       if ( pos == indexStart || pos >= jsonPath.size() || jsonPath.at( pos ) != QLatin1Char( ']' ) || !current.isArray() )
-        return fail();
+        return QString();
 
       bool ok = false;
       const int index = jsonPath.mid( indexStart, pos - indexStart ).toInt( &ok );
       if ( !ok )
-        return fail();
+        return QString();
 
       const QJsonArray array = current.toArray();
       if ( index < 0 || index >= array.size() )
-        return fail();
+        return QString();
 
       current = array.at( index );
       ++pos;
     }
     else
     {
-      return fail();
+      return QString();
     }
   }
 

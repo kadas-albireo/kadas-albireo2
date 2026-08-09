@@ -257,7 +257,7 @@ QString KadasPortalAuth::retrieveOAuthClientId( const QString &clientIdUrl, cons
   if ( content.error() != QNetworkReply::NoError )
   {
     QgsDebugMsgLevel( QString( "error fetching token: %1" ).arg( content.errorString() ), 1 );
-    return;
+    return QString();
   }
 
   QJsonParseError err;
@@ -265,7 +265,7 @@ QString KadasPortalAuth::retrieveOAuthClientId( const QString &clientIdUrl, cons
   if ( doc.isNull() )
   {
     QgsDebugMsgLevel( QString( "could not parse JSON from response: %1" ).arg( err.errorString() ), 1 );
-    return;
+    return QString();
   }
 
   // Extract ClientId from JSON
@@ -273,6 +273,8 @@ QString KadasPortalAuth::retrieveOAuthClientId( const QString &clientIdUrl, cons
   if ( clientId.isEmpty() )
   {
     QgsDebugMsgLevel( QStringLiteral( "could not extract ClientId using JSON path %1" ).arg( clientIdJsonPath ), 1 );
+    return QString();
   }
+
   return clientId;
 }
