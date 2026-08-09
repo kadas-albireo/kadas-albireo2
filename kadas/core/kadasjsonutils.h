@@ -1,9 +1,10 @@
 /***************************************************************************
     kadasjsonutils.h
     ----------------
-    copyright            : (C) 2026 by Damiano Lombardi
-    email                : damiano at opengis dot ch
-***************************************************************************/
+  Date                 : August 2026
+  Copyright            : (C) 2026 by Damiano Lombardi
+  Email                : damiano@opengis.ch
+ ***************************************************************************/
 
 /***************************************************************************
  *                                                                         *
@@ -18,6 +19,7 @@
 #define KADASJSONUTILS_H
 
 #include <QJsonDocument>
+#include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
 #include <QString>
