@@ -54,15 +54,10 @@ const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2TokenUrl
   = new QgsSettingsEntryString( QStringLiteral( "token-url" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Token URL." ) );
 const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2ClientId
   = new QgsSettingsEntryString( QStringLiteral( "client-id" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Client ID." ) );
-const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2ClientIdUrl(
-  QStringLiteral( "client-id-url" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "URL to retrieve ESRI portal TOKEN from. Used only if client-id settings is empty." )
-);
-const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2ClientIdJsonPath(
-  QStringLiteral( "client-id-json-path" ),
-  KadasPortalAuth::sTreePortalOAuth2,
-  QString(),
-  QStringLiteral( "JSON-Path to find the ClientId inside the file returned by client-id-url. Example: $.features[0].attributes.client_id" )
-);
+const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2ClientIdUrl
+  = new QgsSettingsEntryString( QStringLiteral( "client-id-url" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "URL to retrieve ESRI portal TOKEN from. Used only if client-id settings is empty." ) );
+const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2ClientIdJsonPath
+  = new QgsSettingsEntryString( QStringLiteral( "client-id-json-path" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "JSON-Path to find the ClientId inside the file returned by client-id-url. Example: $.features[0].attributes.client_id" ) );
 const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2ClientSecret
   = new QgsSettingsEntryString( QStringLiteral( "client-secret" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Client Secret." ) );
 
