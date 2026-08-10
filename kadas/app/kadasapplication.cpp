@@ -1080,12 +1080,13 @@ void KadasApplication::showLayerFilter( QgsMapLayer *layer )
     return;
 
   // opens specific dialog for filtering layer if available, otherwise shows generic query builder
-  std::unique_ptr<QgsSubsetStringEditorInterface> dialog( QgsGui::subsetStringEditorProviderRegistry()->createDialog( vlayer, mMainWindow ) );
+  QgsSubsetStringEditorInterface *dialog = QgsGui::subsetStringEditorProviderRegistry()->createDialog( vlayer, mMainWindow );
   if ( !dialog )
     return;
 
   dialog->setSubsetString( vlayer->subsetString() );
   dialog->exec();
+  delete dialog;
 }
 
 void KadasApplication::showLayerProperties( QgsMapLayer *layer )
