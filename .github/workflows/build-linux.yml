@@ -83,6 +83,7 @@ jobs:
         env:
           GDAL_PYTHON_BINDINGS_WITHOUT_NUMPY: "Yes"
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          X_VCPKG_ASSET_SOURCES: "x-azurl,https://assetcache.open-vcpkg.org/assetcache,,read"
         run: |
           # Install first only with binarycaching, then run again to build
           # whatever the NuGet cache did not have.
