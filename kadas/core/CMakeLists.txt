@@ -14,6 +14,7 @@ set(kadas_core_HDR
     kadasalgorithms.h
     kadascoordinateformat.h
     kadascoordinateutils.h
+    kadasjsonutils.h
     kadasfileserver.h
     kadaslatlontoutm.h
     kadaspluginlayer.h
