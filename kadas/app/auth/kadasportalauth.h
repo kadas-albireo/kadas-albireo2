@@ -58,6 +58,8 @@ class KadasPortalAuth : public QObject
     void authRequestHandlerBrowserClosed();
 
   private:
+    void setupAuthenticationOAuth2();
+    void setupAuthenticationEsriToken();
     void createCookies( const QString &token );
     void createEsriAuth( const QString &token );
     void createOAuth2Auth( const QString &requestUrl, const QString &tokenUrl, const QString &clientId, const QString &clientSecret );

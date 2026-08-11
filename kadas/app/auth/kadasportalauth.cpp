@@ -90,67 +90,14 @@ KadasPortalAuth::KadasPortalAuth( QObject *parent )
 
 void KadasPortalAuth::setupAuthentication()
 {
-  const QString tokenUrl = settingsPortalTokenUrl->value();
   if ( settingsOAuth2Enabled->value() )
   {
-    QString clientId = settingsOAuth2ClientId->value();
-
-    // ClientId retrival by URL
-    if ( clientId.isEmpty() )
-    {
-      clientId = retrieveOAuthClientId( settingsOAuth2ClientIdUrl->value(), settingsOAuth2ClientIdJsonPath->value() );
-
-      if ( clientId.isEmpty() )
-        return;
-    }
-
-    // Authentication via OAuth2
-    createOAuth2Auth( settingsOAuth2RequestUrl->value(), settingsOAuth2TokenUrl->value(), clientId, settingsOAuth2ClientSecret->value() );
+    setupAuthenticationOAuth2();
+    return;
   }
-  else if ( !tokenUrl.isEmpty() )
+  else if ( !settingsPortalTokenUrl->value().isEmpty() )
   {
-    // Authentication via token. On Windows, Qt's QNetworkAccessManager handles
-    // Negotiate/NTLM transparently via SSPI when speaking HTTP/1.1 (HTTP/2 is
-    // globally disabled via KadasApplication::settingsDisableHttp2 to work
-    // around QTBUG-146829), so the logged-in Windows user's credentials are
-    // used silently without prompting.
-    QgsDebugMsgLevel( QStringLiteral( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
-
-    QNetworkRequest req = QNetworkRequest( QUrl( tokenUrl ) );
-    QgsNetworkReplyContent content = QgsNetworkAccessManager::instance()->blockingGet( req );
-
-    if ( content.error() == QNetworkReply::NoError )
-    {
-      QJsonParseError err;
-      QJsonDocument doc = QJsonDocument::fromJson( content.content(), &err );
-      if ( !doc.isNull() )
-      {
-        QJsonObject obj = doc.object();
-        if ( obj.contains( QStringLiteral( "token" ) ) )
-        {
-          QString token = obj[QStringLiteral( "token" )].toString();
-          QgsDebugMsgLevel( QString( "ESRI Token found" ), 1 );
-          if ( settingsTokenCreateCookies->value() )
-          {
-            // Populate the cookie jar synchronously: the catalog browser starts
-            // issuing requests as soon as the main window is constructed, and a
-            // deferred singleShot would let those first requests go out without
-            // the agstoken cookie.
-            createCookies( token );
-          }
-          if ( settingsTokenUseEsriAuth->value() )
-            createEsriAuth( token );
-        }
-      }
-      else
-      {
-        QgsDebugMsgLevel( QString( "could not read TOKEN from response: %1" ).arg( err.errorString() ), 1 );
-      }
-    }
-    else
-    {
-      QgsDebugMsgLevel( QString( "error fetching token: %1" ).arg( content.errorString() ), 1 );
-    }
+    setupAuthenticationEsriToken();
   }
   else
   {
@@ -166,6 +113,72 @@ void KadasPortalAuth::authRequestHandlerBrowserOpened()
 void KadasPortalAuth::authRequestHandlerBrowserClosed()
 {
   mRequestRunningMessageBox.hide();
+}
+
+void KadasPortalAuth::setupAuthenticationOAuth2()
+{
+  QString clientId = settingsOAuth2ClientId->value();
+
+  // ClientId retrival by URL
+  if ( clientId.isEmpty() )
+  {
+    clientId = retrieveOAuthClientId( settingsOAuth2ClientIdUrl->value(), settingsOAuth2ClientIdJsonPath->value() );
+
+    if ( clientId.isEmpty() )
+      return;
+  }
+
+  // Authentication via OAuth2
+  createOAuth2Auth( settingsOAuth2RequestUrl->value(), settingsOAuth2TokenUrl->value(), clientId, settingsOAuth2ClientSecret->value() );
+}
+
+void KadasPortalAuth::setupAuthenticationEsriToken()
+{
+  const QString tokenUrl = settingsPortalTokenUrl->value();
+
+  // Authentication via token. On Windows, Qt's QNetworkAccessManager handles
+  // Negotiate/NTLM transparently via SSPI when speaking HTTP/1.1 (HTTP/2 is
+  // globally disabled via KadasApplication::settingsDisableHttp2 to work
+  // around QTBUG-146829), so the logged-in Windows user's credentials are
+  // used silently without prompting.
+  QgsDebugMsgLevel( QStringLiteral( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
+
+  QNetworkRequest req = QNetworkRequest( QUrl( tokenUrl ) );
+  QgsNetworkReplyContent content = QgsNetworkAccessManager::instance()->blockingGet( req );
+
+  if ( content.error() != QNetworkReply::NoError )
+  {
+    QgsDebugMsgLevel( QString( "error fetching token: %1" ).arg( content.errorString() ), 1 );
+    return;
+  }
+
+  QJsonParseError err;
+  QJsonDocument doc = QJsonDocument::fromJson( content.content(), &err );
+  if ( doc.isNull() )
+  {
+    QgsDebugMsgLevel( QString( "Could not parse JSON from response: %1" ).arg( err.errorString() ), 1 );
+    return;
+  }
+
+  QJsonObject obj = doc.object();
+  if ( !obj.contains( QStringLiteral( "token" ) ) )
+  {
+    QgsDebugMsgLevel( QString( "Could not read TOKEN from response: %1" ).arg( err.errorString() ), 1 );
+    return;
+  }
+
+  QString token = obj[QStringLiteral( "token" )].toString();
+  QgsDebugMsgLevel( QString( "ESRI Token found" ), 1 );
+  if ( settingsTokenCreateCookies->value() )
+  {
+    // Populate the cookie jar synchronously: the catalog browser starts
+    // issuing requests as soon as the main window is constructed, and a
+    // deferred singleShot would let those first requests go out without
+    // the agstoken cookie.
+    createCookies( token );
+  }
+  if ( settingsTokenUseEsriAuth->value() )
+    createEsriAuth( token );
 }
 
 void KadasPortalAuth::createCookies( const QString &token )
@@ -251,7 +264,7 @@ QString KadasPortalAuth::retrieveOAuthClientId( const QString &clientIdUrl, cons
 
   if ( content.error() != QNetworkReply::NoError )
   {
-    QgsDebugMsgLevel( QString( "error fetching token: %1" ).arg( content.errorString() ), 1 );
+    QgsDebugMsgLevel( QString( "Error fetching token: %1" ).arg( content.errorString() ), 1 );
     return QString();
   }
 
@@ -259,7 +272,7 @@ QString KadasPortalAuth::retrieveOAuthClientId( const QString &clientIdUrl, cons
   QJsonDocument doc = QJsonDocument::fromJson( content.content(), &err );
   if ( doc.isNull() )
   {
-    QgsDebugMsgLevel( QString( "could not parse JSON from response: %1" ).arg( err.errorString() ), 1 );
+    QgsDebugMsgLevel( QString( "Could not parse JSON from response: %1" ).arg( err.errorString() ), 1 );
     return QString();
   }
 
@@ -267,7 +280,7 @@ QString KadasPortalAuth::retrieveOAuthClientId( const QString &clientIdUrl, cons
   const QString clientId = KadasJsonUtils::jsonPathToString( doc, clientIdJsonPath );
   if ( clientId.isEmpty() )
   {
-    QgsDebugMsgLevel( QStringLiteral( "could not extract ClientId using JSON path %1" ).arg( clientIdJsonPath ), 1 );
+    QgsDebugMsgLevel( QStringLiteral( "Could not extract ClientId using JSON path %1" ).arg( clientIdJsonPath ), 1 );
     return QString();
   }
 
