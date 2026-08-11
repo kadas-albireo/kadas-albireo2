@@ -69,7 +69,7 @@ jobs:
           # Also helps to avoid spurious build failures like https://github.com/qgis/QGIS/pull/47098
           cmakeVersion: 3.29.0
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.11'
 
