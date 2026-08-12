@@ -6178,12 +6178,12 @@ Radius: %2</source>
 <context>
     <name>KadasPortalAuth</name>
     <message>
-        <location filename="../kadas/app/auth/kadasportalauth.cpp" line="65"/>
+        <location filename="../kadas/app/auth/kadasportalauth.cpp" line="70"/>
         <source>OAuth2 Authentication</source>
         <translation>OAuth2-Authentifizierung</translation>
     </message>
     <message>
-        <location filename="../kadas/app/auth/kadasportalauth.cpp" line="66"/>
+        <location filename="../kadas/app/auth/kadasportalauth.cpp" line="71"/>
         <source>Your browser has been opened for authentication.
 
 Please complete the authentication in your browser.
