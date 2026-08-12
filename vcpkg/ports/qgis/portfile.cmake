@@ -36,6 +36,7 @@ vcpkg_from_github(
   mounteverest.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1278
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
   reduceLayerPropertiesProviderSection.patch # https://github.com/qgis/QGIS/pull/64123
+  oauth2NoEmptyClientSecret.patch # https://github.com/qgis/QGIS/pull/66777
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
