@@ -26,11 +26,10 @@
 #include <qgis/qgsattributetablemodel.h>
 #include <qgis/qgsdockablewidgethelper.h>
 #include <qgis/qgsexpressionselectiondialog.h>
-#include <memory>
 #include <qgis/qgsgui.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgssubsetstringeditorinterface.h>
-#include <qgis/qgssubsetstringeditorproviderregistry.h
+#include <qgis/qgssubsetstringeditorproviderregistry.h>
 #include <qgis/qgsvectorlayer.h>
 #include <qgis/qgsvectorlayercache.h>
 #include <qgis/qgsvectorlayerselectionmanager.h>

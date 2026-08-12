@@ -68,7 +68,7 @@
 #include <qgis/qgssublayersdialog.h>
 #include <memory>
 #include <qgis/qgssubsetstringeditorinterface.h>
-#include <qgis/qgssubsetstringeditorproviderregistry.h
+#include <qgis/qgssubsetstringeditorproviderregistry.h>
 #include <qgis/qgstaskmanager.h>
 #include <qgis/qgsvectorlayer.h>
 #include <qgis/qgsvectortilelayer.h>
