@@ -1,9 +1,9 @@
 /***************************************************************************
-  kadasportalauth.h
-  -----------------
-  Date                 : January 2026
-  Copyright            : (C) 2026 by Damiano Lombardi
-  Email                : damiano@opengis.ch
+ k adasportalauth.h        *
+ -----------------
+ Date                 : January 2026
+ Copyright            : (C) 2026 by Damiano Lombardi
+ Email                : damiano@opengis.ch
  ***************************************************************************/
 
 /***************************************************************************
@@ -43,6 +43,8 @@ class KadasPortalAuth : public QObject
     static const QgsSettingsEntryString *settingsOAuth2RequestUrl;
     static const QgsSettingsEntryString *settingsOAuth2TokenUrl;
     static const QgsSettingsEntryString *settingsOAuth2ClientId;
+    static const QgsSettingsEntryString *settingsOAuth2ClientIdUrl;
+    static const QgsSettingsEntryString *settingsOAuth2ClientIdJsonPath;
     static const QgsSettingsEntryString *settingsOAuth2ClientSecret;
 
     static const QString ESRI_AUTH_CFG_ID;
@@ -56,9 +58,12 @@ class KadasPortalAuth : public QObject
     void authRequestHandlerBrowserClosed();
 
   private:
+    void setupAuthenticationOAuth2();
+    void setupAuthenticationEsriToken();
     void createCookies( const QString &token );
     void createEsriAuth( const QString &token );
     void createOAuth2Auth( const QString &requestUrl, const QString &tokenUrl, const QString &clientId, const QString &clientSecret );
+    QString retrieveOAuthClientId( const QString &clientIdUrl, const QString &clientIdJsonPath );
 
     QMessageBox mRequestRunningMessageBox;
     KadasAppAuthRequestHandler *mAppAuthRequestHandler;
