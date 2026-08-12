@@ -31,42 +31,42 @@ class KadasAppAuthRequestHandler;
 
 class KadasPortalAuth : public QObject
 {
-  Q_OBJECT
-public:
-  static const QgsSettingsEntryString *settingsPortalTokenUrl;
-  static const QgsSettingsEntryBool *settingsTokenCreateCookies;
-  static const QgsSettingsEntryBool *settingsTokenUseEsriAuth;
-  static const QgsSettingsEntryStringList *settingsPortalCookieUrls;
+    Q_OBJECT
+  public:
+    static const QgsSettingsEntryString *settingsPortalTokenUrl;
+    static const QgsSettingsEntryBool *settingsTokenCreateCookies;
+    static const QgsSettingsEntryBool *settingsTokenUseEsriAuth;
+    static const QgsSettingsEntryStringList *settingsPortalCookieUrls;
 
-  static inline QgsSettingsTreeNode *sTreePortalOAuth2 = KadasSettingsTree::sTreePortal->createChildNode( QStringLiteral( "OAuth2" ) );
-  static const QgsSettingsEntryBool *settingsOAuth2Enabled;
-  static const QgsSettingsEntryString *settingsOAuth2RequestUrl;
-  static const QgsSettingsEntryString *settingsOAuth2TokenUrl;
-  static const QgsSettingsEntryString *settingsOAuth2ClientId;
-  static const QgsSettingsEntryString *settingsOAuth2ClientIdUrl;
-  static const QgsSettingsEntryString *settingsOAuth2ClientIdJsonPath;
-  static const QgsSettingsEntryString *settingsOAuth2ClientSecret;
+    static inline QgsSettingsTreeNode *sTreePortalOAuth2 = KadasSettingsTree::sTreePortal->createChildNode( QStringLiteral( "OAuth2" ) );
+    static const QgsSettingsEntryBool *settingsOAuth2Enabled;
+    static const QgsSettingsEntryString *settingsOAuth2RequestUrl;
+    static const QgsSettingsEntryString *settingsOAuth2TokenUrl;
+    static const QgsSettingsEntryString *settingsOAuth2ClientId;
+    static const QgsSettingsEntryString *settingsOAuth2ClientIdUrl;
+    static const QgsSettingsEntryString *settingsOAuth2ClientIdJsonPath;
+    static const QgsSettingsEntryString *settingsOAuth2ClientSecret;
 
-  static const QString ESRI_AUTH_CFG_ID;
+    static const QString ESRI_AUTH_CFG_ID;
 
-  explicit KadasPortalAuth( QObject *parent = nullptr );
+    explicit KadasPortalAuth( QObject *parent = nullptr );
 
-  void setupAuthentication();
+    void setupAuthentication();
 
-private slots:
-  void authRequestHandlerBrowserOpened();
-  void authRequestHandlerBrowserClosed();
+  private slots:
+    void authRequestHandlerBrowserOpened();
+    void authRequestHandlerBrowserClosed();
 
-private:
-  void setupAuthenticationOAuth2();
-  void setupAuthenticationEsriToken();
-  void createCookies( const QString &token );
-  void createEsriAuth( const QString &token );
-  void createOAuth2Auth( const QString &requestUrl, const QString &tokenUrl, const QString &clientId, const QString &clientSecret );
-  QString retrieveOAuthClientId( const QString &clientIdUrl, const QString &clientIdJsonPath );
+  private:
+    void setupAuthenticationOAuth2();
+    void setupAuthenticationEsriToken();
+    void createCookies( const QString &token );
+    void createEsriAuth( const QString &token );
+    void createOAuth2Auth( const QString &requestUrl, const QString &tokenUrl, const QString &clientId, const QString &clientSecret );
+    QString retrieveOAuthClientId( const QString &clientIdUrl, const QString &clientIdJsonPath );
 
-  QMessageBox mRequestRunningMessageBox;
-  KadasAppAuthRequestHandler *mAppAuthRequestHandler;
+    QMessageBox mRequestRunningMessageBox;
+    KadasAppAuthRequestHandler *mAppAuthRequestHandler;
 };
 
 #endif // KADASPORTALAUTH_H

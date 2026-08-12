@@ -38,43 +38,43 @@
 
 
 const QgsSettingsEntryString *KadasPortalAuth::settingsPortalTokenUrl
-= new QgsSettingsEntryString( QStringLiteral( "token-url" ), KadasSettingsTree::sTreePortal, QString(), QStringLiteral( "URL to retrieve ESRI portal TOKEN from." ) );
+  = new QgsSettingsEntryString( QStringLiteral( "token-url" ), KadasSettingsTree::sTreePortal, QString(), QStringLiteral( "URL to retrieve ESRI portal TOKEN from." ) );
 const QgsSettingsEntryStringList *KadasPortalAuth::settingsPortalCookieUrls
-= new QgsSettingsEntryStringList( QStringLiteral( "cookie-urls" ), KadasSettingsTree::sTreePortal, {}, QStringLiteral( "URLs for which the ERSI portal TOKEN will be set in a cookie." ) );
+  = new QgsSettingsEntryStringList( QStringLiteral( "cookie-urls" ), KadasSettingsTree::sTreePortal, {}, QStringLiteral( "URLs for which the ERSI portal TOKEN will be set in a cookie." ) );
 const QgsSettingsEntryBool *KadasPortalAuth::settingsTokenCreateCookies
-= new QgsSettingsEntryBool( QStringLiteral( "token-create-cookies" ), KadasSettingsTree::sTreePortal, true, QStringLiteral( "Create cookies using the ESRI token." ) );
+  = new QgsSettingsEntryBool( QStringLiteral( "token-create-cookies" ), KadasSettingsTree::sTreePortal, true, QStringLiteral( "Create cookies using the ESRI token." ) );
 const QgsSettingsEntryBool *KadasPortalAuth::settingsTokenUseEsriAuth
-= new QgsSettingsEntryBool( QStringLiteral( "token-use-esri-auth" ), KadasSettingsTree::sTreePortal, true, QStringLiteral( "Create cookies using the ESRI token." ) );
+  = new QgsSettingsEntryBool( QStringLiteral( "token-use-esri-auth" ), KadasSettingsTree::sTreePortal, true, QStringLiteral( "Create cookies using the ESRI token." ) );
 
 const QgsSettingsEntryBool *KadasPortalAuth::settingsOAuth2Enabled
-= new QgsSettingsEntryBool( QStringLiteral( "enabled" ), KadasPortalAuth::sTreePortalOAuth2, false, QStringLiteral( "If enabled use OAuth2 authentication." ) );
+  = new QgsSettingsEntryBool( QStringLiteral( "enabled" ), KadasPortalAuth::sTreePortalOAuth2, false, QStringLiteral( "If enabled use OAuth2 authentication." ) );
 const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2RequestUrl
-= new QgsSettingsEntryString( QStringLiteral( "request-url" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Request URL." ) );
+  = new QgsSettingsEntryString( QStringLiteral( "request-url" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Request URL." ) );
 const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2TokenUrl
-= new QgsSettingsEntryString( QStringLiteral( "token-url" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Token URL." ) );
+  = new QgsSettingsEntryString( QStringLiteral( "token-url" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Token URL." ) );
 const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2ClientId
-= new QgsSettingsEntryString( QStringLiteral( "client-id" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Client ID." ) );
+  = new QgsSettingsEntryString( QStringLiteral( "client-id" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Client ID." ) );
 const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2ClientIdUrl
-= new QgsSettingsEntryString( QStringLiteral( "client-id-url" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "URL to retrieve ESRI portal TOKEN from. Used only if client-id settings is empty." ) );
+  = new QgsSettingsEntryString( QStringLiteral( "client-id-url" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "URL to retrieve ESRI portal TOKEN from. Used only if client-id settings is empty." ) );
 const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2ClientIdJsonPath
-= new QgsSettingsEntryString( QStringLiteral( "client-id-json-path" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "JSON-Path to find the ClientId inside the file returned by client-id-url. Example: $.features[0].attributes.client_id" ) );
+  = new QgsSettingsEntryString( QStringLiteral( "client-id-json-path" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "JSON-Path to find the ClientId inside the file returned by client-id-url. Example: $.features[0].attributes.client_id" ) );
 const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2ClientSecret
-= new QgsSettingsEntryString( QStringLiteral( "client-secret" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Client Secret." ) );
+  = new QgsSettingsEntryString( QStringLiteral( "client-secret" ), KadasPortalAuth::sTreePortalOAuth2, QString(), QStringLiteral( "Client Secret." ) );
 
 const QString KadasPortalAuth::ESRI_AUTH_CFG_ID = QStringLiteral( "kadas_esri_token" );
 
 KadasPortalAuth::KadasPortalAuth( QObject *parent )
-: QObject { parent }
-, mRequestRunningMessageBox(
-  QMessageBox::Icon::Information,
-  tr( "OAuth2 Authentication" ),
-                            tr(
-                              "Your browser has been opened for authentication.\n\n"
-                              "Please complete the authentication in your browser.\n"
-                              "This dialog will close automatically when authentication is complete."
-                            ),
-                            QMessageBox::StandardButton::Cancel
-)
+  : QObject { parent }
+  , mRequestRunningMessageBox(
+      QMessageBox::Icon::Information,
+      tr( "OAuth2 Authentication" ),
+      tr(
+        "Your browser has been opened for authentication.\n\n"
+        "Please complete the authentication in your browser.\n"
+        "This dialog will close automatically when authentication is complete."
+      ),
+      QMessageBox::StandardButton::Cancel
+    )
 {
   mRequestRunningMessageBox.setModal( true );
 
