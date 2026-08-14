@@ -40,6 +40,7 @@
 #include <qgis/qgsdataitem.h>
 #include <qgis/qgsdatumtransformdialog.h>
 #include <qgis/qgsgdalutils.h>
+#include <qgis/qgsgui.h>
 #include <qgis/qgsguiutils.h>
 #include <qgis/qgslayertree.h>
 #include <qgis/qgslayertreemapcanvasbridge.h>
@@ -65,6 +66,9 @@
 #include <qgis/qgssettingsentryimpl.h>
 #include <qgis/qgssettingstreenode.h>
 #include <qgis/qgssublayersdialog.h>
+#include <memory>
+#include <qgis/qgssubsetstringeditorinterface.h>
+#include <qgis/qgssubsetstringeditorproviderregistry.h>
 #include <qgis/qgstaskmanager.h>
 #include <qgis/qgsvectorlayer.h>
 #include <qgis/qgsvectortilelayer.h>
@@ -1068,6 +1072,22 @@ void KadasApplication::showLayerAttributeTable( QgsMapLayer *layer )
       = new KadasAttributeTableDialog( vlayer, mMainWindow->mapCanvas(), mMainWindow->messageBar(), mMainWindow, KadasAttributeTableDialog::settingsAttributeTableLocation->value() );
     table->show();
   }
+}
+
+void KadasApplication::showLayerFilter( QgsMapLayer *layer )
+{
+  QgsVectorLayer *vlayer = qobject_cast<QgsVectorLayer *>( layer );
+  if ( !vlayer )
+    return;
+
+  // opens specific dialog for filtering layer if available, otherwise shows generic query builder
+  QgsSubsetStringEditorInterface *dialog = QgsGui::subsetStringEditorProviderRegistry()->createDialog( vlayer, mMainWindow );
+  if ( !dialog )
+    return;
+
+  dialog->setSubsetString( vlayer->subsetString() );
+  dialog->exec();
+  delete dialog;
 }
 
 void KadasApplication::showLayerProperties( QgsMapLayer *layer )

@@ -26,7 +26,10 @@
 #include <qgis/qgsattributetablemodel.h>
 #include <qgis/qgsdockablewidgethelper.h>
 #include <qgis/qgsexpressionselectiondialog.h>
+#include <qgis/qgsgui.h>
 #include <qgis/qgsmapcanvas.h>
+#include <qgis/qgssubsetstringeditorinterface.h>
+#include <qgis/qgssubsetstringeditorproviderregistry.h>
 #include <qgis/qgsvectorlayer.h>
 #include <qgis/qgsvectorlayercache.h>
 #include <qgis/qgsvectorlayerselectionmanager.h>
@@ -71,6 +74,7 @@ KadasAttributeTableDialog::KadasAttributeTableDialog( QgsVectorLayer *layer, Qgs
   toolbar->addAction( QgsApplication::getThemeIcon( "/mActionDeselectActiveLayer.svg" ), tr( "Deselect all features from the layer" ), this, &KadasAttributeTableDialog::deselectAll );
   toolbar->addAction( QgsApplication::getThemeIcon( "/mActionPanToSelected.svg" ), tr( "Pan map to the selected rows" ), this, &KadasAttributeTableDialog::panToSelected );
   toolbar->addAction( QgsApplication::getThemeIcon( "/mActionZoomToSelected.svg" ), tr( "Zoom map to the selected rows" ), this, &KadasAttributeTableDialog::zoomToSelected );
+  toolbar->addAction( QgsApplication::getThemeIcon( "/mActionFilter2.svg" ), tr( "Filter the layer by attribute value" ), this, &KadasAttributeTableDialog::filterFeatures );
   widget->layout()->addWidget( toolbar );
 
   QgsVectorLayerCache *layerCache = new QgsVectorLayerCache( layer, 10000, this );
@@ -151,6 +155,17 @@ void KadasAttributeTableDialog::selectByExpression()
 void KadasAttributeTableDialog::zoomToSelected()
 {
   mCanvas->zoomToSelected( mFeatureSelectionManager->layer() );
+}
+
+void KadasAttributeTableDialog::filterFeatures()
+{
+  QgsSubsetStringEditorInterface *dialog = QgsGui::subsetStringEditorProviderRegistry()->createDialog( mLayer, this );
+  if ( !dialog )
+    return;
+
+  dialog->setSubsetString( mLayer->subsetString() );
+  dialog->exec();
+  delete dialog;
 }
 
 void KadasAttributeTableDialog::createFromXml( const QDomElement &element, QgsMapCanvas *canvas, QgsMessageBar *messageBar, QMainWindow *parent = nullptr )

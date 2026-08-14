@@ -65,6 +65,7 @@ class KADAS_GUI_EXPORT KadasAttributeTableDialog : public QDockWidget
     void panToSelected();
     void selectAll();
     void selectByExpression();
+    void filterFeatures();
     void zoomToSelected();
 };
 

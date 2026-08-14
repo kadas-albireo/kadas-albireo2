@@ -127,6 +127,7 @@ QMenu *KadasLayerTreeViewMenuProvider::createContextMenu()
       else if ( layer->type() == Qgis::LayerType::Vector )
       {
         menu->addAction( QgsApplication::getThemeIcon( "/mActionOpenTable.svg" ), tr( "&Open Attribute Table" ), this, &KadasLayerTreeViewMenuProvider::showLayerAttributeTable );
+        menu->addAction( QgsApplication::getThemeIcon( "/mActionFilter2.svg" ), tr( "&Filter…" ), this, &KadasLayerTreeViewMenuProvider::showLayerFilter );
       }
       // For gdi layers, also add info icon
       if ( layer->providerType() == "wms" || layer->providerType() == "arcgismapserver" || layer->providerType() == "arcgisfeatureserver" )
@@ -351,6 +352,11 @@ void KadasLayerTreeViewMenuProvider::setLayerLock( bool enabled )
 void KadasLayerTreeViewMenuProvider::showLayerAttributeTable()
 {
   kApp->showLayerAttributeTable( mView->currentLayer() );
+}
+
+void KadasLayerTreeViewMenuProvider::showLayerFilter()
+{
+  kApp->showLayerFilter( mView->currentLayer() );
 }
 
 void KadasLayerTreeViewMenuProvider::showLayerInfo()

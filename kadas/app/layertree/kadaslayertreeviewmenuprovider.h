@@ -41,6 +41,7 @@ class KadasLayerTreeViewMenuProvider : public QObject, public QgsLayerTreeViewMe
     void setLayerUseAsHeightmap( bool enabled );
     void setLayerLock( bool enabled );
     void showLayerAttributeTable();
+    void showLayerFilter();
     void showLayerInfo();
     void showLayerProperties();
 };
