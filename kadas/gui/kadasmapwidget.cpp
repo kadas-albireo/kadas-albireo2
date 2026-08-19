@@ -31,6 +31,7 @@
 #include <qgis/qgssettings.h>
 #include <qgis/qgselevationcontrollerwidget.h>
 #include <qgis/qgselevationutils.h>
+#include <qgis/qgsmathutils.h>
 #include <qgis/qgsrangeslider.h>
 #include <qgis/qgsrasterlayer.h>
 
@@ -226,6 +227,7 @@ void KadasMapWidget::setElevationController()
   if ( !mElevationController )
   {
     mElevationController = new QgsElevationControllerWidget( this );
+    mElevationController->setMapCanvas( mMapCanvas );
     moveElevationControllerLabelsToLeft( mElevationController );
     connect( mElevationController, &QgsElevationControllerWidget::rangeChanged, mMapCanvas, &QgsMapCanvas::setZRange );
     mMapCanvas->addOverlayWidget( mElevationController, Qt::Edge::RightEdge );
@@ -237,8 +239,10 @@ void KadasMapWidget::setElevationController()
   const QgsDoubleRange range = QgsElevationUtils::calculateZRangeForLayers( { layer } );
   if ( !range.isInfinite() && !range.isEmpty() )
   {
-    mElevationController->setRangeLimits( range );
-    mElevationController->setRange( range );
+    // expand to round values, matching what the controller's own limits menu does
+    const QgsDoubleRange rounded = QgsMathUtils::roundedRange( range );
+    mElevationController->setRangeLimits( rounded );
+    mElevationController->setRange( rounded );
   }
 }
 

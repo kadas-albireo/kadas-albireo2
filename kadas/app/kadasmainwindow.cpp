@@ -53,6 +53,7 @@
 #include <qgis/qgsvectortilelayer.h>
 #include <qgis/qgselevationcontrollerwidget.h>
 #include <qgis/qgselevationutils.h>
+#include <qgis/qgsmathutils.h>
 #include <qgis/qgsrasterlayerelevationproperties.h>
 
 #include "external/qgis/app/qgslayertreeviewnonremovableindicator.h"
@@ -1721,6 +1722,7 @@ void KadasMainWindow::setElevationControllerRangeFromHeightmap()
   if ( !mElevationController )
   {
     mElevationController = new QgsElevationControllerWidget( this );
+    mElevationController->setMapCanvas( mMapCanvas );
     KadasMapWidget::moveElevationControllerLabelsToLeft( mElevationController );
     connect( mElevationController, &QgsElevationControllerWidget::rangeChanged, this, &KadasMainWindow::setCanvasZRange );
     mElevationControllerFrame->layout()->addWidget( mElevationController );
@@ -1733,8 +1735,10 @@ void KadasMainWindow::setElevationControllerRangeFromHeightmap()
   const QgsDoubleRange range = QgsElevationUtils::calculateZRangeForLayers( { layer } );
   if ( !range.isInfinite() && !range.isEmpty() )
   {
-    mElevationController->setRangeLimits( range );
-    mElevationController->setRange( range );
+    // expand to round values, matching what the controller's own limits menu does
+    const QgsDoubleRange rounded = QgsMathUtils::roundedRange( range );
+    mElevationController->setRangeLimits( rounded );
+    mElevationController->setRange( rounded );
   }
 }
 
