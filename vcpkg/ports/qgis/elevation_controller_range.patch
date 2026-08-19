@@ -1,5 +1,5 @@
 diff --git a/python/PyQt6/core/auto_additions/qgselevationutils.py b/python/PyQt6/core/auto_additions/qgselevationutils.py
-index 5aeccbad99f..fa6a1ca842f 100644
+index 5aeccbad99f7..fa6a1ca842fb 100644
 --- a/python/PyQt6/core/auto_additions/qgselevationutils.py
 +++ b/python/PyQt6/core/auto_additions/qgselevationutils.py
 @@ -1,6 +1,7 @@
@@ -10,8 +10,20 @@ index 5aeccbad99f..fa6a1ca842f 100644
      QgsElevationUtils.significantZValuesForProject = staticmethod(QgsElevationUtils.significantZValuesForProject)
      QgsElevationUtils.significantZValuesForLayers = staticmethod(QgsElevationUtils.significantZValuesForLayers)
      QgsElevationUtils.canEnableElevationForLayer = staticmethod(QgsElevationUtils.canEnableElevationForLayer)
+diff --git a/python/PyQt6/core/auto_additions/qgsmathutils.py b/python/PyQt6/core/auto_additions/qgsmathutils.py
+index 22fae7e15c6c..ac2f772d857b 100644
+--- a/python/PyQt6/core/auto_additions/qgsmathutils.py
++++ b/python/PyQt6/core/auto_additions/qgsmathutils.py
+@@ -1,5 +1,7 @@
+ # The following has been generated automatically from src/core/qgsmathutils.h
+ try:
+     QgsMathUtils.doubleToRational = staticmethod(QgsMathUtils.doubleToRational)
++    QgsMathUtils.roundingInterval = staticmethod(QgsMathUtils.roundingInterval)
++    QgsMathUtils.roundedRange = staticmethod(QgsMathUtils.roundedRange)
+ except (NameError, AttributeError):
+     pass
 diff --git a/python/PyQt6/core/auto_generated/qgselevationutils.sip.in b/python/PyQt6/core/auto_generated/qgselevationutils.sip.in
-index 8fda20ab57d..e28cdb07efd 100644
+index 8fda20ab57dd..e28cdb07efd7 100644
 --- a/python/PyQt6/core/auto_generated/qgselevationutils.sip.in
 +++ b/python/PyQt6/core/auto_generated/qgselevationutils.sip.in
 @@ -29,6 +29,17 @@ Calculates the elevation range for a ``project``.
@@ -32,128 +44,203 @@ index 8fda20ab57d..e28cdb07efd 100644
  %End
  
      static QList< double > significantZValuesForProject( QgsProject *project );
-diff --git a/python/PyQt6/gui/auto_additions/qgselevationcontrollerwidget.py b/python/PyQt6/gui/auto_additions/qgselevationcontrollerwidget.py
-index 773505c8723..8b879495207 100644
---- a/python/PyQt6/gui/auto_additions/qgselevationcontrollerwidget.py
-+++ b/python/PyQt6/gui/auto_additions/qgselevationcontrollerwidget.py
-@@ -7,6 +7,7 @@ try:
- except (NameError, AttributeError):
-     pass
- try:
-+    QgsElevationControllerSettingsAction.__overridden_methods__ = ['eventFilter']
-     QgsElevationControllerSettingsAction.__group__ = ['elevation']
- except (NameError, AttributeError):
-     pass
-diff --git a/python/PyQt6/gui/auto_generated/elevation/qgselevationcontrollerwidget.sip.in b/python/PyQt6/gui/auto_generated/elevation/qgselevationcontrollerwidget.sip.in
-index d3fbfebee0e..cfb38cbe013 100644
---- a/python/PyQt6/gui/auto_generated/elevation/qgselevationcontrollerwidget.sip.in
-+++ b/python/PyQt6/gui/auto_generated/elevation/qgselevationcontrollerwidget.sip.in
-@@ -22,6 +22,11 @@ class QgsElevationControllerSettingsAction : QWidgetAction
-     QgsElevationControllerSettingsAction( QWidget *parent = 0 );
+diff --git a/python/PyQt6/core/auto_generated/qgsmathutils.sip.in b/python/PyQt6/core/auto_generated/qgsmathutils.sip.in
+index 19c2a28cc3cf..c31194cfbb35 100644
+--- a/python/PyQt6/core/auto_generated/qgsmathutils.sip.in
++++ b/python/PyQt6/core/auto_generated/qgsmathutils.sip.in
+@@ -37,6 +37,32 @@ Converts a double ``value`` to a rational fraction.
  
-     QgsDoubleSpinBox *sizeSpin();
-+    QToolButton *lockButton();
+ :return: - numerator: calculated numerator
+          - denominator: calculated denominator
++%End
 +
-+  protected:
-+    virtual bool eventFilter( QObject *watched, QEvent *event );
++    static double roundingInterval( double span, int divisions = 10 );
++%Docstring
++Returns a round interval, a power of ten, which splits the given
++``span`` into at least ``divisions`` parts. E.g. a span of 2222 returns
++100 for 10 divisions and 10 for 100 divisions.
 +
- 
++Returns 0 if ``span`` is not finite or is not greater than 0, or if
++``divisions`` is lower than 1.
++
++.. versionadded:: 4.4
++%End
++
++    static QgsDoubleRange roundedRange( const QgsDoubleRange &range );
++%Docstring
++Expands a ``range`` outward to round values, e.g. a range of 1234.5 -
++3456.7 is expanded to 1200 - 3500.
++
++The bounds are rounded to a tenth of the order of magnitude of the
++range's size, so that the returned range stays close to the original
++one.
++
++Infinite and empty ranges are returned unchanged.
++
++.. versionadded:: 4.4
+ %End
  };
  
+diff --git a/python/PyQt6/gui/auto_additions/qgselevationcontrollerwidget.py b/python/PyQt6/gui/auto_additions/qgselevationcontrollerwidget.py
+index 773505c87232..c4dad4405af9 100644
+--- a/python/PyQt6/gui/auto_additions/qgselevationcontrollerwidget.py
++++ b/python/PyQt6/gui/auto_additions/qgselevationcontrollerwidget.py
+@@ -6,7 +6,3 @@
+     QgsElevationControllerWidget.__group__ = ['elevation']
+ except (NameError, AttributeError):
+     pass
+-try:
+-    QgsElevationControllerSettingsAction.__group__ = ['elevation']
+-except (NameError, AttributeError):
+-    pass
+diff --git a/python/PyQt6/gui/auto_generated/elevation/qgselevationcontrollerwidget.sip.in b/python/PyQt6/gui/auto_generated/elevation/qgselevationcontrollerwidget.sip.in
+index d3fbfebee0ea..363d45db2732 100644
+--- a/python/PyQt6/gui/auto_generated/elevation/qgselevationcontrollerwidget.sip.in
++++ b/python/PyQt6/gui/auto_generated/elevation/qgselevationcontrollerwidget.sip.in
+@@ -13,17 +13,6 @@
+ 
+ 
+ 
+-class QgsElevationControllerSettingsAction : QWidgetAction
+-{
+-%TypeHeaderCode
+-#include "qgselevationcontrollerwidget.h"
+-%End
+-  public:
+-    QgsElevationControllerSettingsAction( QWidget *parent = 0 );
+-
+-    QgsDoubleSpinBox *sizeSpin();
+-
+-};
+ 
+ 
+ 
+@@ -80,6 +69,15 @@ Returns a reference to the slider component of the widget.
+ %Docstring
+ Returns a reference to the widget's configuration menu, which can be
+ used to add actions to the menu.
++%End
++
++    QgsMapCanvas *mapCanvas() const;
++%Docstring
++Returns the map canvas the widget takes its layers from.
++
++.. seealso:: :py:func:`setMapCanvas`
++
++.. versionadded:: 4.4
+ %End
+ 
+     double fixedRangeSize() const;
+@@ -133,6 +131,19 @@ Sets whether the elevation slider should be inverted.
+     void setSignificantElevations( const QList<double> &elevations );
+ %Docstring
+ Sets a list of significant ``elevations`` to highlight in the widget.
++%End
++
++    void setMapCanvas( QgsMapCanvas *canvas );
++%Docstring
++Sets the map ``canvas`` the widget takes its layers from.
++
++The canvas provides the layer used by the "Current Layer" entry of the
++range limits button, and its layers give the initial limits when the
++project defines no elevation range of its own.
++
++.. seealso:: :py:func:`mapCanvas`
++
++.. versionadded:: 4.4
+ %End
+ 
+   signals:
 diff --git a/src/app/canvas/qgsappcanvasfiltering.cpp b/src/app/canvas/qgsappcanvasfiltering.cpp
-index f11befa4c7d..889be647129 100644
+index f11befa4c7d9..d6fc22e347d4 100644
 --- a/src/app/canvas/qgsappcanvasfiltering.cpp
 +++ b/src/app/canvas/qgsappcanvasfiltering.cpp
-@@ -20,9 +20,13 @@
+@@ -20,9 +20,11 @@
  #include "qgselevationutils.h"
  #include "qgsmapcanvas.h"
  #include "qgsmaplayerelevationproperties.h"
-+#include "qgsmessagebar.h"
 +#include "qgsproject.h"
  #include "qgsprojectelevationproperties.h"
  
- #include <QInputDialog>
+-#include <QInputDialog>
 +#include <QMenu>
 +#include <QPointer>
  
  #include "moc_qgsappcanvasfiltering.cpp"
  
-@@ -56,6 +60,54 @@ void QgsAppCanvasFiltering::createElevationController( QAction *senderAction, Qg
-   QAction *setProjectLimitsAction = new QAction( tr( "Set Elevation Range…" ), controller );
-   controller->menu()->addAction( setProjectLimitsAction );
-   connect( setProjectLimitsAction, &QAction::triggered, QgisApp::instance(), [] { QgisApp::instance()->showProjectProperties( tr( "Elevation" ) ); } );
-+
-+  QMenu *setLimitsFromMenu = new QMenu( tr( "Set Slider Limits From" ), controller->menu() );
-+  controller->menu()->addMenu( setLimitsFromMenu );
-+
-+  QAction *limitsFromProjectRangeAction = setLimitsFromMenu->addAction( tr( "Project Elevation Range" ) );
-+  connect( limitsFromProjectRangeAction, &QAction::triggered, controller, [controller] {
-+    const QgsDoubleRange range = QgsProject::instance()->elevationProperties()->elevationRange();
-+    if ( range.isInfinite() )
-+      return;
-+    controller->setRangeLimits( range );
-+    controller->setRange( range );
-+  } );
-+  // the project elevation range can be defined or cleared at any time, so refresh availability when the menu opens
-+  connect( setLimitsFromMenu, &QMenu::aboutToShow, limitsFromProjectRangeAction, [limitsFromProjectRangeAction] {
-+    limitsFromProjectRangeAction->setEnabled( !QgsProject::instance()->elevationProperties()->elevationRange().isInfinite() );
-+  } );
-+
-+  QAction *limitsFromProjectAction = setLimitsFromMenu->addAction( tr( "Project Layers" ) );
-+  connect( limitsFromProjectAction, &QAction::triggered, controller, [controller] {
-+    const QgsDoubleRange range = QgsElevationUtils::calculateZRangeForProject( QgsProject::instance() );
-+    if ( range.isInfinite() || range.isEmpty() )
-+    {
-+      QgisApp::instance()->messageBar()->pushWarning( tr( "Elevation Range" ), tr( "Could not determine an elevation range from the project layers." ) );
-+      return;
-+    }
-+    controller->setRangeLimits( range );
-+    controller->setRange( range );
-+  } );
-+
-+  QPointer<QgsMapCanvas> canvasPointer( canvas );
-+  QAction *limitsFromVisibleAction = setLimitsFromMenu->addAction( tr( "Visible Layers" ) );
-+  connect( limitsFromVisibleAction, &QAction::triggered, controller, [controller, canvasPointer] {
-+    if ( !canvasPointer )
-+      return;
-+    const QgsDoubleRange range = QgsElevationUtils::calculateZRangeForLayers( canvasPointer->layers( true ) );
-+    if ( range.isInfinite() || range.isEmpty() )
-+    {
-+      QgisApp::instance()->messageBar()->pushWarning( tr( "Elevation Range" ), tr( "Could not determine an elevation range from the visible layers." ) );
-+      return;
-+    }
-+    controller->setRangeLimits( range );
-+    controller->setRange( range );
-+  } );
-+
-+  QAction *saveRangeAction = new QAction( tr( "Save Current Range to Project" ), controller );
-+  controller->menu()->addAction( saveRangeAction );
-+  connect( saveRangeAction, &QAction::triggered, controller, [controller] { QgsProject::instance()->elevationProperties()->setElevationRange( controller->rangeLimits() ); } );
+@@ -53,9 +55,8 @@ void QgsAppCanvasFiltering::createElevationController( QAction *senderAction, Qg
+ {
+   QgsElevationControllerWidget *controller = new QgsElevationControllerWidget();
+ 
+-  QAction *setProjectLimitsAction = new QAction( tr( "Set Elevation Range…" ), controller );
+-  controller->menu()->addAction( setProjectLimitsAction );
+-  connect( setProjectLimitsAction, &QAction::triggered, QgisApp::instance(), [] { QgisApp::instance()->showProjectProperties( tr( "Elevation" ) ); } );
++  controller->menu()->addSeparator();
 +
    QAction *disableAction = new QAction( tr( "Disable Elevation Filter" ), controller );
    controller->menu()->addAction( disableAction );
    connect( disableAction, &QAction::triggered, senderAction, [senderAction] { senderAction->setChecked( false ); } );
-@@ -94,6 +146,18 @@ QgsCanvasElevationControllerBridge::QgsCanvasElevationControllerBridge( QgsEleva
+@@ -94,6 +95,8 @@ QgsCanvasElevationControllerBridge::QgsCanvasElevationControllerBridge( QgsEleva
  
    connect( mCanvas, &QgsMapCanvas::layersChanged, this, &QgsCanvasElevationControllerBridge::canvasLayersChanged );
  
-+  // if the project doesn't define an explicit elevation range, initialize the controller
-+  // limits using the range calculated from the canvas layers so the slider is immediately usable
-+  if ( QgsProject::instance()->elevationProperties()->elevationRange().isInfinite() )
-+  {
-+    const QgsDoubleRange layerRange = QgsElevationUtils::calculateZRangeForLayers( mCanvas->layers( true ) );
-+    if ( !layerRange.isInfinite() && !layerRange.isEmpty() )
-+    {
-+      mController->setRangeLimits( layerRange );
-+      mController->setRange( layerRange );
-+    }
-+  }
++  mController->setMapCanvas( mCanvas );
 +
    canvasLayersChanged();
  }
  
+@@ -103,7 +106,7 @@ void QgsCanvasElevationControllerBridge::canvasLayersChanged()
+     return;
+ 
+   // disconnect from old layers
+-  for ( QgsMapLayer *layer : std::as_const( mCanvasLayers ) )
++  for ( QgsMapLayer *layer : std::as_const( mElevationLayers ) )
+   {
+     if ( layer )
+     {
+@@ -112,12 +115,17 @@ void QgsCanvasElevationControllerBridge::canvasLayersChanged()
+   }
+ 
+   // and connect to new
++  QList<QgsMapLayer *> elevationLayers;
+   const QList<QgsMapLayer *> layers = mCanvas->layers( true );
+   for ( QgsMapLayer *layer : layers )
+   {
++    if ( !layer->elevationProperties() )
++      continue;
++
+     connect( layer->elevationProperties(), &QgsMapLayerElevationProperties::changed, this, &QgsCanvasElevationControllerBridge::updateSignificantElevations );
++    elevationLayers << layer;
+   }
+-  mCanvasLayers = _qgis_listRawToQPointer( layers );
++  mElevationLayers = _qgis_listRawToQPointer( elevationLayers );
+ 
+   updateSignificantElevations();
+ }
+@@ -127,7 +135,7 @@ void QgsCanvasElevationControllerBridge::updateSignificantElevations()
+   if ( !mCanvas )
+     return;
+ 
+-  mController->setSignificantElevations( QgsElevationUtils::significantZValuesForLayers( _qgis_listQPointerToRaw( mCanvasLayers ) ) );
++  mController->setSignificantElevations( QgsElevationUtils::significantZValuesForLayers( _qgis_listQPointerToRaw( mElevationLayers ) ) );
+ }
+ 
+ void QgsCanvasElevationControllerBridge::controllerZRangeChanged( const QgsDoubleRange & )
+diff --git a/src/app/canvas/qgsappcanvasfiltering.h b/src/app/canvas/qgsappcanvasfiltering.h
+index 1b39669faeec..07f41bbf494b 100644
+--- a/src/app/canvas/qgsappcanvasfiltering.h
++++ b/src/app/canvas/qgsappcanvasfiltering.h
+@@ -45,7 +45,7 @@ class QgsCanvasElevationControllerBridge : public QObject
+     QTimer *mUpdateCanvasTimer = nullptr;
+     QgsElevationControllerWidget *mController = nullptr;
+     QPointer<QgsMapCanvas> mCanvas;
+-    QgsWeakMapLayerPointerList mCanvasLayers;
++    QgsWeakMapLayerPointerList mElevationLayers;
+ };
+ 
+ class QgsAppCanvasFiltering : public QObject
 diff --git a/src/core/qgselevationutils.cpp b/src/core/qgselevationutils.cpp
-index b1c00eb1cc3..f55e3faccde 100644
+index b1c00eb1cc30..f55e3faccdec 100644
 --- a/src/core/qgselevationutils.cpp
 +++ b/src/core/qgselevationutils.cpp
 @@ -22,15 +22,24 @@
@@ -186,7 +273,7 @@ index b1c00eb1cc3..f55e3faccde 100644
        continue;
  
 diff --git a/src/core/qgselevationutils.h b/src/core/qgselevationutils.h
-index f18bab79a46..4611615fff4 100644
+index f18bab79a463..4611615fff49 100644
 --- a/src/core/qgselevationutils.h
 +++ b/src/core/qgselevationutils.h
 @@ -40,6 +40,16 @@ class CORE_EXPORT QgsElevationUtils
@@ -206,8 +293,94 @@ index f18bab79a46..4611615fff4 100644
      /**
       * Returns a list of significant elevation/z-values for the specified \a project, using
       * the values from layers contained by the project.
+diff --git a/src/core/qgsmathutils.cpp b/src/core/qgsmathutils.cpp
+index 981c5b4e0f25..d3144d46e66d 100644
+--- a/src/core/qgsmathutils.cpp
++++ b/src/core/qgsmathutils.cpp
+@@ -16,6 +16,8 @@
+ 
+ #include "qgsmathutils.h"
+ 
++#include <cmath>
++
+ #include "qgis.h"
+ 
+ #include "moc_qgsmathutils.cpp"
+@@ -86,3 +88,30 @@ void QgsMathUtils::doubleToRational( double value, qlonglong &numerator, qlonglo
+   numerator = sign * currentAConvergent;
+   denominator = currentBConvergent;
+ }
++
++double QgsMathUtils::roundingInterval( double span, int divisions )
++{
++  if ( !std::isfinite( span ) || span <= 0 || divisions < 1 )
++    return 0;
++
++  return std::pow( 10.0, std::floor( std::log10( span / divisions ) ) );
++}
++
++QgsDoubleRange QgsMathUtils::roundedRange( const QgsDoubleRange &range )
++{
++  const double interval = roundingInterval( range.upper() - range.lower() );
++  if ( interval <= 0 )
++    return range;
++
++  double lower = std::floor( range.lower() / interval ) * interval;
++  double upper = std::ceil( range.upper() / interval ) * interval;
++
++  const int decimals = -static_cast<int>( std::floor( std::log10( interval ) ) );
++  if ( decimals > 0 )
++  {
++    // strip the noise the multiplication above leaves in fractional values
++    lower = qgsRound( lower, decimals );
++    upper = qgsRound( upper, decimals );
++  }
++  return QgsDoubleRange( lower, upper );
++}
+diff --git a/src/core/qgsmathutils.h b/src/core/qgsmathutils.h
+index 77eb2a4bc322..4af69561be6a 100644
+--- a/src/core/qgsmathutils.h
++++ b/src/core/qgsmathutils.h
+@@ -15,6 +15,7 @@
+ 
+ #include "qgis_core.h"
+ #include "qgis_sip.h"
++#include "qgsrange.h"
+ 
+ #include <QObject>
+ 
+@@ -41,6 +42,29 @@ class CORE_EXPORT QgsMathUtils
+      * \param maxIterations maximum number of iterations. Higher values result in better approximations, but at the cost of additional computation.
+      */
+     Q_INVOKABLE static void doubleToRational( double value, qlonglong &numerator SIP_OUT, qlonglong &denominator SIP_OUT, double tolerance = 1.0e-9, int maxIterations = 100 );
++
++    /**
++     * Returns a round interval, a power of ten, which splits the given \a span into at least
++     * \a divisions parts. E.g. a span of 2222 returns 100 for 10 divisions and 10 for 100 divisions.
++     *
++     * Returns 0 if \a span is not finite or is not greater than 0, or if \a divisions is lower than 1.
++     *
++     * \since QGIS 4.4
++     */
++    static double roundingInterval( double span, int divisions = 10 );
++
++    /**
++     * Expands a \a range outward to round values, e.g. a range of 1234.5 - 3456.7 is expanded
++     * to 1200 - 3500.
++     *
++     * The bounds are rounded to a tenth of the order of magnitude of the range's size, so that
++     * the returned range stays close to the original one.
++     *
++     * Infinite and empty ranges are returned unchanged.
++     *
++     * \since QGIS 4.4
++     */
++    static QgsDoubleRange roundedRange( const QgsDoubleRange &range );
+ };
+ 
+ #endif // QGSMATHUTILS_H
 diff --git a/src/core/raster/qgsrasterlayerelevationproperties.cpp b/src/core/raster/qgsrasterlayerelevationproperties.cpp
-index c9b9666bb61..b6f310ff641 100644
+index c9b9666bb614..b6f310ff6414 100644
 --- a/src/core/raster/qgsrasterlayerelevationproperties.cpp
 +++ b/src/core/raster/qgsrasterlayerelevationproperties.cpp
 @@ -357,8 +357,24 @@ QgsDoubleRange QgsRasterLayerElevationProperties::calculateZRange( QgsMapLayer *
@@ -237,85 +410,335 @@ index c9b9666bb61..b6f310ff641 100644
    BUILTIN_UNREACHABLE
  }
 diff --git a/src/gui/elevation/qgselevationcontrollerwidget.cpp b/src/gui/elevation/qgselevationcontrollerwidget.cpp
-index f9e022e41e1..68180306285 100644
+index f9e022e41e11..f89d33bb6a51 100644
 --- a/src/gui/elevation/qgselevationcontrollerwidget.cpp
 +++ b/src/gui/elevation/qgselevationcontrollerwidget.cpp
-@@ -26,6 +26,7 @@
+@@ -19,13 +19,20 @@
  
+ #include "qgsapplication.h"
+ #include "qgsdoublespinbox.h"
++#include "qgselevationutils.h"
++#include "qgsmapcanvas.h"
++#include "qgsmaplayer.h"
++#include "qgsmaplayerelevationproperties.h"
++#include "qgsmathutils.h"
+ #include "qgsproject.h"
+ #include "qgsprojectelevationproperties.h"
+ #include "qgsrange.h"
+ #include "qgsrangeslider.h"
+ 
++#include <QCheckBox>
  #include <QEvent>
  #include <QHBoxLayout>
 +#include <QKeyEvent>
  #include <QLabel>
  #include <QMenu>
  #include <QMouseEvent>
-@@ -61,8 +62,24 @@ QgsElevationControllerWidget::QgsElevationControllerWidget( QWidget *parent )
-   mInvertDirectionAction->setCheckable( true );
-   mMenu->addAction( mInvertDirectionAction );
+@@ -57,14 +64,45 @@ QgsElevationControllerWidget::QgsElevationControllerWidget( QWidget *parent )
+ 
+   mSettingsAction = new QgsElevationControllerSettingsAction( mMenu );
+   mMenu->addAction( mSettingsAction );
+-  mInvertDirectionAction = new QAction( tr( "Invert Direction" ), this );
+-  mInvertDirectionAction->setCheckable( true );
+-  mMenu->addAction( mInvertDirectionAction );
  
 -  mSettingsAction->sizeSpin()->clear();
 -  connect( mSettingsAction->sizeSpin(), qOverload<double>( &QgsDoubleSpinBox::valueChanged ), this, [this]( double size ) { setFixedRangeSize( size < 0 ? -1 : size ); } );
-+  connect( mSettingsAction->sizeSpin(), qOverload<double>( &QgsDoubleSpinBox::valueChanged ), this, [this]( double size ) {
-+    if ( mSettingsAction->sizeSpin()->isCleared() )
-+    {
-+      setFixedRangeSize( -1 );
-+      setRange( rangeLimits() );
-+      whileBlocking( mSettingsAction->sizeSpin() )->setValue( rangeLimits().upper() - rangeLimits().lower() );
-+    }
-+    else if ( mSettingsAction->lockButton()->isChecked() )
-+    {
-+      setFixedRangeSize( size );
-+    }
-+  } );
-+  connect( mSettingsAction->lockButton(), &QToolButton::toggled, this, [this]( bool locked ) {
-+    if ( locked )
-+      setFixedRangeSize( mSettingsAction->sizeSpin()->value() );
-+    else
-+      setFixedRangeSize( -1 );
-+  } );
++  QMenu *limitsMenu = mSettingsAction->limitsMenu();
  
-   mMenu->addSeparator();
- 
-@@ -100,6 +117,14 @@ QgsElevationControllerWidget::QgsElevationControllerWidget( QWidget *parent )
-     mSliderLabels->setRange( range() );
-   } );
- 
-+  connect( mMenu, &QMenu::aboutToShow, this, [this]() {
-+    if ( !mSettingsAction->lockButton()->isChecked() )
-+    {
-+      const QSignalBlocker blocker( mSettingsAction->sizeSpin() );
-+      mSettingsAction->sizeSpin()->setValue( range().upper() - range().lower() );
-+    }
+-  mMenu->addSeparator();
++  QAction *limitsFromProjectRangeAction = limitsMenu->addAction( tr( "Project Elevation Range" ) );
++  connect( limitsFromProjectRangeAction, &QAction::triggered, this, [this] {
++    const QgsDoubleRange range = QgsProject::instance()->elevationProperties()->elevationRange();
++    if ( range.isInfinite() )
++      return;
++
++    // an explicitly configured range is applied as it is
++    setRangeLimits( range );
++    setRange( range );
 +  } );
 +
-   connect( mInvertDirectionAction, &QAction::toggled, this, [this]() {
-     mSlider->setFlippedDirection( !mInvertDirectionAction->isChecked() );
-     mSliderLabels->setInverted( mInvertDirectionAction->isChecked() );
-@@ -233,8 +258,17 @@ void QgsElevationControllerWidget::setFixedRangeSize( double size )
++  QAction *limitsFromProjectLayersAction = limitsMenu->addAction( tr( "Project Layers" ) );
++  connect( limitsFromProjectLayersAction, &QAction::triggered, this, [this] { setLimitsFromRange( QgsElevationUtils::calculateZRangeForProject( QgsProject::instance() ) ); } );
++
++  QAction *limitsFromCurrentLayerAction = limitsMenu->addAction( tr( "Current Layer" ) );
++  connect( limitsFromCurrentLayerAction, &QAction::triggered, this, [this] {
++    if ( mMapCanvas )
++      setLimitsFromRange( QgsElevationUtils::calculateZRangeForLayers( { mMapCanvas->currentLayer() } ) );
++  } );
++
++  // the project and the current layer change at any time, so refresh availability when the menu opens
++  connect( limitsMenu, &QMenu::aboutToShow, this, [this, limitsFromProjectRangeAction, limitsFromProjectLayersAction, limitsFromCurrentLayerAction] {
++    limitsFromProjectRangeAction->setEnabled( !QgsProject::instance()->elevationProperties()->elevationRange().isInfinite() );
++
++    const QMap<QString, QgsMapLayer *> projectLayers = QgsProject::instance()->mapLayers();
++    limitsFromProjectLayersAction->setEnabled( std::any_of( projectLayers.begin(), projectLayers.end(), []( QgsMapLayer *layer ) { return layerHasElevation( layer ); } ) );
++
++    limitsFromCurrentLayerAction->setEnabled( mMapCanvas && layerHasElevation( mMapCanvas->currentLayer() ) );
++  } );
++
++  connect( mSettingsAction, &QgsElevationControllerSettingsAction::limitsChanged, this, &QgsElevationControllerWidget::setRangeLimits );
++  connect( mSettingsAction, &QgsElevationControllerSettingsAction::fixedRangeSizeChanged, this, &QgsElevationControllerWidget::setFixedRangeSize );
++  connect( mSettingsAction, &QgsElevationControllerSettingsAction::fullRangeRequested, this, [this] {
++    setRange( rangeLimits() );
++    mSettingsAction->updateRangeSize( rangeLimits().upper() - rangeLimits().lower() );
++  } );
+ 
+   mSlider = new QgsRangeSlider( Qt::Vertical );
+   mSlider->setFlippedDirection( true );
+@@ -96,15 +134,31 @@ QgsElevationControllerWidget::QgsElevationControllerWidget( QWidget *parent )
+     if ( mBlockSliderChanges )
+       return;
+ 
+-    emit rangeChanged( range() );
+-    mSliderLabels->setRange( range() );
++    const QgsDoubleRange snapped = snappedRange( range() );
++
++    // move the handles onto the snapped values
++    mBlockSliderChanges++;
++    mSlider->setRange( static_cast<int>( std::floor( snapped.lower() * mSliderPrecision ) ), static_cast<int>( std::ceil( snapped.upper() * mSliderPrecision ) ) );
++    mBlockSliderChanges--;
++
++    if ( snapped == mCurrentRange )
++      return;
++
++    mCurrentRange = snapped;
++    emit rangeChanged( mCurrentRange );
++    mSliderLabels->setRange( mCurrentRange );
++  } );
++
++  connect( mMenu, &QMenu::aboutToShow, this, [this]() {
++    mSettingsAction->setLimits( mRangeLimits );
++    mSettingsAction->updateRangeSize( range().upper() - range().lower() );
+   } );
+ 
+-  connect( mInvertDirectionAction, &QAction::toggled, this, [this]() {
+-    mSlider->setFlippedDirection( !mInvertDirectionAction->isChecked() );
+-    mSliderLabels->setInverted( mInvertDirectionAction->isChecked() );
++  connect( mSettingsAction, &QgsElevationControllerSettingsAction::invertedChanged, this, [this]( bool inverted ) {
++    mSlider->setFlippedDirection( !inverted );
++    mSliderLabels->setInverted( inverted );
+ 
+-    emit invertedChanged( mInvertDirectionAction->isChecked() );
++    emit invertedChanged( inverted );
+   } );
+ 
+   // default initial value to full range
+@@ -157,6 +211,36 @@ QMenu *QgsElevationControllerWidget::menu()
+   return mMenu;
+ }
+ 
++QgsMapCanvas *QgsElevationControllerWidget::mapCanvas() const
++{
++  return mMapCanvas;
++}
++
++void QgsElevationControllerWidget::setMapCanvas( QgsMapCanvas *canvas )
++{
++  mMapCanvas = canvas;
++
++  // a project which defines no elevation range of its own leaves the widget with a guessed
++  // range, the canvas layers give a usable one instead
++  if ( mMapCanvas && QgsProject::instance()->elevationProperties()->elevationRange().isInfinite() )
++    setLimitsFromRange( QgsElevationUtils::calculateZRangeForLayers( mMapCanvas->layers( true ) ) );
++}
++
++bool QgsElevationControllerWidget::layerHasElevation( QgsMapLayer *layer )
++{
++  return layer && layer->elevationProperties() && layer->elevationProperties()->hasElevation();
++}
++
++void QgsElevationControllerWidget::setLimitsFromRange( const QgsDoubleRange &range )
++{
++  if ( range.isInfinite() || range.isEmpty() )
++    return;
++
++  const QgsDoubleRange rounded = QgsMathUtils::roundedRange( range );
++  setRangeLimits( rounded );
++  setRange( rounded );
++}
++
+ void QgsElevationControllerWidget::setRange( const QgsDoubleRange &range )
+ {
+   if ( range == mCurrentRange )
+@@ -173,31 +257,97 @@ void QgsElevationControllerWidget::setRange( const QgsDoubleRange &range )
+ 
+ void QgsElevationControllerWidget::setRangeLimits( const QgsDoubleRange &limits )
+ {
+-  if ( limits.isInfinite() )
++  if ( limits.isInfinite() || limits.upper() <= limits.lower() )
+     return;
+ 
+   mRangeLimits = limits;
++  mSettingsAction->setLimits( mRangeLimits );
+ 
+   const double limitRange = limits.upper() - limits.lower();
+ 
+   // pick a reasonable slider precision, given that the slider operates in integer values only
+   mSliderPrecision = std::max( 1000, mSlider->height() ) / limitRange;
+ 
++  // snap the slider to a tenth of the interval used to round elevation ranges, so that dragging
++  // stays smooth while still selecting round values
++  mSnapInterval = QgsMathUtils::roundingInterval( limitRange, 100 );
++  mSnapDecimals = mSnapInterval > 0 ? std::max( 0, -static_cast<int>( std::floor( std::log10( mSnapInterval ) ) ) ) : 0;
++
+   mBlockSliderChanges = true;
+   mSlider->setRangeLimits( static_cast<int>( std::floor( limits.lower() * mSliderPrecision ) ), static_cast<int>( std::ceil( limits.upper() * mSliderPrecision ) ) );
+ 
++  // the slider holds the fixed size in its own integer units, which the new precision changed
++  if ( mFixedRangeSize >= 0 )
++    mSlider->setFixedRangeSize( static_cast<int>( std::round( mFixedRangeSize * mSliderPrecision ) ) );
++
+   // clip current range to fit limits
+-  const double newCurrentLower = std::max( mCurrentRange.lower(), limits.lower() );
+-  const double newCurrentUpper = std::min( mCurrentRange.upper(), limits.upper() );
++  double newCurrentLower = std::max( mCurrentRange.lower(), limits.lower() );
++  double newCurrentUpper = std::min( mCurrentRange.upper(), limits.upper() );
++  if ( mFixedRangeSize >= 0 )
++  {
++    // a locked size is kept, the range moves inside the new limits instead of being clipped
++    newCurrentUpper = std::min( newCurrentLower + mFixedRangeSize, limits.upper() );
++    newCurrentLower = std::max( newCurrentUpper - mFixedRangeSize, limits.lower() );
++  }
+   const bool rangeHasChanged = newCurrentLower != mCurrentRange.lower() || newCurrentUpper != mCurrentRange.upper();
+ 
+   mSlider->setRange( static_cast<int>( std::floor( newCurrentLower * mSliderPrecision ) ), static_cast<int>( std::ceil( newCurrentUpper * mSliderPrecision ) ) );
+   mCurrentRange = QgsDoubleRange( newCurrentLower, newCurrentUpper );
+   mBlockSliderChanges = false;
+   if ( rangeHasChanged )
++  {
+     emit rangeChanged( mCurrentRange );
+ 
++    // the selected range was clipped by the new limits, so the range size shown in the menu is stale
++    mSettingsAction->updateRangeSize( mCurrentRange.upper() - mCurrentRange.lower() );
++  }
++
+   mSliderLabels->setLimits( mRangeLimits );
++  mSliderLabels->setRange( mCurrentRange );
++}
++
++QgsDoubleRange QgsElevationControllerWidget::snappedRange( const QgsDoubleRange &range ) const
++{
++  if ( mSnapInterval <= 0 )
++    return range;
++
++  double lower = snapValue( range.lower() );
++  double upper;
++  if ( mFixedRangeSize >= 0 )
++  {
++    // snapping must not alter the locked range size
++    upper = lower + mFixedRangeSize;
++    if ( upper > mRangeLimits.upper() )
++    {
++      upper = mRangeLimits.upper();
++      lower = upper - mFixedRangeSize;
++    }
++  }
++  else
++  {
++    upper = std::max( snapValue( range.upper() ), lower );
++  }
++
++  return QgsDoubleRange( lower, upper );
++}
++
++double QgsElevationControllerWidget::snapValue( double value ) const
++{
++  double snapped = std::round( value / mSnapInterval ) * mSnapInterval;
++  if ( mSnapDecimals > 0 )
++  {
++    // strip the noise the multiplication above leaves in fractional values
++    snapped = qgsRound( snapped, mSnapDecimals );
++  }
++
++  // an elevation which is significant for the layers is a better snapping target than a round value
++  for ( double elevation : mSignificantElevations )
++  {
++    if ( std::fabs( elevation - value ) < std::fabs( snapped - value ) )
++      snapped = elevation;
++  }
++
++  return std::clamp( snapped, mRangeLimits.lower(), mRangeLimits.upper() );
+ }
+ 
+ void QgsElevationControllerWidget::updateWidgetMask()
+@@ -233,18 +383,20 @@ void QgsElevationControllerWidget::setFixedRangeSize( double size )
    {
      mSlider->setFixedRangeSize( static_cast<int>( std::round( mFixedRangeSize * mSliderPrecision ) ) );
    }
 -  if ( mFixedRangeSize != mSettingsAction->sizeSpin()->value() )
+-    mSettingsAction->sizeSpin()->setValue( mFixedRangeSize );
 +
-+  {
-+    const QSignalBlocker blockLock( mSettingsAction->lockButton() );
-+    mSettingsAction->lockButton()->setChecked( mFixedRangeSize >= 0 );
-+  }
-+  if ( mFixedRangeSize >= 0 )
-+  {
-+    const QSignalBlocker blockSpin( mSettingsAction->sizeSpin() );
-     mSettingsAction->sizeSpin()->setValue( mFixedRangeSize );
-+  }
++  mSettingsAction->setFixedRangeSize( mFixedRangeSize );
 +
    emit fixedRangeSizeChanged( mFixedRangeSize );
  }
  
-@@ -441,19 +475,27 @@ QgsElevationControllerSettingsAction::QgsElevationControllerSettingsAction( QWid
+ void QgsElevationControllerWidget::setInverted( bool inverted )
+ {
+-  mInvertDirectionAction->setChecked( inverted );
++  mSettingsAction->setInverted( inverted );
+ }
+ 
+ void QgsElevationControllerWidget::setSignificantElevations( const QList<double> &elevations )
+ {
++  mSignificantElevations = elevations;
+   mSliderLabels->setSignificantElevations( elevations );
+ }
+ 
+@@ -437,31 +589,203 @@ void QgsElevationControllerLabels::setSignificantElevations( const QList<double>
+ 
+ QgsElevationControllerSettingsAction::QgsElevationControllerSettingsAction( QWidget *parent )
+   : QWidgetAction( parent )
++  , mMenu( qobject_cast<QMenu *>( parent ) )
+ {
    QGridLayout *gLayout = new QGridLayout();
    gLayout->setContentsMargins( 3, 2, 3, 2 );
  
 -  QLabel *label = new QLabel( tr( "Fixed Range Size" ) );
-+  QLabel *label = new QLabel( tr( "Visible Range Size" ) );
-   gLayout->addWidget( label, 0, 0 );
+-  gLayout->addWidget( label, 0, 0 );
++  QLabel *limitsLabel = new QLabel( tr( "Limits" ) );
++  limitsLabel->setToolTip( tr( "Lowest and highest elevations which can be selected with the slider" ) );
++  gLayout->addWidget( limitsLabel, 0, 0 );
++
++  mLowerSpin = new QgsDoubleSpinBox();
++  mLowerSpin->setDecimals( 4 );
++  mLowerSpin->setMinimum( -999999999.0 );
++  mLowerSpin->setMaximum( 999999999.0 );
++  mLowerSpin->setShowClearButton( false );
++  mLowerSpin->setKeyboardTracking( false );
++  mLowerSpin->setToolTip( tr( "Lowest elevation which can be selected" ) );
++
++  gLayout->addWidget( mLowerSpin, 0, 1 );
++
++  mUpperSpin = new QgsDoubleSpinBox();
++  mUpperSpin->setDecimals( 4 );
++  mUpperSpin->setMinimum( -999999999.0 );
++  mUpperSpin->setMaximum( 999999999.0 );
++  mUpperSpin->setShowClearButton( false );
++  mUpperSpin->setKeyboardTracking( false );
++  mUpperSpin->setToolTip( tr( "Highest elevation which can be selected" ) );
++
++  gLayout->addWidget( mUpperSpin, 0, 2 );
++
++  mLimitsButton = new QToolButton();
++  mLimitsButton->setIcon( QgsApplication::getThemeIcon( u"/mActionRefresh.svg"_s ) );
++  mLimitsButton->setPopupMode( QToolButton::InstantPopup );
++  mLimitsButton->setToolTip( tr( "Set the elevation limits from a predefined source" ) );
++  mLimitsMenu = new QMenu( mLimitsButton );
++  mLimitsButton->setMenu( mLimitsMenu );
++
++  gLayout->addWidget( mLimitsButton, 0, 3 );
++
++  const QString rangeToolTip = tr(
++    "Size of the elevation range shown in the map, i.e. the difference between "
++    "the upper and the lower handle of the slider. Lock it to keep this size while "
++    "moving the slider, or clear it to show the full range."
++  );
++
++  QLabel *rangeLabel = new QLabel( tr( "Range" ) );
++  rangeLabel->setToolTip( rangeToolTip );
++  gLayout->addWidget( rangeLabel, 1, 0 );
  
    mSizeSpin = new QgsDoubleSpinBox();
    mSizeSpin->setDecimals( 4 );
@@ -326,62 +749,485 @@ index f9e022e41e1..68180306285 100644
 +  mSizeSpin->setClearValue( 0, tr( "Full Range" ) );
    mSizeSpin->setKeyboardTracking( false );
 -  mSizeSpin->setToolTip( tr( "Limit elevation range to a fixed size" ) );
-+  mSizeSpin->setToolTip( tr( "Currently visible elevation range" ) );
-+  mSizeSpin->installEventFilter( this );
- 
-   gLayout->addWidget( mSizeSpin, 0, 1 );
- 
++  mSizeSpin->setToolTip( rangeToolTip );
++
++  gLayout->addWidget( mSizeSpin, 1, 1, 1, 2 );
++
 +  mLockButton = new QToolButton();
 +  mLockButton->setIcon( QgsApplication::getThemeIcon( u"/cadtools/lock.svg"_s ) );
 +  mLockButton->setCheckable( true );
 +  mLockButton->setToolTip( tr( "Lock the elevation range to a fixed size" ) );
 +
-+  gLayout->addWidget( mLockButton, 0, 2 );
++  gLayout->addWidget( mLockButton, 1, 3 );
 +
++  mInvertCheckBox = new QCheckBox( tr( "Invert direction" ) );
++  mInvertCheckBox->setToolTip( tr( "Invert the direction of the elevation slider" ) );
++
++  gLayout->addWidget( mInvertCheckBox, 2, 0, 1, 4 );
+ 
+-  gLayout->addWidget( mSizeSpin, 0, 1 );
++  const auto emitLimits = [this] { emit limitsChanged( QgsDoubleRange( mLowerSpin->value(), mUpperSpin->value() ) ); };
++  connect( mLowerSpin, qOverload<double>( &QgsDoubleSpinBox::valueChanged ), this, emitLimits );
++  connect( mUpperSpin, qOverload<double>( &QgsDoubleSpinBox::valueChanged ), this, emitLimits );
++
++  connect( mSizeSpin, qOverload<double>( &QgsDoubleSpinBox::valueChanged ), this, [this]( double size ) {
++    if ( mSizeSpin->isCleared() )
++    {
++      emit fixedRangeSizeChanged( -1 );
++      emit fullRangeRequested();
++    }
++    else if ( mLockButton->isChecked() )
++    {
++      emit fixedRangeSizeChanged( size );
++    }
++  } );
++  connect( mLockButton, &QToolButton::toggled, this, [this]( bool locked ) { emit fixedRangeSizeChanged( locked ? mSizeSpin->value() : -1 ); } );
++
++  connect( mInvertCheckBox, &QCheckBox::toggled, this, &QgsElevationControllerSettingsAction::invertedChanged );
+ 
    QWidget *w = new QWidget();
    w->setLayout( gLayout );
++
++  // watch the whole panel, so that hovering any of its widgets marks this action as the
++  // active one and key presses are never handed over to the menu
++  w->installEventFilter( this );
++  const QList<QWidget *> children = w->findChildren<QWidget *>();
++  for ( QWidget *child : children )
++    child->installEventFilter( this );
++
++  connect( this, &QAction::hovered, this, &QgsElevationControllerSettingsAction::onHover );
++
    setDefaultWidget( w );
-@@ -464,4 +506,24 @@ QgsDoubleSpinBox *QgsElevationControllerSettingsAction::sizeSpin()
-   return mSizeSpin;
  }
  
-+QToolButton *QgsElevationControllerSettingsAction::lockButton()
+-QgsDoubleSpinBox *QgsElevationControllerSettingsAction::sizeSpin()
++QMenu *QgsElevationControllerSettingsAction::limitsMenu()
 +{
-+  return mLockButton;
++  return mLimitsMenu;
++}
++
++void QgsElevationControllerSettingsAction::setLimits( const QgsDoubleRange &limits )
++{
++  const QSignalBlocker blockLower( mLowerSpin );
++  const QSignalBlocker blockUpper( mUpperSpin );
++  // the limits can always be widened, but never crossed over
++  mLowerSpin->setMaximum( limits.upper() );
++  mUpperSpin->setMinimum( limits.lower() );
++  mLowerSpin->setValue( limits.lower() );
++  mUpperSpin->setValue( limits.upper() );
++}
++
++void QgsElevationControllerSettingsAction::setFixedRangeSize( double size )
++{
++  {
++    const QSignalBlocker blockLock( mLockButton );
++    mLockButton->setChecked( size >= 0 );
++  }
++
++  if ( size >= 0 )
++  {
++    const QSignalBlocker blockSpin( mSizeSpin );
++    mSizeSpin->setValue( size );
++  }
++}
++
++void QgsElevationControllerSettingsAction::updateRangeSize( double size )
++{
++  // a locked size is the one the user asked for, it must not be overwritten
++  if ( mLockButton->isChecked() )
++    return;
++
++  const QSignalBlocker blockSpin( mSizeSpin );
++  mSizeSpin->setValue( size );
++}
++
++void QgsElevationControllerSettingsAction::setInverted( bool inverted )
++{
++  // not blocked, the widget follows the checkbox through invertedChanged()
++  mInvertCheckBox->setChecked( inverted );
 +}
 +
 +bool QgsElevationControllerSettingsAction::eventFilter( QObject *watched, QEvent *event )
-+{
-+  if ( watched == mSizeSpin && event->type() == QEvent::KeyPress )
+ {
+-  return mSizeSpin;
++  switch ( event->type() )
 +  {
-+    const QKeyEvent *keyEvent = static_cast<QKeyEvent *>( event );
-+    if ( keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter )
++    case QEvent::Enter:
++      onHover();
++      break;
++
++    case QEvent::KeyPress:
 +    {
-+      mSizeSpin->interpretText();
-+      if ( !mSizeSpin->isCleared() )
-+        mLockButton->setChecked( true );
++      const QKeyEvent *keyEvent = static_cast<QKeyEvent *>( event );
++      if ( keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter )
++      {
++        // spin boxes leave the return key for their parents to handle, which would make the
++        // menu activate its highlighted action and close. Apply the typed value ourselves instead.
++        QgsDoubleSpinBox *spin = qobject_cast<QgsDoubleSpinBox *>( watched );
++        if ( !spin )
++          spin = qobject_cast<QgsDoubleSpinBox *>( watched->parent() );
++
++        if ( spin )
++        {
++          spin->interpretText();
++          if ( spin == mSizeSpin && !mSizeSpin->isCleared() )
++            mLockButton->setChecked( true );
++          return true;
++        }
++      }
++      break;
 +    }
++
++    default:
++      break;
 +  }
 +  return QWidgetAction::eventFilter( watched, event );
 +}
 +
++void QgsElevationControllerSettingsAction::onHover()
++{
++  // see https://bugreports.qt.io/browse/QTBUG-10427
++  // the menu keeps highlighting the action the mouse last passed over, and would trigger it
++  // when the user hits enter while interacting with this widget
++  if ( mSuppressRecurse || !mMenu )
++    return;
++
++  mSuppressRecurse = true;
++  mMenu->setActiveAction( this );
++  mSuppressRecurse = false;
+ }
+ 
  ///@endcond PRIVATE
 diff --git a/src/gui/elevation/qgselevationcontrollerwidget.h b/src/gui/elevation/qgselevationcontrollerwidget.h
-index 5b50340df2f..86a4a495c70 100644
+index 5b50340df2f4..15f09cf0be48 100644
 --- a/src/gui/elevation/qgselevationcontrollerwidget.h
 +++ b/src/gui/elevation/qgselevationcontrollerwidget.h
-@@ -61,9 +61,14 @@ class GUI_EXPORT QgsElevationControllerSettingsAction : public QWidgetAction
+@@ -22,11 +22,15 @@
+ #include "qgis_sip.h"
+ #include "qgsrange.h"
+ 
++#include <QPointer>
+ #include <QWidget>
+ #include <QWidgetAction>
+ 
++class QgsMapCanvas;
++class QgsMapLayer;
+ class QgsRangeSlider;
+ class QgsDoubleSpinBox;
++class QCheckBox;
+ class QToolButton;
+ class QMenu;
+ 
+@@ -53,17 +57,57 @@ class GUI_EXPORT QgsElevationControllerLabels : public QWidget SIP_SKIP
+     QList<double> mSignificantElevations;
+ };
+ 
+-class GUI_EXPORT QgsElevationControllerSettingsAction : public QWidgetAction
++class GUI_EXPORT QgsElevationControllerSettingsAction : public QWidgetAction SIP_SKIP
+ {
+     Q_OBJECT
+ 
+   public:
      QgsElevationControllerSettingsAction( QWidget *parent = nullptr );
  
-     QgsDoubleSpinBox *sizeSpin();
-+    QToolButton *lockButton();
+-    QgsDoubleSpinBox *sizeSpin();
++    //! Returns the menu of the button which takes the limits from a predefined source
++    QMenu *limitsMenu();
++
++    //! Shows \a limits in the limit spin boxes
++    void setLimits( const QgsDoubleRange &limits );
++
++    //! Shows a fixed range \a size and its lock state, -1 for no fixed size
++    void setFixedRangeSize( double size );
++
++    //! Shows the current range \a size, unless a fixed size is locked
++    void updateRangeSize( double size );
++
++    //! Shows whether the elevation slider is inverted
++    void setInverted( bool inverted );
++
++  signals:
++
++    //! Emitted when the limits are edited
++    void limitsChanged( const QgsDoubleRange &limits );
++
++    //! Emitted when a fixed range size is locked or edited, -1 when it is unlocked
++    void fixedRangeSizeChanged( double size );
++
++    //! Emitted when the range size is cleared, asking for the full range to be shown
++    void fullRangeRequested();
++
++    //! Emitted when the invert direction checkbox is toggled
++    void invertedChanged( bool inverted );
 +
 +  protected:
 +    bool eventFilter( QObject *watched, QEvent *event ) override;
  
    private:
++    void onHover();
++
++    QMenu *mMenu = nullptr;
++    bool mSuppressRecurse = false;
++    QgsDoubleSpinBox *mLowerSpin = nullptr;
++    QgsDoubleSpinBox *mUpperSpin = nullptr;
++    QToolButton *mLimitsButton = nullptr;
++    QMenu *mLimitsMenu = nullptr;
      QgsDoubleSpinBox *mSizeSpin = nullptr;
 +    QToolButton *mLockButton = nullptr;
++    QCheckBox *mInvertCheckBox = nullptr;
  };
  
  
+@@ -122,6 +166,14 @@ class GUI_EXPORT QgsElevationControllerWidget : public QWidget
+      */
+     QMenu *menu();
+ 
++    /**
++     * Returns the map canvas the widget takes its layers from.
++     *
++     * \see setMapCanvas()
++     * \since QGIS 4.4
++     */
++    QgsMapCanvas *mapCanvas() const;
++
+     /**
+      * Returns the fixed range size, or -1 if no fixed size is set.
+      *
+@@ -172,6 +224,18 @@ class GUI_EXPORT QgsElevationControllerWidget : public QWidget
+      */
+     void setSignificantElevations( const QList<double> &elevations );
+ 
++    /**
++     * Sets the map \a canvas the widget takes its layers from.
++     *
++     * The canvas provides the layer used by the "Current Layer" entry of the range limits
++     * button, and its layers give the initial limits when the project defines no elevation
++     * range of its own.
++     *
++     * \see mapCanvas()
++     * \since QGIS 4.4
++     */
++    void setMapCanvas( QgsMapCanvas *canvas );
++
+   signals:
+ 
+     /**
+@@ -200,14 +264,31 @@ class GUI_EXPORT QgsElevationControllerWidget : public QWidget
+   private:
+     void updateWidgetMask();
+ 
++    //! Applies a \a range calculated from layer data to both the limits and the current range
++    void setLimitsFromRange( const QgsDoubleRange &range );
++
++    static bool layerHasElevation( QgsMapLayer *layer );
++
++    /**
++     * Snaps a \a range selected through the slider to the round values (and significant
++     * elevations) which the slider snaps to.
++     */
++    QgsDoubleRange snappedRange( const QgsDoubleRange &range ) const;
++
++    //! Snaps a single elevation \a value to the closest snapping target.
++    double snapValue( double value ) const;
++
+     QToolButton *mConfigureButton = nullptr;
+     QgsElevationControllerSettingsAction *mSettingsAction = nullptr;
+     QMenu *mMenu = nullptr;
+-    QAction *mInvertDirectionAction = nullptr;
+     QgsRangeSlider *mSlider = nullptr;
+     QgsElevationControllerLabels *mSliderLabels = nullptr;
++    QPointer<QgsMapCanvas> mMapCanvas;
+     QgsDoubleRange mRangeLimits;
+     QgsDoubleRange mCurrentRange;
++    QList<double> mSignificantElevations;
++    double mSnapInterval = 0;
++    int mSnapDecimals = 0;
+     double mFixedRangeSize = -1;
+     int mBlockSliderChanges = 0;
+     double mSliderPrecision = 100;
+diff --git a/tests/src/python/test_qgselevationcontrollerwidget.py b/tests/src/python/test_qgselevationcontrollerwidget.py
+index d8306ac61c93..e388595e628b 100644
+--- a/tests/src/python/test_qgselevationcontrollerwidget.py
++++ b/tests/src/python/test_qgselevationcontrollerwidget.py
+@@ -9,7 +9,7 @@
+ import unittest
+ 
+ from qgis.core import QgsDoubleRange, QgsProject
+-from qgis.gui import QgsElevationControllerWidget
++from qgis.gui import QgsElevationControllerWidget, QgsMapCanvas
+ from qgis.PyQt.QtCore import Qt
+ from qgis.PyQt.QtTest import QSignalSpy
+ from qgis.testing import QgisTestCase, start_app
+@@ -68,6 +68,29 @@ def testRange(self):
+         self.assertEqual(w.range(), QgsDoubleRange(171, 815.5))
+         self.assertEqual(len(spy), 6)
+ 
++        # zero width or inverted limits => should be ignored
++        w.setRangeLimits(QgsDoubleRange(200, 200))
++        self.assertEqual(w.rangeLimits(), QgsDoubleRange(171, 815.5))
++        w.setRangeLimits(QgsDoubleRange(500, 200))
++        self.assertEqual(w.rangeLimits(), QgsDoubleRange(171, 815.5))
++        self.assertEqual(len(spy), 6)
++
++    def test_map_canvas(self):
++        """
++        The canvas provides the layers the limits entries work on
++        """
++        w = QgsElevationControllerWidget()
++        self.assertIsNone(w.mapCanvas())
++
++        canvas = QgsMapCanvas()
++        w.setMapCanvas(canvas)
++        self.assertEqual(w.mapCanvas(), canvas)
++
++        # a canvas without layers must not alter the limits
++        limits = w.rangeLimits()
++        w.setMapCanvas(canvas)
++        self.assertEqual(w.rangeLimits(), limits)
++
+     def test_slider_interaction(self):
+         """
+         Simulate user interaction with slider
+@@ -90,11 +113,40 @@ def test_slider_interaction(self):
+             int(w.slider().minimum() + slider_range * 0.4),
+             int(w.slider().minimum() + slider_range * 0.7),
+         )
++        # slider values are snapped to round values, here multiples of 1
+         self.assertEqual(len(spy), 3)
+-        self.assertAlmostEqual(spy[-1][0].lower(), 459.644, 3)
+-        self.assertAlmostEqual(spy[-1][0].upper(), 729.495, 3)
+-        self.assertAlmostEqual(w.range().lower(), 459.644, 3)
+-        self.assertAlmostEqual(w.range().upper(), 729.495, 3)
++        self.assertEqual(spy[-1][0], QgsDoubleRange(460, 729))
++        self.assertEqual(w.range(), QgsDoubleRange(460, 729))
++
++    def test_slider_snapping(self):
++        """
++        Slider interaction should snap to round values and to significant elevations
++        """
++        w = QgsElevationControllerWidget()
++        w.setRangeLimits(QgsDoubleRange(0, 1000))
++
++        slider = w.slider()
++
++        def slider_pos(elevation):
++            """slider position matching an elevation, whatever precision the slider uses"""
++            return slider.minimum() + round(
++                elevation * (slider.maximum() - slider.minimum()) / 1000
++            )
++
++        slider.setRange(slider_pos(123), slider_pos(457))
++        # a 0 - 1000 range is rounded to multiples of 100, so the slider snaps to multiples of 10
++        self.assertEqual(w.range(), QgsDoubleRange(120, 460))
++
++        # an elevation which is significant for the layers is a closer snapping target than 120
++        w.setSignificantElevations([123.4])
++        slider.setRange(slider_pos(122), slider_pos(457))
++        self.assertEqual(w.range(), QgsDoubleRange(123.4, 460))
++
++        # a locked range size must not be altered by snapping
++        w.setFixedRangeSize(35.5)
++        slider.setRange(slider_pos(223), slider_pos(457))
++        self.assertAlmostEqual(w.range().lower(), 220, 6)
++        self.assertAlmostEqual(w.range().upper() - w.range().lower(), 35.5, 6)
+ 
+     def testFixedRangeSize(self):
+         """
+@@ -110,6 +162,27 @@ def testFixedRangeSize(self):
+         w.slider().setLowerValue(50)
+         self.assertAlmostEqual(w.range().upper() - w.range().lower(), 10.0001, 6)
+ 
++    def test_fixed_range_size_with_new_limits(self):
++        """
++        A locked range size must survive a change of the limits
++        """
++        w = QgsElevationControllerWidget()
++        w.setRangeLimits(QgsDoubleRange(0, 100))
++        w.setFixedRangeSize(10)
++        w.setRange(QgsDoubleRange(20, 30))
++        self.assertAlmostEqual(w.range().upper() - w.range().lower(), 10, 6)
++
++        # the slider holds the fixed size in its own integer units, which follow the limits
++        w.setRangeLimits(QgsDoubleRange(0, 1000))
++        self.assertEqual(w.slider().fixedRangeSize(), round(w.slider().maximum() / 100))
++        self.assertAlmostEqual(w.range().upper() - w.range().lower(), 10, 6)
++
++        # limits which no longer fit the range move it instead of shrinking it
++        w.setRange(QgsDoubleRange(20, 30))
++        w.setRangeLimits(QgsDoubleRange(0, 25))
++        self.assertAlmostEqual(w.range().lower(), 15, 6)
++        self.assertAlmostEqual(w.range().upper(), 25, 6)
++
+     def test_project_interaction(self):
+         """
+         Test interaction of widget with project
+diff --git a/tests/src/python/test_qgsmathutils.py b/tests/src/python/test_qgsmathutils.py
+index 302528b69255..a0e8da6f3383 100644
+--- a/tests/src/python/test_qgsmathutils.py
++++ b/tests/src/python/test_qgsmathutils.py
+@@ -8,7 +8,7 @@
+ 
+ import unittest
+ 
+-from qgis.core import QgsMathUtils
++from qgis.core import QgsDoubleRange, QgsMathUtils
+ from qgis.testing import QgisTestCase
+ 
+ 
+@@ -58,6 +58,56 @@ def test_to_rationale(self):
+         self.assertEqual(QgsMathUtils.doubleToRational(3.1415926535), (103993, 33102))
+         self.assertEqual(QgsMathUtils.doubleToRational(1.6180339887), (28657, 17711))
+ 
++    def test_rounding_interval(self):
++        self.assertEqual(QgsMathUtils.roundingInterval(2222), 100)
++        self.assertEqual(QgsMathUtils.roundingInterval(1000), 100)
++        self.assertEqual(QgsMathUtils.roundingInterval(999), 10)
++        self.assertAlmostEqual(QgsMathUtils.roundingInterval(5.55), 0.1, 10)
++        self.assertAlmostEqual(QgsMathUtils.roundingInterval(0.086), 0.001, 10)
++        # a finer grain can be asked for
++        self.assertEqual(QgsMathUtils.roundingInterval(2222, 100), 10)
++        self.assertEqual(QgsMathUtils.roundingInterval(2222, 1000), 1)
++        self.assertEqual(QgsMathUtils.roundingInterval(2222, 1), 1000)
++        self.assertAlmostEqual(QgsMathUtils.roundingInterval(5.55, 100), 0.01, 10)
++
++        # degenerate spans have no interval
++        self.assertEqual(QgsMathUtils.roundingInterval(0), 0)
++        self.assertEqual(QgsMathUtils.roundingInterval(-5), 0)
++        self.assertEqual(QgsMathUtils.roundingInterval(2222, 0), 0)
++
++    def test_rounded_range(self):
++        self.assertEqual(
++            QgsMathUtils.roundedRange(QgsDoubleRange(1234.5, 3456.7)),
++            QgsDoubleRange(1200, 3500),
++        )
++        self.assertEqual(
++            QgsMathUtils.roundedRange(QgsDoubleRange(0, 8848.86)),
++            QgsDoubleRange(0, 8900),
++        )
++        self.assertEqual(
++            QgsMathUtils.roundedRange(QgsDoubleRange(-15.2, 102.7)),
++            QgsDoubleRange(-20, 110),
++        )
++        # fractional ranges should not pick up floating point noise
++        self.assertEqual(
++            QgsMathUtils.roundedRange(QgsDoubleRange(12.34, 17.89)),
++            QgsDoubleRange(12.3, 17.9),
++        )
++        self.assertEqual(
++            QgsMathUtils.roundedRange(QgsDoubleRange(0.0123, 0.0987)),
++            QgsDoubleRange(0.012, 0.099),
++        )
++        # already round values should be left alone
++        self.assertEqual(
++            QgsMathUtils.roundedRange(QgsDoubleRange(100, 500)),
++            QgsDoubleRange(100, 500),
++        )
++        # degenerate ranges are returned unchanged
++        self.assertEqual(
++            QgsMathUtils.roundedRange(QgsDoubleRange(50, 50)), QgsDoubleRange(50, 50)
++        )
++        self.assertTrue(QgsMathUtils.roundedRange(QgsDoubleRange()).isInfinite())
++
+ 
+ if __name__ == "__main__":
+     unittest.main()
