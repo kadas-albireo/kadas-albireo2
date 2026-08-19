@@ -765,8 +765,6 @@ Wenn Sie eine Beschriftung über der Karte in der Mitte der Seite vergeben wolle
 
 Für alle anderen Zusammenstellungselemente können Sie die Position auf eine ähnliche Art und Weise einstellen so dass Sie korrekt positioniert sind wenn die Seite automatisch nach Hochformat oder Querformat gedreht wird.
 
-Die zur Verfügung gestellten Informationen sind von dem hervorragenden Blog (in Englisch und Portugiesisch) über die Datendefinierte Übersteuerungsoptionen [Multiple\_format\_map\_series\_using\_QGIS\_2.6\_](#id8) abgeleitet.
-
 Dieses ist nur ein Beispiel wie Sie Datendefinierte Übersteuerungen anwenden können.
 
 ## Vorschau
