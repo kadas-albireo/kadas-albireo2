@@ -136,30 +136,26 @@ void KadasRibbonButton::paintEvent( QPaintEvent * /*e*/ )
     int pixmapX = contentWidth / 2.0 - iSize.width() / 2.0;
     // Monochrome icon: white while idle, brand yellow when active (checked),
     // muted dark-blue when disabled. Keeps ribbon icons coherent and legible.
-    QPixmap pixmap = buttonIcon.pixmap( QSize( 1024, 1024 ), QIcon::Normal, QIcon::On );
+    QPixmap pixmap = buttonIcon.pixmap( iSize, devicePixelRatioF(), QIcon::Normal, QIcon::On );
     const QRect iconRect( pixmapX, pixmapY, iSize.width(), iSize.height() );
     QColor iconColor = QColor( 38, 59, 78 );
     if ( isEnabled() )
       iconColor = isChecked() ? QColor( 0xFF, 0xCC, 0x00 ) : QColor( 255, 255, 255 );
 
     // Tint the icon through its alpha channel so edges keep their antialiasing
-    // (a 1-bit mask would look jagged). The outline and fill share the exact
-    // same silhouette, so the fill can never peek outside the outline.
-    // Work in raw device pixels (force a 1.0 device-pixel ratio): on a
-    // high-DPI screen the source pixmap carries a >1 ratio, and drawing it
-    // into a ratio-1 buffer would otherwise paint only its top-left quarter,
-    // making the icon render at half size.
+    // (a 1-bit mask would look jagged).
     auto tintedPixmap = []( const QPixmap &source, const QColor &color ) {
       QPixmap src = source;
+      const qreal sourceRatio = src.devicePixelRatio();
       src.setDevicePixelRatio( 1.0 );
       QPixmap out( src.size() );
       out.fill( Qt::transparent );
       QPainter pp( &out );
-      pp.setRenderHint( QPainter::SmoothPixmapTransform );
       pp.drawPixmap( 0, 0, src );
       pp.setCompositionMode( QPainter::CompositionMode_SourceIn );
       pp.fillRect( out.rect(), color );
       pp.end();
+      out.setDevicePixelRatio( sourceRatio );
       return out;
     };
 
