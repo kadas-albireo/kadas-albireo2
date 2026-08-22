@@ -175,6 +175,7 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
     reqUrl.setQuery( query );
     QNetworkRequest req( reqUrl );
     req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
+    QgsApplication::authManager()->updateNetworkRequest( req, mAuthId );
     QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
     connect( reply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::replyFinished );
   }
