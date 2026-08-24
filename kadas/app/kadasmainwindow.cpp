@@ -125,6 +125,9 @@
 static const QgsSettingsEntryInteger sSettingsLayersWidgetWidth( QStringLiteral( "layers-widget-width" ), KadasSettingsTree::sTreeKadas, 200, QStringLiteral( "Width of the layers side panel." ) );
 static const QgsSettingsEntryInteger sSettingsLayersWidgetTab( QStringLiteral( "layers-widget-tab" ), KadasSettingsTree::sTreeKadas, 0, QStringLiteral( "Last-selected layers panel tab." ) );
 
+//! How far from the layers panel border a press still starts a resize, in pixels.
+static const int sLayersResizeGrabTolerance = 6;
+
 static bool clipboardHasPastableContent()
 {
   // Paste only handles raster images and SVG (see KadasApplication::paste),
@@ -266,6 +269,10 @@ void KadasMainWindow::init()
 
   mMapCanvas->installEventFilter( this );
   mLayersWidgetResizeHandle->installEventFilter( this );
+  // The host margin next to the panel border reads as part of the panel edge:
+  // watch it too, so the resize does not require pixel-precise aiming.
+  mLeftPanelHost->setMouseTracking( true );
+  mLeftPanelHost->installEventFilter( this );
 
   QgsDoubleSpinBox *magnifierSpinBox = mStatusBar->magnifierSpinBox();
   mCoordinateDisplayer = new KadasCoordinateDisplayer( mStatusBar->displayCrsButton(), mStatusBar->coordinateEdit(), mStatusBar->heightEdit(), mHeightUnitCombo, mMapCanvas, this );
@@ -490,36 +497,95 @@ bool KadasMainWindow::eventFilter( QObject *obj, QEvent *ev )
   {
     updateWidgetPositions();
   }
-  else if ( obj == mLayersWidgetResizeHandle && ev->type() == QEvent::MouseButtonPress )
+  else if ( obj == mLayersWidgetResizeHandle || obj == mLeftPanelHost )
   {
-    QMouseEvent *e = static_cast<QMouseEvent *>( ev );
-    if ( e->button() == Qt::LeftButton )
+    return handleLayersWidgetResize( obj, ev );
+  }
+  return false;
+}
+
+bool KadasMainWindow::layersWidgetResizeBandContains( const QPoint &globalPos ) const
+{
+  if ( !mLayersWidget->isVisible() )
+    return false;
+
+  const QRect panel( mLayersWidget->mapToGlobal( QPoint( 0, 0 ) ), mLayersWidget->size() );
+  return globalPos.y() >= panel.top() && globalPos.y() <= panel.bottom() && qAbs( globalPos.x() - panel.right() ) <= sLayersResizeGrabTolerance;
+}
+
+bool KadasMainWindow::handleLayersWidgetResize( QObject *obj, QEvent *ev )
+{
+  // The drag can be started either on the handle itself or anywhere in the
+  // grab band straddling the panel border, which also covers the few pixels
+  // of host margin outside the panel.
+  switch ( ev->type() )
+  {
+    case QEvent::MouseButtonPress:
     {
-      mResizePressPos = e->pos();
+      QMouseEvent *e = static_cast<QMouseEvent *>( ev );
+      const QPoint globalPos = e->globalPosition().toPoint();
+      if ( e->button() != Qt::LeftButton || ( obj != mLayersWidgetResizeHandle && !layersWidgetResizeBandContains( globalPos ) ) )
+        return false;
+
+      mResizingLayersWidget = true;
+      mResizePressGlobalX = globalPos.x();
+      mResizePressWidth = mLayersWidget->width();
       // Freeze the map under a snapshot for the whole drag; a single
       // re-render happens on release.
       mLeftPanelHost->beginPanelResize();
+      return true;
     }
-  }
-  else if ( obj == mLayersWidgetResizeHandle && ev->type() == QEvent::MouseMove )
-  {
-    QMouseEvent *e = static_cast<QMouseEvent *>( ev );
-    if ( e->buttons() == Qt::LeftButton )
+
+    case QEvent::MouseMove:
     {
-      QPoint delta = e->pos() - mResizePressPos;
-      mLayersWidget->setFixedWidth( std::clamp( mLayersWidget->width() + delta.x(), 10, 800 ) );
+      QMouseEvent *e = static_cast<QMouseEvent *>( ev );
+      const QPoint globalPos = e->globalPosition().toPoint();
+      if ( !mResizingLayersWidget )
+      {
+        // Hover feedback for the part of the band outside the handle, which
+        // has no resize cursor of its own.
+        if ( obj == mLeftPanelHost )
+        {
+          const bool inBand = layersWidgetResizeBandContains( globalPos );
+          if ( inBand != mLeftPanelHost->testAttribute( Qt::WA_SetCursor ) )
+          {
+            if ( inBand )
+              mLeftPanelHost->setCursor( Qt::SizeHorCursor );
+            else
+              mLeftPanelHost->unsetCursor();
+          }
+        }
+        return false;
+      }
+
+      // Track the pointer in global coordinates: the handle moves along with
+      // the panel, so a handle-relative delta would drift once clamped.
+      mLayersWidget->setFixedWidth( std::clamp( mResizePressWidth + globalPos.x() - mResizePressGlobalX, 10, 800 ) );
+      return true;
     }
-  }
-  else if ( obj == mLayersWidgetResizeHandle && ev->type() == QEvent::MouseButtonRelease )
-  {
-    QMouseEvent *e = static_cast<QMouseEvent *>( ev );
-    if ( e->button() == Qt::LeftButton )
+
+    case QEvent::MouseButtonRelease:
     {
+      QMouseEvent *e = static_cast<QMouseEvent *>( ev );
+      if ( e->button() != Qt::LeftButton || !mResizingLayersWidget )
+        return false;
+
+      mResizingLayersWidget = false;
       mLeftPanelHost->endPanelResize();
       sSettingsLayersWidgetWidth.setValue( mLayersWidget->width() );
+      return true;
     }
+
+    case QEvent::Leave:
+      // No move events arrive once the pointer is over a child widget, so
+      // drop the resize cursor the host would otherwise pass on to them.
+      if ( obj == mLeftPanelHost && !mResizingLayersWidget )
+        mLeftPanelHost->unsetCursor();
+      return false;
+
+    default:
+      return false;
   }
-  return false;
 }
 
 void KadasMainWindow::updateWidgetPositions()
