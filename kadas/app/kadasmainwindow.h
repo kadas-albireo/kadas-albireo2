@@ -171,6 +171,10 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void setActionToButton( QAction *action, QToolButton *button, const QKeySequence &shortcut = QKeySequence(), const std::function<QgsMapTool *()> &toolFactory = nullptr );
     void showSourceSelectDialog( const QString &provider );
     void updateWidgetPositions();
+    //! Handles the press/move/release of an interactive layers panel resize, from either the handle or the grab band around it.
+    bool handleLayersWidgetResize( QObject *obj, QEvent *ev );
+    //! Returns TRUE if globalPos is close enough to the layers panel border to start a resize.
+    bool layersWidgetResizeBandContains( const QPoint &globalPos ) const;
 
     QgsMessageBar *mInfoBar = nullptr;
     QPointer<QgsMessageBarItem> mReprojMsgItem;
@@ -195,7 +199,11 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QgsElevationControllerWidget *mElevationController = nullptr;
 
     QTimer mLoadingTimer;
-    QPoint mResizePressPos;
+    //! True while the layers panel is being resized by a drag.
+    bool mResizingLayersWidget = false;
+    //! Global x and panel width when the resize drag started.
+    int mResizePressGlobalX = 0;
+    int mResizePressWidth = 0;
     QPoint mDragStartPos;
     QMap<QString, QAction *> mAddedActions;
     QList<QgsCustomDropHandler *> mCustomDropHandlers;
