@@ -1,7 +1,7 @@
 string(REPLACE "." "_" TAG ${VERSION})
 
 # set(QGIS_REF final-${TAG})
-set(QGIS_REF 9e439cdbb9ba5501046600b97a0526c933bdd03d)
+set(QGIS_REF 6402a64e93b010da19e4a58e4cf93f61db8db8fa)
 set(QGIS_SHA512
     439fe564da17eee80f98fe5811bee05f0dba66a8a0552a5e368bf7db2dd61a6a380e75a0d81f8bb2152ef6e75b226eac7558dd1435b5fc423b5ccbde80b1235a
 )
