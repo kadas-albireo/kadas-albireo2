@@ -107,6 +107,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     KadasCatalogBrowser *catalogBrowser() { return mCatalogBrowser; }
     KadasPluginManager *pluginManager() { return mPluginManager; }
     void setElevationControllerRangeFromHeightmap();
+    void updateElevationControllerVisibility();
 
     void addCustomDropHandler( QgsCustomDropHandler *handler );
     void removeCustomDropHandler( QgsCustomDropHandler *handler );

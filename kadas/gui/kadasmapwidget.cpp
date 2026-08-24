@@ -15,10 +15,14 @@
  ***************************************************************************/
 
 
+#include <algorithm>
+
+#include <QColor>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMenu>
+#include <QPalette>
 #include <QStackedWidget>
 #include <QToolButton>
 
@@ -26,6 +30,7 @@
 #include <qgis/qgslayertree.h>
 #include <qgis/qgslayertreelayer.h>
 #include <qgis/qgsmapcanvas.h>
+#include <qgis/qgsmaplayerelevationproperties.h>
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
@@ -112,6 +117,7 @@ KadasMapWidget::KadasMapWidget( int number, const QString &id, const QString &ti
   connect( mMasterCanvas, &QgsMapCanvas::destinationCrsChanged, this, &KadasMapWidget::updateMapProjection );
   connect( QgsProject::instance()->layerTreeRoot(), &QgsLayerTree::layerOrderChanged, this, &KadasMapWidget::updateLayerSelectionMenu );
   connect( mMapCanvas, &QgsMapCanvas::xyCoordinates, mMasterCanvas, &QgsMapCanvas::xyCoordinates );
+  connect( mMapCanvas, &QgsMapCanvas::layersChanged, this, &KadasMapWidget::updateElevationControllerVisibility );
 
   const QList<QgsMapLayer *> layers = mMasterCanvas->layers();
   for ( QgsMapLayer *layer : layers )
@@ -162,56 +168,135 @@ void KadasMapWidget::setMapExtent( const QgsRectangle &extent )
   mMapCanvas->refresh();
 }
 
-void KadasMapWidget::moveElevationControllerLabelsToLeft( QgsElevationControllerWidget *controller )
+namespace
+{
+  //! Drops every spacer from \a layout, so the remaining widgets keep no slack between them.
+  void removeSpacers( QBoxLayout *layout )
+  {
+    for ( int i = layout->count() - 1; i >= 0; --i )
+    {
+      if ( layout->itemAt( i )->spacerItem() )
+        delete layout->takeAt( i );
+    }
+  }
+
+  //! Returns the first widget held by \a layout, skipping \a ignore.
+  QWidget *firstWidget( QBoxLayout *layout, QWidget *ignore = nullptr )
+  {
+    for ( int i = 0; i < layout->count(); ++i )
+    {
+      QWidget *widget = layout->itemAt( i )->widget();
+      if ( widget && widget != ignore )
+        return widget;
+    }
+    return nullptr;
+  }
+} // namespace
+
+void KadasMapWidget::adjustElevationControllerLayout( QgsElevationControllerWidget *controller )
 {
   if ( !controller )
     return;
 
-  // By default the elevation controller lays out the slider on the left and
-  // its labels on the right. In kadas the controller sits on the right edge of
-  // the canvas, so the labels read better on the left of the slider. Instead of
-  // patching QGIS, reorder the two widgets in their shared layout at runtime.
+  // By default the elevation controller lays out the slider on the left with its labels on the
+  // right, and the settings button above the slider. In kadas the controller sits on the right
+  // edge of the canvas, so the whole thing reads better mirrored: labels first, then the slider
+  // flush against the edge, with the settings button following the slider rather than the labels.
+  // Instead of patching QGIS, rearrange the layouts at runtime.
   QgsRangeSlider *slider = controller->slider();
-  if ( !slider )
+  QLayout *rootLayout = controller->layout();
+  if ( !slider || !rootLayout )
     return;
+
+  // The slider fills the span between its two handles with QPalette::Highlight at a fixed alpha,
+  // and the controller starts with the whole range selected, so a saturated accent reads as a
+  // coloured slab painted across the map rather than as a selection. The palette is the only
+  // handle we have on this: the groove, the handles and the band are all drawn with a null
+  // widget pointer, which leaves style sheet rules inert. So pick a muted, low saturation tone -
+  // kadas' own slate - which sits over map imagery as a shaded track instead of a highlight.
+  QPalette sliderPalette = slider->palette();
+  sliderPalette.setColor( QPalette::Highlight, QColor( "#5D7081" ) );
+  slider->setPalette( sliderPalette );
 
   QBoxLayout *sliderLayout = nullptr;
-  if ( QLayout *rootLayout = controller->layout() )
+  QBoxLayout *buttonLayout = nullptr;
+  for ( int i = 0; i < rootLayout->count(); ++i )
   {
-    for ( int i = 0; i < rootLayout->count(); ++i )
-    {
-      QLayout *childLayout = rootLayout->itemAt( i )->layout();
-      if ( childLayout && childLayout->indexOf( slider ) >= 0 )
-      {
-        sliderLayout = qobject_cast<QBoxLayout *>( childLayout );
-        break;
-      }
-    }
+    QBoxLayout *childLayout = qobject_cast<QBoxLayout *>( rootLayout->itemAt( i )->layout() );
+    if ( !childLayout )
+      continue;
+
+    if ( childLayout->indexOf( slider ) >= 0 )
+      sliderLayout = childLayout;
+    else
+      buttonLayout = childLayout;
   }
-  if ( !sliderLayout )
+
+  if ( sliderLayout )
+  {
+    // the labels are the other widget sharing the layout with the slider
+    QWidget *labels = firstWidget( sliderLayout, slider );
+    if ( labels && sliderLayout->indexOf( labels ) > sliderLayout->indexOf( slider ) )
+    {
+      sliderLayout->removeWidget( labels );
+      sliderLayout->removeWidget( slider );
+      sliderLayout->insertWidget( 0, labels, 1 );
+      sliderLayout->insertWidget( 1, slider );
+    }
+    // the labels absorb the slack, so dropping the trailing spacer leaves the slider flush right
+    removeSpacers( sliderLayout );
+  }
+
+  QWidget *button = buttonLayout ? firstWidget( buttonLayout ) : nullptr;
+  if ( button )
+  {
+    // move the button over the slider column instead of over the labels
+    removeSpacers( buttonLayout );
+    buttonLayout->removeWidget( button );
+    buttonLayout->addStretch();
+    buttonLayout->addWidget( button );
+  }
+
+  QToolButton *settingsButton = qobject_cast<QToolButton *>( button );
+  QMenu *menu = controller->menu();
+  if ( settingsButton && menu )
+  {
+    // The controller hugs the right edge of the canvas, so the settings menu has to open towards
+    // the map. QToolButton cannot be talked into this on its own: it only mirrors the popup when
+    // it knows the menu size hint, which Qt deliberately skips for menus having aboutToShow()
+    // receivers - and the controller connects to that signal. So drive the popup ourselves.
+    settingsButton->setMenu( nullptr );
+    settingsButton->setPopupMode( QToolButton::DelayedPopup );
+    QObject::connect( settingsButton, &QToolButton::clicked, menu, [settingsButton, menu] {
+      const QPoint topLeft( settingsButton->width() - menu->sizeHint().width(), settingsButton->height() );
+      menu->popup( settingsButton->mapToGlobal( topLeft ) );
+    } );
+  }
+}
+
+bool KadasMapWidget::hasVisibleElevationLayer( QgsMapCanvas *canvas )
+{
+  if ( !canvas )
+    return false;
+
+  // expand group layers, so an elevation layer nested in a group is still matched
+  const QList<QgsMapLayer *> layers = canvas->layers( true );
+  return std::any_of( layers.begin(), layers.end(), []( QgsMapLayer *layer ) { return layer && layer->elevationProperties() && layer->elevationProperties()->hasElevation(); } );
+}
+
+void KadasMapWidget::updateElevationControllerVisibility()
+{
+  if ( !mElevationController )
     return;
 
-  // The labels are the other widget sharing the layout with the slider.
-  QWidget *labels = nullptr;
-  for ( int i = 0; i < sliderLayout->count(); ++i )
-  {
-    QWidget *widget = sliderLayout->itemAt( i )->widget();
-    if ( widget && widget != slider )
-    {
-      labels = widget;
-      break;
-    }
-  }
-  if ( !labels )
-    return;
+  // hiding the heightmap alone does not retire the controller, it still filters any
+  // other elevation layer left on the map
+  const bool hasElevationLayer = hasVisibleElevationLayer( mMapCanvas );
+  mElevationController->setVisible( hasElevationLayer );
 
-  if ( sliderLayout->indexOf( labels ) < sliderLayout->indexOf( slider ) )
-    return; // already reordered
-
-  sliderLayout->removeWidget( labels );
-  sliderLayout->removeWidget( slider );
-  sliderLayout->insertWidget( 0, labels );
-  sliderLayout->insertWidget( 1, slider, 1 );
+  // a hidden controller must not keep filtering the map, the user has no way to undo it.
+  // the range itself is kept, so showing the controller again restores the filter as it was
+  mMapCanvas->setZRange( hasElevationLayer ? mElevationController->range() : QgsDoubleRange() );
 }
 
 void KadasMapWidget::setElevationController()
@@ -228,7 +313,7 @@ void KadasMapWidget::setElevationController()
   {
     mElevationController = new QgsElevationControllerWidget( this );
     mElevationController->setMapCanvas( mMapCanvas );
-    moveElevationControllerLabelsToLeft( mElevationController );
+    adjustElevationControllerLayout( mElevationController );
     connect( mElevationController, &QgsElevationControllerWidget::rangeChanged, mMapCanvas, &QgsMapCanvas::setZRange );
     mMapCanvas->addOverlayWidget( mElevationController, Qt::Edge::RightEdge );
   }
@@ -244,6 +329,8 @@ void KadasMapWidget::setElevationController()
     mElevationController->setRangeLimits( rounded );
     mElevationController->setRange( rounded );
   }
+
+  updateElevationControllerVisibility();
 }
 
 void KadasMapWidget::removeElevationController()
@@ -252,6 +339,8 @@ void KadasMapWidget::removeElevationController()
   {
     delete mElevationController;
     mElevationController = nullptr;
+    // dropping the controller must not leave its filter behind
+    mMapCanvas->setZRange( QgsDoubleRange() );
     return;
   }
 }

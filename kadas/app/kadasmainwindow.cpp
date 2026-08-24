@@ -402,6 +402,7 @@ void KadasMainWindow::init()
     }
   } );
   connect( mMapCanvas, &QgsMapCanvas::layersChanged, this, &KadasMainWindow::updateBgLayerZoomResolutions );
+  connect( mMapCanvas, &QgsMapCanvas::layersChanged, this, &KadasMainWindow::updateElevationControllerVisibility );
   connect( mMapCanvas, &QgsMapCanvas::destinationCrsChanged, this, &KadasMainWindow::updateBgLayerZoomResolutions );
   connect( &mLoadingTimer, &QTimer::timeout, mLoadingLabel, &QLabel::show );
   connect( mRibbonWidget, &QTabWidget::currentChanged, [this] { mMapCanvas->unsetMapTool( mMapCanvas->mapTool() ); } ); // Clear tool when changing active kadas tab
@@ -597,7 +598,11 @@ void KadasMainWindow::updateWidgetPositions()
 
   mHomeButton->move( mMapCanvas->width() - distanceToRightBorder - mHomeButton->height(), distanceToTop + 90 );
 
-  mElevationControllerFrame->move( mMapCanvas->width() - distanceToRightBorder - mElevationControllerFrame->width(), distanceToTop + 150 );
+  // The elevation controller runs from below the home button down to the bottom of the canvas
+  const int elevationControllerTop = distanceToTop + 150;
+  const int distanceToBottom = 9;
+  mElevationControllerFrame
+    ->setGeometry( mMapCanvas->width() - distanceToRightBorder - mElevationControllerFrame->width(), elevationControllerTop, mElevationControllerFrame->width(), std::max( 0, mMapCanvas->height() - elevationControllerTop - distanceToBottom ) );
 
   // Reposition mRibbonbarButton
   mRibbonbarButton->move( 0.5 * mMapCanvas->width() - 0.5 * mRibbonbarButton->width(), 0 );
@@ -1780,6 +1785,7 @@ void KadasMainWindow::setElevationControllerRangeFromHeightmap()
   {
     delete mElevationController;
     mElevationController = nullptr;
+    updateElevationControllerVisibility();
 
     return;
   }
@@ -1789,7 +1795,7 @@ void KadasMainWindow::setElevationControllerRangeFromHeightmap()
   {
     mElevationController = new QgsElevationControllerWidget( this );
     mElevationController->setMapCanvas( mMapCanvas );
-    KadasMapWidget::moveElevationControllerLabelsToLeft( mElevationController );
+    KadasMapWidget::adjustElevationControllerLayout( mElevationController );
     connect( mElevationController, &QgsElevationControllerWidget::rangeChanged, this, &KadasMainWindow::setCanvasZRange );
     mElevationControllerFrame->layout()->addWidget( mElevationController );
   }
@@ -1806,6 +1812,20 @@ void KadasMainWindow::setElevationControllerRangeFromHeightmap()
     mElevationController->setRangeLimits( rounded );
     mElevationController->setRange( rounded );
   }
+
+  updateElevationControllerVisibility();
+}
+
+void KadasMainWindow::updateElevationControllerVisibility()
+{
+  // hiding the heightmap alone does not retire the controller, it still filters any
+  // other elevation layer left on the map
+  const bool hasElevationLayer = mElevationController && KadasMapWidget::hasVisibleElevationLayer( mMapCanvas );
+  mElevationControllerFrame->setVisible( hasElevationLayer );
+
+  // a hidden controller must not keep filtering the map, the user has no way to undo it.
+  // the range itself is kept, so showing the controller again restores the filter as it was
+  setCanvasZRange( hasElevationLayer ? mElevationController->range() : QgsDoubleRange() );
 }
 
 void KadasMainWindow::addCustomDropHandler( QgsCustomDropHandler *handler )

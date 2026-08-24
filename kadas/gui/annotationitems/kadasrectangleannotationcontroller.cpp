@@ -313,7 +313,7 @@ QString KadasRectangleAnnotationController::asKml( const QgsAnnotationItem *item
 
 KadasAnnotationStyleEditor *KadasRectangleAnnotationController::createStyleEditor( QWidget *parent ) const
 {
-  return new KadasPolygonStyleEditor( parent );
+  return new KadasRectangleStyleEditor( parent );
 }
 
 void KadasRectangleAnnotationController::applyPersistedStyle( QgsAnnotationItem *item ) const
