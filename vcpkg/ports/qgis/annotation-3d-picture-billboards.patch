@@ -1,0 +1,2317 @@
+From 3ee38634ca7a00d12b11f7c89fe34cb6187b095d Mon Sep 17 00:00:00 2001
+From: Nyall Dawson <nyall.dawson@gmail.com>
+Date: Mon, 24 Aug 2026 09:04:57 +1000
+Subject: [PATCH 1/7] Fix incorrectly culled billboard entities in 3d views
+
+Avoids the console being spammed with the qt warning:
+
+"findBoundingVolumeComputeData: Position attribute not suited for
+bounding volume computation warnings"
+
+and missing billboard entities in 3d views, due to incorrectly culled
+entities
+---
+ src/3d/symbols/qgsbillboardgeometry.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/3d/symbols/qgsbillboardgeometry.cpp b/src/3d/symbols/qgsbillboardgeometry.cpp
+index 08e7505d00a..e95ac83eee8 100644
+--- a/src/3d/symbols/qgsbillboardgeometry.cpp
++++ b/src/3d/symbols/qgsbillboardgeometry.cpp
+@@ -68,6 +68,7 @@ void QgsBillboardGeometry::setMode( Mode mode )
+   mPositionAttribute->setByteStride( stride );
+   mPositionAttribute->setName( Qt3DCore::QAttribute::defaultPositionAttributeName() );
+   addAttribute( mPositionAttribute );
++  setBoundingVolumePositionAttribute( mPositionAttribute );
+ 
+   switch ( mode )
+   {
+@@ -178,6 +179,7 @@ void QgsBillboardGeometry::setPositions( const QVector<QVector3D> &vertices )
+ 
+   mVertexCount = vertices.count();
+   mVertexBuffer->setData( vertexBufferData );
++  mPositionAttribute->setCount( mVertexCount );
+ 
+   emit countChanged( mVertexCount );
+ }
+@@ -248,6 +250,7 @@ void QgsBillboardGeometry::setBillboardData( const QVector<BillboardAtlasData> &
+ 
+   mVertexCount = billboards.count();
+   mVertexBuffer->setData( vertexBufferData );
++  mPositionAttribute->setCount( mVertexCount );
+ 
+   emit countChanged( mVertexCount );
+ }
+
+From e7a6de63f26361dcc19863457c5c82095cf5f677 Mon Sep 17 00:00:00 2001
+From: viperminiq <viperminiq@gmail.com>
+Date: Tue, 21 Jul 2026 08:54:23 +0200
+Subject: [PATCH 2/7] remove billboards.geom shader - code moved to
+ billboards.vert - quad is created in billboard geometry constructor
+
+---
+ src/3d/qgs3dsceneexporter.cpp                 |  2 +-
+ src/3d/qgsannotationlayerchunkloader_p.cpp    | 10 +++--
+ src/3d/qgsrubberband3d.cpp                    |  7 ++--
+ src/3d/shaders.qrc                            |  1 -
+ src/3d/shaders/billboards.vert                | 39 ++++++++++++++-----
+ src/3d/symbols/qgsbillboardgeometry.cpp       | 23 ++++++++++-
+ .../symbols/qgspoint3dbillboardmaterial.cpp   |  8 ----
+ src/3d/symbols/qgspoint3dsymbol_p.cpp         |  5 ++-
+ 8 files changed, 66 insertions(+), 29 deletions(-)
+
+diff --git a/src/3d/qgs3dsceneexporter.cpp b/src/3d/qgs3dsceneexporter.cpp
+index 3e5c510bb48..ef91cee69d1 100644
+--- a/src/3d/qgs3dsceneexporter.cpp
++++ b/src/3d/qgs3dsceneexporter.cpp
+@@ -830,7 +830,7 @@ Qgs3DExportObject *Qgs3DSceneExporter::processPoints( Qt3DCore::QEntity *entity,
+     Qt3DCore::QGeometry *geometry = qobject_cast<QgsBillboardGeometry *>( renderer->geometry() );
+     if ( !geometry )
+       continue;
+-    Qt3DCore::QAttribute *positionAttribute = findAttribute( geometry, Qt3DCore::QAttribute::defaultPositionAttributeName(), Qt3DCore::QAttribute::VertexAttribute );
++    Qt3DCore::QAttribute *positionAttribute = findAttribute( geometry, "instancePosition", Qt3DCore::QAttribute::VertexAttribute );
+     if ( !positionAttribute )
+     {
+       QgsDebugError( QString( "Cannot export '%1' - geometry has no position attribute!" ).arg( objectNamePrefix ) );
+diff --git a/src/3d/qgsannotationlayerchunkloader_p.cpp b/src/3d/qgsannotationlayerchunkloader_p.cpp
+index 84b7640a3db..c0887abbf66 100644
+--- a/src/3d/qgsannotationlayerchunkloader_p.cpp
++++ b/src/3d/qgsannotationlayerchunkloader_p.cpp
+@@ -452,9 +452,10 @@ Qt3DCore::QEntity *QgsAnnotationLayerChunkLoader::createEntity( Qt3DCore::QEntit
+     billboardGeometry->setBillboardData( mBillboardPositions, true );
+ 
+     Qt3DRender::QGeometryRenderer *billboardGeometryRenderer = new Qt3DRender::QGeometryRenderer;
+-    billboardGeometryRenderer->setPrimitiveType( Qt3DRender::QGeometryRenderer::Points );
++    billboardGeometryRenderer->setPrimitiveType( Qt3DRender::QGeometryRenderer::TriangleStrip );
+     billboardGeometryRenderer->setGeometry( billboardGeometry );
+-    billboardGeometryRenderer->setVertexCount( billboardGeometry->count() );
++    billboardGeometryRenderer->setVertexCount( 4 );
++    billboardGeometryRenderer->setInstanceCount( mBillboardPositions.count() );
+ 
+     QgsPoint3DBillboardMaterial *billboardMaterial = new QgsPoint3DBillboardMaterial( QgsPoint3DBillboardMaterial::Mode::AtlasTextureWithPixelOffsets );
+     billboardMaterial->setTexture2DFromImage( mBillboardAtlas );
+@@ -472,9 +473,10 @@ Qt3DCore::QEntity *QgsAnnotationLayerChunkLoader::createEntity( Qt3DCore::QEntit
+     textBillboardGeometry->setBillboardData( mTextBillboardPositions, true );
+ 
+     Qt3DRender::QGeometryRenderer *billboardGeometryRenderer = new Qt3DRender::QGeometryRenderer;
+-    billboardGeometryRenderer->setPrimitiveType( Qt3DRender::QGeometryRenderer::Points );
++    billboardGeometryRenderer->setPrimitiveType( Qt3DRender::QGeometryRenderer::TriangleStrip );
+     billboardGeometryRenderer->setGeometry( textBillboardGeometry );
+-    billboardGeometryRenderer->setVertexCount( textBillboardGeometry->count() );
++    billboardGeometryRenderer->setVertexCount( 4 );
++    billboardGeometryRenderer->setInstanceCount( mTextBillboardPositions.count() );
+ 
+     QgsPoint3DBillboardMaterial *billboardMaterial = new QgsPoint3DBillboardMaterial( QgsPoint3DBillboardMaterial::Mode::AtlasTextureWithPixelOffsets );
+     billboardMaterial->setTexture2DFromImage( mTextBillboardAtlas );
+diff --git a/src/3d/qgsrubberband3d.cpp b/src/3d/qgsrubberband3d.cpp
+index 58d1aecb656..0559c370f83 100644
+--- a/src/3d/qgsrubberband3d.cpp
++++ b/src/3d/qgsrubberband3d.cpp
+@@ -80,9 +80,9 @@ void QgsRubberBand3D::setupMarker( Qt3DCore::QEntity *parentEntity )
+   mMarkerEntity = make_qobject_unique<Qt3DCore::QEntity>( parentEntity );
+   mMarkerGeometry = new QgsBillboardGeometry();
+   mMarkerGeometryRenderer = new Qt3DRender::QGeometryRenderer;
+-  mMarkerGeometryRenderer->setPrimitiveType( Qt3DRender::QGeometryRenderer::Points );
++  mMarkerGeometryRenderer->setPrimitiveType( Qt3DRender::QGeometryRenderer::TriangleStrip );
+   mMarkerGeometryRenderer->setGeometry( mMarkerGeometry );
+-  mMarkerGeometryRenderer->setVertexCount( mMarkerGeometry->count() );
++  mMarkerGeometryRenderer->setVertexCount( 4 );
+ 
+   setMarkerType( mMarkerType );
+   mMarkerEntity->addComponent( mMarkerGeometryRenderer );
+@@ -452,7 +452,8 @@ void QgsRubberBand3D::updateGeometry()
+     lineData.vertices.pop_back();
+ 
+   mMarkerGeometry->setPositions( lineData.vertices );
+-  mMarkerGeometryRenderer->setVertexCount( static_cast<int>( lineData.vertices.count() ) );
++  mMarkerGeometryRenderer->setVertexCount( 4 );
++  mMarkerGeometryRenderer->setInstanceCount( lineData.vertices.count() );
+   mMarkerTransform->setGeoTranslation( dataOrigin );
+ 
+   if ( mGeometryType == Qgis::GeometryType::Polygon )
+diff --git a/src/3d/shaders.qrc b/src/3d/shaders.qrc
+index b760b103970..6a947a9b286 100644
+--- a/src/3d/shaders.qrc
++++ b/src/3d/shaders.qrc
+@@ -7,7 +7,6 @@
+         <file>shaders/lines.vert</file>
+         <file>shaders/lines.geom</file>
+         <file>shaders/lines.frag</file>
+-        <file>shaders/billboards.geom</file>
+         <file>shaders/billboards.frag</file>
+         <file>shaders/billboards.vert</file>
+         <file>shaders/mesh/mesh.vert</file>
+diff --git a/src/3d/shaders/billboards.vert b/src/3d/shaders/billboards.vert
+index c06db2da614..69362808b67 100644
+--- a/src/3d/shaders/billboards.vert
++++ b/src/3d/shaders/billboards.vert
+@@ -2,27 +2,48 @@
+ 
+ uniform mat4 modelViewProjection;
+ 
+-in vec3 vertexPosition;
++in vec2 vertexPosition;
++in vec3 instancePosition;
++
++uniform vec2 BB_SIZE;    // billboard size in pixels
++uniform vec2 WIN_SCALE;	 // the size of the viewport in pixels
++
++out vec2 UV;
++
+ #ifdef TEXTURE_ATLAS
+ in vec2 atlasOffset; // The top-left corner of the sprite in the atlas (normalized, 0-1)
+ in vec2 atlasSize;   // The size of the sprite in the atlas (normalized, 0-1)
+-
+-out vec2 gsAtlasOffset;
+-out vec2 gsAtlasSize;
+ #endif
++
+ #ifdef TEXTURE_ATLAS_PIXEL_OFFSETS
+ in ivec2 pixelOffset;
+-out ivec2 gsPixelOffset;
+ #endif
+ 
+ void main(void)
+ {
++  vec2 spritePixelSize = 2 * BB_SIZE / WIN_SCALE; // multiply by 2 to adjust for -1, 1 range for display coordinates
++
+ #ifdef TEXTURE_ATLAS
+-    gsAtlasOffset = atlasOffset;
+-    gsAtlasSize = atlasSize;
++  vec2 textureOffset = atlasOffset;
++  vec2 textureSize = atlasSize;
++  // scale sprite size by the texture size, so that billboard sizes are scaled by the relative size of their associated textures
++  spritePixelSize *= textureSize;
+ #endif
++
++  vec4 P = modelViewProjection * vec4(instancePosition, 1);
++  P /= P.w;
++  P.xy += vertexPosition * spritePixelSize;
++
+ #ifdef TEXTURE_ATLAS_PIXEL_OFFSETS
+-    gsPixelOffset = pixelOffset;
++  // convert the pixel offset to display coordinates, multiplying by 2 to adjust for -1, 1 range for display coordinates
++  P.xy += 2.0 * vec2(pixelOffset) / WIN_SCALE;
++#endif
++
++  gl_Position = P;
++
++#ifdef TEXTURE_ATLAS
++  UV = textureOffset + (vertexPosition + vec2(0.5)) * textureSize;
++#else
++  UV = vertexPosition + vec2(0.5);
+ #endif
+-    gl_Position = modelViewProjection * vec4(vertexPosition, 1);
+ }
+diff --git a/src/3d/symbols/qgsbillboardgeometry.cpp b/src/3d/symbols/qgsbillboardgeometry.cpp
+index e95ac83eee8..257e213a323 100644
+--- a/src/3d/symbols/qgsbillboardgeometry.cpp
++++ b/src/3d/symbols/qgsbillboardgeometry.cpp
+@@ -28,6 +28,21 @@ QgsBillboardGeometry::QgsBillboardGeometry( Qt3DCore::QNode *parent )
+   : QGeometry( parent )
+   , mVertexBuffer( new Qt3DCore::QBuffer( this ) )
+ {
++  static constexpr float quadVertices[] = { -0.5f, -0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, 0.5f };
++  Qt3DCore::QBuffer *quadVertexBuffer = new Qt3DCore::QBuffer( this );
++  quadVertexBuffer->setData( QByteArray( reinterpret_cast<const char *>( quadVertices ), sizeof( quadVertices ) ) );
++
++  Qt3DCore::QAttribute *quadVertexAttribute = new Qt3DCore::QAttribute( this );
++  quadVertexAttribute->setAttributeType( Qt3DCore::QAttribute::VertexAttribute );
++  quadVertexAttribute->setBuffer( quadVertexBuffer );
++  quadVertexAttribute->setVertexBaseType( Qt3DCore::QAttribute::Float );
++  quadVertexAttribute->setVertexSize( 2 );
++  quadVertexAttribute->setByteOffset( 0 );
++  quadVertexAttribute->setByteStride( 2 * sizeof( float ) );
++  quadVertexAttribute->setCount( 4 );
++  quadVertexAttribute->setName( u"vertexPosition"_s );
++  addAttribute( quadVertexAttribute );
++
+   setMode( Mode::PositionOnly );
+ }
+ 
+@@ -66,7 +81,8 @@ void QgsBillboardGeometry::setMode( Mode mode )
+   mPositionAttribute->setVertexSize( 3 );
+   mPositionAttribute->setByteOffset( 0 );
+   mPositionAttribute->setByteStride( stride );
+-  mPositionAttribute->setName( Qt3DCore::QAttribute::defaultPositionAttributeName() );
++  mPositionAttribute->setDivisor( 1 );
++  mPositionAttribute->setName( "instancePosition" );
+   addAttribute( mPositionAttribute );
+   setBoundingVolumePositionAttribute( mPositionAttribute );
+ 
+@@ -111,6 +127,7 @@ void QgsBillboardGeometry::setMode( Mode mode )
+       mAtlasOffsetAttribute->setVertexSize( 2 );
+       mAtlasOffsetAttribute->setByteOffset( 3 * sizeof( float ) );
+       mAtlasOffsetAttribute->setByteStride( stride );
++      mAtlasOffsetAttribute->setDivisor( 1 );
+       mAtlasOffsetAttribute->setName( u"atlasOffset"_s );
+       addAttribute( mAtlasOffsetAttribute );
+ 
+@@ -121,6 +138,7 @@ void QgsBillboardGeometry::setMode( Mode mode )
+       mAtlasSizeAttribute->setVertexSize( 2 );
+       mAtlasSizeAttribute->setByteOffset( ( 3 + 2 ) * sizeof( float ) );
+       mAtlasSizeAttribute->setByteStride( stride );
++      mAtlasSizeAttribute->setDivisor( 1 );
+       mAtlasSizeAttribute->setName( u"atlasSize"_s );
+       addAttribute( mAtlasSizeAttribute );
+       break;
+@@ -135,6 +153,7 @@ void QgsBillboardGeometry::setMode( Mode mode )
+       mAtlasOffsetAttribute->setVertexSize( 2 );
+       mAtlasOffsetAttribute->setByteOffset( 3 * sizeof( float ) );
+       mAtlasOffsetAttribute->setByteStride( stride );
++      mAtlasOffsetAttribute->setDivisor( 1 );
+       mAtlasOffsetAttribute->setName( u"atlasOffset"_s );
+       addAttribute( mAtlasOffsetAttribute );
+ 
+@@ -145,6 +164,7 @@ void QgsBillboardGeometry::setMode( Mode mode )
+       mAtlasSizeAttribute->setVertexSize( 2 );
+       mAtlasSizeAttribute->setByteOffset( ( 3 + 2 ) * sizeof( float ) );
+       mAtlasSizeAttribute->setByteStride( stride );
++      mAtlasSizeAttribute->setDivisor( 1 );
+       mAtlasSizeAttribute->setName( u"atlasSize"_s );
+       addAttribute( mAtlasSizeAttribute );
+ 
+@@ -155,6 +175,7 @@ void QgsBillboardGeometry::setMode( Mode mode )
+       mAtlasPixelOffsetAttribute->setVertexSize( 2 );
+       mAtlasPixelOffsetAttribute->setByteOffset( ( 3 + 2 + 2 ) * sizeof( float ) );
+       mAtlasPixelOffsetAttribute->setByteStride( stride );
++      mAtlasPixelOffsetAttribute->setDivisor( 1 );
+       mAtlasPixelOffsetAttribute->setName( u"pixelOffset"_s );
+       addAttribute( mAtlasPixelOffsetAttribute );
+       break;
+diff --git a/src/3d/symbols/qgspoint3dbillboardmaterial.cpp b/src/3d/symbols/qgspoint3dbillboardmaterial.cpp
+index 611236a6f38..0f06c9f52c9 100644
+--- a/src/3d/symbols/qgspoint3dbillboardmaterial.cpp
++++ b/src/3d/symbols/qgspoint3dbillboardmaterial.cpp
+@@ -64,14 +64,12 @@ QgsPoint3DBillboardMaterial::QgsPoint3DBillboardMaterial( Mode mode )
+   Qt3DRender::QShaderProgram *shaderProgram = new Qt3DRender::QShaderProgram( this );
+ 
+   const QUrl urlVert( u"qrc:/shaders/billboards.vert"_s );
+-  const QUrl urlGeom( u"qrc:/shaders/billboards.geom"_s );
+ 
+   switch ( mode )
+   {
+     case Mode::SingleTexture:
+     {
+       shaderProgram->setVertexShaderCode( Qt3DRender::QShaderProgram::loadSource( urlVert ) );
+-      shaderProgram->setGeometryShaderCode( Qt3DRender::QShaderProgram::loadSource( urlGeom ) );
+       break;
+     }
+     case Mode::AtlasTexture:
+@@ -80,9 +78,6 @@ QgsPoint3DBillboardMaterial::QgsPoint3DBillboardMaterial( Mode mode )
+       const QByteArray finalVertexShaderCode = Qgs3DUtils::addDefinesToShaderCode( vertexShaderCode, QStringList( { "TEXTURE_ATLAS" } ) );
+       shaderProgram->setVertexShaderCode( finalVertexShaderCode );
+ 
+-      const QByteArray geomShaderCode = Qt3DRender::QShaderProgram::loadSource( urlGeom );
+-      const QByteArray finalGeomShaderCode = Qgs3DUtils::addDefinesToShaderCode( geomShaderCode, QStringList( { "TEXTURE_ATLAS" } ) );
+-      shaderProgram->setGeometryShaderCode( finalGeomShaderCode );
+       break;
+     }
+     case Mode::AtlasTextureWithPixelOffsets:
+@@ -91,9 +86,6 @@ QgsPoint3DBillboardMaterial::QgsPoint3DBillboardMaterial( Mode mode )
+       const QByteArray finalVertexShaderCode = Qgs3DUtils::addDefinesToShaderCode( vertexShaderCode, QStringList( { "TEXTURE_ATLAS", "TEXTURE_ATLAS_PIXEL_OFFSETS" } ) );
+       shaderProgram->setVertexShaderCode( finalVertexShaderCode );
+ 
+-      const QByteArray geomShaderCode = Qt3DRender::QShaderProgram::loadSource( urlGeom );
+-      const QByteArray finalGeomShaderCode = Qgs3DUtils::addDefinesToShaderCode( geomShaderCode, QStringList( { "TEXTURE_ATLAS", "TEXTURE_ATLAS_PIXEL_OFFSETS" } ) );
+-      shaderProgram->setGeometryShaderCode( finalGeomShaderCode );
+       break;
+     }
+   }
+diff --git a/src/3d/symbols/qgspoint3dsymbol_p.cpp b/src/3d/symbols/qgspoint3dsymbol_p.cpp
+index 87fef9d9b09..031768f9987 100644
+--- a/src/3d/symbols/qgspoint3dsymbol_p.cpp
++++ b/src/3d/symbols/qgspoint3dsymbol_p.cpp
+@@ -961,9 +961,10 @@ void QgsPoint3DBillboardSymbolHandler::makeEntity( Qt3DCore::QEntity *parent, co
+ 
+   // Billboard Geometry Renderer
+   Qt3DRender::QGeometryRenderer *billboardGeometryRenderer = new Qt3DRender::QGeometryRenderer;
+-  billboardGeometryRenderer->setPrimitiveType( Qt3DRender::QGeometryRenderer::Points );
++  billboardGeometryRenderer->setPrimitiveType( Qt3DRender::QGeometryRenderer::TriangleStrip );
+   billboardGeometryRenderer->setGeometry( billboardGeometry );
+-  billboardGeometryRenderer->setVertexCount( billboardGeometry->count() );
++  billboardGeometryRenderer->setVertexCount( 4 );
++  billboardGeometryRenderer->setInstanceCount( out.positions.count() );
+ 
+   // Billboard Material
+   QgsPoint3DBillboardMaterial *billboardMaterial = new QgsPoint3DBillboardMaterial();
+
+From 1f5c5d2cad29b90c91762ffc731f55ad0c6a2bfb Mon Sep 17 00:00:00 2001
+From: viperminiq <viperminiq@gmail.com>
+Date: Tue, 21 Jul 2026 09:40:32 +0200
+Subject: [PATCH 3/7] remove shader
+
+---
+ src/3d/shaders/billboards.geom | 82 ----------------------------------
+ 1 file changed, 82 deletions(-)
+ delete mode 100644 src/3d/shaders/billboards.geom
+
+diff --git a/src/3d/shaders/billboards.geom b/src/3d/shaders/billboards.geom
+deleted file mode 100644
+index e0e0fe6e28b..00000000000
+--- a/src/3d/shaders/billboards.geom
++++ /dev/null
+@@ -1,82 +0,0 @@
+-#version 150
+-
+-// input
+-layout (points) in;
+-// output
+-layout (triangle_strip, max_vertices = 4) out;
+-
+-uniform mat4 modelViewProjection;
+-
+-uniform vec2 BB_SIZE;    // billboard size in pixels
+-uniform vec2 WIN_SCALE;	 // the size of the viewport in pixels
+-
+-#ifdef TEXTURE_ATLAS
+-in vec2 gsAtlasOffset[];
+-in vec2 gsAtlasSize[];
+-#endif
+-
+-#ifdef TEXTURE_ATLAS_PIXEL_OFFSETS
+-in ivec2 gsPixelOffset[];
+-#endif
+-
+-out vec2 UV;
+-// glsl
+-
+-void main (void)
+-{
+-
+-  vec4 P = gl_in[0].gl_Position;
+-  P /= P.w;
+-
+-  vec2 spritePixelSize = 2 * BB_SIZE / WIN_SCALE; // multiply by 2 to adjust for -1, 1 range for display coordinates
+-
+-#ifdef TEXTURE_ATLAS_PIXEL_OFFSETS
+-  // convert the pixel offset to display coordinates, multiplying by 2 to adjust for -1, 1 range for display coordinates
+-  P.xy += 2.0 * gsPixelOffset[0] / WIN_SCALE;
+-#endif
+-
+-#ifdef TEXTURE_ATLAS
+-  vec2 textureOffset = gsAtlasOffset[0];
+-  vec2 textureSize = gsAtlasSize[0];
+-  // scale sprite size by the texture size, so that billboard sizes are scaled by the relative size of their associated textures
+-  spritePixelSize *= textureSize;
+-#endif
+-
+-  gl_Position = P;
+-  gl_Position.xy += vec2(-0.5,-0.5) * spritePixelSize;
+-#ifdef TEXTURE_ATLAS
+-  UV = textureOffset;
+-#else
+-  UV = vec2(0,0);
+-#endif
+-  EmitVertex();
+-
+-  gl_Position = P;
+-  gl_Position.xy += vec2(0.5,-0.5) * spritePixelSize;
+-#ifdef TEXTURE_ATLAS
+-  UV = textureOffset + vec2(textureSize.x,0);
+-#else
+-  UV = vec2(1,0);
+-#endif
+-  EmitVertex();
+-
+-  gl_Position = P;
+-  gl_Position.xy += vec2(-0.5,+0.5) * spritePixelSize;
+-#ifdef TEXTURE_ATLAS
+-  UV = textureOffset + vec2(0, textureSize.y);
+-#else
+-  UV = vec2(0,1);
+-#endif
+-  EmitVertex();
+-
+-  gl_Position = P;
+-  gl_Position.xy += vec2(+0.5,+0.5) * spritePixelSize;
+-#ifdef TEXTURE_ATLAS
+-  UV = textureOffset + textureSize;
+-#else
+-  UV = vec2(1,1);
+-#endif
+-  EmitVertex();
+-
+-  EndPrimitive();
+-}
+
+From 3e9d9f0f749f634ccda840f5ddc22bf02ee75192 Mon Sep 17 00:00:00 2001
+From: Nyall Dawson <nyall.dawson@gmail.com>
+Date: Fri, 21 Aug 2026 13:05:29 +1000
+Subject: [PATCH 4/7] [api] Add billboard scale mode support to
+ QgsPoint3DBillboardMaterial
+
+Allows creation of perspective corrected billboards, which scale
+size by distance from the camera but are always oriented to face
+directly at the camera
+---
+ python/PyQt6/core/auto_additions/qgis.py      | 13 ++++
+ python/PyQt6/core/auto_generated/qgis.sip.in  |  6 ++
+ src/3d/shaders/billboards.vert                | 51 ++++++++++-----
+ .../symbols/qgspoint3dbillboardmaterial.cpp   | 62 ++++++++++++++-----
+ src/3d/symbols/qgspoint3dbillboardmaterial.h  |  5 +-
+ src/core/qgis.h                               | 12 ++++
+ 6 files changed, 115 insertions(+), 34 deletions(-)
+
+diff --git a/python/PyQt6/core/auto_additions/qgis.py b/python/PyQt6/core/auto_additions/qgis.py
+index ce67d10067f..11721fe88c0 100644
+--- a/python/PyQt6/core/auto_additions/qgis.py
++++ b/python/PyQt6/core/auto_additions/qgis.py
+@@ -7862,6 +7862,19 @@ Qgis.InstancedMaterialFlags = lambda flags=0: Qgis.InstancedMaterialFlag(flags)
+ Qgis.InstancedMaterialFlags.baseClass = Qgis
+ InstancedMaterialFlags = Qgis  # dirty hack since SIP seems to introduce the flags in module
+ # monkey patching scoped based enum
++Qgis.BillboardScaleMode.ViewIndependent.__doc__ = "Billboard has a fixed pixel size on the screen, regardless of the camera distance"
++Qgis.BillboardScaleMode.Perspective.__doc__ = "Billboard size is scaled with perspective distance from camera, using world units"
++Qgis.BillboardScaleMode.__doc__ = """3D billboard scaling modes.
++
++.. versionadded:: 4.4
++
++* ``ViewIndependent``: Billboard has a fixed pixel size on the screen, regardless of the camera distance
++* ``Perspective``: Billboard size is scaled with perspective distance from camera, using world units
++
++"""
++# --
++Qgis.BillboardScaleMode.baseClass = Qgis
++# monkey patching scoped based enum
+ Qgis.TextureFilterQuality.Trilinear.__doc__ = "Trilinear (LinearMipmapLinear)"
+ Qgis.TextureFilterQuality.Anisotropic2x.__doc__ = "Anisotropic filtering (2x)"
+ Qgis.TextureFilterQuality.Anisotropic4x.__doc__ = "Anisotropic filtering (4x)"
+diff --git a/python/PyQt6/core/auto_generated/qgis.sip.in b/python/PyQt6/core/auto_generated/qgis.sip.in
+index 73906f9ad3f..155d4c62f9b 100644
+--- a/python/PyQt6/core/auto_generated/qgis.sip.in
++++ b/python/PyQt6/core/auto_generated/qgis.sip.in
+@@ -2466,6 +2466,12 @@ The development version
+     typedef QFlags<Qgis::InstancedMaterialFlag> InstancedMaterialFlags;
+ 
+ 
++    enum class BillboardScaleMode /BaseType=IntEnum/
++    {
++      ViewIndependent,
++      Perspective
++    };
++
+     enum class TextureFilterQuality /BaseType=IntEnum/
+     {
+       Trilinear,
+diff --git a/src/3d/shaders/billboards.vert b/src/3d/shaders/billboards.vert
+index 69362808b67..aed56766a99 100644
+--- a/src/3d/shaders/billboards.vert
++++ b/src/3d/shaders/billboards.vert
+@@ -1,12 +1,17 @@
+ #version 150
+ 
+-uniform mat4 modelViewProjection;
+-
+ in vec2 vertexPosition;
+ in vec3 instancePosition;
+ 
+ uniform vec2 BB_SIZE;    // billboard size in pixels
++
++#ifdef PERSPECTIVE_SCALE
++uniform mat4 modelView;
++uniform mat4 projectionMatrix;
++#else
++uniform mat4 modelViewProjection;
+ uniform vec2 WIN_SCALE;	 // the size of the viewport in pixels
++#endif
+ 
+ out vec2 UV;
+ 
+@@ -21,25 +26,37 @@ in ivec2 pixelOffset;
+ 
+ void main(void)
+ {
+-  vec2 spritePixelSize = 2 * BB_SIZE / WIN_SCALE; // multiply by 2 to adjust for -1, 1 range for display coordinates
++#ifdef PERSPECTIVE_SCALE
++    // transform instance position into view space
++    vec4 viewPos = modelView * vec4(instancePosition, 1.0);
+ 
+-#ifdef TEXTURE_ATLAS
+-  vec2 textureOffset = atlasOffset;
+-  vec2 textureSize = atlasSize;
+-  // scale sprite size by the texture size, so that billboard sizes are scaled by the relative size of their associated textures
+-  spritePixelSize *= textureSize;
+-#endif
++    vec2 size = BB_SIZE;
+ 
+-  vec4 P = modelViewProjection * vec4(instancePosition, 1);
+-  P /= P.w;
+-  P.xy += vertexPosition * spritePixelSize;
++    // offset quad vertices directly in view space using world units
++    viewPos.xy += vertexPosition * size;
+ 
+-#ifdef TEXTURE_ATLAS_PIXEL_OFFSETS
+-  // convert the pixel offset to display coordinates, multiplying by 2 to adjust for -1, 1 range for display coordinates
+-  P.xy += 2.0 * vec2(pixelOffset) / WIN_SCALE;
+-#endif
++    gl_Position = projectionMatrix * viewPos;
++#else
++    vec2 spritePixelSize = 2 * BB_SIZE / WIN_SCALE; // multiply by 2 to adjust for -1, 1 range for display coordinates
++
++    #ifdef TEXTURE_ATLAS
++      vec2 textureOffset = atlasOffset;
++      vec2 textureSize = atlasSize;
++      // scale sprite size by the texture size, so that billboard sizes are scaled by the relative size of their associated textures
++      spritePixelSize *= textureSize;
++    #endif
+ 
+-  gl_Position = P;
++    vec4 P = modelViewProjection * vec4(instancePosition, 1);
++    P /= P.w;
++    P.xy += vertexPosition * spritePixelSize;
++
++    #ifdef TEXTURE_ATLAS_PIXEL_OFFSETS
++      // convert the pixel offset to display coordinates, multiplying by 2 to adjust for -1, 1 range for display coordinates
++      P.xy += 2.0 * vec2(pixelOffset) / WIN_SCALE;
++    #endif
++
++    gl_Position = P;
++#endif
+ 
+ #ifdef TEXTURE_ATLAS
+   UV = textureOffset + (vertexPosition + vec2(0.5)) * textureSize;
+diff --git a/src/3d/symbols/qgspoint3dbillboardmaterial.cpp b/src/3d/symbols/qgspoint3dbillboardmaterial.cpp
+index 0f06c9f52c9..8d06a0447ef 100644
+--- a/src/3d/symbols/qgspoint3dbillboardmaterial.cpp
++++ b/src/3d/symbols/qgspoint3dbillboardmaterial.cpp
+@@ -36,9 +36,9 @@
+ 
+ using namespace Qt::StringLiterals;
+ 
+-QgsPoint3DBillboardMaterial::QgsPoint3DBillboardMaterial( Mode mode )
++QgsPoint3DBillboardMaterial::QgsPoint3DBillboardMaterial( Mode mode, Qgis::BillboardScaleMode scaleMode )
+   : mSize( new Qt3DRender::QParameter( "BB_SIZE", QSizeF( 100, 100 ), this ) )
+-  , mViewportSize( new Qt3DRender::QParameter( "WIN_SCALE", QSizeF( 800, 600 ), this ) )
++  , mScaleMode( scaleMode )
+ {
+   // billboard materials should not cast shadows -- this causes weird unnatural effects,
+   // as the size and orientation of the billboard seen by the light camera
+@@ -46,7 +46,19 @@ QgsPoint3DBillboardMaterial::QgsPoint3DBillboardMaterial( Mode mode )
+   setCastsShadows( false );
+ 
+   addParameter( mSize );
+-  addParameter( mViewportSize );
++
++  switch ( mScaleMode )
++  {
++    case Qgis::BillboardScaleMode::ViewIndependent:
++    {
++      mViewportSize = new Qt3DRender::QParameter( "WIN_SCALE", QSizeF( 800, 600 ), this );
++      addParameter( mViewportSize );
++      break;
++    }
++
++    case Qgis::BillboardScaleMode::Perspective:
++      break;
++  }
+ 
+   // Initialize with empty parameter.
+   mTexture2D = new Qt3DRender::QParameter( "tex0", QVariant(), this );
+@@ -64,31 +76,39 @@ QgsPoint3DBillboardMaterial::QgsPoint3DBillboardMaterial( Mode mode )
+   Qt3DRender::QShaderProgram *shaderProgram = new Qt3DRender::QShaderProgram( this );
+ 
+   const QUrl urlVert( u"qrc:/shaders/billboards.vert"_s );
++  QStringList vertexShaderDefines;
+ 
+   switch ( mode )
+   {
+     case Mode::SingleTexture:
+-    {
+-      shaderProgram->setVertexShaderCode( Qt3DRender::QShaderProgram::loadSource( urlVert ) );
+       break;
+-    }
++
+     case Mode::AtlasTexture:
+     {
+-      const QByteArray vertexShaderCode = Qt3DRender::QShaderProgram::loadSource( urlVert );
+-      const QByteArray finalVertexShaderCode = Qgs3DUtils::addDefinesToShaderCode( vertexShaderCode, QStringList( { "TEXTURE_ATLAS" } ) );
+-      shaderProgram->setVertexShaderCode( finalVertexShaderCode );
+-
++      vertexShaderDefines << u"TEXTURE_ATLAS"_s;
+       break;
+     }
++
+     case Mode::AtlasTextureWithPixelOffsets:
+     {
+-      const QByteArray vertexShaderCode = Qt3DRender::QShaderProgram::loadSource( urlVert );
+-      const QByteArray finalVertexShaderCode = Qgs3DUtils::addDefinesToShaderCode( vertexShaderCode, QStringList( { "TEXTURE_ATLAS", "TEXTURE_ATLAS_PIXEL_OFFSETS" } ) );
+-      shaderProgram->setVertexShaderCode( finalVertexShaderCode );
+-
++      vertexShaderDefines << u"TEXTURE_ATLAS"_s << u"TEXTURE_ATLAS_PIXEL_OFFSETS"_s;
+       break;
+     }
+   }
++
++  switch ( mScaleMode )
++  {
++    case Qgis::BillboardScaleMode::ViewIndependent:
++      break;
++    case Qgis::BillboardScaleMode::Perspective:
++      vertexShaderDefines << u"PERSPECTIVE_SCALE"_s;
++      break;
++  }
++
++  const QByteArray vertexShaderCode = Qt3DRender::QShaderProgram::loadSource( urlVert );
++  const QByteArray finalVertexShaderCode = Qgs3DUtils::addDefinesToShaderCode( vertexShaderCode, vertexShaderDefines );
++  shaderProgram->setVertexShaderCode( finalVertexShaderCode );
++
+   shaderProgram->setFragmentShaderCode( Qt3DRender::QShaderProgram::loadSource( QUrl( u"qrc:/shaders/billboards.frag"_s ) ) );
+ 
+   // Render Pass
+@@ -132,12 +152,22 @@ QSizeF QgsPoint3DBillboardMaterial::size() const
+ 
+ void QgsPoint3DBillboardMaterial::setViewportSize( const QSizeF size )
+ {
+-  mViewportSize->setValue( size );
++  if ( mViewportSize )
++  {
++    mViewportSize->setValue( size );
++  }
+ }
+ 
+ QSizeF QgsPoint3DBillboardMaterial::windowSize() const
+ {
+-  return mViewportSize->value().value<QSizeF>();
++  if ( mViewportSize )
++  {
++    return mViewportSize->value().value<QSizeF>();
++  }
++  else
++  {
++    return QSizeF();
++  }
+ }
+ 
+ void QgsPoint3DBillboardMaterial::setTexture2DFromImage( const QImage &image )
+diff --git a/src/3d/symbols/qgspoint3dbillboardmaterial.h b/src/3d/symbols/qgspoint3dbillboardmaterial.h
+index 926342d0365..065a0967d4d 100644
+--- a/src/3d/symbols/qgspoint3dbillboardmaterial.h
++++ b/src/3d/symbols/qgspoint3dbillboardmaterial.h
+@@ -15,6 +15,7 @@
+ #ifndef QGSPOINT3DBILLBOARDMATERIAL_H
+ #define QGSPOINT3DBILLBOARDMATERIAL_H
+ 
++#include "qgis.h"
+ #include "qgis_3d.h"
+ #include "qgsmaterial.h"
+ 
+@@ -57,7 +58,7 @@ class _3D_EXPORT QgsPoint3DBillboardMaterial : public QgsMaterial
+     /**
+      * Constructor for QgsPoint3DBillboardMaterial, using the specified \a mode.
+      */
+-    QgsPoint3DBillboardMaterial( Mode mode = Mode::SingleTexture );
++    QgsPoint3DBillboardMaterial( Mode mode = Mode::SingleTexture, Qgis::BillboardScaleMode scaleMode = Qgis::BillboardScaleMode::ViewIndependent );
+     ~QgsPoint3DBillboardMaterial() override;
+ 
+     //! Set the billboard size.
+@@ -93,6 +94,8 @@ class _3D_EXPORT QgsPoint3DBillboardMaterial : public QgsMaterial
+     Qt3DRender::QParameter *mSize = nullptr;
+     Qt3DRender::QParameter *mViewportSize = nullptr;
+     Qt3DRender::QParameter *mTexture2D = nullptr;
++
++    Qgis::BillboardScaleMode mScaleMode = Qgis::BillboardScaleMode::ViewIndependent;
+ };
+ 
+ 
+diff --git a/src/core/qgis.h b/src/core/qgis.h
+index 6cb060a11ea..6d749cc4bd8 100644
+--- a/src/core/qgis.h
++++ b/src/core/qgis.h
+@@ -4398,6 +4398,18 @@ int QgisEvent = QEvent::User + 1;
+     Q_DECLARE_FLAGS( InstancedMaterialFlags, InstancedMaterialFlag )
+     Q_FLAG( InstancedMaterialFlags )
+ 
++    /**
++     * 3D billboard scaling modes.
++     *
++     * \since QGIS 4.4
++     */
++    enum class BillboardScaleMode : int
++    {
++      ViewIndependent, //!< Billboard has a fixed pixel size on the screen, regardless of the camera distance
++      Perspective      //!< Billboard size is scaled with perspective distance from camera, using world units
++    };
++    Q_ENUM( BillboardScaleMode )
++
+     /**
+      * Texture filtering qualities.
+      *
+
+From e528c3b597029c739f4e60aef0c333bb54ba21a5 Mon Sep 17 00:00:00 2001
+From: Nyall Dawson <nyall.dawson@gmail.com>
+Date: Mon, 24 Aug 2026 09:41:39 +1000
+Subject: [PATCH 5/7] [api] Cleanup attribute/mode handling in
+ QgsBillboardGeometry
+
+Make the API more flexible
+---
+ src/3d/symbols/qgsbillboardgeometry.cpp | 193 ++++++++++--------------
+ src/3d/symbols/qgsbillboardgeometry.h   |  14 +-
+ 2 files changed, 89 insertions(+), 118 deletions(-)
+
+diff --git a/src/3d/symbols/qgsbillboardgeometry.cpp b/src/3d/symbols/qgsbillboardgeometry.cpp
+index 257e213a323..458aa205372 100644
+--- a/src/3d/symbols/qgsbillboardgeometry.cpp
++++ b/src/3d/symbols/qgsbillboardgeometry.cpp
+@@ -43,149 +43,117 @@ QgsBillboardGeometry::QgsBillboardGeometry( Qt3DCore::QNode *parent )
+   quadVertexAttribute->setName( u"vertexPosition"_s );
+   addAttribute( quadVertexAttribute );
+ 
+-  setMode( Mode::PositionOnly );
++  setAttributes( Attribute::Position );
+ }
+ 
+-void QgsBillboardGeometry::setMode( Mode mode )
++void QgsBillboardGeometry::setAttributes( QgsBillboardGeometry::Attributes attributes )
+ {
+-  uint stride = 0;
+-  switch ( mode )
++  // position must always be present
++  Q_ASSERT( attributes.testFlag( Attribute::Position ) );
++
++  if ( mAttributes == attributes )
++    return;
++
++  // position is always present
++  uint stride = 3 * sizeof( float );
++
++  if ( attributes.testFlag( Attribute::TextureData ) )
+   {
+-    case Mode::PositionOnly:
+-      stride = 3 * sizeof( float );
+-      break;
+-    case Mode::PositionAndTextureData:
+-      stride = ( 3 + 2 + 2 ) * sizeof( float );
+-      break;
+-    case Mode::PositionAndTextureDataWithPixelOffsets:
+-      stride = ( 3 + 2 + 2 ) * sizeof( float ) + 2 * sizeof( int );
+-      break;
++    stride += ( 2 + 2 ) * sizeof( float );
+   }
+-
+-  if ( mPositionAttribute && mPositionAttribute->byteStride() == stride )
++  if ( attributes.testFlag( Attribute::PixelOffsets ) )
+   {
+-    // already in the target mode
+-    return;
++    stride += 2 * sizeof( int );
+   }
+-  else if ( mPositionAttribute )
++
++  if ( mPositionAttribute )
+   {
+     removeAttribute( mPositionAttribute );
+     delete mPositionAttribute;
+     mPositionAttribute = nullptr;
+   }
+ 
++  uint offset = 0;
+   mPositionAttribute = new Qt3DCore::QAttribute( this );
+   mPositionAttribute->setAttributeType( Qt3DCore::QAttribute::VertexAttribute );
+   mPositionAttribute->setBuffer( mVertexBuffer );
+   mPositionAttribute->setVertexBaseType( Qt3DCore::QAttribute::Float );
+   mPositionAttribute->setVertexSize( 3 );
+-  mPositionAttribute->setByteOffset( 0 );
++  mPositionAttribute->setByteOffset( offset );
+   mPositionAttribute->setByteStride( stride );
+   mPositionAttribute->setDivisor( 1 );
+   mPositionAttribute->setName( "instancePosition" );
+   addAttribute( mPositionAttribute );
+   setBoundingVolumePositionAttribute( mPositionAttribute );
++  offset += 3 * sizeof( float );
+ 
+-  switch ( mode )
++  if ( attributes.testFlag( Attribute::TextureData ) )
+   {
+-    case Mode::PositionOnly:
++    mAtlasOffsetAttribute = new Qt3DCore::QAttribute( this );
++    mAtlasOffsetAttribute->setAttributeType( Qt3DCore::QAttribute::VertexAttribute );
++    mAtlasOffsetAttribute->setBuffer( mVertexBuffer );
++    mAtlasOffsetAttribute->setVertexBaseType( Qt3DCore::QAttribute::Float );
++    mAtlasOffsetAttribute->setVertexSize( 2 );
++    mAtlasOffsetAttribute->setByteOffset( offset );
++    mAtlasOffsetAttribute->setByteStride( stride );
++    mAtlasOffsetAttribute->setDivisor( 1 );
++    mAtlasOffsetAttribute->setName( u"atlasOffset"_s );
++    addAttribute( mAtlasOffsetAttribute );
++    offset += 2 * sizeof( float );
++
++    mAtlasSizeAttribute = new Qt3DCore::QAttribute( this );
++    mAtlasSizeAttribute->setAttributeType( Qt3DCore::QAttribute::VertexAttribute );
++    mAtlasSizeAttribute->setBuffer( mVertexBuffer );
++    mAtlasSizeAttribute->setVertexBaseType( Qt3DCore::QAttribute::Float );
++    mAtlasSizeAttribute->setVertexSize( 2 );
++    mAtlasSizeAttribute->setByteOffset( offset );
++    mAtlasSizeAttribute->setByteStride( stride );
++    mAtlasSizeAttribute->setDivisor( 1 );
++    mAtlasSizeAttribute->setName( u"atlasSize"_s );
++    addAttribute( mAtlasSizeAttribute );
++    offset += 2 * sizeof( float );
++  }
++  else
++  {
++    if ( mAtlasOffsetAttribute )
+     {
+-      if ( mAtlasOffsetAttribute )
+-      {
+-        removeAttribute( mAtlasOffsetAttribute );
+-        delete mAtlasOffsetAttribute;
+-        mAtlasOffsetAttribute = nullptr;
+-      }
+-      if ( mAtlasSizeAttribute )
+-      {
+-        removeAttribute( mAtlasSizeAttribute );
+-        delete mAtlasSizeAttribute;
+-        mAtlasSizeAttribute = nullptr;
+-      }
+-      if ( mAtlasPixelOffsetAttribute )
+-      {
+-        removeAttribute( mAtlasPixelOffsetAttribute );
+-        delete mAtlasPixelOffsetAttribute;
+-        mAtlasPixelOffsetAttribute = nullptr;
+-      }
+-      break;
++      removeAttribute( mAtlasOffsetAttribute );
++      delete mAtlasOffsetAttribute;
++      mAtlasOffsetAttribute = nullptr;
+     }
+-
+-    case Mode::PositionAndTextureData:
++    if ( mAtlasSizeAttribute )
+     {
+-      if ( mAtlasPixelOffsetAttribute )
+-      {
+-        removeAttribute( mAtlasPixelOffsetAttribute );
+-        delete mAtlasPixelOffsetAttribute;
+-        mAtlasPixelOffsetAttribute = nullptr;
+-      }
+-
+-      mAtlasOffsetAttribute = new Qt3DCore::QAttribute( this );
+-      mAtlasOffsetAttribute->setAttributeType( Qt3DCore::QAttribute::VertexAttribute );
+-      mAtlasOffsetAttribute->setBuffer( mVertexBuffer );
+-      mAtlasOffsetAttribute->setVertexBaseType( Qt3DCore::QAttribute::Float );
+-      mAtlasOffsetAttribute->setVertexSize( 2 );
+-      mAtlasOffsetAttribute->setByteOffset( 3 * sizeof( float ) );
+-      mAtlasOffsetAttribute->setByteStride( stride );
+-      mAtlasOffsetAttribute->setDivisor( 1 );
+-      mAtlasOffsetAttribute->setName( u"atlasOffset"_s );
+-      addAttribute( mAtlasOffsetAttribute );
+-
+-      mAtlasSizeAttribute = new Qt3DCore::QAttribute( this );
+-      mAtlasSizeAttribute->setAttributeType( Qt3DCore::QAttribute::VertexAttribute );
+-      mAtlasSizeAttribute->setBuffer( mVertexBuffer );
+-      mAtlasSizeAttribute->setVertexBaseType( Qt3DCore::QAttribute::Float );
+-      mAtlasSizeAttribute->setVertexSize( 2 );
+-      mAtlasSizeAttribute->setByteOffset( ( 3 + 2 ) * sizeof( float ) );
+-      mAtlasSizeAttribute->setByteStride( stride );
+-      mAtlasSizeAttribute->setDivisor( 1 );
+-      mAtlasSizeAttribute->setName( u"atlasSize"_s );
+-      addAttribute( mAtlasSizeAttribute );
+-      break;
++      removeAttribute( mAtlasSizeAttribute );
++      delete mAtlasSizeAttribute;
++      mAtlasSizeAttribute = nullptr;
+     }
++  }
+ 
+-    case Mode::PositionAndTextureDataWithPixelOffsets:
+-    {
+-      mAtlasOffsetAttribute = new Qt3DCore::QAttribute( this );
+-      mAtlasOffsetAttribute->setAttributeType( Qt3DCore::QAttribute::VertexAttribute );
+-      mAtlasOffsetAttribute->setBuffer( mVertexBuffer );
+-      mAtlasOffsetAttribute->setVertexBaseType( Qt3DCore::QAttribute::Float );
+-      mAtlasOffsetAttribute->setVertexSize( 2 );
+-      mAtlasOffsetAttribute->setByteOffset( 3 * sizeof( float ) );
+-      mAtlasOffsetAttribute->setByteStride( stride );
+-      mAtlasOffsetAttribute->setDivisor( 1 );
+-      mAtlasOffsetAttribute->setName( u"atlasOffset"_s );
+-      addAttribute( mAtlasOffsetAttribute );
+-
+-      mAtlasSizeAttribute = new Qt3DCore::QAttribute( this );
+-      mAtlasSizeAttribute->setAttributeType( Qt3DCore::QAttribute::VertexAttribute );
+-      mAtlasSizeAttribute->setBuffer( mVertexBuffer );
+-      mAtlasSizeAttribute->setVertexBaseType( Qt3DCore::QAttribute::Float );
+-      mAtlasSizeAttribute->setVertexSize( 2 );
+-      mAtlasSizeAttribute->setByteOffset( ( 3 + 2 ) * sizeof( float ) );
+-      mAtlasSizeAttribute->setByteStride( stride );
+-      mAtlasSizeAttribute->setDivisor( 1 );
+-      mAtlasSizeAttribute->setName( u"atlasSize"_s );
+-      addAttribute( mAtlasSizeAttribute );
+-
+-      mAtlasPixelOffsetAttribute = new Qt3DCore::QAttribute( this );
+-      mAtlasPixelOffsetAttribute->setAttributeType( Qt3DCore::QAttribute::VertexAttribute );
+-      mAtlasPixelOffsetAttribute->setBuffer( mVertexBuffer );
+-      mAtlasPixelOffsetAttribute->setVertexBaseType( Qt3DCore::QAttribute::Int );
+-      mAtlasPixelOffsetAttribute->setVertexSize( 2 );
+-      mAtlasPixelOffsetAttribute->setByteOffset( ( 3 + 2 + 2 ) * sizeof( float ) );
+-      mAtlasPixelOffsetAttribute->setByteStride( stride );
+-      mAtlasPixelOffsetAttribute->setDivisor( 1 );
+-      mAtlasPixelOffsetAttribute->setName( u"pixelOffset"_s );
+-      addAttribute( mAtlasPixelOffsetAttribute );
+-      break;
+-    }
++  if ( attributes.testFlag( Attribute::PixelOffsets ) )
++  {
++    mAtlasPixelOffsetAttribute = new Qt3DCore::QAttribute( this );
++    mAtlasPixelOffsetAttribute->setAttributeType( Qt3DCore::QAttribute::VertexAttribute );
++    mAtlasPixelOffsetAttribute->setBuffer( mVertexBuffer );
++    mAtlasPixelOffsetAttribute->setVertexBaseType( Qt3DCore::QAttribute::Int );
++    mAtlasPixelOffsetAttribute->setVertexSize( 2 );
++    mAtlasPixelOffsetAttribute->setByteOffset( offset );
++    mAtlasPixelOffsetAttribute->setByteStride( stride );
++    mAtlasPixelOffsetAttribute->setDivisor( 1 );
++    mAtlasPixelOffsetAttribute->setName( u"pixelOffset"_s );
++    addAttribute( mAtlasPixelOffsetAttribute );
++    offset += 2 * sizeof( int );
++  }
++  else
++  {
++    removeAttribute( mAtlasPixelOffsetAttribute );
++    delete mAtlasPixelOffsetAttribute;
++    mAtlasPixelOffsetAttribute = nullptr;
+   }
+ }
+ 
+ void QgsBillboardGeometry::setPositions( const QVector<QVector3D> &vertices )
+ {
+-  setMode( Mode::PositionOnly );
++  setAttributes( Attribute::Position );
+ 
+   QByteArray vertexBufferData;
+   vertexBufferData.resize( vertices.size() * 3 * sizeof( float ) );
+@@ -253,11 +221,10 @@ template<typename VertexType> QByteArray createVertexBuffer( const QVector<QgsBi
+ 
+ void QgsBillboardGeometry::setBillboardData( const QVector<BillboardAtlasData> &billboards, bool includePixelOffsets )
+ {
+-  if ( includePixelOffsets )
+-    setMode( Mode::PositionAndTextureDataWithPixelOffsets );
+-  else
+-    setMode( Mode::PositionAndTextureData );
+-
++  Attributes attributes = Attribute::Position;
++  attributes.setFlag( Attribute::TextureData, true );
++  attributes.setFlag( Attribute::PixelOffsets, includePixelOffsets );
++  setAttributes( attributes );
+ 
+   QByteArray vertexBufferData;
+   if ( includePixelOffsets )
+diff --git a/src/3d/symbols/qgsbillboardgeometry.h b/src/3d/symbols/qgsbillboardgeometry.h
+index a9afd9bab1c..7faf4b5bcb0 100644
+--- a/src/3d/symbols/qgsbillboardgeometry.h
++++ b/src/3d/symbols/qgsbillboardgeometry.h
+@@ -95,13 +95,17 @@ class _3D_EXPORT QgsBillboardGeometry : public Qt3DCore::QGeometry
+     void countChanged( int count );
+ 
+   private:
+-    enum class Mode
++    enum class Attribute
+     {
+-      PositionOnly,
+-      PositionAndTextureData,
+-      PositionAndTextureDataWithPixelOffsets,
++      Position = 1 << 0,
++      TextureData = 1 << 1,
++      PixelOffsets = 1 << 2,
+     };
+-    void setMode( Mode mode );
++    Q_DECLARE_FLAGS( Attributes, Attribute )
++    Q_FLAG( Attributes )
++
++    void setAttributes( Attributes attributes );
++    Attributes mAttributes;
+ 
+     Qt3DCore::QAttribute *mPositionAttribute = nullptr;
+     Qt3DCore::QAttribute *mAtlasOffsetAttribute = nullptr;
+
+From 8180afd84831272232e2cb7bf9d1382f8b82566c Mon Sep 17 00:00:00 2001
+From: Nyall Dawson <nyall.dawson@gmail.com>
+Date: Mon, 24 Aug 2026 10:01:05 +1000
+Subject: [PATCH 6/7] [api] Add per instance billboard size support
+
+---
+ src/3d/qgsannotationlayerchunkloader_p.cpp    |  5 +-
+ src/3d/shaders/billboards.vert                | 17 +++++-
+ src/3d/symbols/qgsbillboardgeometry.cpp       | 55 ++++++++++++++++++-
+ src/3d/symbols/qgsbillboardgeometry.h         | 18 +++++-
+ .../symbols/qgspoint3dbillboardmaterial.cpp   | 25 ++++-----
+ src/3d/symbols/qgspoint3dbillboardmaterial.h  | 20 ++++---
+ 6 files changed, 108 insertions(+), 32 deletions(-)
+
+diff --git a/src/3d/qgsannotationlayerchunkloader_p.cpp b/src/3d/qgsannotationlayerchunkloader_p.cpp
+index c0887abbf66..1bfaa89c9d9 100644
+--- a/src/3d/qgsannotationlayerchunkloader_p.cpp
++++ b/src/3d/qgsannotationlayerchunkloader_p.cpp
+@@ -457,10 +457,9 @@ Qt3DCore::QEntity *QgsAnnotationLayerChunkLoader::createEntity( Qt3DCore::QEntit
+     billboardGeometryRenderer->setVertexCount( 4 );
+     billboardGeometryRenderer->setInstanceCount( mBillboardPositions.count() );
+ 
+-    QgsPoint3DBillboardMaterial *billboardMaterial = new QgsPoint3DBillboardMaterial( QgsPoint3DBillboardMaterial::Mode::AtlasTextureWithPixelOffsets );
++    QgsPoint3DBillboardMaterial *billboardMaterial = new QgsPoint3DBillboardMaterial( QgsPoint3DBillboardMaterial::ExtraAttribute::TextureData | QgsPoint3DBillboardMaterial::ExtraAttribute::PixelOffsets );
+     billboardMaterial->setTexture2DFromImage( mBillboardAtlas );
+ 
+-
+     Qt3DCore::QEntity *billboardEntity = new Qt3DCore::QEntity;
+     billboardEntity->addComponent( billboardMaterial );
+     billboardEntity->addComponent( billboardGeometryRenderer );
+@@ -478,7 +477,7 @@ Qt3DCore::QEntity *QgsAnnotationLayerChunkLoader::createEntity( Qt3DCore::QEntit
+     billboardGeometryRenderer->setVertexCount( 4 );
+     billboardGeometryRenderer->setInstanceCount( mTextBillboardPositions.count() );
+ 
+-    QgsPoint3DBillboardMaterial *billboardMaterial = new QgsPoint3DBillboardMaterial( QgsPoint3DBillboardMaterial::Mode::AtlasTextureWithPixelOffsets );
++    QgsPoint3DBillboardMaterial *billboardMaterial = new QgsPoint3DBillboardMaterial( QgsPoint3DBillboardMaterial::ExtraAttribute::TextureData | QgsPoint3DBillboardMaterial::ExtraAttribute::PixelOffsets );
+     billboardMaterial->setTexture2DFromImage( mTextBillboardAtlas );
+ 
+     Qt3DCore::QEntity *billboardEntity = new Qt3DCore::QEntity;
+diff --git a/src/3d/shaders/billboards.vert b/src/3d/shaders/billboards.vert
+index aed56766a99..09797676ac9 100644
+--- a/src/3d/shaders/billboards.vert
++++ b/src/3d/shaders/billboards.vert
+@@ -3,7 +3,12 @@
+ in vec2 vertexPosition;
+ in vec3 instancePosition;
+ 
+-uniform vec2 BB_SIZE;    // billboard size in pixels
++// billboard size in pixels or world units (for perspective scaled billboards)
++#ifdef PER_INSTANCE_SIZE
++in vec2 instanceSize;
++#else
++uniform vec2 BB_SIZE;
++#endif
+ 
+ #ifdef PERSPECTIVE_SCALE
+ uniform mat4 modelView;
+@@ -26,18 +31,24 @@ in ivec2 pixelOffset;
+ 
+ void main(void)
+ {
++#ifdef PER_INSTANCE_SIZE
++    vec2 bbSize = instanceSize;
++#else
++    vec2 bbSize = BB_SIZE;
++#endif
++
+ #ifdef PERSPECTIVE_SCALE
+     // transform instance position into view space
+     vec4 viewPos = modelView * vec4(instancePosition, 1.0);
+ 
+-    vec2 size = BB_SIZE;
++    vec2 size = bbSize;
+ 
+     // offset quad vertices directly in view space using world units
+     viewPos.xy += vertexPosition * size;
+ 
+     gl_Position = projectionMatrix * viewPos;
+ #else
+-    vec2 spritePixelSize = 2 * BB_SIZE / WIN_SCALE; // multiply by 2 to adjust for -1, 1 range for display coordinates
++    vec2 spritePixelSize = 2 * bbSize / WIN_SCALE; // multiply by 2 to adjust for -1, 1 range for display coordinates
+ 
+     #ifdef TEXTURE_ATLAS
+       vec2 textureOffset = atlasOffset;
+diff --git a/src/3d/symbols/qgsbillboardgeometry.cpp b/src/3d/symbols/qgsbillboardgeometry.cpp
+index 458aa205372..5881549879d 100644
+--- a/src/3d/symbols/qgsbillboardgeometry.cpp
++++ b/src/3d/symbols/qgsbillboardgeometry.cpp
+@@ -56,7 +56,10 @@ void QgsBillboardGeometry::setAttributes( QgsBillboardGeometry::Attributes attri
+ 
+   // position is always present
+   uint stride = 3 * sizeof( float );
+-
++  if ( attributes.testFlag( Attribute::Size ) )
++  {
++    stride += 2 * sizeof( float );
++  }
+   if ( attributes.testFlag( Attribute::TextureData ) )
+   {
+     stride += ( 2 + 2 ) * sizeof( float );
+@@ -87,6 +90,27 @@ void QgsBillboardGeometry::setAttributes( QgsBillboardGeometry::Attributes attri
+   setBoundingVolumePositionAttribute( mPositionAttribute );
+   offset += 3 * sizeof( float );
+ 
++  if ( attributes.testFlag( Attribute::Size ) )
++  {
++    mSizeAttribute = new Qt3DCore::QAttribute( this );
++    mSizeAttribute->setAttributeType( Qt3DCore::QAttribute::VertexAttribute );
++    mSizeAttribute->setBuffer( mVertexBuffer );
++    mSizeAttribute->setVertexBaseType( Qt3DCore::QAttribute::Float );
++    mSizeAttribute->setVertexSize( 2 );
++    mSizeAttribute->setByteOffset( offset );
++    mSizeAttribute->setByteStride( stride );
++    mSizeAttribute->setDivisor( 1 );
++    mSizeAttribute->setName( u"instanceSize"_s );
++    addAttribute( mSizeAttribute );
++    offset += 2 * sizeof( float );
++  }
++  else
++  {
++    removeAttribute( mSizeAttribute );
++    delete mSizeAttribute;
++    mSizeAttribute = nullptr;
++  }
++
+   if ( attributes.testFlag( Attribute::TextureData ) )
+   {
+     mAtlasOffsetAttribute = new Qt3DCore::QAttribute( this );
+@@ -173,6 +197,35 @@ void QgsBillboardGeometry::setPositions( const QVector<QVector3D> &vertices )
+   emit countChanged( mVertexCount );
+ }
+ 
++void QgsBillboardGeometry::setPositionsAndSizes( const QVector<QVector3D> &positions, const QVector<QSizeF> &sizes )
++{
++  Attributes attributes = Attribute::Position;
++  attributes.setFlag( Attribute::Size );
++  setAttributes( attributes );
++
++  const qsizetype size = std::min( positions.size(), sizes.size() );
++  QByteArray vertexBufferData;
++  vertexBufferData.resize( size * ( 3 + 2 ) * sizeof( float ) );
++  float *rawArray = reinterpret_cast<float *>( vertexBufferData.data() );
++  int idx = 0;
++  for ( qsizetype i = 0; i < size; ++i )
++  {
++    rawArray[idx++] = positions[i].x();
++    rawArray[idx++] = positions[i].y();
++    rawArray[idx++] = positions[i].z();
++
++    rawArray[idx++] = sizes[i].width();
++    rawArray[idx++] = sizes[i].height();
++  }
++
++  mVertexCount = size;
++  mVertexBuffer->setData( vertexBufferData );
++  mPositionAttribute->setCount( mVertexCount );
++  mSizeAttribute->setCount( mVertexCount );
++
++  emit countChanged( mVertexCount );
++}
++
+ ///@cond PRIVATE
+ #pragma pack( push, 1 )
+ struct BillboardVertex
+diff --git a/src/3d/symbols/qgsbillboardgeometry.h b/src/3d/symbols/qgsbillboardgeometry.h
+index 7faf4b5bcb0..1426ebee070 100644
+--- a/src/3d/symbols/qgsbillboardgeometry.h
++++ b/src/3d/symbols/qgsbillboardgeometry.h
+@@ -56,6 +56,16 @@ class _3D_EXPORT QgsBillboardGeometry : public Qt3DCore::QGeometry
+      */
+     void setPositions( const QVector<QVector3D> &vertices );
+ 
++    /**
++     * Sets per-instance \a positions and \a sizes for billboards sharing a single texture.
++     *
++     * Use this method when rendering multiple billboards with the same texture but different sizes, and texture
++     * atlas handling is not required.
++     *
++     * \see setBillboardData()
++     */
++    void setPositionsAndSizes( const QVector<QVector3D> &positions, const QVector<QSizeF> &sizes );
++
+     /**
+      * \ingroup qgis_3d
+      * \brief Contains the billboard positions and texture information.
+@@ -98,8 +108,9 @@ class _3D_EXPORT QgsBillboardGeometry : public Qt3DCore::QGeometry
+     enum class Attribute
+     {
+       Position = 1 << 0,
+-      TextureData = 1 << 1,
+-      PixelOffsets = 1 << 2,
++      Size = 1 << 1,
++      TextureData = 1 << 2,
++      PixelOffsets = 1 << 3,
+     };
+     Q_DECLARE_FLAGS( Attributes, Attribute )
+     Q_FLAG( Attributes )
+@@ -108,11 +119,12 @@ class _3D_EXPORT QgsBillboardGeometry : public Qt3DCore::QGeometry
+     Attributes mAttributes;
+ 
+     Qt3DCore::QAttribute *mPositionAttribute = nullptr;
++    Qt3DCore::QAttribute *mSizeAttribute = nullptr;
+     Qt3DCore::QAttribute *mAtlasOffsetAttribute = nullptr;
+     Qt3DCore::QAttribute *mAtlasSizeAttribute = nullptr;
+     Qt3DCore::QAttribute *mAtlasPixelOffsetAttribute = nullptr;
+     Qt3DCore::QBuffer *mVertexBuffer = nullptr;
+-    int mVertexCount = 0;
++    qsizetype mVertexCount = 0;
+ };
+ 
+ #endif // QGSBILLBOARDGEOMETRY_H
+diff --git a/src/3d/symbols/qgspoint3dbillboardmaterial.cpp b/src/3d/symbols/qgspoint3dbillboardmaterial.cpp
+index 8d06a0447ef..3222398ed2d 100644
+--- a/src/3d/symbols/qgspoint3dbillboardmaterial.cpp
++++ b/src/3d/symbols/qgspoint3dbillboardmaterial.cpp
+@@ -36,7 +36,7 @@
+ 
+ using namespace Qt::StringLiterals;
+ 
+-QgsPoint3DBillboardMaterial::QgsPoint3DBillboardMaterial( Mode mode, Qgis::BillboardScaleMode scaleMode )
++QgsPoint3DBillboardMaterial::QgsPoint3DBillboardMaterial( ExtraAttributes attributes, Qgis::BillboardScaleMode scaleMode )
+   : mSize( new Qt3DRender::QParameter( "BB_SIZE", QSizeF( 100, 100 ), this ) )
+   , mScaleMode( scaleMode )
+ {
+@@ -78,22 +78,19 @@ QgsPoint3DBillboardMaterial::QgsPoint3DBillboardMaterial( Mode mode, Qgis::Billb
+   const QUrl urlVert( u"qrc:/shaders/billboards.vert"_s );
+   QStringList vertexShaderDefines;
+ 
+-  switch ( mode )
++  if ( attributes.testFlag( ExtraAttribute::TextureData ) )
+   {
+-    case Mode::SingleTexture:
+-      break;
++    vertexShaderDefines << u"TEXTURE_ATLAS"_s;
++  }
+ 
+-    case Mode::AtlasTexture:
+-    {
+-      vertexShaderDefines << u"TEXTURE_ATLAS"_s;
+-      break;
+-    }
++  if ( attributes.testFlag( ExtraAttribute::PixelOffsets ) )
++  {
++    vertexShaderDefines << u"TEXTURE_ATLAS_PIXEL_OFFSETS"_s;
++  }
+ 
+-    case Mode::AtlasTextureWithPixelOffsets:
+-    {
+-      vertexShaderDefines << u"TEXTURE_ATLAS"_s << u"TEXTURE_ATLAS_PIXEL_OFFSETS"_s;
+-      break;
+-    }
++  if ( attributes.testFlag( ExtraAttribute::Size ) )
++  {
++    vertexShaderDefines << u"PER_INSTANCE_SIZE"_s;
+   }
+ 
+   switch ( mScaleMode )
+diff --git a/src/3d/symbols/qgspoint3dbillboardmaterial.h b/src/3d/symbols/qgspoint3dbillboardmaterial.h
+index 065a0967d4d..22180968260 100644
+--- a/src/3d/symbols/qgspoint3dbillboardmaterial.h
++++ b/src/3d/symbols/qgspoint3dbillboardmaterial.h
+@@ -44,21 +44,23 @@ class _3D_EXPORT QgsPoint3DBillboardMaterial : public QgsMaterial
+ 
+   public:
+     /**
+-     * Material modes.
++     * Additional material attributes.
+      *
+-     * \since QGIS 4.0
++     * \since QGIS 4.4
+      */
+-    enum class Mode
++    enum class ExtraAttribute
+     {
+-      SingleTexture, //!< Use a single repeated texture for all billboards. Billboard positions should be set using QgsBillboardGeometry::setPositions().
+-      AtlasTexture,  //!< Use a texture atlas, so each billboard has a different texture. Billboard positions and texture data should be set using QgsBillboardGeometry::setBillboardData().
+-      AtlasTextureWithPixelOffsets, //!< Use a texture atlas, so each billboard has a different texture. Billboards have pixel-sized offsets from their position. Billboard positions and texture data should be set using QgsBillboardGeometry::setBillboardData().
++      Size = 1 << 1,
++      TextureData = 1 << 2,
++      PixelOffsets = 1 << 3,
+     };
++    Q_DECLARE_FLAGS( ExtraAttributes, ExtraAttribute )
++    Q_FLAG( ExtraAttributes )
+ 
+     /**
+-     * Constructor for QgsPoint3DBillboardMaterial, using the specified \a mode.
++     * Constructor for QgsPoint3DBillboardMaterial, using the specified additional \a attributes.
+      */
+-    QgsPoint3DBillboardMaterial( Mode mode = Mode::SingleTexture, Qgis::BillboardScaleMode scaleMode = Qgis::BillboardScaleMode::ViewIndependent );
++    QgsPoint3DBillboardMaterial( ExtraAttributes attributes = ExtraAttributes(), Qgis::BillboardScaleMode scaleMode = Qgis::BillboardScaleMode::ViewIndependent );
+     ~QgsPoint3DBillboardMaterial() override;
+ 
+     //! Set the billboard size.
+@@ -98,5 +100,7 @@ class _3D_EXPORT QgsPoint3DBillboardMaterial : public QgsMaterial
+     Qgis::BillboardScaleMode mScaleMode = Qgis::BillboardScaleMode::ViewIndependent;
+ };
+ 
++Q_DECLARE_OPERATORS_FOR_FLAGS( QgsPoint3DBillboardMaterial::ExtraAttributes )
++
+ 
+ #endif // QGSPOINT3DBILLBOARDMATERIAL_H
+
+From abf3f6272054b6918f373896221ea00fffbbbcf1 Mon Sep 17 00:00:00 2001
+From: Nyall Dawson <nyall.dawson@gmail.com>
+Date: Fri, 21 Aug 2026 12:52:25 +1000
+Subject: [PATCH 7/7] [feature] Add support for picture annotation items in 3d
+ maps
+
+Extends the existing support for showing marker and text annotations
+as 3D billboards, and now shows picture annotation items as 3d
+billboards too.
+
+There is an option to show these as either view independent, fixed
+size billboards (just like markers and text), or as perspective
+correct sizes (eg like any other 3d item you can zoom in or out
+of).
+
+The sizes of the 3d billboards is set manually, allowing the size
+to be set to one that makes sense in the 3d map (as opposed to strictly
+following the 2d size)
+---
+ .../qgsannotationpictureitem.sip.in           |  36 +++
+ src/3d/qgsannotationlayerchunkloader_p.cpp    | 229 ++++++++++++-
+ src/3d/qgsannotationlayerchunkloader_p.h      |  10 +
+ .../annotations/qgsannotationpictureitem.cpp  |  14 +
+ .../annotations/qgsannotationpictureitem.h    |  35 ++
+ .../qgsannotationitemwidget_impl.cpp          |  36 +++
+ .../qgsannotationitemwidget_impl.h            |   2 +
+ .../qgsannotationpicturewidgetbase.ui         | 301 +++++++++++-------
+ 8 files changed, 539 insertions(+), 124 deletions(-)
+
+diff --git a/python/PyQt6/core/auto_generated/annotations/qgsannotationpictureitem.sip.in b/python/PyQt6/core/auto_generated/annotations/qgsannotationpictureitem.sip.in
+index 99f36f20a74..cc0495d707d 100644
+--- a/python/PyQt6/core/auto_generated/annotations/qgsannotationpictureitem.sip.in
++++ b/python/PyQt6/core/auto_generated/annotations/qgsannotationpictureitem.sip.in
+@@ -75,6 +75,42 @@ Returns ``True`` if the aspect ratio of the picture will be retained.
+ Sets whether the aspect ratio of the picture will be retained.
+ 
+ .. seealso:: :py:func:`lockAspectRatio`
++%End
++
++    Qgis::BillboardScaleMode billboard3DScaleMode() const;
++%Docstring
++Returns the 3D billboard scale mode for the picture.
++
++.. seealso:: :py:func:`setBillboard3DScaleMode`
++
++.. versionadded:: 4.4
++%End
++
++    void setBillboard3DScaleMode( Qgis::BillboardScaleMode mode );
++%Docstring
++Sets the 3D billboard scale ``mode`` for the picture.
++
++.. seealso:: :py:func:`billboard3DScaleMode`
++
++.. versionadded:: 4.4
++%End
++
++    QSizeF billboard3DSize() const;
++%Docstring
++Returns the 3D billboard size for the picture.
++
++.. seealso:: :py:func:`setBillboard3DSize`
++
++.. versionadded:: 4.4
++%End
++
++    void setBillboard3DSize( const QSizeF &size );
++%Docstring
++Sets the 3D billboard ``size`` for the picture.
++
++.. seealso:: :py:func:`billboard3DSize`
++
++.. versionadded:: 4.4
+ %End
+ 
+   protected:
+diff --git a/src/3d/qgsannotationlayerchunkloader_p.cpp b/src/3d/qgsannotationlayerchunkloader_p.cpp
+index 1bfaa89c9d9..043ee8afb6f 100644
+--- a/src/3d/qgsannotationlayerchunkloader_p.cpp
++++ b/src/3d/qgsannotationlayerchunkloader_p.cpp
+@@ -22,8 +22,10 @@
+ #include "qgsannotationlayer.h"
+ #include "qgsannotationlinetextitem.h"
+ #include "qgsannotationmarkeritem.h"
++#include "qgsannotationpictureitem.h"
+ #include "qgsannotationpointtextitem.h"
+ #include "qgsannotationrectangletextitem.h"
++#include "qgsapplication.h"
+ #include "qgsbillboardgeometry.h"
+ #include "qgschunknode.h"
+ #include "qgseventtracing.h"
+@@ -31,11 +33,14 @@
+ #include "qgsfonttextureatlasgenerator.h"
+ #include "qgsgeos.h"
+ #include "qgsgeotransform.h"
++#include "qgsimagecache.h"
+ #include "qgslinematerial_p.h"
+ #include "qgslinevertexdata_p.h"
+ #include "qgslogger.h"
+ #include "qgsmarkersymbol.h"
++#include "qgspainting.h"
+ #include "qgspoint3dbillboardmaterial.h"
++#include "qgssvgcache.h"
+ #include "qgstessellatedpolygongeometry.h"
+ #include "qgstextdocument.h"
+ #include "qgstextureatlasgenerator.h"
+@@ -59,20 +64,44 @@ QgsAnnotationLayerChunkLoader::QgsAnnotationLayerChunkLoader( const QgsAnnotatio
+   , mRenderContext( factory->mRenderContext )
+ {}
+ 
+-
+-struct Billboard
++namespace
+ {
+-    QVector3D position;
+-    int textureId = -1;
+-    const QgsMarkerSymbol *markerSymbol = nullptr;
+-};
++  struct Billboard
++  {
++      QVector3D position;
++      int textureId = -1;
++      const QgsMarkerSymbol *markerSymbol = nullptr;
++  };
+ 
+-struct TextBillboard
+-{
+-    QVector3D position;
+-    QString text;
+-};
++  struct TextBillboard
++  {
++      QVector3D position;
++      QString text;
++  };
++
++  /**
++   * A group of picture billboards sharing the same source image.
++   */
++  struct PictureBillboardGroup
++  {
++      QString path;
++      Qgis::BillboardScaleMode scaleMode;
++      Qgis::PictureFormat pictureFormat;
+ 
++      bool operator<( const PictureBillboardGroup &other ) const
++      {
++        if ( path != other.path )
++          return path < other.path;
++        return scaleMode < other.scaleMode;
++      }
++  };
++
++  struct PictureBillboard
++  {
++      QVector3D position;
++      QSizeF size;
++  };
++} //namespace
+ 
+ void QgsAnnotationLayerChunkLoader::start()
+ {
+@@ -142,12 +171,15 @@ void QgsAnnotationLayerChunkLoader::start()
+     std::vector< Billboard > billboards;
+     billboards.reserve( mItemsToRender.size() );
+     QVector< QImage > textures;
+-    textures.reserve( mItemsToRender.size() );
++    textures.reserve( static_cast< qsizetype >( mItemsToRender.size() ) );
+ 
+     std::vector< TextBillboard > textBillboards;
+     textBillboards.reserve( mItemsToRender.size() );
+     QStringList textBillboardTexts;
+-    textBillboardTexts.reserve( mItemsToRender.size() );
++    textBillboardTexts.reserve( static_cast< qsizetype >( mItemsToRender.size() ) );
++
++    QMap< PictureBillboardGroup, QVector< PictureBillboard > > groupedPictures;
++    mPictureBillboards.reserve( static_cast< qsizetype >( mItemsToRender.size() ) );
+ 
+     auto addTextBillboard = [layerToMapTransform,
+                              showCallouts,
+@@ -317,6 +349,76 @@ void QgsAnnotationLayerChunkLoader::start()
+             break;
+         }
+       }
++      else if ( auto pictureItem = dynamic_cast< QgsAnnotationPictureItem * >( annotation ) )
++      {
++        if ( pictureItem->path().isEmpty() )
++          continue;
++
++        if ( pictureItem->placementMode() == Qgis::AnnotationPlacementMode::RelativeToMapFrame )
++        {
++          // annotations relative to the map frame have no geographic position => ignore
++          continue;
++        }
++
++        const QgsPointXY p = pictureItem->bounds().center();
++        QgsPointXY mapPoint;
++        try
++        {
++          mapPoint = layerToMapTransform.transform( p );
++        }
++        catch ( QgsCsException &e )
++        {
++          QgsDebugError( e.what() );
++          continue;
++        }
++
++        if ( !rect.contains( mapPoint ) )
++          continue;
++
++        double z = 0;
++        const float terrainZ = ( altitudeClamping == Qgis::AltitudeClamping::Absolute && !showCallouts ) ? 0
++                               : mRenderContext.terrainRenderingEnabled() && mRenderContext.terrainGenerator()
++                                 ? static_cast<float>( mRenderContext.terrainGenerator()->heightAt( mapPoint.x(), mapPoint.y(), mRenderContext ) * mRenderContext.terrainSettings()->verticalScale() )
++                                 : 0.f;
++
++        switch ( altitudeClamping )
++        {
++          case Qgis::AltitudeClamping::Absolute:
++            z = zOffset;
++            break;
++          case Qgis::AltitudeClamping::Terrain:
++            z = terrainZ;
++            break;
++          case Qgis::AltitudeClamping::Relative:
++            z = terrainZ + zOffset;
++            break;
++        }
++
++        PictureBillboardGroup billboardGroup;
++        billboardGroup.path = pictureItem->path();
++        billboardGroup.pictureFormat = pictureItem->format();
++        billboardGroup.scaleMode = pictureItem->billboard3DScaleMode();
++
++        PictureBillboard billboardItem;
++        billboardItem.position = ( QgsVector3D( mapPoint.x(), mapPoint.y(), z ) - mChunkOrigin ).toVector3D();
++        billboardItem.size = pictureItem->billboard3DSize();
++        if ( billboardItem.size.isEmpty() )
++        {
++          constexpr QSizeF DEFAULT_FIXED_SIZE = QSizeF( 128, 128 );
++          constexpr QSizeF DEFAULT_WORLD_SIZE = QSizeF( 20, 20 );
++          billboardItem.size = billboardGroup.scaleMode == Qgis::BillboardScaleMode::ViewIndependent ? DEFAULT_FIXED_SIZE : DEFAULT_WORLD_SIZE;
++        }
++
++        groupedPictures[billboardGroup].append( billboardItem );
++
++        if ( showCallouts )
++        {
++          mCalloutLines << QgsLineString( { mapPoint.x(), mapPoint.x() }, { mapPoint.y(), mapPoint.y() }, { terrainZ, z } );
++        }
++
++        mZMax = std::max( mZMax, showCallouts ? std::max( 0.0, z ) : z );
++        mZMin = std::min( mZMin, showCallouts ? std::min( 0.0, z ) : z );
++      }
+     }
+     // free memory
+     mItemsToRender.clear();
+@@ -356,7 +458,6 @@ void QgsAnnotationLayerChunkLoader::start()
+       mBillboardPositions.clear();
+     }
+ 
+-
+     if ( !textBillboardTexts.isEmpty() )
+     {
+       const QgsFontTextureAtlas atlas = QgsFontTextureAtlasGenerator::create( textFormat, textBillboardTexts );
+@@ -401,6 +502,84 @@ void QgsAnnotationLayerChunkLoader::start()
+       mTextBillboardAtlas = QImage();
+       mTextBillboardPositions.clear();
+     }
++
++    // picture item billboards, grouped by picture source
++    for ( auto it = groupedPictures.constBegin(); it != groupedPictures.constEnd(); ++it )
++    {
++      QImage image;
++      bool fitsInCache = false;
++
++      // can't zoom into these billboards, so we can use a fairly conservative texture size
++      constexpr int MAXIMUM_PICTURE_TEXTURE_SIZE_FIXED_SIZE = 256;
++      // can zoom into these, so we need a larger texture
++      constexpr int MAXIMUM_PICTURE_TEXTURE_SIZE_PERSPECTIVE = 1024;
++      const int textureSize = it.key().scaleMode == Qgis::BillboardScaleMode::Perspective ? MAXIMUM_PICTURE_TEXTURE_SIZE_PERSPECTIVE : MAXIMUM_PICTURE_TEXTURE_SIZE_FIXED_SIZE;
++      switch ( it.key().pictureFormat )
++      {
++        case Qgis::PictureFormat::Raster:
++        {
++          const QSize originalSize = QgsApplication::imageCache()->originalSize( it.key().path, true );
++          QSize imageSize = originalSize;
++          if ( imageSize.width() >= imageSize.height() && imageSize.width() > textureSize )
++          {
++            imageSize = QSize( textureSize, static_cast< int >( std::round( imageSize.height() * textureSize / imageSize.width() ) ) );
++          }
++          else if ( imageSize.height() > textureSize )
++          {
++            imageSize = QSize( static_cast< int >( std::round( imageSize.width() * textureSize / imageSize.height() ) ), textureSize );
++          }
++          image = QgsApplication::imageCache()->pathAsImage( it.key().path, imageSize, false, 1.0, fitsInCache, true );
++          break;
++        }
++
++        case Qgis::PictureFormat::SVG:
++        {
++          const QPicture picture = QgsApplication::svgCache()->svgAsPicture( it.key().path, textureSize, QColor(), QColor(), 1.0, 1.0, false, 0, true );
++          if ( !picture.isNull() && picture.boundingRect().width() > 0 && picture.boundingRect().height() > 0 )
++          {
++            const QRectF picRect = picture.boundingRect();
++            QSize imageSize = picRect.size().toSize();
++            if ( imageSize.width() >= imageSize.height() )
++            {
++              imageSize = QSize( textureSize, static_cast< int >( std::round( picRect.height() * static_cast< double >( textureSize ) / picRect.width() ) ) );
++            }
++            else
++            {
++              imageSize = QSize( static_cast< int >( std::round( picRect.width() * static_cast< double >( textureSize ) / picRect.height() ) ), textureSize );
++            }
++
++            image = QImage( imageSize, QImage::Format_ARGB32_Premultiplied );
++            image.fill( Qt::transparent );
++
++            const double scale = static_cast< double >( imageSize.width() ) / picRect.width();
++
++            QPainter painter( &image );
++            painter.setRenderHint( QPainter::Antialiasing );
++            painter.scale( scale, scale );
++
++            QgsPainting::drawPicture( &painter, QPointF( picRect.width() / 2.0, picRect.height() / 2.0 ), picture );
++            painter.end();
++          }
++          break;
++        }
++
++        case Qgis::PictureFormat::Unknown:
++          continue;
++      }
++
++      PictureBillboards billboard;
++      billboard.scaleMode = it.key().scaleMode;
++      billboard.image = image;
++      billboard.positions.reserve( it.value().size() );
++      billboard.sizes.reserve( it.value().size() );
++      for ( const PictureBillboard &item : it.value() )
++      {
++        billboard.positions.append( item.position );
++        billboard.sizes.append( item.size );
++      }
++
++      mPictureBillboards.append( billboard );
++    }
+   } );
+ 
+   // emit finished() as soon as the handler is populated with features
+@@ -430,7 +609,7 @@ Qt3DCore::QEntity *QgsAnnotationLayerChunkLoader::createEntity( Qt3DCore::QEntit
+     return entity;
+   }
+ 
+-  if ( mBillboardPositions.empty() && mTextBillboardPositions.empty() )
++  if ( mBillboardPositions.empty() && mTextBillboardPositions.empty() && mPictureBillboards.empty() )
+   {
+     // an empty node, so we return no entity. This tags the node as having no data and effectively removes it.
+     // we just make sure first that its initial estimated vertical range does not affect its parents' bboxes calculation
+@@ -486,6 +665,26 @@ Qt3DCore::QEntity *QgsAnnotationLayerChunkLoader::createEntity( Qt3DCore::QEntit
+     billboardEntity->setParent( entity );
+   }
+ 
++  for ( const PictureBillboards &pictureBillboard : mPictureBillboards )
++  {
++    QgsBillboardGeometry *pictureGeometry = new QgsBillboardGeometry();
++    pictureGeometry->setPositionsAndSizes( pictureBillboard.positions, pictureBillboard.sizes );
++
++    Qt3DRender::QGeometryRenderer *pictureGeometryRenderer = new Qt3DRender::QGeometryRenderer;
++    pictureGeometryRenderer->setPrimitiveType( Qt3DRender::QGeometryRenderer::TriangleStrip );
++    pictureGeometryRenderer->setGeometry( pictureGeometry );
++    pictureGeometryRenderer->setVertexCount( 4 );
++    pictureGeometryRenderer->setInstanceCount( static_cast< int >( pictureBillboard.positions.size() ) );
++
++    QgsPoint3DBillboardMaterial *pictureMaterial = new QgsPoint3DBillboardMaterial( QgsPoint3DBillboardMaterial::ExtraAttribute::Size, pictureBillboard.scaleMode );
++    pictureMaterial->setTexture2DFromImage( pictureBillboard.image );
++
++    Qt3DCore::QEntity *pictureEntity = new Qt3DCore::QEntity;
++    pictureEntity->addComponent( pictureMaterial );
++    pictureEntity->addComponent( pictureGeometryRenderer );
++    pictureEntity->setParent( entity );
++  }
++
+ 
+   if ( mFactory->mShowCallouts )
+   {
+diff --git a/src/3d/qgsannotationlayerchunkloader_p.h b/src/3d/qgsannotationlayerchunkloader_p.h
+index 58047626ab7..01a695e8821 100644
+--- a/src/3d/qgsannotationlayerchunkloader_p.h
++++ b/src/3d/qgsannotationlayerchunkloader_p.h
+@@ -121,6 +121,16 @@ class QgsAnnotationLayerChunkLoader : public QgsChunkLoader
+ 
+     QVector< QgsBillboardGeometry::BillboardAtlasData > mBillboardPositions;
+     QVector< QgsBillboardGeometry::BillboardAtlasData > mTextBillboardPositions;
++
++    struct PictureBillboards
++    {
++        QImage image;
++        QVector< QVector3D > positions;
++        QVector< QSizeF > sizes;
++        Qgis::BillboardScaleMode scaleMode = Qgis::BillboardScaleMode::ViewIndependent;
++    };
++    QVector< PictureBillboards > mPictureBillboards;
++
+     QVector< QgsLineString > mCalloutLines;
+     QImage mBillboardAtlas;
+     QImage mTextBillboardAtlas;
+diff --git a/src/core/annotations/qgsannotationpictureitem.cpp b/src/core/annotations/qgsannotationpictureitem.cpp
+index a145cafd370..281c2233b15 100644
+--- a/src/core/annotations/qgsannotationpictureitem.cpp
++++ b/src/core/annotations/qgsannotationpictureitem.cpp
+@@ -114,6 +114,15 @@ bool QgsAnnotationPictureItem::writeXml( QDomElement &element, QDomDocument &doc
+   element.setAttribute( u"lockAspect"_s, mLockAspectRatio ? u"1"_s : u"0"_s );
+   element.setAttribute( u"path"_s, mPath );
+   element.setAttribute( u"format"_s, qgsEnumValueToKey( mFormat ) );
++  if ( !m3DSize.isNull() )
++  {
++    element.setAttribute( u"size3D"_s, QgsSymbolLayerUtils::encodeSize( m3DSize ) );
++  }
++  if ( m3DBillboardScaleMode != Qgis::BillboardScaleMode::ViewIndependent )
++  {
++    element.setAttribute( u"billboardMode"_s, qgsEnumValueToKey( m3DBillboardScaleMode ) );
++  }
++
+   writeCommonProperties( element, document, context );
+   return true;
+ }
+@@ -127,6 +136,9 @@ bool QgsAnnotationPictureItem::readXml( const QDomElement &element, const QgsRea
+ {
+   mLockAspectRatio = element.attribute( u"lockAspect"_s, u"1"_s ).toInt();
+ 
++  m3DSize = element.attribute( u"size3D"_s ).isEmpty() ? QSizeF() : QgsSymbolLayerUtils::decodeSize( element.attribute( u"size3D"_s ) );
++  m3DBillboardScaleMode = qgsEnumKeyToValue( element.attribute( u"billboardMode"_s ), Qgis::BillboardScaleMode::ViewIndependent );
++
+   const Qgis::PictureFormat format = qgsEnumKeyToValue( element.attribute( u"format"_s ), Qgis::PictureFormat::Unknown );
+   setPath( format, element.attribute( u"path"_s ) );
+ 
+@@ -138,6 +150,8 @@ QgsAnnotationPictureItem *QgsAnnotationPictureItem::clone() const
+ {
+   auto item = std::make_unique< QgsAnnotationPictureItem >( mFormat, mPath, bounds() );
+   item->setLockAspectRatio( mLockAspectRatio );
++  item->setBillboard3DScaleMode( m3DBillboardScaleMode );
++  item->setBillboard3DSize( m3DSize );
+ 
+   item->copyCommonProperties( this );
+   return item.release();
+diff --git a/src/core/annotations/qgsannotationpictureitem.h b/src/core/annotations/qgsannotationpictureitem.h
+index 8a648e0c87f..3a0ed51be8e 100644
+--- a/src/core/annotations/qgsannotationpictureitem.h
++++ b/src/core/annotations/qgsannotationpictureitem.h
+@@ -82,6 +82,38 @@ class CORE_EXPORT QgsAnnotationPictureItem : public QgsAnnotationRectItem
+      */
+     void setLockAspectRatio( bool locked );
+ 
++    /**
++     * Returns the 3D billboard scale mode for the picture.
++     *
++     * \see setBillboard3DScaleMode()
++     * \since QGIS 4.4
++     */
++    Qgis::BillboardScaleMode billboard3DScaleMode() const { return m3DBillboardScaleMode; }
++
++    /**
++     * Sets the 3D billboard scale \a mode for the picture.
++     *
++     * \see billboard3DScaleMode()
++     * \since QGIS 4.4
++     */
++    void setBillboard3DScaleMode( Qgis::BillboardScaleMode mode ) { m3DBillboardScaleMode = mode; }
++
++    /**
++     * Returns the 3D billboard size for the picture.
++     *
++     * \see setBillboard3DSize()
++     * \since QGIS 4.4
++     */
++    QSizeF billboard3DSize() const { return m3DSize; }
++
++    /**
++     * Sets the 3D billboard \a size for the picture.
++     *
++     * \see billboard3DSize()
++     * \since QGIS 4.4
++     */
++    void setBillboard3DSize( const QSizeF &size ) { m3DSize = size; }
++
+   protected:
+     void renderInBounds( QgsRenderContext &context, const QRectF &painterBounds, QgsFeedback *feedback ) override;
+ 
+@@ -90,6 +122,9 @@ class CORE_EXPORT QgsAnnotationPictureItem : public QgsAnnotationRectItem
+     Qgis::PictureFormat mFormat = Qgis::PictureFormat::Unknown;
+     bool mLockAspectRatio = true;
+ 
++    Qgis::BillboardScaleMode m3DBillboardScaleMode = Qgis::BillboardScaleMode::ViewIndependent;
++    QSizeF m3DSize;
++
+ #ifdef SIP_RUN
+     QgsAnnotationPictureItem( const QgsAnnotationPictureItem &other );
+ #endif
+diff --git a/src/gui/annotations/qgsannotationitemwidget_impl.cpp b/src/gui/annotations/qgsannotationitemwidget_impl.cpp
+index d7787ca67a7..a84fbefb613 100644
+--- a/src/gui/annotations/qgsannotationitemwidget_impl.cpp
++++ b/src/gui/annotations/qgsannotationitemwidget_impl.cpp
+@@ -14,6 +14,7 @@
+  ***************************************************************************/
+ #include "qgsannotationitemwidget_impl.h"
+ 
++#include "qgsannotationlayer.h"
+ #include "qgsannotationlineitem.h"
+ #include "qgsannotationlinetextitem.h"
+ #include "qgsannotationmarkeritem.h"
+@@ -883,6 +884,9 @@ QgsAnnotationPictureItemWidget::QgsAnnotationPictureItemWidget( QWidget *parent
+   mSizeModeCombo->addItem( tr( "Fixed Size" ), QVariant::fromValue( Qgis::AnnotationPlacementMode::FixedSize ) );
+   mSizeModeCombo->addItem( tr( "Relative to Map" ), QVariant::fromValue( Qgis::AnnotationPlacementMode::RelativeToMapFrame ) );
+ 
++  m3DSizeModeCombo->addItem( tr( "View Independent" ), QVariant::fromValue( Qgis::BillboardScaleMode::ViewIndependent ) );
++  m3DSizeModeCombo->addItem( tr( "Perspective Scaled" ), QVariant::fromValue( Qgis::BillboardScaleMode::Perspective ) );
++
+   populateRotationModeComboBox( mRotationModeCombo );
+ 
+   mSizeUnitWidget->setUnits(
+@@ -896,6 +900,9 @@ QgsAnnotationPictureItemWidget::QgsAnnotationPictureItemWidget( QWidget *parent
+   mFrameSymbolButton->setDialogTitle( tr( "Frame" ) );
+   mFrameSymbolButton->registerExpressionContextGenerator( this );
+ 
++  mHeight3DSpinBox->setClearValue( 0, tr( "Default" ) );
++  mWidth3DSpinBox->setClearValue( 0, tr( "Default" ) );
++
+   connect( mPropertiesWidget, &QgsAnnotationItemCommonPropertiesWidget::itemChanged, this, [this] {
+     if ( !mBlockChangedSignal )
+       emit itemChanged();
+@@ -903,11 +910,16 @@ QgsAnnotationPictureItemWidget::QgsAnnotationPictureItemWidget( QWidget *parent
+ 
+   connect( mSizeModeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &QgsAnnotationPictureItemWidget::sizeModeChanged );
+ 
++  connect( m3DSizeModeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &QgsAnnotationPictureItemWidget::onWidgetChanged );
++
+   connect( mRotationModeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &QgsAnnotationPictureItemWidget::onWidgetChanged );
+ 
+   mSpinAngle->setClearValue( 0 );
+   connect( mSpinAngle, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &QgsAnnotationPictureItemWidget::onWidgetChanged );
+ 
++  connect( mHeight3DSpinBox, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &QgsAnnotationPictureItemWidget::onWidgetChanged );
++  connect( mWidth3DSpinBox, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &QgsAnnotationPictureItemWidget::onWidgetChanged );
++
+   connect( mRadioSVG, &QRadioButton::toggled, this, &QgsAnnotationPictureItemWidget::modeChanged );
+   connect( mRadioRaster, &QRadioButton::toggled, this, &QgsAnnotationPictureItemWidget::modeChanged );
+   connect( mSourceLineEdit, &QgsPictureSourceLineEditBase::sourceChanged, this, [this]( const QString &source ) {
+@@ -972,6 +984,16 @@ void QgsAnnotationPictureItemWidget::updateItem( QgsAnnotationItem *item )
+     pictureItem->setBackgroundSymbol( mBackgroundSymbolButton->clonedSymbol<QgsFillSymbol>() );
+     pictureItem->setFrameSymbol( mFrameSymbolButton->clonedSymbol<QgsFillSymbol>() );
+ 
++    pictureItem->setBillboard3DScaleMode( m3DSizeModeCombo->currentData().value< Qgis::BillboardScaleMode >() );
++    if ( mWidth3DSpinBox->value() > 0 && mHeight3DSpinBox->value() > 0 )
++    {
++      pictureItem->setBillboard3DSize( QSizeF( mWidth3DSpinBox->value(), mHeight3DSpinBox->value() ) );
++    }
++    else
++    {
++      pictureItem->setBillboard3DSize( QSizeF() );
++    }
++
+     if ( mUpdateItemPosition )
+     {
+       pictureItem->setBounds( mItem->bounds() );
+@@ -1052,6 +1074,11 @@ bool QgsAnnotationPictureItemWidget::setNewItem( QgsAnnotationItem *item )
+   mSizeModeCombo->setCurrentIndex( mSizeModeCombo->findData( QVariant::fromValue( pictureItem->placementMode() ) ) );
+   mSpinAngle->setValue( pictureItem->rotation() );
+   mRotationModeCombo->setCurrentIndex( mRotationModeCombo->findData( QVariant::fromValue( pictureItem->rotationMode() ) ) );
++
++  mWidth3DSpinBox->setValue( pictureItem->billboard3DSize().width() );
++  mHeight3DSpinBox->setValue( pictureItem->billboard3DSize().height() );
++
++  m3DSizeModeCombo->setCurrentIndex( m3DSizeModeCombo->findData( QVariant::fromValue( pictureItem->billboard3DScaleMode() ) ) );
+   sizeModeChanged();
+ 
+   mBlockChangedSignal = false;
+@@ -1059,6 +1086,15 @@ bool QgsAnnotationPictureItemWidget::setNewItem( QgsAnnotationItem *item )
+   return true;
+ }
+ 
++void QgsAnnotationPictureItemWidget::showEvent( QShowEvent *event )
++{
++  QgsAnnotationLayer *layer = QgsAnnotationPictureItemWidget::layer();
++  // show 3d settings only when layer has a 3d renderer
++  mGroupAppearance3D->setVisible( !layer || layer->renderer3D() );
++
++  QgsAnnotationItemBaseWidget::showEvent( event );
++}
++
+ void QgsAnnotationPictureItemWidget::onWidgetChanged()
+ {
+   if ( !mBlockChangedSignal )
+diff --git a/src/gui/annotations/qgsannotationitemwidget_impl.h b/src/gui/annotations/qgsannotationitemwidget_impl.h
+index b60b718f56d..86c26ccd3c2 100644
+--- a/src/gui/annotations/qgsannotationitemwidget_impl.h
++++ b/src/gui/annotations/qgsannotationitemwidget_impl.h
+@@ -213,12 +213,14 @@ class QgsAnnotationPictureItemWidget : public QgsAnnotationItemBaseWidget, priva
+     void setDockMode( bool dockMode ) override;
+     void setContext( const QgsSymbolWidgetContext &context ) override;
+     QgsExpressionContext createExpressionContext() const override;
++
+   public slots:
+ 
+     void focusDefaultWidget() override;
+ 
+   protected:
+     bool setNewItem( QgsAnnotationItem *item ) override;
++    void showEvent( QShowEvent *event ) override;
+ 
+   private slots:
+ 
+diff --git a/src/ui/annotations/qgsannotationpicturewidgetbase.ui b/src/ui/annotations/qgsannotationpicturewidgetbase.ui
+index 30e01b60cfc..949b61b46eb 100644
+--- a/src/ui/annotations/qgsannotationpicturewidgetbase.ui
++++ b/src/ui/annotations/qgsannotationpicturewidgetbase.ui
+@@ -7,7 +7,7 @@
+     <x>0</x>
+     <y>0</y>
+     <width>321</width>
+-    <height>575</height>
++    <height>685</height>
+    </rect>
+   </property>
+   <property name="windowTitle">
+@@ -26,61 +26,24 @@
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+-   <item row="7" column="0">
+-    <widget class="QgsAnnotationItemCommonPropertiesWidget" name="mPropertiesWidget" native="true"/>
+-   </item>
+-   <item row="0" column="0">
+-    <layout class="QHBoxLayout" name="horizontalLayout">
+-     <item>
+-      <widget class="QRadioButton" name="mRadioRaster">
+-       <property name="text">
+-        <string>Raster image</string>
+-       </property>
+-      </widget>
+-     </item>
+-     <item>
+-      <widget class="QRadioButton" name="mRadioSVG">
+-       <property name="text">
+-        <string>SVG image</string>
+-       </property>
+-       <property name="checked">
+-        <bool>true</bool>
+-       </property>
+-      </widget>
+-     </item>
+-     <item>
+-      <spacer name="horizontalSpacer_2">
+-       <property name="orientation">
+-        <enum>Qt::Horizontal</enum>
+-       </property>
+-       <property name="sizeHint" stdset="0">
+-        <size>
+-         <width>40</width>
+-         <height>20</height>
+-        </size>
+-       </property>
+-      </spacer>
+-     </item>
+-    </layout>
+-   </item>
+-   <item row="5" column="0">
+-    <widget class="QGroupBox" name="mBackgroundCheckbox">
++   <item row="4" column="0">
++    <widget class="QGroupBox" name="mFrameCheckbox">
+      <property name="title">
+-      <string>Background</string>
++      <string>Frame</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+-     <layout class="QGridLayout" name="gridLayout_2">
++     <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+-       <widget class="QLabel" name="label">
++       <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Symbol</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+-       <widget class="QgsSymbolButton" name="mBackgroundSymbolButton">
++       <widget class="QgsSymbolButton" name="mFrameSymbolButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+@@ -95,63 +58,13 @@
+      </layout>
+     </widget>
+    </item>
+-   <item row="2" column="0">
+-    <widget class="QComboBox" name="mSizeModeCombo"/>
+-   </item>
+-   <item row="6" column="0">
+-    <widget class="QGroupBox" name="mRotationGroupBox">
+-     <property name="title">
+-      <string>Rotation</string>
++   <item row="1" column="0">
++    <widget class="QgsPictureSourceLineEditBase" name="mSourceLineEdit" native="true">
++     <property name="focusPolicy">
++      <enum>Qt::FocusPolicy::StrongFocus</enum>
+      </property>
+-     <layout class="QGridLayout" name="gridLayout_7">
+-      <item row="0" column="0" colspan="2">
+-       <widget class="QComboBox" name="mRotationModeCombo"/>
+-      </item>
+-      <item row="1" column="0">
+-       <widget class="QLabel" name="labelAngle">
+-        <property name="text">
+-         <string>Angle</string>
+-        </property>
+-       </widget>
+-      </item>
+-      <item row="1" column="1">
+-       <widget class="QgsDoubleSpinBox" name="mSpinAngle">
+-        <property name="wrapping">
+-         <bool>true</bool>
+-        </property>
+-        <property name="suffix">
+-         <string> °</string>
+-        </property>
+-        <property name="decimals">
+-         <number>2</number>
+-        </property>
+-        <property name="minimum">
+-         <double>-360.000000000000000</double>
+-        </property>
+-        <property name="maximum">
+-         <double>360.000000000000000</double>
+-        </property>
+-        <property name="singleStep">
+-         <double>0.500000000000000</double>
+-        </property>
+-       </widget>
+-      </item>
+-     </layout>
+     </widget>
+    </item>
+-   <item row="8" column="0">
+-    <spacer name="verticalSpacer">
+-     <property name="orientation">
+-      <enum>Qt::Vertical</enum>
+-     </property>
+-     <property name="sizeHint" stdset="0">
+-      <size>
+-       <width>20</width>
+-       <height>40</height>
+-      </size>
+-     </property>
+-    </spacer>
+-   </item>
+    <item row="3" column="0">
+     <widget class="QgsStackedWidget" name="mSizeStackedWidget">
+      <property name="sizePolicy">
+@@ -296,7 +209,7 @@
+           </size>
+          </property>
+          <property name="focusPolicy">
+-          <enum>Qt::StrongFocus</enum>
++          <enum>Qt::FocusPolicy::StrongFocus</enum>
+          </property>
+         </widget>
+        </item>
+@@ -304,31 +217,99 @@
+      </widget>
+     </widget>
+    </item>
+-   <item row="1" column="0">
+-    <widget class="QgsPictureSourceLineEditBase" name="mSourceLineEdit" native="true">
+-     <property name="focusPolicy">
+-      <enum>Qt::StrongFocus</enum>
++   <item row="6" column="0">
++    <widget class="QGroupBox" name="mRotationGroupBox">
++     <property name="title">
++      <string>Rotation</string>
+      </property>
++     <layout class="QGridLayout" name="gridLayout_7">
++      <item row="0" column="0" colspan="2">
++       <widget class="QComboBox" name="mRotationModeCombo"/>
++      </item>
++      <item row="1" column="0">
++       <widget class="QLabel" name="labelAngle">
++        <property name="text">
++         <string>Angle</string>
++        </property>
++       </widget>
++      </item>
++      <item row="1" column="1">
++       <widget class="QgsDoubleSpinBox" name="mSpinAngle">
++        <property name="wrapping">
++         <bool>true</bool>
++        </property>
++        <property name="suffix">
++         <string> °</string>
++        </property>
++        <property name="decimals">
++         <number>2</number>
++        </property>
++        <property name="minimum">
++         <double>-360.000000000000000</double>
++        </property>
++        <property name="maximum">
++         <double>360.000000000000000</double>
++        </property>
++        <property name="singleStep">
++         <double>0.500000000000000</double>
++        </property>
++       </widget>
++      </item>
++     </layout>
+     </widget>
+    </item>
+-   <item row="4" column="0">
+-    <widget class="QGroupBox" name="mFrameCheckbox">
++   <item row="0" column="0">
++    <layout class="QHBoxLayout" name="horizontalLayout">
++     <item>
++      <widget class="QRadioButton" name="mRadioRaster">
++       <property name="text">
++        <string>Raster image</string>
++       </property>
++      </widget>
++     </item>
++     <item>
++      <widget class="QRadioButton" name="mRadioSVG">
++       <property name="text">
++        <string>SVG image</string>
++       </property>
++       <property name="checked">
++        <bool>true</bool>
++       </property>
++      </widget>
++     </item>
++     <item>
++      <spacer name="horizontalSpacer_2">
++       <property name="orientation">
++        <enum>Qt::Orientation::Horizontal</enum>
++       </property>
++       <property name="sizeHint" stdset="0">
++        <size>
++         <width>40</width>
++         <height>20</height>
++        </size>
++       </property>
++      </spacer>
++     </item>
++    </layout>
++   </item>
++   <item row="5" column="0">
++    <widget class="QGroupBox" name="mBackgroundCheckbox">
+      <property name="title">
+-      <string>Frame</string>
++      <string>Background</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+-     <layout class="QGridLayout" name="gridLayout_3">
++     <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+-       <widget class="QLabel" name="label_2">
++       <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Symbol</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+-       <widget class="QgsSymbolButton" name="mFrameSymbolButton">
++       <widget class="QgsSymbolButton" name="mBackgroundSymbolButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+@@ -343,6 +324,108 @@
+      </layout>
+     </widget>
+    </item>
++   <item row="10" column="0">
++    <spacer name="verticalSpacer">
++     <property name="orientation">
++      <enum>Qt::Orientation::Vertical</enum>
++     </property>
++     <property name="sizeHint" stdset="0">
++      <size>
++       <width>20</width>
++       <height>40</height>
++      </size>
++     </property>
++    </spacer>
++   </item>
++   <item row="2" column="0">
++    <widget class="QComboBox" name="mSizeModeCombo"/>
++   </item>
++   <item row="7" column="0">
++    <widget class="QgsAnnotationItemCommonPropertiesWidget" name="mPropertiesWidget" native="true"/>
++   </item>
++   <item row="9" column="0">
++    <widget class="QGroupBox" name="mGroupAppearance3D">
++     <property name="title">
++      <string>3D Appearance</string>
++     </property>
++     <layout class="QGridLayout" name="gridLayout_5" columnstretch="1,2">
++      <item row="0" column="0">
++       <widget class="QLabel" name="label_3">
++        <property name="text">
++         <string>Sizing mode</string>
++        </property>
++       </widget>
++      </item>
++      <item row="0" column="1">
++       <widget class="QComboBox" name="m3DSizeModeCombo"/>
++      </item>
++      <item row="1" column="0">
++       <widget class="QLabel" name="label_14">
++        <property name="text">
++         <string>Width</string>
++        </property>
++       </widget>
++      </item>
++      <item row="1" column="1">
++       <widget class="QgsDoubleSpinBox" name="mWidth3DSpinBox">
++        <property name="sizePolicy">
++         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
++          <horstretch>0</horstretch>
++          <verstretch>0</verstretch>
++         </sizepolicy>
++        </property>
++        <property name="decimals">
++         <number>2</number>
++        </property>
++        <property name="maximum">
++         <double>100000.000000000000000</double>
++        </property>
++        <property name="singleStep">
++         <double>1.000000000000000</double>
++        </property>
++        <property name="value">
++         <double>1.000000000000000</double>
++        </property>
++        <property name="showClearButton" stdset="0">
++         <bool>false</bool>
++        </property>
++       </widget>
++      </item>
++      <item row="2" column="0">
++       <widget class="QLabel" name="label_12">
++        <property name="text">
++         <string>Height</string>
++        </property>
++       </widget>
++      </item>
++      <item row="2" column="1">
++       <widget class="QgsDoubleSpinBox" name="mHeight3DSpinBox">
++        <property name="sizePolicy">
++         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
++          <horstretch>0</horstretch>
++          <verstretch>0</verstretch>
++         </sizepolicy>
++        </property>
++        <property name="decimals">
++         <number>2</number>
++        </property>
++        <property name="maximum">
++         <double>100000.000000000000000</double>
++        </property>
++        <property name="singleStep">
++         <double>1.000000000000000</double>
++        </property>
++        <property name="value">
++         <double>1.000000000000000</double>
++        </property>
++        <property name="showClearButton" stdset="0">
++         <bool>false</bool>
++        </property>
++       </widget>
++      </item>
++     </layout>
++    </widget>
++   </item>
+   </layout>
+  </widget>
+  <customwidgets>
