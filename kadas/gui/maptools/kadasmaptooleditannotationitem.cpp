@@ -802,6 +802,10 @@ void KadasMapToolEditAnnotationItem::inputChanged()
   mController->edit( mItem, mEditContext, values, ctx );
   mLayer->triggerRepaint();
   pushState();
+  // A numeric edit can change a styled property (e.g. the rotation angle), so
+  // keep the style editor's fields from going stale.
+  if ( mStyleEditor )
+    mStyleEditor->loadFromItem( mItem );
 }
 
 void KadasMapToolEditAnnotationItem::setupStyleEditor()
@@ -1039,6 +1043,11 @@ void KadasMapToolEditAnnotationItem::showContextMenu( QgsAnnotationLayer *layer,
   QAction *chosen = menu.exec( globalPos );
   if ( !chosen )
     return;
+
+  // A controller action (e.g. "Reset rotation") has already mutated the item;
+  // refresh the style editor so its fields reflect the new state.
+  if ( mStyleEditor && target == mItem )
+    mStyleEditor->loadFromItem( mItem );
 
   int newZ = curZ;
   if ( chosen == toFront )

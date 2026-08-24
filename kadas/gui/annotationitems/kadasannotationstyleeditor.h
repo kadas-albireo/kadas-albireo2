@@ -80,6 +80,7 @@ class KadasMarkerStyleEditor : public KadasAnnotationStyleEditor
   private:
     QComboBox *mShapeCombo = nullptr;
     QSpinBox *mSizeSpin = nullptr;
+    QDoubleSpinBox *mRotationSpin = nullptr;
     QDoubleSpinBox *mStrokeWidthSpin = nullptr;
     QgsColorButton *mFillColorBtn = nullptr;
     QgsColorButton *mStrokeColorBtn = nullptr;
@@ -106,6 +107,7 @@ class KadasPinStyleEditor : public KadasAnnotationStyleEditor
     QLineEdit *mTitleEdit = nullptr;
     QPlainTextEdit *mDescriptionEdit = nullptr;
     QSpinBox *mSizeSpin = nullptr;
+    QDoubleSpinBox *mRotationSpin = nullptr;
     QgsColorButton *mFillColorBtn = nullptr;
 };
 
@@ -125,6 +127,7 @@ class KadasSvgMarkerStyleEditor : public KadasAnnotationStyleEditor
   private:
     QgsSvgSelectorWidget *mSvgSelector = nullptr;
     QSpinBox *mSizeSpin = nullptr;
+    QDoubleSpinBox *mRotationSpin = nullptr;
     QgsColorButton *mFillColorBtn = nullptr;
 };
 
@@ -160,12 +163,36 @@ class KadasPolygonStyleEditor : public KadasAnnotationStyleEditor
     void loadFromItem( const QgsAnnotationItem *item ) override;
     void applyToItem( QgsAnnotationItem *item ) const override;
 
+  protected:
+    //! Form layout holding the fill/outline rows, so subclasses can append their own.
+    QFormLayout *mForm = nullptr;
+
   private:
     QDoubleSpinBox *mStrokeWidthSpin = nullptr;
     QgsColorButton *mFillColorBtn = nullptr;
     QgsColorButton *mStrokeColorBtn = nullptr;
     QComboBox *mStrokeStyleCombo = nullptr;
     QComboBox *mFillStyleCombo = nullptr;
+};
+
+/**
+ * \brief Style editor for KadasRectangleAnnotationItem: the polygon fill/outline rows plus a rotation angle.
+ *
+ * The rectangle is parametric (centre, size, angle), so unlike a free polygon it
+ * carries a rotation that can be edited numerically.
+ */
+class KadasRectangleStyleEditor : public KadasPolygonStyleEditor
+{
+    Q_OBJECT
+
+  public:
+    explicit KadasRectangleStyleEditor( QWidget *parent = nullptr );
+
+    void loadFromItem( const QgsAnnotationItem *item ) override;
+    void applyToItem( QgsAnnotationItem *item ) const override;
+
+  private:
+    QDoubleSpinBox *mRotationSpin = nullptr;
 };
 
 /**
@@ -236,6 +263,7 @@ class KadasPointTextStyleEditor : public KadasTextStyleEditorBase
     QToolButton *mAlignCenterBtn = nullptr;
     QToolButton *mAlignRightBtn = nullptr;
     QButtonGroup *mAlignGroup = nullptr;
+    QDoubleSpinBox *mRotationSpin = nullptr;
     QgsColorButton *mBackgroundColorBtn = nullptr;
 };
 
@@ -283,6 +311,7 @@ class KadasPictureStyleEditor : public KadasAnnotationStyleEditor
     QSpinBox *mWidthSpin = nullptr;
     QSpinBox *mHeightSpin = nullptr;
     QCheckBox *mLockAspectBox = nullptr;
+    QDoubleSpinBox *mRotationSpin = nullptr;
     QCheckBox *mShowCalloutBox = nullptr;
     QgsColorButton *mFillColorBtn = nullptr;
     QgsColorButton *mStrokeColorBtn = nullptr;

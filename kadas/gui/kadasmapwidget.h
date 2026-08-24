@@ -49,7 +49,9 @@ class KADAS_GUI_EXPORT KadasMapWidget : public QDockWidget
     QgsElevationControllerWidget *elevationController() { return mElevationController; }
     void setElevationController();
     void removeElevationController();
-    static void moveElevationControllerLabelsToLeft( QgsElevationControllerWidget *controller );
+    static void adjustElevationControllerLayout( QgsElevationControllerWidget *controller );
+    //! Returns true if \a canvas currently shows at least one layer carrying elevation data.
+    static bool hasVisibleElevationLayer( QgsMapCanvas *canvas );
 
     bool getLocked() const;
     void setLocked( bool locked );
@@ -84,6 +86,7 @@ class KADAS_GUI_EXPORT KadasMapWidget : public QDockWidget
     void syncCanvasExtents();
     void updateLayerSelectionMenu();
     void updateLayerSet();
+    void updateElevationControllerVisibility();
     void updateMapProjection();
     void closeMapWidget();
 };

@@ -68,9 +68,11 @@
 #include <qgis/qgstextbuffersettings.h>
 #include <qgis/qgstextformat.h>
 
+#include "kadas/gui/annotationitems/kadasannotationrotation.h"
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadaspictureannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
+#include "kadas/gui/annotationitems/kadasrectangleannotationitem.h"
 
 namespace
 {
@@ -132,6 +134,30 @@ namespace
     if ( idx >= 0 )
       combo->setCurrentIndex( idx );
   }
+
+  /**
+   * Spin box for an item rotation, in degrees clockwise from north: the same
+   * convention as the on-canvas rotation handle (KadasAnnotationRotation), so
+   * typing a value and dragging the handle agree.
+   */
+  QDoubleSpinBox *createRotationSpin()
+  {
+    auto *spin = new QDoubleSpinBox();
+    spin->setRange( 0.0, 360.0 );
+    spin->setDecimals( 1 );
+    spin->setSingleStep( KadasAnnotationRotation::sSnapStep );
+    // Wrap so stepping past either end continues around the circle.
+    spin->setWrapping( true );
+    spin->setSuffix( QStringLiteral( " \u00b0" ) );
+    return spin;
+  }
+
+  //! Normalizes \a deg to [0,360) so the spin box never shows a negative angle or 360.
+  double normalizedAngle( double deg )
+  {
+    const double a = std::fmod( deg, 360.0 );
+    return a < 0.0 ? a + 360.0 : a;
+  }
 } // namespace
 
 
@@ -155,6 +181,10 @@ KadasMarkerStyleEditor::KadasMarkerStyleEditor( QWidget *parent )
   mSizeSpin->setSuffix( QStringLiteral( " mm" ) );
   mSizeSpin->setToolTip( tr( "Marker size" ) );
   form->addRow( tr( "Size" ), mSizeSpin );
+
+  mRotationSpin = createRotationSpin();
+  mRotationSpin->setToolTip( tr( "Rotation, in degrees clockwise" ) );
+  form->addRow( tr( "Rotation" ), mRotationSpin );
 
   mStrokeWidthSpin = new QDoubleSpinBox();
   mStrokeWidthSpin->setRange( 0.0, 20.0 );
@@ -186,6 +216,7 @@ KadasMarkerStyleEditor::KadasMarkerStyleEditor( QWidget *parent )
 
   connect( mShapeCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasAnnotationStyleEditor::committed );
   connect( mSizeSpin, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
+  connect( mRotationSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
   connect( mStrokeWidthSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
   connect( mFillColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
   connect( mStrokeColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
@@ -203,6 +234,11 @@ void KadasMarkerStyleEditor::loadFromItem( const QgsAnnotationItem *item )
   const auto *marker = dynamic_cast<const QgsAnnotationMarkerItem *>( item );
   if ( !marker || !marker->symbol() || marker->symbol()->symbolLayerCount() == 0 )
     return;
+  {
+    // The angle lives on the symbol, not the symbol layer, so read it before the simple-marker check.
+    const QSignalBlocker b( mRotationSpin );
+    mRotationSpin->setValue( normalizedAngle( marker->symbol()->angle() ) );
+  }
   const auto *sl = dynamic_cast<const QgsSimpleMarkerSymbolLayer *>( marker->symbol()->symbolLayer( 0 ) );
   if ( !sl )
     return;
@@ -225,10 +261,13 @@ void KadasMarkerStyleEditor::applyToItem( QgsAnnotationItem *item ) const
   std::unique_ptr<QgsMarkerSymbol> sym( marker->symbol() ? marker->symbol()->clone() : new QgsMarkerSymbol() );
   if ( sym->symbolLayerCount() == 0 )
     sym->appendSymbolLayer( new QgsSimpleMarkerSymbolLayer( Qgis::MarkerShape::Circle ) );
+  sym->setAngle( mRotationSpin->value() );
   auto *sl = dynamic_cast<QgsSimpleMarkerSymbolLayer *>( sym->symbolLayer( 0 ) );
   if ( !sl )
   {
-    // Don't clobber symbol layers this editor can't drive (e.g. SVG markers).
+    // Don't clobber symbol layers this editor can't drive (e.g. SVG markers),
+    // but the rotation applies to any marker symbol.
+    marker->setSymbol( sym.release() );
     return;
   }
   sl->setShape( static_cast<Qgis::MarkerShape>( mShapeCombo->currentData().toInt() ) );
@@ -274,6 +313,10 @@ KadasPinStyleEditor::KadasPinStyleEditor( QWidget *parent )
   mSizeSpin->setToolTip( tr( "Pin size" ) );
   form->addRow( tr( "Size" ), mSizeSpin );
 
+  mRotationSpin = createRotationSpin();
+  mRotationSpin->setToolTip( tr( "Rotation, in degrees clockwise" ) );
+  form->addRow( tr( "Rotation" ), mRotationSpin );
+
   mFillColorBtn = new QgsColorButton();
   mFillColorBtn->setAllowOpacity( true );
   mFillColorBtn->setToolTip( tr( "Pin color" ) );
@@ -284,6 +327,7 @@ KadasPinStyleEditor::KadasPinStyleEditor( QWidget *parent )
   connect( mDescriptionEdit, &QPlainTextEdit::textChanged, this, &KadasAnnotationStyleEditor::previewChanged );
   mDescriptionEdit->installEventFilter( this );
   connect( mSizeSpin, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
+  connect( mRotationSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
   connect( mFillColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
 }
 
@@ -310,8 +354,9 @@ void KadasPinStyleEditor::loadFromItem( const QgsAnnotationItem *item )
   const auto *sl = dynamic_cast<const QgsSvgMarkerSymbolLayer *>( marker->symbol()->symbolLayer( 0 ) );
   if ( !sl )
     return;
-  const QSignalBlocker b1( mSizeSpin ), b2( mFillColorBtn );
+  const QSignalBlocker b1( mSizeSpin ), b2( mFillColorBtn ), b3( mRotationSpin );
   mSizeSpin->setValue( static_cast<int>( std::round( sl->size() ) ) );
+  mRotationSpin->setValue( normalizedAngle( marker->symbol()->angle() ) );
   mFillColorBtn->setColor( sl->fillColor() );
 }
 
@@ -331,6 +376,7 @@ void KadasPinStyleEditor::applyToItem( QgsAnnotationItem *item ) const
     return;
   sl->setSize( mSizeSpin->value() );
   sl->setFillColor( mFillColorBtn->color() );
+  sym->setAngle( mRotationSpin->value() );
   marker->setSymbol( sym.release() );
 }
 
@@ -353,6 +399,10 @@ KadasSvgMarkerStyleEditor::KadasSvgMarkerStyleEditor( QWidget *parent )
   mSizeSpin->setToolTip( tr( "Marker size" ) );
   form->addRow( tr( "Size" ), mSizeSpin );
 
+  mRotationSpin = createRotationSpin();
+  mRotationSpin->setToolTip( tr( "Rotation, in degrees clockwise" ) );
+  form->addRow( tr( "Rotation" ), mRotationSpin );
+
   mFillColorBtn = new QgsColorButton();
   mFillColorBtn->setAllowOpacity( true );
   mFillColorBtn->setToolTip( tr( "Fill color (SVGs with a fill parameter)" ) );
@@ -360,6 +410,7 @@ KadasSvgMarkerStyleEditor::KadasSvgMarkerStyleEditor( QWidget *parent )
 
   connect( mSvgSelector, &QgsSvgSelectorWidget::svgSelected, this, &KadasAnnotationStyleEditor::committed );
   connect( mSizeSpin, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
+  connect( mRotationSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
   connect( mFillColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
 }
 
@@ -371,9 +422,10 @@ void KadasSvgMarkerStyleEditor::loadFromItem( const QgsAnnotationItem *item )
   const auto *sl = dynamic_cast<const QgsSvgMarkerSymbolLayer *>( marker->symbol()->symbolLayer( 0 ) );
   if ( !sl )
     return;
-  const QSignalBlocker b1( mSvgSelector ), b2( mSizeSpin ), b3( mFillColorBtn );
+  const QSignalBlocker b1( mSvgSelector ), b2( mSizeSpin ), b3( mFillColorBtn ), b4( mRotationSpin );
   mSvgSelector->setSvgPath( sl->path() );
   mSizeSpin->setValue( static_cast<int>( std::round( sl->size() ) ) );
+  mRotationSpin->setValue( normalizedAngle( marker->symbol()->angle() ) );
   mFillColorBtn->setColor( sl->fillColor() );
 }
 
@@ -391,6 +443,7 @@ void KadasSvgMarkerStyleEditor::applyToItem( QgsAnnotationItem *item ) const
     sl->setPath( path );
   sl->setSize( mSizeSpin->value() );
   sl->setFillColor( mFillColorBtn->color() );
+  sym->setAngle( mRotationSpin->value() );
   marker->setSymbol( sym.release() );
 }
 
@@ -471,6 +524,7 @@ KadasPolygonStyleEditor::KadasPolygonStyleEditor( QWidget *parent )
   auto *form = new QFormLayout( this );
   form->setContentsMargins( 0, 0, 0, 0 );
   form->setFieldGrowthPolicy( QFormLayout::AllNonFixedFieldsGrow );
+  mForm = form;
 
   mStrokeWidthSpin = new QDoubleSpinBox();
   mStrokeWidthSpin->setRange( 0.0, 20.0 );
@@ -554,6 +608,39 @@ void KadasPolygonStyleEditor::applyToItem( QgsAnnotationItem *item ) const
   sl->setStrokeStyle( static_cast<Qt::PenStyle>( mStrokeStyleCombo->currentData().toInt() ) );
   sl->setBrushStyle( static_cast<Qt::BrushStyle>( mFillStyleCombo->currentData().toInt() ) );
   poly->setSymbol( sym.release() );
+}
+
+
+// ----- Rectangle --------------------------------------------------------
+
+KadasRectangleStyleEditor::KadasRectangleStyleEditor( QWidget *parent )
+  : KadasPolygonStyleEditor( parent )
+{
+  mRotationSpin = createRotationSpin();
+  mRotationSpin->setToolTip( tr( "Rotation, in degrees clockwise" ) );
+  mForm->addRow( tr( "Rotation" ), mRotationSpin );
+
+  connect( mRotationSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
+}
+
+void KadasRectangleStyleEditor::loadFromItem( const QgsAnnotationItem *item )
+{
+  KadasPolygonStyleEditor::loadFromItem( item );
+  const auto *rect = dynamic_cast<const KadasRectangleAnnotationItem *>( item );
+  if ( !rect )
+    return;
+  // The item stores a counter-clockwise angle; the UI (like the rotation handle) is clockwise.
+  const QSignalBlocker b( mRotationSpin );
+  mRotationSpin->setValue( normalizedAngle( -rect->angle() ) );
+}
+
+void KadasRectangleStyleEditor::applyToItem( QgsAnnotationItem *item ) const
+{
+  KadasPolygonStyleEditor::applyToItem( item );
+  auto *rect = dynamic_cast<KadasRectangleAnnotationItem *>( item );
+  if ( !rect )
+    return;
+  rect->setAngle( -mRotationSpin->value() );
 }
 
 
@@ -768,6 +855,10 @@ KadasPointTextStyleEditor::KadasPointTextStyleEditor( QWidget *parent )
   alignRow->addStretch( 1 );
   form->addRow( tr( "Alignment" ), alignRow );
 
+  mRotationSpin = createRotationSpin();
+  mRotationSpin->setToolTip( tr( "Rotation, in degrees clockwise" ) );
+  form->addRow( tr( "Rotation" ), mRotationSpin );
+
   addColorRow( form );
   addBufferRow( form );
 
@@ -783,6 +874,7 @@ KadasPointTextStyleEditor::KadasPointTextStyleEditor( QWidget *parent )
       emit committed();
   } );
   connect( mBackgroundColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
+  connect( mRotationSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
 }
 
 void KadasPointTextStyleEditor::loadFromItem( const QgsAnnotationItem *item )
@@ -791,9 +883,11 @@ void KadasPointTextStyleEditor::loadFromItem( const QgsAnnotationItem *item )
   if ( !pt )
     return;
   const QgsTextFormat fmt = pt->format();
-  const QSignalBlocker b10( mBackgroundColorBtn );
+  const QSignalBlocker b10( mBackgroundColorBtn ), b14( mRotationSpin );
   const QSignalBlocker b11( mAlignLeftBtn ), b12( mAlignCenterBtn ), b13( mAlignRightBtn );
   loadCommon( pt->text(), fmt );
+
+  mRotationSpin->setValue( normalizedAngle( pt->angle() ) );
 
   const Qt::Alignment align = pt->alignment();
   if ( align & Qt::AlignRight )
@@ -813,6 +907,7 @@ void KadasPointTextStyleEditor::applyToItem( QgsAnnotationItem *item ) const
   if ( !pt )
     return;
   pt->setText( textValue() );
+  pt->setAngle( mRotationSpin->value() );
   QgsTextFormat fmt = pt->format();
   applyTextFormat( fmt );
 
@@ -944,6 +1039,10 @@ KadasPictureStyleEditor::KadasPictureStyleEditor( QWidget *parent )
   sizeRow->addWidget( mLockAspectBox );
   form->addRow( tr( "Size" ), sizeRow );
 
+  mRotationSpin = createRotationSpin();
+  mRotationSpin->setToolTip( tr( "Rotation, in degrees clockwise" ) );
+  form->addRow( tr( "Rotation" ), mRotationSpin );
+
   // "Show callout" toggles the balloon shape; frame/stroke/wedge controls disable when off.
   mShowCalloutBox = new QCheckBox( tr( "Show callout" ) );
   mShowCalloutBox->setToolTip( tr( "Display the picture inside a balloon shape pointing at its anchor." ) );
@@ -1056,6 +1155,7 @@ KadasPictureStyleEditor::KadasPictureStyleEditor( QWidget *parent )
   connect( mStrokeColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
   connect( mStrokeWidthSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
   connect( mWedgeWidthSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
+  connect( mRotationSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
   connect( mShowCalloutBox, &QCheckBox::toggled, this, [this]( bool on ) {
     mFillColorBtn->setEnabled( on );
     mStrokeColorBtn->setEnabled( on );
@@ -1071,8 +1171,9 @@ void KadasPictureStyleEditor::loadFromItem( const QgsAnnotationItem *item )
   if ( !pic )
     return;
   const QSignalBlocker b1( mWidthSpin ), b2( mHeightSpin ), b3( mFillColorBtn );
-  const QSignalBlocker b4( mStrokeColorBtn ), b5( mStrokeWidthSpin ), b6( mWedgeWidthSpin );
+  const QSignalBlocker b4( mStrokeColorBtn ), b5( mStrokeWidthSpin ), b6( mWedgeWidthSpin ), b7( mRotationSpin );
   mPath = pic->path();
+  mRotationSpin->setValue( normalizedAngle( pic->rotation() ) );
   const QSizeF size = pic->fixedSize();
   mWidthSpin->setValue( static_cast<int>( std::round( size.width() ) ) );
   mHeightSpin->setValue( static_cast<int>( std::round( size.height() ) ) );
@@ -1139,6 +1240,7 @@ void KadasPictureStyleEditor::applyToItem( QgsAnnotationItem *item ) const
     pic->setPath( pictureFormatFromPath( mPath ), mPath );
 
   pic->setFixedSize( QSizeF( mWidthSpin->value(), mHeightSpin->value() ) );
+  pic->setRotation( mRotationSpin->value() );
   // Preserve existing fixedSizeUnit; forcing Pixels would shrink mm-based (paste-SVG) pictures ~3.8x.
 
   // Unchecked keeps the callout installed but invisible, so the picture stays at anchor+offset instead of jumping to bounds.center.
