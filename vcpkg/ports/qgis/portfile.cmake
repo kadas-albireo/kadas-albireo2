@@ -37,6 +37,9 @@ vcpkg_from_github(
   # elevation controller settings panel, rounded limits, initialization from
   # canvas layers + raster elevation surface z-range from band statistics
   nestedSpriteExpression.patch # https://github.com/qgis/QGIS/pull/66810
+  annotation-3d-picture-billboards.patch # https://github.com/qgis/QGIS/pull/67135
+  # picture annotation items as 3d billboards, incl. the upstream billboard
+  # geometry-shader removal it depends on
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
