@@ -30,16 +30,15 @@ vcpkg_from_github(
   mac_install_images.patch
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
-  annotation-item-rotation.patch # https://github.com/qgis/QGIS/pull/66610
-  # rotation for rectangle-based annotations (images + text)
+  annotation-item-rotation.patch # https://github.com/qgis/QGIS/pull/67101
+  # rotation-aware annotation map tools; the earlier rotation parts landed
+  # upstream and are no longer carried here
   oauth2NoEmptyClientSecret.patch # https://github.com/qgis/QGIS/pull/66777
   elevation_controller_range.patch # https://github.com/qgis/QGIS/pull/67112
   # elevation controller settings panel, rounded limits, initialization from
   # canvas layers + raster elevation surface z-range from band statistics
-  nestedSpriteExpression.patch # https://github.com/qgis/QGIS/pull/66810
   annotation-3d-picture-billboards.patch # https://github.com/qgis/QGIS/pull/67135
-  # picture annotation items as 3d billboards, incl. the upstream billboard
-  # geometry-shader removal it depends on
+  # picture annotation items as 3d billboards
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
