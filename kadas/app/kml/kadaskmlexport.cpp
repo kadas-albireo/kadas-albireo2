@@ -101,8 +101,7 @@ bool KadasKMLExport::exportToFile( const QString &filename, const QList<QgsMapLa
   settings.setOutputSize( QSize( fullExtent.width() * factor, fullExtent.height() * factor ) );
   settings.setOutputDpi( dpi );
 
-  QgsDefaultLabelingEngine engine;
-  engine.setMapSettings( settings );
+  QgsDefaultLabelingEngine engine( settings );
 
   QgsRenderContext rc = QgsRenderContext::fromMapSettings( settings );
 
