@@ -46,6 +46,17 @@ Creates a :py:class:`QgsAnnotationLayer` named ``name`` (using
 project.
 %End
 
+    static void ensure3DRenderer( QgsAnnotationLayer *layer );
+%Docstring
+Gives ``layer`` a 3D renderer, so that its items (text, markers and
+pictures) show as billboards in 3D map views. Annotation layers render
+nothing in 3D without one.
+
+Does nothing for parametric layers, or when ``layer`` already carries a
+renderer, so a configuration restored from a project is never
+overwritten.
+%End
+
     static void prepareLayerForSave( QgsAnnotationLayer *layer );
 %Docstring
 Generates and inserts QGIS-compat shadow items for every master item.

@@ -21,6 +21,7 @@
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgsproject.h>
 
+#include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
 
 
@@ -97,6 +98,9 @@ QgsAnnotationLayer *KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( St
     QgsProject::instance()->addMapLayer( annoLayer );
     instance()->mLayerIdMap[layer] = annoLayer->id();
   }
+  // Also covers layers restored from a project saved before annotation layers got a
+  // 3D renderer, which would otherwise stay invisible in 3D map views.
+  KadasAnnotationLayerHelpers::ensure3DRenderer( annoLayer );
   return annoLayer;
 }
 

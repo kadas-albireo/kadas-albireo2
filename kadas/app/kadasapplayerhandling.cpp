@@ -66,9 +66,7 @@
 #include <qgis/qgspolygon3dsymbol.h>
 #include <qgis/qgsphongmaterialsettings.h>
 #include <qgis/qgsvectorlayer3drenderer.h>
-#include <qgis/qgsannotationlayer3drenderer.h>
 #include <qgis/qgsannotationlayer.h>
-#include <qgis/qgstextformat.h>
 
 
 #include <qgis/qgsprovidersublayersdialog.h>
@@ -221,22 +219,8 @@ void KadasAppLayerHandling::postProcessAddedLayer( QgsMapLayer *layer )
 
     case Qgis::LayerType::Annotation:
     {
-      QgsAnnotationLayer *al = qobject_cast<QgsAnnotationLayer *>( layer );
-      // Skip parametric Kadas overlays (bullseye, guide grid): they are geometric
-      // constructs, not text/marker annotations, so a billboard renderer is wrong.
-      if ( al && !KadasAnnotationLayerHelpers::isParametricLayer( al ) )
-      {
-        // Render annotations (text + markers) as billboards in 3D, with a callout
-        // line vertically joining each item to the terrain.
-        std::unique_ptr<QgsAnnotationLayer3DRenderer> renderer = std::make_unique<QgsAnnotationLayer3DRenderer>();
-        renderer->setLayer( al );
-        renderer->setShowCalloutLines( true );
-        renderer->setCalloutLineColor( QColor( 255, 255, 0 ) );
-        QgsTextFormat textFormat;
-        textFormat.setColor( QColor( 255, 255, 0 ) );
-        renderer->setTextFormat( textFormat );
-        layer->setRenderer3D( renderer.release() );
-      }
+      // Render annotations (text, markers and pictures) as billboards in 3D.
+      KadasAnnotationLayerHelpers::ensure3DRenderer( qobject_cast<QgsAnnotationLayer *>( layer ) );
       break;
     }
     case Qgis::LayerType::Group:
