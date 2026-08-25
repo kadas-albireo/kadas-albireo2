@@ -36,7 +36,7 @@ KadasMapToolHeightProfile::KadasMapToolHeightProfile( QgsMapCanvas *canvas )
   mPosMarker->setColor( Qt::blue );
   mPosMarker->setStrokeColor( Qt::blue );
   mPosMarker->setFillColor( Qt::blue );
-  mPosMarker->setIcon( QgsRubberBand::ICON_CIRCLE );
+  mPosMarker->setIcon( Qgis::RubberBandIconType::Circle );
   mPosMarker->setIconSize( 8 );
 
   mDialog = new KadasHeightProfileDialog( this, nullptr, Qt::WindowStaysOnTopHint );

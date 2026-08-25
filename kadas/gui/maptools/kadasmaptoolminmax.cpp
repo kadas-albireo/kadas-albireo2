@@ -260,7 +260,7 @@ void KadasMapToolMinMax::runMinMax( const QgsGeometry &geometry, const QgsCoordi
   if ( !mPinMinBand )
   {
     mPinMinBand = new QgsRubberBand( canvas(), Qgis::GeometryType::Point );
-    mPinMinBand->setIcon( QgsRubberBand::ICON_SVG );
+    mPinMinBand->setIcon( Qgis::RubberBandIconType::SVG );
     mPinMinBand->setSvgIcon( QStringLiteral( ":/kadas/icons/tri_up" ), QPoint( -27, 0 ) );
     mPinMinBand->setIconSize( pinRectIconSize );
   }
@@ -271,7 +271,7 @@ void KadasMapToolMinMax::runMinMax( const QgsGeometry &geometry, const QgsCoordi
   if ( !mPinMaxBand )
   {
     mPinMaxBand = new QgsRubberBand( canvas(), Qgis::GeometryType::Point );
-    mPinMaxBand->setIcon( QgsRubberBand::ICON_SVG );
+    mPinMaxBand->setIcon( Qgis::RubberBandIconType::SVG );
     mPinMaxBand->setSvgIcon( QStringLiteral( ":/kadas/icons/tri_down" ), QPoint( -27, -43 ) );
     mPinMaxBand->setIconSize( pinRectIconSize );
   }
