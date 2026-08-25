@@ -85,7 +85,7 @@ KadasPortalAuth::KadasPortalAuth( QObject *parent )
 
   connect( mAppAuthRequestHandler, &KadasAppAuthRequestHandler::browserOpened, this, &KadasPortalAuth::authRequestHandlerBrowserOpened );
   connect( mAppAuthRequestHandler, &KadasAppAuthRequestHandler::browserClosed, this, &KadasPortalAuth::authRequestHandlerBrowserClosed );
-  connect( &mRequestRunningMessageBox, &QMessageBox::rejected, mAppAuthRequestHandler, &KadasAppAuthRequestHandler::abortAuth );
+  connect( &mRequestRunningMessageBox, &QMessageBox::rejected, mAppAuthRequestHandler, &KadasAppAuthRequestHandler::abortAuth, Qt::QueuedConnection );
 }
 
 void KadasPortalAuth::setupAuthentication()
