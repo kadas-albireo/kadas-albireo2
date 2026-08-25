@@ -142,7 +142,7 @@ void KadasMapIdentifyDialog::onItemClicked( QTreeWidgetItem *item, int /*col*/ )
   {
     QgsPoint *p = static_cast<QgsPoint *>( geom );
     mResultPin = new QgsRubberBand( mCanvas, Qgis::GeometryType::Point );
-    mResultPin->setIcon( QgsRubberBand::ICON_FULL_BOX );
+    mResultPin->setIcon( Qgis::RubberBandIconType::BoxFilled );
     mResultPin->setColor( QColor( 0, 0, 255 ) );
     mResultPin->setIconSize( 12 );
     mResultPin->addPoint( QgsPointXY( p->x(), p->y() ) );
@@ -163,7 +163,7 @@ void KadasMapIdentifyDialog::collectInfo( const QgsPointXY &mapPos )
   clear();
 
   mClickPosPin = new QgsRubberBand( mCanvas, Qgis::GeometryType::Point );
-  mClickPosPin->setIcon( QgsRubberBand::ICON_FULL_BOX );
+  mClickPosPin->setIcon( Qgis::RubberBandIconType::BoxFilled );
   mClickPosPin->setColor( QColor( 255, 0, 0 ) );
   mClickPosPin->setIconSize( 12 );
   mClickPosPin->addPoint( mapPos );
