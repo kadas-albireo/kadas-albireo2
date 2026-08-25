@@ -4,6 +4,7 @@ try:
     KadasAnnotationLayerHelpers.tooltip = staticmethod(KadasAnnotationLayerHelpers.tooltip)
     KadasAnnotationLayerHelpers.setTooltip = staticmethod(KadasAnnotationLayerHelpers.setTooltip)
     KadasAnnotationLayerHelpers.createLayer = staticmethod(KadasAnnotationLayerHelpers.createLayer)
+    KadasAnnotationLayerHelpers.ensure3DRenderer = staticmethod(KadasAnnotationLayerHelpers.ensure3DRenderer)
     KadasAnnotationLayerHelpers.prepareLayerForSave = staticmethod(KadasAnnotationLayerHelpers.prepareLayerForSave)
     KadasAnnotationLayerHelpers.stripShadowsFromLayer = staticmethod(KadasAnnotationLayerHelpers.stripShadowsFromLayer)
     KadasAnnotationLayerHelpers.reconstructOrphanCrosses = staticmethod(KadasAnnotationLayerHelpers.reconstructOrphanCrosses)

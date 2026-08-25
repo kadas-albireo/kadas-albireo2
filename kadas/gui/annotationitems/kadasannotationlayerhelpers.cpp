@@ -14,12 +14,18 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <memory>
+
+#include <QColor>
+
 #include <qgis/qgsannotationitem.h>
 #include <qgis/qgsannotationlayer.h>
+#include <qgis/qgsannotationlayer3drenderer.h>
 #include <qgis/qgsannotationmarkeritem.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgstextformat.h>
 
 #include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontext.h"
@@ -112,7 +118,30 @@ QgsAnnotationLayer *KadasAnnotationLayerHelpers::createLayer( const QString &nam
   if ( !crs.isValid() )
     crs = QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:3857" ) );
   layer->setCrs( crs );
+  ensure3DRenderer( layer );
   return layer;
+}
+
+void KadasAnnotationLayerHelpers::ensure3DRenderer( QgsAnnotationLayer *layer )
+{
+  // Parametric Kadas overlays (bullseye, guide grid) are geometric constructs rather
+  // than text/marker/picture annotations, so billboards are the wrong representation.
+  if ( !layer || isParametricLayer( layer ) )
+    return;
+
+  // A renderer read back from a project carries the user's own settings: leave it alone.
+  if ( layer->renderer3D() )
+    return;
+
+  auto renderer = std::make_unique<QgsAnnotationLayer3DRenderer>();
+  renderer->setLayer( layer );
+  // Join each billboard to the terrain, so a floating item still reads as belonging to a place.
+  renderer->setShowCalloutLines( true );
+  renderer->setCalloutLineColor( QColor( 255, 255, 0 ) );
+  QgsTextFormat textFormat;
+  textFormat.setColor( QColor( 255, 255, 0 ) );
+  renderer->setTextFormat( textFormat );
+  layer->setRenderer3D( renderer.release() );
 }
 
 void KadasAnnotationLayerHelpers::stripShadowsFromLayer( QgsAnnotationLayer *layer )

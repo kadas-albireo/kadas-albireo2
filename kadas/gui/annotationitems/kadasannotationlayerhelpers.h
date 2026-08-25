@@ -44,6 +44,15 @@ class KADAS_GUI_EXPORT KadasAnnotationLayerHelpers
     //! Creates a QgsAnnotationLayer named \a name (using \a preferredCrs, else project CRS, else EPSG:3857). Not added to the project.
     static QgsAnnotationLayer *createLayer( const QString &name, const QgsCoordinateReferenceSystem &preferredCrs = QgsCoordinateReferenceSystem() );
 
+    /**
+     * Gives \a layer a 3D renderer, so that its items (text, markers and pictures) show as
+     * billboards in 3D map views. Annotation layers render nothing in 3D without one.
+     *
+     * Does nothing for parametric layers, or when \a layer already carries a renderer, so a
+     * configuration restored from a project is never overwritten.
+     */
+    static void ensure3DRenderer( QgsAnnotationLayer *layer );
+
     //! Generates and inserts QGIS-compat shadow items for every master item. Call before QgsProject::write(). Idempotent.
     static void prepareLayerForSave( QgsAnnotationLayer *layer );
 
