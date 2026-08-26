@@ -32,6 +32,7 @@ class QToolButton;
 class QButtonGroup;
 class QgsAnnotationItem;
 class QgsColorButton;
+class QgsDoubleSpinBox;
 class QgsSvgSelectorWidget;
 class QgsTextFormat;
 
@@ -80,7 +81,7 @@ class KadasMarkerStyleEditor : public KadasAnnotationStyleEditor
   private:
     QComboBox *mShapeCombo = nullptr;
     QSpinBox *mSizeSpin = nullptr;
-    QDoubleSpinBox *mRotationSpin = nullptr;
+    QgsDoubleSpinBox *mRotationSpin = nullptr;
     QDoubleSpinBox *mStrokeWidthSpin = nullptr;
     QgsColorButton *mFillColorBtn = nullptr;
     QgsColorButton *mStrokeColorBtn = nullptr;
@@ -107,7 +108,7 @@ class KadasPinStyleEditor : public KadasAnnotationStyleEditor
     QLineEdit *mTitleEdit = nullptr;
     QPlainTextEdit *mDescriptionEdit = nullptr;
     QSpinBox *mSizeSpin = nullptr;
-    QDoubleSpinBox *mRotationSpin = nullptr;
+    QgsDoubleSpinBox *mRotationSpin = nullptr;
     QgsColorButton *mFillColorBtn = nullptr;
 };
 
@@ -127,7 +128,7 @@ class KadasSvgMarkerStyleEditor : public KadasAnnotationStyleEditor
   private:
     QgsSvgSelectorWidget *mSvgSelector = nullptr;
     QSpinBox *mSizeSpin = nullptr;
-    QDoubleSpinBox *mRotationSpin = nullptr;
+    QgsDoubleSpinBox *mRotationSpin = nullptr;
     QgsColorButton *mFillColorBtn = nullptr;
 };
 
@@ -192,7 +193,7 @@ class KadasRectangleStyleEditor : public KadasPolygonStyleEditor
     void applyToItem( QgsAnnotationItem *item ) const override;
 
   private:
-    QDoubleSpinBox *mRotationSpin = nullptr;
+    QgsDoubleSpinBox *mRotationSpin = nullptr;
 };
 
 /**
@@ -263,7 +264,7 @@ class KadasPointTextStyleEditor : public KadasTextStyleEditorBase
     QToolButton *mAlignCenterBtn = nullptr;
     QToolButton *mAlignRightBtn = nullptr;
     QButtonGroup *mAlignGroup = nullptr;
-    QDoubleSpinBox *mRotationSpin = nullptr;
+    QgsDoubleSpinBox *mRotationSpin = nullptr;
     QgsColorButton *mBackgroundColorBtn = nullptr;
 };
 
@@ -311,7 +312,7 @@ class KadasPictureStyleEditor : public KadasAnnotationStyleEditor
     QSpinBox *mWidthSpin = nullptr;
     QSpinBox *mHeightSpin = nullptr;
     QCheckBox *mLockAspectBox = nullptr;
-    QDoubleSpinBox *mRotationSpin = nullptr;
+    QgsDoubleSpinBox *mRotationSpin = nullptr;
     QCheckBox *mShowCalloutBox = nullptr;
     QgsColorButton *mFillColorBtn = nullptr;
     QgsColorButton *mStrokeColorBtn = nullptr;
