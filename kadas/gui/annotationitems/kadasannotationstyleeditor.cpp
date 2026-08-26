@@ -55,6 +55,7 @@
 #include <qgis/qgsannotationpolygonitem.h>
 #include <qgis/qgscallout.h>
 #include <qgis/qgscolorbutton.h>
+#include <qgis/qgsdoublespinbox.h>
 #include <qgis/qgsfillsymbol.h>
 #include <qgis/qgsfillsymbollayer.h>
 #include <qgis/qgslinesymbol.h>
@@ -140,15 +141,18 @@ namespace
    * convention as the on-canvas rotation handle (KadasAnnotationRotation), so
    * typing a value and dragging the handle agree.
    */
-  QDoubleSpinBox *createRotationSpin()
+  QgsDoubleSpinBox *createRotationSpin()
   {
-    auto *spin = new QDoubleSpinBox();
+    auto *spin = new QgsDoubleSpinBox();
     spin->setRange( 0.0, 360.0 );
     spin->setDecimals( 1 );
     spin->setSingleStep( KadasAnnotationRotation::sSnapStep );
     // Wrap so stepping past either end continues around the circle.
     spin->setWrapping( true );
     spin->setSuffix( QStringLiteral( " \u00b0" ) );
+    // Reset indicator: shown as soon as the item is rotated, clearing back to unrotated.
+    spin->setShowClearButton( true );
+    spin->setClearValue( 0.0 );
     return spin;
   }
 
