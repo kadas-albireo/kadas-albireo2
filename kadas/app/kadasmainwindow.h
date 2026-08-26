@@ -30,6 +30,7 @@ class QSplashScreen;
 class QgsDecorationGrid;
 class QgsLayerTreeMapCanvasBridge;
 class QgsElevationControllerWidget;
+class QgsMapLayer;
 class QgsMessageBar;
 class QgsSettingsEntryInteger;
 class QToolButton;
@@ -46,6 +47,8 @@ class KadasRedliningIntegration;
 class KadasStatusBar;
 class KadasTemporalController;
 class KadasSidePanelHost;
+class KadasCatalogPreview;
+struct KadasCatalogLayerSource;
 
 
 class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private Ui::KadasTopWidget
@@ -187,6 +190,13 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void setLayersWidgetWidth( int width );
     //! Restores the remembered catalog/layer tree split of the panel.
     void applyCatalogColumnWidth();
+    /**
+     * Resolves the single layer a catalog entry maps to, for previewing it.
+     * Returns an invalid source for entries which map to more than one layer.
+     */
+    KadasCatalogLayerSource catalogLayerSource( const QgsMimeDataUtils::Uri &uri, const QVariantList &sublayers ) const;
+    //! Adds \a source to the project and returns the created layer.
+    QgsMapLayer *addCatalogLayerSource( const KadasCatalogLayerSource &source, bool adjustInsertionPoint );
 
     QgsMessageBar *mInfoBar = nullptr;
     QPointer<QgsMessageBarItem> mReprojMsgItem;
@@ -201,6 +211,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     KadasRedliningIntegration *mRedliningIntegration = nullptr;
     KadasTemporalController *mKadasTemporalController = nullptr;
     KadasPluginManager *mPluginManager = nullptr;
+    KadasCatalogPreview *mCatalogPreview = nullptr;
     KadasSidePanelHost *mLeftPanelHost = nullptr;
     KadasSidePanelHost *mRightPanelHost = nullptr;
     QToolButton *mPluginsToolButton = nullptr;

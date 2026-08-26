@@ -4,6 +4,9 @@ set(kadas_gui_SRC
     kadassidepanel.cpp
     kadassidepanelhost.cpp
     kadascatalogbrowser.cpp
+    kadascataloglayersource.cpp
+    kadascatalogpreview.cpp
+    kadascatalogpreviewcanvasitem.cpp
     kadascatalogprovider.cpp
     kadasclipboard.cpp
     kadasclipboardutils.h
@@ -87,6 +90,9 @@ set(kadas_gui_HDR
     kadassidepanel.h
     kadassidepanelhost.h
     kadascatalogbrowser.h
+    kadascataloglayersource.h
+    kadascatalogpreview.h
+    kadascatalogpreviewcanvasitem.h
     kadascatalogprovider.h
     kadasclipboard.h
     kadascoordinatedisplayer.h

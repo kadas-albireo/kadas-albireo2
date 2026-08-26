@@ -14,19 +14,32 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <memory>
+
 #include <QHBoxLayout>
 #include <QIcon>
+#include <QItemSelectionModel>
 #include <QSortFilterProxyModel>
 #include <QStandardItem>
+#include <QTimer>
 #include <QToolButton>
 #include <QTreeView>
 #include <QVBoxLayout>
 
 #include <qgis/qgsfilterlineedit.h>
 #include <qgis/qgsrasterlayer.h>
+#include <qgis/qgssettingsentryimpl.h>
 
 #include "kadas/gui/kadascatalogbrowser.h"
 #include "kadas/gui/kadascatalogprovider.h"
+
+
+static const QgsSettingsEntryBool sSettingAutoPreview(
+  QStringLiteral( "catalog-auto-preview" ), KadasSettingsTree::sTreeKadas, false, QStringLiteral( "Whether selecting a catalog entry previews it on the map." )
+);
+
+//! Delay between the selection settling and the preview request, in milliseconds.
+static const int sPreviewDelay = 350;
 
 
 class KadasCatalogBrowser::CatalogItem : public QStandardItem
@@ -211,13 +224,39 @@ KadasCatalogBrowser::KadasCatalogBrowser( QWidget *parent )
   );
   connect( mRefreshButton, &QToolButton::clicked, this, &KadasCatalogBrowser::reload );
 
+  mPreviewButton = new QToolButton( this );
+  mPreviewButton->setObjectName( "mCatalogBrowserPreviewButton" );
+  mPreviewButton->setIcon( QIcon( ":/kadas/icons/preview" ) );
+  mPreviewButton->setToolTip( tr( "Preview the selected entry on the map, without adding it" ) );
+  mPreviewButton->setCheckable( true );
+  mPreviewButton->setChecked( sSettingAutoPreview.value() );
+  mPreviewButton->setFixedSize( 40, 40 );
+  mPreviewButton->setStyleSheet(
+    "QToolButton { border: 1px solid #263B4E; border-radius: 4px; background: #263B4E; } QToolButton:checked { border-color: #3daee9; background: #3daee9; } QToolButton:pressed { background: "
+    "#16232f; }"
+  );
+  connect( mPreviewButton, &QToolButton::toggled, this, [this]( bool checked ) {
+    sSettingAutoPreview.setValue( checked );
+    // Enabling picks up whatever is already selected; disabling drops the preview.
+    updatePreview();
+  } );
+
   QWidget *filterRow = new QWidget( this );
   QHBoxLayout *filterRowLayout = new QHBoxLayout( filterRow );
   filterRowLayout->setContentsMargins( 6, 6, 6, 6 );
   filterRowLayout->setSpacing( 0 );
   filterRowLayout->addWidget( mFilterLineEdit );
   filterRowLayout->addWidget( mRefreshButton );
+  // The filter field and the refresh button read as one control, so keep the
+  // preview toggle clear of them.
+  filterRowLayout->addSpacing( 6 );
+  filterRowLayout->addWidget( mPreviewButton );
   layout()->addWidget( filterRow );
+
+  mPreviewTimer = new QTimer( this );
+  mPreviewTimer->setSingleShot( true );
+  mPreviewTimer->setInterval( sPreviewDelay );
+  connect( mPreviewTimer, &QTimer::timeout, this, &KadasCatalogBrowser::updatePreview );
 
   mTreeView = new QTreeView( this );
   mTreeView->setFrameShape( QTreeView::NoFrame );
@@ -247,7 +286,7 @@ void KadasCatalogBrowser::reload()
   if ( mTreeView->model() != mLoadingModel && mProviders.size() > 0 )
   {
     mCatalogModel->setRowCount( 0 );
-    mTreeView->setModel( mLoadingModel );
+    setTreeModel( mLoadingModel );
 
     mFinishedProviders = 0;
     for ( KadasCatalogProvider *provider : mProviders )
@@ -268,11 +307,11 @@ void KadasCatalogBrowser::providerFinished()
       mFilterProxyModel->setSourceModel( mCatalogModel );
       mFilterProxyModel->setSortRole( CatalogItem::s_sortIndexRole );
       mFilterProxyModel->sort( 0 );
-      mTreeView->setModel( mFilterProxyModel );
+      setTreeModel( mFilterProxyModel );
     }
     else
     {
-      mTreeView->setModel( mOfflineModel );
+      setTreeModel( mOfflineModel );
     }
   }
 }
@@ -300,6 +339,62 @@ void KadasCatalogBrowser::itemDoubleClicked( const QModelIndex &index )
     }
     delete data;
   }
+}
+
+void KadasCatalogBrowser::showEvent( QShowEvent *event )
+{
+  QWidget::showEvent( event );
+  // Bring back the preview of whatever is still selected.
+  updatePreview();
+}
+
+void KadasCatalogBrowser::hideEvent( QHideEvent *event )
+{
+  QWidget::hideEvent( event );
+  updatePreview();
+}
+
+bool KadasCatalogBrowser::autoPreviewEnabled() const
+{
+  return mPreviewButton->isChecked();
+}
+
+void KadasCatalogBrowser::setTreeModel( QAbstractItemModel *model )
+{
+  mTreeView->setModel( model );
+  // Changing the model gives the view a fresh selection model, so the
+  // connection has to be made again every time.
+  connect( mTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, [this] { mPreviewTimer->start(); } );
+  updatePreview();
+}
+
+void KadasCatalogBrowser::updatePreview()
+{
+  mPreviewTimer->stop();
+
+  // Only leaf entries of a loaded, visible catalog carry a uri to preview.
+  if ( !isVisible() || !mPreviewButton->isChecked() || mTreeView->model() != mFilterProxyModel || !mTreeView->selectionModel() )
+  {
+    emit previewCleared();
+    return;
+  }
+
+  const QModelIndexList selection = mTreeView->selectionModel()->selectedIndexes();
+  if ( selection.isEmpty() )
+  {
+    emit previewCleared();
+    return;
+  }
+
+  std::unique_ptr<QMimeData> data( mCatalogModel->mimeData( QModelIndexList() << mFilterProxyModel->mapToSource( selection.front() ) ) );
+  const QgsMimeDataUtils::UriList uriList = data ? QgsMimeDataUtils::decodeUriList( data.get() ) : QgsMimeDataUtils::UriList();
+  if ( uriList.isEmpty() || uriList[0].uri.isEmpty() )
+  {
+    emit previewCleared();
+    return;
+  }
+
+  emit previewRequested( uriList[0], data->property( "sublayers" ).toList() );
 }
 
 QStandardItem *KadasCatalogBrowser::addItem( QStandardItem *parent, QString text, int sortIndex, bool isLeaf, QMimeData *mimeData )
