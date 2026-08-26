@@ -55,16 +55,18 @@ QString KadasCatalogLayerSource::adjustUri( const QgsMimeDataUtils::Uri &uri, co
   return adjustedUri;
 }
 
-KadasCatalogLayerSource KadasCatalogLayerSource::resolve( const QgsMimeDataUtils::Uri &uri, const QString &adjustedUri, const QVariant &sublayerId, const QString &name )
+KadasCatalogLayerSource KadasCatalogLayerSource::resolve( const QString &providerKey, const QString &adjustedUri, const QVariant &sublayerId, const QString &name )
 {
   KadasCatalogLayerSource source;
-  source.providerKey = uri.providerKey;
+  source.providerKey = providerKey;
   source.name = name;
   source.uri = adjustedUri;
+  // Providers not recognized below are loaded through their provider as a
+  // raster layer, which is also what most of the recognized ones are.
+  source.type = Type::Raster;
 
-  if ( uri.providerKey == QLatin1String( "arcgismapserver" ) )
+  if ( providerKey == QLatin1String( "arcgismapserver" ) )
   {
-    source.type = Type::Raster;
     if ( sublayerId.isValid() )
     {
       QgsDataSourceUri dataSource( adjustedUri );
@@ -73,7 +75,7 @@ KadasCatalogLayerSource KadasCatalogLayerSource::resolve( const QgsMimeDataUtils
       source.uri = dataSource.uri( false );
     }
   }
-  else if ( uri.providerKey == QLatin1String( "arcgisfeatureserver" ) )
+  else if ( providerKey == QLatin1String( "arcgisfeatureserver" ) )
   {
     source.type = Type::Vector;
     if ( sublayerId.isValid() )
@@ -85,23 +87,14 @@ KadasCatalogLayerSource KadasCatalogLayerSource::resolve( const QgsMimeDataUtils
       source.uri = dataSource.uri( false );
     }
   }
-  else if ( uri.providerKey == QLatin1String( "arcgisvectortileservice" ) )
+  else if ( providerKey == QLatin1String( "arcgisvectortileservice" ) )
   {
     // The service is a single layer; a sublayer id does not narrow it down.
     source.type = Type::VectorTile;
   }
-  else if ( uri.providerKey == QLatin1String( "wms" ) )
+  else if ( providerKey == QLatin1String( "wms" ) && sublayerId.isValid() )
   {
-    source.type = Type::Raster;
-    if ( sublayerId.isValid() )
-    {
-      source.uri.replace( QRegularExpression( "layers=[^&]*" ), "layers=" + sublayerId.toString() );
-    }
-  }
-  else
-  {
-    // Everything else is loaded through its provider as a raster layer.
-    source.type = Type::Raster;
+    source.uri.replace( QRegularExpression( "layers=[^&]*" ), "layers=" + sublayerId.toString() );
   }
 
   return source;

@@ -1531,7 +1531,7 @@ KadasCatalogLayerSource KadasMainWindow::catalogLayerSource( const QgsMimeDataUt
 
   const QString adjustedUri = KadasCatalogLayerSource::adjustUri( uri, mMapCanvas->mapSettings().destinationCrs() );
   const QVariant sublayerId = sublayers.size() == 1 ? sublayers[0].toMap().value( QStringLiteral( "id" ) ) : QVariant();
-  return KadasCatalogLayerSource::resolve( uri, adjustedUri, sublayerId, uri.name );
+  return KadasCatalogLayerSource::resolve( uri.providerKey, adjustedUri, sublayerId, uri.name );
 }
 
 QgsMapLayer *KadasMainWindow::addCatalogLayerSource( const KadasCatalogLayerSource &source, bool adjustInsertionPoint )
@@ -1575,7 +1575,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
   {
     // If there is exactly one sublayer, add it directly
     const QVariantMap sublayer = sublayers[0].toMap();
-    QgsMapLayer *layer = addCatalogLayerSource( KadasCatalogLayerSource::resolve( uri, adjustedUri, sublayer["id"], uri.name ), !atInsertionPoint );
+    QgsMapLayer *layer = addCatalogLayerSource( KadasCatalogLayerSource::resolve( uri.providerKey, adjustedUri, sublayer["id"], uri.name ), !atInsertionPoint );
     if ( layer )
     {
       layer->serverProperties()->setMetadataUrls( { QgsServerMetadataUrlProperties::MetadataUrl( metadataUrl ) } );
@@ -1642,7 +1642,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
         // not at a single drop row.
         QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( parent, parent == rootGroup ? rootInsCount++ : parent->children().count() ) );
 
-        QgsMapLayer *layer = addCatalogLayerSource( KadasCatalogLayerSource::resolve( uri, adjustedUri, entry->id, entry->name ), false );
+        QgsMapLayer *layer = addCatalogLayerSource( KadasCatalogLayerSource::resolve( uri.providerKey, adjustedUri, entry->id, entry->name ), false );
         if ( layer )
         {
           layer->serverProperties()->setMetadataUrls( { QgsServerMetadataUrlProperties::MetadataUrl( metadataUrl ) } );
@@ -1659,7 +1659,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
   else
   {
     // No sublayers: the entry itself is the layer.
-    QgsMapLayer *layer = addCatalogLayerSource( KadasCatalogLayerSource::resolve( uri, adjustedUri, QVariant(), uri.name ), !atInsertionPoint );
+    QgsMapLayer *layer = addCatalogLayerSource( KadasCatalogLayerSource::resolve( uri.providerKey, adjustedUri, QVariant(), uri.name ), !atInsertionPoint );
     if ( layer )
     {
       layer->serverProperties()->setMetadataUrls( { QgsServerMetadataUrlProperties::MetadataUrl( metadataUrl ) } );
