@@ -49,6 +49,11 @@ struct KADAS_GUI_EXPORT KadasCatalogLayerSource
     QString uri;
     QString name;
 
+    /**
+     * TRUE if this resolves to a layer. Only a default constructed source is
+     * invalid by type: resolve() always yields a concrete one, falling back to
+     * a raster layer for providers it does not know.
+     */
     bool isValid() const { return type != Type::Unknown && !uri.isEmpty(); }
 
     /**
@@ -58,13 +63,14 @@ struct KADAS_GUI_EXPORT KadasCatalogLayerSource
     static QString adjustUri( const QgsMimeDataUtils::Uri &uri, const QgsCoordinateReferenceSystem &canvasCrs );
 
     /**
-     * Resolves the source a layer named \a name would be created from, for the
-     * catalog entry \a uri with its adjustUri() result \a adjustedUri.
+     * Resolves the source a layer named \a name would be created from, for a
+     * catalog entry of \a providerKey whose uri went through adjustUri() into
+     * \a adjustedUri.
      *
      * \a sublayerId is the "id" of the sublayer to resolve; pass an invalid
      * QVariant for entries which carry no sublayers.
      */
-    static KadasCatalogLayerSource resolve( const QgsMimeDataUtils::Uri &uri, const QString &adjustedUri, const QVariant &sublayerId, const QString &name );
+    static KadasCatalogLayerSource resolve( const QString &providerKey, const QString &adjustedUri, const QVariant &sublayerId, const QString &name );
 };
 
 #endif // KADASCATALOGLAYERSOURCE_H

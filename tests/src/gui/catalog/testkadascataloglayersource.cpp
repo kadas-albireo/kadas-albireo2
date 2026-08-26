@@ -42,7 +42,8 @@ class TestKadasCatalogLayerSource : public QObject
     void adjustsCrsToCanvas();
     void keepsUriWhenCanvasCrsUnsupported();
 
-    void invalidWithoutProvider();
+    void invalidWithoutUri();
+    void unrecognizedProviderFallsBackToRaster();
 
   private:
     static QgsMimeDataUtils::Uri entry( const QString &providerKey, const QString &uri );
@@ -76,7 +77,7 @@ void TestKadasCatalogLayerSource::resolvesProviderToLayerType()
   QFETCH( int, type );
 
   const QgsMimeDataUtils::Uri uri = entry( providerKey, QStringLiteral( "url=https://example.com/service" ) );
-  const KadasCatalogLayerSource source = KadasCatalogLayerSource::resolve( uri, uri.uri, QVariant(), uri.name );
+  const KadasCatalogLayerSource source = KadasCatalogLayerSource::resolve( uri.providerKey, uri.uri, QVariant(), uri.name );
 
   QCOMPARE( static_cast<int>( source.type ), type );
   QCOMPARE( source.providerKey, providerKey );
@@ -90,7 +91,7 @@ void TestKadasCatalogLayerSource::narrowsWmsToSublayerName()
   // strings.
   const QgsMimeDataUtils::Uri uri = entry( QStringLiteral( "wms" ), QStringLiteral( "crs=EPSG:2056&format=image/png&layers=all&url=https://example.com/wms" ) );
 
-  const KadasCatalogLayerSource source = KadasCatalogLayerSource::resolve( uri, uri.uri, QStringLiteral( "ch.swisstopo.pixelkarte" ), uri.name );
+  const KadasCatalogLayerSource source = KadasCatalogLayerSource::resolve( uri.providerKey, uri.uri, QStringLiteral( "ch.swisstopo.pixelkarte" ), uri.name );
 
   QCOMPARE( source.uri, QStringLiteral( "crs=EPSG:2056&format=image/png&layers=ch.swisstopo.pixelkarte&url=https://example.com/wms" ) );
 }
@@ -99,7 +100,7 @@ void TestKadasCatalogLayerSource::narrowsArcGisMapServerToSublayerId()
 {
   const QgsMimeDataUtils::Uri uri = entry( QStringLiteral( "arcgismapserver" ), QStringLiteral( "crs='EPSG:2056' layer='0' url='https://example.com/MapServer'" ) );
 
-  const KadasCatalogLayerSource source = KadasCatalogLayerSource::resolve( uri, uri.uri, 7, uri.name );
+  const KadasCatalogLayerSource source = KadasCatalogLayerSource::resolve( uri.providerKey, uri.uri, 7, uri.name );
 
   QgsDataSourceUri resolved( source.uri );
   QCOMPARE( resolved.param( QStringLiteral( "layer" ) ), QStringLiteral( "7" ) );
@@ -110,7 +111,7 @@ void TestKadasCatalogLayerSource::appendsSublayerIdToArcGisFeatureServerUrl()
 {
   const QgsMimeDataUtils::Uri uri = entry( QStringLiteral( "arcgisfeatureserver" ), QStringLiteral( "crs='EPSG:2056' url='https://example.com/FeatureServer'" ) );
 
-  const KadasCatalogLayerSource source = KadasCatalogLayerSource::resolve( uri, uri.uri, 3, uri.name );
+  const KadasCatalogLayerSource source = KadasCatalogLayerSource::resolve( uri.providerKey, uri.uri, 3, uri.name );
 
   QgsDataSourceUri resolved( source.uri );
   QCOMPARE( resolved.param( QStringLiteral( "url" ) ), QStringLiteral( "https://example.com/FeatureServer/3" ) );
@@ -121,7 +122,7 @@ void TestKadasCatalogLayerSource::keepsUriWithoutSublayer()
   const QString raw = QStringLiteral( "crs=EPSG:2056&format=image/png&layers=all&url=https://example.com/wms" );
   const QgsMimeDataUtils::Uri uri = entry( QStringLiteral( "wms" ), raw );
 
-  const KadasCatalogLayerSource source = KadasCatalogLayerSource::resolve( uri, uri.uri, QVariant(), uri.name );
+  const KadasCatalogLayerSource source = KadasCatalogLayerSource::resolve( uri.providerKey, uri.uri, QVariant(), uri.name );
 
   QCOMPARE( source.uri, raw );
 }
@@ -146,12 +147,24 @@ void TestKadasCatalogLayerSource::keepsUriWhenCanvasCrsUnsupported()
   QCOMPARE( adjusted, uri.uri );
 }
 
-void TestKadasCatalogLayerSource::invalidWithoutProvider()
+void TestKadasCatalogLayerSource::invalidWithoutUri()
 {
-  // A group row in the catalog carries no uri; it must not resolve to a layer.
-  const KadasCatalogLayerSource source = KadasCatalogLayerSource::resolve( QgsMimeDataUtils::Uri(), QString(), QVariant(), QString() );
+  // A group row in the catalog carries no uri, and it is the missing uri that
+  // makes the source invalid -- an unknown provider key on its own does not,
+  // see unrecognizedProviderFallsBackToRaster().
+  const KadasCatalogLayerSource source = KadasCatalogLayerSource::resolve( QString(), QString(), QVariant(), QString() );
 
   QVERIFY( !source.isValid() );
+}
+
+void TestKadasCatalogLayerSource::unrecognizedProviderFallsBackToRaster()
+{
+  // resolve() never reports Unknown: a provider it does not know is loaded
+  // through that provider as a raster layer.
+  const KadasCatalogLayerSource source = KadasCatalogLayerSource::resolve( QStringLiteral( "brand-new-provider" ), QStringLiteral( "url=https://example.com" ), QVariant(), QStringLiteral( "Entry" ) );
+
+  QCOMPARE( source.type, KadasCatalogLayerSource::Type::Raster );
+  QVERIFY( source.isValid() );
 }
 
 QTEST_MAIN( TestKadasCatalogLayerSource )
