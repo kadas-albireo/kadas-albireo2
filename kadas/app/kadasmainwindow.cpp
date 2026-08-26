@@ -294,6 +294,8 @@ void KadasMainWindow::init()
 
   mMapCanvas->installEventFilter( this );
   mLayersWidgetResizeHandle->installEventFilter( this );
+  // Watched for Enter only, to clear the host's resize cursor (see eventFilter).
+  mLayersWidget->installEventFilter( this );
   // The host margin next to the panel border reads as part of the panel edge:
   // watch it too, so the resize does not require pixel-precise aiming.
   mLeftPanelHost->setMouseTracking( true );
@@ -526,6 +528,17 @@ bool KadasMainWindow::eventFilter( QObject *obj, QEvent *ev )
   if ( obj == mMapCanvas && ev->type() == QEvent::Resize )
   {
     updateWidgetPositions();
+  }
+  else if ( obj == mLayersWidget && ev->type() == QEvent::Enter )
+  {
+    // Qt sends no Leave to a widget when the pointer moves into one of its own
+    // children, and the host is an ancestor of the panel: coming in from the
+    // host margin, the resize cursor set there would stay and be inherited by
+    // everything inside the panel. Entering the panel is the moment to drop it.
+    if ( !mResizingLayersWidget )
+    {
+      mLeftPanelHost->unsetCursor();
+    }
   }
   else if ( obj == mLayersWidgetResizeHandle || obj == mLeftPanelHost )
   {
