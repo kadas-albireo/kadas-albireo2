@@ -1,7 +1,7 @@
-From 1c97f5fff9080dadc26f4127365ca8bcb91737b1 Mon Sep 17 00:00:00 2001
+From 7922ee13dd53bf9edcdc2360aea18e8a0d29de5d Mon Sep 17 00:00:00 2001
 From: Nyall Dawson <nyall.dawson@gmail.com>
 Date: Mon, 24 Aug 2026 09:04:57 +1000
-Subject: [PATCH 1/5] Fix incorrectly culled billboard entities in 3d views
+Subject: [PATCH 1/7] Fix incorrectly culled billboard entities in 3d views
 
 Avoids the console being spammed with the qt warning:
 
@@ -43,10 +43,10 @@ index 0e6716138da..257e213a323 100644
    emit countChanged( mVertexCount );
  }
 
-From 4e906edc2c4ceeb0c440c302973fd9b00a01e07e Mon Sep 17 00:00:00 2001
+From ea22cbc54a6286900a0c7e36d15472c7c2974a35 Mon Sep 17 00:00:00 2001
 From: Nyall Dawson <nyall.dawson@gmail.com>
 Date: Fri, 21 Aug 2026 13:05:29 +1000
-Subject: [PATCH 2/5] [api] Add billboard scale mode support to
+Subject: [PATCH 2/7] [api] Add billboard scale mode support to
  QgsPoint3DBillboardMaterial
 
 Allows creation of perspective corrected billboards, which scale
@@ -346,10 +346,10 @@ index ec8e21b3d1e..a196d770e02 100644
       * Texture filtering qualities.
       *
 
-From 6270e34377bffbc1fd700bc6fb004419091b7d22 Mon Sep 17 00:00:00 2001
+From cc6798da56af278641cf6affe74b83c342ce7292 Mon Sep 17 00:00:00 2001
 From: Nyall Dawson <nyall.dawson@gmail.com>
 Date: Mon, 24 Aug 2026 09:41:39 +1000
-Subject: [PATCH 3/5] [api] Cleanup attribute/mode handling in
+Subject: [PATCH 3/7] [api] Cleanup attribute/mode handling in
  QgsBillboardGeometry
 
 Make the API more flexible
@@ -632,10 +632,10 @@ index a9afd9bab1c..7faf4b5bcb0 100644
      Qt3DCore::QAttribute *mPositionAttribute = nullptr;
      Qt3DCore::QAttribute *mAtlasOffsetAttribute = nullptr;
 
-From 242a4498c96c367d746bf34171dfb34fcf644030 Mon Sep 17 00:00:00 2001
+From bbf86312ed07b85c08cba2e360dda2857bfaffae Mon Sep 17 00:00:00 2001
 From: Nyall Dawson <nyall.dawson@gmail.com>
 Date: Mon, 24 Aug 2026 10:01:05 +1000
-Subject: [PATCH 4/5] [api] Add per instance billboard size support
+Subject: [PATCH 4/7] [api] Add per instance billboard size support
 
 ---
  src/3d/qgsannotationlayerchunkloader_p.cpp    |  5 +-
@@ -934,10 +934,10 @@ index 065a0967d4d..22180968260 100644
  
  #endif // QGSPOINT3DBILLBOARDMATERIAL_H
 
-From 686b6050cca64a21cce7fee3ba97e790382890d7 Mon Sep 17 00:00:00 2001
+From 7834647be8aa8b6694e62bdf4d96ff1e3cb563e6 Mon Sep 17 00:00:00 2001
 From: Nyall Dawson <nyall.dawson@gmail.com>
 Date: Fri, 21 Aug 2026 12:52:25 +1000
-Subject: [PATCH 5/5] [feature] Add support for picture annotation items in 3d
+Subject: [PATCH 5/7] [feature] Add support for picture annotation items in 3d
  maps
 
 Extends the existing support for showing marker and text annotations
@@ -1923,3 +1923,202 @@ index 30e01b60cfc..949b61b46eb 100644
    </layout>
   </widget>
   <customwidgets>
+
+From cf51ebec8795a248b1402804e8860ee8e75c1251 Mon Sep 17 00:00:00 2001
+From: Nyall Dawson <nyall.dawson@gmail.com>
+Date: Wed, 26 Aug 2026 14:30:45 +1000
+Subject: [PATCH 6/7] Picture billboards should be vertically anchored to the
+ bottom edge
+
+---
+ src/3d/qgsannotationlayerchunkloader_p.cpp     |  5 ++++-
+ src/3d/shaders/billboards.vert                 | 13 +++++++++++--
+ src/3d/symbols/qgspoint3dbillboardmaterial.cpp | 15 +++++++++++++++
+ src/3d/symbols/qgspoint3dbillboardmaterial.h   | 12 ++++++++++++
+ 4 files changed, 42 insertions(+), 3 deletions(-)
+
+diff --git a/src/3d/qgsannotationlayerchunkloader_p.cpp b/src/3d/qgsannotationlayerchunkloader_p.cpp
+index 043ee8afb6f..ce089c11ed6 100644
+--- a/src/3d/qgsannotationlayerchunkloader_p.cpp
++++ b/src/3d/qgsannotationlayerchunkloader_p.cpp
+@@ -676,8 +676,11 @@ Qt3DCore::QEntity *QgsAnnotationLayerChunkLoader::createEntity( Qt3DCore::QEntit
+     pictureGeometryRenderer->setVertexCount( 4 );
+     pictureGeometryRenderer->setInstanceCount( static_cast< int >( pictureBillboard.positions.size() ) );
+ 
+-    QgsPoint3DBillboardMaterial *pictureMaterial = new QgsPoint3DBillboardMaterial( QgsPoint3DBillboardMaterial::ExtraAttribute::Size, pictureBillboard.scaleMode );
++    QgsPoint3DBillboardMaterial *pictureMaterial
++      = new QgsPoint3DBillboardMaterial( QgsPoint3DBillboardMaterial::ExtraAttribute::Size | QgsPoint3DBillboardMaterial::ExtraAttribute::VerticalOffset, pictureBillboard.scaleMode );
+     pictureMaterial->setTexture2DFromImage( pictureBillboard.image );
++    // picture billboards should be vertically anchored to the bottom of the picture
++    pictureMaterial->setVerticalOffset( 0.5 );
+ 
+     Qt3DCore::QEntity *pictureEntity = new Qt3DCore::QEntity;
+     pictureEntity->addComponent( pictureMaterial );
+diff --git a/src/3d/shaders/billboards.vert b/src/3d/shaders/billboards.vert
+index 09797676ac9..570fbd1e701 100644
+--- a/src/3d/shaders/billboards.vert
++++ b/src/3d/shaders/billboards.vert
+@@ -18,6 +18,10 @@ uniform mat4 modelViewProjection;
+ uniform vec2 WIN_SCALE;	 // the size of the viewport in pixels
+ #endif
+ 
++#ifdef VERTICAL_OFFSET
++uniform float VERT_OFFSET;
++#endif
++
+ out vec2 UV;
+ 
+ #ifdef TEXTURE_ATLAS
+@@ -37,6 +41,11 @@ void main(void)
+     vec2 bbSize = BB_SIZE;
+ #endif
+ 
++    vec2 offsetPos = vertexPosition;
++#ifdef VERTICAL_OFFSET
++    offsetPos.y += VERT_OFFSET;
++#endif
++
+ #ifdef PERSPECTIVE_SCALE
+     // transform instance position into view space
+     vec4 viewPos = modelView * vec4(instancePosition, 1.0);
+@@ -44,7 +53,7 @@ void main(void)
+     vec2 size = bbSize;
+ 
+     // offset quad vertices directly in view space using world units
+-    viewPos.xy += vertexPosition * size;
++    viewPos.xy += offsetPos * size;
+ 
+     gl_Position = projectionMatrix * viewPos;
+ #else
+@@ -59,7 +68,7 @@ void main(void)
+ 
+     vec4 P = modelViewProjection * vec4(instancePosition, 1);
+     P /= P.w;
+-    P.xy += vertexPosition * spritePixelSize;
++    P.xy += offsetPos * spritePixelSize;
+ 
+     #ifdef TEXTURE_ATLAS_PIXEL_OFFSETS
+       // convert the pixel offset to display coordinates, multiplying by 2 to adjust for -1, 1 range for display coordinates
+diff --git a/src/3d/symbols/qgspoint3dbillboardmaterial.cpp b/src/3d/symbols/qgspoint3dbillboardmaterial.cpp
+index 3222398ed2d..bfd509fa9b0 100644
+--- a/src/3d/symbols/qgspoint3dbillboardmaterial.cpp
++++ b/src/3d/symbols/qgspoint3dbillboardmaterial.cpp
+@@ -93,6 +93,13 @@ QgsPoint3DBillboardMaterial::QgsPoint3DBillboardMaterial( ExtraAttributes attrib
+     vertexShaderDefines << u"PER_INSTANCE_SIZE"_s;
+   }
+ 
++  if ( attributes.testFlag( ExtraAttribute::VerticalOffset ) )
++  {
++    vertexShaderDefines << u"VERTICAL_OFFSET"_s;
++    mVerticalOffset = new Qt3DRender::QParameter( "VERT_OFFSET", 0.0, this );
++    addParameter( mVerticalOffset );
++  }
++
+   switch ( mScaleMode )
+   {
+     case Qgis::BillboardScaleMode::ViewIndependent:
+@@ -147,6 +154,14 @@ QSizeF QgsPoint3DBillboardMaterial::size() const
+   return mSize->value().value<QSizeF>();
+ }
+ 
++void QgsPoint3DBillboardMaterial::setVerticalOffset( float offset )
++{
++  if ( mVerticalOffset )
++  {
++    mVerticalOffset->setValue( offset );
++  }
++}
++
+ void QgsPoint3DBillboardMaterial::setViewportSize( const QSizeF size )
+ {
+   if ( mViewportSize )
+diff --git a/src/3d/symbols/qgspoint3dbillboardmaterial.h b/src/3d/symbols/qgspoint3dbillboardmaterial.h
+index 22180968260..05c78a3a49d 100644
+--- a/src/3d/symbols/qgspoint3dbillboardmaterial.h
++++ b/src/3d/symbols/qgspoint3dbillboardmaterial.h
+@@ -53,6 +53,7 @@ class _3D_EXPORT QgsPoint3DBillboardMaterial : public QgsMaterial
+       Size = 1 << 1,
+       TextureData = 1 << 2,
+       PixelOffsets = 1 << 3,
++      VerticalOffset = 1 << 4,
+     };
+     Q_DECLARE_FLAGS( ExtraAttributes, ExtraAttribute )
+     Q_FLAG( ExtraAttributes )
+@@ -68,6 +69,16 @@ class _3D_EXPORT QgsPoint3DBillboardMaterial : public QgsMaterial
+     //! Returns the billboard size.
+     QSizeF size() const;
+ 
++    /**
++     * Set the vertical \a offset.
++     *
++     * For example, a vertical offset of 0.5 will anchor the billboard's bottom edge at the vertex z position,
++     * or -0.5 will anchor the billboard's top edge at the vertex z position.
++     *
++     * \note This only applies if the material was constructed with the ExtraAttribute::VerticalOffset flag set.
++     */
++    void setVerticalOffset( float offset );
++
+     //! Set the size of the view port.
+     void setViewportSize( const QSizeF size );
+     //! Returns the size of the view port.
+@@ -96,6 +107,7 @@ class _3D_EXPORT QgsPoint3DBillboardMaterial : public QgsMaterial
+     Qt3DRender::QParameter *mSize = nullptr;
+     Qt3DRender::QParameter *mViewportSize = nullptr;
+     Qt3DRender::QParameter *mTexture2D = nullptr;
++    Qt3DRender::QParameter *mVerticalOffset = nullptr;
+ 
+     Qgis::BillboardScaleMode mScaleMode = Qgis::BillboardScaleMode::ViewIndependent;
+ };
+
+From d106969c1c8f6c7a112e03d0b8a18ca96af33b01 Mon Sep 17 00:00:00 2001
+From: Nyall Dawson <nyall.dawson@gmail.com>
+Date: Wed, 26 Aug 2026 14:42:45 +1000
+Subject: [PATCH 7/7] Render broken pictures as ?
+
+---
+ src/3d/qgsannotationlayerchunkloader_p.cpp | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/src/3d/qgsannotationlayerchunkloader_p.cpp b/src/3d/qgsannotationlayerchunkloader_p.cpp
+index ce089c11ed6..f3bf2b56288 100644
+--- a/src/3d/qgsannotationlayerchunkloader_p.cpp
++++ b/src/3d/qgsannotationlayerchunkloader_p.cpp
+@@ -506,6 +506,19 @@ void QgsAnnotationLayerChunkLoader::start()
+     // picture item billboards, grouped by picture source
+     for ( auto it = groupedPictures.constBegin(); it != groupedPictures.constEnd(); ++it )
+     {
++      QSizeF maxGroupSize( 0, 0 );
++      for ( auto picIt = it.value().constBegin(); picIt != it.value().constEnd(); ++picIt )
++      {
++        if ( picIt->size.width() > maxGroupSize.width() )
++        {
++          maxGroupSize.setWidth( picIt->size.width() );
++        }
++        if ( picIt->size.height() > maxGroupSize.height() )
++        {
++          maxGroupSize.setHeight( picIt->size.height() );
++        }
++      }
++
+       QImage image;
+       bool fitsInCache = false;
+ 
+@@ -520,6 +533,10 @@ void QgsAnnotationLayerChunkLoader::start()
+         {
+           const QSize originalSize = QgsApplication::imageCache()->originalSize( it.key().path, true );
+           QSize imageSize = originalSize;
++          if ( imageSize.isEmpty() )
++          {
++            imageSize = maxGroupSize.toSize();
++          }
+           if ( imageSize.width() >= imageSize.height() && imageSize.width() > textureSize )
+           {
+             imageSize = QSize( textureSize, static_cast< int >( std::round( imageSize.height() * textureSize / imageSize.width() ) ) );
+@@ -688,7 +705,6 @@ Qt3DCore::QEntity *QgsAnnotationLayerChunkLoader::createEntity( Qt3DCore::QEntit
+     pictureEntity->setParent( entity );
+   }
+ 
+-
+   if ( mFactory->mShowCallouts )
+   {
+     QgsLineVertexData lineData;
