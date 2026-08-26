@@ -61,6 +61,8 @@
 
 #include "kadas/core/kadas.h"
 #include "kadas/core/kadassettingstree.h"
+#include "kadas/gui/kadascataloglayersource.h"
+#include "kadas/gui/kadascatalogpreview.h"
 #include "kadas/gui/kadasclipboard.h"
 #include "kadas/gui/kadascoordinatedisplayer.h"
 #include "kadas/gui/kadascrsselection.h"
@@ -477,6 +479,14 @@ void KadasMainWindow::init()
   connect( mCatalogBrowser, &KadasCatalogBrowser::layerSelected, this, [this]( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers ) {
     addCatalogLayer( uri, metadataUrl, sublayers );
   } );
+
+  // Parented to the canvas so its overlay item is torn down while the canvas
+  // it lives in is still around.
+  mCatalogPreview = new KadasCatalogPreview( mMapCanvas, mInfoBar, mMapCanvas );
+  connect( mCatalogBrowser, &KadasCatalogBrowser::previewRequested, this, [this]( const QgsMimeDataUtils::Uri &uri, const QVariantList &sublayers ) {
+    mCatalogPreview->setSource( catalogLayerSource( uri, sublayers ) );
+  } );
+  connect( mCatalogBrowser, &KadasCatalogBrowser::previewCleared, mCatalogPreview, &KadasCatalogPreview::clear );
 
   const QList<QgsLocatorFilter *> filters = lw->locator()->filters();
   for ( QgsLocatorFilter *filter : filters )
@@ -1497,8 +1507,45 @@ void KadasMainWindow::showFavoriteContextMenu( const QPoint &pos )
   }
 }
 
+KadasCatalogLayerSource KadasMainWindow::catalogLayerSource( const QgsMimeDataUtils::Uri &uri, const QVariantList &sublayers ) const
+{
+  if ( sublayers.size() > 1 )
+  {
+    // Such an entry is added as a whole group of layers (see addCatalogLayer);
+    // what a preview of that should show is a separate question, so there is none.
+    return KadasCatalogLayerSource();
+  }
+
+  const QString adjustedUri = KadasCatalogLayerSource::adjustUri( uri, mMapCanvas->mapSettings().destinationCrs() );
+  const QVariant sublayerId = sublayers.size() == 1 ? sublayers[0].toMap().value( QStringLiteral( "id" ) ) : QVariant();
+  return KadasCatalogLayerSource::resolve( uri, adjustedUri, sublayerId, uri.name );
+}
+
+QgsMapLayer *KadasMainWindow::addCatalogLayerSource( const KadasCatalogLayerSource &source, bool adjustInsertionPoint )
+{
+  switch ( source.type )
+  {
+    case KadasCatalogLayerSource::Type::Raster:
+      return kApp->addRasterLayer( source.uri, source.name, source.providerKey, false, 0, adjustInsertionPoint );
+
+    case KadasCatalogLayerSource::Type::Vector:
+      return kApp->addVectorLayer( source.uri, source.name, source.providerKey, false, 0, adjustInsertionPoint );
+
+    case KadasCatalogLayerSource::Type::VectorTile:
+      return kApp->addVectorTileLayer( source.uri, source.name, false, true, 0, adjustInsertionPoint );
+
+    case KadasCatalogLayerSource::Type::Unknown:
+      return nullptr;
+  }
+  return nullptr;
+}
+
 void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers, bool atInsertionPoint )
 {
+  // The real layer takes over from here; a preview of it on top would only
+  // draw the same thing twice.
+  mCatalogPreview->clear();
+
   // Track the layers added below, to select the last one afterwards
   QgsMapLayer *addedLayer = nullptr;
   const QMetaObject::Connection addedConnection
@@ -1509,64 +1556,13 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
         }
       } );
 
-  QString adjustedUri = uri.uri;
-
-  // Adjust layer CRS to project CRS
-  QgsCoordinateReferenceSystem testCrs;
-  for ( QString c : uri.supportedCrs )
-  {
-    testCrs.createFromOgcWmsCrs( c );
-    if ( testCrs == mMapCanvas->mapSettings().destinationCrs() )
-    {
-      adjustedUri.replace( QRegularExpression( "crs=[^&]+" ), "crs=" + c );
-      QgsDebugMsgLevel( QString( "Changing layer crs to %1, new uri: %2" ).arg( c, adjustedUri ), 2 );
-      break;
-    }
-  }
-
-  // Use the last used image format
-  QString lastImageEncoding = QSettings().value( "/Qgis/lastWmsImageEncoding", "image/png" ).toString();
-  for ( QString fmt : uri.supportedFormats )
-  {
-    if ( fmt == lastImageEncoding )
-    {
-      adjustedUri.replace( QRegularExpression( "format=[^&]+" ), "format=" + fmt );
-      QgsDebugMsgLevel( QString( "Changing layer format to %1, new uri: %2" ).arg( fmt, adjustedUri ), 2 );
-      break;
-    }
-  }
+  const QString adjustedUri = KadasCatalogLayerSource::adjustUri( uri, mMapCanvas->mapSettings().destinationCrs() );
 
   if ( sublayers.size() == 1 )
   {
     // If there is exactly one sublayer, add it directly
-    QVariantMap sublayer = sublayers[0].toMap();
-
-    QgsMapLayer *layer = nullptr;
-    if ( uri.providerKey == "arcgismapserver" )
-    {
-      QgsDataSourceUri dataSource( adjustedUri );
-      dataSource.removeParam( "layer" );
-      dataSource.setParam( "layer", QString::number( sublayer["id"].toInt() ) );
-      layer = kApp->addRasterLayer( dataSource.uri( false ), uri.name, uri.providerKey, false, 0, !atInsertionPoint );
-    }
-    else if ( uri.providerKey == "arcgisfeatureserver" )
-    {
-      QgsDataSourceUri dataSource( adjustedUri );
-      QString urlParameter = QString( "%1/%2" ).arg( dataSource.param( "url" ) ).arg( sublayer["id"].toInt() );
-      dataSource.removeParam( "url" );
-      dataSource.setParam( "url", urlParameter );
-      layer = kApp->addVectorLayer( dataSource.uri( false ), uri.name, uri.providerKey, false, 0, !atInsertionPoint );
-    }
-    else if ( uri.providerKey == "arcgisvectortileservice" )
-    {
-      layer = kApp->addVectorTileLayer( adjustedUri, uri.name, false, true, 0, !atInsertionPoint );
-    }
-    else if ( uri.providerKey == "wms" )
-    {
-      adjustedUri.replace( QRegularExpression( "layers=[^&]*" ), "layers=" + sublayer["id"].toString() );
-      layer = kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey, false, 0, !atInsertionPoint );
-    }
-
+    const QVariantMap sublayer = sublayers[0].toMap();
+    QgsMapLayer *layer = addCatalogLayerSource( KadasCatalogLayerSource::resolve( uri, adjustedUri, sublayer["id"], uri.name ), !atInsertionPoint );
     if ( layer )
     {
       layer->serverProperties()->setMetadataUrls( { QgsServerMetadataUrlProperties::MetadataUrl( metadataUrl ) } );
@@ -1633,32 +1629,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
         // not at a single drop row.
         QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( parent, parent == rootGroup ? rootInsCount++ : parent->children().count() ) );
 
-        QgsMapLayer *layer = nullptr;
-        if ( uri.providerKey == "arcgismapserver" )
-        {
-          QgsDataSourceUri dataSource( adjustedUri );
-          dataSource.removeParam( "layer" );
-          dataSource.setParam( "layer", QString::number( entry->id ) );
-          layer = kApp->addRasterLayer( dataSource.uri( false ), entry->name, uri.providerKey, false, 0, false );
-        }
-        else if ( uri.providerKey == "arcgisfeatureserver" )
-        {
-          QgsDataSourceUri dataSource( adjustedUri );
-          QString urlParameter = QString( "%1/%2" ).arg( dataSource.param( "url" ) ).arg( entry->id );
-          dataSource.removeParam( "url" );
-          dataSource.setParam( "url", urlParameter );
-          layer = kApp->addVectorLayer( dataSource.uri( false ), entry->name, uri.providerKey, false, 0, false );
-        }
-        else if ( uri.providerKey == "arcgisvectortileservice" )
-        {
-          layer = kApp->addVectorTileLayer( adjustedUri, entry->name, false, true, 0, false );
-        }
-        else if ( uri.providerKey == "wms" )
-        {
-          adjustedUri.replace( QRegularExpression( "layers=[^&]*" ), "layers=" + QString::number( entry->id ) );
-          layer = kApp->addRasterLayer( adjustedUri, entry->name, uri.providerKey, false, 0, false );
-        }
-
+        QgsMapLayer *layer = addCatalogLayerSource( KadasCatalogLayerSource::resolve( uri, adjustedUri, entry->id, entry->name ), false );
         if ( layer )
         {
           layer->serverProperties()->setMetadataUrls( { QgsServerMetadataUrlProperties::MetadataUrl( metadataUrl ) } );
@@ -1672,17 +1643,10 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
 
     qDeleteAll( entries );
   }
-  else if ( uri.providerKey == "arcgisvectortileservice" )
-  {
-    QgsVectorTileLayer *layer = kApp->addVectorTileLayer( adjustedUri, uri.name, false, true, 0, !atInsertionPoint );
-    if ( layer )
-    {
-      layer->serverProperties()->setMetadataUrls( { QgsServerMetadataUrlProperties::MetadataUrl( metadataUrl ) } );
-    }
-  }
   else
   {
-    QgsRasterLayer *layer = kApp->addRasterLayer( adjustedUri, uri.name, uri.providerKey, false, 0, !atInsertionPoint );
+    // No sublayers: the entry itself is the layer.
+    QgsMapLayer *layer = addCatalogLayerSource( KadasCatalogLayerSource::resolve( uri, adjustedUri, QVariant(), uri.name ), !atInsertionPoint );
     if ( layer )
     {
       layer->serverProperties()->setMetadataUrls( { QgsServerMetadataUrlProperties::MetadataUrl( metadataUrl ) } );

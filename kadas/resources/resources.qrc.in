@@ -139,6 +139,7 @@
         <file alias="icons/locked">icons/locked.svg</file>
         <file alias="icons/unlocked">icons/unlocked.svg</file>
         <file alias="icons/info">icons/info.svg</file>
+        <file alias="icons/preview">icons/preview.svg</file>
         <file alias="icons/rename">icons/rename.svg</file>
         <file alias="icons/polygon">icons/polygon.svg</file>
         <file alias="icons/switch">icons/switch.svg</file>
