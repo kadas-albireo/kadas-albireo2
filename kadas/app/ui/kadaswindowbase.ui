@@ -415,7 +415,7 @@
                 </size>
                </property>
                <property name="toolTip">
-                <string>Catalog</string>
+                <string>Show the catalog next to the layer tree</string>
                </property>
                <property name="text">
                 <string>Catalog</string>
@@ -452,11 +452,29 @@
            </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QStackedWidget" name="mLayersStack">
-            <property name="currentIndex">
-             <number>0</number>
+         <widget class="QSplitter" name="mLayersSplitter">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Orientation::Horizontal</enum>
+            </property>
+            <property name="handleWidth">
+             <number>7</number>
+            </property>
+            <property name="childrenCollapsible">
+             <bool>false</bool>
             </property>
             <widget class="QWidget" name="mLayersTreePage">
+             <property name="minimumSize">
+              <size>
+               <width>120</width>
+               <height>0</height>
+              </size>
+             </property>
              <layout class="QVBoxLayout" name="mLayersTreePageLayout">
               <property name="spacing">
                <number>0</number>
@@ -510,6 +528,12 @@
            </layout>
           </widget>
             <widget class="QWidget" name="mGeodataPage">
+             <property name="minimumSize">
+              <size>
+               <width>120</width>
+               <height>0</height>
+              </size>
+             </property>
              <layout class="QVBoxLayout" name="mGeodataPageLayout">
               <property name="spacing">
                <number>0</number>
