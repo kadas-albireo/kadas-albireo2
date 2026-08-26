@@ -24,6 +24,7 @@
 #include <QMimeData>
 #include <QRegularExpression>
 #include <QShortcut>
+#include <QSplitter>
 #include <QUrlQuery>
 
 #include <gdal.h>
@@ -122,11 +123,33 @@
 #include "milx/kadasmilxintegration.h"
 
 
-static const QgsSettingsEntryInteger sSettingsLayersWidgetWidth( QStringLiteral( "layers-widget-width" ), KadasSettingsTree::sTreeKadas, 200, QStringLiteral( "Width of the layers side panel." ) );
-static const QgsSettingsEntryInteger sSettingsLayersWidgetTab( QStringLiteral( "layers-widget-tab" ), KadasSettingsTree::sTreeKadas, 0, QStringLiteral( "Last-selected layers panel tab." ) );
+// The panel has two remembered widths, one per catalog state, so that showing
+// the catalog widens the panel instead of squeezing the layer tree.
+static const QgsSettingsEntryInteger sSettingsLayersWidgetWidth(
+  QStringLiteral( "layers-widget-width" ), KadasSettingsTree::sTreeKadas, 200, QStringLiteral( "Width of the layers side panel with the catalog hidden." )
+);
+static const QgsSettingsEntryInteger sSettingsLayersWidgetWidthWithCatalog(
+  QStringLiteral( "layers-widget-width-with-catalog" ), KadasSettingsTree::sTreeKadas, 560, QStringLiteral( "Width of the layers side panel with the catalog shown." )
+);
+static const QgsSettingsEntryInteger sSettingsCatalogColumnWidth(
+  QStringLiteral( "layers-widget-catalog-width" ), KadasSettingsTree::sTreeKadas, 280, QStringLiteral( "Width of the catalog column within the layers side panel." )
+);
+static const QgsSettingsEntryBool sSettingsShowCatalog(
+  QStringLiteral( "layers-widget-show-catalog" ), KadasSettingsTree::sTreeKadas, false, QStringLiteral( "Whether the catalog is shown next to the layer tree." )
+);
 
 //! How far from the layers panel border a press still starts a resize, in pixels.
 static const int sLayersResizeGrabTolerance = 6;
+
+//! Absolute bounds for the layers panel width, wide enough for both trees side by side.
+static const int sLayersWidgetMinWidth = 10;
+static const int sLayersWidgetMaxWidth = 1200;
+
+//! Map canvas width kept free when the panel width is chosen interactively.
+static const int sMapCanvasMinWidth = 320;
+
+//! Minimum width of either column of the layers panel, matching the .ui minimums.
+static const int sLayersColumnMinWidth = 120;
 
 static bool clipboardHasPastableContent()
 {
@@ -201,16 +224,16 @@ void KadasMainWindow::init()
   mLocatorLayout->insertWidget( 0, lw );
 
   mLayersWidget->setVisible( false );
-  mLayersWidget->setFixedWidth( std::clamp( sSettingsLayersWidgetWidth.value(), 10, 800 ) );
 
-  // The catalog button toggles between the layer tree (unchecked) and the catalog (checked)
-  connect( mGeodataTabButton, &QAbstractButton::toggled, this, [this]( bool checked ) {
-    mLayersStack->setCurrentIndex( checked ? 1 : 0 );
-    sSettingsLayersWidgetTab.setValue( checked ? 1 : 0 );
-  } );
-  const int layersTab = std::clamp( sSettingsLayersWidgetTab.value(), 0, 1 );
-  mLayersStack->setCurrentIndex( layersTab );
-  mGeodataTabButton->setChecked( layersTab == 1 );
+  // The layer tree and the catalog live side by side in the panel; the catalog
+  // button shows or hides the catalog column.
+  const bool showCatalog = sSettingsShowCatalog.value();
+  mGeodataPage->setVisible( showCatalog );
+  mGeodataTabButton->setChecked( showCatalog );
+  setLayersWidgetWidth( layersWidgetWidthSetting()->value() );
+  applyCatalogColumnWidth();
+  connect( mGeodataTabButton, &QAbstractButton::toggled, this, &KadasMainWindow::setCatalogVisible );
+  connect( mLayersSplitter, &QSplitter::splitterMoved, this, [this] { sSettingsCatalogColumnWidth.setValue( mLayersSplitter->sizes().last() ); } );
   QShortcut *layerTreeShortcut = new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_L ), this );
   connect( layerTreeShortcut, &QShortcut::activated, this, &KadasMainWindow::toggleLayerTree );
 
@@ -453,11 +476,7 @@ void KadasMainWindow::init()
 
   connect( mCatalogBrowser, &KadasCatalogBrowser::layerSelected, this, [this]( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers ) {
     addCatalogLayer( uri, metadataUrl, sublayers );
-    // Reveal the layer tree so the freshly added (and selected) layer is visible
-    mGeodataTabButton->setChecked( false );
   } );
-  // Dragging a catalog entry: reveal the layer tree so it can serve as drop target.
-  connect( mCatalogBrowser, &KadasCatalogBrowser::dragStarted, this, [this] { mGeodataTabButton->setChecked( false ); } );
 
   const QList<QgsLocatorFilter *> filters = lw->locator()->filters();
   for ( QgsLocatorFilter *filter : filters )
@@ -531,6 +550,9 @@ bool KadasMainWindow::handleLayersWidgetResize( QObject *obj, QEvent *ev )
       mResizingLayersWidget = true;
       mResizePressGlobalX = globalPos.x();
       mResizePressWidth = mLayersWidget->width();
+      // Computed once: the panel and the canvas share a constant total width,
+      // so a per-move recomputation would only add jitter.
+      mResizeMaxWidth = maxLayersWidgetWidth();
       // Freeze the map under a snapshot for the whole drag; a single
       // re-render happens on release.
       mLeftPanelHost->beginPanelResize();
@@ -561,7 +583,7 @@ bool KadasMainWindow::handleLayersWidgetResize( QObject *obj, QEvent *ev )
 
       // Track the pointer in global coordinates: the handle moves along with
       // the panel, so a handle-relative delta would drift once clamped.
-      mLayersWidget->setFixedWidth( std::clamp( mResizePressWidth + globalPos.x() - mResizePressGlobalX, 10, 800 ) );
+      mLayersWidget->setFixedWidth( std::clamp( mResizePressWidth + globalPos.x() - mResizePressGlobalX, sLayersWidgetMinWidth, mResizeMaxWidth ) );
       return true;
     }
 
@@ -573,7 +595,7 @@ bool KadasMainWindow::handleLayersWidgetResize( QObject *obj, QEvent *ev )
 
       mResizingLayersWidget = false;
       mLeftPanelHost->endPanelResize();
-      sSettingsLayersWidgetWidth.setValue( mLayersWidget->width() );
+      layersWidgetWidthSetting()->setValue( mLayersWidget->width() );
       return true;
     }
 
@@ -587,6 +609,80 @@ bool KadasMainWindow::handleLayersWidgetResize( QObject *obj, QEvent *ev )
     default:
       return false;
   }
+}
+
+const QgsSettingsEntryInteger *KadasMainWindow::layersWidgetWidthSetting() const
+{
+  return mGeodataPage->isHidden() ? &sSettingsLayersWidgetWidth : &sSettingsLayersWidgetWidthWithCatalog;
+}
+
+int KadasMainWindow::maxLayersWidgetWidth() const
+{
+  if ( !mLayersWidget->isVisible() )
+  {
+    // No reflowed canvas to measure against yet (startup): absolute bound only.
+    return sLayersWidgetMaxWidth;
+  }
+  // The panel reflows the canvas, so cap it at what still leaves a usable map.
+  return std::clamp( mLayersWidget->width() + mMapCanvas->width() - sMapCanvasMinWidth, sLayersWidgetMinWidth, sLayersWidgetMaxWidth );
+}
+
+void KadasMainWindow::setLayersWidgetWidth( int width )
+{
+  // Route the change through the host resize hooks so the map stays anchored
+  // instead of being recentred on the canvas resize which follows.
+  const bool anchored = mLayersWidget->isVisible();
+  if ( anchored )
+  {
+    mLeftPanelHost->beginPanelResize();
+  }
+  mLayersWidget->setFixedWidth( std::clamp( width, sLayersWidgetMinWidth, maxLayersWidgetWidth() ) );
+  if ( anchored )
+  {
+    mLeftPanelHost->endPanelResize();
+  }
+}
+
+void KadasMainWindow::applyCatalogColumnWidth()
+{
+  if ( mGeodataPage->isHidden() )
+  {
+    return;
+  }
+  // The splitter rescales the sizes to its actual width, so only their ratio
+  // matters and the panel width is a good enough reference before the first layout.
+  const int total = std::max( 2 * sLayersColumnMinWidth, mLayersWidget->width() );
+  const int catalogWidth = std::clamp( sSettingsCatalogColumnWidth.value(), sLayersColumnMinWidth, total - sLayersColumnMinWidth );
+  mLayersSplitter->setSizes( { total - catalogWidth, catalogWidth } );
+}
+
+void KadasMainWindow::setCatalogVisible( bool visible )
+{
+  if ( visible == !mGeodataPage->isHidden() )
+  {
+    return;
+  }
+
+  // Remember the width of the state being left before switching over, so each
+  // state comes back at the width the user last gave it.
+  layersWidgetWidthSetting()->setValue( mLayersWidget->width() );
+  if ( !visible )
+  {
+    sSettingsCatalogColumnWidth.setValue( mLayersSplitter->sizes().last() );
+  }
+
+  mGeodataPage->setVisible( visible );
+  sSettingsShowCatalog.setValue( visible );
+
+  int width = layersWidgetWidthSetting()->value();
+  if ( visible && !sSettingsLayersWidgetWidthWithCatalog.exists() )
+  {
+    // First reveal: grow the panel by the catalog column instead of splitting
+    // the width the layer tree had to itself.
+    width = mLayersWidget->width() + sSettingsCatalogColumnWidth.value() + mLayersSplitter->handleWidth();
+  }
+  setLayersWidgetWidth( width );
+  applyCatalogColumnWidth();
 }
 
 void KadasMainWindow::updateWidgetPositions()

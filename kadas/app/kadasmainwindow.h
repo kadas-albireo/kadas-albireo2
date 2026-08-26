@@ -31,6 +31,7 @@ class QgsDecorationGrid;
 class QgsLayerTreeMapCanvasBridge;
 class QgsElevationControllerWidget;
 class QgsMessageBar;
+class QgsSettingsEntryInteger;
 class QToolButton;
 class KadasCoordinateDisplayer;
 class KadasGpsIntegration;
@@ -155,6 +156,8 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void showFeedback();
     void toggleIgnoreDpiScale();
     void setCanvasZRange( const QgsDoubleRange &range );
+    //! Shows or hides the catalog column next to the layer tree, restoring the panel width of that state.
+    void setCatalogVisible( bool visible );
 
   private:
     bool eventFilter( QObject *obj, QEvent *ev ) override;
@@ -176,6 +179,14 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     bool handleLayersWidgetResize( QObject *obj, QEvent *ev );
     //! Returns TRUE if globalPos is close enough to the layers panel border to start a resize.
     bool layersWidgetResizeBandContains( const QPoint &globalPos ) const;
+    //! Returns the panel width setting matching the current catalog visibility.
+    const QgsSettingsEntryInteger *layersWidgetWidthSetting() const;
+    //! Returns the widest the layers panel may get without starving the map canvas.
+    int maxLayersWidgetWidth() const;
+    //! Sets the (clamped) layers panel width, keeping the map anchored.
+    void setLayersWidgetWidth( int width );
+    //! Restores the remembered catalog/layer tree split of the panel.
+    void applyCatalogColumnWidth();
 
     QgsMessageBar *mInfoBar = nullptr;
     QPointer<QgsMessageBarItem> mReprojMsgItem;
@@ -202,9 +213,10 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QTimer mLoadingTimer;
     //! True while the layers panel is being resized by a drag.
     bool mResizingLayersWidget = false;
-    //! Global x and panel width when the resize drag started.
+    //! Global x, panel width and width limit when the resize drag started.
     int mResizePressGlobalX = 0;
     int mResizePressWidth = 0;
+    int mResizeMaxWidth = 0;
     QPoint mDragStartPos;
     QMap<QString, QAction *> mAddedActions;
     QList<QgsCustomDropHandler *> mCustomDropHandlers;

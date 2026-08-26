@@ -142,6 +142,21 @@ QPushButton#mRibbonbarButton:pressed
   border: 1px solid #263B4E;
 }
 
+/**
+ * Divider between the layer tree and the catalog, running the full panel
+ * height. The margins reduce the drawn part of the 7px grab area to a single
+ * centered rule, so the two trees stay clearly separated without a heavy band.
+ */
+#mLayersSplitter::handle:horizontal {
+  background-color: #C3CBD3;
+  margin: 0px 3px 0px 3px;
+}
+
+#mLayersSplitter::handle:horizontal:hover,
+#mLayersSplitter::handle:horizontal:pressed {
+  background-color: #263B4E;
+}
+
 #mGeodataToolbar {
   background-color: #FFFFFF;
 }
