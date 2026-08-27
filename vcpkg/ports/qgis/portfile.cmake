@@ -39,6 +39,7 @@ vcpkg_from_github(
   # canvas layers + raster elevation surface z-range from band statistics
   annotation-3d-picture-billboards.patch # https://github.com/qgis/QGIS/pull/67135
   # picture annotation items as 3d billboards
+  oauthApplicationName.patch
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
