@@ -1075,7 +1075,7 @@ index cf03a98d0f9..1ea1008162d 100644
 \ No newline at end of file
 +</TS>
 diff --git a/src/auth/oauth2/core/qgso2.cpp b/src/auth/oauth2/core/qgso2.cpp
-index d19243ac3f5..164c0043aa2 100644
+index d19243ac3f5..0c33034a246 100644
 --- a/src/auth/oauth2/core/qgso2.cpp
 +++ b/src/auth/oauth2/core/qgso2.cpp
 @@ -24,6 +24,7 @@
@@ -1097,8 +1097,8 @@ index d19243ac3f5..164c0043aa2 100644
 -                       .toUtf8()
 +    setReplyContent(
 +      QString::fromUtf8( verhtml.readAll() )
-+        .replace( "{{ H2_TITLE }}"_L1, tr( "%1 OAuth2 verification has finished." ).arg( QCoreApplication::applicationName() ) )
-+        .replace( "{{ H3_TITLE }}"_L1, tr( "You can close this window and return to %1." ).arg( QCoreApplication::applicationName() ) )
++        .replace( QLatin1String( "{{ H2_TITLE }}" ), tr( "%1 OAuth2 verification has finished." ).arg( QCoreApplication::applicationName() ) )
++        .replace( QLatin1String( "{{ H3_TITLE }}" ), tr( "You can close this window and return to %1." ).arg( QCoreApplication::applicationName() ) )
 +        .toUtf8()
      );
    }
