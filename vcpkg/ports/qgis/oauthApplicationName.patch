@@ -1103,3 +1103,14 @@ index d19243ac3f5..0c33034a246 100644
      );
    }
  }
+diff --git a/src/auth/oauth2/resources/oauth2_verification_finished.html b/src/auth/oauth2/resources/oauth2_verification_finished.html
+index 5d8376c228b..3abdfed0328 100644
+--- a/src/auth/oauth2/resources/oauth2_verification_finished.html
++++ b/src/auth/oauth2/resources/oauth2_verification_finished.html
+@@ -26,6 +26,5 @@
+ 
+     <h3>{{ H3_TITLE }}</h3>
+ 
+-    <p><a href="#" onclick="window.close()">{{ CLOSE_WINDOW }}</a></p>
+   </body>
+ </html>
