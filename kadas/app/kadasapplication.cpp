@@ -404,7 +404,7 @@ void KadasApplication::init()
   QgsProject::instance()->setBadLayerHandler( new KadasHandleBadLayersHandler );
   QgsPathResolver::setPathPreprocessor( [this]( const QString &path ) { return migrateDatasource( path ); } );
 
-  QgsDockableWidgetHelper::sAppStylesheetFunction = []() -> QString { return KadasApplication::instance()->styleSheet(); };
+  QgsGui::instance()->setApplicationStyleSheet( QApplication::styleSheet() );
   QgsDockableWidgetHelper::sOwnerWindow = mMainWindow;
 
 
