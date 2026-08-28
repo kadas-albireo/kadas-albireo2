@@ -1,9 +1,9 @@
 string(REPLACE "." "_" TAG ${VERSION})
 
 # set(QGIS_REF final-${TAG})
-set(QGIS_REF 6402a64e93b010da19e4a58e4cf93f61db8db8fa)
+set(QGIS_REF 17a4bfae8eaea25b8f9ede1f3d720a69bc776604)
 set(QGIS_SHA512
-    fe15f7d7529f6bdf3a60fcf6597575dc91267ff72e238fe4bfae616bf49015e84fdb0008e42d8375880f9ec08b8fb488f98a784b85213bfc0a826ae4ec76ebd9
+    9d30bca4a3a2c9f8b6772d8af25b945087aa9ef838148414298b339967c6d2d6d6f5acb9e0479f0343d9f2ecc2d1ec268a6a7340412c755b08d9a2f5c25c7da0
 )
 
 vcpkg_from_github(
@@ -30,16 +30,12 @@ vcpkg_from_github(
   mac_install_images.patch
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
-  annotation-item-rotation.patch # https://github.com/qgis/QGIS/pull/67101
-  # rotation-aware annotation map tools; the earlier rotation parts landed
-  # upstream and are no longer carried here
   oauth2NoEmptyClientSecret.patch # https://github.com/qgis/QGIS/pull/66777
   elevation_controller_range.patch # https://github.com/qgis/QGIS/pull/67112
   # elevation controller settings panel, rounded limits, initialization from
   # canvas layers + raster elevation surface z-range from band statistics
   annotation-3d-picture-billboards.patch # https://github.com/qgis/QGIS/pull/67135
   # picture annotation items as 3d billboards
-  oauthApplicationName.patch # https://github.com/qgis/QGIS/pull/67175
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
