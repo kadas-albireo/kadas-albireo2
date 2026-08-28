@@ -37,6 +37,7 @@ vcpkg_from_github(
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
   reduceLayerPropertiesProviderSection.patch # https://github.com/qgis/QGIS/pull/64123
   oauth2NoEmptyClientSecret.patch # https://github.com/qgis/QGIS/pull/66777
+  oauthApplicationName.patch # https://github.com/qgis/QGIS/pull/67175
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
