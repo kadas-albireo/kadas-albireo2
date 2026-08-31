@@ -188,8 +188,8 @@ KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeVi
   connect( ui.toolButtonColor, &QgsColorButton::colorChanged, this, &KadasGuideGridWidget::updateColor );
   connect( ui.spinBoxLineWidth, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasGuideGridWidget::updateLineWidth );
   connect( ui.spinBoxFontSize, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasGuideGridWidget::updateFontSize );
-  connect( ui.comboBoxRowLabels, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
-  connect( ui.comboBoxColLabels, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
+  connect( ui.comboBoxRowLabels, qOverload<const QString &>( &QComboBox::currentTextChanged ), this, &KadasGuideGridWidget::updateLabeling );
+  connect( ui.comboBoxColLabels, qOverload<const QString &>( &QComboBox::currentTextChanged ), this, &KadasGuideGridWidget::updateLabeling );
   connect( ui.toolButtonSwitchLabels, &QToolButton::clicked, this, &KadasGuideGridWidget::switchLabels );
   connect( ui.comboBoxLabelPos, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
   connect( ui.comboBoxQuadrants, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
@@ -479,7 +479,7 @@ void KadasGuideGridWidget::updateLabeling()
   {
     return;
   }
-  mCurrentLayer->setLabelingMode( ui.comboBoxRowLabels->currentText(), ui.comboBoxColLabels->currentText() );
+  mCurrentLayer->setLabelingMode( ui.comboBoxRowLabels->currentText().toUpper(), ui.comboBoxColLabels->currentText().toUpper() );
   mCurrentLayer->setLabelingPos( static_cast<KadasGuideGridLayer::LabelingPos>( ui.comboBoxLabelPos->currentData().toInt() ) );
   mCurrentLayer->setLabelQuadrants( static_cast<KadasGuideGridLayer::QuadrantLabeling>( ui.comboBoxQuadrants->currentData().toInt() ) );
   mCurrentLayer->triggerRepaint();

@@ -38,15 +38,25 @@
 
 namespace
 {
-  QString gridLabel( QString firstStart, int offset )
+  QString gridLabel( const QString firstStart, int offset )
   {
-    QChar firstChar = firstStart.at( 0 );
-    if ( firstChar >= '0' && firstChar <= '9' )
+    bool isInt = false;
+    int startNumber = firstStart.toInt( &isInt );
+    if ( isInt )
     {
-      return QString::number( firstChar.digitValue() + offset );
+      return QString::number( startNumber + offset );
     }
+
+    // Convert to decimal base
+    int startOffset = 0;
+    for ( int i = 0; i < firstStart.length(); ++i )
+    {
+      QChar c = firstStart.at( i );
+      startOffset = startOffset * 26 + ( c.toLatin1() - 'A' + 1 );
+    }
+    offset += startOffset;
+
     QString label;
-    offset += firstChar.toLatin1() - 'A' + 1;
     do
     {
       offset -= 1;

@@ -313,7 +313,11 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QComboBox" name="comboBoxRowLabels"/>
+           <widget class="QComboBox" name="comboBoxRowLabels">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QToolButton" name="toolButtonSwitchLabels">
@@ -324,7 +328,11 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="comboBoxColLabels"/>
+           <widget class="QComboBox" name="comboBoxColLabels">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
