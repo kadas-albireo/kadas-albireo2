@@ -38,8 +38,9 @@
 
 namespace
 {
-  QString gridLabel( QChar firstChar, int offset )
+  QString gridLabel( QString firstStart, int offset )
   {
+    QChar firstChar = firstStart.at( 0 );
     if ( firstChar >= '0' && firstChar <= '9' )
     {
       return QString::number( firstChar.digitValue() + offset );
@@ -140,7 +141,7 @@ class KadasGuideGridRenderer : public QgsMapLayerRenderer
         {
           const double sx1 = vLine1.first().x();
           const double sx2 = vLine2.first().x();
-          const QString label = gridLabel( mGridConfig.colChar, col - 1 );
+          const QString label = gridLabel( mGridConfig.colStart, col - 1 );
           if ( mGridConfig.labelingPos == KadasGuideGridLayer::LabelsOutside && vLine1.first().y() - labelBoxSize > screenRect.top() )
             drawGridLabel( 0.5 * ( sx1 + sx2 ), sy1 - 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
           else if ( sy1 < vLine1.last().y() - 2 * labelBoxSize )
@@ -204,7 +205,7 @@ class KadasGuideGridRenderer : public QgsMapLayerRenderer
         {
           const double sy1h = hLine1.first().y();
           const double sy2h = hLine2.first().y();
-          const QString label = gridLabel( mGridConfig.rowChar, row - 1 );
+          const QString label = gridLabel( mGridConfig.rowStart, row - 1 );
           if ( mGridConfig.labelingPos == KadasGuideGridLayer::LabelsOutside && hLine1.first().x() - labelBoxSize > screenRect.left() )
             drawGridLabel( sx1 - 0.5 * labelBoxSize, 0.5 * ( sy1h + sy2h ), label, font, fontMetrics, bufferColor );
           else if ( sx1 < hLine1.last().x() - 2 * labelBoxSize )
@@ -355,7 +356,7 @@ QList<KadasPluginLayer::IdentifyResult> KadasGuideGridLayer::identify( const Qgs
   bbox->setExteriorRing( ring );
   QMap<QString, QVariant> attrs;
 
-  QString text = tr( "Cell %1, %2" ).arg( gridLabel( mGridConfig.rowChar, j ) ).arg( gridLabel( mGridConfig.colChar, i ) );
+  QString text = tr( "Cell %1, %2" ).arg( gridLabel( mGridConfig.rowStart, j ) ).arg( gridLabel( mGridConfig.colStart.at( 0 ), i ) );
   if ( mGridConfig.quadrantLabeling != DontLabelQuadrants )
   {
     bool left = pos.x() <= mGridConfig.gridRect.xMinimum() + ( i + 0.5 ) * colWidth;
@@ -393,10 +394,10 @@ bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteConte
     mGridConfig.fontSize = customProperty( QStringLiteral( "kadas/guidegrid/fontSize" ) ).toInt();
     mGridConfig.color = QgsSymbolLayerUtils::decodeColor( customProperty( QStringLiteral( "kadas/guidegrid/color" ) ).toString() );
     mGridConfig.lineWidth = customProperty( QStringLiteral( "kadas/guidegrid/lineWidth" ), 1 ).toInt();
-    const QString rowChar = customProperty( QStringLiteral( "kadas/guidegrid/rowChar" ) ).toString();
-    const QString colChar = customProperty( QStringLiteral( "kadas/guidegrid/colChar" ) ).toString();
-    mGridConfig.rowChar = rowChar.isEmpty() ? QChar( 'A' ) : rowChar.at( 0 );
-    mGridConfig.colChar = colChar.isEmpty() ? QChar( '1' ) : colChar.at( 0 );
+    const QString rowStart = customProperty( QStringLiteral( "kadas/guidegrid/rowChar" ) ).toString();
+    const QString colStart = customProperty( QStringLiteral( "kadas/guidegrid/colChar" ) ).toString();
+    mGridConfig.rowStart = rowStart.isEmpty() ? QString( "A" ) : rowStart;
+    mGridConfig.colStart = colStart.isEmpty() ? QString( "1" ) : colStart;
     mGridConfig.labelingPos = static_cast<LabelingPos>( customProperty( QStringLiteral( "kadas/guidegrid/labelingPos" ) ).toInt() );
     mGridConfig.quadrantLabeling = static_cast<QuadrantLabeling>( customProperty( QStringLiteral( "kadas/guidegrid/quadrantLabeling" ) ).toInt() );
     regenerate();
@@ -421,8 +422,8 @@ bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteConte
   mGridConfig.fontSize = cfgEl.attribute( "fontSize" ).toInt();
   mGridConfig.color = QgsSymbolLayerUtils::decodeColor( cfgEl.attribute( "color" ) );
   mGridConfig.lineWidth = cfgEl.attribute( "lineWidth", "1" ).toInt();
-  mGridConfig.rowChar = !cfgEl.attribute( "rowChar" ).isEmpty() ? cfgEl.attribute( "rowChar" ).at( 0 ) : 'A';
-  mGridConfig.colChar = !cfgEl.attribute( "colChar" ).isEmpty() ? cfgEl.attribute( "colChar" ).at( 0 ) : '1';
+  mGridConfig.rowStart = !cfgEl.attribute( "rowChar" ).isEmpty() ? cfgEl.attribute( "rowChar" ).at( 0 ) : 'A';
+  mGridConfig.colStart = !cfgEl.attribute( "colChar" ).isEmpty() ? cfgEl.attribute( "colChar" ).at( 0 ) : '1';
   mGridConfig.labelingPos = static_cast<LabelingPos>( cfgEl.attribute( "labelingPos" ).toInt() );
   mGridConfig.quadrantLabeling = static_cast<QuadrantLabeling>( cfgEl.attribute( "quadrantLabeling" ).toInt() );
 
@@ -457,8 +458,8 @@ void KadasGuideGridLayer::writeConfigToCustomProperties()
   setCustomProperty( QStringLiteral( "kadas/guidegrid/fontSize" ), mGridConfig.fontSize );
   setCustomProperty( QStringLiteral( "kadas/guidegrid/color" ), QgsSymbolLayerUtils::encodeColor( mGridConfig.color ) );
   setCustomProperty( QStringLiteral( "kadas/guidegrid/lineWidth" ), mGridConfig.lineWidth );
-  setCustomProperty( QStringLiteral( "kadas/guidegrid/rowChar" ), QString( mGridConfig.rowChar ) );
-  setCustomProperty( QStringLiteral( "kadas/guidegrid/colChar" ), QString( mGridConfig.colChar ) );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/rowChar" ), QString( mGridConfig.rowStart ) );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/colChar" ), QString( mGridConfig.colStart ) );
   setCustomProperty( QStringLiteral( "kadas/guidegrid/labelingPos" ), static_cast<int>( mGridConfig.labelingPos ) );
   setCustomProperty( QStringLiteral( "kadas/guidegrid/quadrantLabeling" ), static_cast<int>( mGridConfig.quadrantLabeling ) );
 }
@@ -546,7 +547,7 @@ void KadasGuideGridLayer::regenerate()
   // --- Column labels (top + bottom of the grid rect) ---
   for ( int col = 0; col < mGridConfig.cols; ++col )
   {
-    const QString label = gridLabel( mGridConfig.colChar, col );
+    const QString label = gridLabel( mGridConfig.colStart, col );
     const double cx = r.xMinimum() + ( col + 0.5 ) * dx;
     // Top
     {
@@ -569,7 +570,7 @@ void KadasGuideGridLayer::regenerate()
   // --- Row labels (left + right of the grid rect) ---
   for ( int row = 0; row < mGridConfig.rows; ++row )
   {
-    const QString label = gridLabel( mGridConfig.rowChar, row );
+    const QString label = gridLabel( mGridConfig.rowStart, row );
     const double cy = r.yMaximum() - ( row + 0.5 ) * dy;
     // Left
     {

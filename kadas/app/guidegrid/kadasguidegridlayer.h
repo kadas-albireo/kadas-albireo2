@@ -75,7 +75,7 @@ class KadasGuideGridLayer : public KadasAnnotationLayer
     const QColor &color() const { return mGridConfig.color; }
     int lineWidth() const { return mGridConfig.lineWidth; }
     int fontSize() const { return mGridConfig.fontSize; }
-    QPair<QChar, QChar> labelingMode() const { return qMakePair( mGridConfig.rowChar, mGridConfig.colChar ); }
+    QPair<QString, QString> labelingMode() const { return qMakePair( mGridConfig.rowStart, mGridConfig.colStart ); }
     LabelingPos labelingPos() const { return mGridConfig.labelingPos; }
     QuadrantLabeling labelQuadrants() const { return mGridConfig.quadrantLabeling; }
 
@@ -95,10 +95,10 @@ class KadasGuideGridLayer : public KadasAnnotationLayer
       mGridConfig.fontSize = fontSize;
       regenerate();
     }
-    void setLabelingMode( QChar rowChar, QChar colChar )
+    void setLabelingMode( QString rowStart, QString colStart )
     {
-      mGridConfig.rowChar = rowChar;
-      mGridConfig.colChar = colChar;
+      mGridConfig.rowStart = rowStart;
+      mGridConfig.colStart = colStart;
       regenerate();
     }
     void setLabelingPos( LabelingPos pos )
@@ -133,8 +133,8 @@ class KadasGuideGridLayer : public KadasAnnotationLayer
         int fontSize = 30;
         QColor color = Qt::red;
         int lineWidth = 1;
-        QChar rowChar = 'A';
-        QChar colChar = '1';
+        QString rowStart = QString( "A" );
+        QString colStart = QString( "1" );
         LabelingPos labelingPos = LabelsInside;
         QuadrantLabeling quadrantLabeling = DontLabelQuadrants;
     } mGridConfig;
@@ -199,7 +199,7 @@ class KadasGuideGridLayer : public KadasPluginLayer
     const QColor &color() const { return mGridConfig.color; }
     int lineWidth() const { return mGridConfig.lineWidth; }
     int fontSize() const { return mGridConfig.fontSize; }
-    QPair<QChar, QChar> labelingMode() const { return qMakePair( mGridConfig.rowChar, mGridConfig.colChar ); }
+    QPair<QString, QString> labelingMode() const { return qMakePair( mGridConfig.rowStart, mGridConfig.colStart ); }
     LabelingPos labelingPos() const { return mGridConfig.labelingPos; }
     QuadrantLabeling labelQuadrants() const { return mGridConfig.quadrantLabeling; }
 
@@ -207,10 +207,10 @@ class KadasGuideGridLayer : public KadasPluginLayer
     void setColor( const QColor &color ) { mGridConfig.color = color; }
     void setLineWidth( int lineWidth ) { mGridConfig.lineWidth = lineWidth; }
     void setFontSize( int fontSize ) { mGridConfig.fontSize = fontSize; }
-    void setLabelingMode( QChar rowChar, QChar colChar )
+    void setLabelingMode( QString rowStart, QString colStart )
     {
-      mGridConfig.rowChar = rowChar;
-      mGridConfig.colChar = colChar;
+      mGridConfig.rowStart = rowStart;
+      mGridConfig.colStart = colStart;
     }
     void setLabelingPos( LabelingPos pos ) { mGridConfig.labelingPos = pos; }
     void setLabelQuadrants( QuadrantLabeling labelQuadrants ) { mGridConfig.quadrantLabeling = labelQuadrants; }
@@ -232,8 +232,8 @@ class KadasGuideGridLayer : public KadasPluginLayer
         int fontSize = 30;
         QColor color = Qt::red;
         int lineWidth = 1;
-        QChar rowChar = 'A';
-        QChar colChar = '1';
+        QString rowStart = QString( "A" );
+        QString colStart = QString( "1" );
         LabelingPos labelingPos = LabelsInside;
         QuadrantLabeling quadrantLabeling = DontLabelQuadrants;
     } mGridConfig;

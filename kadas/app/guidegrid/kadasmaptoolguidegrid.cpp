@@ -259,7 +259,7 @@ void KadasGuideGridWidget::setCurrentLayer( QgsMapLayer *layer )
   ui.spinBoxLineWidth->setValue( mCurrentLayer->lineWidth() );
   ui.spinBoxLineWidth->blockSignals( false );
   ui.spinBoxFontSize->setValue( mCurrentLayer->fontSize() );
-  QPair<QChar, QChar> labelingMode = mCurrentLayer->labelingMode();
+  QPair<QString, QString> labelingMode = mCurrentLayer->labelingMode();
   ui.comboBoxRowLabels->blockSignals( true );
   ui.comboBoxRowLabels->setCurrentText( QString( labelingMode.first ) );
   ui.comboBoxRowLabels->blockSignals( false );
@@ -479,7 +479,7 @@ void KadasGuideGridWidget::updateLabeling()
   {
     return;
   }
-  mCurrentLayer->setLabelingMode( ui.comboBoxRowLabels->currentText().front(), ui.comboBoxColLabels->currentText().front() );
+  mCurrentLayer->setLabelingMode( ui.comboBoxRowLabels->currentText(), ui.comboBoxColLabels->currentText() );
   mCurrentLayer->setLabelingPos( static_cast<KadasGuideGridLayer::LabelingPos>( ui.comboBoxLabelPos->currentData().toInt() ) );
   mCurrentLayer->setLabelQuadrants( static_cast<KadasGuideGridLayer::QuadrantLabeling>( ui.comboBoxQuadrants->currentData().toInt() ) );
   mCurrentLayer->triggerRepaint();
