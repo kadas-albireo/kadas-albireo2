@@ -347,6 +347,12 @@ void KadasLayerTreeViewMenuProvider::setLayerLock( bool enabled )
   {
     vl->setReadOnly( enabled );
   }
+  QgsAnnotationLayer *annoLayer = qobject_cast<QgsAnnotationLayer *>( layer );
+  if ( annoLayer )
+  {
+    // annotation layer are always read only so we cannot rely on it to know if we can edit it.
+    annoLayer->setCustomProperty( QStringLiteral( "readOnly" ), enabled );
+  }
 }
 
 void KadasLayerTreeViewMenuProvider::showLayerAttributeTable()
