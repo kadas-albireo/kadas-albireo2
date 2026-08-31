@@ -32,7 +32,7 @@ Les **waypoints** sont de simples points sur la carte qui peuvent être nommés.
 
 Les **itinéraires** sont des lignes que l’on peut nommer et numéroter.
 
-Les waypoints et les itinéraires ont leur propre niveau dans l’arborescence, Routes GPS, tout comme le niveau Redlining.
+Les waypoints et les itinéraires ont leur propre niveau dans l’arborescence, Routes GPS, tout comme le niveau **Annotation**.
 
 ![](../media/image9.png)
 

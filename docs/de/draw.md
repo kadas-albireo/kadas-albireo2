@@ -3,7 +3,7 @@
 
 # Zeichnen
 
-## Geometrie und Texte (Redlining)
+## Geometrie und Texte
 
 Es können Geometrien der folgenden Typen gezeichnet werden:
 
@@ -18,7 +18,7 @@ Abhängig vom Geometrietyp können für Rand und Füllung die Farbe und das Must
 
 Für **Texte** können Schriftart und Grösse sowie Füllfarbe angepasst werden.
 
-Gezeichnete Geometrien und Texte werden in der **Redlining** Ebene im Karteninhaltsverzeichnis abgelegt.
+Gezeichnete Geometrien und Texte werden in der **Annotation** Ebene im Karteninhaltsverzeichnis abgelegt.
 
 Bereits gezeichnete Geometrien oder Texte können nachträglich editiert werden, indem sie auf der Karte selektiert werden. Selektierte Objekte lassen sich verschieben, und, abhängig vom Geometrietyp, können Knotenpunkte individuell verschoben werden sowie per Kontextmenü erstellt oder entfernt werden. Die z-Reihenfolge einer Geometrie kann über das Kontextmenü geändert werden.
 
@@ -26,11 +26,11 @@ Bestehende Linien- und Polygongeometrien lassen sich per Kontextmenü auf den Kn
 
 ![](../media/image6.png)
 
-Editieroperationen an einer Redlining-Zeichnung können via CTRL+Z und CTRL+Y oder mit den entsprechenden Schaltflächen am unteren Kartenrand rückgängig gemacht bzw. wiederholt werden.
+Editieroperationen an einer Zeichnung können via CTRL+Z und CTRL+Y oder mit den entsprechenden Schaltflächen am unteren Kartenrand rückgängig gemacht bzw. wiederholt werden.
 
 Beim Erstellen und Editieren von Geometrien werden gleichzeitig relevante Messwerte angezeigt.
 
-Redlining-Zeichnungen können per Kontextmenü oder den üblichen Tastaturkürzel CTRL+C, CTRL+X und CTRL+V kopiert/ausgeschnitten und eingefügt werden. Mehrere Redlining-Zeichnungen können zusammen mit der CTRL-Taste selektiert werden und als Gruppe verschoben, kopiert, ausgeschnitten und eingefügt werden.
+Zeichnungen können per Kontextmenü oder den üblichen Tastaturkürzel CTRL+C, CTRL+X und CTRL+V kopiert/ausgeschnitten und eingefügt werden. Mehrere Zeichnungen können zusammen mit der CTRL-Taste selektiert werden und als Gruppe verschoben, kopiert, ausgeschnitten und eingefügt werden.
 
 ## Stecknadeln
 
@@ -60,7 +60,7 @@ Vektorgraphiken werden in der **SVG Graphiken** Ebene abgelegt.
 
 Mit der Funktion **Einfügen** lassen sich verschiene Objekte aus der Zwischenablage in die Karte einfügen:
 
-- Geometrien: Diese werden als Redlining Objekt eingefügt
+- Geometrien: Diese werden als Annotation eingefügt
 - MSS Symbole: Diese werden in der ausgewählten MilX Ebene eingefügt
 - SVG Graphiken: Diese werden in der **SVG Graphiken** eingefügt.
 

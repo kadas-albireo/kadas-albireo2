@@ -32,7 +32,7 @@ Mit diesen Funktionen können Wegpunkte und Routen gezeichnet werden, welche sp�
 
 **Routen** sind Linienzüge und können mit Namen und Nummer versehen werden.
 
-Wegpunkte und Routen werden in einer eigenen Ebene GPS Routen im Layerbaum abgelegt, analog zur Redlining Ebene.
+Wegpunkte und Routen werden in einer eigenen Ebene GPS Routen im Layerbaum abgelegt, analog zur **Annotation** Ebene.
 
 ![](../media/image9.png)
 

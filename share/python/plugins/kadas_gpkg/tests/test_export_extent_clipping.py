@@ -192,7 +192,7 @@ def test_exporter_hook_sequence_strips_items(project, tmp_path):
     """Replays the hook call order of KadasGpkgExport.run().
 
     Regression test: the collected item ids must survive until
-    __removeFlaggedRedlining runs on the parsed XML (they were once reset
+    __removeFlaggedAnnotationItems runs on the parsed XML (they were once reset
     in between, turning extent clipping into a silent no-op).
     """
     layer = _make_annotation_layer("annotations")
@@ -204,7 +204,7 @@ def test_exporter_hook_sequence_strips_items(project, tmp_path):
     extent = QgsRectangle(2590000, 1190000, 2610000, 1210000)
 
     # Same sequence as run(): collect, write the project, parse, strip
-    exporter._KadasGpkgExport__flagRedliningItemsOutsideExtent(
+    exporter._KadasGpkgExport__flagAnnotationItemsOutsideExtent(
         extent, QgsCoordinateReferenceSystem("EPSG:2056")
     )
 
@@ -214,7 +214,7 @@ def test_exporter_hook_sequence_strips_items(project, tmp_path):
     parser = ET.XMLParser(strip_cdata=False)
     doc = ET.parse(project_file, parser=parser)
 
-    exporter._KadasGpkgExport__removeFlaggedRedlining(doc)
+    exporter._KadasGpkgExport__removeFlaggedAnnotationItems(doc)
 
     remaining = [el.attrib["id"] for el in doc.iterfind("projectlayers/maplayer/items/item")]
     assert remaining == [inside_id]

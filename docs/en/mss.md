@@ -21,7 +21,7 @@ For **one-point symbols**, the user can place the symbol at an offset from the a
 
 For **multi-point symbols**, node points and control points, if any, can be edited depending on the respective symbol schema. When editing the symbol, node points are drawn as yellow points, and control points as red points. Latter typically control attributes such as arrow widths or weighting parameters of bezier. Besides moving these points, the user can add new nodes or delete existing ones from the context menu.
 
-Similar to redlining objects, MSS symbols can be moved, copied, cut and pasted individually or as a group. In addition to the entries in the context menu and the usual keyboard shortcuts, there are also the **Copy to...** and **Move to...** buttons at the bottom of the map frame. The latter allow to explicitly specify a target layer, otherwise the currently selected MilX layer is taken as the target layer. If no MilX layer is selected, the user will be asked to specify the destination layer.
+Similar to annotation objects, MSS symbols can be moved, copied, cut and pasted individually or as a group. In addition to the entries in the context menu and the usual keyboard shortcuts, there are also the **Copy to...** and **Move to...** buttons at the bottom of the map frame. The latter allow to explicitly specify a target layer, otherwise the currently selected MilX layer is taken as the target layer. If no MilX layer is selected, the user will be asked to specify the destination layer.
 
 ![](../media/image11.png)
 
@@ -35,7 +35,7 @@ A special property of MilX layers is the possibility to mark them as **Approved*
 
 MilX layers can be exported as MILXLY or MILXLYZ layers, and existing MILXLY or MILXLYZ layers can be imported.
 
-MILXLY (and the compressed variant MILXLYZ) is a format for the exchange of situation reports. It contains only MSS symbols of the situation report, and no further objects like redlining, pins or camera pictures.
+MILXLY (and the compressed variant MILXLYZ) is a format for the exchange of situation reports. It contains only MSS symbols of the situation report, and no further objects like annotations, pins or camera pictures.
 
 When **exporting** to MILXLY(Z) you can select which MilX layers to export and in which version the file should be created. In addition, you can choose whether to export the map cartouche defined in the print dialog.
 

@@ -21,7 +21,7 @@ Un’ulteriore possibilità di modifica per i **simboli mono-punto** è quella d
 
 Nei **simboli multi-punto**, se permesso dalla specifica del simbolo, è possibile modificare i punti nodali e gli eventuali punti di controllo. Nella modalità di modifica, i punti nodali vengono disegnati quali punti gialli, i punti di controllo quali punti rossi. Questi ultimi possono ad esempio comandare la larghezza della freccia o i parametri di ponderazione delle curve di Bézier. Oltre allo spostamento dei punti, con il clic del tasto destro è possibile aggiungere nuovi punti nodali o cancellare quelli esistenti.
 
-Analogamente alle figure redlining, è possibile spostare, copiare, tagliare ed incollare simboli MSS singolarmente o in gruppi. Oltre ai tasti di scelta rapida e le apposite voci nel menu contestuale, vi è la possibilità di usare le funzioni **Copia a...** e **Sposta a...** situate nella parte inferiore della mappa. Queste ultime permettono di specificare esplicitamente il layer di destinazione, altrimenti il layer MilX attuale viene usato come destinazione. Se nessun layer MilX è selezionato, viene richiesto di specificare il layer di destinazione.
+Analogamente alle annotazioni, è possibile spostare, copiare, tagliare ed incollare simboli MSS singolarmente o in gruppi. Oltre ai tasti di scelta rapida e le apposite voci nel menu contestuale, vi è la possibilità di usare le funzioni **Copia a...** e **Sposta a...** situate nella parte inferiore della mappa. Queste ultime permettono di specificare esplicitamente il layer di destinazione, altrimenti il layer MilX attuale viene usato come destinazione. Se nessun layer MilX è selezionato, viene richiesto di specificare il layer di destinazione.
 
 ![](../media/image11.png)
 
@@ -35,7 +35,7 @@ Una caratteristica speciale dei layer MilX è rappresentata dalla possibilità d
 
 I layer MilX possono essere esportati in un file MILXLY o MILXLYZ; i file MILXLY o MILXLYZ esistenti possono essere importati quali layer MilX.
 
-MILXLY (e la variante compres­sa MILXLYZ) è un formato per lo scambio delle rappresentazioni della posizione. Contiene sola­mente i simboli MSS della rappresentazione della posizione e nessun altro oggetto come figure redlining, spilli o immagini della fotocamera.
+MILXLY (e la variante compres­sa MILXLYZ) è un formato per lo scambio delle rappresentazioni della posizione. Contiene sola­mente i simboli MSS della rappresentazione della posizione e nessun altro oggetto come annotazioni, spilli o immagini della fotocamera.
 
 **Nell'esportazione** in formato MILXLY(Z) è possibile scegliere quali layer MilX esportare e in quale versione il file debba essere creato. Inoltre può venir specificato se esportare il cartiglio della mappa definito nel dialogo di stampa.
 

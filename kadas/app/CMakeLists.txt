@@ -26,7 +26,7 @@ set(kadas_SRC
     kadaspluginlayerproperties.cpp
     kadaspluginmanager.cpp
     kadaspythonintegration.cpp
-    kadasredliningintegration.cpp
+    kadasannotationintegration.cpp
     kadasribbonactiongallery.cpp
     kadasribbonsplitbutton.cpp
     kadasstatusbar.cpp
@@ -95,7 +95,7 @@ set(kadas_HDR
     kadaspluginlayerproperties.h
     kadaspluginmanager.h
     kadaspythonintegration.h
-    kadasredliningintegration.h
+    kadasannotationintegration.h
     kadasribbonactiongallery.h
     kadasribbonsplitbutton.h
     kadasstatusbar.h

@@ -39,7 +39,7 @@ With the release of KADAS 2.3 in Q3 2025, numerous new features, improvements, a
     - Restricted geoservices in the MGDI can be displayed in KADAS by authorized users.
     - The coordinate search has been improved and standardized.
     - Support for WCS geoservices now also enables analyses with high-resolution elevation models.
-    - The text function in redlining contains additional settings options.
+    - The text function for annotations contains additional settings options.
     - The display and labeling of the MGRS grid have been optimized.
     - The print templates have been updated and now include the creation date and projection system by default.
     - Analyses can be started directly by right-clicking with the mouse.
@@ -93,7 +93,7 @@ With the release of KADAS 2.3 in Q3 2025, numerous new features, improvements, a
     - Print: Properly scale symbols (MSS, pins, pictures, ...) according to print DPI
     - GPKG: Allow importing project layers
     - Layer tree: Possibility to zoom to and remove all selected layers
-    - Scale based visibility also for redlining/MSS layers
+    - Scale based visibility also for annotation/MSS layers
     - Attribute table: various new selection and zoom tools to
 - _View_:
     - New bookmarks function
@@ -114,7 +114,7 @@ With the release of KADAS 2.3 in Q3 2025, numerous new features, improvements, a
 ### Version 2.0.0 (July 2020)
 
 - Complete architectural redesign: KADAS is now a separate application, built on top of the QGIS 3.x libraries
-- New map item architecture, for consistent workflow when drawing and editing redlining objects, MSS symbols, etc
+- New map item architecture, for consistent workflow when drawing and editing annotation objects, MSS symbols, etc
 - Uses the new qgz file format, avoiding the previous `<projectname>_files` folder
 - Project autosave
 - New plugin manager for managing external plugins directly from within KADAS
@@ -122,7 +122,7 @@ With the release of KADAS 2.3 in Q3 2025, numerous new features, improvements, a
 - New map grid implementation, supporting also UTM/MGRS grids on the main map
 - KML/KMZ export by bounding box
 - GPKG data export by bounding box
-- Styles of redlining geometries are honoured when displayed as 2.5D or 3D objects on the Globe
+- Styles of annotation geometries are honoured when displayed as 2.5D or 3D objects on the Globe
 - Enhanced guide grid
 - Update to MSS-2021
 
@@ -139,7 +139,7 @@ With the release of KADAS 2.3 in Q3 2025, numerous new features, improvements, a
 - _Analysis_:
     - Show node markers in height profile
 - _Draw_:
-    - Support numeric input when drawing redlining objects
+    - Support numeric input when drawing annotation objects
     - Allow setting scaling factor for annotation layers
     - Allow toggling frames of image annotations
     - Allow manipulating groups of annotation items

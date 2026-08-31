@@ -26,7 +26,7 @@ Process-wide registry of the well-known singleton Kadas \c
   public:
     enum class StandardLayer
     {
-      RedliningLayer,
+      AnnotationLayer,
       SymbolsLayer,
       PicturesLayer,
       PinsLayer,

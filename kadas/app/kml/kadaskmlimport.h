@@ -26,7 +26,6 @@ class QDomDocument;
 class QDomElement;
 class QuaZip;
 class QgsMapCanvas;
-class QgsRedliningLayer;
 
 class KadasKMLImport : public QObject
 {

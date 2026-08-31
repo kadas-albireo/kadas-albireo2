@@ -202,7 +202,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
 
       QMap<QString, QString> attributes = parseExtendedData( placemarkEl );
 
-      // If there is an icon and the geometry is a point, add as picture item, otherwise as redlining-style annotation
+      // If there is an icon and the geometry is a point, add as picture item, otherwise as a geometry annotation
       if ( geoms.size() == 1 && !style.icon.isEmpty() && dynamic_cast<QgsPoint *>( geoms.front() ) )
       {
         const QgsPointXY pos = itemCrst.transform( *static_cast<QgsPoint *>( geoms.front() ) );

@@ -56,7 +56,7 @@ class KadasDeveloperToolsDockWidget;
 class KadasPluginInterface;
 class KadasPortalAuth;
 class KadasPythonIntegration;
-class KadasRedliningIntegration;
+class KadasAnnotationIntegration;
 class KadasAnnotationProjectIntegration;
 
 #define kApp KadasApplication::instance()

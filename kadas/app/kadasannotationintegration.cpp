@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadasredliningintegration.cpp
-    -----------------------------
+    kadasannotationintegration.cpp
+    ------------------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -43,7 +43,7 @@
 
 #include "kadasapplication.h"
 #include "kadasmainwindow.h"
-#include "kadasredliningintegration.h"
+#include "kadasannotationintegration.h"
 
 
 namespace
@@ -64,7 +64,7 @@ namespace
 } // namespace
 
 
-KadasRedliningIntegration::KadasRedliningIntegration( QObject *parent )
+KadasAnnotationIntegration::KadasAnnotationIntegration( QObject *parent )
   : QObject( parent )
 {
   using V = AnnotationVariant;
@@ -113,7 +113,7 @@ KadasRedliningIntegration::KadasRedliningIntegration( QObject *parent )
   connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_O ), kApp->mainWindow() ), &QShortcut::activated, mActionNewCoordCross, &QAction::trigger );
 }
 
-QAction *KadasRedliningIntegration::createToolAction( const QIcon &icon, const QString &text, const QString &objectName, AnnotationVariant variant )
+QAction *KadasAnnotationIntegration::createToolAction( const QIcon &icon, const QString &text, const QString &objectName, AnnotationVariant variant )
 {
   QAction *action = new QAction( icon, text, this );
   action->setObjectName( objectName );
@@ -123,16 +123,16 @@ QAction *KadasRedliningIntegration::createToolAction( const QIcon &icon, const Q
   return action;
 }
 
-QgsAnnotationLayer *KadasRedliningIntegration::getOrCreateAnnotationLayer()
+QgsAnnotationLayer *KadasAnnotationIntegration::getOrCreateAnnotationLayer()
 {
   if ( !mLastAnnotationLayer )
   {
-    mLastAnnotationLayer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::RedliningLayer );
+    mLastAnnotationLayer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::AnnotationLayer );
   }
   return mLastAnnotationLayer;
 }
 
-void KadasRedliningIntegration::toggleAnnotation( bool active, AnnotationVariant variant )
+void KadasAnnotationIntegration::toggleAnnotation( bool active, AnnotationVariant variant )
 {
   QgsMapCanvas *canvas = kApp->mainWindow()->mapCanvas();
   QAction *action = qobject_cast<QAction *>( QObject::sender() );
@@ -237,7 +237,7 @@ void KadasRedliningIntegration::toggleAnnotation( bool active, AnnotationVariant
   canvas->setMapTool( tool );
 }
 
-void KadasRedliningIntegration::updateCustomSvgActionIcon()
+void KadasAnnotationIntegration::updateCustomSvgActionIcon()
 {
   if ( !mActionNewCustomSvg )
     return;

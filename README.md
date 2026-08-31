@@ -7,7 +7,7 @@ KADAS Albireo is a mapping application based on [QGIS](http://qgis.org/) and tar
 ## Main features:
 
  * Streamlined user interface
- * Redlining functionality for adding geometries, pins, georeferenced pictures and other symbols
+ * Annotation functionality for adding geometries, pins, georeferenced pictures and other symbols
  * Measurement tools, incl. geodetic measurements.
  * Terrain analysis: slope, hillshade, viewshed, line of sight
  * Numeric inputs for all drawing operations
@@ -40,11 +40,11 @@ KADAS Albireo is a mapping application based on [QGIS](http://qgis.org/) and tar
 
 ## Screenshots
 
-### Redlining tools
+### Annotation tools
 
-Redlining sketches:
+Annotation sketches:
 
-![redlining](https://github.com/kadas-albireo/kadas-albireo2/blob/gh-pages/images/redlining.png)
+![annotations](https://github.com/kadas-albireo/kadas-albireo2/blob/gh-pages/images/redlining.png)
 
 Georeferenced pictures:
 

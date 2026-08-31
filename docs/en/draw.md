@@ -3,7 +3,7 @@
 
 # Draw
 
-## Geometries and labels (Redlining)
+## Geometries and labels
 
 Geometries of the following types can be drawn:
 
@@ -18,7 +18,7 @@ Depending on the geometry type, the border and fill color and patterns can be ad
 
 For labels, the font and size as well as fill color can be adjusted.
 
-Drawn geometries and texts are stored in the **Redlining** layer in the map legend.
+Drawn geometries and texts are stored in the **Annotation** layer in the map legend.
 
 Already drawn geometries or texts can be subsequently edited by selecting them on the map. Selected objects can be moved and, depending on the geometry type, nodes can be moved individually or created or removed via the context menu. The z-order of a geometry can be changed via context-menu.
 
@@ -26,11 +26,11 @@ Existing line and polygon geometries can be continued via context menu on the no
 
 ![](../media/image6.png)
 
-Editing operations on a redlining drawing can be reversed or repeated via CTRL+Z and CTRL+Y or with the corresponding buttons at the bottom of the map frame.
+Editing operations on a drawing can be reversed or repeated via CTRL+Z and CTRL+Y or with the corresponding buttons at the bottom of the map frame.
 
 When creating and editing geometries, relevant measurement values ​​are displayed at the same time.
 
-Redlining drawings can be copied, cut and pasted using the context menu or the usual keyboard shortcuts CTRL+C, CTRL+X and CTRL+V. Multiple redlining drawings can be selected together with the CTRL key and moved, copied, cut and pasted as a group.
+Drawings can be copied, cut and pasted using the context menu or the usual keyboard shortcuts CTRL+C, CTRL+X and CTRL+V. Multiple drawings can be selected together with the CTRL key and moved, copied, cut and pasted as a group.
 
 ## Pins
 
@@ -60,7 +60,7 @@ Vector graphics are stored in the **SVG graphics** layer.
 
 The **Paste** function allows to add various types of object to the map from the clipboard:
 
-- Geometries: Are added as redlining objects
+- Geometries: Are added as annotation objects
 - MSS symbols: Are added to the selected MilX layer
 - SVG graphics: Are added to the **SVG graphics** layer
 
