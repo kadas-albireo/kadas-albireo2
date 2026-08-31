@@ -21,7 +21,7 @@ Eine weitere Editiermöglichkeit für **Einpunktsymbole** ist, ein Offset zwisch
 
 Bei **Mehrpunktsymbole** können, soweit es die Symbolspezifikation erlaubt, Knotenpunkte und allfällige Kontrollpunkte editiert werden. Knotenpunkte werden im Editiermodus als gelbe Punkte gezeichnet, Kontrollpunkte hingegen als rote Punkte. Letztere können z.B. Pfeilbreiten oder Gewichtungsparameter von Bezier Kurven steuern. Neben dem Verschieben der Punkte können per Rechtsclick neue Knotenpunkte hinzugefügt werden oder existierende gelöscht werden.
 
-Analog zu Redlining-Objekte lassen sich MSS Symbole individuell oder als Gruppe verschieben, kopieren, ausschneiden und einfügen. Neben den Einträgen im Kontextmenü und den üblichen Tastaturkürzel gibt es dafür noch die **Kopieren nach...** und **Verschieben nach...** Schaltflächen am unteren Kartenrand. Letztere erlauben explizit eine Zielebene anzugeben, ansonsten wird die aktuell selektierte MilX Ebene als Zielebene genommen. Falls keine MilX Ebene selektiert ist, wird nach der Zielebene gefragt.
+Analog zu Annotationen lassen sich MSS Symbole individuell oder als Gruppe verschieben, kopieren, ausschneiden und einfügen. Neben den Einträgen im Kontextmenü und den üblichen Tastaturkürzel gibt es dafür noch die **Kopieren nach...** und **Verschieben nach...** Schaltflächen am unteren Kartenrand. Letztere erlauben explizit eine Zielebene anzugeben, ansonsten wird die aktuell selektierte MilX Ebene als Zielebene genommen. Falls keine MilX Ebene selektiert ist, wird nach der Zielebene gefragt.
 
 ![](../media/image11.png)
 
@@ -34,7 +34,7 @@ Eine spezielle Eigenschaft von MilX Ebenen ist die Möglichkeit, sie als **Geneh
 ## MilX Import und Export
 
 MilX Ebenen können in eine MILXLY oder MILXLYZ Datei exportiert werden, und existierende MILXLY oder MILXLYZ Dateiein können als MilX Ebenen importiert werden.
-MILXLY (und die komprimierten Variante MILXLYZ) ist ein Format für den Austausch von Lagedarstellungen. Es enthält ausschliesslich MSS Symbole der Lagedarstellung, und keine weitere Objekte wie Redlining, Stecknadeln oder Bilder.
+MILXLY (und die komprimierten Variante MILXLYZ) ist ein Format für den Austausch von Lagedarstellungen. Es enthält ausschliesslich MSS Symbole der Lagedarstellung, und keine weitere Objekte wie Annotationen, Stecknadeln oder Bilder.
 
 Beim **Export** nach MILXLY(Z) kann ausgewählt werden, welche MilX Ebenen zu exportieren sind, und in welcher Version die Datei erstellt werden soll. Zudem kann gewählt werden, ob die im Druckdialog definierte Kartenkartusche exportiert werden soll.
 

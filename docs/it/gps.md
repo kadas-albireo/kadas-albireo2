@@ -32,7 +32,7 @@ I **waypoint** sono punti semplici sulla mappa che possono essere inoltre dotati
 
 I **rotte** sono polilinee che possono essere dotate di nome e numero.
 
-Waypoint e rotte vengono salvat in un proprio layer **Percorsi GPS**, analogo al layer Redlining.
+Waypoint e rotte vengono salvat in un proprio layer **Percorsi GPS**, analogo al layer **Annotation**.
 
 ![](../media/image9.png)
 

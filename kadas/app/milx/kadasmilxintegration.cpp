@@ -311,7 +311,7 @@ void KadasMilxIntegration::refreshMilxLayers()
     if ( !annoLayer )
       continue;
     // Only repaint annotation layers that actually carry MilX content;
-    // otherwise we'd thrash unrelated redlining/symbol layers on every
+    // otherwise we'd thrash unrelated annotation/symbol layers on every
     // global setting change.
     const QMap<QString, QgsAnnotationItem *> items = annoLayer->items();
     for ( auto it = items.constBegin(); it != items.constEnd(); ++it )

@@ -32,7 +32,7 @@ These functions allow drawing waypoints and routes, which can later be exported 
 
 **Routes** are polylines, fitted with an option name and number.
 
-Waypoints and routes are managed in a dedicated GPS Routes layer in the layer tree, analogous to redlining layers.
+Waypoints and routes are managed in a dedicated GPS Routes layer in the layer tree, analogous to the **Annotation** layer.
 
 ![](../media/image9.png)
 

@@ -43,7 +43,7 @@ class KadasMilxIntegration;
 class KadasMapWidgetManager;
 class KadasProjectTemplateSelectionDialog;
 class KadasPluginManager;
-class KadasRedliningIntegration;
+class KadasAnnotationIntegration;
 class KadasStatusBar;
 class KadasTemporalController;
 class KadasSidePanelHost;
@@ -106,7 +106,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
 
     QAction *actionShowPythonConsole() const { return mActionShowPythonConsole; }
 
-    KadasRedliningIntegration *redliningIntegration() const { return mRedliningIntegration; }
+    KadasAnnotationIntegration *annotationIntegration() const { return mAnnotationIntegration; }
     KadasGpxIntegration *gpxIntegration() { return mGpxIntegration; }
     KadasCatalogBrowser *catalogBrowser() { return mCatalogBrowser; }
     KadasPluginManager *pluginManager() { return mPluginManager; }
@@ -208,7 +208,7 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     KadasKmlIntegration *mKmlIntegration = nullptr;
     KadasMilxIntegration *mMilxIntegration = nullptr;
     KadasMapWidgetManager *mMapWidgetManager = nullptr;
-    KadasRedliningIntegration *mRedliningIntegration = nullptr;
+    KadasAnnotationIntegration *mAnnotationIntegration = nullptr;
     KadasTemporalController *mKadasTemporalController = nullptr;
     KadasPluginManager *mPluginManager = nullptr;
     KadasCatalogPreview *mCatalogPreview = nullptr;

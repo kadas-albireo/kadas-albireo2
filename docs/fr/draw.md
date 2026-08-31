@@ -3,7 +3,7 @@
 
 # Dessiner
 
-## Géométries et textes (Redlining)
+## Géométries et textes
 
 On peut dessiner les géométries des types suivants:
 
@@ -18,7 +18,7 @@ Selon le type de géométrie, les couleurs et le motif du contour et du rempliss
 
 Pour les **textes**, les caractères et leur taille ainsi que la couleur de remplissage peuvent être adaptés.
 
-Les géométries dessinées et les textes sont placés sous le niveau **Redlining** du répertoire de la carte.
+Les géométries dessinées et les textes sont placés sous le niveau **Annotation** du répertoire de la carte.
 
 On peut éditer a posteriori les géométries déjà dessinées ou les textes en les sélectionnant sur la carte. Les objets sélectionnés peuvent être déplacés et, en fonction du type de géométrie, les nœuds peuvent être déplacés individuellement, créées ou éliminés via le menu contextuel. L'ordre z d'une géométrie peut être modifié via le menu contextuel.
 
@@ -26,11 +26,11 @@ Les géométries de lignes et de polygones existantes peuvent être continuées 
 
 ![](../media/image6.png)
 
-Les opérations d'édition sur une couche de Redlining peuvent se faire par CTRL+Z et CTRL+Y ou avec les touches correspondantes du bord inférieur de la carte.
+Les opérations d'édition sur un dessin peuvent se faire par CTRL+Z et CTRL+Y ou avec les touches correspondantes du bord inférieur de la carte.
 
 Lors de la création et de l'édition de géométries, les valeurs mesurées pertinentes sont affichées en même temps.
 
-Les dessins de Redlining peuvent être copiés / coupé et collé via le menu contextuel ou les raccourcis habituels CTRL+C, CTRL+X et CTRL+V. Plusieurs objets de Redlining peuvent être sélectionnés avec la touche CTRL et déplacés, copiés, coupés et collés en tant que groupe.
+Les dessins peuvent être copiés / coupé et collé via le menu contextuel ou les raccourcis habituels CTRL+C, CTRL+X et CTRL+V. Plusieurs annotations peuvent être sélectionnées avec la touche CTRL et déplacés, copiés, coupés et collés en tant que groupe.
 
 ## Épingle
 
@@ -60,7 +60,7 @@ Les graphiques vectoriels sont stockés dans la couche **SVG graphics**.
 
 La fonction **Coller**\*\* permet d'insérer divers objets du presse-papiers dans la carte:
 
-- Géométries: Ces objets sont insérés comme des objets redlining
+- Géométries: Ces objets sont insérés comme des annotations
 - Symboles MSS: Ceux-ci sont insérés dans la couche MilX sélectionné
 - Graphiques SVG: Ceux-ci sont insérés dans la couche **SVG graphics**
 

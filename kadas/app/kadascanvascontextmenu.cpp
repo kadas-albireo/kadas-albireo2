@@ -40,7 +40,7 @@
 #include "kadascanvascontextmenu.h"
 #include "kadasmainwindow.h"
 #include "kadasmapidentifydialog.h"
-#include "kadasredliningintegration.h"
+#include "kadasannotationintegration.h"
 
 const QString KadasCanvasContextMenu::ACTION_PROPERTY_MAP_POSITION( "MapPosition" );
 
@@ -123,14 +123,14 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     QMenu *drawMenu = new QMenu();
     addAction( tr( "Draw" ) )->setMenu( drawMenu );
     drawMenu->addAction( QIcon( ":/kadas/icons/pin_red" ), tr( "Pin marker" ), this, &KadasCanvasContextMenu::drawPin );
-    drawMenu->addAction( QIcon( ":/kadas/icons/redlining_point" ), tr( "Point marker" ), this, &KadasCanvasContextMenu::drawPointMarker );
-    drawMenu->addAction( QIcon( ":/kadas/icons/redlining_square" ), tr( "Square marker" ), this, &KadasCanvasContextMenu::drawSquareMarker );
-    drawMenu->addAction( QIcon( ":/kadas/icons/redlining_triangle" ), tr( "Triangle marker" ), this, &KadasCanvasContextMenu::drawTriangleMarker );
-    drawMenu->addAction( QIcon( ":/kadas/icons/redlining_line" ), tr( "Line" ), this, &KadasCanvasContextMenu::drawLine );
-    drawMenu->addAction( QIcon( ":/kadas/icons/redlining_rectangle" ), tr( "Rectangle" ), this, &KadasCanvasContextMenu::drawRectangle );
-    drawMenu->addAction( QIcon( ":/kadas/icons/redlining_polygon" ), tr( "Polygon" ), this, &KadasCanvasContextMenu::drawPolygon );
-    drawMenu->addAction( QIcon( ":/kadas/icons/redlining_circle" ), tr( "Circle" ), this, &KadasCanvasContextMenu::drawCircle );
-    drawMenu->addAction( QIcon( ":/kadas/icons/redlining_text" ), tr( "Text" ), this, &KadasCanvasContextMenu::drawText );
+    drawMenu->addAction( QIcon( ":/kadas/icons/draw_point" ), tr( "Point marker" ), this, &KadasCanvasContextMenu::drawPointMarker );
+    drawMenu->addAction( QIcon( ":/kadas/icons/draw_square" ), tr( "Square marker" ), this, &KadasCanvasContextMenu::drawSquareMarker );
+    drawMenu->addAction( QIcon( ":/kadas/icons/draw_triangle" ), tr( "Triangle marker" ), this, &KadasCanvasContextMenu::drawTriangleMarker );
+    drawMenu->addAction( QIcon( ":/kadas/icons/draw_line" ), tr( "Line" ), this, &KadasCanvasContextMenu::drawLine );
+    drawMenu->addAction( QIcon( ":/kadas/icons/draw_rectangle" ), tr( "Rectangle" ), this, &KadasCanvasContextMenu::drawRectangle );
+    drawMenu->addAction( QIcon( ":/kadas/icons/draw_polygon" ), tr( "Polygon" ), this, &KadasCanvasContextMenu::drawPolygon );
+    drawMenu->addAction( QIcon( ":/kadas/icons/draw_circle" ), tr( "Circle" ), this, &KadasCanvasContextMenu::drawCircle );
+    drawMenu->addAction( QIcon( ":/kadas/icons/draw_text" ), tr( "Text" ), this, &KadasCanvasContextMenu::drawText );
     drawMenu->addAction( QIcon( ":/kadas/icons/coord_cross" ), tr( "Coordinate Cross" ), this, &KadasCanvasContextMenu::drawCoordinateCross );
     addAction( QgsApplication::getThemeIcon( "/mIconSelectRemove.svg" ), tr( "Delete items" ), this, &KadasCanvasContextMenu::deleteItems );
 
@@ -361,55 +361,55 @@ void KadasCanvasContextMenu::drawPin()
 
 void KadasCanvasContextMenu::drawPointMarker()
 {
-  kApp->mainWindow()->redliningIntegration()->actionNewPoint()->trigger();
+  kApp->mainWindow()->annotationIntegration()->actionNewPoint()->trigger();
   seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), mMapPos );
 }
 
 void KadasCanvasContextMenu::drawSquareMarker()
 {
-  kApp->mainWindow()->redliningIntegration()->actionNewSquare()->trigger();
+  kApp->mainWindow()->annotationIntegration()->actionNewSquare()->trigger();
   seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), mMapPos );
 }
 
 void KadasCanvasContextMenu::drawTriangleMarker()
 {
-  kApp->mainWindow()->redliningIntegration()->actionNewTriangle()->trigger();
+  kApp->mainWindow()->annotationIntegration()->actionNewTriangle()->trigger();
   seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), mMapPos );
 }
 
 void KadasCanvasContextMenu::drawLine()
 {
-  kApp->mainWindow()->redliningIntegration()->actionNewLine()->trigger();
+  kApp->mainWindow()->annotationIntegration()->actionNewLine()->trigger();
   seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), mMapPos );
 }
 
 void KadasCanvasContextMenu::drawRectangle()
 {
-  kApp->mainWindow()->redliningIntegration()->actionNewRectangle()->trigger();
+  kApp->mainWindow()->annotationIntegration()->actionNewRectangle()->trigger();
   seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), mMapPos );
 }
 
 void KadasCanvasContextMenu::drawPolygon()
 {
-  kApp->mainWindow()->redliningIntegration()->actionNewPolygon()->trigger();
+  kApp->mainWindow()->annotationIntegration()->actionNewPolygon()->trigger();
   seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), mMapPos );
 }
 
 void KadasCanvasContextMenu::drawCircle()
 {
-  kApp->mainWindow()->redliningIntegration()->actionNewCircle()->trigger();
+  kApp->mainWindow()->annotationIntegration()->actionNewCircle()->trigger();
   seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), mMapPos );
 }
 
 void KadasCanvasContextMenu::drawText()
 {
-  kApp->mainWindow()->redliningIntegration()->actionNewText()->trigger();
+  kApp->mainWindow()->annotationIntegration()->actionNewText()->trigger();
   seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), mMapPos );
 }
 
 void KadasCanvasContextMenu::drawCoordinateCross()
 {
-  kApp->mainWindow()->redliningIntegration()->actionNewCoordinateCross()->trigger();
+  kApp->mainWindow()->annotationIntegration()->actionNewCoordinateCross()->trigger();
   seedActiveCreateToolWithPoint( kApp->mainWindow()->mapCanvas(), mMapPos );
 }
 

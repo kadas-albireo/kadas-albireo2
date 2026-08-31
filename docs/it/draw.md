@@ -3,7 +3,7 @@
 
 # Disegnare
 
-## Figure geometriche e testi (Redlining)
+## Figure geometriche e testi
 
 Possono essere disegnate geometrie dei seguenti tipi:
 
@@ -18,7 +18,7 @@ A seconda del tipo di figura geometrica, è possibile definire colore e stile pe
 
 Per quanto riguarda i testi, è possibile impostare dimensione e tipo del carattere, nonché il colore di riempi­mento.
 
-Le figure geometriche e i testi così delineati vengono raggruppati nel layer **Redlining** nell'elenco delle carte.
+Le figure geometriche e i testi così delineati vengono raggruppati nel layer **Annotation** nell'elenco delle carte.
 
 Le figure geometriche o i testi già disegnati possono essere modificati selezionandoli sulla mappa. Gli oggetti selezionati possono essere spostati e, a seconda del tipo di figura geo­metrica, è possibile spostare i singoli punti di controllo, nonché crearne o rimuoverne tramite menu contestuale. L'ordine z di una geometria può essere modificato tramite il menu contestuale.
 
@@ -60,7 +60,7 @@ Grafiche vettoriali sono raggruppate nel layer **Immagini SVG**.
 
 La funzione **Incolla** permette di aggiungere diversi tipi di oggetti alla mappa dagli appunti:
 
-- Geometrie: Vengono inserite come oggetti Redlining
+- Geometrie: Vengono inserite come annotazioni
 - Simboli MSS: Vengono inseriti nel layer MilX Selezionato
 - Grafiche SVG: Vengono inserite nel layer **Immagini SVG**
 

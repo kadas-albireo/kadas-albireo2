@@ -21,7 +21,7 @@ Pour les **symboles à un point**, il est également possible de choisir entre p
 
 Pour les **symboles à plusieurs points**, il est possible d’éditer des nœuds et des points de contrôle éventuels, tant que les spécifications du symbole le permettent. Dans le mode édition, les nœuds sont représentés par des points jaunes et les points de contrôle par des points rouges. Ces derniers peuvent contrôler la largeur des flèches ou les paramètres d’évaluation des courbes Bézier. En plus de déplacer les points, on peut ajouter de nouveaux noeuds ou en supprimer ou faisant clic droit.
 
-De la même manière que pour les objets redlining, les symboles MSS peuvent être déplacés, copiés, coupés et collés individuellement ou en groupe. En plus des entrées du menu contextuel et des raccourcis clavier habituels, il y a aussi les boutons **Copier vers...** et **Déplacer vers...** en bas de la carte. Ces derniers permettent explicitement de spécifier une couche cible, par défaut la couche MilX actuellement sélectionnée est prise comme cible. Si aucune couche MilX n'est sélectionnée, la couche de destination sera demandée.
+De la même manière que pour les annotations, les symboles MSS peuvent être déplacés, copiés, coupés et collés individuellement ou en groupe. En plus des entrées du menu contextuel et des raccourcis clavier habituels, il y a aussi les boutons **Copier vers...** et **Déplacer vers...** en bas de la carte. Ces derniers permettent explicitement de spécifier une couche cible, par défaut la couche MilX actuellement sélectionnée est prise comme cible. Si aucune couche MilX n'est sélectionnée, la couche de destination sera demandée.
 
 ![](../media/image11.png)
 
@@ -35,7 +35,7 @@ Les niveaux MilX présentent la caractéristique particulière de pouvoir être 
 
 Les niveaux MilX peuvent être exportés dans un fichier MILXLY ou MILXLYZ, et les fichiers MILXLY et MILXLYZ peuvent être importés en tant que niveaux MilX.
 
-MILXLY (et la variante comprimée MILXLYZ) est un format d’échange de représentations de situation. Il comprend uniquement des symboles MSS de représentation de situation, et aucun autre objet tel que les redlinings, punaises ou images.
+MILXLY (et la variante comprimée MILXLYZ) est un format d’échange de représentations de situation. Il comprend uniquement des symboles MSS de représentation de situation, et aucun autre objet tel que les annotations, punaises ou images.
 
 Lors de **l'exportation** vers MILXLY (Z), vous pouvez choisir les couches MilX à exporter et dans quelle version le fichier doit être créé. De plus, vous pouvez choisir d'exporter le cartouche de carte défini dans la boîte de dialogue d'impression.
 

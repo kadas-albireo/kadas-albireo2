@@ -113,7 +113,7 @@
 #include "kadaspluginmanager.h"
 #include "kadaspythonintegration.h"
 #include "kadas3dintegration.h"
-#include "kadasredliningintegration.h"
+#include "kadasannotationintegration.h"
 #include "kadasribbonsplitbutton.h"
 #include "kadasstatusbar.h"
 #include "auth/kadasportalauth.h"
@@ -350,8 +350,8 @@ void KadasMainWindow::init()
   // KML
   mKmlIntegration = new KadasKmlIntegration( mKMLButton, this );
 
-  // Redlining
-  mRedliningIntegration = new KadasRedliningIntegration( this );
+  // Annotations
+  mAnnotationIntegration = new KadasAnnotationIntegration( this );
 
   // GPX routes
   mGpxIntegration = new KadasGpxIntegration( mActionDrawWaypoint, mActionDrawRoute, mActionExportGPX, mActionImportGPX, this );
@@ -975,20 +975,20 @@ void KadasMainWindow::configureButtons()
   static const QgsSettingsEntryString sLastOtherTool( QStringLiteral( "draw-last-other-tool" ), KadasSettingsTree::sTreeKadas, QStringLiteral( "mActionPin" ) );
 
   KadasRibbonSplitButton *markersSplit = new KadasRibbonSplitButton( mToolButtonMarkers, tr( "Markers" ), QIcon( ":/kadas/icons/draw_point" ), &sLastMarkerTool, this );
-  const QList<QAction *> markerActions = mRedliningIntegration->markerActions();
+  const QList<QAction *> markerActions = mAnnotationIntegration->markerActions();
   for ( QAction *action : markerActions )
     markersSplit->addAction( action );
   markersSplit->finish();
 
   KadasRibbonSplitButton *shapesSplit = new KadasRibbonSplitButton( mToolButtonShapes, tr( "Shapes" ), QIcon( ":/kadas/icons/draw_polygon" ), &sLastShapeTool, this );
-  const QList<QAction *> shapeActions = mRedliningIntegration->shapeActions();
+  const QList<QAction *> shapeActions = mAnnotationIntegration->shapeActions();
   for ( QAction *action : shapeActions )
     shapesSplit->addAction( action );
   shapesSplit->finish();
 
-  // Pin tool: checkable, mutually exclusive with the redlining tools.
+  // Pin tool: checkable, mutually exclusive with the annotation tools.
   mActionPin->setObjectName( QStringLiteral( "mActionPin" ) );
-  mRedliningIntegration->actionGroup()->addAction( mActionPin );
+  mAnnotationIntegration->actionGroup()->addAction( mActionPin );
   connect( mActionPin, &QAction::toggled, this, [this]( bool active ) {
     if ( active )
     {
@@ -1029,9 +1029,9 @@ void KadasMainWindow::configureButtons()
   KadasRibbonSplitButton *othersSplit = new KadasRibbonSplitButton( mToolButtonOthers, tr( "Others" ), QIcon( ":/kadas/icons/draw_pin" ), &sLastOtherTool, this );
   othersSplit->addAction( mActionPin );
   othersSplit->addAction( actionAddImage );
-  othersSplit->addAction( mRedliningIntegration->actionNewText() );
-  othersSplit->addAction( mRedliningIntegration->actionNewTextAlongLine() );
-  othersSplit->addAction( mRedliningIntegration->actionNewCoordinateCross() );
+  othersSplit->addAction( mAnnotationIntegration->actionNewText() );
+  othersSplit->addAction( mAnnotationIntegration->actionNewTextAlongLine() );
+  othersSplit->addAction( mAnnotationIntegration->actionNewCoordinateCross() );
   othersSplit->finish();
 
   setActionToButton( mActionGuideGrid, mGuideGridButton, QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_G ), [this] {
@@ -1451,8 +1451,8 @@ void KadasMainWindow::switchToTabForTool( QgsMapTool *tool )
         }
       }
     }
-    // If action is not associated to a kadas button, try with redlining and gpx route editor
-    if ( tool->action()->parent() == mRedliningIntegration )
+    // If action is not associated to a kadas button, try with the annotation and gpx route editor
+    if ( tool->action()->parent() == mAnnotationIntegration )
     {
       mRibbonWidget->blockSignals( true );
       mRibbonWidget->setCurrentWidget( mDrawTab );

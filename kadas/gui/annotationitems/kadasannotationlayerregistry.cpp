@@ -107,7 +107,7 @@ QgsAnnotationLayer *KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( St
 const QMap<KadasAnnotationLayerRegistry::StandardLayer, QString> &KadasAnnotationLayerRegistry::standardLayerNames()
 {
   static const QMap<StandardLayer, QString> names = {
-    { StandardLayer::RedliningLayer, tr( "Redlining" ) },
+    { StandardLayer::AnnotationLayer, QStringLiteral( "Annotation" ) },
     { StandardLayer::SymbolsLayer, tr( "Symbols" ) },
     { StandardLayer::PicturesLayer, tr( "Pictures" ) },
     { StandardLayer::PinsLayer, tr( "Pins" ) },

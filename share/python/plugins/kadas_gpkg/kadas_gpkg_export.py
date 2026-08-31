@@ -176,9 +176,9 @@ class KadasGpkgExport(KadasGpkgExportBase):
         tmpfile = tmpdir.filePath("gpkg_project.qgs")
         project.setFileName(tmpfile)
 
-        # Flag redlining items outside export extent
+        # Flag annotation items outside export extent
         if self.kadasGpkgExportDialog.filterExtent() is not None:
-            self.__flagRedliningItemsOutsideExtent(
+            self.__flagAnnotationItemsOutsideExtent(
                 self.kadasGpkgExportDialog.filterExtent(),
                 self.kadasGpkgExportDialog.filterExtentCrs(),
             )
@@ -215,12 +215,12 @@ class KadasGpkgExport(KadasGpkgExportBase):
                 elif layer.type() == QgsMapLayer.RasterLayer:
                     projectlayerEl.find("provider").text = "gdal"
 
-        # Remove redlining layers not selected for export
+        # Remove layers not selected for export
         self.__removeUnselectedProjectLayers(doc)
 
-        # Remove redlining items outside export extent from project file
+        # Remove annotation items outside export extent from project file
         if self.kadasGpkgExportDialog.filterExtent() is not None:
-            self.__removeFlaggedRedlining(doc)
+            self.__removeFlaggedAnnotationItems(doc)
 
         # Add additional resources
         conn = sqlite3.connect(gpkg_writefile)
@@ -352,19 +352,19 @@ class KadasGpkgExport(KadasGpkgExportBase):
                     (mime_type, sqlite3.Binary(blob), resource_id),
                 )
 
-    def __flagRedliningItemsOutsideExtent(self, extent, crs):
+    def __flagAnnotationItemsOutsideExtent(self, extent, crs):
         """Collect annotation items outside the export extent"""
         self.__annotation_items_outside_extent = collect_annotation_items_outside_extent(
             QgsProject.instance(), extent, crs
         )
 
-    def __removeFlaggedRedlining(self, doc):
+    def __removeFlaggedAnnotationItems(self, doc):
         """Remove annotation items outside export extent from the project XML"""
         strip_annotation_items(doc, self.__annotation_items_outside_extent)
         self.__annotation_items_outside_extent = {}
 
     def __removeUnselectedProjectLayers(self, doc):
-        """Remove redlining/annotation layers not selected for export"""
+        """Remove annotation layers not selected for export"""
         unselected_layer_ids = self.kadasGpkgExportDialog.unselectedProjectLayers().keys()
 
         for mapLayerIdEl in doc.iterfind("projectlayers/maplayer/id"):

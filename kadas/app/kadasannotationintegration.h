@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadasredliningintegration.h
-    ---------------------------
+    kadasannotationintegration.h
+    ----------------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -14,8 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef KADASREDLININGINTEGRATION_H
-#define KADASREDLININGINTEGRATION_H
+#ifndef KADASANNOTATIONINTEGRATION_H
+#define KADASANNOTATIONINTEGRATION_H
 
 #include <QList>
 #include <QObject>
@@ -33,14 +33,14 @@ class QgsMapLayer;
 class KadasMainWindow;
 
 
-class KadasRedliningIntegration : public QObject
+class KadasAnnotationIntegration : public QObject
 {
     Q_OBJECT
   public:
-    KadasRedliningIntegration( QObject *parent );
+    KadasAnnotationIntegration( QObject *parent );
 
-    //! Returns (creating if needed) the redlining QgsAnnotationLayer used
-    //! by the redlining toolbar actions.
+    //! Returns (creating if needed) the QgsAnnotationLayer used by the
+    //! drawing toolbar actions.
     QgsAnnotationLayer *getOrCreateAnnotationLayer();
 
     //! Shared exclusive (optional) group holding every checkable drawing
@@ -69,7 +69,7 @@ class KadasRedliningIntegration : public QObject
     QAction *actionNewCustomSvg() const { return mActionNewCustomSvg; }
 
   private:
-    //! The set of annotation-item kinds the redlining toolbar can create.
+    //! The set of annotation-item kinds the drawing toolbar can create.
     enum class AnnotationVariant
     {
       MarkerCircle,
@@ -117,4 +117,4 @@ class KadasRedliningIntegration : public QObject
     void updateCustomSvgActionIcon();
 };
 
-#endif // KADASREDLININGINTEGRATION_H
+#endif // KADASANNOTATIONINTEGRATION_H

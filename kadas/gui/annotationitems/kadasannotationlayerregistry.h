@@ -40,7 +40,7 @@ class KADAS_GUI_EXPORT KadasAnnotationLayerRegistry : public QObject
   public:
     enum class StandardLayer
     {
-      RedliningLayer,
+      AnnotationLayer,
       SymbolsLayer,
       PicturesLayer,
       PinsLayer,

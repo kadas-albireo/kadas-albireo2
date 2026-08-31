@@ -39,7 +39,7 @@ Con il rilascio di KADAS 2.3 nel terzo trimestre del 2025 sono state implementat
     - I geoservizi limitati nell'MGDI possono essere visualizzati dagli utenti autorizzati in KADAS.
     - La ricerca delle coordinate è stata migliorata e standardizzata.
     - Il supporto dei geoservizi WCS consente ora anche analisi con modelli altimetrici ad alta risoluzione.
-    - La funzione di testo in Redlining contiene ulteriori opzioni di impostazione.
+    - La funzione di testo delle annotazioni contiene ulteriori opzioni di impostazione.
     - La visualizzazione e l'etichettatura della griglia MGRS sono state ottimizzate.
     - I modelli di stampa sono stati aggiornati e ora contengono di default la data di creazione e il sistema di proiezione.
     - Le analisi possono essere avviate direttamente con un clic destro del mouse.
@@ -93,7 +93,7 @@ Con il rilascio di KADAS 2.3 nel terzo trimestre del 2025 sono state implementat
     - Stampa: Scalare correttamente i simboli (MSS, pin, immagini, ...) in base ai DPI di stampa
     - GPKG: Permettere l'importazione dei livelli di progetti
     - Indice: Possibilità di zoomare e rimuovere tutti i layer selezionati
-    - Visibilità basata sulla scala anche per i layer redlining/MSS
+    - Visibilità basata sulla scala anche per i layer di annotazioni/MSS
     - Tabella attributi: vari nuovi strumenti di selezione e zoom per
 - _Vista_:
     - Nuova funzione segnalibri
@@ -114,7 +114,7 @@ Con il rilascio di KADAS 2.3 nel terzo trimestre del 2025 sono state implementat
 ### Versione 2.0.0 (luglio 2020)
 
 - Nuova architettura dell'applicazione: KADAS è ora un'applicazione separata, basata sulle librerie QGIS 3.x
-- Nuova architettura comune per tutti gli oggetti posizionabili sulla mappa (redlining, symboli MSS; ecc.), per un flusso di lavoro coerente durante il disegno e la modifica degli elementi
+- Nuova architettura comune per tutti gli oggetti posizionabili sulla mappa (annotazioni, symboli MSS; ecc.), per un flusso di lavoro coerente durante il disegno e la modifica degli elementi
 - Utilizza il nuovo formato di file qgz, evitando la precedente cartella `<projectname>_files`
 - Autosalvataggio del progetto
 - Nuovo strumento per la gestione di plugin direttamente dall'interno di KADAS
@@ -122,7 +122,7 @@ Con il rilascio di KADAS 2.3 nel terzo trimestre del 2025 sono state implementat
 - Nuova implementazione della griglia della mappa, supporta griglie UTM/MGRS sulla mappa principale
 - Esportazione KML/KMZ confinata ad un'estensione
 - Esportazione dati GPKG confinata ad un'estensione
-- Stili delle geometrie di redlining sono applicati quando visualizzate come oggetti 2.5D o 3D sul globo
+- Stili delle geometrie delle annotazioni sono applicati quando visualizzate come oggetti 2.5D o 3D sul globo
 - Griglia di guida migliorata
 - Aggiornamento a MSS-2021
 
@@ -139,7 +139,7 @@ Con il rilascio di KADAS 2.3 nel terzo trimestre del 2025 sono state implementat
 - _Analisi_:
     - Disegna i vertici della linea di misura nel profilo di elevazione
 - _Disegnare_:
-    - Supporta l'input numerico nel disegno di oggetti redlining
+    - Supporta l'input numerico nel disegno di annotazioni
     - Possibilità di scalare il contanuto di interi layer di annotazioni
     - Possibilità di attivare e disattivare le cornici di immagini
     - Possibilità di manipulare gruppi di annotazioni
