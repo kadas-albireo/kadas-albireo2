@@ -17,6 +17,8 @@
 
 
 #include "qgs3dmapsettings.h"
+#include "qgsabstract3dmapbackgroundsettings.h"
+#include "qgsskyboxsettings.h"
 #include "qgsdemterrainsettings.h"
 #include "qgsflatterrainsettings.h"
 #include "qgsonlinedemterrainsettings.h"
@@ -93,7 +95,6 @@ Kadas3DMapConfigWidget::Kadas3DMapConfigWidget( Qgs3DMapSettings *map, QgsMapCan
   terrainElevationOffsetSpinBox->setClearValue( 0.0 );
   edlStrengthSpinBox->setClearValue( 1000 );
   edlDistanceSpinBox->setClearValue( 1 );
-  mDebugShadowMapSizeSpinBox->setClearValue( 0.1 );
   mDebugDepthMapSizeSpinBox->setClearValue( 0.1 );
 
   cboTerrainLayer->setAllowEmptyLayer( true );
@@ -169,12 +170,13 @@ Kadas3DMapConfigWidget::Kadas3DMapConfigWidget( Qgs3DMapSettings *map, QgsMapCan
   spinGroundError->setValue( mMap->terrainSettings()->maximumGroundError() );
   terrainElevationOffsetSpinBox->setValue( mMap->terrainSettings()->elevationOffset() );
   chkShowLabels->setChecked( mMap->showLabels() );
-  chkShowTileInfo->setChecked( mMap->showTerrainTilesInfo() );
-  chkShowBoundingBoxes->setChecked( mMap->showTerrainBoundingBoxes() );
-  chkShowCameraViewCenter->setChecked( mMap->showCameraViewCenter() );
-  chkShowCameraRotationCenter->setChecked( mMap->showCameraRotationCenter() );
-  chkShowLightSourceOrigins->setChecked( mMap->showLightSourceOrigins() );
-  mFpsCounterCheckBox->setChecked( mMap->isFpsCounterEnabled() );
+  const Qgis::Map3DDebugFlags debugFlags = mMap->debugFlags();
+  chkShowTileInfo->setChecked( debugFlags.testFlag( Qgis::Map3DDebugFlag::ShowTerrainTileInfo ) );
+  chkShowBoundingBoxes->setChecked( debugFlags.testFlag( Qgis::Map3DDebugFlag::ShowTerrainBoundingBoxes ) );
+  chkShowCameraViewCenter->setChecked( debugFlags.testFlag( Qgis::Map3DDebugFlag::ShowCameraViewCenter ) );
+  chkShowCameraRotationCenter->setChecked( debugFlags.testFlag( Qgis::Map3DDebugFlag::ShowCameraRotationCenter ) );
+  chkShowLightSourceOrigins->setChecked( debugFlags.testFlag( Qgis::Map3DDebugFlag::ShowLightSourceOrigins ) );
+  mFpsCounterCheckBox->setChecked( debugFlags.testFlag( Qgis::Map3DDebugFlag::ShowFPS ) );
 
   mDebugOverlayCheckBox->setChecked( mMap->isDebugOverlayEnabled() );
   mDebugOverlayCheckBox->setVisible( true );
@@ -199,9 +201,12 @@ Kadas3DMapConfigWidget::Kadas3DMapConfigWidget( Qgs3DMapSettings *map, QgsMapCan
   // ==================
   // Page: Skybox
   mSkyboxSettingsWidget = new KadasSkyboxRenderingSettingsWidget( this );
-  mSkyboxSettingsWidget->setSkyboxSettings( map->skyboxSettings() );
+  const QgsAbstract3DMapBackgroundSettings *backgroundSettings = map->backgroundSettings();
+  const bool skyboxEnabled = backgroundSettings && backgroundSettings->type() == Qgis::Map3DBackgroundType::DistinctTextureSkybox;
+  if ( skyboxEnabled )
+    mSkyboxSettingsWidget->setSkyboxSettings( *static_cast<const QgsSkyboxSettings *>( backgroundSettings ) );
   groupSkyboxSettings->layout()->addWidget( mSkyboxSettingsWidget );
-  groupSkyboxSettings->setChecked( mMap->isSkyboxEnabled() );
+  groupSkyboxSettings->setChecked( skyboxEnabled );
 
   // ==================
   // Page: Shadows
@@ -244,20 +249,10 @@ Kadas3DMapConfigWidget::Kadas3DMapConfigWidget( Qgs3DMapSettings *map, QgsMapCan
   edlStrengthSpinBox->setValue( map->eyeDomeLightingStrength() );
   edlDistanceSpinBox->setValue( map->eyeDomeLightingDistance() );
 
-  mDebugShadowMapCornerComboBox->addItem( tr( "Top Left" ) );
-  mDebugShadowMapCornerComboBox->addItem( tr( "Top Right" ) );
-  mDebugShadowMapCornerComboBox->addItem( tr( "Bottom Left" ) );
-  mDebugShadowMapCornerComboBox->addItem( tr( "Bottom Right" ) );
-
   mDebugDepthMapCornerComboBox->addItem( tr( "Top Left" ) );
   mDebugDepthMapCornerComboBox->addItem( tr( "Top Right" ) );
   mDebugDepthMapCornerComboBox->addItem( tr( "Bottom Left" ) );
   mDebugDepthMapCornerComboBox->addItem( tr( "Bottom Right" ) );
-
-  mDebugShadowMapGroupBox->setChecked( map->debugShadowMapEnabled() );
-
-  mDebugShadowMapCornerComboBox->setCurrentIndex( static_cast<int>( map->debugShadowMapCorner() ) );
-  mDebugShadowMapSizeSpinBox->setValue( map->debugShadowMapSize() );
 
   mDebugDepthMapGroupBox->setChecked( map->debugDepthMapEnabled() );
   mDebugDepthMapCornerComboBox->setCurrentIndex( static_cast<int>( map->debugDepthMapCorner() ) );
@@ -364,12 +359,14 @@ void Kadas3DMapConfigWidget::apply()
   mMap->setCameraNavigationMode( mCameraNavigationModeCombo->currentData().value<Qgis::NavigationMode>() );
   mMap->setCameraMovementSpeed( mCameraMovementSpeed->value() );
   mMap->setShowLabels( chkShowLabels->isChecked() );
-  mMap->setShowTerrainTilesInfo( chkShowTileInfo->isChecked() );
-  mMap->setShowTerrainBoundingBoxes( chkShowBoundingBoxes->isChecked() );
-  mMap->setShowCameraViewCenter( chkShowCameraViewCenter->isChecked() );
-  mMap->setShowCameraRotationCenter( chkShowCameraRotationCenter->isChecked() );
-  mMap->setShowLightSourceOrigins( chkShowLightSourceOrigins->isChecked() );
-  mMap->setIsFpsCounterEnabled( mFpsCounterCheckBox->isChecked() );
+  Qgis::Map3DDebugFlags debugFlags = mMap->debugFlags();
+  debugFlags.setFlag( Qgis::Map3DDebugFlag::ShowTerrainTileInfo, chkShowTileInfo->isChecked() );
+  debugFlags.setFlag( Qgis::Map3DDebugFlag::ShowTerrainBoundingBoxes, chkShowBoundingBoxes->isChecked() );
+  debugFlags.setFlag( Qgis::Map3DDebugFlag::ShowCameraViewCenter, chkShowCameraViewCenter->isChecked() );
+  debugFlags.setFlag( Qgis::Map3DDebugFlag::ShowCameraRotationCenter, chkShowCameraRotationCenter->isChecked() );
+  debugFlags.setFlag( Qgis::Map3DDebugFlag::ShowLightSourceOrigins, chkShowLightSourceOrigins->isChecked() );
+  debugFlags.setFlag( Qgis::Map3DDebugFlag::ShowFPS, mFpsCounterCheckBox->isChecked() );
+  mMap->setDebugFlags( debugFlags );
   mMap->setTerrainShadingEnabled( groupTerrainShading->isChecked() );
   mMap->setIsDebugOverlayEnabled( mDebugOverlayCheckBox->isChecked() );
 
@@ -378,8 +375,14 @@ void Kadas3DMapConfigWidget::apply()
     mMap->setTerrainShadingMaterial( *phongMaterial );
 
   mMap->setLightSources( widgetLights->lightSources() );
-  mMap->setIsSkyboxEnabled( groupSkyboxSettings->isChecked() );
-  mMap->setSkyboxSettings( mSkyboxSettingsWidget->toSkyboxSettings() );
+  if ( groupSkyboxSettings->isChecked() )
+  {
+    mMap->setBackgroundSettings( mSkyboxSettingsWidget->toSkyboxSettings().clone() );
+  }
+  else if ( const QgsAbstract3DMapBackgroundSettings *background = mMap->backgroundSettings(); background && background->type() == Qgis::Map3DBackgroundType::DistinctTextureSkybox )
+  {
+    mMap->setBackgroundSettings( nullptr );
+  }
   QgsShadowSettings shadowSettings = mShadowSettingsWidget->toShadowSettings();
   shadowSettings.setRenderShadows( groupShadowRendering->isChecked() );
   mMap->setShadowSettings( shadowSettings );
@@ -397,11 +400,6 @@ void Kadas3DMapConfigWidget::apply()
   mMap->setViewFrustumVisualizationEnabled( mVisualizeExtentCheckBox->isChecked() );
 
   mMap->setDebugDepthMapSettings( mDebugDepthMapGroupBox->isChecked(), static_cast<Qt::Corner>( mDebugDepthMapCornerComboBox->currentIndex() ), mDebugDepthMapSizeSpinBox->value() );
-
-  // Do not display the shadow debug map if the shadow effect is not enabled.
-  mMap->setDebugShadowMapSettings(
-    mDebugShadowMapGroupBox->isChecked() && groupShadowRendering->isChecked(), static_cast<Qt::Corner>( mDebugShadowMapCornerComboBox->currentIndex() ), mDebugShadowMapSizeSpinBox->value()
-  );
 }
 
 void Kadas3DMapConfigWidget::onTerrainTypeChanged()

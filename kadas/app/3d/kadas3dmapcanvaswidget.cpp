@@ -419,7 +419,7 @@ void Kadas3DMapCanvasWidget::setMapSettings( Qgs3DMapSettings *map )
 
   // Disable button for switching the map theme if the terrain generator is a mesh, or if there is no terrain
   // mActionMapThemes->setDisabled( !mCanvas->mapSettings()->terrainRenderingEnabled() || !mCanvas->mapSettings()->terrainGenerator() || mCanvas->mapSettings()->terrainGenerator()->type() == QgsTerrainGenerator::Mesh );
-  mLabelFpsCounter->setVisible( map->isFpsCounterEnabled() );
+  mLabelFpsCounter->setVisible( map->debugFlags().testFlag( Qgis::Map3DDebugFlag::ShowFPS ) );
 
   connect( map, &Qgs3DMapSettings::viewFrustumVisualizationEnabledChanged, this, &Kadas3DMapCanvasWidget::onViewFrustumVisualizationEnabledChanged );
   connect( map, &Qgs3DMapSettings::extentChanged, this, &Kadas3DMapCanvasWidget::onExtentChanged );
