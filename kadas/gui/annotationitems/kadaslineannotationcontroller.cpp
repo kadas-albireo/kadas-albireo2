@@ -28,6 +28,8 @@
 #include <qgis/qgslinesymbol.h>
 #include <qgis/qgslinesymbollayer.h>
 #include <qgis/qgsmapsettings.h>
+#include <qgis/qgsmarkersymbol.h>
+#include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgspoint.h>
 #include <qgis/qgspointxy.h>
 #include <qgis/qgsproject.h>
@@ -47,6 +49,14 @@ const QgsSettingsEntryColor *KadasLineAnnotationController::settingsColor
   = new QgsSettingsEntryColor( QStringLiteral( "line-color" ), sTreeAnnotation, QColor( 255, 0, 0 ), QStringLiteral( "Last-used line color." ) );
 const QgsSettingsEntryInteger *KadasLineAnnotationController::settingsStyle
   = new QgsSettingsEntryInteger( QStringLiteral( "line-style" ), sTreeAnnotation, static_cast<int>( Qt::SolidLine ), QStringLiteral( "Last-used line style." ) );
+const QgsSettingsEntryInteger *KadasLineAnnotationController::settingsHeadStyle
+  = new QgsSettingsEntryInteger( QStringLiteral( "line-head-style" ), sTreeAnnotation, sNoEndShape, QStringLiteral( "Last-used line head marker shape (-1: none)." ) );
+const QgsSettingsEntryDouble *KadasLineAnnotationController::settingsHeadSize
+  = new QgsSettingsEntryDouble( QStringLiteral( "line-head-size" ), sTreeAnnotation, sDefaultEndSize, QStringLiteral( "Last-used line head size (mm)." ) );
+const QgsSettingsEntryInteger *KadasLineAnnotationController::settingsTailStyle
+  = new QgsSettingsEntryInteger( QStringLiteral( "line-tail-style" ), sTreeAnnotation, sNoEndShape, QStringLiteral( "Last-used line tail marker shape (-1: none)." ) );
+const QgsSettingsEntryDouble *KadasLineAnnotationController::settingsTailSize
+  = new QgsSettingsEntryDouble( QStringLiteral( "line-tail-size" ), sTreeAnnotation, sDefaultEndSize, QStringLiteral( "Last-used line tail size (mm)." ) );
 
 namespace
 {
@@ -63,6 +73,35 @@ namespace
 
   // vidx.part sentinel for the rotation handle (real vertices use part 0).
   constexpr int kPartRotate = 1;
+
+  //! Placement the head/tail decoration marker line uses, one marker per line end.
+  Qgis::MarkerLinePlacement endPlacement( KadasLineAnnotationController::LineEnd end )
+  {
+    return end == KadasLineAnnotationController::LineEnd::Head ? Qgis::MarkerLinePlacement::LastVertex : Qgis::MarkerLinePlacement::FirstVertex;
+  }
+
+  //! Returns the index of the marker-line layer decorating \a end of \a symbol, or -1 if that end is undecorated.
+  int endLayerIndex( const QgsLineSymbol *symbol, KadasLineAnnotationController::LineEnd end )
+  {
+    for ( int i = 0; i < symbol->symbolLayerCount(); ++i )
+    {
+      const auto *ml = dynamic_cast<const QgsMarkerLineSymbolLayer *>( symbol->symbolLayer( i ) );
+      if ( ml && ml->placements() == Qgis::MarkerLinePlacements( endPlacement( end ) ) )
+        return i;
+    }
+    return -1;
+  }
+
+  //! Returns the simple-line layer carrying the line's own color and width, or nullptr.
+  const QgsSimpleLineSymbolLayer *baseLineLayer( const QgsLineSymbol *symbol )
+  {
+    for ( int i = 0; i < symbol->symbolLayerCount(); ++i )
+    {
+      if ( const auto *sl = dynamic_cast<const QgsSimpleLineSymbolLayer *>( symbol->symbolLayer( i ) ) )
+        return sl;
+    }
+    return nullptr;
+  }
 
   //! Returns a mutable QgsLineString backing the item, cloning it via setGeometry() for in-place edits.
   QgsLineString *takeMutableLine( QgsAnnotationLineItem *item )
@@ -466,7 +505,7 @@ QList<KadasAnnotationMeasurementLabel> KadasLineAnnotationController::measuremen
 void KadasLineAnnotationController::applyPersistedStyle( QgsAnnotationItem *item ) const
 {
   auto *line = dynamic_cast<QgsAnnotationLineItem *>( item );
-  if ( !line || !settingsColor->exists() )
+  if ( !line )
     return;
   std::unique_ptr<QgsLineSymbol> sym( line->symbol() ? line->symbol()->clone() : new QgsLineSymbol() );
   if ( sym->symbolLayerCount() == 0 )
@@ -478,9 +517,18 @@ void KadasLineAnnotationController::applyPersistedStyle( QgsAnnotationItem *item
     sym->changeSymbolLayer( 0, replacement );
     sl = replacement;
   }
-  sl->setWidth( settingsWidth->value() );
-  sl->setColor( settingsColor->value() );
-  sl->setPenStyle( static_cast<Qt::PenStyle>( settingsStyle->value() ) );
+  // The stroke settings only exist once a line has been styled at least once;
+  // until then the item keeps its own defaults. The head/tail settings default
+  // to "no decoration", so they can be applied unconditionally, which is what
+  // lets the arrow tool preset a head on a fresh profile.
+  if ( settingsColor->exists() )
+  {
+    sl->setWidth( settingsWidth->value() );
+    sl->setColor( settingsColor->value() );
+    sl->setPenStyle( static_cast<Qt::PenStyle>( settingsStyle->value() ) );
+  }
+  setEndDecoration( sym.get(), LineEnd::Head, { endShapeFromValue( settingsHeadStyle->value() ), settingsHeadSize->value() } );
+  setEndDecoration( sym.get(), LineEnd::Tail, { endShapeFromValue( settingsTailStyle->value() ), settingsTailSize->value() } );
   line->setSymbol( sym.release() );
 }
 
@@ -495,6 +543,87 @@ void KadasLineAnnotationController::persistStyle( const QgsAnnotationItem *item 
   settingsWidth->setValue( sl->width() );
   settingsColor->setValue( sl->color() );
   settingsStyle->setValue( static_cast<int>( sl->penStyle() ) );
+
+  const EndDecoration head = endDecoration( line->symbol(), LineEnd::Head );
+  settingsHeadStyle->setValue( head.shape ? static_cast<int>( *head.shape ) : sNoEndShape );
+  settingsHeadSize->setValue( head.size );
+  const EndDecoration tail = endDecoration( line->symbol(), LineEnd::Tail );
+  settingsTailStyle->setValue( tail.shape ? static_cast<int>( *tail.shape ) : sNoEndShape );
+  settingsTailSize->setValue( tail.size );
+}
+
+
+// ----- Head/tail decorations --------------------------------------------
+
+const QList<Qgis::MarkerShape> &KadasLineAnnotationController::endShapeChoices()
+{
+  // Only shapes that either face right (so the marker line's along-the-line
+  // rotation aims them correctly) or are rotation invariant.
+  static const QList<Qgis::MarkerShape> sChoices = {
+    Qgis::MarkerShape::ArrowHeadFilled,
+    Qgis::MarkerShape::ArrowHead,
+    Qgis::MarkerShape::Circle,
+    Qgis::MarkerShape::Square,
+    Qgis::MarkerShape::Diamond,
+  };
+  return sChoices;
+}
+
+std::optional<Qgis::MarkerShape> KadasLineAnnotationController::endShapeFromValue( int value )
+{
+  const Qgis::MarkerShape shape = static_cast<Qgis::MarkerShape>( value );
+  if ( value == sNoEndShape || !endShapeChoices().contains( shape ) )
+    return std::nullopt;
+  return shape;
+}
+
+void KadasLineAnnotationController::setEndDecoration( QgsLineSymbol *symbol, LineEnd end, const EndDecoration &decoration )
+{
+  if ( !symbol )
+    return;
+
+  if ( const int existing = endLayerIndex( symbol, end ); existing >= 0 )
+    symbol->deleteSymbolLayer( existing );
+
+  if ( !decoration.shape )
+    return;
+
+  // Match the line itself, so the decoration stays in sync with color/width edits.
+  const QgsSimpleLineSymbolLayer *base = baseLineLayer( symbol );
+  const QColor color = base ? base->color() : QColor( Qt::black );
+  const double strokeWidth = base ? base->width() : 0.5;
+
+  auto *marker = new QgsSimpleMarkerSymbolLayer( *decoration.shape, decoration.size );
+  marker->setColor( color );
+  marker->setStrokeColor( color );
+  marker->setStrokeStyle( Qt::SolidLine );
+  marker->setStrokeWidth( strokeWidth );
+  // The marker-line rotation aims both ends forwards along the line, so the
+  // tail has to be flipped to point back out of the line's start.
+  marker->setAngle( end == LineEnd::Tail ? 180.0 : 0.0 );
+
+  auto *markerLine = new QgsMarkerLineSymbolLayer( true );
+  markerLine->setPlacements( endPlacement( end ) );
+  markerLine->setSubSymbol( new QgsMarkerSymbol( QgsSymbolLayerList() << marker ) );
+  symbol->appendSymbolLayer( markerLine );
+}
+
+KadasLineAnnotationController::EndDecoration KadasLineAnnotationController::endDecoration( const QgsLineSymbol *symbol, LineEnd end )
+{
+  if ( !symbol )
+    return EndDecoration();
+  const int idx = endLayerIndex( symbol, end );
+  if ( idx < 0 )
+    return EndDecoration();
+  // QgsSymbolLayer::subSymbol() has no const overload, hence the cast; it is only read from.
+  auto *ml = const_cast<QgsMarkerLineSymbolLayer *>( static_cast<const QgsMarkerLineSymbolLayer *>( symbol->symbolLayer( idx ) ) );
+  const auto *sub = dynamic_cast<const QgsMarkerSymbol *>( ml->subSymbol() );
+  if ( !sub || sub->symbolLayerCount() == 0 )
+    return EndDecoration();
+  const auto *marker = dynamic_cast<const QgsSimpleMarkerSymbolLayer *>( sub->symbolLayer( 0 ) );
+  if ( !marker )
+    return EndDecoration();
+  return EndDecoration { endShapeFromValue( static_cast<int>( marker->shape() ) ), marker->size() };
 }
 
 KadasAnnotationStyleEditor *KadasLineAnnotationController::createStyleEditor( QWidget *parent ) const

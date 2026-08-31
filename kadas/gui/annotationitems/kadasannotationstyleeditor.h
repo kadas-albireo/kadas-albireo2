@@ -133,7 +133,7 @@ class KadasSvgMarkerStyleEditor : public KadasAnnotationStyleEditor
 };
 
 /**
- * \brief Style editor for QgsAnnotationLineItem (width, color, pen style).
+ * \brief Style editor for QgsAnnotationLineItem (width, color, pen style, head/tail decorations).
  */
 class KadasLineStyleEditor : public KadasAnnotationStyleEditor
 {
@@ -149,6 +149,10 @@ class KadasLineStyleEditor : public KadasAnnotationStyleEditor
     QDoubleSpinBox *mStrokeWidthSpin = nullptr;
     QgsColorButton *mStrokeColorBtn = nullptr;
     QComboBox *mStrokeStyleCombo = nullptr;
+    QComboBox *mHeadStyleCombo = nullptr;
+    QDoubleSpinBox *mHeadSizeSpin = nullptr;
+    QComboBox *mTailStyleCombo = nullptr;
+    QDoubleSpinBox *mTailSizeSpin = nullptr;
 };
 
 /**

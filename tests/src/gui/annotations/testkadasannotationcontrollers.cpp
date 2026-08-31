@@ -28,6 +28,8 @@
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgslinestring.h>
+#include <qgis/qgslinesymbol.h>
+#include <qgis/qgslinesymbollayer.h>
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgsmarkersymbol.h>
 #include <qgis/qgsmarkersymbollayer.h>
@@ -93,6 +95,8 @@ class TestKadasAnnotationControllers : public QObject
     // KadasLineAnnotationController --------------------------------------
     void line_getEditContext_hitsOnSegmentNotInBoundingBox();
     void line_getEditContext_hitsVertex();
+    void line_endDecoration_roundTripsPerEnd();
+    void line_endDecoration_matchesLineAndFlipsTail();
 
     // KadasPolygonAnnotationController -----------------------------------
     void polygon_getEditContext_hitsBodyNotBoundingBox();
@@ -526,6 +530,76 @@ void TestKadasAnnotationControllers::line_getEditContext_hitsOnSegmentNotInBound
   // Sanity: click well outside bbox: miss.
   ec = controller.getEditContext( item.get(), QgsPointXY( -500, -500 ), ctx );
   QVERIFY( !ec.isValid() );
+}
+
+void TestKadasAnnotationControllers::line_endDecoration_roundTripsPerEnd()
+{
+  using Ctrl = KadasLineAnnotationController;
+
+  QgsLineSymbol symbol( QgsSymbolLayerList() << new QgsSimpleLineSymbolLayer() );
+  QVERIFY( !Ctrl::endDecoration( &symbol, Ctrl::LineEnd::Head ).shape.has_value() );
+  QVERIFY( !Ctrl::endDecoration( &symbol, Ctrl::LineEnd::Tail ).shape.has_value() );
+
+  Ctrl::setEndDecoration( &symbol, Ctrl::LineEnd::Head, { Qgis::MarkerShape::ArrowHeadFilled, 6.0 } );
+  Ctrl::setEndDecoration( &symbol, Ctrl::LineEnd::Tail, { Qgis::MarkerShape::Circle, 2.5 } );
+  QCOMPARE( symbol.symbolLayerCount(), 3 );
+
+  Ctrl::EndDecoration head = Ctrl::endDecoration( &symbol, Ctrl::LineEnd::Head );
+  QCOMPARE( head.shape, Qgis::MarkerShape::ArrowHeadFilled );
+  QCOMPARE( head.size, 6.0 );
+  Ctrl::EndDecoration tail = Ctrl::endDecoration( &symbol, Ctrl::LineEnd::Tail );
+  QCOMPARE( tail.shape, Qgis::MarkerShape::Circle );
+  QCOMPARE( tail.size, 2.5 );
+
+  // Re-setting an end replaces its decoration rather than stacking a second one.
+  Ctrl::setEndDecoration( &symbol, Ctrl::LineEnd::Head, { Qgis::MarkerShape::Square, 3.0 } );
+  QCOMPARE( symbol.symbolLayerCount(), 3 );
+  QCOMPARE( Ctrl::endDecoration( &symbol, Ctrl::LineEnd::Head ).shape, Qgis::MarkerShape::Square );
+  // ... and the other end is untouched.
+  QCOMPARE( Ctrl::endDecoration( &symbol, Ctrl::LineEnd::Tail ).shape, Qgis::MarkerShape::Circle );
+
+  // A shapeless decoration clears the end, leaving the plain line behind.
+  Ctrl::setEndDecoration( &symbol, Ctrl::LineEnd::Head, {} );
+  Ctrl::setEndDecoration( &symbol, Ctrl::LineEnd::Tail, {} );
+  QCOMPARE( symbol.symbolLayerCount(), 1 );
+  QVERIFY( dynamic_cast<QgsSimpleLineSymbolLayer *>( symbol.symbolLayer( 0 ) ) );
+}
+
+void TestKadasAnnotationControllers::line_endDecoration_matchesLineAndFlipsTail()
+{
+  using Ctrl = KadasLineAnnotationController;
+
+  auto *base = new QgsSimpleLineSymbolLayer();
+  base->setColor( QColor( 0, 128, 255 ) );
+  base->setWidth( 1.2 );
+  QgsLineSymbol symbol( QgsSymbolLayerList() << base );
+
+  Ctrl::setEndDecoration( &symbol, Ctrl::LineEnd::Head, { Qgis::MarkerShape::ArrowHeadFilled, 4.0 } );
+  Ctrl::setEndDecoration( &symbol, Ctrl::LineEnd::Tail, { Qgis::MarkerShape::ArrowHeadFilled, 4.0 } );
+
+  const auto markerAt = [&symbol]( Qgis::MarkerLinePlacement placement ) -> const QgsSimpleMarkerSymbolLayer * {
+    for ( int i = 0; i < symbol.symbolLayerCount(); ++i )
+    {
+      auto *ml = dynamic_cast<QgsMarkerLineSymbolLayer *>( symbol.symbolLayer( i ) );
+      if ( !ml || ml->placements() != Qgis::MarkerLinePlacements( placement ) )
+        continue;
+      auto *sub = dynamic_cast<QgsMarkerSymbol *>( ml->subSymbol() );
+      return sub ? dynamic_cast<const QgsSimpleMarkerSymbolLayer *>( sub->symbolLayer( 0 ) ) : nullptr;
+    }
+    return nullptr;
+  };
+
+  const QgsSimpleMarkerSymbolLayer *head = markerAt( Qgis::MarkerLinePlacement::LastVertex );
+  QVERIFY( head );
+  QCOMPARE( head->color(), QColor( 0, 128, 255 ) );
+  QCOMPARE( head->strokeColor(), QColor( 0, 128, 255 ) );
+  QCOMPARE( head->strokeWidth(), 1.2 );
+  // The marker line aims both ends forwards along the line, so only the tail is flipped.
+  QCOMPARE( head->angle(), 0.0 );
+
+  const QgsSimpleMarkerSymbolLayer *tail = markerAt( Qgis::MarkerLinePlacement::FirstVertex );
+  QVERIFY( tail );
+  QCOMPARE( tail->angle(), 180.0 );
 }
 
 void TestKadasAnnotationControllers::line_getEditContext_hitsVertex()
