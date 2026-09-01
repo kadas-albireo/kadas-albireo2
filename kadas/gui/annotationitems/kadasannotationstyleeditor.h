@@ -25,6 +25,7 @@ class QComboBox;
 class QDoubleSpinBox;
 class QFontComboBox;
 class QFormLayout;
+class QGroupBox;
 class QLineEdit;
 class QPlainTextEdit;
 class QSpinBox;
@@ -134,6 +135,9 @@ class KadasSvgMarkerStyleEditor : public KadasAnnotationStyleEditor
 
 /**
  * \brief Style editor for QgsAnnotationLineItem (width, color, pen style, head/tail decorations).
+ *
+ * The head/tail decorations live in a checkable group: unchecking it strips both
+ * ends, and checking it seeds a head arrow so the box always has a visible effect.
  */
 class KadasLineStyleEditor : public KadasAnnotationStyleEditor
 {
@@ -149,10 +153,14 @@ class KadasLineStyleEditor : public KadasAnnotationStyleEditor
     QDoubleSpinBox *mStrokeWidthSpin = nullptr;
     QgsColorButton *mStrokeColorBtn = nullptr;
     QComboBox *mStrokeStyleCombo = nullptr;
+    QGroupBox *mArrowGroup = nullptr;
     QComboBox *mHeadStyleCombo = nullptr;
     QDoubleSpinBox *mHeadSizeSpin = nullptr;
     QComboBox *mTailStyleCombo = nullptr;
     QDoubleSpinBox *mTailSizeSpin = nullptr;
+
+    //! Enables each size spin only while its end carries a decoration.
+    void syncEndSizesEnabled();
 };
 
 /**

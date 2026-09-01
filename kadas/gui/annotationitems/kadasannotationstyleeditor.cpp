@@ -138,16 +138,23 @@ namespace
   }
 
   /**
-   * Preview of a line-end decoration: a stub of line with \a shape drawn at its
-   * right end, mirroring how the marker line renders the head on the canvas.
-   * A null \a shape previews the undecorated end.
+   * Preview of a line-end decoration: a stub of line with \a shape at the end it
+   * decorates, mirroring how the marker line renders it on the canvas. \a mirrored
+   * draws the decorated end at the left, for the tail. A null \a shape previews the
+   * undecorated end.
    */
-  QIcon lineEndIcon( std::optional<Qgis::MarkerShape> shape )
+  QIcon lineEndIcon( std::optional<Qgis::MarkerShape> shape, bool mirrored )
   {
     QPixmap pix( 28, 16 );
     pix.fill( Qt::transparent );
     QPainter p( &pix );
     p.setRenderHint( QPainter::Antialiasing );
+    if ( mirrored )
+    {
+      // Flip horizontally so the decorated end sits where it does on the canvas.
+      p.translate( pix.width(), 0 );
+      p.scale( -1, 1 );
+    }
     p.setPen( QPen( Qt::black, 1.6 ) );
     p.drawLine( 2, 8, shape ? 18 : 26, 8 );
     if ( shape )
@@ -188,11 +195,11 @@ namespace
   }
 
   //! Fills \a combo with the "no decoration" entry followed by every offered end shape.
-  void populateLineEndCombo( QComboBox *combo )
+  void populateLineEndCombo( QComboBox *combo, bool mirrored )
   {
-    combo->addItem( lineEndIcon( std::nullopt ), QString(), KadasLineAnnotationController::sNoEndShape );
+    combo->addItem( lineEndIcon( std::nullopt, mirrored ), QString(), KadasLineAnnotationController::sNoEndShape );
     for ( Qgis::MarkerShape shape : KadasLineAnnotationController::endShapeChoices() )
-      combo->addItem( lineEndIcon( shape ), QString(), static_cast<int>( shape ) );
+      combo->addItem( lineEndIcon( shape, mirrored ), QString(), static_cast<int>( shape ) );
   }
 
   //! Size spin box for a line-end decoration, in millimeters.
@@ -548,9 +555,15 @@ KadasLineStyleEditor::KadasLineStyleEditor( QWidget *parent )
   mStrokeStyleCombo->setToolTip( tr( "Line style" ) );
   form->addRow( tr( "Style" ), mStrokeStyleCombo );
 
-  // Head (last vertex) and tail (first vertex) decorations: shape plus size.
+  // Head (last vertex) and tail (first vertex) decorations: shape plus size,
+  // behind one checkable group so a plain line needs no per-end fiddling.
+  mArrowGroup = new QGroupBox( tr( "Arrow" ) );
+  mArrowGroup->setCheckable( true );
+  auto *arrowForm = new QFormLayout( mArrowGroup );
+  arrowForm->setFieldGrowthPolicy( QFormLayout::AllNonFixedFieldsGrow );
+
   mHeadStyleCombo = new QComboBox();
-  populateLineEndCombo( mHeadStyleCombo );
+  populateLineEndCombo( mHeadStyleCombo, false );
   mHeadStyleCombo->setToolTip( tr( "Head style" ) );
   mHeadSizeSpin = createLineEndSizeSpin();
   mHeadSizeSpin->setToolTip( tr( "Head size" ) );
@@ -558,10 +571,10 @@ KadasLineStyleEditor::KadasLineStyleEditor( QWidget *parent )
   headRow->setContentsMargins( 0, 0, 0, 0 );
   headRow->addWidget( mHeadStyleCombo );
   headRow->addWidget( mHeadSizeSpin );
-  form->addRow( tr( "Head" ), headRow );
+  arrowForm->addRow( tr( "Head" ), headRow );
 
   mTailStyleCombo = new QComboBox();
-  populateLineEndCombo( mTailStyleCombo );
+  populateLineEndCombo( mTailStyleCombo, true );
   mTailStyleCombo->setToolTip( tr( "Tail style" ) );
   mTailSizeSpin = createLineEndSizeSpin();
   mTailSizeSpin->setToolTip( tr( "Tail size" ) );
@@ -569,22 +582,43 @@ KadasLineStyleEditor::KadasLineStyleEditor( QWidget *parent )
   tailRow->setContentsMargins( 0, 0, 0, 0 );
   tailRow->addWidget( mTailStyleCombo );
   tailRow->addWidget( mTailSizeSpin );
-  form->addRow( tr( "Tail" ), tailRow );
+  arrowForm->addRow( tr( "Tail" ), tailRow );
+
+  form->addRow( mArrowGroup );
 
   connect( mStrokeWidthSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
   connect( mStrokeColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
   connect( mStrokeStyleCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasAnnotationStyleEditor::committed );
-  connect( mHeadStyleCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasAnnotationStyleEditor::committed );
   connect( mHeadSizeSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
-  connect( mTailStyleCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasAnnotationStyleEditor::committed );
   connect( mTailSizeSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
 
-  // A size only means something once an end carries a decoration.
-  const auto syncSizeEnabled = []( const QComboBox *combo, QDoubleSpinBox *spin ) { spin->setEnabled( combo->currentData().toInt() != KadasLineAnnotationController::sNoEndShape ); };
-  connect( mHeadStyleCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, [this, syncSizeEnabled] { syncSizeEnabled( mHeadStyleCombo, mHeadSizeSpin ); } );
-  connect( mTailStyleCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, [this, syncSizeEnabled] { syncSizeEnabled( mTailStyleCombo, mTailSizeSpin ); } );
-  syncSizeEnabled( mHeadStyleCombo, mHeadSizeSpin );
-  syncSizeEnabled( mTailStyleCombo, mTailSizeSpin );
+  const auto endStyleChanged = [this] {
+    syncEndSizesEnabled();
+    emit committed();
+  };
+  connect( mHeadStyleCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, endStyleChanged );
+  connect( mTailStyleCombo, qOverload<int>( &QComboBox::currentIndexChanged ), this, endStyleChanged );
+
+  // Checking the group with both ends still unset would be a no-op, so seed a
+  // head arrow. Done with signals blocked, then committed once for the toggle.
+  connect( mArrowGroup, &QGroupBox::toggled, this, [this]( bool on ) {
+    if ( on && mHeadStyleCombo->currentData().toInt() == KadasLineAnnotationController::sNoEndShape && mTailStyleCombo->currentData().toInt() == KadasLineAnnotationController::sNoEndShape )
+    {
+      const QSignalBlocker block( mHeadStyleCombo );
+      selectByData( mHeadStyleCombo, static_cast<int>( Qgis::MarkerShape::ArrowHeadFilled ) );
+    }
+    syncEndSizesEnabled();
+    emit committed();
+  } );
+
+  syncEndSizesEnabled();
+}
+
+void KadasLineStyleEditor::syncEndSizesEnabled()
+{
+  const int none = KadasLineAnnotationController::sNoEndShape;
+  mHeadSizeSpin->setEnabled( mHeadStyleCombo->currentData().toInt() != none );
+  mTailSizeSpin->setEnabled( mTailStyleCombo->currentData().toInt() != none );
 }
 
 void KadasLineStyleEditor::loadFromItem( const QgsAnnotationItem *item )
@@ -596,7 +630,7 @@ void KadasLineStyleEditor::loadFromItem( const QgsAnnotationItem *item )
   if ( !sl )
     return;
   const QSignalBlocker b1( mStrokeWidthSpin ), b2( mStrokeColorBtn ), b3( mStrokeStyleCombo );
-  const QSignalBlocker b4( mHeadStyleCombo ), b5( mHeadSizeSpin ), b6( mTailStyleCombo ), b7( mTailSizeSpin );
+  const QSignalBlocker b4( mHeadStyleCombo ), b5( mHeadSizeSpin ), b6( mTailStyleCombo ), b7( mTailSizeSpin ), b8( mArrowGroup );
   mStrokeWidthSpin->setValue( sl->width() );
   mStrokeColorBtn->setColor( sl->color() );
   selectByData( mStrokeStyleCombo, static_cast<int>( sl->penStyle() ) );
@@ -605,11 +639,11 @@ void KadasLineStyleEditor::loadFromItem( const QgsAnnotationItem *item )
   const Ctrl::EndDecoration head = Ctrl::endDecoration( line->symbol(), Ctrl::LineEnd::Head );
   selectByData( mHeadStyleCombo, head.shape ? static_cast<int>( *head.shape ) : Ctrl::sNoEndShape );
   mHeadSizeSpin->setValue( head.size );
-  mHeadSizeSpin->setEnabled( head.shape.has_value() );
   const Ctrl::EndDecoration tail = Ctrl::endDecoration( line->symbol(), Ctrl::LineEnd::Tail );
   selectByData( mTailStyleCombo, tail.shape ? static_cast<int>( *tail.shape ) : Ctrl::sNoEndShape );
   mTailSizeSpin->setValue( tail.size );
-  mTailSizeSpin->setEnabled( tail.shape.has_value() );
+  mArrowGroup->setChecked( head.shape || tail.shape );
+  syncEndSizesEnabled();
 }
 
 void KadasLineStyleEditor::applyToItem( QgsAnnotationItem *item ) const
@@ -632,9 +666,15 @@ void KadasLineStyleEditor::applyToItem( QgsAnnotationItem *item ) const
   sl->setPenStyle( static_cast<Qt::PenStyle>( mStrokeStyleCombo->currentData().toInt() ) );
 
   // After the stroke, so the decorations pick up the line's current color/width.
+  // An unchecked group means a plain line, whatever the per-end combos still hold.
   using Ctrl = KadasLineAnnotationController;
-  Ctrl::setEndDecoration( sym.get(), Ctrl::LineEnd::Head, { Ctrl::endShapeFromValue( mHeadStyleCombo->currentData().toInt() ), mHeadSizeSpin->value() } );
-  Ctrl::setEndDecoration( sym.get(), Ctrl::LineEnd::Tail, { Ctrl::endShapeFromValue( mTailStyleCombo->currentData().toInt() ), mTailSizeSpin->value() } );
+  const auto decoration = [this]( const QComboBox *combo, const QDoubleSpinBox *sizeSpin ) -> Ctrl::EndDecoration {
+    if ( !mArrowGroup->isChecked() )
+      return Ctrl::EndDecoration();
+    return { Ctrl::endShapeFromValue( combo->currentData().toInt() ), sizeSpin->value() };
+  };
+  Ctrl::setEndDecoration( sym.get(), Ctrl::LineEnd::Head, decoration( mHeadStyleCombo, mHeadSizeSpin ) );
+  Ctrl::setEndDecoration( sym.get(), Ctrl::LineEnd::Tail, decoration( mTailStyleCombo, mTailSizeSpin ) );
 
   line->setSymbol( sym.release() );
 }
