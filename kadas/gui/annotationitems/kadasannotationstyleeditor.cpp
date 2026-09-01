@@ -64,7 +64,9 @@
 #include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsscreenproperties.h>
 #include <qgis/qgssvgselectorwidget.h>
+#include <qgis/qgssymbollayerutils.h>
 #include <qgis/qgstextbackgroundsettings.h>
 #include <qgis/qgstextbuffersettings.h>
 #include <qgis/qgstextformat.h>
@@ -138,68 +140,36 @@ namespace
   }
 
   /**
-   * Preview of a line-end decoration: a stub of line with \a shape at the end it
-   * decorates, mirroring how the marker line renders it on the canvas. \a mirrored
-   * draws the decorated end at the left, for the tail. A null \a shape previews the
-   * undecorated end.
+   * Preview of a line-end decoration, rendered from the very symbol an item would
+   * carry: a stub of line with \a shape applied to \a end. Building the symbol for
+   * the real end also puts the decoration on the side it renders on (head right,
+   * tail left), so the icon cannot drift from what the canvas draws.
+   * A null \a shape previews the undecorated end.
+   *
+   * Sizes are in pixels, not millimeters, so the preview is independent of the
+   * screen DPI the symbol would otherwise be scaled by.
    */
-  QIcon lineEndIcon( std::optional<Qgis::MarkerShape> shape, bool mirrored )
+  QIcon lineEndIcon( std::optional<Qgis::MarkerShape> shape, KadasLineAnnotationController::LineEnd end, const QgsScreenProperties &screen )
   {
-    QPixmap pix( 28, 16 );
-    pix.fill( Qt::transparent );
-    QPainter p( &pix );
-    p.setRenderHint( QPainter::Antialiasing );
-    if ( mirrored )
-    {
-      // Flip horizontally so the decorated end sits where it does on the canvas.
-      p.translate( pix.width(), 0 );
-      p.scale( -1, 1 );
-    }
-    p.setPen( QPen( Qt::black, 1.6 ) );
-    p.drawLine( 2, 8, shape ? 18 : 26, 8 );
-    if ( shape )
-    {
-      // Same geometry as QgsSimpleMarkerSymbolLayer: shapes live in [-1, 1] with
-      // the arrow tip at the origin, scaled by half the marker size.
-      p.translate( 24, 8 );
-      p.scale( 6, 6 );
-      QPen pen( Qt::black, 1.6 / 6.0 );
-      p.setPen( pen );
-      switch ( *shape )
-      {
-        case Qgis::MarkerShape::ArrowHeadFilled:
-          p.setBrush( Qt::black );
-          p.drawPolygon( QPolygonF() << QPointF( 0, 0 ) << QPointF( -1, 1 ) << QPointF( -1, -1 ) );
-          break;
-        case Qgis::MarkerShape::ArrowHead:
-          p.setBrush( Qt::NoBrush );
-          p.drawPolyline( QPolygonF() << QPointF( -1, -1 ) << QPointF( 0, 0 ) << QPointF( -1, 1 ) );
-          break;
-        case Qgis::MarkerShape::Circle:
-          p.setBrush( Qt::black );
-          p.drawEllipse( QPointF( 0, 0 ), 1, 1 );
-          break;
-        case Qgis::MarkerShape::Square:
-          p.setBrush( Qt::black );
-          p.drawRect( QRectF( -1, -1, 2, 2 ) );
-          break;
-        case Qgis::MarkerShape::Diamond:
-          p.setBrush( Qt::black );
-          p.drawPolygon( QPolygonF() << QPointF( 0, -1 ) << QPointF( 1, 0 ) << QPointF( 0, 1 ) << QPointF( -1, 0 ) );
-          break;
-        default:
-          break;
-      }
-    }
-    return pix;
+    constexpr QSize iconSize( 32, 16 );
+    // Inset the patch by more than half a decoration, so a marker centred on the
+    // line end (circle, square, diamond) stays clear of the icon edge.
+    constexpr int padding = 6;
+    constexpr double lineWidthPx = 1.6;
+    constexpr double endSizePx = 9.0;
+
+    QgsLineSymbol symbol( QgsSymbolLayerList() << new QgsSimpleLineSymbolLayer( QColor( 0, 0, 0 ), lineWidthPx ) );
+    KadasLineAnnotationController::setEndDecoration( &symbol, end, { shape, endSizePx } );
+    symbol.setOutputUnit( Qgis::RenderUnit::Pixels );
+    return QgsSymbolLayerUtils::symbolPreviewIcon( &symbol, iconSize, padding, nullptr, screen );
   }
 
   //! Fills \a combo with the "no decoration" entry followed by every offered end shape.
-  void populateLineEndCombo( QComboBox *combo, bool mirrored )
+  void populateLineEndCombo( QComboBox *combo, KadasLineAnnotationController::LineEnd end, const QgsScreenProperties &screen )
   {
-    combo->addItem( lineEndIcon( std::nullopt, mirrored ), QString(), KadasLineAnnotationController::sNoEndShape );
+    combo->addItem( lineEndIcon( std::nullopt, end, screen ), QString(), KadasLineAnnotationController::sNoEndShape );
     for ( Qgis::MarkerShape shape : KadasLineAnnotationController::endShapeChoices() )
-      combo->addItem( lineEndIcon( shape, mirrored ), QString(), static_cast<int>( shape ) );
+      combo->addItem( lineEndIcon( shape, end, screen ), QString(), static_cast<int>( shape ) );
   }
 
   //! Size spin box for a line-end decoration, in millimeters.
@@ -562,8 +532,10 @@ KadasLineStyleEditor::KadasLineStyleEditor( QWidget *parent )
   auto *arrowForm = new QFormLayout( mArrowGroup );
   arrowForm->setFieldGrowthPolicy( QFormLayout::AllNonFixedFieldsGrow );
 
+  const QgsScreenProperties screen( this->screen() );
+
   mHeadStyleCombo = new QComboBox();
-  populateLineEndCombo( mHeadStyleCombo, false );
+  populateLineEndCombo( mHeadStyleCombo, KadasLineAnnotationController::LineEnd::Head, screen );
   mHeadStyleCombo->setToolTip( tr( "Head style" ) );
   mHeadSizeSpin = createLineEndSizeSpin();
   mHeadSizeSpin->setToolTip( tr( "Head size" ) );
@@ -574,7 +546,7 @@ KadasLineStyleEditor::KadasLineStyleEditor( QWidget *parent )
   arrowForm->addRow( tr( "Head" ), headRow );
 
   mTailStyleCombo = new QComboBox();
-  populateLineEndCombo( mTailStyleCombo, true );
+  populateLineEndCombo( mTailStyleCombo, KadasLineAnnotationController::LineEnd::Tail, screen );
   mTailStyleCombo->setToolTip( tr( "Tail style" ) );
   mTailSizeSpin = createLineEndSizeSpin();
   mTailSizeSpin->setToolTip( tr( "Tail size" ) );
