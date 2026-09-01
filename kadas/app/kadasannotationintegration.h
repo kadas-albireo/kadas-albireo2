@@ -50,8 +50,11 @@ class KadasAnnotationIntegration : public QObject
     //! Marker shape tool actions (circle, square, triangle, diamond, star, cross).
     QList<QAction *> markerActions() const { return mMarkerActions; }
 
-    //! Geometric shape tool actions (line, arrow, polygon, rectangle, circle).
-    QList<QAction *> shapeActions() const { return mShapeActions; }
+    //! Open-shape tool actions (line, arrow).
+    QList<QAction *> lineActions() const { return mLineActions; }
+
+    //! Closed-shape tool actions (polygon, rectangle, circle).
+    QList<QAction *> polygonActions() const { return mPolygonActions; }
 
     QAction *actionNewPoint() const { return mActionNewPoint; }
     QAction *actionNewSquare() const { return mActionNewSquare; }
@@ -109,7 +112,8 @@ class KadasAnnotationIntegration : public QObject
     QAction *mActionNewCoordCross = nullptr;
 
     QList<QAction *> mMarkerActions;
-    QList<QAction *> mShapeActions;
+    QList<QAction *> mLineActions;
+    QList<QAction *> mPolygonActions;
 
     QPointer<QgsAnnotationLayer> mLastAnnotationLayer;
 

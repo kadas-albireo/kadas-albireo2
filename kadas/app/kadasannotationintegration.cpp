@@ -88,12 +88,15 @@ KadasAnnotationIntegration::KadasAnnotationIntegration( QObject *parent )
   updateCustomSvgActionIcon();
   mMarkerActions = { mActionNewPoint, mActionNewSquare, mActionNewTriangle, mActionNewDiamond, mActionNewStar, mActionNewCross, mActionNewCustomSvg };
 
-  // Shapes: lines and polygons.
+  // Shapes: open shapes first, then closed ones; the ribbon gallery gives each
+  // family its own row.
   mActionNewLine = createToolAction( QIcon( ":/kadas/icons/draw_line" ), tr( "Line" ), QStringLiteral( "draw-line" ), V::Line );
   connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_L ), kApp->mainWindow() ), &QShortcut::activated, mActionNewLine, &QAction::trigger );
 
   mActionNewArrow = createToolAction( QIcon( ":/kadas/icons/draw_arrow" ), tr( "Arrow" ), QStringLiteral( "draw-arrow" ), V::Arrow );
   connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_A ), kApp->mainWindow() ), &QShortcut::activated, mActionNewArrow, &QAction::trigger );
+
+  mLineActions = { mActionNewLine, mActionNewArrow };
 
   mActionNewPolygon = createToolAction( QIcon( ":/kadas/icons/draw_polygon" ), tr( "Polygon" ), QStringLiteral( "draw-polygon" ), V::Polygon );
   connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_P ), kApp->mainWindow() ), &QShortcut::activated, mActionNewPolygon, &QAction::trigger );
@@ -103,7 +106,7 @@ KadasAnnotationIntegration::KadasAnnotationIntegration( QObject *parent )
 
   mActionNewCircle = createToolAction( QIcon( ":/kadas/icons/draw_circle" ), tr( "Circle" ), QStringLiteral( "draw-circle" ), V::Circle );
   connect( new QShortcut( QKeySequence( Qt::CTRL | Qt::Key_D, Qt::CTRL | Qt::Key_C ), kApp->mainWindow() ), &QShortcut::activated, mActionNewCircle, &QAction::trigger );
-  mShapeActions = { mActionNewLine, mActionNewArrow, mActionNewPolygon, mActionNewRectangle, mActionNewCircle };
+  mPolygonActions = { mActionNewPolygon, mActionNewRectangle, mActionNewCircle };
 
   // Other annotation tools.
   mActionNewText = createToolAction( QIcon( ":/kadas/icons/draw_text" ), tr( "Text" ), QStringLiteral( "draw-text" ), V::Text );

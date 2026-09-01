@@ -981,8 +981,12 @@ void KadasMainWindow::configureButtons()
   markersSplit->finish();
 
   KadasRibbonSplitButton *shapesSplit = new KadasRibbonSplitButton( mToolButtonShapes, tr( "Shapes" ), QIcon( ":/kadas/icons/draw_polygon" ), &sLastShapeTool, this );
-  const QList<QAction *> shapeActions = mAnnotationIntegration->shapeActions();
-  for ( QAction *action : shapeActions )
+  const QList<QAction *> lineActions = mAnnotationIntegration->lineActions();
+  for ( QAction *action : lineActions )
+    shapesSplit->addAction( action );
+  shapesSplit->addRowBreak();
+  const QList<QAction *> polygonActions = mAnnotationIntegration->polygonActions();
+  for ( QAction *action : polygonActions )
     shapesSplit->addAction( action );
   shapesSplit->finish();
 

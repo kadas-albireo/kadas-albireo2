@@ -41,6 +41,9 @@ class KadasRibbonActionGallery : public QWidget
     //! Adds an action tile to the current section.
     void addActionTile( QAction *action );
 
+    //! Ends the current row, so the next tile starts a new one. No-op on a full row.
+    void addRowBreak() { finishPartialRow(); }
+
     //! Size of the icon shown on each tile.
     void setTileIconSize( const QSize &size ) { mTileIconSize = size; }
 
