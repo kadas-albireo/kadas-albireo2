@@ -114,6 +114,13 @@ KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeVi
   ui.setupUi( base );
   addRow( base );
 
+  // Match either a number xor a letters, but not both (e.g not abc1234) .
+  QRegularExpression rx( "^(?:\\d+|[A-Za-z]+)$" );
+
+  QValidator *validatorNumberXorLetter = new QRegularExpressionValidator( rx, this );
+  ui.comboBoxRowLabels->setValidator( validatorNumberXorLetter );
+  ui.comboBoxColLabels->setValidator( validatorNumberXorLetter );
+
   for ( int c = 'A'; c <= 'Z'; ++c )
   {
     ui.comboBoxRowLabels->addItem( QChar( c ) );
