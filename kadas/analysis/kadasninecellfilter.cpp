@@ -343,8 +343,6 @@ bool KadasNineCellFilter::computeWindow(
 
 GDALDriverH KadasNineCellFilter::openOutputDriver()
 {
-  char **driverMetadata;
-
   //open driver
   GDALDriverH outputDriver = GDALGetDriverByName( mOutputFormat.toLocal8Bit().data() );
 
@@ -353,7 +351,7 @@ GDALDriverH KadasNineCellFilter::openOutputDriver()
     return outputDriver; //return NULL, driver does not exist
   }
 
-  driverMetadata = GDALGetMetadata( outputDriver, NULL );
+  CSLConstList driverMetadata = GDALGetMetadata( outputDriver, NULL );
   if ( !CSLFetchBoolean( driverMetadata, GDAL_DCAP_CREATE, false ) )
   {
     return NULL; //driver exist, but it does not support the create operation

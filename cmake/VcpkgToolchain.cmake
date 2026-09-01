@@ -133,8 +133,11 @@ if(NOT "${NUGET_TOKEN}" STREQUAL "" AND (_HOST_IS_WINDOWS OR EXISTS
   endif()
 
   file(TO_NATIVE_PATH "${_CONFIG_PATH}" _CONFIG_PATH_NATIVE)
+  # qtbase/qtdeclarative nupkgs exceed vcpkg's default 100s push timeout on the
+  # GitHub Packages feed, so they never land in the cache and get rebuilt (~1h
+  # each) on every run.
   set(ENV{VCPKG_BINARY_SOURCES}
-      "$ENV{VCPKG_BINARY_SOURCES};nugetconfig,${_CONFIG_PATH_NATIVE},readwrite"
+      "$ENV{VCPKG_BINARY_SOURCES};nugettimeout,1800;nugetconfig,${_CONFIG_PATH_NATIVE},readwrite"
   )
 endif()
 
