@@ -314,6 +314,9 @@
           </property>
           <item>
            <widget class="QComboBox" name="comboBoxRowLabels">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Starting label for coordinates&lt;/p&gt;&lt;p&gt;Example 'A', 'AA' or 'BA' &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="editable">
              <bool>true</bool>
             </property>
@@ -329,6 +332,9 @@
           </item>
           <item>
            <widget class="QComboBox" name="comboBoxColLabels">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Starting label for coordinates&lt;/p&gt;&lt;p&gt;Example '1' , '20' or '100' &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="editable">
              <bool>true</bool>
             </property>
