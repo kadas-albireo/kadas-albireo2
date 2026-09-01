@@ -22,6 +22,34 @@
 #include "kadas/app/kadasannotationlayer.h"
 #include "kadas/core/kadaspluginlayer.h"
 
+enum class LabelingPos
+{
+  LabelsInside,
+  LabelsOutside
+};
+enum class QuadrantLabeling
+{
+  DontLabelQuadrants,
+  LabelOneQuadrant,
+  LabelAllQuadrants
+};
+
+struct GridConfig
+{
+    QgsRectangle gridRect;
+    int cols = 0;
+    int rows = 0;
+    bool colSizeLocked = false;
+    bool rowSizeLocked = false;
+    int fontSize = 30;
+    QColor color = Qt::red;
+    int lineWidth = 1;
+    QString rowStart = QString( "A" );
+    QString colStart = QString( "1" );
+    LabelingPos labelingPos = LabelingPos::LabelsInside;
+    QuadrantLabeling quadrantLabeling = QuadrantLabeling::DontLabelQuadrants;
+};
+
 /**
  * Guide grid layer: draws a numbered/lettered rectangular grid over the map.
  *
@@ -43,18 +71,6 @@ class KadasGuideGridLayer : public KadasAnnotationLayer
 {
     Q_OBJECT
   public:
-    enum LabelingPos
-    {
-      LabelsInside,
-      LabelsOutside
-    };
-    enum QuadrantLabeling
-    {
-      DontLabelQuadrants,
-      LabelOneQuadrant,
-      LabelAllQuadrants
-    };
-
     static QString layerType() { return "guide_grid"; }
 
     explicit KadasGuideGridLayer( const QString &name );
@@ -123,21 +139,7 @@ class KadasGuideGridLayer : public KadasAnnotationLayer
     /// of this subclass and would strip any custom child element).
     void writeConfigToCustomProperties();
 
-    struct GridConfig
-    {
-        QgsRectangle gridRect;
-        int cols = 0;
-        int rows = 0;
-        bool colSizeLocked = false;
-        bool rowSizeLocked = false;
-        int fontSize = 30;
-        QColor color = Qt::red;
-        int lineWidth = 1;
-        QString rowStart = QString( "A" );
-        QString colStart = QString( "1" );
-        LabelingPos labelingPos = LabelsInside;
-        QuadrantLabeling quadrantLabeling = DontLabelQuadrants;
-    } mGridConfig;
+    GridConfig mGridConfig;
 
     /// Rebuild the layer's annotation items (lines + labels) from the current GridConfig.
     void regenerate() override;
@@ -169,17 +171,6 @@ class KadasGuideGridLayer : public KadasPluginLayer
 {
     Q_OBJECT
   public:
-    enum LabelingPos
-    {
-      LabelsInside,
-      LabelsOutside
-    };
-    enum QuadrantLabeling
-    {
-      DontLabelQuadrants,
-      LabelOneQuadrant,
-      LabelAllQuadrants
-    };
     static QString layerType() { return "guide_grid"; }
 
     KadasGuideGridLayer( const QString &name );
@@ -222,21 +213,7 @@ class KadasGuideGridLayer : public KadasPluginLayer
   private:
     class Renderer;
 
-    struct GridConfig
-    {
-        QgsRectangle gridRect;
-        int cols = 0;
-        int rows = 0;
-        bool colSizeLocked = false;
-        bool rowSizeLocked = false;
-        int fontSize = 30;
-        QColor color = Qt::red;
-        int lineWidth = 1;
-        QString rowStart = QString( "A" );
-        QString colStart = QString( "1" );
-        LabelingPos labelingPos = LabelsInside;
-        QuadrantLabeling quadrantLabeling = DontLabelQuadrants;
-    } mGridConfig;
+    GridConfig mGridConfig;
 };
 
 
