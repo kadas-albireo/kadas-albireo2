@@ -52,7 +52,7 @@ jobs:
             autoconf automake libtool libltdl-dev autoconf-archive \
             bison flex \
             python3 python3-dev python3-pip \
-            nasm yasm gperf swig \
+            mono-complete nasm yasm gperf swig \
             libgl1-mesa-dev libglu1-mesa-dev \
             libx11-dev libxext-dev libxfixes-dev \
             libxrandr-dev libxdamage-dev libxcomposite-dev libxtst-dev \
