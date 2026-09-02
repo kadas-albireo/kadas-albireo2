@@ -12,6 +12,7 @@
 
 
 
+
 class KadasAnnotationItemController
 {
 %Docstring(signature="appended")
@@ -48,6 +49,7 @@ Creates a fresh annotation item. Caller takes ownership.
     virtual QList<KadasNode> nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const = 0;
 
 
+
     virtual bool startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx ) = 0;
 %Docstring
 Begins a new part at ``firstPoint``. Returns true if the item is ready
@@ -79,10 +81,27 @@ Geometry (item CRS) for the edit tool's rubber-band preview. Mirrors
 :py:func:`QgsAnnotationItemEditOperationTransientResults.representativeGeometry()`.
 %End
 
+
     virtual bool liveRepaintOnEdit() const;
 %Docstring
 When ``True``, the edit tool re-renders the layer on every drag step
 (e.g. pictures) rather than only on release.
+%End
+
+    virtual bool symbolPreviewWhileDrawing( const QgsAnnotationItem *item ) const;
+%Docstring
+When ``True``, the create tool previews the in-progress ``item`` by
+rendering its real symbol rather than tracing its geometry with a rubber
+band. Worth it only where the symbol adds something the geometry does
+not carry, such as a line's arrow head; a rubber band is cheaper for
+everything else.
+%End
+
+    virtual bool isEmpty( const QgsAnnotationItem *item ) const;
+%Docstring
+When ``True``, ``item`` carries no meaningful content yet (e.g. a text
+item with no text); the create tool discards such items if the user
+leaves them untouched.
 %End
 
 
@@ -132,6 +151,7 @@ takes ownership.
     static QgsRectangle toItemRect( const QgsRectangle &mapRect, const KadasAnnotationItemContext &ctx );
     static QgsRectangle toMapRect( const QgsRectangle &itemRect, const KadasAnnotationItemContext &ctx );
     static double pickTolSqr( const KadasAnnotationItemContext &ctx );
+
 
 };
 

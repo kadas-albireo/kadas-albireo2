@@ -97,6 +97,7 @@ class TestKadasAnnotationControllers : public QObject
     void line_getEditContext_hitsVertex();
     void line_endDecoration_roundTripsPerEnd();
     void line_endDecoration_matchesLineAndFlipsTail();
+    void line_symbolPreviewWhileDrawing_onlyWhenDecorated();
 
     // KadasPolygonAnnotationController -----------------------------------
     void polygon_getEditContext_hitsBodyNotBoundingBox();
@@ -600,6 +601,35 @@ void TestKadasAnnotationControllers::line_endDecoration_matchesLineAndFlipsTail(
   const QgsSimpleMarkerSymbolLayer *tail = markerAt( Qgis::MarkerLinePlacement::FirstVertex );
   QVERIFY( tail );
   QCOMPARE( tail->angle(), 180.0 );
+}
+
+void TestKadasAnnotationControllers::line_symbolPreviewWhileDrawing_onlyWhenDecorated()
+{
+  using Ctrl = KadasLineAnnotationController;
+  Ctrl controller;
+
+  auto *ls = new QgsLineString( QVector<QgsPoint> { QgsPoint( 0, 0 ), QgsPoint( 10, 10 ) } );
+  auto item = std::make_unique<QgsAnnotationLineItem>( ls );
+  item->setSymbol( new QgsLineSymbol( QgsSymbolLayerList() << new QgsSimpleLineSymbolLayer() ) );
+
+  // A plain line looks the same either way, so it keeps the cheaper rubber band.
+  QVERIFY( !controller.symbolPreviewWhileDrawing( item.get() ) );
+
+  // A decorated end is invisible to a rubber band, so the real symbol is drawn.
+  const auto decorate = [&item]( Ctrl::LineEnd end, const Ctrl::EndDecoration &decoration ) {
+    QgsLineSymbol *clone = item->symbol()->clone();
+    Ctrl::setEndDecoration( clone, end, decoration );
+    item->setSymbol( clone );
+  };
+  decorate( Ctrl::LineEnd::Head, { Qgis::MarkerShape::ArrowHeadFilled, 4.0 } );
+  QVERIFY( controller.symbolPreviewWhileDrawing( item.get() ) );
+
+  decorate( Ctrl::LineEnd::Head, {} );
+  decorate( Ctrl::LineEnd::Tail, { Qgis::MarkerShape::Circle, 3.0 } );
+  QVERIFY( controller.symbolPreviewWhileDrawing( item.get() ) );
+
+  decorate( Ctrl::LineEnd::Tail, {} );
+  QVERIFY( !controller.symbolPreviewWhileDrawing( item.get() ) );
 }
 
 void TestKadasAnnotationControllers::line_getEditContext_hitsVertex()

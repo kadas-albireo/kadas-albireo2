@@ -74,6 +74,9 @@ Controller for stock \c :py:class:`QgsAnnotationLineItem` (type id \c
 
 
 
+    virtual bool symbolPreviewWhileDrawing( const QgsAnnotationItem *item ) const;
+
+
     virtual void applyPersistedStyle( QgsAnnotationItem *item ) const;
 
     virtual void persistStyle( const QgsAnnotationItem *item ) const;

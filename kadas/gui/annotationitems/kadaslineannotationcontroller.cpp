@@ -502,6 +502,16 @@ QList<KadasAnnotationMeasurementLabel> KadasLineAnnotationController::measuremen
   return labels;
 }
 
+bool KadasLineAnnotationController::symbolPreviewWhileDrawing( const QgsAnnotationItem *item ) const
+{
+  const auto *line = dynamic_cast<const QgsAnnotationLineItem *>( item );
+  if ( !line || !line->symbol() )
+    return false;
+  // Only the head/tail decorations are invisible to a rubber band: an undecorated
+  // line previews identically either way, and more cheaply.
+  return endDecoration( line->symbol(), LineEnd::Head ).shape.has_value() || endDecoration( line->symbol(), LineEnd::Tail ).shape.has_value();
+}
+
 void KadasLineAnnotationController::applyPersistedStyle( QgsAnnotationItem *item ) const
 {
   auto *line = dynamic_cast<QgsAnnotationLineItem *>( item );

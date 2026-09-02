@@ -69,6 +69,8 @@ class KADAS_GUI_EXPORT KadasLineAnnotationController : public KadasAnnotationIte
     QList<KadasAnnotationMeasurementLabel> measurementLabels( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const override;
 #endif
 
+    bool symbolPreviewWhileDrawing( const QgsAnnotationItem *item ) const override;
+
     void applyPersistedStyle( QgsAnnotationItem *item ) const override;
     void persistStyle( const QgsAnnotationItem *item ) const override;
     KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = nullptr ) const override;
