@@ -38,7 +38,7 @@
 
 namespace
 {
-  QString gridLabel( const QString firstStart, int offset )
+  QString gridLabel( const QString firstStart, int offset, bool avoidRepeatingLetters = false )
   {
     bool isInt = false;
     int startNumber = firstStart.toInt( &isInt );
@@ -54,7 +54,24 @@ namespace
       QChar c = firstStart.at( i );
       startOffset = startOffset * 26 + ( c.toLatin1() - 'A' + 1 );
     }
-    offset += startOffset;
+
+    int skipped = 0;
+    if ( avoidRepeatingLetters )
+    {
+      for ( int i = 0; i <= offset; i++ )
+      {
+        QString lbl = gridLabel( firstStart, i );
+        QChar firstChar = lbl.at( 0 );
+        bool isRepeating = std::all_of( lbl.begin(), lbl.end(), [firstChar]( QChar c ) { return c == firstChar; } );
+
+        if ( lbl.length() != 1 && isRepeating )
+        {
+          skipped++;
+        }
+      }
+    }
+
+    offset += startOffset + skipped;
 
     QString label;
     do
@@ -147,7 +164,7 @@ class KadasGuideGridRenderer : public QgsMapLayerRenderer
         {
           const double sx1 = vLine1.first().x();
           const double sx2 = vLine2.first().x();
-          const QString label = gridLabel( mGridConfig.colStart, col - 1 );
+          const QString label = gridLabel( mGridConfig.colStart, col - 1, mGridConfig.avoidRepeatingLetters );
           if ( mGridConfig.labelingPos == LabelingPos::LabelsOutside && vLine1.first().y() - labelBoxSize > screenRect.top() )
             drawGridLabel( 0.5 * ( sx1 + sx2 ), sy1 - 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
           else if ( sy1 < vLine1.last().y() - 2 * labelBoxSize )
@@ -211,7 +228,7 @@ class KadasGuideGridRenderer : public QgsMapLayerRenderer
         {
           const double sy1h = hLine1.first().y();
           const double sy2h = hLine2.first().y();
-          const QString label = gridLabel( mGridConfig.rowStart, row - 1 );
+          const QString label = gridLabel( mGridConfig.rowStart, row - 1, mGridConfig.avoidRepeatingLetters );
           if ( mGridConfig.labelingPos == LabelingPos::LabelsOutside && hLine1.first().x() - labelBoxSize > screenRect.left() )
             drawGridLabel( sx1 - 0.5 * labelBoxSize, 0.5 * ( sy1h + sy2h ), label, font, fontMetrics, bufferColor );
           else if ( sx1 < hLine1.last().x() - 2 * labelBoxSize )
@@ -362,7 +379,7 @@ QList<KadasPluginLayer::IdentifyResult> KadasGuideGridLayer::identify( const Qgs
   bbox->setExteriorRing( ring );
   QMap<QString, QVariant> attrs;
 
-  QString text = tr( "Cell %1, %2" ).arg( gridLabel( mGridConfig.rowStart, j ) ).arg( gridLabel( mGridConfig.colStart.at( 0 ), i ) );
+  QString text = tr( "Cell %1, %2" ).arg( gridLabel( mGridConfig.rowStart, j, mGridConfig.avoidRepeatingLetters ) ).arg( gridLabel( mGridConfig.colStart.at( 0 ), i, mGridConfig.avoidRepeatingLetters ) );
   if ( mGridConfig.quadrantLabeling != QuadrantLabeling::DontLabelQuadrants )
   {
     bool left = pos.x() <= mGridConfig.gridRect.xMinimum() + ( i + 0.5 ) * colWidth;
@@ -406,6 +423,7 @@ bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteConte
     mGridConfig.colStart = colStart.isEmpty() ? QString( "1" ) : colStart;
     mGridConfig.labelingPos = static_cast<LabelingPos>( customProperty( QStringLiteral( "kadas/guidegrid/labelingPos" ) ).toInt() );
     mGridConfig.quadrantLabeling = static_cast<QuadrantLabeling>( customProperty( QStringLiteral( "kadas/guidegrid/quadrantLabeling" ) ).toInt() );
+    mGridConfig.avoidRepeatingLetters = customProperty( QStringLiteral( "kadas/guidegrid/avoidRepeatingLetters" ) ).toBool();
     regenerate();
     return true;
   }
@@ -432,6 +450,7 @@ bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteConte
   mGridConfig.colStart = !cfgEl.attribute( "colChar" ).isEmpty() ? cfgEl.attribute( "colChar" ).at( 0 ) : '1';
   mGridConfig.labelingPos = static_cast<LabelingPos>( cfgEl.attribute( "labelingPos" ).toInt() );
   mGridConfig.quadrantLabeling = static_cast<QuadrantLabeling>( cfgEl.attribute( "quadrantLabeling" ).toInt() );
+  mGridConfig.avoidRepeatingLetters = false; // Legacy didn't have this option, set to false same as default.
 
   // Base readXml replaced all customProperties from the (legacy, marker-less)
   // XML; re-assert the parametric marker set by the constructor.
@@ -468,6 +487,7 @@ void KadasGuideGridLayer::writeConfigToCustomProperties()
   setCustomProperty( QStringLiteral( "kadas/guidegrid/colChar" ), QString( mGridConfig.colStart ) );
   setCustomProperty( QStringLiteral( "kadas/guidegrid/labelingPos" ), static_cast<int>( mGridConfig.labelingPos ) );
   setCustomProperty( QStringLiteral( "kadas/guidegrid/quadrantLabeling" ), static_cast<int>( mGridConfig.quadrantLabeling ) );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/avoidRepeatingLetters" ), mGridConfig.avoidRepeatingLetters );
 }
 
 void KadasGuideGridLayer::regenerate()
@@ -553,7 +573,7 @@ void KadasGuideGridLayer::regenerate()
   // --- Column labels (top + bottom of the grid rect) ---
   for ( int col = 0; col < mGridConfig.cols; ++col )
   {
-    const QString label = gridLabel( mGridConfig.colStart, col );
+    const QString label = gridLabel( mGridConfig.colStart, col, mGridConfig.avoidRepeatingLetters );
     const double cx = r.xMinimum() + ( col + 0.5 ) * dx;
     // Top
     {
@@ -576,7 +596,7 @@ void KadasGuideGridLayer::regenerate()
   // --- Row labels (left + right of the grid rect) ---
   for ( int row = 0; row < mGridConfig.rows; ++row )
   {
-    const QString label = gridLabel( mGridConfig.rowStart, row );
+    const QString label = gridLabel( mGridConfig.rowStart, row, mGridConfig.avoidRepeatingLetters );
     const double cy = r.yMaximum() - ( row + 0.5 ) * dy;
     // Left
     {

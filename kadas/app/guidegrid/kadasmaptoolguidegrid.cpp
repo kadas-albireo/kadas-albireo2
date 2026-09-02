@@ -200,6 +200,7 @@ KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeVi
   connect( ui.toolButtonSwitchLabels, &QToolButton::clicked, this, &KadasGuideGridWidget::switchLabels );
   connect( ui.comboBoxLabelPos, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
   connect( ui.comboBoxQuadrants, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
+  connect( ui.checkBoxAvoidRepeatingLetters, &QCheckBox::toggled, this, &KadasGuideGridWidget::updateLabeling );
 
   connect( mLayerSelectionWidget, &KadasLayerSelectionWidget::selectedLayerChanged, this, &KadasGuideGridWidget::setCurrentLayer );
 
@@ -279,6 +280,9 @@ void KadasGuideGridWidget::setCurrentLayer( QgsMapLayer *layer )
   ui.comboBoxQuadrants->blockSignals( true );
   ui.comboBoxQuadrants->setCurrentIndex( ui.comboBoxQuadrants->findData( static_cast<int>( mCurrentLayer->labelQuadrants() ) ) );
   ui.comboBoxQuadrants->blockSignals( false );
+  ui.checkBoxAvoidRepeatingLetters->blockSignals( true );
+  ui.checkBoxAvoidRepeatingLetters->setChecked( mCurrentLayer->avoidRepeatingLetters() );
+  ui.checkBoxAvoidRepeatingLetters->blockSignals( false );
   updateIntervals();
   ui.widgetLayerSetup->setEnabled( true );
 }
@@ -489,5 +493,6 @@ void KadasGuideGridWidget::updateLabeling()
   mCurrentLayer->setLabelingMode( ui.comboBoxRowLabels->currentText().toUpper(), ui.comboBoxColLabels->currentText().toUpper() );
   mCurrentLayer->setLabelingPos( static_cast<LabelingPos>( ui.comboBoxLabelPos->currentData().toInt() ) );
   mCurrentLayer->setLabelQuadrants( static_cast<QuadrantLabeling>( ui.comboBoxQuadrants->currentData().toInt() ) );
+  mCurrentLayer->setAvoidRepeatingLetters( ui.checkBoxAvoidRepeatingLetters->isChecked() );
   mCurrentLayer->triggerRepaint();
 }

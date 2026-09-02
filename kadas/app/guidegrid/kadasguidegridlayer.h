@@ -46,6 +46,7 @@ struct GridConfig
     int lineWidth = 1;
     QString rowStart = QString( "A" );
     QString colStart = QString( "1" );
+    bool avoidRepeatingLetters = true;
     LabelingPos labelingPos = LabelingPos::LabelsInside;
     QuadrantLabeling quadrantLabeling = QuadrantLabeling::DontLabelQuadrants;
 };
@@ -94,6 +95,7 @@ class KadasGuideGridLayer : public KadasAnnotationLayer
     QPair<QString, QString> labelingMode() const { return qMakePair( mGridConfig.rowStart, mGridConfig.colStart ); }
     LabelingPos labelingPos() const { return mGridConfig.labelingPos; }
     QuadrantLabeling labelQuadrants() const { return mGridConfig.quadrantLabeling; }
+    bool avoidRepeatingLetters() const { return mGridConfig.avoidRepeatingLetters; }
 
   public slots:
     void setColor( const QColor &color )
@@ -125,6 +127,11 @@ class KadasGuideGridLayer : public KadasAnnotationLayer
     void setLabelQuadrants( QuadrantLabeling labelQuadrants )
     {
       mGridConfig.quadrantLabeling = labelQuadrants;
+      regenerate();
+    }
+    void setAvoidRepeatingLetters( bool avoidRepeatingLetters )
+    {
+      mGridConfig.avoidRepeatingLetters = avoidRepeatingLetters;
       regenerate();
     }
 
@@ -193,6 +200,7 @@ class KadasGuideGridLayer : public KadasPluginLayer
     QPair<QString, QString> labelingMode() const { return qMakePair( mGridConfig.rowStart, mGridConfig.colStart ); }
     LabelingPos labelingPos() const { return mGridConfig.labelingPos; }
     QuadrantLabeling labelQuadrants() const { return mGridConfig.quadrantLabeling; }
+    bool avoidRepeatingLetters() const { return mGridConfig.avoidRepeatingLetters; }
 
   public slots:
     void setColor( const QColor &color ) { mGridConfig.color = color; }
@@ -205,6 +213,7 @@ class KadasGuideGridLayer : public KadasPluginLayer
     }
     void setLabelingPos( LabelingPos pos ) { mGridConfig.labelingPos = pos; }
     void setLabelQuadrants( QuadrantLabeling labelQuadrants ) { mGridConfig.quadrantLabeling = labelQuadrants; }
+    void setAvoidRepeatingLetters( bool avoidRepeatingLetters ) { mGridConfig.avoidRepeatingLetters = avoidRepeatingLetters; }
 
   protected:
     bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
