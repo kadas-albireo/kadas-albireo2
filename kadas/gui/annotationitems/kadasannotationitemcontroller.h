@@ -154,6 +154,18 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     //! When TRUE, the edit tool re-renders the layer on every drag step (e.g. pictures) rather than only on release.
     virtual bool liveRepaintOnEdit() const { return false; }
 
+    /**
+     * When TRUE, the create tool previews the in-progress \a item by rendering its
+     * real symbol rather than tracing its geometry with a rubber band. Worth it only
+     * where the symbol adds something the geometry does not carry, such as a line's
+     * arrow head; a rubber band is cheaper for everything else.
+     */
+    virtual bool symbolPreviewWhileDrawing( const QgsAnnotationItem *item ) const
+    {
+      Q_UNUSED( item );
+      return false;
+    }
+
     //! When TRUE, \a item carries no meaningful content yet (e.g. a text item with no text); the create tool discards such items if the user leaves them untouched.
     virtual bool isEmpty( const QgsAnnotationItem *item ) const
     {

@@ -15,6 +15,7 @@ site/
 share/docs/html/
 scripts/.venv/
 .qtcreator
+.worktrees
 
 # from the ORAS package from instructions to build from scratch, not to be pushed
 share/geodata/ 

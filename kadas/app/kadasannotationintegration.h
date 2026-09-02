@@ -50,8 +50,11 @@ class KadasAnnotationIntegration : public QObject
     //! Marker shape tool actions (circle, square, triangle, diamond, star, cross).
     QList<QAction *> markerActions() const { return mMarkerActions; }
 
-    //! Geometric shape tool actions (line, polygon, rectangle, circle).
-    QList<QAction *> shapeActions() const { return mShapeActions; }
+    //! Open-shape tool actions (line, arrow).
+    QList<QAction *> lineActions() const { return mLineActions; }
+
+    //! Closed-shape tool actions (polygon, rectangle, circle).
+    QList<QAction *> polygonActions() const { return mPolygonActions; }
 
     QAction *actionNewPoint() const { return mActionNewPoint; }
     QAction *actionNewSquare() const { return mActionNewSquare; }
@@ -60,6 +63,7 @@ class KadasAnnotationIntegration : public QObject
     QAction *actionNewStar() const { return mActionNewStar; }
     QAction *actionNewCross() const { return mActionNewCross; }
     QAction *actionNewLine() const { return mActionNewLine; }
+    QAction *actionNewArrow() const { return mActionNewArrow; }
     QAction *actionNewRectangle() const { return mActionNewRectangle; }
     QAction *actionNewPolygon() const { return mActionNewPolygon; }
     QAction *actionNewCircle() const { return mActionNewCircle; }
@@ -80,6 +84,7 @@ class KadasAnnotationIntegration : public QObject
       MarkerCross,
       MarkerCustomSvg,
       Line,
+      Arrow,
       Rectangle,
       Polygon,
       Circle,
@@ -98,6 +103,7 @@ class KadasAnnotationIntegration : public QObject
     QAction *mActionNewCross = nullptr;
     QAction *mActionNewCustomSvg = nullptr;
     QAction *mActionNewLine = nullptr;
+    QAction *mActionNewArrow = nullptr;
     QAction *mActionNewRectangle = nullptr;
     QAction *mActionNewPolygon = nullptr;
     QAction *mActionNewCircle = nullptr;
@@ -106,7 +112,8 @@ class KadasAnnotationIntegration : public QObject
     QAction *mActionNewCoordCross = nullptr;
 
     QList<QAction *> mMarkerActions;
-    QList<QAction *> mShapeActions;
+    QList<QAction *> mLineActions;
+    QList<QAction *> mPolygonActions;
 
     QPointer<QgsAnnotationLayer> mLastAnnotationLayer;
 

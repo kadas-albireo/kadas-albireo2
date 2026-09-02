@@ -63,14 +63,21 @@ void KadasRibbonSplitButton::addAction( QAction *action )
   } );
 }
 
+void KadasRibbonSplitButton::addRowBreak()
+{
+  mRowBreaks.append( mActions.size() );
+}
+
 void KadasRibbonSplitButton::finish()
 {
   mMenu = new QMenu( mButton );
   mMenu->setObjectName( QStringLiteral( "mRibbonGalleryMenu" ) );
   mGallery = new KadasRibbonActionGallery( 4, mMenu );
-  for ( QAction *action : std::as_const( mActions ) )
+  for ( int i = 0; i < mActions.size(); ++i )
   {
-    mGallery->addActionTile( action );
+    if ( mRowBreaks.contains( i ) )
+      mGallery->addRowBreak();
+    mGallery->addActionTile( mActions.at( i ) );
   }
   QWidgetAction *galleryAction = new QWidgetAction( mMenu );
   galleryAction->setDefaultWidget( mGallery );

@@ -82,6 +82,7 @@
         <file alias="icons/draw_diamond">icons/draw_diamond.svg</file>
         <file alias="icons/draw_triangle">icons/draw_triangle.svg</file>
         <file alias="icons/draw_line">icons/draw_line.svg</file>
+        <file alias="icons/draw_arrow">icons/draw_arrow.svg</file>
         <file alias="icons/draw_rectangle">icons/draw_rectangle.svg</file>
         <file alias="icons/draw_polygon">icons/draw_polygon.svg</file>
         <file alias="icons/draw_circle">icons/draw_circle.svg</file>

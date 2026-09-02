@@ -17,10 +17,15 @@
 #ifndef KADASLINEANNOTATIONCONTROLLER_H
 #define KADASLINEANNOTATIONCONTROLLER_H
 
+#include <optional>
+
+#include <qgis/qgis.h>
 #include <qgis/qgspointxy.h>
 
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationrotation.h"
+
+class QgsLineSymbol;
 
 /**
  * \ingroup gui
@@ -64,14 +69,59 @@ class KADAS_GUI_EXPORT KadasLineAnnotationController : public KadasAnnotationIte
     QList<KadasAnnotationMeasurementLabel> measurementLabels( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const override;
 #endif
 
+    bool symbolPreviewWhileDrawing( const QgsAnnotationItem *item ) const override;
+
     void applyPersistedStyle( QgsAnnotationItem *item ) const override;
     void persistStyle( const QgsAnnotationItem *item ) const override;
     KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = nullptr ) const override;
 
 #ifndef SIP_RUN
+
+    //! Which end of a line a head decoration sits on.
+    enum class LineEnd
+    {
+      Head, //!< Last vertex, decoration facing along the line
+      Tail  //!< First vertex, decoration facing back along the line
+    };
+
+    //! A line-end decoration: a marker shape and its size, or no decoration at all.
+    struct EndDecoration
+    {
+        //! Marker shape to draw at the end, or `std::nullopt` for an undecorated end.
+        std::optional<Qgis::MarkerShape> shape;
+        //! Marker size, in millimeters.
+        double size = sDefaultEndSize;
+    };
+
+    //! Default size (mm) of a line-end decoration.
+    static constexpr double sDefaultEndSize = 4.0;
+
+    //! Marker shapes offered as line-end decorations, in editor order.
+    static const QList<Qgis::MarkerShape> &endShapeChoices();
+
+    /**
+     * Replaces the \a end decoration of \a symbol with \a decoration, dropping any
+     * previous decoration on that end. Colors and stroke width are taken from the
+     * symbol's simple-line layer, so the decoration always matches the line itself.
+     */
+    static void setEndDecoration( QgsLineSymbol *symbol, LineEnd end, const EndDecoration &decoration );
+
+    //! Returns the current \a end decoration of \a symbol.
+    static EndDecoration endDecoration( const QgsLineSymbol *symbol, LineEnd end );
+
     static const QgsSettingsEntryDouble *settingsWidth;
     static const QgsSettingsEntryColor *settingsColor;
     static const QgsSettingsEntryInteger *settingsStyle;
+    static const QgsSettingsEntryInteger *settingsHeadStyle;
+    static const QgsSettingsEntryDouble *settingsHeadSize;
+    static const QgsSettingsEntryInteger *settingsTailStyle;
+    static const QgsSettingsEntryDouble *settingsTailSize;
+
+    //! Sentinel for an undecorated end, in the int encoding shared by the head/tail style settings and the style editor.
+    static constexpr int sNoEndShape = -1;
+
+    //! Maps a value in that int encoding to an offered shape, or `std::nullopt` for #sNoEndShape and for unsupported shapes.
+    static std::optional<Qgis::MarkerShape> endShapeFromValue( int value );
 #endif
 
   private:

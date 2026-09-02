@@ -11,6 +11,7 @@
 
 
 
+
 class KadasLineAnnotationController : KadasAnnotationItemController
 {
 %Docstring(signature="appended")
@@ -71,6 +72,9 @@ Controller for stock \c :py:class:`QgsAnnotationLineItem` (type id \c
 
     virtual void translate( QgsAnnotationItem *item, double dx, double dy );
 
+
+
+    virtual bool symbolPreviewWhileDrawing( const QgsAnnotationItem *item ) const;
 
 
     virtual void applyPersistedStyle( QgsAnnotationItem *item ) const;

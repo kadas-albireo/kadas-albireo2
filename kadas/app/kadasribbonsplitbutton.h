@@ -44,6 +44,9 @@ class KadasRibbonSplitButton : public QObject
     //! Adds a tool action to the category. Actions should have a unique objectName for persistence.
     void addAction( QAction *action );
 
+    //! Breaks the dropdown gallery's row here, so the next action starts a new row.
+    void addRowBreak();
+
     //! Builds the dropdown gallery and restores the last-used tool. Call once after all addAction() calls.
     void finish();
 
@@ -57,6 +60,8 @@ class KadasRibbonSplitButton : public QObject
     KadasRibbonActionGallery *mGallery = nullptr;
     QMenu *mMenu = nullptr;
     QList<QAction *> mActions;
+    //! Indices into mActions before which the gallery starts a new row.
+    QList<int> mRowBreaks;
     QAction *mCurrentAction = nullptr;
 };
 

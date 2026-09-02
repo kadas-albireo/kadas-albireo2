@@ -407,6 +407,24 @@ void KadasMapToolEditAnnotationItem::updateTempRubberBand()
   mTempRubberBand->setToGeometry( geom, mLayer->crs() );
 }
 
+void KadasMapToolEditAnnotationItem::updateDrawPreview()
+{
+  // The item is hidden on the layer for as long as a part is being drawn, so the
+  // preview is all the user sees. A rubber band only traces the geometry, which
+  // is enough unless the symbol draws something the geometry does not carry (a
+  // line's arrow head); those items render their real symbol in the overlay.
+  if ( mItem && mController && mController->symbolPreviewWhileDrawing( mItem ) )
+  {
+    clearTempRubberBand();
+    setLivePreviewEnabled( true );
+  }
+  else
+  {
+    setLivePreviewEnabled( false );
+    updateTempRubberBand();
+  }
+}
+
 void KadasMapToolEditAnnotationItem::clearTempRubberBand()
 {
   delete mTempRubberBand;
@@ -511,7 +529,7 @@ void KadasMapToolEditAnnotationItem::addPoint( const QgsPointXY &pos )
       }
       else
       {
-        updateTempRubberBand();
+        updateDrawPreview();
         pushState();
       }
       break;
@@ -560,7 +578,7 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
       clearNumericInput();
     }
     mController->setCurrentPoint( mItem, pos, ctx );
-    updateTempRubberBand();
+    updateDrawPreview();
     refreshHandles();
     return;
   }
@@ -740,9 +758,14 @@ void KadasMapToolEditAnnotationItem::stateChanged( KadasStateHistory::ChangeType
     mItem->setEnabled( mDrawState != DrawState::InProgress );
   mLayer->triggerRepaint();
   if ( mDrawState == DrawState::InProgress )
-    updateTempRubberBand();
+  {
+    updateDrawPreview();
+  }
   else
+  {
+    setLivePreviewEnabled( false );
     clearTempRubberBand();
+  }
   mEditContext = KadasEditContext();
   clearNumericInput();
   if ( mStyleEditor )
@@ -867,6 +890,7 @@ void KadasMapToolEditAnnotationItem::clearInProgressItem()
     mLayer->removeItem( mItemId );
     mLayer->triggerRepaint();
   }
+  setLivePreviewEnabled( false );
   clearTempRubberBand();
   mItem = nullptr;
   mItemId.clear();
@@ -887,7 +911,7 @@ void KadasMapToolEditAnnotationItem::startPart( const QgsPointXY &pos )
     mDrawState = DrawState::InProgress;
     mItem->setEnabled( false );
     mLayer->triggerRepaint();
-    updateTempRubberBand();
+    updateDrawPreview();
     pushState();
   }
 }
@@ -899,6 +923,7 @@ void KadasMapToolEditAnnotationItem::finishPart()
   mController->endPart( mItem );
   mDrawState = DrawState::Finished;
   mItem->setEnabled( true );
+  setLivePreviewEnabled( false );
   clearTempRubberBand();
   mLayer->triggerRepaint();
   pushState();
