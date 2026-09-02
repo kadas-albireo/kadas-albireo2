@@ -35,55 +35,7 @@
 #include <qgis/qgstextformat.h>
 
 #include <guidegrid/kadasguidegridlayer.h>
-
-namespace
-{
-  QString gridLabel( const QString firstStart, int offset, bool avoidRepeatingLetters = false )
-  {
-    bool isInt = false;
-    int startNumber = firstStart.toInt( &isInt );
-    if ( isInt )
-    {
-      return QString::number( startNumber + offset );
-    }
-
-    // Convert to decimal base
-    int startOffset = 0;
-    for ( int i = 0; i < firstStart.length(); ++i )
-    {
-      QChar c = firstStart.at( i );
-      startOffset = startOffset * 26 + ( c.toLatin1() - 'A' + 1 );
-    }
-
-    int skipped = 0;
-    if ( avoidRepeatingLetters )
-    {
-      for ( int i = 0; i <= offset; i++ )
-      {
-        QString lbl = gridLabel( firstStart, i );
-        QChar firstChar = lbl.at( 0 );
-        bool isRepeating = std::all_of( lbl.begin(), lbl.end(), [firstChar]( QChar c ) { return c == firstChar; } );
-
-        if ( lbl.length() != 1 && isRepeating )
-        {
-          skipped++;
-        }
-      }
-    }
-
-    offset += startOffset + skipped;
-
-    QString label;
-    do
-    {
-      offset -= 1;
-      int res = offset % 26;
-      label.prepend( QChar( 'A' + res ) );
-      offset /= 26;
-    } while ( offset > 0 );
-    return label;
-  }
-} // namespace
+#include "guidegrid/kadasguidegridutils.h"
 
 
 /// Kadas-only QPainter-based renderer that preserves the dynamic
@@ -164,7 +116,7 @@ class KadasGuideGridRenderer : public QgsMapLayerRenderer
         {
           const double sx1 = vLine1.first().x();
           const double sx2 = vLine2.first().x();
-          const QString label = gridLabel( mGridConfig.colStart, col - 1, mGridConfig.avoidRepeatingLetters );
+          const QString label = KadasGuideGridUtils::gridLabel( mGridConfig.colStart, col - 1, mGridConfig.avoidRepeatingLetters );
           if ( mGridConfig.labelingPos == LabelingPos::LabelsOutside && vLine1.first().y() - labelBoxSize > screenRect.top() )
             drawGridLabel( 0.5 * ( sx1 + sx2 ), sy1 - 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
           else if ( sy1 < vLine1.last().y() - 2 * labelBoxSize )
@@ -228,7 +180,7 @@ class KadasGuideGridRenderer : public QgsMapLayerRenderer
         {
           const double sy1h = hLine1.first().y();
           const double sy2h = hLine2.first().y();
-          const QString label = gridLabel( mGridConfig.rowStart, row - 1, mGridConfig.avoidRepeatingLetters );
+          const QString label = KadasGuideGridUtils::gridLabel( mGridConfig.rowStart, row - 1, mGridConfig.avoidRepeatingLetters );
           if ( mGridConfig.labelingPos == LabelingPos::LabelsOutside && hLine1.first().x() - labelBoxSize > screenRect.left() )
             drawGridLabel( sx1 - 0.5 * labelBoxSize, 0.5 * ( sy1h + sy2h ), label, font, fontMetrics, bufferColor );
           else if ( sx1 < hLine1.last().x() - 2 * labelBoxSize )
@@ -379,7 +331,9 @@ QList<KadasPluginLayer::IdentifyResult> KadasGuideGridLayer::identify( const Qgs
   bbox->setExteriorRing( ring );
   QMap<QString, QVariant> attrs;
 
-  QString text = tr( "Cell %1, %2" ).arg( gridLabel( mGridConfig.rowStart, j, mGridConfig.avoidRepeatingLetters ) ).arg( gridLabel( mGridConfig.colStart.at( 0 ), i, mGridConfig.avoidRepeatingLetters ) );
+  QString text = tr( "Cell %1, %2" )
+                   .arg( KadasGuideGridUtils::gridLabel( mGridConfig.rowStart, j, mGridConfig.avoidRepeatingLetters ) )
+                   .arg( KadasGuideGridUtils::gridLabel( mGridConfig.colStart.at( 0 ), i, mGridConfig.avoidRepeatingLetters ) );
   if ( mGridConfig.quadrantLabeling != QuadrantLabeling::DontLabelQuadrants )
   {
     bool left = pos.x() <= mGridConfig.gridRect.xMinimum() + ( i + 0.5 ) * colWidth;
@@ -573,7 +527,7 @@ void KadasGuideGridLayer::regenerate()
   // --- Column labels (top + bottom of the grid rect) ---
   for ( int col = 0; col < mGridConfig.cols; ++col )
   {
-    const QString label = gridLabel( mGridConfig.colStart, col, mGridConfig.avoidRepeatingLetters );
+    const QString label = KadasGuideGridUtils::gridLabel( mGridConfig.colStart, col, mGridConfig.avoidRepeatingLetters );
     const double cx = r.xMinimum() + ( col + 0.5 ) * dx;
     // Top
     {
@@ -596,7 +550,7 @@ void KadasGuideGridLayer::regenerate()
   // --- Row labels (left + right of the grid rect) ---
   for ( int row = 0; row < mGridConfig.rows; ++row )
   {
-    const QString label = gridLabel( mGridConfig.rowStart, row, mGridConfig.avoidRepeatingLetters );
+    const QString label = KadasGuideGridUtils::gridLabel( mGridConfig.rowStart, row, mGridConfig.avoidRepeatingLetters );
     const double cy = r.yMaximum() - ( row + 0.5 ) * dy;
     // Left
     {
