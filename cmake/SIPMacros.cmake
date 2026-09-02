@@ -66,26 +66,6 @@ macro(GENERATE_SIP_PYTHON_MODULE_CODE MODULE_NAME MODULE_SIP SIP_FILES
   set(_message "-DMESSAGE=Generating CPP code for module ${MODULE_NAME}")
   set(_sip_output_files)
 
-  # Suppress warnings
-  if(PEDANTIC)
-    if(MSVC)
-      add_definitions(
-        /wd4189 # local variable is initialized but not referenced
-        /wd4996 # deprecation warnings (bindings re-export deprecated methods)
-        /wd4701 # potentially uninitialized variable used (sip generated code)
-        /wd4702 # unreachable code (sip generated code)
-        /wd4703 # potentially uninitialized local pointer variable 'sipType'
-                # used
-      )
-    else(MSVC)
-      # disable all warnings
-      add_definitions(-w -Wno-deprecated-declarations)
-      if(NOT APPLE)
-        add_definitions(-fpermissive)
-      endif(NOT APPLE)
-    endif(MSVC)
-  endif(PEDANTIC)
-
   if(MSVC)
     add_definitions(/bigobj)
   endif(MSVC)
@@ -155,6 +135,25 @@ macro(BUILD_SIP_PYTHON_MODULE MODULE_NAME SIP_FILES EXTRA_OBJECTS)
   )
   if(NOT MSVC)
     target_compile_definitions(${_logical_name} PRIVATE protected=public)
+  endif()
+
+  # Suppress warnings in the SIP generated code, which cannot be fixed here
+  if(MSVC)
+    target_compile_options(
+      ${_logical_name}
+      PRIVATE /wd4189 # local variable is initialized but not referenced
+              /wd4996 # deprecation warnings (bindings re-export deprecated
+                      # methods)
+              /wd4701 # potentially uninitialized variable used
+              /wd4702 # unreachable code
+              /wd4703 # potentially uninitialized local pointer variable
+                      # 'sipType' used
+    )
+  else()
+    # the bindings re-export deprecated methods
+    target_compile_options(
+      ${_logical_name} PRIVATE -Wno-deprecated-declarations
+    )
   endif()
 
   if(${SIP_VERSION_STR} VERSION_LESS 5.0.0)
