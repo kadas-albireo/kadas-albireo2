@@ -35,27 +35,7 @@
 #include <qgis/qgstextformat.h>
 
 #include <guidegrid/kadasguidegridlayer.h>
-
-namespace
-{
-  QString gridLabel( QChar firstChar, int offset )
-  {
-    if ( firstChar >= '0' && firstChar <= '9' )
-    {
-      return QString::number( firstChar.digitValue() + offset );
-    }
-    QString label;
-    offset += firstChar.toLatin1() - 'A' + 1;
-    do
-    {
-      offset -= 1;
-      int res = offset % 26;
-      label.prepend( QChar( 'A' + res ) );
-      offset /= 26;
-    } while ( offset > 0 );
-    return label;
-  }
-} // namespace
+#include "guidegrid/kadasguidegridutils.h"
 
 
 /// Kadas-only QPainter-based renderer that preserves the dynamic
@@ -66,10 +46,6 @@ namespace
 class KadasGuideGridRenderer : public QgsMapLayerRenderer
 {
   public:
-    using GridConfig = KadasGuideGridLayer::GridConfig;
-    using LabelingPos = KadasGuideGridLayer::LabelingPos;
-    using QuadrantLabeling = KadasGuideGridLayer::QuadrantLabeling;
-
     KadasGuideGridRenderer( KadasGuideGridLayer *layer, QgsRenderContext &rendererContext )
       : QgsMapLayerRenderer( layer->id(), &rendererContext )
       , mGridConfig( layer->mGridConfig )
@@ -140,18 +116,18 @@ class KadasGuideGridRenderer : public QgsMapLayerRenderer
         {
           const double sx1 = vLine1.first().x();
           const double sx2 = vLine2.first().x();
-          const QString label = gridLabel( mGridConfig.colChar, col - 1 );
-          if ( mGridConfig.labelingPos == KadasGuideGridLayer::LabelsOutside && vLine1.first().y() - labelBoxSize > screenRect.top() )
+          const QString label = KadasGuideGridUtils::gridLabel( mGridConfig.colStart, col - 1, mGridConfig.avoidRepeatingLetters );
+          if ( mGridConfig.labelingPos == LabelingPos::LabelsOutside && vLine1.first().y() - labelBoxSize > screenRect.top() )
             drawGridLabel( 0.5 * ( sx1 + sx2 ), sy1 - 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
           else if ( sy1 < vLine1.last().y() - 2 * labelBoxSize )
             drawGridLabel( 0.5 * ( sx1 + sx2 ), sy1 + 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
-          if ( mGridConfig.labelingPos == KadasGuideGridLayer::LabelsOutside && vLine1.last().y() + labelBoxSize < screenRect.bottom() )
+          if ( mGridConfig.labelingPos == LabelingPos::LabelsOutside && vLine1.last().y() + labelBoxSize < screenRect.bottom() )
             drawGridLabel( 0.5 * ( sx1 + sx2 ), sy2 + 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
           else if ( sy2 > vLine1.first().y() + 2 * labelBoxSize )
             drawGridLabel( 0.5 * ( sx1 + sx2 ), sy2 - 0.5 * labelBoxSize, label, font, fontMetrics, bufferColor );
         }
 
-        if ( quadrantLabeling != KadasGuideGridLayer::DontLabelQuadrants )
+        if ( quadrantLabeling != QuadrantLabeling::DontLabelQuadrants )
         {
           p->save();
           p->setPen( QPen( mGridConfig.color, mGridConfig.lineWidth, Qt::DashLine ) );
@@ -166,10 +142,10 @@ class KadasGuideGridRenderer : public QgsMapLayerRenderer
               drawGridLabel( vLine1.at( i + 1 ).x() + 0.5 * smallLabelBoxSize, vLine1.at( i + 1 ).y() - 0.5 * smallLabelBoxSize, "D", smallFont, smallFontMetrics, bufferColor );
               drawGridLabel( vLine2.at( i + 1 ).x() - 0.5 * smallLabelBoxSize, vLine2.at( i + 1 ).y() - 0.5 * smallLabelBoxSize, "C", smallFont, smallFontMetrics, bufferColor );
             }
-            if ( quadrantLabeling == KadasGuideGridLayer::LabelOneQuadrant )
+            if ( quadrantLabeling == QuadrantLabeling::LabelOneQuadrant )
             {
               vLineMid.append( 0.5 * ( vLine1.at( i + 1 ) + vLine2.at( i + 1 ) ) );
-              quadrantLabeling = KadasGuideGridLayer::DontLabelQuadrants;
+              quadrantLabeling = QuadrantLabeling::DontLabelQuadrants;
               break;
             }
           }
@@ -204,27 +180,27 @@ class KadasGuideGridRenderer : public QgsMapLayerRenderer
         {
           const double sy1h = hLine1.first().y();
           const double sy2h = hLine2.first().y();
-          const QString label = gridLabel( mGridConfig.rowChar, row - 1 );
-          if ( mGridConfig.labelingPos == KadasGuideGridLayer::LabelsOutside && hLine1.first().x() - labelBoxSize > screenRect.left() )
+          const QString label = KadasGuideGridUtils::gridLabel( mGridConfig.rowStart, row - 1, mGridConfig.avoidRepeatingLetters );
+          if ( mGridConfig.labelingPos == LabelingPos::LabelsOutside && hLine1.first().x() - labelBoxSize > screenRect.left() )
             drawGridLabel( sx1 - 0.5 * labelBoxSize, 0.5 * ( sy1h + sy2h ), label, font, fontMetrics, bufferColor );
           else if ( sx1 < hLine1.last().x() - 2 * labelBoxSize )
             drawGridLabel( sx1 + 0.5 * labelBoxSize, 0.5 * ( sy1h + sy2h ), label, font, fontMetrics, bufferColor );
-          if ( mGridConfig.labelingPos == KadasGuideGridLayer::LabelsOutside && hLine1.last().x() + labelBoxSize < screenRect.right() )
+          if ( mGridConfig.labelingPos == LabelingPos::LabelsOutside && hLine1.last().x() + labelBoxSize < screenRect.right() )
             drawGridLabel( sx2 + 0.5 * labelBoxSize, 0.5 * ( sy1h + sy2h ), label, font, fontMetrics, bufferColor );
           else if ( sx2 > hLine1.first().x() + 2 * labelBoxSize )
             drawGridLabel( sx2 - 0.5 * labelBoxSize, 0.5 * ( sy1h + sy2h ), label, font, fontMetrics, bufferColor );
         }
 
-        if ( quadrantLabeling != KadasGuideGridLayer::DontLabelQuadrants )
+        if ( quadrantLabeling != QuadrantLabeling::DontLabelQuadrants )
         {
           p->save();
           p->setPen( QPen( mGridConfig.color, mGridConfig.lineWidth, Qt::DashLine ) );
           QPolygonF hLineMid;
-          if ( quadrantLabeling == KadasGuideGridLayer::LabelOneQuadrant )
+          if ( quadrantLabeling == QuadrantLabeling::LabelOneQuadrant )
           {
             hLineMid.append( 0.5 * ( hLine1.at( 0 ) + hLine2.at( 0 ) ) );
             hLineMid.append( 0.5 * ( hLine1.at( 1 ) + hLine2.at( 1 ) ) );
-            quadrantLabeling = KadasGuideGridLayer::DontLabelQuadrants;
+            quadrantLabeling = QuadrantLabeling::DontLabelQuadrants;
           }
           else
           {
@@ -355,8 +331,10 @@ QList<KadasPluginLayer::IdentifyResult> KadasGuideGridLayer::identify( const Qgs
   bbox->setExteriorRing( ring );
   QMap<QString, QVariant> attrs;
 
-  QString text = tr( "Cell %1, %2" ).arg( gridLabel( mGridConfig.rowChar, j ) ).arg( gridLabel( mGridConfig.colChar, i ) );
-  if ( mGridConfig.quadrantLabeling != DontLabelQuadrants )
+  QString text = tr( "Cell %1, %2" )
+                   .arg( KadasGuideGridUtils::gridLabel( mGridConfig.rowStart, j, mGridConfig.avoidRepeatingLetters ) )
+                   .arg( KadasGuideGridUtils::gridLabel( mGridConfig.colStart.at( 0 ), i, mGridConfig.avoidRepeatingLetters ) );
+  if ( mGridConfig.quadrantLabeling != QuadrantLabeling::DontLabelQuadrants )
   {
     bool left = pos.x() <= mGridConfig.gridRect.xMinimum() + ( i + 0.5 ) * colWidth;
     bool top = pos.y() >= mGridConfig.gridRect.yMaximum() - ( j + 0.5 ) * rowHeight;
@@ -393,12 +371,13 @@ bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteConte
     mGridConfig.fontSize = customProperty( QStringLiteral( "kadas/guidegrid/fontSize" ) ).toInt();
     mGridConfig.color = QgsSymbolLayerUtils::decodeColor( customProperty( QStringLiteral( "kadas/guidegrid/color" ) ).toString() );
     mGridConfig.lineWidth = customProperty( QStringLiteral( "kadas/guidegrid/lineWidth" ), 1 ).toInt();
-    const QString rowChar = customProperty( QStringLiteral( "kadas/guidegrid/rowChar" ) ).toString();
-    const QString colChar = customProperty( QStringLiteral( "kadas/guidegrid/colChar" ) ).toString();
-    mGridConfig.rowChar = rowChar.isEmpty() ? QChar( 'A' ) : rowChar.at( 0 );
-    mGridConfig.colChar = colChar.isEmpty() ? QChar( '1' ) : colChar.at( 0 );
+    const QString rowStart = customProperty( QStringLiteral( "kadas/guidegrid/rowChar" ) ).toString();
+    const QString colStart = customProperty( QStringLiteral( "kadas/guidegrid/colChar" ) ).toString();
+    mGridConfig.rowStart = rowStart.isEmpty() ? QString( "A" ) : rowStart;
+    mGridConfig.colStart = colStart.isEmpty() ? QString( "1" ) : colStart;
     mGridConfig.labelingPos = static_cast<LabelingPos>( customProperty( QStringLiteral( "kadas/guidegrid/labelingPos" ) ).toInt() );
     mGridConfig.quadrantLabeling = static_cast<QuadrantLabeling>( customProperty( QStringLiteral( "kadas/guidegrid/quadrantLabeling" ) ).toInt() );
+    mGridConfig.avoidRepeatingLetters = customProperty( QStringLiteral( "kadas/guidegrid/avoidRepeatingLetters" ) ).toBool();
     regenerate();
     return true;
   }
@@ -421,10 +400,11 @@ bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteConte
   mGridConfig.fontSize = cfgEl.attribute( "fontSize" ).toInt();
   mGridConfig.color = QgsSymbolLayerUtils::decodeColor( cfgEl.attribute( "color" ) );
   mGridConfig.lineWidth = cfgEl.attribute( "lineWidth", "1" ).toInt();
-  mGridConfig.rowChar = !cfgEl.attribute( "rowChar" ).isEmpty() ? cfgEl.attribute( "rowChar" ).at( 0 ) : 'A';
-  mGridConfig.colChar = !cfgEl.attribute( "colChar" ).isEmpty() ? cfgEl.attribute( "colChar" ).at( 0 ) : '1';
+  mGridConfig.rowStart = !cfgEl.attribute( "rowChar" ).isEmpty() ? cfgEl.attribute( "rowChar" ).at( 0 ) : 'A';
+  mGridConfig.colStart = !cfgEl.attribute( "colChar" ).isEmpty() ? cfgEl.attribute( "colChar" ).at( 0 ) : '1';
   mGridConfig.labelingPos = static_cast<LabelingPos>( cfgEl.attribute( "labelingPos" ).toInt() );
   mGridConfig.quadrantLabeling = static_cast<QuadrantLabeling>( cfgEl.attribute( "quadrantLabeling" ).toInt() );
+  mGridConfig.avoidRepeatingLetters = false; // Legacy didn't have this option, set to false same as default.
 
   // Base readXml replaced all customProperties from the (legacy, marker-less)
   // XML; re-assert the parametric marker set by the constructor.
@@ -457,10 +437,11 @@ void KadasGuideGridLayer::writeConfigToCustomProperties()
   setCustomProperty( QStringLiteral( "kadas/guidegrid/fontSize" ), mGridConfig.fontSize );
   setCustomProperty( QStringLiteral( "kadas/guidegrid/color" ), QgsSymbolLayerUtils::encodeColor( mGridConfig.color ) );
   setCustomProperty( QStringLiteral( "kadas/guidegrid/lineWidth" ), mGridConfig.lineWidth );
-  setCustomProperty( QStringLiteral( "kadas/guidegrid/rowChar" ), QString( mGridConfig.rowChar ) );
-  setCustomProperty( QStringLiteral( "kadas/guidegrid/colChar" ), QString( mGridConfig.colChar ) );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/rowChar" ), QString( mGridConfig.rowStart ) );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/colChar" ), QString( mGridConfig.colStart ) );
   setCustomProperty( QStringLiteral( "kadas/guidegrid/labelingPos" ), static_cast<int>( mGridConfig.labelingPos ) );
   setCustomProperty( QStringLiteral( "kadas/guidegrid/quadrantLabeling" ), static_cast<int>( mGridConfig.quadrantLabeling ) );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/avoidRepeatingLetters" ), mGridConfig.avoidRepeatingLetters );
 }
 
 void KadasGuideGridLayer::regenerate()
@@ -546,11 +527,11 @@ void KadasGuideGridLayer::regenerate()
   // --- Column labels (top + bottom of the grid rect) ---
   for ( int col = 0; col < mGridConfig.cols; ++col )
   {
-    const QString label = gridLabel( mGridConfig.colChar, col );
+    const QString label = KadasGuideGridUtils::gridLabel( mGridConfig.colStart, col, mGridConfig.avoidRepeatingLetters );
     const double cx = r.xMinimum() + ( col + 0.5 ) * dx;
     // Top
     {
-      const double cy = mGridConfig.labelingPos == LabelsOutside ? r.yMaximum() + 0.5 * dy : r.yMaximum() - 0.5 * dy;
+      const double cy = mGridConfig.labelingPos == LabelingPos::LabelsOutside ? r.yMaximum() + 0.5 * dy : r.yMaximum() - 0.5 * dy;
       auto *txt = new QgsAnnotationPointTextItem( label, QgsPointXY( cx, cy ) );
       txt->setFormat( textFmt );
       txt->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter );
@@ -558,7 +539,7 @@ void KadasGuideGridLayer::regenerate()
     }
     // Bottom
     {
-      const double cy = mGridConfig.labelingPos == LabelsOutside ? r.yMinimum() - 0.5 * dy : r.yMinimum() + 0.5 * dy;
+      const double cy = mGridConfig.labelingPos == LabelingPos::LabelsOutside ? r.yMinimum() - 0.5 * dy : r.yMinimum() + 0.5 * dy;
       auto *txt = new QgsAnnotationPointTextItem( label, QgsPointXY( cx, cy ) );
       txt->setFormat( textFmt );
       txt->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter );
@@ -569,11 +550,11 @@ void KadasGuideGridLayer::regenerate()
   // --- Row labels (left + right of the grid rect) ---
   for ( int row = 0; row < mGridConfig.rows; ++row )
   {
-    const QString label = gridLabel( mGridConfig.rowChar, row );
+    const QString label = KadasGuideGridUtils::gridLabel( mGridConfig.rowStart, row, mGridConfig.avoidRepeatingLetters );
     const double cy = r.yMaximum() - ( row + 0.5 ) * dy;
     // Left
     {
-      const double cx = mGridConfig.labelingPos == LabelsOutside ? r.xMinimum() - 0.5 * dx : r.xMinimum() + 0.5 * dx;
+      const double cx = mGridConfig.labelingPos == LabelingPos::LabelsOutside ? r.xMinimum() - 0.5 * dx : r.xMinimum() + 0.5 * dx;
       auto *txt = new QgsAnnotationPointTextItem( label, QgsPointXY( cx, cy ) );
       txt->setFormat( textFmt );
       txt->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter );
@@ -581,7 +562,7 @@ void KadasGuideGridLayer::regenerate()
     }
     // Right
     {
-      const double cx = mGridConfig.labelingPos == LabelsOutside ? r.xMaximum() + 0.5 * dx : r.xMaximum() - 0.5 * dx;
+      const double cx = mGridConfig.labelingPos == LabelingPos::LabelsOutside ? r.xMaximum() + 0.5 * dx : r.xMaximum() - 0.5 * dx;
       auto *txt = new QgsAnnotationPointTextItem( label, QgsPointXY( cx, cy ) );
       txt->setFormat( textFmt );
       txt->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter );
@@ -590,10 +571,10 @@ void KadasGuideGridLayer::regenerate()
   }
 
   // --- Quadrant subgrid (mid-lines + ABCD micro-labels) ---
-  if ( mGridConfig.quadrantLabeling != DontLabelQuadrants )
+  if ( mGridConfig.quadrantLabeling != QuadrantLabeling::DontLabelQuadrants )
   {
-    const int qCols = mGridConfig.quadrantLabeling == LabelOneQuadrant ? 1 : mGridConfig.cols;
-    const int qRows = mGridConfig.quadrantLabeling == LabelOneQuadrant ? 1 : mGridConfig.rows;
+    const int qCols = mGridConfig.quadrantLabeling == QuadrantLabeling::LabelOneQuadrant ? 1 : mGridConfig.cols;
+    const int qRows = mGridConfig.quadrantLabeling == QuadrantLabeling::LabelOneQuadrant ? 1 : mGridConfig.rows;
 
     // Vertical mid-lines (one per quadrant column, splitting it horizontally in half)
     for ( int col = 0; col < qCols; ++col )
