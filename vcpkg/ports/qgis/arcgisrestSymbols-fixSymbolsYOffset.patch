@@ -1,0 +1,66 @@
+diff --git a/src/core/symbology/converters/qgssymbolconverteresrirest.cpp b/src/core/symbology/converters/qgssymbolconverteresrirest.cpp
+index dd0ea6dc870..235fa211e16 100644
+--- a/src/core/symbology/converters/qgssymbolconverteresrirest.cpp
++++ b/src/core/symbology/converters/qgssymbolconverteresrirest.cpp
+@@ -175,7 +175,7 @@ std::unique_ptr<QgsFillSymbol> QgsSymbolConverterEsriRest::parseEsriPictureFillS
+   fillLayer->setWidth( widthInPixels );
+   fillLayer->setAngle( angleCW );
+   fillLayer->setSizeUnit( Qgis::RenderUnit::Points );
+-  fillLayer->setOffset( QPointF( xOffset, yOffset ) );
++  fillLayer->setOffset( QPointF( xOffset, -yOffset ) );
+   fillLayer->setOffsetUnit( Qgis::RenderUnit::Points );
+   layers.append( fillLayer.release() );
+ 
+@@ -252,7 +252,7 @@ std::unique_ptr<QgsMarkerSymbol> QgsSymbolConverterEsriRest::parseEsriMarkerSymb
+   markerLayer->setStrokeWidthUnit( Qgis::RenderUnit::Points );
+   markerLayer->setStrokeStyle( penStyle );
+   markerLayer->setStrokeWidth( penWidthInPoints );
+-  markerLayer->setOffset( QPointF( xOffset, yOffset ) );
++  markerLayer->setOffset( QPointF( xOffset, -yOffset ) );
+   markerLayer->setOffsetUnit( Qgis::RenderUnit::Points );
+   layers.append( markerLayer.release() );
+ 
+@@ -289,7 +289,7 @@ std::unique_ptr<QgsMarkerSymbol> QgsSymbolConverterEsriRest::parseEsriPictureMar
+   if ( !qgsDoubleNear( static_cast< double >( heightInPixels ) / widthInPixels, markerLayer->defaultAspectRatio() ) )
+     markerLayer->setFixedAspectRatio( static_cast< double >( heightInPixels ) / widthInPixels );
+ 
+-  markerLayer->setOffset( QPointF( xOffset, yOffset ) );
++  markerLayer->setOffset( QPointF( xOffset, -yOffset ) );
+   markerLayer->setOffsetUnit( Qgis::RenderUnit::Points );
+   layers.append( markerLayer.release() );
+ 
+@@ -322,7 +322,7 @@ std::unique_ptr<QgsMarkerSymbol> QgsSymbolConverterEsriRest::parseEsriTextMarker
+   double xOffset = symbolData.value( u"xoffset"_s ).toDouble();
+   double yOffset = symbolData.value( u"yoffset"_s ).toDouble();
+ 
+-  markerLayer->setOffset( QPointF( xOffset, yOffset ) );
++  markerLayer->setOffset( QPointF( xOffset, -yOffset ) );
+   markerLayer->setOffsetUnit( Qgis::RenderUnit::Points );
+ 
+   markerLayer->setSizeUnit( Qgis::RenderUnit::Points );
+diff --git a/tests/src/core/testqgsarcgisrestutils.cpp b/tests/src/core/testqgsarcgisrestutils.cpp
+index c43c2313d91..52cd53833cc 100644
+--- a/tests/src/core/testqgsarcgisrestutils.cpp
++++ b/tests/src/core/testqgsarcgisrestutils.cpp
+@@ -277,8 +277,8 @@ void TestQgsArcGisRestUtils::testParseMarkerSymbol()
+   QCOMPARE( markerLayer->shape(), Qgis::MarkerShape::Square );
+   QCOMPARE( markerLayer->size(), 8.0 );
+   QCOMPARE( markerLayer->sizeUnit(), Qgis::RenderUnit::Points );
+-  QCOMPARE( markerLayer->angle(), -10.0 ); // opposite direction to esri spec!
+-  QCOMPARE( markerLayer->offset(), QPointF( 7, 17 ) );
++  QCOMPARE( markerLayer->angle(), -10.0 );              // opposite direction to esri spec!
++  QCOMPARE( markerLayer->offset(), QPointF( 7, -17 ) ); // y offset is opposite direction to esri spec!
+   QCOMPARE( markerLayer->offsetUnit(), Qgis::RenderUnit::Points );
+   QCOMPARE( markerLayer->strokeColor(), QColor( 152, 230, 17, 176 ) );
+   QCOMPARE( markerLayer->strokeWidth(), 5.0 );
+@@ -422,8 +422,8 @@ void TestQgsArcGisRestUtils::testPictureMarkerSymbol()
+   QCOMPARE( markerLayer->size(), 20.0 );
+   QCOMPARE( markerLayer->fixedAspectRatio(), 1.25 );
+   QCOMPARE( markerLayer->sizeUnit(), Qgis::RenderUnit::Points );
+-  QCOMPARE( markerLayer->angle(), -10.0 ); // opposite direction to esri spec!
+-  QCOMPARE( markerLayer->offset(), QPointF( 7, 17 ) );
++  QCOMPARE( markerLayer->angle(), -10.0 );              // opposite direction to esri spec!
++  QCOMPARE( markerLayer->offset(), QPointF( 7, -17 ) ); // y offset is opposite direction to esri spec!
+   QCOMPARE( markerLayer->offsetUnit(), Qgis::RenderUnit::Points );
+ 
+   // invalid json
