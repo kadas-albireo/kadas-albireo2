@@ -30,14 +30,24 @@ your option) any later version. *
   public:
     KadasMapItemTooltip( QgsMapCanvas *canvas );
     void updateForPos( const QPoint &canvasPos );
-    virtual QVariant loadResource( int type, const QUrl &url );
 
+    void setInteractive( bool interactive );
+%Docstring
+When ``interactive`` is ``False`` the tooltip ignores the pointer
+entirely: its links and image stop being clickable, and clicks and drags
+pass straight through to the canvas beneath it.
+
+Used while a map tool owns the pointer, where the tooltip is a preview
+rather than something to be operated. Interactive by default.
+%End
 
   public slots:
     void clear();
 
   protected:
     virtual void enterEvent( QEnterEvent * );
+
+    virtual void leaveEvent( QEvent * );
 
     virtual void mousePressEvent( QMouseEvent *ev );
 

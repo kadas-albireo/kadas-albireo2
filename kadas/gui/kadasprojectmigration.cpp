@@ -1578,8 +1578,10 @@ namespace
 
   /**
    * Translate one `<MapItem name="KadasPinItem">` (v2 format) into a
-   * `KadasPinAnnotationItem`. Carries name/remarks; size/anchor are
-   * dropped (pins have a canonical icon).
+   * `KadasPinAnnotationItem`. Carries name and remarks — the latter verbatim,
+   * since 2.x rich text is exactly what the pin editor and tooltip handle
+   * today, images and all. Size/anchor are dropped (pins have a canonical
+   * icon).
    */
   KadasPinAnnotationItem *translateKadasPinItem( const QDomElement &itemEl, const QgsCoordinateReferenceSystem &itemCrs, const QgsCoordinateReferenceSystem &layerCrs )
   {
@@ -1952,26 +1954,10 @@ bool KadasProjectMigration::migrateLegacyKadasItemLayers( QDomDocument &doc, QDo
       for ( QgsAnnotationItem *a : annos )
       {
         translated.append( a );
-        // Pins render their tooltip from the current title/description
-        // (see KadasMapToolEditAnnotationItem), so synthesize it here
-        // rather than importing 2.x's frozen position/height HTML.
-        if ( const auto *pin = dynamic_cast<const KadasPinAnnotationItem *>( a ) )
-        {
-          QString html;
-          if ( !pin->name().isEmpty() )
-            html += QStringLiteral( "<b>%1</b>" ).arg( pin->name().toHtmlEscaped() );
-          if ( !pin->remarks().isEmpty() )
-          {
-            if ( !html.isEmpty() )
-              html += QStringLiteral( "<br>" );
-            html += pin->remarks().toHtmlEscaped().replace( '\n', QStringLiteral( "<br>" ) );
-          }
-          tooltips.append( html );
-        }
-        else
-        {
-          tooltips.append( tooltip );
-        }
+        // Pins compose their tooltip live from the current title, description
+        // and position (see KadasPinAnnotationController::tooltip), so 2.x's
+        // frozen HTML would only shadow it.
+        tooltips.append( dynamic_cast<const KadasPinAnnotationItem *>( a ) ? QString() : tooltip );
       }
     }
 

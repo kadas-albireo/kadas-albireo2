@@ -15,6 +15,8 @@
  ***************************************************************************/
 
 #include <QGraphicsItem>
+#include <QTextDocument>
+#include <QTextDocumentFragment>
 
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationmarkeritem.h>
@@ -52,7 +54,10 @@ void KadasPinSearchProvider::fetchResults( const QString &string, const QgsLocat
         {
           continue;
         }
-        if ( pin->name().contains( string, Qt::CaseInsensitive ) || pin->remarks().contains( string, Qt::CaseInsensitive ) )
+        // A rich-text description must be matched on its text: searching the
+        // markup both misses words split by formatting and hits tag names.
+        const QString remarks = Qt::mightBeRichText( pin->remarks() ) ? QTextDocumentFragment::fromHtml( pin->remarks() ).toPlainText() : pin->remarks();
+        if ( pin->name().contains( string, Qt::CaseInsensitive ) || remarks.contains( string, Qt::CaseInsensitive ) )
         {
           QgsLocatorResult result;
           QVariantMap resultData;

@@ -29,6 +29,7 @@ class QGroupBox;
 class QLineEdit;
 class QPlainTextEdit;
 class QSpinBox;
+class QTextEdit;
 class QToolButton;
 class QButtonGroup;
 class QgsAnnotationItem;
@@ -106,8 +107,15 @@ class KadasPinStyleEditor : public KadasAnnotationStyleEditor
     bool eventFilter( QObject *watched, QEvent *event ) override;
 
   private:
+    //! Opens the rich-text dialog on the description and commits what it returns.
+    void editDescription();
+    void updateDescriptionPreview();
+
     QLineEdit *mTitleEdit = nullptr;
-    QPlainTextEdit *mDescriptionEdit = nullptr;
+    //! Read-only rendering of mRemarks; the description itself is edited in a dialog.
+    QTextEdit *mDescriptionPreview = nullptr;
+    //! The pin's description, as rich text or plain text.
+    QString mRemarks;
     QSpinBox *mSizeSpin = nullptr;
     QgsDoubleSpinBox *mRotationSpin = nullptr;
     QgsColorButton *mFillColorBtn = nullptr;

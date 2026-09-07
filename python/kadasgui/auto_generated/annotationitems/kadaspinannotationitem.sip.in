@@ -40,6 +40,10 @@ class KadasPinAnnotationItem : QgsAnnotationMarkerItem
     void setName( const QString &name );
 
     QString remarks() const;
+%Docstring
+Rich text (Qt's HTML subset), or plain text; images are attachment:///
+references within it.
+%End
     void setRemarks( const QString &remarks );
 
     static QString defaultIconPath();

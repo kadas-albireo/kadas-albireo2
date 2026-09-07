@@ -45,7 +45,7 @@ QString KadasPinAnnotationItem::defaultIconPath()
 
 void KadasPinAnnotationItem::installDefaultSymbol()
 {
-  auto *layer = new QgsSvgMarkerSymbolLayer( defaultIconPath(), 24.0 );
+  auto *layer = new QgsSvgMarkerSymbolLayer( defaultIconPath(), 12.0 );
   layer->setFillColor( QColor( 255, 0, 0 ) );
   layer->setVerticalAnchorPoint( Qgis::VerticalAnchorPoint::Bottom );
   layer->setHorizontalAnchorPoint( Qgis::HorizontalAnchorPoint::Center );

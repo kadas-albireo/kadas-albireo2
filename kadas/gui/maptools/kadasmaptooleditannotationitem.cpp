@@ -42,34 +42,11 @@
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
-#include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 #include "kadas/gui/kadassidepanel.h"
 #include "kadas/gui/kadasfeaturepicker.h"
 #include "kadas/gui/kadasfloatinginputwidget.h"
+#include "kadas/gui/kadasmapitemtooltip.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
-
-namespace
-{
-  //! Composes an HTML tooltip from a pin's title/description and stores it on
-  //! the annotation layer so the map-item tooltip surfaces it on hover.
-  void updatePinTooltip( QgsAnnotationLayer *layer, const QString &itemId, const QgsAnnotationItem *item )
-  {
-    const auto *pin = dynamic_cast<const KadasPinAnnotationItem *>( item );
-    if ( !pin )
-      return;
-    QString html;
-    if ( !pin->name().isEmpty() )
-      html += QStringLiteral( "<b>%1</b>" ).arg( pin->name().toHtmlEscaped() );
-    if ( !pin->remarks().isEmpty() )
-    {
-      if ( !html.isEmpty() )
-        html += QStringLiteral( "<br>" );
-      html += pin->remarks().toHtmlEscaped().replace( '\n', QStringLiteral( "<br>" ) );
-    }
-    KadasAnnotationLayerHelpers::setTooltip( layer, itemId, html );
-  }
-} // namespace
-
 
 class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
 {
@@ -254,6 +231,15 @@ void KadasMapToolEditAnnotationItem::activate()
 {
   QgsMapTool::activate();
   setCursor( Qt::ArrowCursor );
+  if ( !mTooltipWidget )
+  {
+    // Editing is the one time a user most wants to see what an item will look
+    // like to a reader, so hovering previews it here too - but as a preview
+    // only: it must not swallow the clicks and drags this tool exists for.
+    mTooltipWidget = new KadasMapItemTooltip( canvas() );
+    mTooltipWidget->setInteractive( false );
+    connect( canvas(), &QgsMapCanvas::extentsChanged, mTooltipWidget, &KadasMapItemTooltip::clear );
+  }
   if ( !mController || !mLayer )
   {
     canvas()->unsetMapTool( this );
@@ -434,6 +420,8 @@ void KadasMapToolEditAnnotationItem::clearTempRubberBand()
 void KadasMapToolEditAnnotationItem::deactivate()
 {
   QgsMapTool::deactivate();
+  delete mTooltipWidget;
+  mTooltipWidget = nullptr;
   if ( mEditItemHidden && mItem )
   {
     mEditItemHidden = false;
@@ -464,6 +452,8 @@ void KadasMapToolEditAnnotationItem::deactivate()
 
 void KadasMapToolEditAnnotationItem::canvasPressEvent( QgsMapMouseEvent *e )
 {
+  if ( mTooltipWidget )
+    mTooltipWidget->clear();
   if ( !mItem || !mController || !mLayer )
     return;
 
@@ -563,6 +553,16 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
   {
     mIgnoreNextMoveEvent = false;
     return;
+  }
+
+  // A held button or an unfinished shape means an edit is under way, and a
+  // preview would only be in the way of it.
+  if ( mTooltipWidget )
+  {
+    if ( e->buttons() == Qt::NoButton && mDrawState != DrawState::InProgress )
+      mTooltipWidget->updateForPos( e->pos() );
+    else
+      mTooltipWidget->clear();
   }
 
   KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
@@ -863,7 +863,6 @@ void KadasMapToolEditAnnotationItem::setupStyleEditor()
       updateTempRubberBand();
     if ( mController )
       mController->persistStyle( item );
-    updatePinTooltip( mLayer, mItemId, item );
     pushState();
     emit stylePersisted();
   } );

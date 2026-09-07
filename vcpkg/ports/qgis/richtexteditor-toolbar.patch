@@ -1,0 +1,300 @@
+From 61c28769955f80652f08388d868836323c623ecd Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Mon, 7 Sep 2026 18:27:46 +0200
+Subject: [PATCH 1/3] QgsRichTextEditor: toolbar accessor + add missing  SVG
+ icons
+
+---
+ images/images.qrc                                     |  2 ++
+ images/themes/default/mActionEditBulletList.svg       |  1 +
+ images/themes/default/mActionEditOrderedList.svg      |  1 +
+ .../PyQt6/gui/auto_generated/qgsrichtexteditor.sip.in | 10 ++++++++++
+ src/gui/qgsrichtexteditor.h                           | 11 +++++++++++
+ src/ui/qgsrichtexteditorbase.ui                       |  8 ++++++++
+ 6 files changed, 33 insertions(+)
+ create mode 100644 images/themes/default/mActionEditBulletList.svg
+ create mode 100644 images/themes/default/mActionEditOrderedList.svg
+
+diff --git a/images/images.qrc b/images/images.qrc
+index b23de127a58..134aab5f7d1 100644
+--- a/images/images.qrc
++++ b/images/images.qrc
+@@ -301,6 +301,8 @@
+         <file>themes/default/mActionDigitizeWithSegment.svg</file>
+         <file>themes/default/mActionDuplicateLayer.svg</file>
+         <file>themes/default/mActionDuplicateComposer.svg</file>
++        <file>themes/default/mActionEditBulletList.svg</file>
++        <file>themes/default/mActionEditOrderedList.svg</file>
+         <file>themes/default/mActionEditCopy.svg</file>
+         <file>themes/default/mActionEditCut.svg</file>
+         <file>themes/default/mActionEditPaste.svg</file>
+diff --git a/images/themes/default/mActionEditBulletList.svg b/images/themes/default/mActionEditBulletList.svg
+new file mode 100644
+index 00000000000..14c082e6ca3
+--- /dev/null
++++ b/images/themes/default/mActionEditBulletList.svg
+@@ -0,0 +1 @@
++<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><g fill="#4d4d4d"><circle cx="3.6" cy="5.5" r="1.6"/><circle cx="3.6" cy="12" r="1.6"/><circle cx="3.6" cy="18.5" r="1.6"/><path d="M8 4.5h13v2H8zM8 11h13v2H8zM8 17.5h13v2H8z"/></g></svg>
+diff --git a/images/themes/default/mActionEditOrderedList.svg b/images/themes/default/mActionEditOrderedList.svg
+new file mode 100644
+index 00000000000..d0168220112
+--- /dev/null
++++ b/images/themes/default/mActionEditOrderedList.svg
+@@ -0,0 +1 @@
++<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><g fill="none" stroke="#4d4d4d" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M0.5 1.5 L1.9 0.4 L1.9 5.6" transform="translate(1.9 3.0) scale(.8)"/><path d="M0.3 1.5 C0.3 -0.3 3.5 -0.3 3.5 1.7 C3.5 3.2 0.3 4.1 0.3 5.6 L3.6 5.6" transform="translate(1.9 9.5) scale(.8)"/><path d="M0.4 1.2 C1.2 -0.1 3.5 0.1 3.5 1.6 C3.5 2.6 2.6 3.0 1.9 3.0 C2.6 3.0 3.7 3.4 3.7 4.4 C3.7 6.1 1.0 6.2 0.3 4.9" transform="translate(1.9 16.0) scale(.8)"/></g><path fill="#4d4d4d" d="M8 4.5h13v2H8zM8 11h13v2H8zM8 17.5h13v2H8z"/></svg>
+diff --git a/python/PyQt6/gui/auto_generated/qgsrichtexteditor.sip.in b/python/PyQt6/gui/auto_generated/qgsrichtexteditor.sip.in
+index ae343f25d22..cad618da4d9 100644
+--- a/python/PyQt6/gui/auto_generated/qgsrichtexteditor.sip.in
++++ b/python/PyQt6/gui/auto_generated/qgsrichtexteditor.sip.in
+@@ -80,6 +80,16 @@ Returns the widget's content as a HTML string.
+ Returns the widget's QTextEditor control.
+ 
+ .. versionadded:: 3.40
++%End
++
++    QToolBar *toolBar();
++%Docstring
++Returns the widget's toolbar.
++
++Exposed so that embedders can adapt it to the space they have, e.g. by
++shrinking its icons or rehosting its actions.
++
++.. versionadded:: 4.4
+ %End
+ 
+     QTextDocument *document();
+diff --git a/src/gui/qgsrichtexteditor.h b/src/gui/qgsrichtexteditor.h
+index a98464f722d..4a33c4819b0 100644
+--- a/src/gui/qgsrichtexteditor.h
++++ b/src/gui/qgsrichtexteditor.h
+@@ -40,6 +40,7 @@
+ 
+ class QImage;
+ class QComboBox;
++class QToolBar;
+ class QgsColorButton;
+ class QgsCodeEditorHTML;
+ 
+@@ -118,6 +119,16 @@ class GUI_EXPORT QgsRichTextEditor : public QWidget, private Ui::QgsRichTextEdit
+      */
+     QTextEdit *textEdit() { return mTextEdit; }
+ 
++    /**
++     * Returns the widget's toolbar.
++     *
++     * Exposed so that embedders can adapt it to the space they have, e.g. by
++     * shrinking its icons or rehosting its actions.
++     *
++     * \since QGIS 4.4
++     */
++    QToolBar *toolBar() { return mToolBar; }
++
+     /**
+      * Returns a reference to the QTextDocument shown in the widget.
+      */
+diff --git a/src/ui/qgsrichtexteditorbase.ui b/src/ui/qgsrichtexteditorbase.ui
+index b0e9f7dc58a..ce8168f85da 100644
+--- a/src/ui/qgsrichtexteditorbase.ui
++++ b/src/ui/qgsrichtexteditorbase.ui
+@@ -200,6 +200,10 @@
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
++   <property name="icon">
++    <iconset resource="../../images/images.qrc">
++     <normaloff>:/images/themes/default/mActionEditBulletList.svg</normaloff>:/images/themes/default/mActionEditBulletList.svg</iconset>
++   </property>
+    <property name="text">
+     <string>Bullet List</string>
+    </property>
+@@ -211,6 +215,10 @@
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
++   <property name="icon">
++    <iconset resource="../../images/images.qrc">
++     <normaloff>:/images/themes/default/mActionEditOrderedList.svg</normaloff>:/images/themes/default/mActionEditOrderedList.svg</iconset>
++   </property>
+    <property name="text">
+     <string>Ordered List</string>
+    </property>
+-- 
+2.53.0
+
+
+From bf64e7328022a9bf70f94240e200a580ba2c712d Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Tue, 8 Sep 2026 11:46:49 +0200
+Subject: [PATCH 2/3] insert an image from a URL
+
+---
+ src/gui/qgsrichtexteditor.cpp   | 58 ++++++++++++++++++++++++++++++++-
+ src/gui/qgsrichtexteditor.h     |  1 +
+ src/ui/qgsrichtexteditorbase.ui |  8 +++++
+ 3 files changed, 66 insertions(+), 1 deletion(-)
+
+diff --git a/src/gui/qgsrichtexteditor.cpp b/src/gui/qgsrichtexteditor.cpp
+index 270822c1f0d..0cd07e50003 100644
+--- a/src/gui/qgsrichtexteditor.cpp
++++ b/src/gui/qgsrichtexteditor.cpp
+@@ -35,8 +35,10 @@
+ #include "qgscodeeditorwidget.h"
+ #include "qgscolorbutton.h"
+ #include "qgsgui.h"
++#include "qgsnetworkaccessmanager.h"
+ 
+ #include <QApplication>
++#include <QBuffer>
+ #include <QClipboard>
+ #include <QComboBox>
+ #include <QFileDialog>
+@@ -44,7 +46,9 @@
+ #include <QImageReader>
+ #include <QInputDialog>
+ #include <QMenu>
++#include <QMessageBox>
+ #include <QMimeData>
++#include <QNetworkRequest>
+ #include <QSettings>
+ #include <QString>
+ #include <QTextList>
+@@ -110,6 +114,7 @@ QgsRichTextEditor::QgsRichTextEditor( QWidget *parent )
+   // link
+   mActionInsertLink->setShortcut( QKeySequence( u"CTRL+L"_s ) );
+   connect( mActionInsertLink, &QAction::triggered, this, &QgsRichTextEditor::textLink );
++  connect( mActionInsertImageFromUrl, &QAction::triggered, this, &QgsRichTextEditor::insertImageFromUrl );
+ 
+   // bold, italic & underline
+   mActionBold->setShortcut( QKeySequence( u"CTRL+B"_s ) );
+@@ -242,7 +247,15 @@ void QgsRichTextEditor::setMode( Mode mode )
+     mToolBar->addAction( mActionIncreaseIndent );
+     mToolBar->addSeparator();
+     mToolBar->addAction( mActionInsertLink );
+-    mToolBar->addAction( mActionInsertImage );
++    // Both image sources share one toolbar slot: clicking the button inserts
++    // from a file as before, its arrow offers the URL alternative.
++    QToolButton *insertImageButton = new QToolButton( mToolBar );
++    insertImageButton->setDefaultAction( mActionInsertImage );
++    insertImageButton->setPopupMode( QToolButton::MenuButtonPopup );
++    QMenu *insertImageMenu = new QMenu( insertImageButton );
++    insertImageMenu->addAction( mActionInsertImageFromUrl );
++    insertImageButton->setMenu( insertImageMenu );
++    mToolBar->addWidget( insertImageButton );
+   }
+   if ( mode != Mode::PlainText )
+   {
+@@ -787,3 +800,46 @@ void QgsRichTextEditor::insertImage()
+ 
+   mTextEdit->dropImage( image, QFileInfo( file ).suffix().toUpper().toLocal8Bit().data() );
+ }
++
++void QgsRichTextEditor::insertImageFromUrl()
++{
++  bool ok = false;
++  const QString entered = QInputDialog::getText( this, tr( "Image from URL" ), tr( "Enter the URL of an image:" ), QLineEdit::Normal, QString(), &ok );
++  if ( !ok || entered.trimmed().isEmpty() )
++    return;
++
++  const QUrl url( entered.trimmed() );
++  if ( !url.isValid() || !( url.scheme().compare( "http"_L1, Qt::CaseInsensitive ) == 0 || url.scheme().compare( "https"_L1, Qt::CaseInsensitive ) == 0 ) )
++  {
++    QMessageBox::warning( this, tr( "Image from URL" ), tr( "Please enter a valid http:// or https:// URL." ) );
++    return;
++  }
++
++  QNetworkRequest request( url );
++  const QgsNetworkReplyContent content = QgsNetworkAccessManager::instance()->blockingGet( request );
++  if ( content.error() != QNetworkReply::NoError || content.content().isEmpty() )
++  {
++    QMessageBox::warning( this, tr( "Image from URL" ), tr( "Failed to download the image: %1" ).arg( content.errorString() ) );
++    return;
++  }
++
++  QByteArray data = content.content();
++  QBuffer buffer( &data );
++  buffer.open( QIODevice::ReadOnly );
++  QImageReader reader;
++  // Honour any EXIF orientation, so a photo taken on a phone does not come in
++  // on its side.
++  reader.setAutoTransform( true );
++  reader.setDevice( &buffer );
++  // Take the format from the payload rather than the URL, which need not carry
++  // a usable extension at all.
++  const QByteArray format = reader.format().isEmpty() ? QByteArray( "PNG" ) : reader.format().toUpper();
++  const QImage image = reader.read();
++  if ( image.isNull() )
++  {
++    QMessageBox::warning( this, tr( "Image from URL" ), tr( "That URL did not return an image." ) );
++    return;
++  }
++
++  mTextEdit->dropImage( image, QString::fromLatin1( format ) );
++}
+diff --git a/src/gui/qgsrichtexteditor.h b/src/gui/qgsrichtexteditor.h
+index 4a33c4819b0..a212717c5e2 100644
+--- a/src/gui/qgsrichtexteditor.h
++++ b/src/gui/qgsrichtexteditor.h
+@@ -194,6 +194,7 @@ class GUI_EXPORT QgsRichTextEditor : public QWidget, private Ui::QgsRichTextEdit
+     void increaseIndentation();
+     void decreaseIndentation();
+     void insertImage();
++    void insertImageFromUrl();
+     void editSource( bool enabled );
+ 
+   private:
+diff --git a/src/ui/qgsrichtexteditorbase.ui b/src/ui/qgsrichtexteditorbase.ui
+index ce8168f85da..660887617f7 100644
+--- a/src/ui/qgsrichtexteditorbase.ui
++++ b/src/ui/qgsrichtexteditorbase.ui
+@@ -262,6 +262,14 @@
+     <string>Insert image</string>
+    </property>
+   </action>
++  <action name="mActionInsertImageFromUrl">
++   <property name="text">
++    <string>Insert Image from URL…</string>
++   </property>
++   <property name="toolTip">
++    <string>Download an image and insert it</string>
++   </property>
++  </action>
+   <action name="mActionEditSource">
+    <property name="checkable">
+     <bool>true</bool>
+-- 
+2.53.0
+
+
+From 6d42484468e10e883fa5294203530844cfb60971 Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Tue, 8 Sep 2026 12:14:41 +0200
+Subject: [PATCH 3/3] Honour EXIF orientation when inserting an image from a
+ file
+
+A photo taken on a phone carries its rotation in EXIF metadata rather
+than in the pixels, so QImageReader hands back a sideways image unless
+asked to apply it.
+---
+ src/gui/qgsrichtexteditor.cpp | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/gui/qgsrichtexteditor.cpp b/src/gui/qgsrichtexteditor.cpp
+index 0cd07e50003..c8b659afe9c 100644
+--- a/src/gui/qgsrichtexteditor.cpp
++++ b/src/gui/qgsrichtexteditor.cpp
+@@ -796,7 +796,11 @@ void QgsRichTextEditor::insertImage()
+   if ( file.isEmpty() )
+     return;
+ 
+-  const QImage image = QImageReader( file ).read();
++  QImageReader reader( file );
++  // Honour any EXIF orientation, so a photo taken on a phone does not come in
++  // on its side.
++  reader.setAutoTransform( true );
++  const QImage image = reader.read();
+ 
+   mTextEdit->dropImage( image, QFileInfo( file ).suffix().toUpper().toLocal8Bit().data() );
+ }
+-- 
+2.53.0
+

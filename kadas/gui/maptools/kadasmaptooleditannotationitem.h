@@ -30,6 +30,7 @@
 
 class KadasAnnotationItemController;
 class KadasAnnotationStyleEditor;
+class KadasMapItemTooltip;
 class KadasSidePanel;
 class KadasFloatingInputWidget;
 class QBoxLayout;
@@ -109,6 +110,8 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     QPointer<QWidget> mExtraTopWidget;
 
     KadasEditContext mEditContext;
+    //! Non-interactive preview of the hovered item's tooltip; alive only while the tool is.
+    KadasMapItemTooltip *mTooltipWidget = nullptr;
     QgsVector mMoveOffset;
     Qt::MouseButton mPressedButton = Qt::NoButton;
     bool mEditItemHidden = false;

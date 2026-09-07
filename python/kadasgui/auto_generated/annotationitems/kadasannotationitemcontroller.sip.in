@@ -115,6 +115,19 @@ leaves them untouched.
 
 
 
+    virtual QString tooltip( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs ) const;
+%Docstring
+Rich-text tooltip for ``item``, whose geometry is expressed in
+``itemCrs``.
+
+Recomputed on every hover, so it may include values that the item does
+not own and that change under it (the coordinate display format, the
+project heightmap). Returning an empty string means "no live tooltip":
+the caller then falls back to the static text stored on the layer via
+KadasAnnotationLayerHelpers.tooltip().
+%End
+
+
 
 
     virtual void applyPersistedStyle( QgsAnnotationItem *item ) const;

@@ -43,6 +43,7 @@ class KADAS_GUI_EXPORT KadasPinAnnotationItem : public QgsAnnotationMarkerItem
     QString name() const { return mName; }
     void setName( const QString &name ) { mName = name; }
 
+    //! Rich text (Qt's HTML subset), or plain text; images are attachment:/// references within it.
     QString remarks() const { return mRemarks; }
     void setRemarks( const QString &remarks ) { mRemarks = remarks; }
 

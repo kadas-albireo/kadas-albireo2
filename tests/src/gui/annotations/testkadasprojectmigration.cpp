@@ -15,6 +15,9 @@
  ***************************************************************************/
 
 #include <QDomDocument>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QPair>
 #include <QSet>
 #include <QStandardPaths>
@@ -55,6 +58,7 @@ class TestKadasProjectMigration : public QObject
     void migrateLegacyKadasItemLayer_translatesPictureItem();
     void migrateLegacyKadasItemLayer_translatesSymbolItem();
     void migrateLegacyKadasItemLayer_translatesPinItem();
+    void migrateLegacyKadasItemLayer_translatesV1PinItemWithRichRemarks();
     void migrateLegacyKadasItemLayer_translatesCircularSectorItem();
     void migrateLegacyKadasItemLayer_translatesGpxRouteItem();
     void migrateLegacyKadasItemLayer_translatesGpxWaypointItem();
@@ -587,11 +591,12 @@ void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesPinItem()
   itemEl.setAttribute( QStringLiteral( "format_version" ), QStringLiteral( "2" ) );
   itemEl.setAttribute( QStringLiteral( "pos_x" ), QStringLiteral( "1000" ) );
   itemEl.setAttribute( QStringLiteral( "pos_y" ), QStringLiteral( "2000" ) );
-  // NOTE: KadasSymbolItem::writeXmlPrivate clobbers the class-name `name`
-  // attribute with the display name (legacy bug). The XML rewriter
-  // dispatches on `name`, so we leave the display name empty here and
-  // only set `remarks`. Real-world legacy saves with non-empty pin names
-  // are unrecoverable by either dispatcher.
+  // NOTE: in the v2 format KadasSymbolItem::writeXmlPrivate clobbered the
+  // class-name `name` attribute with the display name (legacy bug). The XML
+  // rewriter dispatches on `name`, so we leave the display name empty here and
+  // only set `remarks`. Real 2.3 saves use the v1 JSON-CDATA format instead,
+  // where the display name does survive — see
+  // migrateLegacyKadasItemLayer_translatesV1PinItemWithRichRemarks().
   itemEl.setAttribute( QStringLiteral( "remarks" ), QStringLiteral( "test pin" ) );
   mapLayerEl.appendChild( itemEl );
 
@@ -603,6 +608,71 @@ void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesPinItem()
   const QDomNodeList items = migratedLayer.firstChildElement( QStringLiteral( "items" ) ).elementsByTagName( QStringLiteral( "item" ) );
   QCOMPARE( items.size(), 1 );
   QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "kadas:pin" ) );
+}
+
+void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesV1PinItemWithRichRemarks()
+{
+  // What a real Kadas 2.3 project holds: <MapItem name="KadasPinItem"> with a
+  // JSON-CDATA payload whose `remarks` is the HTML document the old rich-text
+  // editor produced. The display name survives (the v1 rewriter routes it to
+  // `pin_name`, out of the way of the class-name dispatch), the markup is
+  // carries over verbatim — the pin editor and tooltip are rich text again, so
+  // formatting, link labels and every embedded image are kept.
+  QDomDocument doc;
+  QDomElement root = doc.createElement( QStringLiteral( "qgis" ) );
+  doc.appendChild( root );
+  QDomElement projectLayersEl = doc.createElement( QStringLiteral( "projectlayers" ) );
+  root.appendChild( projectLayersEl );
+
+  QDomElement mapLayerEl = appendKadasItemLayer( doc, projectLayersEl, QStringLiteral( "pin_id" ), QStringLiteral( "Pins" ), QStringLiteral( "EPSG:3857" ) );
+
+  const QString remarksHtml = QStringLiteral(
+    "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\"><html><head></head><body>"
+    "<p>Meeting point, see <a href=\"https://example.org/plan\"><span style=\" color:#0000ff;\">the plan</span></a></p>"
+    "<p><img src=\"attachment:///photo.png?w=192&amp;h=128\" /></p>"
+    "</body></html>"
+  );
+
+  QJsonObject props;
+  props.insert( QStringLiteral( "anchorX" ), 0.5 );
+  props.insert( QStringLiteral( "anchorY" ), 1.0 );
+  props.insert( QStringLiteral( "filePath" ), QStringLiteral( ":/kadas/icons/pin_red" ) );
+  props.insert( QStringLiteral( "name" ), QStringLiteral( "Camp" ) );
+  props.insert( QStringLiteral( "remarks" ), remarksHtml );
+  props.insert( QStringLiteral( "zIndex" ), 0 );
+  QJsonObject state;
+  state.insert( QStringLiteral( "angle" ), 0 );
+  state.insert( QStringLiteral( "pos" ), QJsonArray { 1000, 2000 } );
+  state.insert( QStringLiteral( "size" ), QJsonArray { 24, 40 } );
+  state.insert( QStringLiteral( "status" ), 2 );
+  QJsonObject payload;
+  payload.insert( QStringLiteral( "props" ), props );
+  payload.insert( QStringLiteral( "state" ), state );
+
+  QDomElement itemEl = doc.createElement( QStringLiteral( "MapItem" ) );
+  itemEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasPinItem" ) );
+  itemEl.setAttribute( QStringLiteral( "crs" ), QStringLiteral( "EPSG:3857" ) );
+  itemEl.setAttribute( QStringLiteral( "editor" ), QStringLiteral( "KadasSymbolAttributesEditor" ) );
+  itemEl.appendChild( doc.createCDATASection( QString::fromUtf8( QJsonDocument( payload ).toJson( QJsonDocument::Compact ) ) ) );
+  mapLayerEl.appendChild( itemEl );
+
+  QStringList filesToAttach;
+  QVERIFY( KadasProjectMigration::migrateProjectXml( QString(), doc, filesToAttach ) );
+
+  const QDomElement migratedLayer = doc.documentElement().firstChildElement( QStringLiteral( "projectlayers" ) ).firstChildElement( QStringLiteral( "maplayer" ) );
+  QCOMPARE( migratedLayer.attribute( QStringLiteral( "type" ) ), QStringLiteral( "annotation" ) );
+  const QDomNodeList items = migratedLayer.firstChildElement( QStringLiteral( "items" ) ).elementsByTagName( QStringLiteral( "item" ) );
+  QCOMPARE( items.size(), 1 );
+  const QDomElement pinEl = items.at( 0 ).toElement();
+  QCOMPARE( pinEl.attribute( QStringLiteral( "type" ) ), QStringLiteral( "kadas:pin" ) );
+  QCOMPARE( pinEl.attribute( QStringLiteral( "kadasName" ) ), QStringLiteral( "Camp" ) );
+  const QString remarks = pinEl.attribute( QStringLiteral( "kadasRemarks" ) );
+  QCOMPARE( remarks, remarksHtml );
+  // Spelled out too, so a regression in the pass-through reads legibly: the
+  // link keeps its label as well as its target, and the image survives.
+  QVERIFY( remarks.contains( QStringLiteral( "href=\"https://example.org/plan\"" ) ) );
+  QVERIFY( remarks.contains( QStringLiteral( "the plan" ) ) );
+  QVERIFY( remarks.contains( QStringLiteral( "attachment:///photo.png" ) ) );
 }
 
 void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesCircularSectorItem()

@@ -42,6 +42,8 @@
 #include <QPushButton>
 #include <QSignalBlocker>
 #include <QSpinBox>
+#include <QTextDocument>
+#include <QTextEdit>
 #include <QToolButton>
 #include <QUrl>
 #include <cmath>
@@ -53,6 +55,7 @@
 #include <qgis/qgsannotationpictureitem.h>
 #include <qgis/qgsannotationpointtextitem.h>
 #include <qgis/qgsannotationpolygonitem.h>
+#include <qgis/qgsapplication.h>
 #include <qgis/qgscallout.h>
 #include <qgis/qgscolorbutton.h>
 #include <qgis/qgsdoublespinbox.h>
@@ -65,6 +68,7 @@
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgsscreenproperties.h>
+#include <qgis/qgssettings.h>
 #include <qgis/qgssvgselectorwidget.h>
 #include <qgis/qgssymbollayerutils.h>
 #include <qgis/qgstextbackgroundsettings.h>
@@ -76,6 +80,8 @@
 #include "kadas/gui/annotationitems/kadaslineannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadaspictureannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
+#include "kadas/gui/kadasattachmentutils.h"
+#include "kadas/gui/kadasrichtextdialog.h"
 #include "kadas/gui/annotationitems/kadasrectangleannotationitem.h"
 
 namespace
@@ -352,11 +358,28 @@ KadasPinStyleEditor::KadasPinStyleEditor( QWidget *parent )
   mTitleEdit->setToolTip( tr( "Pin title" ) );
   form->addRow( tr( "Title" ), mTitleEdit );
 
-  mDescriptionEdit = new QPlainTextEdit();
-  mDescriptionEdit->setToolTip( tr( "Pin description" ) );
-  mDescriptionEdit->setTabChangesFocus( true );
-  mDescriptionEdit->setFixedHeight( 60 );
-  form->addRow( tr( "Description" ), mDescriptionEdit );
+  // The description is rich text with links and images, which needs the whole
+  // QgsRichTextEditor toolbar — far more room than this form row has. So show a
+  // preview here and hand editing to a dialog.
+  mDescriptionPreview = new QTextEdit();
+  mDescriptionPreview->setReadOnly( true );
+  mDescriptionPreview->setFixedHeight( 60 );
+  // A scroll area asks for a generous width by default, which would push the
+  // side panel past its budget; it can have whatever the form row leaves it.
+  mDescriptionPreview->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Fixed );
+  mDescriptionPreview->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+  mDescriptionPreview->setPlaceholderText( tr( "No description" ) );
+  mDescriptionPreview->setToolTip( tr( "Pin description — double-click to edit" ) );
+  mDescriptionPreview->installEventFilter( this );
+  KadasAttachmentUtils::installResourceProvider( mDescriptionPreview->document() );
+  auto *editDescriptionBtn = new QToolButton();
+  editDescriptionBtn->setIcon( QgsApplication::getThemeIcon( QStringLiteral( "/mActionToggleEditing.svg" ) ) );
+  editDescriptionBtn->setToolTip( tr( "Edit the description" ) );
+  auto *descriptionRow = new QHBoxLayout();
+  descriptionRow->setContentsMargins( 0, 0, 0, 0 );
+  descriptionRow->addWidget( mDescriptionPreview );
+  descriptionRow->addWidget( editDescriptionBtn, 0, Qt::AlignTop );
+  form->addRow( tr( "Description" ), descriptionRow );
 
   mSizeSpin = new QSpinBox();
   mSizeSpin->setRange( 1, 200 );
@@ -374,19 +397,39 @@ KadasPinStyleEditor::KadasPinStyleEditor( QWidget *parent )
 
   connect( mTitleEdit, &QLineEdit::textChanged, this, &KadasAnnotationStyleEditor::previewChanged );
   connect( mTitleEdit, &QLineEdit::editingFinished, this, &KadasAnnotationStyleEditor::committed );
-  connect( mDescriptionEdit, &QPlainTextEdit::textChanged, this, &KadasAnnotationStyleEditor::previewChanged );
-  mDescriptionEdit->installEventFilter( this );
+  connect( editDescriptionBtn, &QToolButton::clicked, this, &KadasPinStyleEditor::editDescription );
   connect( mSizeSpin, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
   connect( mRotationSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
   connect( mFillColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
 }
 
+void KadasPinStyleEditor::editDescription()
+{
+  KadasRichTextDialog dialog( tr( "Pin description" ), mRemarks, this );
+  if ( dialog.exec() != QDialog::Accepted )
+    return;
+  mRemarks = dialog.html();
+  updateDescriptionPreview();
+  emit committed();
+}
+
+void KadasPinStyleEditor::updateDescriptionPreview()
+{
+  if ( Qt::mightBeRichText( mRemarks ) )
+    mDescriptionPreview->setHtml( mRemarks );
+  else
+    mDescriptionPreview->setPlainText( mRemarks );
+}
+
 bool KadasPinStyleEditor::eventFilter( QObject *watched, QEvent *event )
 {
-  // QPlainTextEdit has no editingFinished signal; finalize (push history +
-  // persist) when the description loses focus, mirroring QLineEdit semantics.
-  if ( watched == mDescriptionEdit && event->type() == QEvent::FocusOut )
-    emit committed();
+  // The preview is read-only, so a double-click on it has nothing else to mean:
+  // treat it as the shortcut into the dialog the adjacent button opens.
+  if ( watched == mDescriptionPreview && event->type() == QEvent::MouseButtonDblClick )
+  {
+    editDescription();
+    return true;
+  }
   return KadasAnnotationStyleEditor::eventFilter( watched, event );
 }
 
@@ -394,9 +437,10 @@ void KadasPinStyleEditor::loadFromItem( const QgsAnnotationItem *item )
 {
   if ( const auto *pin = dynamic_cast<const KadasPinAnnotationItem *>( item ) )
   {
-    const QSignalBlocker bt( mTitleEdit ), bd( mDescriptionEdit );
+    const QSignalBlocker bt( mTitleEdit );
     mTitleEdit->setText( pin->name() );
-    mDescriptionEdit->setPlainText( pin->remarks() );
+    mRemarks = pin->remarks();
+    updateDescriptionPreview();
   }
   const auto *marker = dynamic_cast<const QgsAnnotationMarkerItem *>( item );
   if ( !marker || !marker->symbol() || marker->symbol()->symbolLayerCount() == 0 )
@@ -415,7 +459,7 @@ void KadasPinStyleEditor::applyToItem( QgsAnnotationItem *item ) const
   if ( auto *pin = dynamic_cast<KadasPinAnnotationItem *>( item ) )
   {
     pin->setName( mTitleEdit->text() );
-    pin->setRemarks( mDescriptionEdit->toPlainText() );
+    pin->setRemarks( mRemarks );
   }
   auto *marker = dynamic_cast<QgsAnnotationMarkerItem *>( item );
   if ( !marker || !marker->symbol() || marker->symbol()->symbolLayerCount() == 0 )

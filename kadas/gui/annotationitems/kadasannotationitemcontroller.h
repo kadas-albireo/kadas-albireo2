@@ -197,6 +197,24 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     }
 #endif
 
+    // ----- Tooltip --------------------------------------------------------
+
+    /**
+     * Rich-text tooltip for \a item, whose geometry is expressed in \a itemCrs.
+     *
+     * Recomputed on every hover, so it may include values that the item does not
+     * own and that change under it (the coordinate display format, the project
+     * heightmap). Returning an empty string means "no live tooltip": the caller
+     * then falls back to the static text stored on the layer via
+     * KadasAnnotationLayerHelpers::tooltip().
+     */
+    virtual QString tooltip( const QgsAnnotationItem *item, const QgsCoordinateReferenceSystem &itemCrs ) const
+    {
+      Q_UNUSED( item );
+      Q_UNUSED( itemCrs );
+      return QString();
+    }
+
     // ----- KML export ----------------------------------------------------
 
 #ifndef SIP_RUN

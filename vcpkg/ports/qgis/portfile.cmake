@@ -36,6 +36,11 @@ vcpkg_from_github(
   # canvas layers + raster elevation surface z-range from band statistics
   annotation-3d-picture-billboards.patch # https://github.com/qgis/QGIS/pull/67135
   # picture annotation items as 3d billboards
+  richtexteditor-toolbar.patch
+  # expose the QgsRichTextEditor toolbar, so an embedder can shrink its icons
+  # and rehost its actions in a layout that wraps, and give the bullet/ordered
+  # list actions icons - they were the only two without, so they rendered as
+  # wide text buttons (branch richtexteditor-toolbar, PR pending)
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
