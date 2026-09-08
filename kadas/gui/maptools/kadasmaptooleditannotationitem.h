@@ -83,6 +83,9 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     //! Emitted after a committed style edit has been persisted to settings.
     void stylePersisted();
 
+  protected:
+    bool eventFilter( QObject *watched, QEvent *event ) override;
+
   private:
     enum class DrawState
     {
@@ -110,6 +113,11 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     QPointer<QWidget> mExtraTopWidget;
 
     KadasEditContext mEditContext;
+    //! TRUE while the pointer is over the editor panel, where the map tooltip previews the edit.
+    bool mPointerInEditor = false;
+    //! Shows the edited item's tooltip beside it, for as long as the pointer is in the editor.
+    void previewTooltipForEditedItem();
+
     //! Non-interactive preview of the hovered item's tooltip; alive only while the tool is.
     KadasMapItemTooltip *mTooltipWidget = nullptr;
     QgsVector mMoveOffset;

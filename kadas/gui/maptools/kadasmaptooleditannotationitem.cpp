@@ -266,6 +266,10 @@ void KadasMapToolEditAnnotationItem::activate()
   connect( mStateHistory, &KadasStateHistory::stateChanged, this, &KadasMapToolEditAnnotationItem::stateChanged );
 
   mBottomBar = new KadasSidePanel( canvas() );
+  // The panel is a child of the canvas, so once the pointer reaches it the
+  // canvas sees no more moves. Watch it directly instead, and preview the item
+  // being edited for as long as the pointer is in there.
+  mBottomBar->installEventFilter( this );
   mBottomBar->setTitle( ( mAllowCreate ? tr( "Draw %1" ) : tr( "Edit %1" ) ).arg( mController->itemName() ) );
   connect( mBottomBar, &KadasSidePanel::closeRequested, this, [this] { canvas()->unsetMapTool( this ); } );
 
@@ -422,6 +426,7 @@ void KadasMapToolEditAnnotationItem::deactivate()
   QgsMapTool::deactivate();
   delete mTooltipWidget;
   mTooltipWidget = nullptr;
+  mPointerInEditor = false;
   if ( mEditItemHidden && mItem )
   {
     mEditItemHidden = false;
@@ -831,6 +836,46 @@ void KadasMapToolEditAnnotationItem::inputChanged()
     mStyleEditor->loadFromItem( mItem );
 }
 
+bool KadasMapToolEditAnnotationItem::eventFilter( QObject *watched, QEvent *event )
+{
+  if ( watched == mBottomBar )
+  {
+    if ( event->type() == QEvent::Enter )
+    {
+      mPointerInEditor = true;
+      previewTooltipForEditedItem();
+    }
+    else if ( event->type() == QEvent::Leave )
+    {
+      mPointerInEditor = false;
+      if ( mTooltipWidget )
+        mTooltipWidget->clear();
+    }
+  }
+  return QgsMapTool::eventFilter( watched, event );
+}
+
+void KadasMapToolEditAnnotationItem::previewTooltipForEditedItem()
+{
+  if ( !mPointerInEditor || !mTooltipWidget || !mItem || !mController || !mLayer || mItemId.isEmpty() )
+    return;
+  const QgsPointXY itemPos = mController->position( mItem );
+  QgsPointXY mapPos = itemPos;
+  if ( mLayer->crs() != canvas()->mapSettings().destinationCrs() )
+  {
+    try
+    {
+      mapPos = QgsCoordinateTransform( mLayer->crs(), canvas()->mapSettings().destinationCrs(), QgsProject::instance() ).transform( itemPos );
+    }
+    catch ( const QgsCsException & )
+    {
+      return;
+    }
+  }
+  const QgsPointXY devicePos = canvas()->mapSettings().mapToPixel().transform( mapPos );
+  mTooltipWidget->showForItem( mLayer, mItemId, QPoint( static_cast<int>( devicePos.x() ), static_cast<int>( devicePos.y() ) ) );
+}
+
 void KadasMapToolEditAnnotationItem::setupStyleEditor()
 {
   if ( !mController )
@@ -850,6 +895,7 @@ void KadasMapToolEditAnnotationItem::setupStyleEditor()
     mLayer->triggerRepaint();
     if ( mTempRubberBand )
       updateTempRubberBand();
+    previewTooltipForEditedItem();
   } );
 
   connect( mStyleEditor, &KadasAnnotationStyleEditor::committed, this, [this] {
@@ -863,6 +909,7 @@ void KadasMapToolEditAnnotationItem::setupStyleEditor()
       updateTempRubberBand();
     if ( mController )
       mController->persistStyle( item );
+    previewTooltipForEditedItem();
     pushState();
     emit stylePersisted();
   } );

@@ -34,6 +34,16 @@ class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextEdit
     void updateForPos( const QPoint &canvasPos );
 
     /**
+     * Shows \a itemId's tooltip beside \a itemPos, a point in canvas coordinates,
+     * recomposing the text even when that item is already the one on display.
+     *
+     * For previewing an item while the pointer is somewhere the cursor cannot
+     * speak for — over an editor panel, say — and for reflecting an edit as it
+     * is made. Placed clear of \a itemPos so the item itself stays visible.
+     */
+    void showForItem( QgsAnnotationLayer *layer, const QString &itemId, const QPoint &itemPos );
+
+    /**
      * When \a interactive is FALSE the tooltip ignores the pointer entirely: its
      * links and image stop being clickable, and clicks and drags pass straight
      * through to the canvas beneath it.
@@ -77,6 +87,8 @@ class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextEdit
 
   private slots:
     void positionAndShow();
+    //! Places the tooltip beside \a itemPos rather than over it, on whichever side has room.
+    void positionBeside( const QPoint &itemPos );
 };
 
 #endif // KADASMAPITEMTOOLTIP_H

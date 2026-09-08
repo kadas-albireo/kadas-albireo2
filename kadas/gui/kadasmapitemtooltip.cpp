@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QAbstractTextDocumentLayout>
+#include <algorithm>
 #include <QDesktopServices>
 
 #include <qgis/qgsannotationitem.h>
@@ -83,6 +84,46 @@ void KadasMapItemTooltip::updateForPos( const QPoint &canvasPos )
     // Leave a shown tooltip up briefly: its links and image are clickable, so
     // the pointer needs a chance to travel onto it.
     mHideTimer.start( sHideDelayMs );
+}
+
+void KadasMapItemTooltip::showForItem( QgsAnnotationLayer *layer, const QString &itemId, const QPoint &itemPos )
+{
+  if ( !layer || itemId.isEmpty() )
+    return;
+  mShowTimer.stop();
+  mHideTimer.stop();
+  mLayer = layer;
+  mItemId = itemId;
+  // Force a recompose: unlike a hover, this is also how an edit in progress is
+  // reflected, and the item on display may well be the one that just changed.
+  mShownItemId.clear();
+  const QString text = tooltipFor( layer, itemId );
+  if ( text.isEmpty() )
+  {
+    hide();
+    return;
+  }
+  mShownItemId = itemId;
+  setText( text );
+  positionBeside( itemPos );
+  show();
+}
+
+void KadasMapItemTooltip::positionBeside( const QPoint &itemPos )
+{
+  // A hover tooltip sits under the cursor, which is fine because the cursor is
+  // on the item. Anchored to an item nobody is pointing at, it has to leave the
+  // item visible instead: take whichever side has room.
+  constexpr int gap = 16;
+  int x = itemPos.x() + gap;
+  if ( x + sWidth > mCanvas->width() )
+    x = itemPos.x() - gap - sWidth;
+  if ( x < 0 )
+    x = std::max( 0, std::min( mCanvas->width() - sWidth, itemPos.x() - sWidth / 2 ) );
+
+  int y = itemPos.y() - sHeight / 2;
+  y = std::max( 0, std::min( mCanvas->height() - sHeight, y ) );
+  move( x, y );
 }
 
 void KadasMapItemTooltip::setInteractive( bool interactive )

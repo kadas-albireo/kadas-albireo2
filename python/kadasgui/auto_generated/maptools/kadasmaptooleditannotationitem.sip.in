@@ -87,6 +87,10 @@ Create-mode: emitted after a fresh item replaces the previous one.
 Emitted after a committed style edit has been persisted to settings.
 %End
 
+  protected:
+    virtual bool eventFilter( QObject *watched, QEvent *event );
+
+
 };
 
 /************************************************************************
