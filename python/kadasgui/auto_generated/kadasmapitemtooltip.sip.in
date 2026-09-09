@@ -44,9 +44,10 @@ is made. Placed clear of ``itemPos`` so the item itself stays visible.
 
     void setInteractive( bool interactive );
 %Docstring
-When ``interactive`` is ``False`` the tooltip ignores the pointer
-entirely: its links and image stop being clickable, and clicks and drags
-pass straight through to the canvas beneath it.
+When ``interactive`` is ``False`` the tooltip stops acting on mouse
+buttons: its links and image are no longer clickable, and clicks and
+drags pass through to the canvas beneath it. It still scrolls, so a
+description too tall for the window can be read either way.
 
 Used while a map tool owns the pointer, where the tooltip is a preview
 rather than something to be operated. Interactive by default.
@@ -65,6 +66,10 @@ rather than something to be operated. Interactive by default.
     virtual void mouseMoveEvent( QMouseEvent *ev );
 
     virtual void mouseReleaseEvent( QMouseEvent *ev );
+
+    virtual void mouseDoubleClickEvent( QMouseEvent *ev );
+
+    virtual void contextMenuEvent( QContextMenuEvent *ev );
 
 
 };

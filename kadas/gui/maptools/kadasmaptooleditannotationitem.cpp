@@ -859,6 +859,14 @@ void KadasMapToolEditAnnotationItem::previewTooltipForEditedItem()
 {
   if ( !mPointerInEditor || !mTooltipWidget || !mItem || !mController || !mLayer || mItemId.isEmpty() )
     return;
+  // There is nothing to preview until the item has been placed. An unplaced one
+  // still sits at the origin, and the preview would be clamped to a canvas edge,
+  // describing a position the user never picked.
+  if ( mDrawState != DrawState::Finished || mController->isEmpty( mItem ) )
+  {
+    mTooltipWidget->clear();
+    return;
+  }
   const QgsPointXY itemPos = mController->position( mItem );
   QgsPointXY mapPos = itemPos;
   if ( mLayer->crs() != canvas()->mapSettings().destinationCrs() )

@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QAbstractTextDocumentLayout>
+#include <QContextMenuEvent>
 #include <algorithm>
 #include <QDesktopServices>
 
@@ -128,7 +129,11 @@ void KadasMapItemTooltip::positionBeside( const QPoint &itemPos )
 
 void KadasMapItemTooltip::setInteractive( bool interactive )
 {
-  setAttribute( Qt::WA_TransparentForMouseEvents, !interactive );
+  // Deliberately not Qt::WA_TransparentForMouseEvents, which is all or nothing:
+  // it would hand the wheel to the canvas too, so pointing at a scrollable
+  // tooltip would zoom the map instead of scrolling it. Ignoring the button
+  // events individually passes those to the canvas and keeps the wheel here.
+  mInteractive = interactive;
 }
 
 QString KadasMapItemTooltip::tooltipFor( QgsAnnotationLayer *layer, const QString &itemId )
@@ -161,12 +166,43 @@ void KadasMapItemTooltip::leaveEvent( QEvent * )
 
 void KadasMapItemTooltip::mousePressEvent( QMouseEvent *ev )
 {
+  if ( !mInteractive )
+  {
+    ev->ignore();
+    return;
+  }
   mMouseMoved = false;
   QTextEdit::mousePressEvent( ev );
 }
 
+void KadasMapItemTooltip::mouseDoubleClickEvent( QMouseEvent *ev )
+{
+  if ( !mInteractive )
+  {
+    ev->ignore();
+    return;
+  }
+  QTextEdit::mouseDoubleClickEvent( ev );
+}
+
+void KadasMapItemTooltip::contextMenuEvent( QContextMenuEvent *ev )
+{
+  // Right-click is how drawing is finished, so it belongs to the map tool.
+  if ( !mInteractive )
+  {
+    ev->ignore();
+    return;
+  }
+  QTextEdit::contextMenuEvent( ev );
+}
+
 void KadasMapItemTooltip::mouseMoveEvent( QMouseEvent *ev )
 {
+  if ( !mInteractive )
+  {
+    ev->ignore();
+    return;
+  }
   mMouseMoved = true;
   QString anchor = document()->documentLayout()->anchorAt( ev->pos() );
   QString image = document()->documentLayout()->imageAt( ev->pos() );
@@ -183,6 +219,11 @@ void KadasMapItemTooltip::mouseMoveEvent( QMouseEvent *ev )
 
 void KadasMapItemTooltip::mouseReleaseEvent( QMouseEvent *ev )
 {
+  if ( !mInteractive )
+  {
+    ev->ignore();
+    return;
+  }
   if ( ev->button() == Qt::LeftButton && !mMouseMoved )
   {
     QString anchor = document()->documentLayout()->anchorAt( ev->pos() );

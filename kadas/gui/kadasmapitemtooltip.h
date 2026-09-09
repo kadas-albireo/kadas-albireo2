@@ -44,9 +44,10 @@ class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextEdit
     void showForItem( QgsAnnotationLayer *layer, const QString &itemId, const QPoint &itemPos );
 
     /**
-     * When \a interactive is FALSE the tooltip ignores the pointer entirely: its
-     * links and image stop being clickable, and clicks and drags pass straight
-     * through to the canvas beneath it.
+     * When \a interactive is FALSE the tooltip stops acting on mouse buttons: its
+     * links and image are no longer clickable, and clicks and drags pass through
+     * to the canvas beneath it. It still scrolls, so a description too tall for
+     * the window can be read either way.
      *
      * Used while a map tool owns the pointer, where the tooltip is a preview
      * rather than something to be operated. Interactive by default.
@@ -62,6 +63,8 @@ class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextEdit
     void mousePressEvent( QMouseEvent *ev ) override;
     void mouseMoveEvent( QMouseEvent *ev ) override;
     void mouseReleaseEvent( QMouseEvent *ev ) override;
+    void mouseDoubleClickEvent( QMouseEvent *ev ) override;
+    void contextMenuEvent( QContextMenuEvent *ev ) override;
 
   private:
     static constexpr int sWidth = 320;
@@ -78,6 +81,8 @@ class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextEdit
     QPoint mPos;
     QgsMapCanvas *mCanvas = nullptr;
     bool mMouseMoved = false;
+    //! FALSE while a map tool owns the pointer: buttons pass through, the wheel does not.
+    bool mInteractive = true;
     // Item under the pointer, and the one positionAndShow() last acted on. Every
     // transition runs off the two timers, so a pointer sweeping across items
     // composes nothing until it settles.

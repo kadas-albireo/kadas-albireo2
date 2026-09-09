@@ -106,6 +106,11 @@ void KadasMapToolPan::canvasMoveEvent( QgsMapMouseEvent *e )
 
   if ( ( e->buttons() & Qt::LeftButton ) )
   {
+    // A hover tooltip belongs to a pointer resting on something. Dragging the
+    // map is no longer that, and the tooltip cannot follow: panAction() shifts
+    // the rendered content without changing the extent until release, so there
+    // is no signal to re-anchor on.
+    mTooltipWidget->clear();
     if ( mExtentRubberBand )
     {
       mExtentRect.setBottomRight( e->pos() );
