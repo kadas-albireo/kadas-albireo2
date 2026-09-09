@@ -101,6 +101,21 @@ class KadasGuideGridRenderer : public QgsMapLayerRenderer
         path.addPolygon( vLine1 );
         p->drawPath( path );
       }
+
+      if ( mGridConfig.showLayerTitle && !previewJob )
+      {
+        QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerId() );
+        if ( layer )
+        {
+          QPointF ptsLeft = titlePoints( true );
+          QPointF ptsTop = titlePoints( false );
+
+          QString name = layer->name();
+          drawTitleLabel( ptsLeft, name, true, font, fontMetrics, bufferColor );
+          drawTitleLabel( ptsTop, name, false, font, fontMetrics, bufferColor );
+        }
+      }
+
       double sy1 = adaptLabelsToScreen ? std::max( vLine1.first().y(), screenRect.top() ) : vLine1.first().y();
       double sy2 = adaptLabelsToScreen ? std::min( vLine1.last().y(), screenRect.bottom() ) : vLine1.last().y();
       QuadrantLabeling quadrantLabeling = mGridConfig.quadrantLabeling;
@@ -266,12 +281,78 @@ class KadasGuideGridRenderer : public QgsMapLayerRenderer
       }
       return screenPoints;
     }
+
+    void drawTitleLabel( const QPointF &point, const QString &name, const bool &vertical, const QFont &font, const QFontMetrics &metrics, const QColor &bufferColor )
+    {
+      const int labelBoxSize = mGridConfig.labelingPos == LabelingPos::LabelsOutside ? metrics.height() : 0;
+      QPainterPath path;
+      double x = point.x() + labelBoxSize;
+      double y = point.y() - labelBoxSize;
+      x -= 0.5 * metrics.horizontalAdvance( name );
+      y = y - metrics.descent() + 0.5 * metrics.height();
+      path.addText( x, y, font, name );
+      QPainter *p = renderContext()->painter();
+      p->save();
+      if ( vertical )
+      {
+        p->translate( point.x(), point.y() );
+        p->rotate( -90 );
+        p->translate( -point.x(), -point.y() );
+      }
+      p->setPen( QPen( bufferColor, qRound( mGridConfig.fontSize / 8. ) ) );
+      p->drawPath( path );
+      p->setPen( Qt::NoPen );
+      p->drawPath( path );
+      p->restore();
+    }
+
+    QPointF titlePoints( const bool &vertical ) const
+    {
+      const QgsCoordinateTransform crst = renderContext()->coordinateTransform();
+      const QgsMapToPixel &mapToPixel = renderContext()->mapToPixel();
+      const QgsRectangle &gridRect = mGridConfig.gridRect;
+
+      QgsPointXY center = gridRect.center();
+
+
+      double left = gridRect.xMinimum();
+      double top = gridRect.yMaximum();
+
+      QgsPoint pt;
+      if ( vertical )
+      {
+        pt = QgsPoint( left, center.y() );
+      }
+      else
+      {
+        pt = QgsPoint( center.x(), top );
+      }
+
+      QPointF screenPoint = mapToPixel.transform( crst.transform( pt ) ).toQPointF();
+
+      constexpr double OFFSET_FROM_GRID = 25;
+      if ( vertical )
+      {
+        screenPoint.setX( screenPoint.x() - OFFSET_FROM_GRID );
+      }
+      else
+      {
+        screenPoint.setY( screenPoint.y() - OFFSET_FROM_GRID );
+      }
+
+      return screenPoint;
+    }
 };
 
 
 KadasGuideGridLayer::KadasGuideGridLayer( const QString &name )
   : KadasAnnotationLayer( name, QStringLiteral( "guidegrid" ) )
-{}
+{
+  connect( this, &QgsMapLayer::nameChanged, this, [this]() {
+    regenerate();
+    triggerRepaint();
+  } );
+}
 
 void KadasGuideGridLayer::setup( const QgsRectangle &gridRect, int cols, int rows, const QgsCoordinateReferenceSystem &crs, bool colSizeLocked, bool rowSizeLocked )
 {
@@ -378,6 +459,7 @@ bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteConte
     mGridConfig.labelingPos = static_cast<LabelingPos>( customProperty( QStringLiteral( "kadas/guidegrid/labelingPos" ) ).toInt() );
     mGridConfig.quadrantLabeling = static_cast<QuadrantLabeling>( customProperty( QStringLiteral( "kadas/guidegrid/quadrantLabeling" ) ).toInt() );
     mGridConfig.avoidRepeatingLetters = customProperty( QStringLiteral( "kadas/guidegrid/avoidRepeatingLetters" ) ).toBool();
+    mGridConfig.showLayerTitle = customProperty( QStringLiteral( "kadas/guidegrid/showLayerTitle" ), true ).toBool();
     regenerate();
     return true;
   }
@@ -405,7 +487,7 @@ bool KadasGuideGridLayer::readXml( const QDomNode &layer_node, QgsReadWriteConte
   mGridConfig.labelingPos = static_cast<LabelingPos>( cfgEl.attribute( "labelingPos" ).toInt() );
   mGridConfig.quadrantLabeling = static_cast<QuadrantLabeling>( cfgEl.attribute( "quadrantLabeling" ).toInt() );
   mGridConfig.avoidRepeatingLetters = false; // Legacy didn't have this option, set to false same as default.
-
+  mGridConfig.showLayerTitle = false;        // Legacy didn't have this option, set to false same as default.
   // Base readXml replaced all customProperties from the (legacy, marker-less)
   // XML; re-assert the parametric marker set by the constructor.
   setCustomProperty( QStringLiteral( "kadas/annotation-type" ), QStringLiteral( "guidegrid" ) );
@@ -442,6 +524,7 @@ void KadasGuideGridLayer::writeConfigToCustomProperties()
   setCustomProperty( QStringLiteral( "kadas/guidegrid/labelingPos" ), static_cast<int>( mGridConfig.labelingPos ) );
   setCustomProperty( QStringLiteral( "kadas/guidegrid/quadrantLabeling" ), static_cast<int>( mGridConfig.quadrantLabeling ) );
   setCustomProperty( QStringLiteral( "kadas/guidegrid/avoidRepeatingLetters" ), mGridConfig.avoidRepeatingLetters );
+  setCustomProperty( QStringLiteral( "kadas/guidegrid/showLayerTitle" ), mGridConfig.showLayerTitle );
 }
 
 void KadasGuideGridLayer::regenerate()
@@ -568,6 +651,31 @@ void KadasGuideGridLayer::regenerate()
       txt->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter );
       addItem( txt );
     }
+  }
+
+  // --- Layer title ---
+  if ( mGridConfig.showLayerTitle )
+  {
+    const double offsetX = ( 0.5 * dx ) * ( mGridConfig.labelingPos == LabelingPos::LabelsOutside ? 2 : 1 );
+    const double offsetY = ( 0.5 * dy ) * ( mGridConfig.labelingPos == LabelingPos::LabelsOutside ? 2 : 1 );
+
+    QgsPointXY center = mGridConfig.gridRect.center();
+    double left = mGridConfig.gridRect.xMinimum() - offsetX;
+    double top = mGridConfig.gridRect.yMaximum() + offsetY;
+
+    QgsPointXY leftCenter( left, center.y() );
+    QgsPointXY topCenter( center.x(), top );
+
+    auto *titleTopTxt = new QgsAnnotationPointTextItem( name(), leftCenter );
+    titleTopTxt->setFormat( textFmt );
+    titleTopTxt->setAngle( -90 );
+    titleTopTxt->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter );
+    addItem( titleTopTxt );
+
+    auto *titleLeftTxt = new QgsAnnotationPointTextItem( name(), topCenter );
+    titleLeftTxt->setFormat( textFmt );
+    titleLeftTxt->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter );
+    addItem( titleLeftTxt );
   }
 
   // --- Quadrant subgrid (mid-lines + ABCD micro-labels) ---

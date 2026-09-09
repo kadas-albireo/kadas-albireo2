@@ -47,6 +47,7 @@ struct GridConfig
     QString rowStart = QString( "A" );
     QString colStart = QString( "1" );
     bool avoidRepeatingLetters = true;
+    bool showLayerTitle = true;
     LabelingPos labelingPos = LabelingPos::LabelsInside;
     QuadrantLabeling quadrantLabeling = QuadrantLabeling::DontLabelQuadrants;
 };
@@ -96,6 +97,7 @@ class KadasGuideGridLayer : public KadasAnnotationLayer
     LabelingPos labelingPos() const { return mGridConfig.labelingPos; }
     QuadrantLabeling labelQuadrants() const { return mGridConfig.quadrantLabeling; }
     bool avoidRepeatingLetters() const { return mGridConfig.avoidRepeatingLetters; }
+    bool showLayerTitle() const { return mGridConfig.showLayerTitle; }
 
   public slots:
     void setColor( const QColor &color )
@@ -132,6 +134,11 @@ class KadasGuideGridLayer : public KadasAnnotationLayer
     void setAvoidRepeatingLetters( bool avoidRepeatingLetters )
     {
       mGridConfig.avoidRepeatingLetters = avoidRepeatingLetters;
+      regenerate();
+    }
+    void setShowLayerTitle( bool showLayerTitle )
+    {
+      mGridConfig.showLayerTitle = showLayerTitle;
       regenerate();
     }
 
@@ -201,6 +208,7 @@ class KadasGuideGridLayer : public KadasPluginLayer
     LabelingPos labelingPos() const { return mGridConfig.labelingPos; }
     QuadrantLabeling labelQuadrants() const { return mGridConfig.quadrantLabeling; }
     bool avoidRepeatingLetters() const { return mGridConfig.avoidRepeatingLetters; }
+    bool showLayerTitle() const { return mGridConfig.showLayerTitle; }
 
   public slots:
     void setColor( const QColor &color ) { mGridConfig.color = color; }
@@ -214,6 +222,7 @@ class KadasGuideGridLayer : public KadasPluginLayer
     void setLabelingPos( LabelingPos pos ) { mGridConfig.labelingPos = pos; }
     void setLabelQuadrants( QuadrantLabeling labelQuadrants ) { mGridConfig.quadrantLabeling = labelQuadrants; }
     void setAvoidRepeatingLetters( bool avoidRepeatingLetters ) { mGridConfig.avoidRepeatingLetters = avoidRepeatingLetters; }
+    void setShowLayerTitle( bool showLayerTitle ) { mGridConfig.showLayerTitle = showLayerTitle; }
 
   protected:
     bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
