@@ -79,6 +79,7 @@ class KadasGuideGridLayer : public KadasAnnotationLayer
     LabelingPos labelingPos() const { return mGridConfig.labelingPos; }
     QuadrantLabeling labelQuadrants() const { return mGridConfig.quadrantLabeling; }
     bool avoidRepeatingLetters() const { return mGridConfig.avoidRepeatingLetters; }
+    bool showLayerTitle() const { return mGridConfig.showLayerTitle; }
 
   public slots:
     void setColor( const QColor &color )
@@ -117,6 +118,11 @@ class KadasGuideGridLayer : public KadasAnnotationLayer
       mGridConfig.avoidRepeatingLetters = avoidRepeatingLetters;
       regenerate();
     }
+    void setShowLayerTitle( bool showLayerTitle )
+    {
+      mGridConfig.showLayerTitle = showLayerTitle;
+      regenerate();
+    }
 
   protected:
     bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
@@ -142,6 +148,7 @@ class KadasGuideGridLayer : public KadasAnnotationLayer
         QString rowStart = QStringLiteral( "A" );
         QString colStart = QStringLiteral( "1" );
         bool avoidRepeatingLetters = true;
+        bool showLayerTitle = true;
         LabelingPos labelingPos = LabelsInside;
         QuadrantLabeling quadrantLabeling = DontLabelQuadrants;
     } mGridConfig;
