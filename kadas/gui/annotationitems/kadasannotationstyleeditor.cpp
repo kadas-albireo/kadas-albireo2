@@ -34,6 +34,7 @@
 #include <QList>
 #include <QMenu>
 #include <QMessageBox>
+#include <QMouseEvent>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QPainter>
@@ -368,18 +369,17 @@ KadasPinStyleEditor::KadasPinStyleEditor( QWidget *parent )
   // side panel past its budget; it can have whatever the form row leaves it.
   mDescriptionPreview->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Fixed );
   mDescriptionPreview->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-  mDescriptionPreview->setPlaceholderText( tr( "No description" ) );
-  mDescriptionPreview->setToolTip( tr( "Pin description — double-click to edit" ) );
-  mDescriptionPreview->installEventFilter( this );
+  mDescriptionPreview->setPlaceholderText( tr( "No description — click to edit" ) );
+  mDescriptionPreview->setToolTip( tr( "Click to edit the description" ) );
+  // Nothing else a click in here could mean, so the whole area is the way into
+  // the editor: no button to spend a form row on, and nothing to discover.
+  // QTextEdit is a scroll area, so the pointer belongs to the viewport rather
+  // than to the widget itself.
+  mDescriptionPreview->setTextInteractionFlags( Qt::NoTextInteraction );
+  mDescriptionPreview->viewport()->setCursor( Qt::PointingHandCursor );
+  mDescriptionPreview->viewport()->installEventFilter( this );
   KadasAttachmentUtils::installResourceProvider( mDescriptionPreview->document() );
-  auto *editDescriptionBtn = new QToolButton();
-  editDescriptionBtn->setIcon( QgsApplication::getThemeIcon( QStringLiteral( "/mActionToggleEditing.svg" ) ) );
-  editDescriptionBtn->setToolTip( tr( "Edit the description" ) );
-  auto *descriptionRow = new QHBoxLayout();
-  descriptionRow->setContentsMargins( 0, 0, 0, 0 );
-  descriptionRow->addWidget( mDescriptionPreview );
-  descriptionRow->addWidget( editDescriptionBtn, 0, Qt::AlignTop );
-  form->addRow( tr( "Description" ), descriptionRow );
+  form->addRow( tr( "Description" ), mDescriptionPreview );
 
   mSizeSpin = new QSpinBox();
   mSizeSpin->setRange( 1, 200 );
@@ -397,7 +397,6 @@ KadasPinStyleEditor::KadasPinStyleEditor( QWidget *parent )
 
   connect( mTitleEdit, &QLineEdit::textChanged, this, &KadasAnnotationStyleEditor::previewChanged );
   connect( mTitleEdit, &QLineEdit::editingFinished, this, &KadasAnnotationStyleEditor::committed );
-  connect( editDescriptionBtn, &QToolButton::clicked, this, &KadasPinStyleEditor::editDescription );
   connect( mSizeSpin, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
   connect( mRotationSpin, qOverload<double>( &QDoubleSpinBox::valueChanged ), this, &KadasAnnotationStyleEditor::committed );
   connect( mFillColorBtn, &QgsColorButton::colorChanged, this, &KadasAnnotationStyleEditor::committed );
@@ -423,12 +422,14 @@ void KadasPinStyleEditor::updateDescriptionPreview()
 
 bool KadasPinStyleEditor::eventFilter( QObject *watched, QEvent *event )
 {
-  // The preview is read-only, so a double-click on it has nothing else to mean:
-  // treat it as the shortcut into the dialog the adjacent button opens.
-  if ( watched == mDescriptionPreview && event->type() == QEvent::MouseButtonDblClick )
+  if ( mDescriptionPreview && watched == mDescriptionPreview->viewport() && event->type() == QEvent::MouseButtonRelease )
   {
-    editDescription();
-    return true;
+    // On release rather than press, so it behaves like the button it replaces.
+    if ( static_cast<QMouseEvent *>( event )->button() == Qt::LeftButton )
+    {
+      editDescription();
+      return true;
+    }
   }
   return KadasAnnotationStyleEditor::eventFilter( watched, event );
 }
