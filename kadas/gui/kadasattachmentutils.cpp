@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QFileInfo>
+#include <QHash>
 #include <QImage>
 #include <QList>
 #include <QTextBlock>
@@ -24,6 +25,7 @@
 #include <QUrl>
 #include <QUrlQuery>
 #include <algorithm>
+#include <memory>
 
 #include <qgis/qgsproject.h>
 
@@ -211,19 +213,40 @@ void KadasAttachmentUtils::installResourceProvider( QTextDocument *document )
 {
   if ( !document )
     return;
-  document->setResourceProvider( []( const QUrl &url ) -> QVariant {
+  // Installing a provider bypasses QTextDocument's own resource cache, and Qt
+  // asks for each image several times over a layout and paint. Without a cache
+  // of our own, every one of those re-reads and re-decodes the file - a
+  // full-size photo decoded a dozen times per hover.
+  auto cache = std::make_shared<QHash<QString, QImage>>();
+  document->setResourceProvider( [cache]( const QUrl &url ) -> QVariant {
     if ( url.scheme() != sScheme )
       return QVariant();
+    // Keyed by the whole URL, so the same file asked for at two display sizes
+    // keeps two entries rather than one of them winning.
+    const QString key = url.toString();
+    const auto cached = cache->constFind( key );
+    if ( cached != cache->constEnd() )
+      return *cached;
+
     // QUrl::path() drops the scheme and its slashes, so put them back.
     const QString file = resolve( sScheme + QLatin1String( "://" ) + url.path() );
     if ( file.isEmpty() )
       return QVariant();
     QImage image( file );
+    if ( image.isNull() )
+      return QVariant();
     const QUrlQuery query( url.query() );
     const int width = query.queryItemValue( QStringLiteral( "w" ) ).toInt();
     const int height = query.queryItemValue( QStringLiteral( "h" ) ).toInt();
     if ( width > 0 && height > 0 )
       image = image.scaled( width, height, Qt::IgnoreAspectRatio, Qt::SmoothTransformation );
+
+    // A single document outlives many items — the map tooltip is reused for
+    // every annotation hovered — so the cache must not grow along with them.
+    // A miss costs one decode, which is what this saves a dozen of.
+    if ( cache->size() >= sMaxCachedImages )
+      cache->clear();
+    cache->insert( key, image );
     return image;
   } );
 }

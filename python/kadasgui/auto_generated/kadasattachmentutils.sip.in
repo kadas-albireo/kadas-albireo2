@@ -90,6 +90,9 @@ provider.
 
 A "?w=&h=" query scales the image, the spelling Kadas 2.x stored its
 display sizes in.
+
+Decoded images are cached per document, since Qt asks for each of them
+repeatedly while laying out and painting.
 %End
 
   private:

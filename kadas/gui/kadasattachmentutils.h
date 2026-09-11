@@ -86,6 +86,9 @@ class KADAS_GUI_EXPORT KadasAttachmentUtils
      *
      * A "?w=&h=" query scales the image, the spelling Kadas 2.x stored its
      * display sizes in.
+     *
+     * Decoded images are cached per document, since Qt asks for each of them
+     * repeatedly while laying out and painting.
      */
     static void installResourceProvider( QTextDocument *document );
 
@@ -94,6 +97,9 @@ class KADAS_GUI_EXPORT KadasAttachmentUtils
     static constexpr QLatin1StringView sScheme { "attachment" };
     //! What any attachment reference starts with, in any spelling.
     static constexpr QLatin1StringView sIdentifierPrefix { "attachment:" };
+    //! How many decoded images one document's provider keeps before starting over.
+    static constexpr int sMaxCachedImages = 8;
+
     //! The one spelling QgsProject::resolveAttachmentIdentifier() accepts.
     static constexpr QLatin1StringView sCanonicalPrefix { "attachment:///" };
 
