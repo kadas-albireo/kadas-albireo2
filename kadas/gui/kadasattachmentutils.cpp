@@ -82,6 +82,11 @@ QString KadasAttachmentUtils::resolve( const QString &identifier )
 
 QString KadasAttachmentUtils::materializeInlineImages( const QString &html, int maxStoredSize, int maxDisplaySize )
 {
+  // Parsing the markup costs far more than looking for the one thing that would
+  // make it worth parsing, and a description with no inline image is the norm.
+  if ( !html.contains( QLatin1String( "data:image/" ), Qt::CaseInsensitive ) )
+    return html;
+
   QTextDocument doc;
   doc.setHtml( html );
 
@@ -116,11 +121,13 @@ QString KadasAttachmentUtils::materializeInlineImages( const QString &html, int 
       QSize displaySize = image.size();
       if ( std::max( displaySize.width(), displaySize.height() ) > maxStoredSize )
         displaySize.scale( maxStoredSize, maxStoredSize, Qt::KeepAspectRatio );
-      if ( displaySize.width() > maxDisplaySize )
-        displaySize = QSize( maxDisplaySize, std::max( 1, qRound( static_cast<double>( maxDisplaySize ) * image.height() / image.width() ) ) );
+      if ( std::max( displaySize.width(), displaySize.height() ) > maxDisplaySize )
+        displaySize.scale( maxDisplaySize, maxDisplaySize, Qt::KeepAspectRatio );
+      displaySize = displaySize.expandedTo( QSize( 1, 1 ) );
       format.setWidth( displaySize.width() );
       format.setHeight( displaySize.height() );
-      rewrites.append( { fragment.position(), fragment.length(), format } );
+      for ( int offset = 0; offset < fragment.length(); ++offset )
+        rewrites.append( { fragment.position() + offset, 1, format } );
     }
   }
 
@@ -184,11 +191,14 @@ bool KadasAttachmentUtils::clampImageDisplaySize( QTextDocument *document, int m
         width = image.width();
         height = image.height();
       }
-      if ( width <= maxDisplaySize )
+      const double longest = std::max( width, height );
+      if ( longest <= maxDisplaySize )
         continue;
-      format.setWidth( maxDisplaySize );
-      format.setHeight( std::max( 1, qRound( maxDisplaySize * height / width ) ) );
-      rewrites.append( { fragment.position(), fragment.length(), format } );
+      const double factor = maxDisplaySize / longest;
+      format.setWidth( std::max( 1, qRound( width * factor ) ) );
+      format.setHeight( std::max( 1, qRound( height * factor ) ) );
+      for ( int offset = 0; offset < fragment.length(); ++offset )
+        rewrites.append( { fragment.position() + offset, 1, format } );
     }
   }
 
@@ -228,8 +238,14 @@ void KadasAttachmentUtils::installResourceProvider( QTextDocument *document )
     if ( cached != cache->constEnd() )
       return *cached;
 
-    // QUrl::path() drops the scheme and its slashes, so put them back.
-    const QString file = resolve( sScheme + QLatin1String( "://" ) + url.path() );
+    // QUrl::path() drops the scheme and its slashes, and how many of those
+    // there were depends on the spelling: Kadas 2.x's bare "attachment:name"
+    // leaves "name" where "attachment:///name" leaves "/name". Put back the one
+    // spelling QgsProject resolves rather than whichever was written.
+    QString path = url.path();
+    while ( path.startsWith( QLatin1Char( '/' ) ) )
+      path.remove( 0, 1 );
+    const QString file = resolve( sCanonicalPrefix + path );
     if ( file.isEmpty() )
       return QVariant();
     QImage image( file );

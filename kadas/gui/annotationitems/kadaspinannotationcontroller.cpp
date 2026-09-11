@@ -65,12 +65,13 @@ bool KadasPinAnnotationController::projectHasHeightmap()
 // pin's own text, labels set small, italic and grey so the values lead.
 QString KadasPinAnnotationController::headerHtml( const QgsPointXY &pos, const QgsCoordinateReferenceSystem &crs )
 {
-  QString posStr = KadasCoordinateFormat::instance()->getDisplayString( pos, crs );
+  KadasCoordinateFormat *coordinateFormat = KadasCoordinateFormat::instance();
+  QString posStr = coordinateFormat->getDisplayString( pos, crs );
   if ( posStr.isEmpty() )
     posStr = QStringLiteral( "%1 (%2)" ).arg( pos.toString(), crs.authid() );
   posStr = posStr.toHtmlEscaped();
 
-  const Qgis::DistanceUnit unit = KadasCoordinateFormat::instance()->getHeightDisplayUnit();
+  const Qgis::DistanceUnit unit = coordinateFormat->getHeightDisplayUnit();
   QString errMsg;
   const double height = KadasCoordinateUtils::getHeightAtPos( pos, crs, unit, &errMsg );
   QString heightStr;
@@ -122,13 +123,7 @@ QString KadasPinAnnotationController::tooltip( const QgsAnnotationItem *item, co
   QString html = headerHtml( pin->geometry(), itemCrs );
   if ( !pin->name().isEmpty() )
     html += QStringLiteral( "<p><b>%1</b></p>" ).arg( pin->name().toHtmlEscaped() );
-  if ( !pin->remarks().isEmpty() )
-  {
-    // Rich text brings its own anchors, images and block structure, and the
-    // editor has already linked any bare URLs in it. Plain text - a description
-    // set from outside the editor - still needs escaping and a block.
-    html += Qt::mightBeRichText( pin->remarks() ) ? pin->remarks() : QStringLiteral( "<p>%1</p>" ).arg( pin->remarks().toHtmlEscaped().replace( QLatin1Char( '\n' ), QStringLiteral( "<br>" ) ) );
-  }
+  html += KadasPinAnnotationItem::remarksAsHtml( pin->remarks() );
   return html;
 }
 

@@ -17,6 +17,8 @@
 #ifndef KADASPINSEARCHPROVIDER_H
 #define KADASPINSEARCHPROVIDER_H
 
+#include <QHash>
+
 #include <qgis/qgslocatorfilter.h>
 
 #include "kadas/gui/kadas_gui.h"
@@ -38,7 +40,19 @@ class KADAS_GUI_EXPORT KadasPinSearchProvider : public QgsLocatorFilter
     virtual void triggerResult( const QgsLocatorResult &result ) override;
 
   private:
+    //! remarks as plain text, reusing the last conversion of that same markup.
+    QString plainRemarks( const QString &remarks );
+
     QgsMapCanvas *mMapCanvas = nullptr;
+    /**
+     * Resolving markup to text costs far more than the match it feeds, and the
+     * locator re-runs this filter from scratch on every keystroke over
+     * descriptions that have not changed. Keyed by the markup itself, so an
+     * edited description is simply a new entry rather than a stale one.
+     */
+    QHash<QString, QString> mPlainRemarks;
+    //! How many conversions to keep before starting over; a project's pins come and go.
+    static constexpr int sMaxCachedRemarks = 512;
 };
 
 #endif // KADASPINSEARCHPROVIDER_H

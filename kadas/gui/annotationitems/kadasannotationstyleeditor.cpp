@@ -414,10 +414,7 @@ void KadasPinStyleEditor::editDescription()
 
 void KadasPinStyleEditor::updateDescriptionPreview()
 {
-  if ( Qt::mightBeRichText( mRemarks ) )
-    mDescriptionPreview->setHtml( mRemarks );
-  else
-    mDescriptionPreview->setPlainText( mRemarks );
+  mDescriptionPreview->setHtml( KadasPinAnnotationItem::remarksAsHtml( mRemarks ) );
 }
 
 bool KadasPinStyleEditor::eventFilter( QObject *watched, QEvent *event )

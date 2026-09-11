@@ -91,6 +91,11 @@ class TestKadasAnnotationControllers : public QObject
     void pin_tooltip_keepsRichTextVerbatim();
     void richText_inlineImagesBecomeCappedProjectAttachments();
     void richText_insertedImagesAreShrunkToTheirDisplaySize();
+    void richText_portraitImagesAreCappedOnTheirLongestEdge();
+    void richText_adjacentIdenticalImagesBothSurvive();
+    void richText_bareUrlKeepsBracketsItOpened();
+    void attachment_legacyIdentifierResolvesThroughResourceProvider();
+    void richText_unformattedTextIsStoredAsPlainText();
 
     // KadasRectangleAnnotationController ---------------------------------
     void rectangle_nodes_returnFourCornersPlusRotation();
@@ -1050,6 +1055,167 @@ void TestKadasAnnotationControllers::richText_insertedImagesAreShrunkToTheirDisp
 
   // Already small enough, so nothing to do and no spurious undo entry.
   QVERIFY( !KadasAttachmentUtils::clampImageDisplaySize( &document ) );
+}
+
+void TestKadasAnnotationControllers::richText_portraitImagesAreCappedOnTheirLongestEdge()
+{
+  // Capping the width alone leaves a portrait photo taller than the tooltip it
+  // is shown in, which does not grow to take it.
+  QImage source( 1200, 2400, QImage::Format_ARGB32 );
+  source.fill( Qt::darkMagenta );
+  QByteArray png;
+  QBuffer buffer( &png );
+  QVERIFY( buffer.open( QIODevice::WriteOnly ) );
+  QVERIFY( source.save( &buffer, "PNG" ) );
+  buffer.close();
+  const QString url = QStringLiteral( "data:image/17.PNG;base64,%1" ).arg( QString::fromLatin1( png.toBase64() ) );
+
+  QTextDocument document;
+  QTextCursor cursor( &document );
+  QTextImageFormat format;
+  format.setName( url );
+  format.setWidth( source.width() );
+  format.setHeight( source.height() );
+  cursor.insertImage( format );
+
+  QVERIFY( KadasAttachmentUtils::clampImageDisplaySize( &document ) );
+  const QTextImageFormat clamped = document.begin().begin().fragment().charFormat().toImageFormat();
+  QCOMPARE( clamped.height(), 280.0 );
+  QCOMPARE( clamped.width(), 140.0 );
+
+  // The same bound applies to what gets stored.
+  const QString stored = KadasAttachmentUtils::materializeInlineImages( QStringLiteral( "<p><img src=\"%1\" /></p>" ).arg( url ) );
+  static const QRegularExpression heightRe( QStringLiteral( "height=\"(\\d+)\"" ) );
+  QCOMPARE( heightRe.match( stored ).captured( 1 ).toInt(), 280 );
+}
+
+void TestKadasAnnotationControllers::richText_adjacentIdenticalImagesBothSurvive()
+{
+  // Two identical images side by side share one character format, so Qt reports
+  // them as a single text fragment two characters long. Rewriting that fragment
+  // as one image would quietly drop the second.
+  QImage source( 400, 400, QImage::Format_ARGB32 );
+  source.fill( Qt::darkGreen );
+  QByteArray png;
+  QBuffer buffer( &png );
+  QVERIFY( buffer.open( QIODevice::WriteOnly ) );
+  QVERIFY( source.save( &buffer, "PNG" ) );
+  buffer.close();
+  const QString url = QStringLiteral( "data:image/17.PNG;base64,%1" ).arg( QString::fromLatin1( png.toBase64() ) );
+
+  // Inserted the way the editor inserts them - parsing markup instead would
+  // give two fragments, and miss this entirely.
+  QTextDocument document;
+  QTextCursor cursor( &document );
+  QTextImageFormat format;
+  format.setName( url );
+  format.setWidth( source.width() );
+  format.setHeight( source.height() );
+  cursor.insertImage( format );
+  cursor.insertImage( format );
+  QCOMPARE( document.begin().begin().fragment().length(), 2 );
+
+  QVERIFY( KadasAttachmentUtils::clampImageDisplaySize( &document ) );
+
+  int images = 0;
+  for ( QTextBlock block = document.begin(); block.isValid(); block = block.next() )
+  {
+    for ( QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it )
+    {
+      const QTextFragment fragment = it.fragment();
+      if ( fragment.isValid() && fragment.charFormat().isImageFormat() )
+        images += fragment.length();
+    }
+  }
+  QCOMPARE( images, 2 );
+
+  const QString stored = KadasAttachmentUtils::materializeInlineImages( document.toHtml() );
+  QCOMPARE( stored.count( QStringLiteral( "<img" ), Qt::CaseInsensitive ), 2 );
+  QVERIFY2( !stored.contains( QStringLiteral( "data:image" ) ), qPrintable( stored ) );
+}
+
+void TestKadasAnnotationControllers::richText_bareUrlKeepsBracketsItOpened()
+{
+  QTextDocument document;
+  document.setHtml( QStringLiteral( "<p>see https://en.wikipedia.org/wiki/Foo_(bar) and (www.example.com) too</p>" ) );
+  KadasRichTextDialog::linkifyBareUrls( &document );
+
+  QStringList anchors;
+  for ( QTextBlock block = document.begin(); block.isValid(); block = block.next() )
+  {
+    for ( QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it )
+    {
+      const QTextFragment fragment = it.fragment();
+      if ( fragment.isValid() && fragment.charFormat().isAnchor() )
+        anchors << fragment.charFormat().anchorHref();
+    }
+  }
+
+  const QStringList expected {
+    // A bracket the address opened itself belongs to it...
+    QStringLiteral( "https://en.wikipedia.org/wiki/Foo_(bar)" ),
+    // ...while one the sentence opened does not.
+    QStringLiteral( "http://www.example.com" ),
+  };
+  QCOMPARE( anchors, expected );
+}
+
+void TestKadasAnnotationControllers::attachment_legacyIdentifierResolvesThroughResourceProvider()
+{
+  // Kadas 2.x wrote a bare "attachment:name"; only "attachment:///name" is the
+  // spelling QgsProject resolves, and both reach the provider as image URLs.
+  QImage source( 32, 32, QImage::Format_ARGB32 );
+  source.fill( Qt::red );
+  const QString identifier = KadasAttachmentUtils::attachImage( source, QStringLiteral( "png" ) );
+  QVERIFY( identifier.startsWith( QStringLiteral( "attachment:///" ) ) );
+  const QString legacy = QStringLiteral( "attachment:" ) + identifier.mid( QStringLiteral( "attachment:///" ).size() );
+
+  QCOMPARE( KadasAttachmentUtils::canonicalIdentifier( legacy ), identifier );
+
+  QTextDocument document;
+  KadasAttachmentUtils::installResourceProvider( &document );
+  for ( const QString &spelling : { identifier, legacy } )
+  {
+    const QVariant resource = document.resource( QTextDocument::ImageResource, QUrl( spelling ) );
+    QVERIFY2( !qvariant_cast<QImage>( resource ).isNull(), qPrintable( spelling ) );
+  }
+
+  // The "?w=&h=" display size Kadas 2.x stored still scales, in either spelling.
+  const QImage scaled = qvariant_cast<QImage>( document.resource( QTextDocument::ImageResource, QUrl( legacy + QStringLiteral( "?w=8&h=8" ) ) ) );
+  QCOMPARE( scaled.size(), QSize( 8, 8 ) );
+}
+
+void TestKadasAnnotationControllers::richText_unformattedTextIsStoredAsPlainText()
+{
+  // Qt writes the document's default styling onto every paragraph, so a line
+  // nobody formatted would otherwise be stored as ten times its own length in
+  // markup - in every project, forever, once resaved.
+  {
+    KadasRichTextDialog dialog( QStringLiteral( "t" ), QStringLiteral( "typed plainly" ) );
+    dialog.accept();
+    QCOMPARE( dialog.html(), QStringLiteral( "typed plainly" ) );
+  }
+
+  // Formatting is not something to collapse away, though.
+  {
+    KadasRichTextDialog dialog( QStringLiteral( "t" ), QStringLiteral( "<p>Hello <b>there</b></p>" ) );
+    dialog.accept();
+    QVERIFY2( dialog.html().contains( QStringLiteral( "font-weight" ) ), qPrintable( dialog.html() ) );
+  }
+
+  // Nor is a link.
+  {
+    KadasRichTextDialog dialog( QStringLiteral( "t" ), QStringLiteral( "<p>see <a href=\"https://example.org\">x</a></p>" ) );
+    dialog.accept();
+    QVERIFY2( dialog.html().contains( QStringLiteral( "href=\"https://example.org\"" ) ), qPrintable( dialog.html() ) );
+  }
+
+  // An emptied field stores nothing at all, rather than a skeleton of markup.
+  {
+    KadasRichTextDialog dialog( QStringLiteral( "t" ), QString() );
+    dialog.accept();
+    QVERIFY( dialog.html().isEmpty() );
+  }
 }
 
 QTEST_MAIN( TestKadasAnnotationControllers )

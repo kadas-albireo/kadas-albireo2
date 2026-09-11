@@ -54,7 +54,7 @@ class KADAS_GUI_EXPORT KadasAttachmentUtils
      *
      * The stored file is capped at \a maxStoredSize pixels on its longest edge,
      * so a phone photo cannot bloat the project, while the markup carries a
-     * display size of at most \a maxDisplaySize pixels wide — the two are
+     * display size of at most \a maxDisplaySize pixels on its longest edge — the two are
      * deliberately different, so an image shown small in a tooltip still opens
      * usefully large.
      */
@@ -70,9 +70,12 @@ class KADAS_GUI_EXPORT KadasAttachmentUtils
     static QString attachImage( const QImage &image, const QString &suffix, int maxStoredSize = 1920 );
 
     /**
-     * Clamps every image in \a document to at most \a maxDisplaySize pixels wide,
-     * preserving aspect ratio and leaving the file behind it untouched. Returns
-     * TRUE if anything changed.
+     * Clamps every image in \a document to at most \a maxDisplaySize pixels on
+     * its longest edge, preserving aspect ratio and leaving the file behind it
+     * untouched. Returns TRUE if anything changed.
+     *
+     * Bounding the longest edge rather than the width is what keeps a portrait
+     * photo inside the tooltip it will be shown in, which does not grow.
      *
      * QgsRichTextEditor inserts an image at its full pixel size, so a photo
      * arrives in the editor many times wider than the field it will be shown in.

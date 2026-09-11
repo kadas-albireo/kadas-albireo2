@@ -18,14 +18,9 @@
 #include <QDialogButtonBox>
 #include <QApplication>
 #include <QFrame>
-#include <QInputDialog>
-#include <QMenu>
-#include <QMessageBox>
 #include <QLayout>
 #include <QList>
 #include <QRegularExpression>
-#include <QFileInfo>
-#include <QImage>
 #include <QTextBlock>
 #include <QTextCursor>
 #include <QTextDocument>
@@ -36,9 +31,6 @@
 #include <QWidgetAction>
 #include <algorithm>
 
-#include <QNetworkRequest>
-
-#include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsrichtexteditor.h>
 
 #include "kadas/gui/kadasattachmentutils.h"
@@ -134,7 +126,7 @@ QString KadasRichTextDialog::documentBody( const QString &html )
  */
 void KadasRichTextDialog::reflowToolbar( int iconSize )
 {
-  QToolBar *toolbar = mEditor->findChild<QToolBar *>();
+  QToolBar *toolbar = mEditor->toolBar();
   auto *editorLayout = qobject_cast<QBoxLayout *>( mEditor->layout() );
   if ( !toolbar || !editorLayout )
     return;
@@ -170,26 +162,12 @@ void KadasRichTextDialog::reflowToolbar( int iconSize )
       if ( widget->sizePolicy().horizontalPolicy() == QSizePolicy::Expanding )
         continue;
       toolbar->removeAction( action ); // releases the widget: unparented and hidden
+      // The image button arrives as one of these, and would otherwise keep the
+      // toolbar's own icon size while everything around it is reflowed.
+      if ( auto *toolButton = qobject_cast<QToolButton *>( widget ) )
+        toolButton->setIconSize( QSize( iconSize, iconSize ) );
       flow->addWidget( widget );
       widget->show();
-      continue;
-    }
-    if ( action->objectName() == QLatin1String( "mActionInsertImage" ) )
-    {
-      // QgsRichTextEditor only offers a file chooser. Fold that and a URL
-      // download into one menu, rather than spending a second slot of toolbar
-      // width on it.
-      auto *imageButton = new QToolButton();
-      imageButton->setIcon( action->icon() );
-      imageButton->setToolTip( action->toolTip() );
-      imageButton->setAutoRaise( true );
-      imageButton->setIconSize( QSize( iconSize, iconSize ) );
-      imageButton->setPopupMode( QToolButton::InstantPopup );
-      auto *menu = new QMenu( imageButton );
-      menu->addAction( tr( "From File…" ), action, &QAction::trigger );
-      menu->addAction( tr( "From URL…" ), this, &KadasRichTextDialog::insertImageFromUrl );
-      imageButton->setMenu( menu );
-      flow->addWidget( imageButton );
       continue;
     }
     auto *button = new QToolButton();
@@ -241,7 +219,11 @@ KadasRichTextDialog::KadasRichTextDialog( const QString &title, const QString &h
 
 void KadasRichTextDialog::linkifyBareUrls( QTextDocument *document )
 {
-  static const QRegularExpression sUrlRe( QStringLiteral( R"((?:https?://|www\.)[^\s<>"']+)" ), QRegularExpression::CaseInsensitiveOption );
+  static const QString sUrlPattern( QStringLiteral( R"((?:https?://|www\.)[^\s<>"']+)" ) );
+  static const QRegularExpression sUrlRe( sUrlPattern, QRegularExpression::CaseInsensitiveOption );
+  // Trimming the trailing punctuation can eat into the match's own prefix
+  // ("www.)" leaves "www"), which is no longer a URL to link to.
+  static const QRegularExpression sWholeUrlRe( QRegularExpression::anchoredPattern( sUrlPattern ), QRegularExpression::CaseInsensitiveOption );
 
   struct Link
   {
@@ -268,8 +250,19 @@ void KadasRichTextDialog::linkifyBareUrls( QTextDocument *document )
         // Punctuation hard against the end of a URL is far more often the
         // sentence's than the URL's, so leave it outside the link.
         while ( !url.isEmpty() && QStringLiteral( ".,;:!?)]}" ).contains( url.back() ) )
+        {
+          // Unless the URL opened it itself, as a Wikipedia title does:
+          // ".../Foo_(bar)" ends in a bracket that is part of the address.
+          const QChar last = url.back();
+          if (
+            ( last == QLatin1Char( ')' ) && url.count( QLatin1Char( '(' ) ) >= url.count( QLatin1Char( ')' ) ) )
+            || ( last == QLatin1Char( ']' ) && url.count( QLatin1Char( '[' ) ) >= url.count( QLatin1Char( ']' ) ) )
+            || ( last == QLatin1Char( '}' ) && url.count( QLatin1Char( '{' ) ) >= url.count( QLatin1Char( '}' ) ) )
+          )
+            break;
           url.chop( 1 );
-        if ( url.isEmpty() )
+        }
+        if ( !sWholeUrlRe.match( url ).hasMatch() )
           continue;
         const QString href = url.startsWith( QLatin1String( "www." ), Qt::CaseInsensitive ) ? QStringLiteral( "http://" ) + url : url;
         links.append( { static_cast<int>( fragment.position() + match.capturedStart() ), static_cast<int>( url.length() ), href } );
@@ -296,61 +289,29 @@ void KadasRichTextDialog::linkifyBareUrls( QTextDocument *document )
   cursor.endEditBlock();
 }
 
-void KadasRichTextDialog::insertImageFromUrl()
-{
-  bool ok = false;
-  const QString entered = QInputDialog::getText( this, tr( "Image from URL" ), tr( "Enter the URL of an image:" ), QLineEdit::Normal, QString(), &ok );
-  if ( !ok || entered.trimmed().isEmpty() )
-    return;
-
-  const QUrl url( entered.trimmed() );
-  if ( !url.isValid() || !( url.scheme().compare( QLatin1String( "http" ), Qt::CaseInsensitive ) == 0 || url.scheme().compare( QLatin1String( "https" ), Qt::CaseInsensitive ) == 0 ) )
-  {
-    QMessageBox::warning( this, tr( "Image from URL" ), tr( "Please enter a valid http:// or https:// URL." ) );
-    return;
-  }
-
-  QNetworkRequest request( url );
-  const QgsNetworkReplyContent content = QgsNetworkAccessManager::instance()->blockingGet( request );
-  if ( content.error() != QNetworkReply::NoError || content.content().isEmpty() )
-  {
-    QMessageBox::warning( this, tr( "Image from URL" ), tr( "Failed to download the image: %1" ).arg( content.errorString() ) );
-    return;
-  }
-
-  QImage image;
-  if ( !image.loadFromData( content.content() ) )
-  {
-    QMessageBox::warning( this, tr( "Image from URL" ), tr( "That URL did not return an image." ) );
-    return;
-  }
-
-  // Copied into the project rather than left as a remote reference, so the
-  // description keeps working offline and once the URL rots.
-  const QString identifier = KadasAttachmentUtils::attachImage( image, QFileInfo( url.path() ).suffix().toLower() );
-  if ( identifier.isEmpty() )
-  {
-    QMessageBox::warning( this, tr( "Image from URL" ), tr( "Failed to store the image in the project." ) );
-    return;
-  }
-
-  QTextImageFormat format;
-  format.setName( identifier );
-  format.setWidth( image.width() );
-  format.setHeight( image.height() );
-  // Inserted at its own size; the textChanged handler brings it down to the
-  // size it will be shown at, exactly as for a file-chosen image.
-  mEditor->textCursor().insertImage( format );
-}
-
 void KadasRichTextDialog::accept()
 {
   // Only styling changes, so no position shifts to work around.
   linkifyBareUrls( mEditor->document() );
   mHtml = documentBody( KadasAttachmentUtils::materializeInlineImages( mEditor->toHtml() ) );
+
+  // Qt spells the document's default styling out on every paragraph it writes,
+  // so a line nobody formatted still round-trips into a screenful of markup —
+  // stored, and carried by every copy of the project from then on. Rebuilding
+  // the document from its own plain text says whether that markup holds
+  // anything the plain text does not: when the two agree, it does not, and the
+  // plain text is what gets stored. Proving them equal beats guessing at which
+  // properties count as formatting, which risks dropping some that do.
+  const QString plainText = mEditor->document()->toPlainText();
+  QTextDocument plain;
+  plain.setDefaultFont( mEditor->document()->defaultFont() );
+  plain.setPlainText( plainText );
+  if ( documentBody( plain.toHtml() ) == mHtml )
+    mHtml = plainText;
+
   // An emptied field still round-trips into a skeleton of markup; store nothing
   // at all, so callers can test it for emptiness.
-  if ( mEditor->toPlainText().trimmed().isEmpty() && !mHtml.contains( QLatin1String( "<img" ), Qt::CaseInsensitive ) )
+  if ( plainText.trimmed().isEmpty() && !mHtml.contains( QLatin1String( "<img" ), Qt::CaseInsensitive ) )
     mHtml.clear();
   QDialog::accept();
 }

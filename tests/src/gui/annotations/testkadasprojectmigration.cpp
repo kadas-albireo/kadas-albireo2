@@ -607,7 +607,13 @@ void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesPinItem()
   QCOMPARE( migratedLayer.attribute( QStringLiteral( "type" ) ), QStringLiteral( "annotation" ) );
   const QDomNodeList items = migratedLayer.firstChildElement( QStringLiteral( "items" ) ).elementsByTagName( QStringLiteral( "item" ) );
   QCOMPARE( items.size(), 1 );
-  QCOMPARE( items.at( 0 ).toElement().attribute( QStringLiteral( "type" ) ), QStringLiteral( "kadas:pin" ) );
+  const QDomElement pinEl = items.at( 0 ).toElement();
+  QCOMPARE( pinEl.attribute( QStringLiteral( "type" ) ), QStringLiteral( "kadas:pin" ) );
+  QCOMPARE( pinEl.attribute( QStringLiteral( "kadasRemarks" ) ), QStringLiteral( "test pin" ) );
+  // The dispatcher routes on `name` holding the class name, so there is no
+  // display name in it to fall back to - falling back would title the pin
+  // "KadasPinItem".
+  QCOMPARE( pinEl.attribute( QStringLiteral( "kadasName" ) ), QString() );
 }
 
 void TestKadasProjectMigration::migrateLegacyKadasItemLayer_translatesV1PinItemWithRichRemarks()

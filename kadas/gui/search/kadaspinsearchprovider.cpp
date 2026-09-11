@@ -15,8 +15,6 @@
  ***************************************************************************/
 
 #include <QGraphicsItem>
-#include <QTextDocument>
-#include <QTextDocumentFragment>
 
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationmarkeritem.h>
@@ -34,6 +32,19 @@ KadasPinSearchProvider::KadasPinSearchProvider( QgsMapCanvas *mapCanvas )
 QgsLocatorFilter *KadasPinSearchProvider::clone() const
 {
   return new KadasPinSearchProvider( mMapCanvas );
+}
+
+QString KadasPinSearchProvider::plainRemarks( const QString &remarks )
+{
+  const auto cached = mPlainRemarks.constFind( remarks );
+  if ( cached != mPlainRemarks.constEnd() )
+    return *cached;
+
+  const QString plain = KadasPinAnnotationItem::remarksAsPlainText( remarks );
+  if ( mPlainRemarks.size() >= sMaxCachedRemarks )
+    mPlainRemarks.clear();
+  mPlainRemarks.insert( remarks, plain );
+  return plain;
 }
 
 void KadasPinSearchProvider::fetchResults( const QString &string, const QgsLocatorContext &context, QgsFeedback *feedback )
@@ -54,9 +65,7 @@ void KadasPinSearchProvider::fetchResults( const QString &string, const QgsLocat
         {
           continue;
         }
-        // A rich-text description must be matched on its text: searching the
-        // markup both misses words split by formatting and hits tag names.
-        const QString remarks = Qt::mightBeRichText( pin->remarks() ) ? QTextDocumentFragment::fromHtml( pin->remarks() ).toPlainText() : pin->remarks();
+        const QString remarks = plainRemarks( pin->remarks() );
         if ( pin->name().contains( string, Qt::CaseInsensitive ) || remarks.contains( string, Qt::CaseInsensitive ) )
         {
           QgsLocatorResult result;

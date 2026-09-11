@@ -56,10 +56,6 @@ class KADAS_GUI_EXPORT KadasRichTextDialog : public QDialog
      */
     static void linkifyBareUrls( QTextDocument *document );
 
-  private slots:
-    //! Downloads an image the user names by URL into the project, and inserts it at the cursor.
-    void insertImageFromUrl();
-
   public slots:
     void accept() override;
 
@@ -70,7 +66,7 @@ class KADAS_GUI_EXPORT KadasRichTextDialog : public QDialog
     //! Keeps only what is inside <body> of \a html.
     static QString documentBody( const QString &html );
 
-    //! Rehosts the editor's toolbar in a wrapping layout with \a iconSize icons, dropping the tools this dialog has no use for and adding those it needs.
+    //! Rehosts the editor's toolbar in a wrapping layout with \a iconSize icons, dropping the tools this dialog has no use for.
     void reflowToolbar( int iconSize );
 
     QgsRichTextEditor *mEditor = nullptr;
