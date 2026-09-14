@@ -164,6 +164,12 @@ takes ownership.
     static QgsRectangle toItemRect( const QgsRectangle &mapRect, const KadasAnnotationItemContext &ctx );
     static QgsRectangle toMapRect( const QgsRectangle &itemRect, const KadasAnnotationItemContext &ctx );
     static double pickTolSqr( const KadasAnnotationItemContext &ctx );
+    static double rotationPickTolSqr( const KadasAnnotationItemContext &ctx );
+%Docstring
+Squared pick tolerance for rotation handles; wider than
+:py:func:`~KadasAnnotationItemController.pickTolSqr` to match the larger
+knob.
+%End
 
 
 };

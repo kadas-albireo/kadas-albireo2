@@ -39,6 +39,7 @@
 #include <qgis/qgsunittypes.h>
 
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
+#include "kadas/gui/annotationitems/kadasannotationrotation.h"
 
 
 void KadasAnnotationItemController::populateContextMenu( QgsAnnotationItem *, QMenu *, const KadasEditContext &, const QgsPointXY &, const KadasAnnotationItemContext & )
@@ -158,6 +159,12 @@ double KadasAnnotationItemController::pickTolSqr( const KadasAnnotationItemConte
 {
   const double mupp = ctx.mapSettings().mapUnitsPerPixel();
   return 25 * mupp * mupp;
+}
+
+double KadasAnnotationItemController::rotationPickTolSqr( const KadasAnnotationItemContext &ctx )
+{
+  const double tol = KadasAnnotationRotation::sHandleRadiusPixels * ctx.mapSettings().mapUnitsPerPixel();
+  return tol * tol;
 }
 
 QgsPointXY KadasAnnotationItemController::centroidMap( const QgsAbstractGeometry *geom, const KadasAnnotationItemContext &ctx )

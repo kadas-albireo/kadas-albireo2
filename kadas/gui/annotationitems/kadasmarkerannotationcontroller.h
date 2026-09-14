@@ -89,6 +89,14 @@ class KADAS_GUI_EXPORT KadasMarkerAnnotationController : public KadasAnnotationI
       AttrAngle
     };
 
+    /**
+     * Map-unit radius at which the rotation knob orbits the anchor: far enough
+     * to clear the rendered symbol (pins and other SVG markers are anchored at
+     * their bottom tip, so a fixed offset lands on the icon), never closer than
+     * KadasAnnotationRotation::sHandleOffsetPixels.
+     */
+    static double rotationHandleOffsetMap( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx );
+
     //! Vertex 1 is the rotation handle; vertex 0 is the anchor point.
     static constexpr int RotationHandleVertex = 1;
 };

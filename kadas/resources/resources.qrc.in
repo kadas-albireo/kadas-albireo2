@@ -92,6 +92,7 @@
         <file alias="icons/draw_pin">icons/draw_pin.svg</file>
         <file alias="icons/draw_svgmarker">icons/draw_svgmarker.svg</file>
         <file alias="icons/reset">icons/reset.svg</file>
+        <file alias="icons/rotate_handle">icons/rotate_handle.svg</file>
         <file alias="icons/close">icons/close.svg</file>
         <file alias="icons/search">icons/search.svg</file>
         <file alias="icons/textBold">icons/textBold.png</file>

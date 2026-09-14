@@ -40,6 +40,8 @@ namespace KadasAnnotationRotation
 {
   //! Pixel distance from the centre to the rotation handle.
   constexpr double sHandleOffsetPixels = 30.0;
+  //! Radius (pixels) of the rotation knob; also the grab radius, so the drawn glyph is exactly the hit target.
+  constexpr double sHandleRadiusPixels = 9.0;
   //! Snap step (degrees) applied while a modifier is held.
   constexpr double sSnapStep = 15.0;
 
@@ -55,7 +57,7 @@ namespace KadasAnnotationRotation
   //! Returns \a deg normalised to [0,360); snapped to sSnapStep when \a snap.
   double snapAngle( double deg, bool snap );
 
-  //! Paints the circular rotation handle at screen \a pt with nominal \a size.
+  //! Paints the rotation knob (a circular arrow on a white disc) at screen \a pt. The knob size is fixed (sHandleRadiusPixels); the node size argument is ignored.
   void renderHandle( QPainter *painter, const QPointF &pt, int size );
 
   /**

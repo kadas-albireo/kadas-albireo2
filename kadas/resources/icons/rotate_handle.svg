@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Rotation handle for annotation editing.
+     1 SVG unit = 1 screen pixel at the nominal handle size; the glyph is a
+     clockwise circular arrow, drawn twice so the white pass acts as a buffer
+     that keeps it legible over any basemap. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26">
+  <g stroke-linejoin="round" stroke-linecap="butt">
+    <g stroke="#ffffff" fill="#ffffff" opacity="0.9">
+      <path d="M 7.484 8.372 A 7.2 7.2 0 1 1 7.102 17.130" fill="none" stroke-width="4.4"/>
+      <path d="M 3.179 11.527 L 10.759 14.569 L 3.445 19.690 Z" stroke-width="2.4"/>
+    </g>
+    <g stroke="#007a00" fill="#007a00">
+      <path d="M 7.484 8.372 A 7.2 7.2 0 1 1 7.102 17.130" fill="none" stroke-width="2"/>
+      <path d="M 3.179 11.527 L 10.759 14.569 L 3.445 19.690 Z" stroke="none"/>
+    </g>
+  </g>
+</svg>
