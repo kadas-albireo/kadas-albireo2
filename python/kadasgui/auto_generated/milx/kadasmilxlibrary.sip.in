@@ -32,6 +32,18 @@ your option) any later version. *
     ~KadasMilxLibrary();
     void focusFilter();
 
+    static QString localizedName( const QDomElement &element, const QString &lang );
+%Docstring
+Localized display name of an MSS gallery ``element`` (the gallery
+itself, a section or a subsection), for the two-letter upper case
+``lang``.
+
+MSS gallery files name their groups with \c TranslDesc children
+(`<TranslDesc LangId="DE" Desc="..."/>`); galleries predating the 2026
+MSS library used \c Name_<lang> elements instead. Both are read, English
+serving as the fallback for a language the file does not carry.
+%End
+
   signals:
     void symbolSelected( const KadasMilxSymbolDesc &symbolDesc );
     void visibilityChanged( bool visible );
