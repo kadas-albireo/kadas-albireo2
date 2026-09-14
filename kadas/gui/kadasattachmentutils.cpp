@@ -15,7 +15,7 @@
  ***************************************************************************/
 
 #include <QFileInfo>
-#include <QHash>
+#include <QCache>
 #include <QImage>
 #include <QList>
 #include <QTextBlock>
@@ -80,86 +80,7 @@ QString KadasAttachmentUtils::resolve( const QString &identifier )
   return QFileInfo::exists( path ) ? path : QString();
 }
 
-QString KadasAttachmentUtils::materializeInlineImages( const QString &html, int maxStoredSize, int maxDisplaySize )
-{
-  // Parsing the markup costs far more than looking for the one thing that would
-  // make it worth parsing, and a description with no inline image is the norm.
-  if ( !html.contains( QLatin1String( "data:image/" ), Qt::CaseInsensitive ) )
-    return html;
-
-  QTextDocument doc;
-  doc.setHtml( html );
-
-  struct Rewrite
-  {
-      int position = 0;
-      int length = 0;
-      QTextImageFormat format;
-  };
-  QList<Rewrite> rewrites;
-
-  for ( QTextBlock block = doc.begin(); block.isValid(); block = block.next() )
-  {
-    for ( QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it )
-    {
-      const QTextFragment fragment = it.fragment();
-      if ( !fragment.isValid() || !fragment.charFormat().isImageFormat() )
-        continue;
-      QTextImageFormat format = fragment.charFormat().toImageFormat();
-      QImage image;
-      QString suffix;
-      if ( !decodeDataUrl( format.name(), image, suffix ) )
-        continue;
-
-      const QString identifier = attachImage( image, suffix, maxStoredSize );
-      if ( identifier.isEmpty() )
-        continue;
-      format.setName( identifier );
-
-      // The file keeps its resolution so it opens usefully at full size; the
-      // markup only says how big to draw it.
-      QSize displaySize = image.size();
-      if ( std::max( displaySize.width(), displaySize.height() ) > maxStoredSize )
-        displaySize.scale( maxStoredSize, maxStoredSize, Qt::KeepAspectRatio );
-      if ( std::max( displaySize.width(), displaySize.height() ) > maxDisplaySize )
-        displaySize.scale( maxDisplaySize, maxDisplaySize, Qt::KeepAspectRatio );
-      displaySize = displaySize.expandedTo( QSize( 1, 1 ) );
-      format.setWidth( displaySize.width() );
-      format.setHeight( displaySize.height() );
-      for ( int offset = 0; offset < fragment.length(); ++offset )
-        rewrites.append( { fragment.position() + offset, 1, format } );
-    }
-  }
-
-  if ( rewrites.isEmpty() )
-    return html;
-
-  // Back to front, so replacing one image cannot shift the position of the next.
-  QTextCursor cursor( &doc );
-  for ( int i = rewrites.size() - 1; i >= 0; --i )
-  {
-    cursor.setPosition( rewrites.at( i ).position );
-    cursor.setPosition( rewrites.at( i ).position + rewrites.at( i ).length, QTextCursor::KeepAnchor );
-    cursor.insertImage( rewrites.at( i ).format );
-  }
-  return doc.toHtml();
-}
-
-QString KadasAttachmentUtils::attachImage( const QImage &image, const QString &suffix, int maxStoredSize )
-{
-  if ( image.isNull() )
-    return QString();
-  QImage stored = image;
-  if ( std::max( stored.width(), stored.height() ) > maxStoredSize )
-    stored = stored.scaled( maxStoredSize, maxStoredSize, Qt::KeepAspectRatio, Qt::SmoothTransformation );
-
-  const QString file = QgsProject::instance()->createAttachedFile( QStringLiteral( "annotation_image.%1" ).arg( suffix.isEmpty() ? QStringLiteral( "png" ) : suffix ) );
-  if ( file.isEmpty() || !stored.save( file ) )
-    return QString();
-  return QgsProject::instance()->attachmentIdentifier( file );
-}
-
-bool KadasAttachmentUtils::clampImageDisplaySize( QTextDocument *document, int maxDisplaySize )
+bool KadasAttachmentUtils::rewriteImages( QTextDocument *document, const std::function<bool( QTextImageFormat & )> &rewrite, bool joinPreviousUndoStep )
 {
   if ( !document )
     return false;
@@ -180,23 +101,10 @@ bool KadasAttachmentUtils::clampImageDisplaySize( QTextDocument *document, int m
       if ( !fragment.isValid() || !fragment.charFormat().isImageFormat() )
         continue;
       QTextImageFormat format = fragment.charFormat().toImageFormat();
-      double width = format.width();
-      double height = format.height();
-      if ( width <= 0 || height <= 0 )
-      {
-        // No explicit size on the fragment: fall back to the image's own.
-        const QImage image = qvariant_cast<QImage>( document->resource( QTextDocument::ImageResource, QUrl( format.name() ) ) );
-        if ( image.isNull() )
-          continue;
-        width = image.width();
-        height = image.height();
-      }
-      const double longest = std::max( width, height );
-      if ( longest <= maxDisplaySize )
+      if ( !rewrite( format ) )
         continue;
-      const double factor = maxDisplaySize / longest;
-      format.setWidth( std::max( 1, qRound( width * factor ) ) );
-      format.setHeight( std::max( 1, qRound( height * factor ) ) );
+      // Adjacent images sharing a format arrive as a single fragment, so replace
+      // them one character at a time rather than collapsing them into one image.
       for ( int offset = 0; offset < fragment.length(); ++offset )
         rewrites.append( { fragment.position() + offset, 1, format } );
     }
@@ -206,9 +114,11 @@ bool KadasAttachmentUtils::clampImageDisplaySize( QTextDocument *document, int m
     return false;
 
   QTextCursor cursor( document );
-  // Fold the resize into the edit that inserted the image, so a single undo
-  // takes the image back out rather than first restoring its original size.
-  cursor.joinPreviousEditBlock();
+  if ( joinPreviousUndoStep )
+    cursor.joinPreviousEditBlock();
+  else
+    cursor.beginEditBlock();
+  // Back to front, so replacing one image cannot shift the position of the next.
   for ( int i = rewrites.size() - 1; i >= 0; --i )
   {
     cursor.setPosition( rewrites.at( i ).position );
@@ -219,6 +129,86 @@ bool KadasAttachmentUtils::clampImageDisplaySize( QTextDocument *document, int m
   return true;
 }
 
+QString KadasAttachmentUtils::materializeInlineImages( const QString &html, int maxStoredSize, int maxDisplaySize )
+{
+  // Parsing the markup costs far more than looking for the one thing that would
+  // make it worth parsing, and a description with no inline image is the norm.
+  if ( !html.contains( QLatin1String( "data:image/" ), Qt::CaseInsensitive ) )
+    return html;
+
+  QTextDocument doc;
+  doc.setHtml( html );
+
+  const bool changed = rewriteImages( &doc, [&]( QTextImageFormat &format ) {
+    QImage image;
+    QString suffix;
+    if ( !decodeDataUrl( format.name(), image, suffix ) )
+      return false;
+    const QString identifier = attachImage( image, suffix, maxStoredSize );
+    if ( identifier.isEmpty() )
+      return false;
+    format.setName( identifier );
+
+    // The file keeps its resolution so it opens usefully at full size; the
+    // markup only says how big to draw it.
+    QSize displaySize = image.size();
+    if ( std::max( displaySize.width(), displaySize.height() ) > maxStoredSize )
+      displaySize.scale( maxStoredSize, maxStoredSize, Qt::KeepAspectRatio );
+    if ( std::max( displaySize.width(), displaySize.height() ) > maxDisplaySize )
+      displaySize.scale( maxDisplaySize, maxDisplaySize, Qt::KeepAspectRatio );
+    displaySize = displaySize.expandedTo( QSize( 1, 1 ) );
+    format.setWidth( displaySize.width() );
+    format.setHeight( displaySize.height() );
+    return true;
+  } );
+
+  return changed ? doc.toHtml() : html;
+}
+
+QString KadasAttachmentUtils::attachImage( const QImage &image, const QString &suffix, int maxStoredSize )
+{
+  if ( image.isNull() )
+    return QString();
+  QImage stored = image;
+  if ( std::max( stored.width(), stored.height() ) > maxStoredSize )
+    stored = stored.scaled( maxStoredSize, maxStoredSize, Qt::KeepAspectRatio, Qt::SmoothTransformation );
+
+  const QString file = QgsProject::instance()->createAttachedFile( QStringLiteral( "annotation_image.%1" ).arg( suffix.isEmpty() ? QStringLiteral( "png" ) : suffix ) );
+  if ( file.isEmpty() || !stored.save( file ) )
+    return QString();
+  return QgsProject::instance()->attachmentIdentifier( file );
+}
+
+bool KadasAttachmentUtils::clampImageDisplaySize( QTextDocument *document, int maxDisplaySize )
+{
+  return rewriteImages(
+    document,
+    [document, maxDisplaySize]( QTextImageFormat &format ) {
+      double width = format.width();
+      double height = format.height();
+      if ( width <= 0 || height <= 0 )
+      {
+        // No explicit size on the fragment: fall back to the image's own.
+        const QImage image = qvariant_cast<QImage>( document->resource( QTextDocument::ImageResource, QUrl( format.name() ) ) );
+        if ( image.isNull() )
+          return false;
+        width = image.width();
+        height = image.height();
+      }
+      const double longest = std::max( width, height );
+      if ( longest <= maxDisplaySize )
+        return false;
+      const double factor = maxDisplaySize / longest;
+      format.setWidth( std::max( 1, qRound( width * factor ) ) );
+      format.setHeight( std::max( 1, qRound( height * factor ) ) );
+      return true;
+    },
+    // Fold the resize into the edit that inserted the image, so a single undo
+    // takes the image back out rather than first restoring its original size.
+    true
+  );
+}
+
 void KadasAttachmentUtils::installResourceProvider( QTextDocument *document )
 {
   if ( !document )
@@ -227,15 +217,17 @@ void KadasAttachmentUtils::installResourceProvider( QTextDocument *document )
   // asks for each image several times over a layout and paint. Without a cache
   // of our own, every one of those re-reads and re-decodes the file - a
   // full-size photo decoded a dozen times per hover.
-  auto cache = std::make_shared<QHash<QString, QImage>>();
+  // QCache evicts the least recently used entry on its own, and costing each
+  // image by its size bounds the memory rather than the count: a stored image
+  // can be anything from a few KB to some 11 MB at our 1920 px cap.
+  auto cache = std::make_shared<QCache<QString, QImage>>( sMaxCachedImageBytes );
   document->setResourceProvider( [cache]( const QUrl &url ) -> QVariant {
     if ( url.scheme() != sScheme )
       return QVariant();
     // Keyed by the whole URL, so the same file asked for at two display sizes
     // keeps two entries rather than one of them winning.
     const QString key = url.toString();
-    const auto cached = cache->constFind( key );
-    if ( cached != cache->constEnd() )
+    if ( const QImage *cached = cache->object( key ) )
       return *cached;
 
     // QUrl::path() drops the scheme and its slashes, and how many of those
@@ -259,10 +251,7 @@ void KadasAttachmentUtils::installResourceProvider( QTextDocument *document )
 
     // A single document outlives many items — the map tooltip is reused for
     // every annotation hovered — so the cache must not grow along with them.
-    // A miss costs one decode, which is what this saves a dozen of.
-    if ( cache->size() >= sMaxCachedImages )
-      cache->clear();
-    cache->insert( key, image );
+    cache->insert( key, new QImage( image ), static_cast<int>( image.sizeInBytes() ) );
     return image;
   } );
 }

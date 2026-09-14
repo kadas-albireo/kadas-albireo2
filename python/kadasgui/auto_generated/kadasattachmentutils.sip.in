@@ -11,6 +11,7 @@
 
 
 
+
 class KadasAttachmentUtils
 {
 %Docstring(signature="appended")
@@ -54,9 +55,9 @@ and markup with no inline images at all, are returned untouched.
 
 The stored file is capped at ``maxStoredSize`` pixels on its longest
 edge, so a phone photo cannot bloat the project, while the markup
-carries a display size of at most ``maxDisplaySize`` pixels wide — the
-two are deliberately different, so an image shown small in a tooltip
-still opens usefully large.
+carries a display size of at most ``maxDisplaySize`` pixels on its
+longest edge — the two are deliberately different, so an image shown
+small in a tooltip still opens usefully large.
 %End
 
     static QString attachImage( const QImage &image, const QString &suffix, int maxStoredSize = 1920 );
@@ -73,8 +74,11 @@ size.
     static bool clampImageDisplaySize( QTextDocument *document, int maxDisplaySize = 280 );
 %Docstring
 Clamps every image in ``document`` to at most ``maxDisplaySize`` pixels
-wide, preserving aspect ratio and leaving the file behind it untouched.
-Returns ``True`` if anything changed.
+on its longest edge, preserving aspect ratio and leaving the file behind
+it untouched. Returns ``True`` if anything changed.
+
+Bounding the longest edge rather than the width is what keeps a portrait
+photo inside the tooltip it will be shown in, which does not grow.
 
 :py:class:`QgsRichTextEditor` inserts an image at its full pixel size,
 so a photo arrives in the editor many times wider than the field it will

@@ -200,12 +200,30 @@ KadasRichTextDialog::KadasRichTextDialog( const QString &title, const QString &h
   // QgsRichTextEditor inserts an image at its full pixel size, which in a photo's
   // case dwarfs the dialog. Bring it down to the size it will be shown at, as
   // soon as it lands, so the editor shows what the tooltip will.
-  connect( mEditor, &QgsRichTextEditor::textChanged, this, [this] {
-    if ( mClampingImages )
+  //
+  // Driven by contentsChange rather than textChanged, so that typing - which can
+  // never need a clamp - does not walk the whole document on every keystroke.
+  connect( mEditor->document(), &QTextDocument::contentsChange, this, [this]( int position, int, int charsAdded ) {
+    if ( mClampingImages || charsAdded == 0 )
       return;
+    // An image is a single object replacement character; if the inserted range
+    // holds none, there is nothing to size.
+    QTextCursor inserted( mEditor->document() );
+    inserted.setPosition( position );
+    inserted.setPosition( position + charsAdded, QTextCursor::KeepAnchor );
+    if ( !inserted.selectedText().contains( QChar::ObjectReplacementCharacter ) )
+      return;
+    // The document must not be edited from inside contentsChange, so do the
+    // clamp once this change has finished being applied.
     mClampingImages = true;
-    KadasAttachmentUtils::clampImageDisplaySize( mEditor->document() );
-    mClampingImages = false;
+    QMetaObject::invokeMethod(
+      this,
+      [this] {
+        KadasAttachmentUtils::clampImageDisplaySize( mEditor->document() );
+        mClampingImages = false;
+      },
+      Qt::QueuedConnection
+    );
   } );
 
   auto *buttons = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel );
