@@ -58,6 +58,8 @@ class KADAS_GUI_EXPORT KadasMilxAnnotationController : public KadasAnnotationIte
     //! Re-render the layer live while dragging (the outline band is a poor stand-in for the symbol).
     bool liveRepaintOnEdit() const override { return true; }
 
+    KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = nullptr ) const override;
+
     bool hitTest( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const override;
     void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx ) override;
     void onDoubleClick( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) override;

@@ -75,6 +75,9 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     //! Create-mode: place a vertex at \a pos as if left-clicked; no-op in edit mode.
     void addPoint( const QgsPointXY &pos );
 
+    //! Reloads the editor panel from the current item, after something outside the tool changed it.
+    void refreshStyleEditor();
+
   signals:
     //! Create-mode: emitted whenever a part is finalized.
     void partFinished();

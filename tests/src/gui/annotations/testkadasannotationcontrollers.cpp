@@ -45,6 +45,7 @@
 #include <qgis/qgspointxy.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsrectangle.h>
+#include <qgis/qgsrendercontext.h>
 
 #include <kadas/gui/kadasattachmentutils.h>
 #include <kadas/gui/kadasrichtextdialog.h>
@@ -57,6 +58,7 @@
 #include <kadas/gui/annotationitems/kadascoordcrossannotationitem.h>
 #include <kadas/gui/annotationitems/kadaslineannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadasmarkerannotationcontroller.h>
+#include <kadas/gui/annotationitems/kadasmilxannotationitem.h>
 #include <kadas/gui/annotationitems/kadaspinannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadaspinannotationitem.h>
 #include <kadas/gui/annotationitems/kadaspolygonannotationcontroller.h>
@@ -112,6 +114,9 @@ class TestKadasAnnotationControllers : public QObject
 
     // KadasPinAnnotationItem ---------------------------------------------
     void pin_defaultIconPath_resolvesInQrc();
+
+    // KadasMilxAnnotationItem --------------------------------------------
+    void milx_boundingBox_coversRenderedGlyph();
 
     // KadasLineAnnotationController --------------------------------------
     void line_getEditContext_hitsOnSegmentNotInBoundingBox();
@@ -1216,6 +1221,50 @@ void TestKadasAnnotationControllers::richText_unformattedTextIsStoredAsPlainText
     dialog.accept();
     QVERIFY( dialog.html().isEmpty() );
   }
+}
+
+
+// ----- MilX ---------------------------------------------------------------
+
+void TestKadasAnnotationControllers::milx_boundingBox_coversRenderedGlyph()
+{
+  // The rendered MSS glyph is far bigger than the control point it hangs on, and
+  // the scale-dependent bounding box is all QgsAnnotationLayer::itemsInBounds()
+  // has to offer a click: too tight a box and clicking the symbol picks nothing,
+  // so neither the editor nor the context menu can ever open on it.
+  const QgsCoordinateReferenceSystem mapCrs( QStringLiteral( "EPSG:3857" ) );
+  const QgsCoordinateReferenceSystem itemCrs( QStringLiteral( "EPSG:4326" ) );
+  QgsMapSettings ms;
+  ms.setDestinationCrs( mapCrs );
+  ms.setExtent( QgsRectangle( 820000, 5930000, 840000, 5950000 ) );
+  ms.setOutputSize( QSize( 1000, 1000 ) );
+  ms.setOutputDpi( 96 );
+
+  const QgsCoordinateTransform toMap( itemCrs, mapCrs, QgsCoordinateTransformContext() );
+  const QgsPointXY anchor( 7.44, 46.95 );
+
+  KadasMilxAnnotationItem item;
+  item.setMssString( QStringLiteral( "<mss-symbol/>" ) );
+  item.setPoints( { anchor } );
+
+  const QPointF anchorScreen = ms.mapToPixel().transform( toMap.transform( anchor ) ).toQPointF();
+  auto itemPosAtScreenOffset = [&]( int dx, int dy ) {
+    const QgsPointXY mapPos = ms.mapToPixel().toMapCoordinates( QPoint( anchorScreen.x() + dx, anchorScreen.y() + dy ) );
+    return toMap.transform( mapPos, Qgis::TransformDirection::Reverse );
+  };
+
+  QgsRenderContext context = QgsRenderContext::fromMapSettings( ms );
+
+  // 40 px above the anchor is on the glyph of a single point symbol, yet way
+  // outside the (zero-size) hull of its control points.
+  const QgsPointXY onGlyph = itemPosAtScreenOffset( 0, -40 );
+  QVERIFY( !item.boundingBox().contains( onGlyph ) );
+  QVERIFY( item.boundingBox( context ).contains( onGlyph ) );
+
+  // Dragging the symbol away from its anchor leaves a leader line behind: the
+  // box has to follow the glyph, not stay on the anchor.
+  item.setUserOffset( QPoint( 0, -400 ) );
+  QVERIFY( item.boundingBox( context ).contains( itemPosAtScreenOffset( 0, -400 ) ) );
 }
 
 QTEST_MAIN( TestKadasAnnotationControllers )

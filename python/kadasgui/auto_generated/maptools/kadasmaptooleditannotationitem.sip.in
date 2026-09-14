@@ -73,6 +73,12 @@ Create-mode: place a vertex at ``pos`` as if left-clicked; no-op in edit
 mode.
 %End
 
+    void refreshStyleEditor();
+%Docstring
+Reloads the editor panel from the current item, after something outside
+the tool changed it.
+%End
+
   signals:
     void partFinished();
 %Docstring

@@ -75,6 +75,9 @@ Re-render the layer live while dragging (the outline band is a poor
 stand-in for the symbol).
 %End
 
+    virtual KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = 0 ) const;
+
+
     virtual bool hitTest( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const;
 
     virtual void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx );

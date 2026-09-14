@@ -921,6 +921,25 @@ void KadasMapToolEditAnnotationItem::setupStyleEditor()
     pushState();
     emit stylePersisted();
   } );
+
+  connect( mStyleEditor, &KadasAnnotationStyleEditor::externalEditRequested, this, [this] {
+    QgsAnnotationItem *item = mLayer ? mLayer->item( mItemId ) : nullptr;
+    if ( !item || !mController )
+      return;
+    mItem = item;
+    KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
+    mController->onDoubleClick( mItem, ctx );
+    mLayer->triggerRepaint();
+    mStyleEditor->loadFromItem( mItem );
+    refreshHandles();
+    pushState();
+  } );
+}
+
+void KadasMapToolEditAnnotationItem::refreshStyleEditor()
+{
+  if ( mStyleEditor && mItem )
+    mStyleEditor->loadFromItem( mItem );
 }
 
 void KadasMapToolEditAnnotationItem::createInitialItem()
@@ -1123,10 +1142,21 @@ void KadasMapToolEditAnnotationItem::showContextMenu( QgsAnnotationLayer *layer,
   if ( !chosen )
     return;
 
-  // A controller action (e.g. "Reset rotation") has already mutated the item;
-  // refresh the style editor so its fields reflect the new state.
-  if ( mStyleEditor && target == mItem )
-    mStyleEditor->loadFromItem( mItem );
+  if ( chosen != toFront && chosen != toBack && chosen != forward && chosen != backward )
+  {
+    // A controller action (e.g. "Reset rotation", "Symbol editor...") has already
+    // mutated the item: show the new state and record it.
+    if ( target == mItem )
+    {
+      if ( mStyleEditor )
+        mStyleEditor->loadFromItem( mItem );
+      refreshHandles();
+    }
+    layer->triggerRepaint();
+    if ( layer == mLayer.data() && itemId == mItemId )
+      pushState();
+    return;
+  }
 
   int newZ = curZ;
   if ( chosen == toFront )

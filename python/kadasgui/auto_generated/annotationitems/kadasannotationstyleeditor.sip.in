@@ -41,6 +41,11 @@ Emitted continuously while the user is interacting (live preview).
 %Docstring
 Emitted when a discrete edit is finalized (push history + persist).
 %End
+    void externalEditRequested();
+%Docstring
+Requests the item's own external editor, i.e. the controller's
+double-click action.
+%End
 };
 
 

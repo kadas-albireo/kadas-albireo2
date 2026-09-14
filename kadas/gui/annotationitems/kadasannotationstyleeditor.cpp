@@ -47,6 +47,7 @@
 #include <QTextEdit>
 #include <QToolButton>
 #include <QUrl>
+#include <QVBoxLayout>
 #include <cmath>
 #include <memory>
 
@@ -79,6 +80,7 @@
 #include "kadas/gui/annotationitems/kadasannotationrotation.h"
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadaslineannotationcontroller.h"
+#include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
 #include "kadas/gui/annotationitems/kadaspictureannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 #include "kadas/gui/kadasattachmentutils.h"
@@ -1446,4 +1448,40 @@ void KadasPictureStyleEditor::applyToItem( QgsAnnotationItem *item ) const
     pic->setOffsetFromCallout( QSizeF( -size.width() / 2.0, -size.height() / 2.0 ) );
     pic->setOffsetFromCalloutUnit( pic->fixedSizeUnit() );
   }
+}
+
+
+//
+// KadasMilxStyleEditor
+//
+
+KadasMilxStyleEditor::KadasMilxStyleEditor( QWidget *parent )
+  : KadasAnnotationStyleEditor( parent )
+{
+  QVBoxLayout *layout = new QVBoxLayout( this );
+  layout->setContentsMargins( 0, 0, 0, 0 );
+
+  mNameLabel = new QLabel( this );
+  mNameLabel->setWordWrap( true );
+  layout->addWidget( mNameLabel );
+
+  mSymbolEditorButton = new QPushButton( tr( "Symbol editor..." ), this );
+  mSymbolEditorButton->setIcon( QIcon( QStringLiteral( ":/kadas/icons/editor" ) ) );
+  connect( mSymbolEditorButton, &QPushButton::clicked, this, &KadasAnnotationStyleEditor::externalEditRequested );
+  layout->addWidget( mSymbolEditorButton );
+}
+
+void KadasMilxStyleEditor::loadFromItem( const QgsAnnotationItem *item )
+{
+  const auto *milx = dynamic_cast<const KadasMilxAnnotationItem *>( item );
+  mNameLabel->setText( milx ? milx->militaryName() : QString() );
+  mNameLabel->setVisible( !mNameLabel->text().isEmpty() );
+  // While a symbol is still being picked there is nothing for libmss to edit.
+  mSymbolEditorButton->setEnabled( milx && !milx->mssString().isEmpty() );
+}
+
+void KadasMilxStyleEditor::applyToItem( QgsAnnotationItem *item ) const
+{
+  // Nothing to apply: the symbol itself is edited by libmss, through externalEditRequested().
+  Q_UNUSED( item )
 }

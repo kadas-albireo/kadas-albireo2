@@ -38,6 +38,7 @@
 #include <quazip/quazipfile.h>
 #include <quazip/quazipnewinfo.h>
 
+#include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
 #include "kadas/gui/annotationitems/kadasmilxlayersettings.h"
@@ -629,6 +630,11 @@ void KadasMilxAnnotationController::populateContextMenu( QgsAnnotationItem *item
     QAction *action = menu->addAction( QObject::tr( "Reset offset" ), [milx]() { milx->setUserOffset( QPoint() ); } );
     action->setEnabled( !milx->userOffset().isNull() );
   }
+}
+
+KadasAnnotationStyleEditor *KadasMilxAnnotationController::createStyleEditor( QWidget *parent ) const
+{
+  return new KadasMilxStyleEditor( parent );
 }
 
 void KadasMilxAnnotationController::onDoubleClick( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx )
