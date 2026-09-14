@@ -138,7 +138,7 @@ QList<KadasNode> KadasPolygonAnnotationController::nodes( const QgsAnnotationIte
     {
       handle = restHandleMap( poly, ctx );
     }
-    result.append( { handle, []( QPainter *p, const QPointF &pt, int sz ) { KadasAnnotationRotation::renderHandle( p, pt, sz ); } } );
+    result.append( { handle, KadasAnnotationRotation::renderHandle } );
   }
   return result;
 }
@@ -270,7 +270,7 @@ KadasEditContext KadasPolygonAnnotationController::getEditContext( const QgsAnno
   {
     const QgsPointXY centerMap = centroidMap( poly, ctx );
     const QgsPointXY handle = restHandleMap( poly, ctx );
-    if ( pos.sqrDist( handle ) < pickTolSqr( ctx ) )
+    if ( pos.sqrDist( handle ) < rotationPickTolSqr( ctx ) )
     {
       QVector<QgsPointXY> verticesMap;
       verticesMap.reserve( n );

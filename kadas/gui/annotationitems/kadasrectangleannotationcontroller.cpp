@@ -30,6 +30,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettingsentryimpl.h>
 
+#include "kadas/gui/annotationitems/kadasannotationrotation.h"
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasrectangleannotationcontroller.h"
@@ -87,7 +88,7 @@ QList<KadasNode> KadasRectangleAnnotationController::nodes( const QgsAnnotationI
   QList<KadasNode> result;
   for ( const QgsPointXY &c : rect->corners() )
     result.append( { toMapPos( c, ctx ) } );
-  result.append( { toMapPos( rect->rotationHandle(), ctx ) } );
+  result.append( { toMapPos( rect->rotationHandle(), ctx ), KadasAnnotationRotation::renderHandle } );
   return result;
 }
 
@@ -161,7 +162,7 @@ KadasEditContext KadasRectangleAnnotationController::getEditContext( const QgsAn
       return KadasEditContext( QgsVertexId( 0, 0, i ), mp, drawAttribs() );
   }
   const QgsPointXY rotMap = toMapPos( rect->rotationHandle(), ctx );
-  if ( pos.sqrDist( rotMap ) < pickTolSqr( ctx ) )
+  if ( pos.sqrDist( rotMap ) < rotationPickTolSqr( ctx ) )
     return KadasEditContext( QgsVertexId( 0, 0, RotationHandleVertex ), rotMap, drawAttribs(), Qt::CrossCursor );
 
   const auto csMap = [&]() {

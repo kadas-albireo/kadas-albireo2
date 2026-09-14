@@ -165,7 +165,7 @@ QList<KadasNode> KadasLineAnnotationController::nodes( const QgsAnnotationItem *
       const QgsPointXY centerMap = centroidMap( curve, ctx );
       handle = KadasAnnotationRotation::VertexRotationState::restHandle( centerMap, off );
     }
-    result.append( { handle, []( QPainter *p, const QPointF &pt, int sz ) { KadasAnnotationRotation::renderHandle( p, pt, sz ); } } );
+    result.append( { handle, KadasAnnotationRotation::renderHandle } );
   }
   return result;
 }
@@ -268,7 +268,7 @@ KadasEditContext KadasLineAnnotationController::getEditContext( const QgsAnnotat
     const QgsPointXY centerMap = centroidMap( curve, ctx );
     const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
     const QgsPointXY handle = KadasAnnotationRotation::VertexRotationState::restHandle( centerMap, off );
-    if ( pos.sqrDist( handle ) < pickTolSqr( ctx ) )
+    if ( pos.sqrDist( handle ) < rotationPickTolSqr( ctx ) )
     {
       QVector<QgsPointXY> verticesMap;
       verticesMap.reserve( n );

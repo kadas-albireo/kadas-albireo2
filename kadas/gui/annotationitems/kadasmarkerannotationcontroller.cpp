@@ -94,6 +94,30 @@ QgsAnnotationItem *KadasMarkerAnnotationController::createItem() const
   return item;
 }
 
+double KadasMarkerAnnotationController::rotationHandleOffsetMap( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx )
+{
+  double offPx = KadasAnnotationRotation::sHandleOffsetPixels;
+  if ( const QgsMarkerSymbol *symRaw = asMarker( item )->symbol() )
+  {
+    // QgsMarkerSymbol::bounds() needs startRender/stopRender (non-const); clone to
+    // avoid mutating it. Measure the unrotated symbol: rotation happens about the
+    // anchor, so the reach is angle-invariant and the knob keeps a steady radius
+    // during a drag.
+    std::unique_ptr<QgsMarkerSymbol> sym( symRaw->clone() );
+    sym->setAngle( 0 );
+    QgsRenderContext rc = QgsRenderContext::fromMapSettings( ctx.mapSettings() );
+    sym->startRender( rc );
+    const QRectF bounds = sym->bounds( QPointF( 0, 0 ), rc );
+    sym->stopRender( rc );
+    double reach = 0.0;
+    for ( const QPointF &corner : { bounds.topLeft(), bounds.topRight(), bounds.bottomRight(), bounds.bottomLeft() } )
+      reach = std::max( reach, std::hypot( corner.x(), corner.y() ) );
+    constexpr double gapPx = 6.0;
+    offPx = std::max( offPx, reach + KadasAnnotationRotation::sHandleRadiusPixels + gapPx );
+  }
+  return offPx * ctx.mapSettings().mapUnitsPerPixel();
+}
+
 QList<KadasNode> KadasMarkerAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
 {
   const QgsPointXY p = asMarker( item )->geometry();
@@ -102,9 +126,8 @@ QList<KadasNode> KadasMarkerAnnotationController::nodes( const QgsAnnotationItem
     return { { anchor } };
   const QgsMarkerSymbol *sym = asMarker( item )->symbol();
   const double angle = sym ? sym->angle() : 0.0;
-  const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
-  const QgsPointXY handle = KadasAnnotationRotation::handlePos( anchor, angle, off );
-  return { { anchor }, { handle, []( QPainter *p, const QPointF &pt, int sz ) { KadasAnnotationRotation::renderHandle( p, pt, sz ); } } };
+  const QgsPointXY handle = KadasAnnotationRotation::handlePos( anchor, angle, rotationHandleOffsetMap( item, ctx ) );
+  return { { anchor }, { handle, KadasAnnotationRotation::renderHandle } };
 }
 
 bool KadasMarkerAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
@@ -163,9 +186,8 @@ KadasEditContext KadasMarkerAnnotationController::getEditContext( const QgsAnnot
   {
     const QgsMarkerSymbol *sym0 = asMarker( item )->symbol();
     const double curAngle = sym0 ? sym0->angle() : 0.0;
-    const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
-    const QgsPointXY handle = KadasAnnotationRotation::handlePos( testPos, curAngle, off );
-    if ( pos.sqrDist( handle ) < pickTolSqr( ctx ) )
+    const QgsPointXY handle = KadasAnnotationRotation::handlePos( testPos, curAngle, rotationHandleOffsetMap( item, ctx ) );
+    if ( pos.sqrDist( handle ) < rotationPickTolSqr( ctx ) )
     {
       KadasAttribDefs rot;
       rot.insert( AttrAngle, KadasNumericAttribute { "angle", KadasNumericAttribute::Type::TypeAngle } );

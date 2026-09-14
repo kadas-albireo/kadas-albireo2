@@ -277,6 +277,8 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     static QgsRectangle toItemRect( const QgsRectangle &mapRect, const KadasAnnotationItemContext &ctx );
     static QgsRectangle toMapRect( const QgsRectangle &itemRect, const KadasAnnotationItemContext &ctx );
     static double pickTolSqr( const KadasAnnotationItemContext &ctx );
+    //! Squared pick tolerance for rotation handles; wider than pickTolSqr() to match the larger knob.
+    static double rotationPickTolSqr( const KadasAnnotationItemContext &ctx );
 
 #ifndef SIP_RUN
     //! Geometric centroid of \a geom (item CRS) expressed in map coords; the natural rotation pivot for vertex geometries.

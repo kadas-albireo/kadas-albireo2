@@ -17,8 +17,11 @@
 #include <cmath>
 
 #include <QBrush>
+#include <QColor>
 #include <QPainter>
 #include <QPen>
+#include <QPolygonF>
+#include <QSvgRenderer>
 
 #include "kadas/gui/annotationitems/kadasannotationrotation.h"
 
@@ -58,17 +61,19 @@ double KadasAnnotationRotation::snapAngle( double deg, bool snap )
   return deg;
 }
 
-void KadasAnnotationRotation::renderHandle( QPainter *painter, const QPointF &pt, int size )
+void KadasAnnotationRotation::renderHandle( QPainter *painter, const QPointF &pt, int )
 {
-  const double r = 0.5 * size;
+  // The knob has its own fixed size (sHandleRadiusPixels), not the caller's
+  // vertex-node size: a rotation handle must never read as one more vertex.
+  // The asset is authored at 1 unit = 1 pixel around a centred sHandleRadiusPixels
+  // circle, with room for the arrowhead and its white buffer beyond that radius.
+  constexpr double boxPixels = 26.0;
+  // Parsed once: QSvgRenderer keeps the document tree, so painting is just a replay.
+  static QSvgRenderer sRenderer { QStringLiteral( ":/kadas/icons/rotate_handle" ) };
+
   painter->save();
   painter->setRenderHint( QPainter::Antialiasing, true );
-  painter->setPen( QPen( QColor( 0, 122, 0 ), 1.5 ) );
-  painter->setBrush( QBrush( QColor( 255, 255, 255 ) ) );
-  painter->drawEllipse( pt, r, r );
-  painter->setPen( QPen( QColor( 0, 122, 0 ), 1.0 ) );
-  painter->drawLine( QPointF( pt.x() - 0.4 * r, pt.y() ), QPointF( pt.x() + 0.4 * r, pt.y() ) );
-  painter->drawLine( QPointF( pt.x(), pt.y() - 0.4 * r ), QPointF( pt.x(), pt.y() + 0.4 * r ) );
+  sRenderer.render( painter, QRectF( pt.x() - 0.5 * boxPixels, pt.y() - 0.5 * boxPixels, boxPixels, boxPixels ) );
   painter->restore();
 }
 

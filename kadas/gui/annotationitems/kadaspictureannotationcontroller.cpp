@@ -409,7 +409,7 @@ QList<KadasNode> KadasPictureAnnotationController::nodes( const QgsAnnotationIte
                       p->restore();
                     } } );
   const QPointF handlePx = rotationHandleScreen( frame, pic->rotation() );
-  result.append( { ctx.mapSettings().mapToPixel().toMapCoordinates( handlePx.toPoint() ), []( QPainter *p, const QPointF &pt, int size ) { KadasAnnotationRotation::renderHandle( p, pt, size ); } } );
+  result.append( { ctx.mapSettings().mapToPixel().toMapCoordinates( handlePx.toPoint() ), KadasAnnotationRotation::renderHandle } );
   return result;
 }
 
@@ -492,7 +492,7 @@ KadasEditContext KadasPictureAnnotationController::getEditContext( const QgsAnno
   {
     const QPointF handlePx = rotationHandleScreen( frameRect, pic->rotation() );
     const QgsPointXY handleMap = ctx.mapSettings().mapToPixel().toMapCoordinates( handlePx.toPoint() );
-    if ( pos.sqrDist( handleMap ) < pickTolSqr( ctx ) )
+    if ( pos.sqrDist( handleMap ) < rotationPickTolSqr( ctx ) )
     {
       KadasAttribDefs rotAttribs;
       rotAttribs.insert( AttrAngle, KadasNumericAttribute { "angle", KadasNumericAttribute::Type::TypeAngle } );

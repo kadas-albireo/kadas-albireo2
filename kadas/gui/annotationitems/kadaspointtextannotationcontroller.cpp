@@ -87,7 +87,7 @@ QList<KadasNode> KadasPointTextAnnotationController::nodes( const QgsAnnotationI
   const QgsPointXY anchor = toMapPos( asText( item )->point(), ctx );
   const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
   const QgsPointXY handle = KadasAnnotationRotation::handlePos( anchor, asText( item )->angle(), off );
-  return { { anchor }, { handle, []( QPainter *p, const QPointF &pt, int sz ) { KadasAnnotationRotation::renderHandle( p, pt, sz ); } } };
+  return { { anchor }, { handle, KadasAnnotationRotation::renderHandle } };
 }
 
 bool KadasPointTextAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
@@ -146,7 +146,7 @@ KadasEditContext KadasPointTextAnnotationController::getEditContext( const QgsAn
 
   const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
   const QgsPointXY handle = KadasAnnotationRotation::handlePos( testPos, asText( item )->angle(), off );
-  if ( pos.sqrDist( handle ) < pickTolSqr( ctx ) )
+  if ( pos.sqrDist( handle ) < rotationPickTolSqr( ctx ) )
   {
     KadasAttribDefs rot;
     rot.insert( AttrAngle, KadasNumericAttribute { "angle", KadasNumericAttribute::Type::TypeAngle } );
