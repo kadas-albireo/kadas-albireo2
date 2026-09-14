@@ -80,53 +80,24 @@ QString KadasAttachmentUtils::resolve( const QString &identifier )
   return QFileInfo::exists( path ) ? path : QString();
 }
 
-bool KadasAttachmentUtils::rewriteImages( QTextDocument *document, const std::function<bool( QTextImageFormat & )> &rewrite, bool joinPreviousUndoStep )
+void KadasAttachmentUtils::applyImageRewrites( QTextDocument *document, const QList<ImageRewrite> &rewrites, UndoStep undoStep )
 {
-  if ( !document )
-    return false;
-
-  struct Rewrite
-  {
-      int position = 0;
-      int length = 0;
-      QTextImageFormat format;
-  };
-  QList<Rewrite> rewrites;
-
-  for ( QTextBlock block = document->begin(); block.isValid(); block = block.next() )
-  {
-    for ( QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it )
-    {
-      const QTextFragment fragment = it.fragment();
-      if ( !fragment.isValid() || !fragment.charFormat().isImageFormat() )
-        continue;
-      QTextImageFormat format = fragment.charFormat().toImageFormat();
-      if ( !rewrite( format ) )
-        continue;
-      // Adjacent images sharing a format arrive as a single fragment, so replace
-      // them one character at a time rather than collapsing them into one image.
-      for ( int offset = 0; offset < fragment.length(); ++offset )
-        rewrites.append( { fragment.position() + offset, 1, format } );
-    }
-  }
-
-  if ( rewrites.isEmpty() )
-    return false;
-
   QTextCursor cursor( document );
-  if ( joinPreviousUndoStep )
+  if ( undoStep == UndoStep::JoinPrevious )
     cursor.joinPreviousEditBlock();
   else
     cursor.beginEditBlock();
-  // Back to front, so replacing one image cannot shift the position of the next.
   for ( int i = rewrites.size() - 1; i >= 0; --i )
   {
-    cursor.setPosition( rewrites.at( i ).position );
-    cursor.setPosition( rewrites.at( i ).position + rewrites.at( i ).length, QTextCursor::KeepAnchor );
-    cursor.insertImage( rewrites.at( i ).format );
+    const ImageRewrite &rewrite = rewrites.at( i );
+    for ( int offset = rewrite.length - 1; offset >= 0; --offset )
+    {
+      cursor.setPosition( rewrite.position + offset );
+      cursor.setPosition( rewrite.position + offset + 1, QTextCursor::KeepAnchor );
+      cursor.insertImage( rewrite.format );
+    }
   }
   cursor.endEditBlock();
-  return true;
 }
 
 QString KadasAttachmentUtils::materializeInlineImages( const QString &html, int maxStoredSize, int maxDisplaySize )
@@ -139,30 +110,44 @@ QString KadasAttachmentUtils::materializeInlineImages( const QString &html, int 
   QTextDocument doc;
   doc.setHtml( html );
 
-  const bool changed = rewriteImages( &doc, [&]( QTextImageFormat &format ) {
-    QImage image;
-    QString suffix;
-    if ( !decodeDataUrl( format.name(), image, suffix ) )
-      return false;
-    const QString identifier = attachImage( image, suffix, maxStoredSize );
-    if ( identifier.isEmpty() )
-      return false;
-    format.setName( identifier );
+  QList<ImageRewrite> rewrites;
+  for ( QTextBlock block = doc.begin(); block.isValid(); block = block.next() )
+  {
+    for ( QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it )
+    {
+      const QTextFragment fragment = it.fragment();
+      if ( !fragment.isValid() || !fragment.charFormat().isImageFormat() )
+        continue;
+      QTextImageFormat format = fragment.charFormat().toImageFormat();
 
-    // The file keeps its resolution so it opens usefully at full size; the
-    // markup only says how big to draw it.
-    QSize displaySize = image.size();
-    if ( std::max( displaySize.width(), displaySize.height() ) > maxStoredSize )
-      displaySize.scale( maxStoredSize, maxStoredSize, Qt::KeepAspectRatio );
-    if ( std::max( displaySize.width(), displaySize.height() ) > maxDisplaySize )
-      displaySize.scale( maxDisplaySize, maxDisplaySize, Qt::KeepAspectRatio );
-    displaySize = displaySize.expandedTo( QSize( 1, 1 ) );
-    format.setWidth( displaySize.width() );
-    format.setHeight( displaySize.height() );
-    return true;
-  } );
+      QImage image;
+      QString suffix;
+      if ( !decodeDataUrl( format.name(), image, suffix ) )
+        continue;
+      const QString identifier = attachImage( image, suffix, maxStoredSize );
+      if ( identifier.isEmpty() )
+        continue;
+      format.setName( identifier );
 
-  return changed ? doc.toHtml() : html;
+      // The file keeps its resolution so it opens usefully at full size; the
+      // markup only says how big to draw it.
+      QSize displaySize = image.size();
+      if ( std::max( displaySize.width(), displaySize.height() ) > maxStoredSize )
+        displaySize.scale( maxStoredSize, maxStoredSize, Qt::KeepAspectRatio );
+      if ( std::max( displaySize.width(), displaySize.height() ) > maxDisplaySize )
+        displaySize.scale( maxDisplaySize, maxDisplaySize, Qt::KeepAspectRatio );
+      displaySize = displaySize.expandedTo( QSize( 1, 1 ) );
+      format.setWidth( displaySize.width() );
+      format.setHeight( displaySize.height() );
+
+      rewrites.append( { fragment.position(), fragment.length(), format } );
+    }
+  }
+
+  if ( rewrites.isEmpty() )
+    return html;
+  applyImageRewrites( &doc, rewrites, UndoStep::Separate );
+  return doc.toHtml();
 }
 
 QString KadasAttachmentUtils::attachImage( const QImage &image, const QString &suffix, int maxStoredSize )
@@ -181,9 +166,19 @@ QString KadasAttachmentUtils::attachImage( const QImage &image, const QString &s
 
 bool KadasAttachmentUtils::clampImageDisplaySize( QTextDocument *document, int maxDisplaySize )
 {
-  return rewriteImages(
-    document,
-    [document, maxDisplaySize]( QTextImageFormat &format ) {
+  if ( !document )
+    return false;
+
+  QList<ImageRewrite> rewrites;
+  for ( QTextBlock block = document->begin(); block.isValid(); block = block.next() )
+  {
+    for ( QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it )
+    {
+      const QTextFragment fragment = it.fragment();
+      if ( !fragment.isValid() || !fragment.charFormat().isImageFormat() )
+        continue;
+      QTextImageFormat format = fragment.charFormat().toImageFormat();
+
       double width = format.width();
       double height = format.height();
       if ( width <= 0 || height <= 0 )
@@ -191,22 +186,27 @@ bool KadasAttachmentUtils::clampImageDisplaySize( QTextDocument *document, int m
         // No explicit size on the fragment: fall back to the image's own.
         const QImage image = qvariant_cast<QImage>( document->resource( QTextDocument::ImageResource, QUrl( format.name() ) ) );
         if ( image.isNull() )
-          return false;
+          continue;
         width = image.width();
         height = image.height();
       }
       const double longest = std::max( width, height );
       if ( longest <= maxDisplaySize )
-        return false;
+        continue;
       const double factor = maxDisplaySize / longest;
       format.setWidth( std::max( 1, qRound( width * factor ) ) );
       format.setHeight( std::max( 1, qRound( height * factor ) ) );
-      return true;
-    },
-    // Fold the resize into the edit that inserted the image, so a single undo
-    // takes the image back out rather than first restoring its original size.
-    true
-  );
+
+      rewrites.append( { fragment.position(), fragment.length(), format } );
+    }
+  }
+
+  if ( rewrites.isEmpty() )
+    return false;
+  // Fold the resize into the edit that inserted the image, so that a single undo
+  // takes the image back out rather than first restoring its original size.
+  applyImageRewrites( document, rewrites, UndoStep::JoinPrevious );
+  return true;
 }
 
 void KadasAttachmentUtils::installResourceProvider( QTextDocument *document )

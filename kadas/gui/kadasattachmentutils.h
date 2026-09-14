@@ -18,15 +18,14 @@
 #define KADASATTACHMENTUTILS_H
 
 #include <QLatin1StringView>
+#include <QList>
 #include <QString>
+#include <QTextFormat>
 
 #include "kadas/gui/kadas_gui.h"
 
-#include <functional>
-
 class QImage;
 class QTextDocument;
-class QTextImageFormat;
 
 /**
  * \ingroup gui
@@ -106,15 +105,32 @@ class KADAS_GUI_EXPORT KadasAttachmentUtils
     //! How much decoded image data one document's provider keeps, in bytes.
     static constexpr int sMaxCachedImageBytes = 64 * 1024 * 1024;
 
+#ifndef SIP_RUN
+    //! Whether replacements form their own undo step, or fold into the edit before them.
+    enum class UndoStep
+    {
+      Separate,
+      JoinPrevious,
+    };
+
+    //! One image to replace: the span it occupies, and the format to give it.
+    struct ImageRewrite
+    {
+        int position = 0;
+        int length = 0;
+        QTextImageFormat format;
+    };
+
     /**
-     * Offers every image in \a document to \a rewrite, replacing those for which
-     * it returns TRUE with the format it left behind. Returns TRUE if anything
-     * was replaced.
+     * Applies \a rewrites to \a document.
      *
-     * Set \a joinPreviousUndoStep to fold the replacements into the edit that
-     * preceded them, so that one undo takes both back.
+     * Works back to front, so that replacing one image cannot shift the position
+     * of the next, and one character at a time, because images that sit next to
+     * each other with the same format arrive as a single fragment and replacing
+     * that wholesale would merge them into one.
      */
-    static bool rewriteImages( QTextDocument *document, const std::function<bool( QTextImageFormat & )> &rewrite, bool joinPreviousUndoStep = false );
+    static void applyImageRewrites( QTextDocument *document, const QList<ImageRewrite> &rewrites, UndoStep undoStep );
+#endif
 
     //! The one spelling QgsProject::resolveAttachmentIdentifier() accepts.
     static constexpr QLatin1StringView sCanonicalPrefix { "attachment:///" };
