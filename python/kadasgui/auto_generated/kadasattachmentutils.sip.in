@@ -1,0 +1,111 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadasattachmentutils.h                                     *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+class KadasAttachmentUtils
+{
+%Docstring(signature="appended")
+Images kept in the project archive and referenced from rich text as
+"attachment:///name" URLs.
+
+:py:class:`QgsRichTextEditor` embeds an inserted image inline, as a
+base64 data: URL at the file's original resolution.
+:py:func:`~materializeInlineImages` moves those into the project archive
+instead, so the stored markup stays small and the file behind an image
+can still be opened at its full size.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/kadasattachmentutils.h"
+%End
+  public:
+    static bool isIdentifier( const QString &url );
+%Docstring
+``True`` if ``url`` references a project attachment, in any spelling
+Kadas has written.
+%End
+
+    static QString canonicalIdentifier( const QString &identifier );
+%Docstring
+``identifier`` in the canonical "attachment:///name" spelling, the only
+one :py:class:`QgsProject` resolves.
+%End
+
+    static QString resolve( const QString &identifier );
+%Docstring
+Absolute path ``identifier`` points at, or an empty string when no such
+file exists.
+%End
+
+    static QString materializeInlineImages( const QString &html, int maxStoredSize = 1920, int maxDisplaySize = 280 );
+%Docstring
+Rewrites every inline data: image in ``html`` into a project attachment
+and returns the adjusted markup. Images that are already attachments,
+and markup with no inline images at all, are returned untouched.
+
+The stored file is capped at ``maxStoredSize`` pixels on its longest
+edge, so a phone photo cannot bloat the project, while the markup
+carries a display size of at most ``maxDisplaySize`` pixels on its
+longest edge — the two are deliberately different, so an image shown
+small in a tooltip still opens usefully large.
+%End
+
+    static QString attachImage( const QImage &image, const QString &suffix, int maxStoredSize = 1920 );
+%Docstring
+Stores ``image`` in the project archive as a ``suffix`` file and returns
+its attachment identifier, or an empty string if it could not be
+written.
+
+Capped at ``maxStoredSize`` pixels on its longest edge, so that a phone
+photo cannot bloat the project while still being worth opening full
+size.
+%End
+
+    static bool clampImageDisplaySize( QTextDocument *document, int maxDisplaySize = 280 );
+%Docstring
+Clamps every image in ``document`` to at most ``maxDisplaySize`` pixels
+on its longest edge, preserving aspect ratio and leaving the file behind
+it untouched. Returns ``True`` if anything changed.
+
+Bounding the longest edge rather than the width is what keeps a portrait
+photo inside the tooltip it will be shown in, which does not grow.
+
+:py:class:`QgsRichTextEditor` inserts an image at its full pixel size,
+so a photo arrives in the editor many times wider than the field it will
+be shown in.
+%End
+
+    static void installResourceProvider( QTextDocument *document );
+%Docstring
+Teaches ``document`` to resolve "attachment:///name" image URLs against
+the current project, which it has no way to do on its own. Inline data:
+images keep working: Qt decodes those itself and never consults the
+provider.
+
+A "?w=&h=" query scales the image, the spelling Kadas 2.x stored its
+display sizes in.
+
+Decoded images are cached per document, since Qt asks for each of them
+repeatedly while laying out and painting.
+%End
+
+  private:
+    KadasAttachmentUtils();
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadasattachmentutils.h                                     *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

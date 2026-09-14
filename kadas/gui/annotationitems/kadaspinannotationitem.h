@@ -43,8 +43,22 @@ class KADAS_GUI_EXPORT KadasPinAnnotationItem : public QgsAnnotationMarkerItem
     QString name() const { return mName; }
     void setName( const QString &name ) { mName = name; }
 
+    //! Rich text (Qt's HTML subset), or plain text; images are attachment:/// references within it.
     QString remarks() const { return mRemarks; }
     void setRemarks( const QString &remarks ) { mRemarks = remarks; }
+
+    /**
+     * \a remarks as markup ready to be appended to a document: rich text as it
+     * stands, plain text escaped and wrapped in a block.
+     *
+     * Which of the two a description is, is a guess — Kadas 2.x stored both in
+     * this one field, with nothing to tell them apart — so it is made here once
+     * and everything that renders or searches a description guesses alike.
+     */
+    static QString remarksAsHtml( const QString &remarks );
+
+    //! \a remarks as searchable text, with any markup resolved rather than matched against.
+    static QString remarksAsPlainText( const QString &remarks );
 
     static QString defaultIconPath();
 

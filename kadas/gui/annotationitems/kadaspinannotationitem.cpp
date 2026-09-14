@@ -16,6 +16,8 @@
 
 #include <QDomDocument>
 #include <QDomElement>
+#include <QTextDocument>
+#include <QTextDocumentFragment>
 
 #include <qgis/qgsmarkersymbol.h>
 #include <qgis/qgsmarkersymbollayer.h>
@@ -45,7 +47,7 @@ QString KadasPinAnnotationItem::defaultIconPath()
 
 void KadasPinAnnotationItem::installDefaultSymbol()
 {
-  auto *layer = new QgsSvgMarkerSymbolLayer( defaultIconPath(), 24.0 );
+  auto *layer = new QgsSvgMarkerSymbolLayer( defaultIconPath(), 12.0 );
   layer->setFillColor( QColor( 255, 0, 0 ) );
   layer->setVerticalAnchorPoint( Qgis::VerticalAnchorPoint::Bottom );
   layer->setHorizontalAnchorPoint( Qgis::HorizontalAnchorPoint::Center );
@@ -84,4 +86,24 @@ KadasPinAnnotationItem *KadasPinAnnotationItem::clone() const
 KadasPinAnnotationItem *KadasPinAnnotationItem::create()
 {
   return new KadasPinAnnotationItem();
+}
+
+QString KadasPinAnnotationItem::remarksAsHtml( const QString &remarks )
+{
+  if ( remarks.isEmpty() )
+    return QString();
+  // Rich text brings its own anchors, images and block structure; the editor has
+  // already linked any bare URLs in it. Plain text — a description set from
+  // outside the editor — still needs escaping and a block of its own.
+  if ( Qt::mightBeRichText( remarks ) )
+    return remarks;
+  return QStringLiteral( "<p>%1</p>" ).arg( remarks.toHtmlEscaped().replace( QLatin1Char( '\n' ), QStringLiteral( "<br>" ) ) );
+}
+
+QString KadasPinAnnotationItem::remarksAsPlainText( const QString &remarks )
+{
+  if ( remarks.isEmpty() )
+    return QString();
+  // Searching the markup both misses words split by formatting and hits tag names.
+  return Qt::mightBeRichText( remarks ) ? QTextDocumentFragment::fromHtml( remarks ).toPlainText() : remarks;
 }

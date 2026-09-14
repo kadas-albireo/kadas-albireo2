@@ -30,8 +30,28 @@ your option) any later version. *
   public:
     KadasMapItemTooltip( QgsMapCanvas *canvas );
     void updateForPos( const QPoint &canvasPos );
-    virtual QVariant loadResource( int type, const QUrl &url );
 
+    void showForItem( QgsAnnotationLayer *layer, const QString &itemId, const QPoint &itemPos );
+%Docstring
+Shows ``itemId``'s tooltip beside ``itemPos``, a point in canvas
+coordinates, recomposing the text even when that item is already the one
+on display.
+
+For previewing an item while the pointer is somewhere the cursor cannot
+speak for — over an editor panel, say — and for reflecting an edit as it
+is made. Placed clear of ``itemPos`` so the item itself stays visible.
+%End
+
+    void setInteractive( bool interactive );
+%Docstring
+When ``interactive`` is ``False`` the tooltip stops acting on mouse
+buttons: its links and image are no longer clickable, and clicks and
+drags pass through to the canvas beneath it. It still scrolls, so a
+description too tall for the window can be read either way.
+
+Used while a map tool owns the pointer, where the tooltip is a preview
+rather than something to be operated. Interactive by default.
+%End
 
   public slots:
     void clear();
@@ -39,11 +59,17 @@ your option) any later version. *
   protected:
     virtual void enterEvent( QEnterEvent * );
 
+    virtual void leaveEvent( QEvent * );
+
     virtual void mousePressEvent( QMouseEvent *ev );
 
     virtual void mouseMoveEvent( QMouseEvent *ev );
 
     virtual void mouseReleaseEvent( QMouseEvent *ev );
+
+    virtual void mouseDoubleClickEvent( QMouseEvent *ev );
+
+    virtual void contextMenuEvent( QContextMenuEvent *ev );
 
 
 };

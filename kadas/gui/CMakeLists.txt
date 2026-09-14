@@ -8,6 +8,7 @@ set(kadas_gui_SRC
     kadascatalogpreview.cpp
     kadascatalogpreviewcanvasitem.cpp
     kadascatalogprovider.cpp
+    kadasattachmentutils.cpp
     kadasclipboard.cpp
     kadasclipboardutils.h
     kadascoordinatedisplayer.cpp
@@ -24,8 +25,7 @@ set(kadas_gui_SRC
     kadasprojectmigration.cpp
     kadasprojecttemplateselectiondialog.cpp
     kadasribbonbutton.cpp
-    kadasrichtexteditor.cpp
-    kadastextbrowser.cpp
+    kadasrichtextdialog.cpp
     annotationitems/kadasannotationcontrollerregistry.cpp
     annotationitems/kadasannotationitemcontroller.cpp
     annotationitems/kadasannotationitemcontrollers.cpp
@@ -94,6 +94,7 @@ set(kadas_gui_HDR
     kadascatalogpreview.h
     kadascatalogpreviewcanvasitem.h
     kadascatalogprovider.h
+    kadasattachmentutils.h
     kadasclipboard.h
     kadascoordinatedisplayer.h
     kadascoordinateinput.h
@@ -109,9 +110,8 @@ set(kadas_gui_HDR
     kadasprojectmigration.h
     kadasprojecttemplateselectiondialog.h
     kadasribbonbutton.h
-    kadasrichtexteditor.h
+    kadasrichtextdialog.h
     kadassearchprovider.h
-    kadastextbrowser.h
     annotationitems/kadasannotationcontrollerregistry.h
     annotationitems/kadasannotationitemcontext.h
     annotationitems/kadasannotationitemcontroller.h

@@ -15,13 +15,18 @@
  ***************************************************************************/
 
 #include <QAbstractTextDocumentLayout>
+#include <QContextMenuEvent>
+#include <algorithm>
 #include <QDesktopServices>
-#include <QUrlQuery>
 
+#include <qgis/qgsannotationitem.h>
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsmapcanvas.h>
 
+#include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
+#include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
+#include "kadas/gui/kadasattachmentutils.h"
 #include "kadas/gui/kadasfeaturepicker.h"
 #include "kadas/gui/kadasmapitemtooltip.h"
 
@@ -35,71 +40,114 @@ KadasMapItemTooltip::KadasMapItemTooltip( QgsMapCanvas *canvas )
   setReadOnly( true );
   connect( &mShowTimer, &QTimer::timeout, this, &KadasMapItemTooltip::positionAndShow );
   connect( &mHideTimer, &QTimer::timeout, this, &KadasMapItemTooltip::clear );
+  // Images in an annotation's rich text live in the project archive, which a
+  // QTextDocument cannot resolve unaided.
+  KadasAttachmentUtils::installResourceProvider( document() );
   setFixedSize( sWidth, sHeight );
   hide();
 }
 
 void KadasMapItemTooltip::updateForPos( const QPoint &canvasPos )
 {
-  QString annotationTooltip;
-
-  KadasFeaturePicker::PickResult result
+  const KadasFeaturePicker::PickResult result
     = KadasFeaturePicker::pick( mCanvas, mCanvas->getCoordinateTransform()->toMapCoordinates( canvasPos ), Qgis::GeometryType::Unknown, KadasFeaturePicker::PickObjective::PICK_OBJECTIVE_TOOLTIP );
-  if ( result.annotationLayer && !result.annotationItemId.isEmpty() )
+  QgsAnnotationLayer *layer = result.annotationLayer;
+  const QString itemId = result.annotationItemId;
+  mPos = canvasPos;
+
+  if ( layer == mLayer && itemId == mItemId )
   {
-    annotationTooltip = KadasAnnotationLayerHelpers::tooltip( result.annotationLayer, result.annotationItemId );
+    // Still on whatever we were on. The pointer may have been away in the
+    // meantime — over the tooltip window itself, which cancels both timers —
+    // so cancel any pending dismissal and re-arm the reveal if this item is
+    // not the one already on display.
+    if ( layer && !itemId.isEmpty() )
+    {
+      mHideTimer.stop();
+      if ( !mShowTimer.isActive() && itemId != mShownItemId )
+        mShowTimer.start( sShowDelayMs );
+    }
+    return;
   }
 
-  // If hovering over an annotation item with a tooltip, update/show
-  const QString currentText = annotationTooltip;
-  const bool hasHover = !annotationTooltip.isEmpty();
-  if ( hasHover )
-  {
-    mHideTimer.stop();
-    mPos = canvasPos;
-    if ( currentText != mLastText )
-    {
-      mLastText = currentText;
-      setText( currentText );
-      if ( isVisible() )
-      {
-        hide();
-      }
-    }
-    if ( !currentText.isEmpty() )
-    {
-      mShowTimer.start( 500 );
-    }
-  }
-  else if ( isVisible() )
-  {
-    mHideTimer.start( 500 );
-    mShowTimer.stop();
-  }
+  // The hovered item changed — onto nothing, or from one item straight onto the
+  // next. Everything from here happens on a timer and at the same pace, so a
+  // pointer crossing several items neither flickers through their tooltips nor
+  // pays to compose them. The countdown is never restarted mid-move either: it
+  // would then only run out once the pointer came to rest.
+  mLayer = layer;
+  mItemId = itemId;
+  mShowTimer.stop();
+  mHideTimer.stop();
+  if ( layer && !itemId.isEmpty() )
+    mShowTimer.start( sShowDelayMs );
   else
-  {
-    clear();
-  }
+    // Leave a shown tooltip up briefly: its links and image are clickable, so
+    // the pointer needs a chance to travel onto it.
+    mHideTimer.start( sHideDelayMs );
 }
 
-QVariant KadasMapItemTooltip::loadResource( int type, const QUrl &url )
+void KadasMapItemTooltip::showForItem( QgsAnnotationLayer *layer, const QString &itemId, const QPoint &itemPos )
 {
-  if ( type == QTextDocument::ImageResource )
+  if ( !layer || itemId.isEmpty() )
+    return;
+  mShowTimer.stop();
+  mHideTimer.stop();
+  mLayer = layer;
+  mItemId = itemId;
+  // Force a recompose: unlike a hover, this is also how an edit in progress is
+  // reflected, and the item on display may well be the one that just changed.
+  mShownItemId.clear();
+  const QString text = tooltipFor( layer, itemId );
+  if ( text.isEmpty() )
   {
-    if ( url.scheme() == "attachment" )
+    hide();
+    return;
+  }
+  mShownItemId = itemId;
+  setText( text );
+  positionBeside( itemPos );
+  show();
+}
+
+void KadasMapItemTooltip::positionBeside( const QPoint &itemPos )
+{
+  // A hover tooltip sits under the cursor, which is fine because the cursor is
+  // on the item. Anchored to an item nobody is pointing at, it has to leave the
+  // item visible instead: take whichever side has room.
+  constexpr int gap = 16;
+  int x = itemPos.x() + gap;
+  if ( x + sWidth > mCanvas->width() )
+    x = itemPos.x() - gap - sWidth;
+  if ( x < 0 )
+    x = std::max( 0, std::min( mCanvas->width() - sWidth, itemPos.x() - sWidth / 2 ) );
+
+  int y = itemPos.y() - sHeight / 2;
+  y = std::max( 0, std::min( mCanvas->height() - sHeight, y ) );
+  move( x, y );
+}
+
+void KadasMapItemTooltip::setInteractive( bool interactive )
+{
+  // Deliberately not Qt::WA_TransparentForMouseEvents, which is all or nothing:
+  // it would hand the wheel to the canvas too, so pointing at a scrollable
+  // tooltip would zoom the map instead of scrolling it. Ignoring the button
+  // events individually passes those to the canvas and keeps the wheel here.
+  mInteractive = interactive;
+}
+
+QString KadasMapItemTooltip::tooltipFor( QgsAnnotationLayer *layer, const QString &itemId )
+{
+  if ( QgsAnnotationItem *item = layer->item( itemId ) )
+  {
+    if ( KadasAnnotationItemController *controller = KadasAnnotationControllerRegistry::instance()->controllerFor( item->type() ) )
     {
-      QString path = url.path();
-      int width = QUrlQuery( url.query() ).queryItemValue( "w" ).toInt();
-      int height = QUrlQuery( url.query() ).queryItemValue( "h" ).toInt();
-      QString attachmentId = QStringLiteral( "%1://%2" ).arg( url.scheme() ).arg( url.path() );
-      QString attachmentFile = QgsProject::instance()->resolveAttachmentIdentifier( attachmentId );
-      if ( !attachmentFile.isEmpty() )
-      {
-        return QImage( attachmentFile ).scaled( width, height, Qt::IgnoreAspectRatio, Qt::SmoothTransformation );
-      }
+      const QString live = controller->tooltip( item, layer->crs() );
+      if ( !live.isEmpty() )
+        return live;
     }
   }
-  return QTextEdit::loadResource( type, url );
+  return KadasAnnotationLayerHelpers::tooltip( layer, itemId );
 }
 
 void KadasMapItemTooltip::enterEvent( QEnterEvent * )
@@ -108,14 +156,53 @@ void KadasMapItemTooltip::enterEvent( QEnterEvent * )
   mShowTimer.stop();
 }
 
+void KadasMapItemTooltip::leaveEvent( QEvent * )
+{
+  // The pointer can leave for somewhere that sends the canvas no move events at
+  // all (another widget, off-window), so the tooltip has to time itself out
+  // rather than wait to be told.
+  mHideTimer.start( sHideDelayMs );
+}
+
 void KadasMapItemTooltip::mousePressEvent( QMouseEvent *ev )
 {
+  if ( !mInteractive )
+  {
+    ev->ignore();
+    return;
+  }
   mMouseMoved = false;
   QTextEdit::mousePressEvent( ev );
 }
 
+void KadasMapItemTooltip::mouseDoubleClickEvent( QMouseEvent *ev )
+{
+  if ( !mInteractive )
+  {
+    ev->ignore();
+    return;
+  }
+  QTextEdit::mouseDoubleClickEvent( ev );
+}
+
+void KadasMapItemTooltip::contextMenuEvent( QContextMenuEvent *ev )
+{
+  // Right-click is how drawing is finished, so it belongs to the map tool.
+  if ( !mInteractive )
+  {
+    ev->ignore();
+    return;
+  }
+  QTextEdit::contextMenuEvent( ev );
+}
+
 void KadasMapItemTooltip::mouseMoveEvent( QMouseEvent *ev )
 {
+  if ( !mInteractive )
+  {
+    ev->ignore();
+    return;
+  }
   mMouseMoved = true;
   QString anchor = document()->documentLayout()->anchorAt( ev->pos() );
   QString image = document()->documentLayout()->imageAt( ev->pos() );
@@ -132,6 +219,11 @@ void KadasMapItemTooltip::mouseMoveEvent( QMouseEvent *ev )
 
 void KadasMapItemTooltip::mouseReleaseEvent( QMouseEvent *ev )
 {
+  if ( !mInteractive )
+  {
+    ev->ignore();
+    return;
+  }
   if ( ev->button() == Qt::LeftButton && !mMouseMoved )
   {
     QString anchor = document()->documentLayout()->anchorAt( ev->pos() );
@@ -142,21 +234,13 @@ void KadasMapItemTooltip::mouseReleaseEvent( QMouseEvent *ev )
     }
     else if ( !image.isEmpty() )
     {
-      QUrl url( image );
-      if ( url.scheme() == "attachment" )
+      // The image is drawn small to fit the tooltip; opening it shows the file
+      // behind it at the resolution it was stored with.
+      const QUrl url( image );
+      const QString file = KadasAttachmentUtils::isIdentifier( image ) ? KadasAttachmentUtils::resolve( image ) : ( url.isLocalFile() ? url.toLocalFile() : image );
+      if ( !file.isEmpty() && QFile::exists( file ) )
       {
-        QString path = url.path();
-        QString attachmentId = QStringLiteral( "%1://%2" ).arg( url.scheme() ).arg( url.path() );
-        image = QgsProject::instance()->resolveAttachmentIdentifier( attachmentId );
-      }
-      if ( QFile::exists( image ) )
-      {
-        QString path = QString( image ).replace( QStringLiteral( "\\" ), QStringLiteral( "/" ) );
-        if ( !path.startsWith( QStringLiteral( "/" ) ) )
-        {
-          path.prepend( QStringLiteral( "/" ) );
-        }
-        QDesktopServices::openUrl( QUrl( QStringLiteral( "file://%1" ).arg( path ) ) );
+        QDesktopServices::openUrl( QUrl::fromLocalFile( file ) );
       }
     }
   }
@@ -168,14 +252,30 @@ void KadasMapItemTooltip::mouseReleaseEvent( QMouseEvent *ev )
 
 void KadasMapItemTooltip::clear()
 {
-  mLastText.clear();
+  mLayer = nullptr;
+  mItemId.clear();
+  mShownItemId.clear();
   setText( "" );
   mShowTimer.stop();
+  mHideTimer.stop();
   hide();
 }
 
 void KadasMapItemTooltip::positionAndShow()
 {
+  // Composed here rather than on hover, so only the item the pointer settles on
+  // is paid for (a pin samples the project heightmap).
+  const QString text = mLayer && !mItemId.isEmpty() ? tooltipFor( mLayer, mItemId ) : QString();
+  // Records the item as dealt with even when it has nothing to say, so the
+  // re-arm above does not keep retrying it.
+  mShownItemId = mItemId;
+  if ( text.isEmpty() )
+  {
+    hide();
+    return;
+  }
+  setText( text );
+
   double x = mPos.x() + 5;
   double y = mPos.y() + 5;
   if ( x + sWidth > mCanvas->width() )

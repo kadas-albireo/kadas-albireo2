@@ -1,0 +1,65 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadasrichtextdialog.h                                      *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+class KadasRichTextDialog : QDialog
+{
+%Docstring(signature="appended")
+Dialog for editing a rich-text field stored in a Kadas project.
+
+Wraps :py:class:`QgsRichTextEditor`, whose toolbar needs far more room
+than an inline form row affords. On accept, images the editor embedded
+inline are moved into the project archive (see
+KadasAttachmentUtils.materializeInlineImages) and the document skeleton
+is stripped, so :py:func:`~html` returns compact markup that can be
+dropped straight into a larger document such as a map tooltip.
+%End
+
+%TypeHeaderCode
+#include "kadas/gui/kadasrichtextdialog.h"
+%End
+  public:
+    KadasRichTextDialog( const QString &title, const QString &html, QWidget *parent = 0 );
+%Docstring
+Edits ``html``, which may equally be plain text, under the window title
+``title``.
+%End
+
+    QString html() const;
+%Docstring
+The edited markup. Only meaningful once
+:py:func:`~KadasRichTextDialog.exec` has returned QDialog.Accepted.
+%End
+
+    static void linkifyBareUrls( QTextDocument *document );
+%Docstring
+Turns bare URLs in ``document`` into anchors, leaving text the author
+already linked alone.
+
+Applied to what the dialog stores rather than to what a viewer renders,
+so a typed URL is a real link from then on — in the tooltip, and to
+whatever else reads the markup.
+%End
+
+  public slots:
+    virtual void accept();
+
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/gui/kadasrichtextdialog.h                                      *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

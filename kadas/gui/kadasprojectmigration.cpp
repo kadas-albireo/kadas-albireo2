@@ -43,6 +43,7 @@
 #include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
 #include "kadas/gui/annotationitems/kadasmilxlayersettings.h"
+#include "kadas/gui/kadasattachmentutils.h"
 #include "kadas/gui/kadasprojectmigration.h"
 #include "kadas/gui/milx/kadasmilxclient.h"
 
@@ -912,8 +913,7 @@ namespace
         // canonical `attachment:///<name>` form. Normalize on the fly
         // so the post-load resolver in KadasAnnotationProjectIntegration
         // can locate the file inside the migrated `.qgz`.
-        if ( fp.startsWith( QLatin1String( "attachment:" ) ) && !fp.startsWith( QLatin1String( "attachment:///" ) ) )
-          fp = QStringLiteral( "attachment:///" ) + fp.mid( 11 );
+        fp = KadasAttachmentUtils::canonicalIdentifier( fp );
         setAttr( "file_path", fp );
       }
     }
@@ -937,8 +937,7 @@ namespace
       if ( props.contains( QStringLiteral( "filePath" ) ) )
       {
         QString fp = props.value( QStringLiteral( "filePath" ) ).toString();
-        if ( fp.startsWith( QLatin1String( "attachment:" ) ) && !fp.startsWith( QLatin1String( "attachment:///" ) ) )
-          fp = QStringLiteral( "attachment:///" ) + fp.mid( 11 );
+        fp = KadasAttachmentUtils::canonicalIdentifier( fp );
         setAttr( "file_path", fp );
       }
     }
@@ -1578,8 +1577,10 @@ namespace
 
   /**
    * Translate one `<MapItem name="KadasPinItem">` (v2 format) into a
-   * `KadasPinAnnotationItem`. Carries name/remarks; size/anchor are
-   * dropped (pins have a canonical icon).
+   * `KadasPinAnnotationItem`. Carries name and remarks — the latter verbatim,
+   * since 2.x rich text is exactly what the pin editor and tooltip handle
+   * today, images and all. Size/anchor are dropped (pins have a canonical
+   * icon).
    */
   KadasPinAnnotationItem *translateKadasPinItem( const QDomElement &itemEl, const QgsCoordinateReferenceSystem &itemCrs, const QgsCoordinateReferenceSystem &layerCrs )
   {
@@ -1603,11 +1604,11 @@ namespace
     }
 
     auto *anno = new KadasPinAnnotationItem( QgsPoint( p ) );
-    // `pin_name` is the v1-migration-specific attribute; falls back to
-    // `name` for projects saved by the v2 writer (which clobbered the
-    // class-name `name` with the display name — see slice notes in
-    // testkadasprojectmigration.cpp).
-    const QString pinName = itemEl.hasAttribute( QStringLiteral( "pin_name" ) ) ? itemEl.attribute( QStringLiteral( "pin_name" ) ) : itemEl.attribute( QStringLiteral( "name" ) );
+    // `pin_name` is where the v1 rewriter puts the display name, out of the way
+    // of the class-name `name` the dispatcher routes on. There is deliberately
+    // no fallback to `name`: reaching here at all means it held the class name,
+    // so falling back would title every such pin "KadasPinItem".
+    const QString pinName = itemEl.attribute( QStringLiteral( "pin_name" ) );
     anno->setName( pinName );
     anno->setRemarks( itemEl.attribute( QStringLiteral( "remarks" ) ) );
     return anno;
@@ -1952,26 +1953,10 @@ bool KadasProjectMigration::migrateLegacyKadasItemLayers( QDomDocument &doc, QDo
       for ( QgsAnnotationItem *a : annos )
       {
         translated.append( a );
-        // Pins render their tooltip from the current title/description
-        // (see KadasMapToolEditAnnotationItem), so synthesize it here
-        // rather than importing 2.x's frozen position/height HTML.
-        if ( const auto *pin = dynamic_cast<const KadasPinAnnotationItem *>( a ) )
-        {
-          QString html;
-          if ( !pin->name().isEmpty() )
-            html += QStringLiteral( "<b>%1</b>" ).arg( pin->name().toHtmlEscaped() );
-          if ( !pin->remarks().isEmpty() )
-          {
-            if ( !html.isEmpty() )
-              html += QStringLiteral( "<br>" );
-            html += pin->remarks().toHtmlEscaped().replace( '\n', QStringLiteral( "<br>" ) );
-          }
-          tooltips.append( html );
-        }
-        else
-        {
-          tooltips.append( tooltip );
-        }
+        // Pins compose their tooltip live from the current title, description
+        // and position (see KadasPinAnnotationController::tooltip), so 2.x's
+        // frozen HTML would only shadow it.
+        tooltips.append( dynamic_cast<const KadasPinAnnotationItem *>( a ) ? QString() : tooltip );
       }
     }
 

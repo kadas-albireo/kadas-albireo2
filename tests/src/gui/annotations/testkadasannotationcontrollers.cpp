@@ -16,8 +16,16 @@
 
 #include <memory>
 
+#include <QBuffer>
+#include <QDir>
 #include <QFile>
+#include <QImage>
+#include <QRegularExpression>
 #include <QStandardPaths>
+#include <QTextBlock>
+#include <QTextCursor>
+#include <QTextDocument>
+#include <QTextFragment>
 #include <QtTest/QTest>
 
 #include <qgis/qgsannotationlineitem.h>
@@ -38,6 +46,8 @@
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsrectangle.h>
 
+#include <kadas/gui/kadasattachmentutils.h>
+#include <kadas/gui/kadasrichtextdialog.h>
 #include <kadas/gui/kadasattributetypes.h>
 #include <kadas/gui/kadasfeaturepicker.h>
 #include <kadas/gui/annotationitems/kadasannotationitemcontext.h>
@@ -75,6 +85,17 @@ class TestKadasAnnotationControllers : public QObject
     void marker_getEditContext_hitsWithinTolerance();
     void marker_getEditContext_hitsAnchorOffsetSymbolBody();
     void pin_getEditContext_hitsBodyAndTip();
+    void pin_tooltip_composesTitleDescriptionAndPosition();
+    void pin_tooltip_escapesPlainTextDescription();
+    void richText_bareUrlsBecomeLinksOnSave();
+    void pin_tooltip_keepsRichTextVerbatim();
+    void richText_inlineImagesBecomeCappedProjectAttachments();
+    void richText_insertedImagesAreShrunkToTheirDisplaySize();
+    void richText_portraitImagesAreCappedOnTheirLongestEdge();
+    void richText_adjacentIdenticalImagesBothSurvive();
+    void richText_bareUrlKeepsBracketsItOpened();
+    void attachment_legacyIdentifierResolvesThroughResourceProvider();
+    void richText_unformattedTextIsStoredAsPlainText();
 
     // KadasRectangleAnnotationController ---------------------------------
     void rectangle_nodes_returnFourCornersPlusRotation();
@@ -275,6 +296,13 @@ void TestKadasAnnotationControllers::pin_getEditContext_hitsBodyAndTip()
   const auto ctx = makeContext();
   std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
   controller.startPart( item.get(), QgsPointXY( 0, 0 ), ctx );
+
+  // What is under test is the anchor handling, not the shipped default size,
+  // so fix the symbol at 24 mm and keep the distances below meaningful.
+  auto *marker = static_cast<QgsAnnotationMarkerItem *>( item.get() );
+  std::unique_ptr<QgsMarkerSymbol> sym( marker->symbol()->clone() );
+  static_cast<QgsSvgMarkerSymbolLayer *>( sym->symbolLayer( 0 ) )->setSize( 24.0 );
+  marker->setSymbol( sym.release() );
 
   // Pin renders ≈ 24 mm tall at 96 dpi = ≈ 91 px ≈ 182 m in this CRS
   // (mupp = 2). With Bottom anchor the body spans map-y [0, 182] above
@@ -851,6 +879,344 @@ void TestKadasAnnotationControllers::selection_rankerPrefersPrecisionOverZIndex(
   QCOMPARE( KadasFeaturePicker::rankAnnotationCandidates( {} ), -1 );
 }
 
+
+void TestKadasAnnotationControllers::pin_tooltip_composesTitleDescriptionAndPosition()
+{
+  // The pin tooltip is composed on every hover rather than stored, so it can
+  // report where the pin is and how high the terrain is under it.
+  KadasPinAnnotationController controller;
+  const auto ctx = makeContext();
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  controller.startPart( item.get(), QgsPointXY( 1000, 2000 ), ctx );
+  auto *pin = static_cast<KadasPinAnnotationItem *>( item.get() );
+  pin->setName( QStringLiteral( "Base camp" ) );
+  pin->setRemarks( QStringLiteral( "Reachable on foot" ) );
+
+  const QString tooltip = controller.tooltip( item.get(), ctx.itemCrs() );
+  // The position/altitude band leads, the pin's own text follows.
+  QVERIFY( tooltip.startsWith( QStringLiteral( "<table" ) ) );
+  QVERIFY( tooltip.contains( QStringLiteral( "<b>Base camp</b>" ) ) );
+  QVERIFY( tooltip.contains( QStringLiteral( "Reachable on foot" ) ) );
+  QVERIFY( tooltip.contains( QStringLiteral( ">Position</font>" ) ) );
+  // No heightmap is configured in a bare test project, and the tooltip says so
+  // instead of quietly reporting 0 m.
+  QVERIFY( tooltip.contains( QStringLiteral( ">Altitude</font>" ) ) );
+  QVERIFY( tooltip.contains( QStringLiteral( "undefined (no heightmap defined)" ) ) );
+
+  // An item that is not a pin has no live tooltip, so the caller falls back to
+  // whatever the layer stored.
+  KadasMarkerAnnotationController markerController;
+  std::unique_ptr<QgsAnnotationItem> marker( markerController.createItem() );
+  QVERIFY( markerController.tooltip( marker.get(), ctx.itemCrs() ).isEmpty() );
+}
+
+void TestKadasAnnotationControllers::pin_tooltip_escapesPlainTextDescription()
+{
+  // A description that never went through the editor is plain text, so the
+  // tooltip has to escape it rather than let it act as markup.
+  KadasPinAnnotationController controller;
+  const auto ctx = makeContext();
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  controller.startPart( item.get(), QgsPointXY( 0, 0 ), ctx );
+  auto *pin = static_cast<KadasPinAnnotationItem *>( item.get() );
+  const QString remarks = QStringLiteral( "5 < 10 & rising\nsecond line" );
+  QVERIFY2( !Qt::mightBeRichText( remarks ), "fixture must exercise the plain-text branch" );
+  pin->setRemarks( remarks );
+
+  const QString tooltip = controller.tooltip( item.get(), ctx.itemCrs() );
+  QVERIFY( tooltip.contains( QStringLiteral( "5 &lt; 10 &amp; rising" ) ) );
+  QVERIFY( tooltip.contains( QStringLiteral( "<br>second line" ) ) );
+}
+
+void TestKadasAnnotationControllers::richText_bareUrlsBecomeLinksOnSave()
+{
+  // Bare URLs are linked into what the editor stores, not into what a viewer
+  // renders, so a typed address is a real link everywhere the markup is read.
+  QTextDocument document;
+  document.setHtml( QStringLiteral(
+    "<p>see https://example.org/a?b=1, and www.example.com.</p>"
+    "<p>plus <a href=\"https://example.org/keep\">a label</a></p>"
+  ) );
+  KadasRichTextDialog::linkifyBareUrls( &document );
+
+  QStringList anchors;
+  for ( QTextBlock block = document.begin(); block.isValid(); block = block.next() )
+  {
+    for ( QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it )
+    {
+      const QTextFragment fragment = it.fragment();
+      if ( fragment.isValid() && fragment.charFormat().isAnchor() )
+        anchors << QStringLiteral( "%1 -> %2" ).arg( fragment.text(), fragment.charFormat().anchorHref() );
+    }
+  }
+
+  const QStringList expected {
+    // Trailing sentence punctuation stays outside the link...
+    QStringLiteral( "https://example.org/a?b=1 -> https://example.org/a?b=1" ),
+    // ...and a bare host gains a scheme, so QDesktopServices can open it.
+    QStringLiteral( "www.example.com -> http://www.example.com" ),
+    // What the author linked by hand keeps both its label and its target.
+    QStringLiteral( "a label -> https://example.org/keep" ),
+  };
+  QCOMPARE( anchors, expected );
+
+  // Running it again finds nothing new to do.
+  const QString before = document.toHtml();
+  KadasRichTextDialog::linkifyBareUrls( &document );
+  QCOMPARE( document.toHtml(), before );
+}
+
+void TestKadasAnnotationControllers::pin_tooltip_keepsRichTextVerbatim()
+{
+  // A rich-text description already carries its own anchors and images, so the
+  // tooltip must pass it through rather than escape it and re-link it.
+  KadasPinAnnotationController controller;
+  const auto ctx = makeContext();
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  controller.startPart( item.get(), QgsPointXY( 0, 0 ), ctx );
+  auto *pin = static_cast<KadasPinAnnotationItem *>( item.get() );
+  pin->setRemarks( QStringLiteral(
+    "<p>See <a href=\"https://example.org/plan\">the plan</a></p>"
+    "<p><img src=\"attachment:///photo.png\" width=\"280\" height=\"140\"/></p>"
+  ) );
+
+  const QString tooltip = controller.tooltip( item.get(), ctx.itemCrs() );
+  QVERIFY( tooltip.contains( QStringLiteral( "<a href=\"https://example.org/plan\">the plan</a>" ) ) );
+  QVERIFY( tooltip.contains( QStringLiteral( "<img src=\"attachment:///photo.png\"" ) ) );
+  QVERIFY2( !tooltip.contains( QStringLiteral( "&lt;" ) ), qPrintable( tooltip ) );
+}
+
+void TestKadasAnnotationControllers::richText_inlineImagesBecomeCappedProjectAttachments()
+{
+  // QgsRichTextEditor embeds an inserted image inline at its original
+  // resolution. Storing that verbatim would put megabytes of base64 into a
+  // single XML attribute, so it is moved into the project archive on the way in.
+  QImage source( 2400, 1200, QImage::Format_ARGB32 );
+  source.fill( Qt::darkCyan );
+  QByteArray png;
+  QBuffer buffer( &png );
+  QVERIFY( buffer.open( QIODevice::WriteOnly ) );
+  QVERIFY( source.save( &buffer, "PNG" ) );
+  buffer.close();
+
+  const QString html = QStringLiteral( "<p>before</p><p><img src=\"data:image/17.PNG;base64,%1\" /></p><p>after</p>" ).arg( QString::fromLatin1( png.toBase64() ) );
+  const QString stored = KadasAttachmentUtils::materializeInlineImages( html );
+
+  QVERIFY2( !stored.contains( QStringLiteral( "data:image" ) ), "inline image must not survive" );
+  QVERIFY( stored.contains( QStringLiteral( "before" ) ) && stored.contains( QStringLiteral( "after" ) ) );
+
+  static const QRegularExpression srcRe( QStringLiteral( "src=\"(attachment:///[^\"]+)\"" ) );
+  const QRegularExpressionMatch match = srcRe.match( stored );
+  QVERIFY2( match.hasMatch(), qPrintable( stored ) );
+
+  // The stored file is capped on its longest edge, keeping enough resolution to
+  // be worth opening at full size...
+  const QString file = KadasAttachmentUtils::resolve( match.captured( 1 ) );
+  QVERIFY( !file.isEmpty() );
+  QCOMPARE( QImage( file ).size(), QSize( 1920, 960 ) );
+
+  // ...while the markup asks for a size that fits the tooltip.
+  static const QRegularExpression widthRe( QStringLiteral( "width=\"(\\d+)\"" ) );
+  QCOMPARE( widthRe.match( stored ).captured( 1 ).toInt(), 280 );
+
+  // Markup with nothing inline is handed back untouched.
+  const QString plain = QStringLiteral( "<p>no images here</p>" );
+  QCOMPARE( KadasAttachmentUtils::materializeInlineImages( plain ), plain );
+}
+
+void TestKadasAnnotationControllers::richText_insertedImagesAreShrunkToTheirDisplaySize()
+{
+  // QgsRichTextEditor drops an image in at its full pixel size, so a photo
+  // arrives in the editor many times wider than the field it will be shown in.
+  QImage source( 2400, 1200, QImage::Format_ARGB32 );
+  source.fill( Qt::darkCyan );
+  QByteArray png;
+  QBuffer buffer( &png );
+  QVERIFY( buffer.open( QIODevice::WriteOnly ) );
+  QVERIFY( source.save( &buffer, "PNG" ) );
+  buffer.close();
+  const QString url = QStringLiteral( "data:image/17.PNG;base64,%1" ).arg( QString::fromLatin1( png.toBase64() ) );
+
+  QTextDocument document;
+  QTextCursor cursor( &document );
+  QTextImageFormat format;
+  format.setName( url );
+  format.setWidth( source.width() );
+  format.setHeight( source.height() );
+  cursor.insertImage( format );
+
+  QVERIFY( KadasAttachmentUtils::clampImageDisplaySize( &document ) );
+
+  const QTextImageFormat clamped = document.begin().begin().fragment().charFormat().toImageFormat();
+  QCOMPARE( clamped.width(), 280.0 );
+  QCOMPARE( clamped.height(), 140.0 );
+  // The image itself is untouched: only how large it is drawn changed.
+  QCOMPARE( clamped.name(), url );
+
+  // Already small enough, so nothing to do and no spurious undo entry.
+  QVERIFY( !KadasAttachmentUtils::clampImageDisplaySize( &document ) );
+}
+
+void TestKadasAnnotationControllers::richText_portraitImagesAreCappedOnTheirLongestEdge()
+{
+  // Capping the width alone leaves a portrait photo taller than the tooltip it
+  // is shown in, which does not grow to take it.
+  QImage source( 1200, 2400, QImage::Format_ARGB32 );
+  source.fill( Qt::darkMagenta );
+  QByteArray png;
+  QBuffer buffer( &png );
+  QVERIFY( buffer.open( QIODevice::WriteOnly ) );
+  QVERIFY( source.save( &buffer, "PNG" ) );
+  buffer.close();
+  const QString url = QStringLiteral( "data:image/17.PNG;base64,%1" ).arg( QString::fromLatin1( png.toBase64() ) );
+
+  QTextDocument document;
+  QTextCursor cursor( &document );
+  QTextImageFormat format;
+  format.setName( url );
+  format.setWidth( source.width() );
+  format.setHeight( source.height() );
+  cursor.insertImage( format );
+
+  QVERIFY( KadasAttachmentUtils::clampImageDisplaySize( &document ) );
+  const QTextImageFormat clamped = document.begin().begin().fragment().charFormat().toImageFormat();
+  QCOMPARE( clamped.height(), 280.0 );
+  QCOMPARE( clamped.width(), 140.0 );
+
+  // The same bound applies to what gets stored.
+  const QString stored = KadasAttachmentUtils::materializeInlineImages( QStringLiteral( "<p><img src=\"%1\" /></p>" ).arg( url ) );
+  static const QRegularExpression heightRe( QStringLiteral( "height=\"(\\d+)\"" ) );
+  QCOMPARE( heightRe.match( stored ).captured( 1 ).toInt(), 280 );
+}
+
+void TestKadasAnnotationControllers::richText_adjacentIdenticalImagesBothSurvive()
+{
+  // Two identical images side by side share one character format, so Qt reports
+  // them as a single text fragment two characters long. Rewriting that fragment
+  // as one image would quietly drop the second.
+  QImage source( 400, 400, QImage::Format_ARGB32 );
+  source.fill( Qt::darkGreen );
+  QByteArray png;
+  QBuffer buffer( &png );
+  QVERIFY( buffer.open( QIODevice::WriteOnly ) );
+  QVERIFY( source.save( &buffer, "PNG" ) );
+  buffer.close();
+  const QString url = QStringLiteral( "data:image/17.PNG;base64,%1" ).arg( QString::fromLatin1( png.toBase64() ) );
+
+  // Inserted the way the editor inserts them - parsing markup instead would
+  // give two fragments, and miss this entirely.
+  QTextDocument document;
+  QTextCursor cursor( &document );
+  QTextImageFormat format;
+  format.setName( url );
+  format.setWidth( source.width() );
+  format.setHeight( source.height() );
+  cursor.insertImage( format );
+  cursor.insertImage( format );
+  QCOMPARE( document.begin().begin().fragment().length(), 2 );
+
+  QVERIFY( KadasAttachmentUtils::clampImageDisplaySize( &document ) );
+
+  int images = 0;
+  for ( QTextBlock block = document.begin(); block.isValid(); block = block.next() )
+  {
+    for ( QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it )
+    {
+      const QTextFragment fragment = it.fragment();
+      if ( fragment.isValid() && fragment.charFormat().isImageFormat() )
+        images += fragment.length();
+    }
+  }
+  QCOMPARE( images, 2 );
+
+  const QString stored = KadasAttachmentUtils::materializeInlineImages( document.toHtml() );
+  QCOMPARE( stored.count( QStringLiteral( "<img" ), Qt::CaseInsensitive ), 2 );
+  QVERIFY2( !stored.contains( QStringLiteral( "data:image" ) ), qPrintable( stored ) );
+}
+
+void TestKadasAnnotationControllers::richText_bareUrlKeepsBracketsItOpened()
+{
+  QTextDocument document;
+  document.setHtml( QStringLiteral( "<p>see https://en.wikipedia.org/wiki/Foo_(bar) and (www.example.com) too</p>" ) );
+  KadasRichTextDialog::linkifyBareUrls( &document );
+
+  QStringList anchors;
+  for ( QTextBlock block = document.begin(); block.isValid(); block = block.next() )
+  {
+    for ( QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it )
+    {
+      const QTextFragment fragment = it.fragment();
+      if ( fragment.isValid() && fragment.charFormat().isAnchor() )
+        anchors << fragment.charFormat().anchorHref();
+    }
+  }
+
+  const QStringList expected {
+    // A bracket the address opened itself belongs to it...
+    QStringLiteral( "https://en.wikipedia.org/wiki/Foo_(bar)" ),
+    // ...while one the sentence opened does not.
+    QStringLiteral( "http://www.example.com" ),
+  };
+  QCOMPARE( anchors, expected );
+}
+
+void TestKadasAnnotationControllers::attachment_legacyIdentifierResolvesThroughResourceProvider()
+{
+  // Kadas 2.x wrote a bare "attachment:name"; only "attachment:///name" is the
+  // spelling QgsProject resolves, and both reach the provider as image URLs.
+  QImage source( 32, 32, QImage::Format_ARGB32 );
+  source.fill( Qt::red );
+  const QString identifier = KadasAttachmentUtils::attachImage( source, QStringLiteral( "png" ) );
+  QVERIFY( identifier.startsWith( QStringLiteral( "attachment:///" ) ) );
+  const QString legacy = QStringLiteral( "attachment:" ) + identifier.mid( QStringLiteral( "attachment:///" ).size() );
+
+  QCOMPARE( KadasAttachmentUtils::canonicalIdentifier( legacy ), identifier );
+
+  QTextDocument document;
+  KadasAttachmentUtils::installResourceProvider( &document );
+  for ( const QString &spelling : { identifier, legacy } )
+  {
+    const QVariant resource = document.resource( QTextDocument::ImageResource, QUrl( spelling ) );
+    QVERIFY2( !qvariant_cast<QImage>( resource ).isNull(), qPrintable( spelling ) );
+  }
+
+  // The "?w=&h=" display size Kadas 2.x stored still scales, in either spelling.
+  const QImage scaled = qvariant_cast<QImage>( document.resource( QTextDocument::ImageResource, QUrl( legacy + QStringLiteral( "?w=8&h=8" ) ) ) );
+  QCOMPARE( scaled.size(), QSize( 8, 8 ) );
+}
+
+void TestKadasAnnotationControllers::richText_unformattedTextIsStoredAsPlainText()
+{
+  // Qt writes the document's default styling onto every paragraph, so a line
+  // nobody formatted would otherwise be stored as ten times its own length in
+  // markup - in every project, forever, once resaved.
+  {
+    KadasRichTextDialog dialog( QStringLiteral( "t" ), QStringLiteral( "typed plainly" ) );
+    dialog.accept();
+    QCOMPARE( dialog.html(), QStringLiteral( "typed plainly" ) );
+  }
+
+  // Formatting is not something to collapse away, though.
+  {
+    KadasRichTextDialog dialog( QStringLiteral( "t" ), QStringLiteral( "<p>Hello <b>there</b></p>" ) );
+    dialog.accept();
+    QVERIFY2( dialog.html().contains( QStringLiteral( "font-weight" ) ), qPrintable( dialog.html() ) );
+  }
+
+  // Nor is a link.
+  {
+    KadasRichTextDialog dialog( QStringLiteral( "t" ), QStringLiteral( "<p>see <a href=\"https://example.org\">x</a></p>" ) );
+    dialog.accept();
+    QVERIFY2( dialog.html().contains( QStringLiteral( "href=\"https://example.org\"" ) ), qPrintable( dialog.html() ) );
+  }
+
+  // An emptied field stores nothing at all, rather than a skeleton of markup.
+  {
+    KadasRichTextDialog dialog( QStringLiteral( "t" ), QString() );
+    dialog.accept();
+    QVERIFY( dialog.html().isEmpty() );
+  }
+}
 
 QTEST_MAIN( TestKadasAnnotationControllers )
 #include "testkadasannotationcontrollers.moc"

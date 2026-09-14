@@ -1,9 +1,9 @@
 string(REPLACE "." "_" TAG ${VERSION})
 
 # set(QGIS_REF final-${TAG})
-set(QGIS_REF 17a4bfae8eaea25b8f9ede1f3d720a69bc776604)
+set(QGIS_REF 0f4c86e1cbeb3a2720e9c1bff9373f15684846e5)
 set(QGIS_SHA512
-    9d30bca4a3a2c9f8b6772d8af25b945087aa9ef838148414298b339967c6d2d6d6f5acb9e0479f0343d9f2ecc2d1ec268a6a7340412c755b08d9a2f5c25c7da0
+    d2ce8273059bac58c54eff1330f2c3f7513ee9b31ddbd0efff6bde4387d654cc5169461e62ade421bf8b855fa5dcc728e0d9b5c1c8505f1c2c66c40e86d0f31e
 )
 
 vcpkg_from_github(
@@ -31,11 +31,6 @@ vcpkg_from_github(
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
   oauth2NoEmptyClientSecret.patch # https://github.com/qgis/QGIS/pull/66777
-  elevation_controller_range.patch # https://github.com/qgis/QGIS/pull/67112
-  # elevation controller settings panel, rounded limits, initialization from
-  # canvas layers + raster elevation surface z-range from band statistics
-  annotation-3d-picture-billboards.patch # https://github.com/qgis/QGIS/pull/67135
-  # picture annotation items as 3d billboards
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
