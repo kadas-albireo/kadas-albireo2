@@ -137,9 +137,20 @@ void KadasMilxAnnotationItem::render( QgsRenderContext &context, QgsFeedback *fe
   if ( symbol.points.isEmpty() || symbol.xml.isEmpty() )
     return;
 
-  if ( !KadasMilxClient::updateSymbol( computeScreenExtent( ms ), ms.outputDpi(), symbol, KadasMilxLayerSettings::resolve( context ), result, /* returnPoints */ false ) )
+  const KadasMilxSymbolSettings settings = KadasMilxLayerSettings::resolve( context );
+  if ( !KadasMilxClient::updateSymbol( computeScreenExtent( ms ), ms.outputDpi(), symbol, settings, result, /* returnPoints */ false ) )
   {
     return;
+  }
+
+  // A single point symbol can be dragged off its anchor (mUserOffset); the
+  // leader line is what still ties the graphic to the position it describes.
+  if ( !isMultiPoint() && !mUserOffset.isNull() )
+  {
+    context.painter()->save();
+    context.painter()->setPen( QPen( settings.leaderLineColor, settings.leaderLineWidth ) );
+    context.painter()->drawLine( symbol.points.front(), symbol.points.front() + mUserOffset );
+    context.painter()->restore();
   }
 
   const QPoint renderPos = symbol.points.front() + result.offset + mUserOffset;
