@@ -168,6 +168,8 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     KadasAttribValues collectAttributeValues() const;
 
     void setupStyleEditor();
+    //! Locks the layer chooser for as long as a shape is being drawn.
+    void updateLayerSelectionLock();
     //! Adds the layer row to the bottom bar: a chooser in create mode, a read-only display when editing.
     void setupLayerSelection();
 

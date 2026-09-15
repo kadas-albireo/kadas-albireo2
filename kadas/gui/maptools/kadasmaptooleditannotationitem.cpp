@@ -774,6 +774,7 @@ void KadasMapToolEditAnnotationItem::stateChanged( KadasStateHistory::ChangeType
   mLayer->replaceItem( mItemId, replacement );
   mItem = mLayer->item( mItemId );
   mDrawState = ts->drawState;
+  updateLayerSelectionLock();
   if ( mItem )
     mItem->setEnabled( mDrawState != DrawState::InProgress );
   mLayer->triggerRepaint();
@@ -899,6 +900,16 @@ void KadasMapToolEditAnnotationItem::previewTooltipForEditedItem()
   mTooltipWidget->showForItem( mLayer, mItemId, QPoint( static_cast<int>( devicePos.x() ), static_cast<int>( devicePos.y() ) ) );
 }
 
+void KadasMapToolEditAnnotationItem::updateLayerSelectionLock()
+{
+  if ( !mLayerSelection )
+    return;
+  // Mid-shape the layer is not up for grabs: switching would have to throw the
+  // partial geometry away, since it is expressed in the CRS of the layer it was
+  // started on. Between shapes it is, and then nothing is at stake.
+  mLayerSelection->setEnabled( mDrawState != DrawState::InProgress );
+}
+
 void KadasMapToolEditAnnotationItem::closeIfTargetLayerHidden()
 {
   if ( !canvas() || canvas()->mapTool() != this )
@@ -951,6 +962,7 @@ void KadasMapToolEditAnnotationItem::setupLayerSelection()
       setTargetLayer( selected );
     }
     connect( mLayerSelection, &KadasLayerSelectionWidget::selectedLayerChanged, this, [this]( QgsMapLayer *layer ) { setTargetLayer( qobject_cast<QgsAnnotationLayer *>( layer ) ); } );
+    updateLayerSelectionLock();
   }
 
   mBottomBar->addRow( tr( "Layer" ), mLayerSelection );
@@ -961,18 +973,19 @@ void KadasMapToolEditAnnotationItem::setTargetLayer( QgsAnnotationLayer *layer )
   if ( !mAllowCreate || !layer || layer == mLayer )
     return;
 
-  // An item that is not a finished annotation yet is dropped rather than moved:
-  // its coordinates are in the CRS of the layer it was started on, and it is by
-  // definition not something the user has committed to. Finished items stay on
-  // the layer they were drawn into.
-  if ( mItem && ( mDrawState != DrawState::Finished || ( mController && mController->isEmpty( mItem ) ) ) )
+  // The chooser is locked while a shape is being drawn, so the item at this
+  // point is either the untouched placeholder for the next one - which just
+  // moves along with the choice - or one the user already finished, which stays
+  // on the layer it was drawn into. Nothing has to be transformed either way.
+  // An item left empty (a text item with no text, say) is litter rather than
+  // content, and is dropped here as it is everywhere else.
+  if ( mItem && ( mDrawState == DrawState::Empty || ( mController && mController->isEmpty( mItem ) ) ) )
   {
     clearInProgressItem();
   }
   if ( mLayer )
   {
     disconnect( mLayer.data(), &QgsMapLayer::repaintRequested, this, &KadasMapToolEditAnnotationItem::refreshHandles );
-    mLayer->triggerRepaint();
   }
 
   mItem = nullptr;
@@ -987,6 +1000,8 @@ void KadasMapToolEditAnnotationItem::setTargetLayer( QgsAnnotationLayer *layer )
     mStateHistory->clear();
   }
 
+  // From here on this is the same restart as moving on to the next item on the
+  // same layer; see the DrawState::Finished branch of addPoint().
   createInitialItem();
   if ( mItem )
   {
@@ -996,6 +1011,8 @@ void KadasMapToolEditAnnotationItem::setTargetLayer( QgsAnnotationLayer *layer )
       mStyleEditor->loadFromItem( mItem );
     emit cleared();
   }
+  // Not covered by the repaint above: a createInitialItem() that bailed out
+  // leaves the handles of the previous item on screen.
   refreshHandles();
   emit targetLayerChanged( mLayer );
 }
@@ -1069,6 +1086,7 @@ void KadasMapToolEditAnnotationItem::createInitialItem()
   mItemId = mLayer->addItem( fresh );
   mItem = mLayer->item( mItemId );
   mDrawState = DrawState::Empty;
+  updateLayerSelectionLock();
   mLayer->triggerRepaint();
 }
 
@@ -1084,6 +1102,7 @@ void KadasMapToolEditAnnotationItem::clearInProgressItem()
   mItem = nullptr;
   mItemId.clear();
   mDrawState = DrawState::Empty;
+  updateLayerSelectionLock();
 }
 
 void KadasMapToolEditAnnotationItem::startPart( const QgsPointXY &pos )
@@ -1098,6 +1117,7 @@ void KadasMapToolEditAnnotationItem::startPart( const QgsPointXY &pos )
   else
   {
     mDrawState = DrawState::InProgress;
+    updateLayerSelectionLock();
     mItem->setEnabled( false );
     mLayer->triggerRepaint();
     updateDrawPreview();
@@ -1111,6 +1131,7 @@ void KadasMapToolEditAnnotationItem::finishPart()
     return;
   mController->endPart( mItem );
   mDrawState = DrawState::Finished;
+  updateLayerSelectionLock();
   mItem->setEnabled( true );
   setLivePreviewEnabled( false );
   clearTempRubberBand();
