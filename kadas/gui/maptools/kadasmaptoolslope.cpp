@@ -29,25 +29,16 @@
 #include "kadas/gui/maptools/kadasmaptoolslope.h"
 
 KadasMapToolSlope::KadasMapToolSlope( QgsMapCanvas *mapCanvas )
-  : QgsMapToolExtent( mapCanvas )
+  : KadasShapeCaptureMapTool( mapCanvas, KadasShapeCaptureMapTool::Shape::Rectangle )
 {
   setCursor( Qt::ArrowCursor );
-  connect( this, &QgsMapToolExtent::extentChanged, this, &KadasMapToolSlope::onExtentDrawn );
+  connect( this, &KadasShapeCaptureMapTool::shapeCaptured, this, &KadasMapToolSlope::onShapeCaptured );
 }
 
-void KadasMapToolSlope::onExtentDrawn( const QgsRectangle &extent )
+void KadasMapToolSlope::onShapeCaptured( const QgsGeometry &geometry, const QgsCoordinateReferenceSystem &crs )
 {
-  QgsRectangle rect = extent;
-  rect.normalize();
-  if ( rect.isEmpty() )
-  {
-    clearRubberBand();
-    return;
-  }
-
-  compute( rect, canvas()->mapSettings().destinationCrs() );
-
-  clearRubberBand();
+  compute( geometry.boundingBox(), canvas()->mapSettings().destinationCrs() );
+  clear();
 }
 
 void KadasMapToolSlope::compute( const QgsRectangle &extent, const QgsCoordinateReferenceSystem &crs )

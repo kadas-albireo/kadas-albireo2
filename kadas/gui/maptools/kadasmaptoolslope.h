@@ -17,11 +17,11 @@
 #ifndef KADASMAPTOOLSLOPE_H
 #define KADASMAPTOOLSLOPE_H
 
-#include <qgis/qgsmaptoolextent.h>
-
 #include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/maptools/kadasshapecapturemaptool.h"
 
-class KADAS_GUI_EXPORT KadasMapToolSlope : public QgsMapToolExtent
+class KADAS_GUI_EXPORT KadasMapToolSlope : public KadasShapeCaptureMapTool
+
 {
     Q_OBJECT
   public:
@@ -29,7 +29,7 @@ class KADAS_GUI_EXPORT KadasMapToolSlope : public QgsMapToolExtent
     void compute( const QgsRectangle &extent, const QgsCoordinateReferenceSystem &crs );
 
   private slots:
-    void onExtentDrawn( const QgsRectangle &extent );
+    void onShapeCaptured( const QgsGeometry &geometry, const QgsCoordinateReferenceSystem &crs );
 };
 
 #endif // KADASMAPTOOLSLOPE_H
