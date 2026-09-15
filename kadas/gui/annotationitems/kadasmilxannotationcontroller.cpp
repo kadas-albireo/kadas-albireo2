@@ -632,6 +632,15 @@ void KadasMilxAnnotationController::populateContextMenu( QgsAnnotationItem *item
   }
 }
 
+bool KadasMilxAnnotationController::symbolPreviewWhileDrawing( const QgsAnnotationItem *item ) const
+{
+  // libmss redraws the whole graphic from the control points on every click and
+  // every move, so the symbol under construction looks nothing like the polyline
+  // a rubber band would trace through those points. Nothing to preview until a
+  // symbol has been picked.
+  return !static_cast<const KadasMilxAnnotationItem *>( item )->mssString().isEmpty();
+}
+
 KadasAnnotationStyleEditor *KadasMilxAnnotationController::createStyleEditor( QWidget *parent ) const
 {
   return new KadasMilxStyleEditor( parent );

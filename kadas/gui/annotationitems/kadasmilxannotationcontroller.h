@@ -58,6 +58,9 @@ class KADAS_GUI_EXPORT KadasMilxAnnotationController : public KadasAnnotationIte
     //! Re-render the layer live while dragging (the outline band is a poor stand-in for the symbol).
     bool liveRepaintOnEdit() const override { return true; }
 
+    //! Preview the real symbol while drawing: a rubber band through the control points shows nothing of an MSS graphic.
+    bool symbolPreviewWhileDrawing( const QgsAnnotationItem *item ) const override;
+
     KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = nullptr ) const override;
 
     bool hitTest( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const override;

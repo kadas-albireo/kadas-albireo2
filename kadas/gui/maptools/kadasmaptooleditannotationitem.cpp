@@ -27,6 +27,7 @@
 #include <qgis/qgsannotationitem.h>
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgsexpressioncontextutils.h>
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapcanvasitem.h>
@@ -345,6 +346,11 @@ void KadasMapToolEditAnnotationItem::renderItemPreview( QPainter *painter )
   QgsRenderContext ctx = QgsRenderContext::fromMapSettings( ms );
   ctx.setPainter( painter );
   ctx.setCoordinateTransform( QgsCoordinateTransform( mLayer->crs(), ms.destinationCrs(), ms.transformContext() ) );
+  // The layer scope is what a real render passes down (QgsMapRendererJob does the
+  // same), and an item that reads per-layer settings from it - an MSS symbol
+  // takes its size and line width that way - would otherwise preview with the
+  // global defaults and jump on the first real repaint.
+  ctx.expressionContext().appendScope( QgsExpressionContextUtils::layerScope( mLayer ) );
   QgsFeedback feedback;
   mItem->render( ctx, &feedback );
 }

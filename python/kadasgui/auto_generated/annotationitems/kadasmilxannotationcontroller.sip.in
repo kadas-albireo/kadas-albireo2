@@ -75,6 +75,13 @@ Re-render the layer live while dragging (the outline band is a poor
 stand-in for the symbol).
 %End
 
+    virtual bool symbolPreviewWhileDrawing( const QgsAnnotationItem *item ) const;
+
+%Docstring
+Preview the real symbol while drawing: a rubber band through the control
+points shows nothing of an MSS graphic.
+%End
+
     virtual KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = 0 ) const;
 
 
