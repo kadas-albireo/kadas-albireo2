@@ -190,6 +190,8 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
   private slots:
     void stateChanged( KadasStateHistory::ChangeType, KadasStateHistory::State *state, KadasStateHistory::State *prevState );
     void inputChanged();
+    //! Ends the session once the edited item's layer is no longer drawn on the canvas.
+    void closeIfTargetLayerHidden();
 };
 
 #endif // KADASMAPTOOLEDITANNOTATIONITEM_H

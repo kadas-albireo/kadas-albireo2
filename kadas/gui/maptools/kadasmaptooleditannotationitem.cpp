@@ -29,9 +29,11 @@
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsexpressioncontextutils.h>
 #include <qgis/qgsgeometry.h>
+#include <qgis/qgslayertree.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapcanvasitem.h>
 #include <qgis/qgsmapmouseevent.h>
+#include <qgis/qgsproject.h>
 #include <qgis/qgsrectangle.h>
 #include <qgis/qgsrendercontext.h>
 #include <qgis/qgsrubberband.h>
@@ -319,6 +321,9 @@ void KadasMapToolEditAnnotationItem::activate()
     }
   } );
   connect( mLayer.data(), &QgsMapLayer::repaintRequested, this, &KadasMapToolEditAnnotationItem::refreshHandles, Qt::UniqueConnection );
+  // Queued: this arrives from the middle of QgsMapCanvas::setLayers(), and
+  // tearing the tool down from there would be re-entrant.
+  connect( canvas(), &QgsMapCanvas::layersChanged, this, &KadasMapToolEditAnnotationItem::closeIfTargetLayerHidden, static_cast<Qt::ConnectionType>( Qt::QueuedConnection | Qt::UniqueConnection ) );
 
   if ( mStyleEditor || mExtraTopWidget || mLayerSelection )
   {
@@ -892,6 +897,25 @@ void KadasMapToolEditAnnotationItem::previewTooltipForEditedItem()
   }
   const QgsPointXY devicePos = canvas()->mapSettings().mapToPixel().transform( mapPos );
   mTooltipWidget->showForItem( mLayer, mItemId, QPoint( static_cast<int>( devicePos.x() ), static_cast<int>( devicePos.y() ) ) );
+}
+
+void KadasMapToolEditAnnotationItem::closeIfTargetLayerHidden()
+{
+  if ( !canvas() || canvas()->mapTool() != this )
+    return;
+  if ( mLayer )
+  {
+    // Ask the layer tree rather than the canvas' layer list: the bridge feeds
+    // that list through a queued call, so it lags right after a layer is added.
+    QgsLayerTreeLayer *node = QgsProject::instance()->layerTreeRoot()->findLayer( mLayer );
+    if ( node && node->isVisible() )
+      return;
+  }
+  // Once the layer is no longer shown there is nothing left to edit on screen:
+  // the item is invisible, the edit handles float over nothing, and picking
+  // already skips hidden layers, so the item could not even be reselected.
+  // Hiding the layer (or removing it) therefore ends the session.
+  canvas()->unsetMapTool( this );
 }
 
 void KadasMapToolEditAnnotationItem::setupLayerSelection()
