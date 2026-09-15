@@ -209,27 +209,34 @@ QString KadasMilxLibrary::localizedName( const QDomElement &element, const QStri
   // instead. A name that resolves to nothing collapses the group into its
   // parent (see addItem()), which flattens the whole library into one long
   // list of symbols.
+  // A translation that is present but blank is no translation: the shipped
+  // galleries carry a few (e.g. the empty <Name_DE/> on one Units subsection),
+  // and honouring those verbatim would label the group with nothing at all.
   QString english;
   QString languageVariant;
   for ( QDomElement el = element.firstChildElement( QStringLiteral( "TranslDesc" ) ); !el.isNull(); el = el.nextSiblingElement( QStringLiteral( "TranslDesc" ) ) )
   {
+    const QString desc = el.attribute( QStringLiteral( "Desc" ) );
+    if ( desc.isEmpty() )
+      continue;
     const QString langId = el.attribute( QStringLiteral( "LangId" ) );
     if ( langId.compare( lang, Qt::CaseInsensitive ) == 0 )
-      return el.attribute( QStringLiteral( "Desc" ) );
+      return desc;
     // Regional variant of the wanted language, e.g. PT_BR for a PT locale.
     if ( languageVariant.isEmpty() && langId.startsWith( lang + '_', Qt::CaseInsensitive ) )
-      languageVariant = el.attribute( QStringLiteral( "Desc" ) );
+      languageVariant = desc;
     if ( english.isEmpty() && langId.compare( QLatin1String( "EN" ), Qt::CaseInsensitive ) == 0 )
-      english = el.attribute( QStringLiteral( "Desc" ) );
+      english = desc;
   }
   if ( !languageVariant.isEmpty() )
     return languageVariant;
 
-  QDomElement nameEl = element.firstChildElement( QStringLiteral( "Name_%1" ).arg( lang ) );
-  if ( nameEl.isNull() )
-    nameEl = element.firstChildElement( QStringLiteral( "Name_EN" ) );
-  if ( !nameEl.isNull() )
-    return nameEl.text();
+  const QString name = element.firstChildElement( QStringLiteral( "Name_%1" ).arg( lang ) ).text();
+  if ( !name.isEmpty() )
+    return name;
+  const QString englishName = element.firstChildElement( QStringLiteral( "Name_EN" ) ).text();
+  if ( !englishName.isEmpty() )
+    return englishName;
 
   return english;
 }

@@ -34,6 +34,7 @@ class TestKadasMilxLibrary : public QObject
     void localizedName_readsTranslDescGalleries();
     void localizedName_readsLegacyNameElements();
     void localizedName_fallsBackToEnglish();
+    void localizedName_treatsBlankTranslationAsMissing();
     void localizedName_hasNoNameToRead();
 
   private:
@@ -82,6 +83,18 @@ void TestKadasMilxLibrary::localizedName_fallsBackToEnglish()
 
   QDomDocument legacy;
   QCOMPARE( KadasMilxLibrary::localizedName( parse( QStringLiteral( "<Section><Name_EN>Existing Situation</Name_EN></Section>" ), legacy ), QStringLiteral( "IT" ) ), QStringLiteral( "Existing Situation" ) );
+}
+
+void TestKadasMilxLibrary::localizedName_treatsBlankTranslationAsMissing()
+{
+  // The shipped galleries carry a few groups whose localized name is present
+  // but empty - one subsection of Units.xml has had an empty <Name_DE/> since
+  // 2.3. Honouring the blank verbatim would label that group with nothing.
+  QDomDocument legacy;
+  QCOMPARE( KadasMilxLibrary::localizedName( parse( QStringLiteral( "<SubSection><Name_DE></Name_DE><Name_EN>Flugzeug</Name_EN></SubSection>" ), legacy ), QStringLiteral( "DE" ) ), QStringLiteral( "Flugzeug" ) );
+
+  QDomDocument translDesc;
+  QCOMPARE( KadasMilxLibrary::localizedName( parse( QStringLiteral( R"(<SubSection><TranslDesc LangId="DE" Desc=""/><TranslDesc LangId="EN" Desc="Flugzeug"/></SubSection>)" ), translDesc ), QStringLiteral( "DE" ) ), QStringLiteral( "Flugzeug" ) );
 }
 
 void TestKadasMilxLibrary::localizedName_hasNoNameToRead()
