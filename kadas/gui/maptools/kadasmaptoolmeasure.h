@@ -23,6 +23,7 @@
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgssettingsentryenumflag.h>
 #include <qgis/qgsunittypes.h>
+#include <qgis/qgsrubberband.h>
 
 #include "kadas/core/kadassettingstree.h"
 #include "kadas/gui/kadas_gui.h"
@@ -84,6 +85,8 @@ class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasShapeCaptureMapTool
     QgsDistanceArea mDa;
     QList<Part> mParts;
 
+    QgsRubberBand *mRubberBand = nullptr;
+
     KadasMeasureLabelsOverlay *mLabelsOverlay = nullptr;
 
     KadasSidePanel *mBottomBar = nullptr;
@@ -101,6 +104,7 @@ class KADAS_GUI_EXPORT KadasMapToolMeasure : public KadasShapeCaptureMapTool
     QString polygonReadout( const QgsGeometry &g, double &totalArea ) const;
     QString circleReadout( const QgsGeometry &g, double &totalArea ) const;
     void updateCanvasLabels( const QList<Part> &parts );
+    void updateRubberBand( const QList<Part> &parts );
 };
 
 #endif // KADASMAPTOOLMEASURE_H

@@ -131,20 +131,39 @@ void KadasShapeCaptureMapTool::addPoint( const QgsPointXY &pos )
   {
     case Shape::Rectangle:
     case Shape::Circle:
-      mAnchor = pos;
-      mCurrent = pos;
-      mDragging = true;
+      if ( !mDragging )
+      {
+        mAnchor = pos;
+        mCurrent = pos;
+        mDragging = true;
+        mPressBeganShape = true;
+      }
       break;
 
     case Shape::Sector:
-      if ( mSectorStage == SectorStage::None )
+      switch ( mSectorStage )
       {
-        resetRubberBand();
-        mAnchor = pos;
-        mCircleRadius = 0.0;
-        mSectorStartAngle = 0.0;
-        mSectorStopAngle = 2 * M_PI;
-        mSectorStage = SectorStage::HaveCenter;
+        case SectorStage::None:
+          resetRubberBand();
+          mAnchor = pos;
+          mCircleRadius = 0.0;
+          mSectorStartAngle = 0.0;
+          mSectorStopAngle = 2 * M_PI;
+          mSectorStage = SectorStage::HaveCenter;
+          break;
+        case SectorStage::HaveCenter:
+          mSectorStage = SectorStage::HaveRadius;
+          break;
+
+        case SectorStage::HaveRadius:
+        {
+          mSectorStage = SectorStage::None;
+          updateSectorRubberBand();
+          const QgsGeometry geom = buildSectorGeometry();
+          if ( !geom.isEmpty() )
+            emit shapeCaptured( geom, canvas()->mapSettings().destinationCrs() );
+          break;
+        }
       }
       break;
 
@@ -167,6 +186,7 @@ void KadasShapeCaptureMapTool::canvasPressEvent( QgsMapMouseEvent *e )
   {
     if ( e->button() == Qt::RightButton && ( mShape == Shape::Polyline || mShape == Shape::Polygon ) && mCapturing )
     {
+      addPoint( toMapCoordinates( e->pos() ) );
       mCapturing = false;
       const QgsGeometry geom = ( mShape == Shape::Polygon ) ? buildPolygonGeometry() : buildPolylineGeometry();
       if ( !geom.isEmpty() )

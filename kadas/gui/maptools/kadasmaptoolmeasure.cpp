@@ -161,6 +161,7 @@ KadasMapToolMeasure::KadasMapToolMeasure( QgsMapCanvas *canvas, MeasureMode meas
 KadasMapToolMeasure::~KadasMapToolMeasure()
 {
   delete mBottomBar;
+  delete mRubberBand;
   delete mLabelsOverlay;
 }
 
@@ -278,6 +279,8 @@ void KadasMapToolMeasure::deactivate()
 {
   delete mBottomBar;
   mBottomBar = nullptr;
+  delete mRubberBand;
+  mRubberBand = nullptr;
   delete mLabelsOverlay;
   mLabelsOverlay = nullptr;
   mReadoutLabel = nullptr;
@@ -286,6 +289,7 @@ void KadasMapToolMeasure::deactivate()
   mNorthComboBox = nullptr;
   mAzimuthCheckbox = nullptr;
   mParts.clear();
+  qDebug() << "Deactivating KadasMapToolMeasure";
   KadasShapeCaptureMapTool::deactivate();
 }
 
@@ -352,6 +356,7 @@ void KadasMapToolMeasure::onShapeCaptured( const QgsGeometry &geometry, const Qg
     p.circleCenter = circleCenter();
     p.circleRadius = circleRadius();
   }
+  qDebug() << "Captured part:" << p.geometry.asWkt();
   mParts.append( p );
   recomputeReadout();
 }
@@ -540,9 +545,31 @@ void KadasMapToolMeasure::recomputeReadout()
       mBottomBar->setMinimumWidth( hintWidth );
   }
 
+  updateRubberBand( parts );
   updateCanvasLabels( parts );
 }
 
+
+void KadasMapToolMeasure::updateRubberBand( const QList<Part> &parts )
+{
+  if ( !mRubberBand )
+  {
+    mRubberBand = new QgsRubberBand( canvas(), Qgis::GeometryType::Polygon );
+    mRubberBand->setStrokeColor( QColor( 227, 22, 28, 255 ) );
+    mRubberBand->setFillColor( QColor( 227, 22, 28, 63 ) );
+    mRubberBand->setWidth( 2 );
+  }
+
+  const Qgis::GeometryType bandType = ( shape() == Shape::Polygon ) ? Qgis::GeometryType::Polygon : Qgis::GeometryType::Line;
+  mRubberBand->reset( bandType );
+
+
+  for ( int i = 0, n = parts.size(); i < n; ++i )
+  {
+    const Part &p = parts[i];
+    mRubberBand->addGeometry( p.geometry );
+  }
+}
 void KadasMapToolMeasure::updateCanvasLabels( const QList<Part> &parts )
 {
   if ( !mLabelsOverlay )
