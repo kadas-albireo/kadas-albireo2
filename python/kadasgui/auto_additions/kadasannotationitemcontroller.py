@@ -5,7 +5,8 @@ try:
     KadasAnnotationItemController.toItemRect = staticmethod(KadasAnnotationItemController.toItemRect)
     KadasAnnotationItemController.toMapRect = staticmethod(KadasAnnotationItemController.toMapRect)
     KadasAnnotationItemController.pickTolSqr = staticmethod(KadasAnnotationItemController.pickTolSqr)
-    KadasAnnotationItemController.__virtual_methods__ = ['populateContextMenu', 'onDoubleClick', 'representativeGeometry', 'liveRepaintOnEdit', 'symbolPreviewWhileDrawing', 'isEmpty', 'hitTest', 'intersects', 'tooltip', 'applyPersistedStyle', 'persistStyle', 'createStyleEditor', 'generateShadows', 'shadowIds', 'setShadowIds']
+    KadasAnnotationItemController.rotationPickTolSqr = staticmethod(KadasAnnotationItemController.rotationPickTolSqr)
+    KadasAnnotationItemController.__virtual_methods__ = ['populateContextMenu', 'onDoubleClick', 'representativeGeometry', 'liveRepaintOnEdit', 'symbolPreviewWhileDrawing', 'isEmpty', 'supportsLayer', 'preferredLayerCrs', 'hitTest', 'intersects', 'tooltip', 'applyPersistedStyle', 'persistStyle', 'createStyleEditor', 'generateShadows', 'shadowIds', 'setShadowIds']
     KadasAnnotationItemController.__abstract_methods__ = ['itemType', 'itemName', 'createItem', 'nodes', 'startPart', 'setCurrentPoint', 'setCurrentAttributes', 'continuePart', 'endPart', 'drawAttribs', 'drawAttribsFromPosition', 'positionFromDrawAttribs', 'getEditContext', 'edit', 'editAttribsFromPosition', 'positionFromEditAttribs', 'position', 'setPosition', 'translate']
 except (NameError, AttributeError):
     pass

@@ -62,6 +62,16 @@ Controller for \c KadasMilxAnnotationItem (type id \c "kadas:milx").
     virtual QgsPointXY positionFromEditAttribs( const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const;
 
 
+    virtual bool supportsLayer( const QgsAnnotationLayer *layer ) const;
+
+%Docstring
+MSS geometry is stored in WGS84 (the libmss IPC convention) and the item
+reads its layer's CRS as being that, so only a WGS84 annotation layer
+can hold MSS symbols.
+%End
+    virtual QgsCoordinateReferenceSystem preferredLayerCrs() const;
+
+
     virtual QgsPointXY position( const QgsAnnotationItem *item ) const;
 
     virtual void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos );

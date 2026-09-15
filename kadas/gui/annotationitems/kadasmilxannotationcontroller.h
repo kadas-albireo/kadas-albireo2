@@ -52,6 +52,14 @@ class KADAS_GUI_EXPORT KadasMilxAnnotationController : public KadasAnnotationIte
     KadasAttribValues editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const override;
     QgsPointXY positionFromEditAttribs( const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const override;
 
+    /**
+     * MSS geometry is stored in WGS84 (the libmss IPC convention) and the item
+     * reads its layer's CRS as being that, so only a WGS84 annotation layer can
+     * hold MSS symbols.
+     */
+    bool supportsLayer( const QgsAnnotationLayer *layer ) const override;
+    QgsCoordinateReferenceSystem preferredLayerCrs() const override;
+
     QgsPointXY position( const QgsAnnotationItem *item ) const override;
     void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos ) override;
     void translate( QgsAnnotationItem *item, double dx, double dy ) override;

@@ -105,6 +105,24 @@ leaves them untouched.
 %End
 
 
+    virtual bool supportsLayer( const QgsAnnotationLayer *layer ) const;
+%Docstring
+``True`` if items of this type can be drawn onto ``layer``, which is
+what the layer chooser of the create tool offers.
+
+The default accepts every annotation layer except the parametric Kadas
+overlays (bullseye, map grid, ...), whose content is generated from
+layer settings rather than drawn. Override to constrain the choice
+further.
+%End
+
+    virtual QgsCoordinateReferenceSystem preferredLayerCrs() const;
+%Docstring
+CRS a layer newly created for this item type carries; an invalid CRS
+(the default) means "follow the project".
+%End
+
+
     virtual QgsPointXY position( const QgsAnnotationItem *item ) const = 0;
     virtual void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos ) = 0;
     virtual void translate( QgsAnnotationItem *item, double dx, double dy ) = 0;

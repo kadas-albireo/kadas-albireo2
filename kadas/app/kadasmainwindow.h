@@ -27,6 +27,7 @@
 #include "ui_kadastopwidget.h"
 
 class QSplashScreen;
+class QgsAnnotationLayer;
 class QgsDecorationGrid;
 class QgsLayerTreeMapCanvasBridge;
 class QgsElevationControllerWidget;
@@ -170,6 +171,9 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     void dragEnterEvent( QDragEnterEvent *event ) override;
     void showEvent( QShowEvent * /*event*/ ) override;
     void closeEvent( QCloseEvent * /*event*/ ) override;
+
+    //! Layer the last pin went to, so the tool reopens on the layer the user works in.
+    QPointer<QgsAnnotationLayer> mLastPinLayer;
 
     QgsMapTool *addPinTool();
     KadasRibbonButton *addRibbonButton( QWidget *tabWidget );

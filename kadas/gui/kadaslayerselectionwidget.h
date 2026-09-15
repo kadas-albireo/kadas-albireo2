@@ -25,6 +25,7 @@
 #include "kadas/gui/kadas_gui.h"
 
 class QComboBox;
+class QToolButton;
 class QgsLayerTreeView;
 class QgsMapCanvas;
 class QgsMapLayer;
@@ -101,8 +102,23 @@ class KADAS_GUI_EXPORT KadasLayerSelectionWidget : public QWidget
     {}
 
 
+    //! Creates a layer named \a name when the project holds no eligible one yet. Also becomes the base for suggested new layer names.
     void createLayerIfEmpty( const QString &name );
+
+    //! Sets the text in front of the combo box; an empty label hides it (e.g. when the host form supplies its own).
     void setLabel( const QString &label );
+
+    //! Base name the "new layer" prompt suggests; when unset, the name of the currently selected layer is used.
+    void setNewLayerName( const QString &name );
+
+    /**
+     * Turns the widget into a display of the selected layer: the combo box is
+     * disabled and the "new layer" button hidden, and the selection no longer
+     * follows the current layer. Use it where the layer is a property of
+     * something that already exists rather than a choice.
+     */
+    void setReadOnly( bool readOnly );
+
     QgsMapLayer *getSelectedLayer() const;
 
   public slots:
@@ -116,14 +132,30 @@ class KADAS_GUI_EXPORT KadasLayerSelectionWidget : public QWidget
     QgsLayerTreeView *mLayerTreeView = nullptr;
     QLabel *mLabel = nullptr;
     QComboBox *mLayersCombo = nullptr;
+    QToolButton *mNewLayerButton = nullptr;
 
     LayerFilter mFilter = nullptr;
     LayerCreator mCreator = nullptr;
+
+    QString mNewLayerName;
+    bool mRepopulating = false;
+    bool mReadOnly = false;
+    //! TRUE only while the constructor fills the combo for the first time.
+    bool mInitialPopulation = false;
+
+    //! Id of the layer the combo box currently points at, or an empty string.
+    QString selectedLayerId() const;
+    //! Makes \a layer visible and current, so that what a tool draws into it actually shows up.
+    void activateLayer( QgsMapLayer *layer );
+    //! An unused layer name derived from the base name, e.g. "Annotation 2".
+    QString suggestedNewLayerName() const;
 
   private slots:
     void createLayer();
     void layerSelectionChanged( int idx );
     void repopulateLayers();
+    //! Follows the legend's active layer, but only when it is one this widget offers.
+    void canvasCurrentLayerChanged( QgsMapLayer *layer );
 };
 
 #endif // KADASLAYERSELECTIONWIDGET_H

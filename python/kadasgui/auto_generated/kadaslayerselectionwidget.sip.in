@@ -87,7 +87,31 @@ your option) any later version. *
 
 
     void createLayerIfEmpty( const QString &name );
+%Docstring
+Creates a layer named ``name`` when the project holds no eligible one
+yet. Also becomes the base for suggested new layer names.
+%End
+
     void setLabel( const QString &label );
+%Docstring
+Sets the text in front of the combo box; an empty label hides it (e.g.
+when the host form supplies its own).
+%End
+
+    void setNewLayerName( const QString &name );
+%Docstring
+Base name the "new layer" prompt suggests; when unset, the name of the
+currently selected layer is used.
+%End
+
+    void setReadOnly( bool readOnly );
+%Docstring
+Turns the widget into a display of the selected layer: the combo box is
+disabled and the "new layer" button hidden, and the selection no longer
+follows the current layer. Use it where the layer is a property of
+something that already exists rather than a choice.
+%End
+
     QgsMapLayer *getSelectedLayer() const;
 
   public slots:

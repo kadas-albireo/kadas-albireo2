@@ -240,6 +240,10 @@ void KadasAnnotationIntegration::toggleAnnotation( bool active, AnnotationVarian
   // keep its action unchecked so the owning split button reflects it.
   connect( tool, &QgsMapTool::deactivated, action, [action] { action->setChecked( false ); } );
 
+  // Picking another layer in the tool's chooser makes it the default for the
+  // next drawing tool too, so a session stays on the layer the user works in.
+  connect( tool, &KadasMapToolEditAnnotationItem::targetLayerChanged, this, [this]( QgsAnnotationLayer *target ) { mLastAnnotationLayer = target; } );
+
   // Once a custom-SVG marker has been placed/edited, the last-used SVG is
   // persisted; reflect it on the ribbon tile so it becomes the visible default.
   if ( variant == AnnotationVariant::MarkerCustomSvg )
