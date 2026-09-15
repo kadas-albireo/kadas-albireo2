@@ -60,6 +60,7 @@ class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextEdit
   protected:
     void enterEvent( QEnterEvent * ) override;
     void leaveEvent( QEvent * ) override;
+    bool eventFilter( QObject *watched, QEvent *event ) override;
     void mousePressEvent( QMouseEvent *ev ) override;
     void mouseMoveEvent( QMouseEvent *ev ) override;
     void mouseReleaseEvent( QMouseEvent *ev ) override;

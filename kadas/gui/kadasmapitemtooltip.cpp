@@ -44,6 +44,7 @@ KadasMapItemTooltip::KadasMapItemTooltip( QgsMapCanvas *canvas )
   // QTextDocument cannot resolve unaided.
   KadasAttachmentUtils::installResourceProvider( document() );
   setFixedSize( sWidth, sHeight );
+  canvas->installEventFilter( this );
   hide();
 }
 
@@ -162,6 +163,18 @@ void KadasMapItemTooltip::leaveEvent( QEvent * )
   // all (another widget, off-window), so the tooltip has to time itself out
   // rather than wait to be told.
   mHideTimer.start( sHideDelayMs );
+}
+
+bool KadasMapItemTooltip::eventFilter( QObject *watched, QEvent *event )
+{
+  // Leaving the canvas for a neighbouring widget — the layer tree, the ribbon —
+  // ends the hover, but the canvas sends no further move events to say so. The
+  // pointer moving onto the tooltip, or onto a map tool's panel, does not come
+  // through here: those are children of the canvas, and Qt sends a widget no
+  // leave event when the pointer merely descends into one of its own children.
+  if ( watched == mCanvas && event->type() == QEvent::Leave )
+    clear();
+  return QTextEdit::eventFilter( watched, event );
 }
 
 void KadasMapItemTooltip::mousePressEvent( QMouseEvent *ev )
