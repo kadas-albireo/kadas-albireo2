@@ -289,7 +289,6 @@ void KadasMapToolMeasure::deactivate()
   mNorthComboBox = nullptr;
   mAzimuthCheckbox = nullptr;
   mParts.clear();
-  qDebug() << "Deactivating KadasMapToolMeasure";
   KadasShapeCaptureMapTool::deactivate();
 }
 
@@ -356,7 +355,6 @@ void KadasMapToolMeasure::onShapeCaptured( const QgsGeometry &geometry, const Qg
     p.circleCenter = circleCenter();
     p.circleRadius = circleRadius();
   }
-  qDebug() << "Captured part:" << p.geometry.asWkt();
   mParts.append( p );
   recomputeReadout();
 }

@@ -21,7 +21,6 @@
 #include "kadas/gui/maptools/kadasshapecapturemaptool.h"
 
 class KADAS_GUI_EXPORT KadasMapToolSlope : public KadasShapeCaptureMapTool
-
 {
     Q_OBJECT
   public:
