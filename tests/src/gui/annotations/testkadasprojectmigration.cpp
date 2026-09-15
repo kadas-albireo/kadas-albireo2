@@ -48,6 +48,7 @@ class TestKadasProjectMigration : public QObject
     void initTestCase();
 
     void migrateLegacyMilxLayer_preservesNonAsciiItems();
+    void migrateLegacyMilxLayer_preservesSymbolStateAndLayerSettings();
     void migrateLegacyKadasItemLayer_translatesPointItem();
     void migrateLegacyKadasItemLayer_translatesTextItem();
     void migrateLegacyKadasItemLayer_translatesLineItem();
@@ -68,6 +69,12 @@ class TestKadasProjectMigration : public QObject
 
   private:
     static QString milxItemCdata( const QString &militaryName, double lon, double lat );
+    static QString milxCorridorItemCdata();
+    //! Value of the `<customproperties>` option named \a key on a migrated `<maplayer>`.
+    static QString customProperty( const QDomElement &layerEl, const QString &key );
+    //! The migrated `<item>` whose `kadasMilitaryName` is \a militaryName.
+    static QDomElement itemByMilitaryName( const QDomElement &layerEl, const QString &militaryName );
+    static QDomElement findOption( const QDomElement &element, const QString &name );
     static QDomElement appendKadasItemLayer( QDomDocument &doc, QDomElement &projectLayersEl, const QString &layerId, const QString &layerName, const QString &authid );
     static void appendV2PointMapItem( QDomDocument &doc, QDomElement &mapLayerEl, double x, double y, const QString &authid, const QString &tooltip = QString() );
 };
@@ -102,6 +109,169 @@ QString TestKadasProjectMigration::milxItemCdata( const QString &militaryName, d
     .arg( militaryName )
     .arg( lon, 0, 'f', 6 )
     .arg( lat, 0, 'f', 6 );
+}
+
+QString TestKadasProjectMigration::milxCorridorItemCdata()
+{
+  // A multi-point symbol as the legacy KadasMilxLayer serializer wrote it:
+  // three geometry points, libmss control point indices, a width attribute
+  // (MilxAttributeWidth == 1) with its control point, and a user offset from
+  // dragging the symbol off its anchor.
+  return QStringLiteral(
+    "{\"props\":{\"authId\":\"EPSG:4326\",\"editor\":\"KadasMilxEditor\","
+    "\"hasVariablePoints\":true,\"militaryName\":\"Corridor\",\"minNPoints\":2,"
+    "\"mssString\":\"<Symbol ID=\\\"G*GPOLAA-------X\\\"/>\","
+    "\"objectName\":\"\",\"symbolScale\":1,\"symbolType\":\"Corridor\","
+    "\"tooltip\":\"\",\"zIndex\":0},\"state\":{"
+    "\"attributePoints\":[[1,[8.310000,46.310000]]],"
+    "\"attributes\":[[1,250.5]],\"controlPoints\":[0,2],"
+    "\"margin\":[13,13,12,12],"
+    "\"points\":[[8.300000,46.300000],[8.400000,46.350000],[8.500000,46.400000]],"
+    "\"pressedPoints\":3,\"status\":2,\"userOffset\":[12,-34]}}"
+  );
+}
+
+QDomElement TestKadasProjectMigration::findOption( const QDomElement &element, const QString &name )
+{
+  for ( QDomElement child = element.firstChildElement(); !child.isNull(); child = child.nextSiblingElement() )
+  {
+    if ( child.tagName() == QLatin1String( "Option" ) && child.attribute( QStringLiteral( "name" ) ) == name )
+      return child;
+    const QDomElement found = findOption( child, name );
+    if ( !found.isNull() )
+      return found;
+  }
+  return QDomElement();
+}
+
+QString TestKadasProjectMigration::customProperty( const QDomElement &layerEl, const QString &key )
+{
+  return findOption( layerEl.firstChildElement( QStringLiteral( "customproperties" ) ), key ).attribute( QStringLiteral( "value" ) );
+}
+
+QDomElement TestKadasProjectMigration::itemByMilitaryName( const QDomElement &layerEl, const QString &militaryName )
+{
+  // Items are keyed by a generated uuid in QgsAnnotationLayer, so the order
+  // they are written in is not the order they were migrated in.
+  const QDomNodeList items = layerEl.firstChildElement( QStringLiteral( "items" ) ).elementsByTagName( QStringLiteral( "item" ) );
+  for ( int i = 0; i < items.size(); ++i )
+  {
+    const QDomElement item = items.at( i ).toElement();
+    if ( item.attribute( QStringLiteral( "kadasMilitaryName" ) ) == militaryName )
+      return item;
+  }
+  return QDomElement();
+}
+
+void TestKadasProjectMigration::migrateLegacyMilxLayer_preservesSymbolStateAndLayerSettings()
+{
+  // A 2.3 MSS layer carries more than its items: the per-layer symbol settings
+  // ride as `milx_*` attributes on `<maplayer>` (written by
+  // KadasMilxLayerPropertiesPageFactory through QgsProject::writeMapLayer), and
+  // each symbol's state holds points, libmss control points, attributes and the
+  // screen-space offset of a symbol dragged off its anchor. All of it has to
+  // survive the translation to QgsAnnotationLayer + KadasMilxAnnotationItem, or
+  // an imported project renders differently from the one that was saved.
+  QDomDocument doc;
+  QDomElement root = doc.createElement( QStringLiteral( "qgis" ) );
+  doc.appendChild( root );
+  QDomElement projectLayersEl = doc.createElement( QStringLiteral( "projectlayers" ) );
+  root.appendChild( projectLayersEl );
+
+  QDomElement mapLayerEl = doc.createElement( QStringLiteral( "maplayer" ) );
+  mapLayerEl.setAttribute( QStringLiteral( "type" ), QStringLiteral( "plugin" ) );
+  mapLayerEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasMilxLayer" ) );
+  mapLayerEl.setAttribute( QStringLiteral( "title" ), QStringLiteral( "MSS" ) );
+  mapLayerEl.setAttribute( QStringLiteral( "milx_override_symbol_settings" ), QStringLiteral( "1" ) );
+  mapLayerEl.setAttribute( QStringLiteral( "milx_symbol_size" ), QStringLiteral( "80" ) );
+  mapLayerEl.setAttribute( QStringLiteral( "milx_line_width" ), QStringLiteral( "4" ) );
+  mapLayerEl.setAttribute( QStringLiteral( "milx_work_mode" ), QStringLiteral( "0" ) );
+  mapLayerEl.setAttribute( QStringLiteral( "milx_leader_line_width" ), QStringLiteral( "5" ) );
+  mapLayerEl.setAttribute( QStringLiteral( "milx_leader_line_color" ), QStringLiteral( "#ff0000" ) );
+  projectLayersEl.appendChild( mapLayerEl );
+
+  QDomElement idEl = doc.createElement( QStringLiteral( "id" ) );
+  idEl.appendChild( doc.createTextNode( QStringLiteral( "MilX_state_layer_id" ) ) );
+  mapLayerEl.appendChild( idEl );
+  QDomElement nameEl = doc.createElement( QStringLiteral( "layername" ) );
+  nameEl.appendChild( doc.createTextNode( QStringLiteral( "MSS" ) ) );
+  mapLayerEl.appendChild( nameEl );
+
+  const auto appendMapItem = [&]( const QString &cdata ) {
+    QDomElement itemEl = doc.createElement( QStringLiteral( "MapItem" ) );
+    itemEl.setAttribute( QStringLiteral( "editor" ), QStringLiteral( "KadasMilxEditor" ) );
+    itemEl.setAttribute( QStringLiteral( "name" ), QStringLiteral( "KadasMilxItem" ) );
+    itemEl.setAttribute( QStringLiteral( "crs" ), QStringLiteral( "EPSG:4326" ) );
+    itemEl.appendChild( doc.createCDATASection( cdata ) );
+    mapLayerEl.appendChild( itemEl );
+  };
+  appendMapItem( milxItemCdata( QStringLiteral( "Point symbol" ), 8.27, 46.22 ) );
+  appendMapItem( milxCorridorItemCdata() );
+
+  QStringList filesToAttach;
+  QVERIFY( KadasProjectMigration::migrateProjectXml( QString(), doc, filesToAttach ) );
+
+  const QDomElement migratedLayer = doc.documentElement().firstChildElement( QStringLiteral( "projectlayers" ) ).firstChildElement( QStringLiteral( "maplayer" ) );
+  QCOMPARE( migratedLayer.attribute( QStringLiteral( "type" ) ), QStringLiteral( "annotation" ) );
+  QCOMPARE( migratedLayer.firstChildElement( QStringLiteral( "id" ) ).text(), QStringLiteral( "MilX_state_layer_id" ) );
+  QCOMPARE( migratedLayer.firstChildElement( QStringLiteral( "layername" ) ).text(), QStringLiteral( "MSS" ) );
+  // MilX is WGS84 in both formats, so the migrated layer must say so - reading
+  // the stored coordinates in any other CRS would move every symbol.
+  QCOMPARE( migratedLayer.firstChildElement( QStringLiteral( "srs" ) ).firstChildElement( QStringLiteral( "spatialrefsys" ) ).firstChildElement( QStringLiteral( "authid" ) ).text(), QStringLiteral( "EPSG:4326" ) );
+
+  // Per-layer symbol settings land in the customProperty namespace that
+  // KadasMilxLayerSettings reads.
+  QCOMPARE( customProperty( migratedLayer, QStringLiteral( "kadas/milx/override" ) ), QStringLiteral( "true" ) );
+  QCOMPARE( customProperty( migratedLayer, QStringLiteral( "kadas/milx/symbolSize" ) ), QStringLiteral( "80" ) );
+  QCOMPARE( customProperty( migratedLayer, QStringLiteral( "kadas/milx/lineWidth" ) ), QStringLiteral( "4" ) );
+  QCOMPARE( customProperty( migratedLayer, QStringLiteral( "kadas/milx/workMode" ) ), QStringLiteral( "0" ) );
+  QCOMPARE( customProperty( migratedLayer, QStringLiteral( "kadas/milx/leaderLineWidth" ) ), QStringLiteral( "5" ) );
+  QCOMPARE( customProperty( migratedLayer, QStringLiteral( "kadas/milx/leaderLineColor" ) ), QStringLiteral( "#ff0000" ) );
+
+  QCOMPARE( migratedLayer.firstChildElement( QStringLiteral( "items" ) ).elementsByTagName( QStringLiteral( "item" ) ).size(), 2 );
+
+  const QDomElement pointEl = itemByMilitaryName( migratedLayer, QStringLiteral( "Point symbol" ) );
+  QVERIFY( !pointEl.isNull() );
+  QCOMPARE( pointEl.attribute( QStringLiteral( "type" ) ), QStringLiteral( "kadas:milx" ) );
+  QVERIFY( pointEl.attribute( QStringLiteral( "kadasMssString" ) ).contains( QStringLiteral( "EFNP-----------" ) ) );
+  QCOMPARE( pointEl.attribute( QStringLiteral( "kadasSymbolType" ) ), QStringLiteral( "Other" ) );
+  QCOMPARE( pointEl.attribute( QStringLiteral( "kadasMinNumPoints" ) ), QStringLiteral( "1" ) );
+  const QDomNodeList pointPts = pointEl.firstChildElement( QStringLiteral( "kadasPoints" ) ).elementsByTagName( QStringLiteral( "p" ) );
+  QCOMPARE( pointPts.size(), 1 );
+  QCOMPARE( pointPts.at( 0 ).toElement().attribute( QStringLiteral( "x" ) ).toDouble(), 8.27 );
+  QCOMPARE( pointPts.at( 0 ).toElement().attribute( QStringLiteral( "y" ) ).toDouble(), 46.22 );
+
+  const QDomElement corridorEl = itemByMilitaryName( migratedLayer, QStringLiteral( "Corridor" ) );
+  QVERIFY( !corridorEl.isNull() );
+  QCOMPARE( corridorEl.attribute( QStringLiteral( "type" ) ), QStringLiteral( "kadas:milx" ) );
+  QCOMPARE( corridorEl.attribute( QStringLiteral( "kadasSymbolType" ) ), QStringLiteral( "Corridor" ) );
+  QCOMPARE( corridorEl.attribute( QStringLiteral( "kadasMinNumPoints" ) ), QStringLiteral( "2" ) );
+  QCOMPARE( corridorEl.attribute( QStringLiteral( "kadasHasVariablePoints" ) ), QStringLiteral( "1" ) );
+  // The screen-space offset of a symbol dragged off its anchor: losing it would
+  // snap the symbol back and drop its leader line.
+  QCOMPARE( corridorEl.attribute( QStringLiteral( "kadasUserOffsetX" ) ), QStringLiteral( "12" ) );
+  QCOMPARE( corridorEl.attribute( QStringLiteral( "kadasUserOffsetY" ) ), QStringLiteral( "-34" ) );
+
+  const QDomNodeList corridorPts = corridorEl.firstChildElement( QStringLiteral( "kadasPoints" ) ).elementsByTagName( QStringLiteral( "p" ) );
+  QCOMPARE( corridorPts.size(), 3 );
+  QCOMPARE( corridorPts.at( 2 ).toElement().attribute( QStringLiteral( "x" ) ).toDouble(), 8.5 );
+  QCOMPARE( corridorPts.at( 2 ).toElement().attribute( QStringLiteral( "y" ) ).toDouble(), 46.4 );
+
+  const QDomNodeList ctrlPts = corridorEl.firstChildElement( QStringLiteral( "kadasControlPoints" ) ).elementsByTagName( QStringLiteral( "i" ) );
+  QCOMPARE( ctrlPts.size(), 2 );
+  QCOMPARE( ctrlPts.at( 0 ).toElement().attribute( QStringLiteral( "v" ) ), QStringLiteral( "0" ) );
+  QCOMPARE( ctrlPts.at( 1 ).toElement().attribute( QStringLiteral( "v" ) ), QStringLiteral( "2" ) );
+
+  const QDomNodeList attrs = corridorEl.firstChildElement( QStringLiteral( "kadasAttributes" ) ).elementsByTagName( QStringLiteral( "a" ) );
+  QCOMPARE( attrs.size(), 1 );
+  QCOMPARE( attrs.at( 0 ).toElement().attribute( QStringLiteral( "k" ) ).toInt(), 1 );
+  QCOMPARE( attrs.at( 0 ).toElement().attribute( QStringLiteral( "v" ) ).toDouble(), 250.5 );
+
+  const QDomNodeList attrPts = corridorEl.firstChildElement( QStringLiteral( "kadasAttributePoints" ) ).elementsByTagName( QStringLiteral( "ap" ) );
+  QCOMPARE( attrPts.size(), 1 );
+  QCOMPARE( attrPts.at( 0 ).toElement().attribute( QStringLiteral( "k" ) ).toInt(), 1 );
+  QCOMPARE( attrPts.at( 0 ).toElement().attribute( QStringLiteral( "x" ) ).toDouble(), 8.31 );
+  QCOMPARE( attrPts.at( 0 ).toElement().attribute( QStringLiteral( "y" ) ).toDouble(), 46.31 );
 }
 
 void TestKadasProjectMigration::migrateLegacyMilxLayer_preservesNonAsciiItems()
