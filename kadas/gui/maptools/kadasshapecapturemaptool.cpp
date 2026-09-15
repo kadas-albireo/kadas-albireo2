@@ -182,70 +182,20 @@ void KadasShapeCaptureMapTool::addPoint( const QgsPointXY &pos )
 
 void KadasShapeCaptureMapTool::canvasPressEvent( QgsMapMouseEvent *e )
 {
-  if ( e->button() != Qt::LeftButton )
+  if ( e->button() == Qt::LeftButton )
   {
-    if ( e->button() == Qt::RightButton && ( mShape == Shape::Polyline || mShape == Shape::Polygon ) && mCapturing )
-    {
-      addPoint( toMapCoordinates( e->pos() ) );
-      mCapturing = false;
-      const QgsGeometry geom = ( mShape == Shape::Polygon ) ? buildPolygonGeometry() : buildPolylineGeometry();
-      if ( !geom.isEmpty() )
-        emit shapeCaptured( geom, canvas()->mapSettings().destinationCrs() );
-    }
+    addPoint( toMapCoordinates( e->pos() ) );
     return;
   }
 
-  switch ( mShape )
+  if ( e->button() == Qt::RightButton && ( mShape == Shape::Polyline || mShape == Shape::Polygon ) && mCapturing )
   {
-    case Shape::Rectangle:
-    case Shape::Circle:
-      if ( !mDragging )
-      {
-        mAnchor = toMapCoordinates( e->pos() );
-        mCurrent = mAnchor;
-        mDragging = true;
-        mPressBeganShape = true;
-      }
-      break;
-
-    case Shape::Sector:
-      switch ( mSectorStage )
-      {
-        case SectorStage::None:
-          resetRubberBand();
-          mAnchor = toMapCoordinates( e->pos() );
-          mCircleRadius = 0.0;
-          mSectorStartAngle = 0.0;
-          mSectorStopAngle = 2 * M_PI;
-          mSectorStage = SectorStage::HaveCenter;
-          break;
-
-        case SectorStage::HaveCenter:
-          mSectorStage = SectorStage::HaveRadius;
-          break;
-
-        case SectorStage::HaveRadius:
-        {
-          mSectorStage = SectorStage::None;
-          updateSectorRubberBand();
-          const QgsGeometry geom = buildSectorGeometry();
-          if ( !geom.isEmpty() )
-            emit shapeCaptured( geom, canvas()->mapSettings().destinationCrs() );
-          break;
-        }
-      }
-      break;
-
-    case Shape::Polyline:
-    case Shape::Polygon:
-      if ( !mCapturing )
-      {
-        mVertices.clear();
-        mCapturing = true;
-      }
-      mVertices.append( toMapCoordinates( e->pos() ) );
-      updatePolyRubberBand( mVertices.last(), false );
-      break;
+    addPoint( toMapCoordinates( e->pos() ) );
+    mCapturing = false;
+    const QgsGeometry geom = ( mShape == Shape::Polygon ) ? buildPolygonGeometry() : buildPolylineGeometry();
+    if ( !geom.isEmpty() )
+      emit shapeCaptured( geom, canvas()->mapSettings().destinationCrs() );
+    return;
   }
 }
 
