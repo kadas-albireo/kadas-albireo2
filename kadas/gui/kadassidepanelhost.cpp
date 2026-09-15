@@ -14,6 +14,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QCoreApplication>
 #include <QEvent>
 #include <QLabel>
 #include <QLayout>
@@ -148,6 +149,11 @@ void KadasSidePanelHost::endPanelResize()
   mResizeOverlay = nullptr;
   mResizeSnapshot = QPixmap();
 
+  // A resize driven by code (e.g. toggling the catalog column, which sets a
+  // new panel width) leaves the geometry change pending, so flush it before
+  // measuring -- see applyPendingLayout().
+  applyPendingLayout();
+
   // Re-anchor the extent at the final width, then render once.
   armCanvasAnchor( mResizeAnchor );
   mResizeAnchor = CanvasAnchor();
@@ -179,11 +185,29 @@ void KadasSidePanelHost::reconcileReflow()
   // visibility once and re-anchor against the captured extent.
   updateVisibility();
 
-  // Apply the new geometry synchronously so the canvas resize happens now,
-  // while the canvas is frozen, rather than on a later event-loop turn. If it
-  // were left deferred, the settle timer could thaw and disarm before the
-  // resize arrived, leaving QGIS to recentre the map on its own -- a visible
-  // horizontal shift when switching to a differently sized panel.
+  applyPendingLayout();
+
+  armCanvasAnchor( mPendingAnchor );
+  mPendingAnchor = CanvasAnchor();
+}
+
+void KadasSidePanelHost::applyPendingLayout()
+{
+  // Apply the pending geometry synchronously so the canvas resize happens now,
+  // while the canvas is frozen and the anchor is still armed, rather than on a
+  // later event-loop turn. If it were left deferred, the settle timer could
+  // thaw and disarm before the resize arrived, leaving QGIS' own resize
+  // handling as the last word -- and that keeps the extent, not the scale, so
+  // the map zooms out by the width ratio every time the canvas narrows.
+
+  // Qt posts the layout request for a geometry change deeper in the panel (a
+  // new panel width) to whichever ancestor owns the top-level layout, which is
+  // not necessarily our direct parent: deliver the posted requests first.
+  QCoreApplication::sendPostedEvents( nullptr, QEvent::LayoutRequest );
+
+  // A panel added or removed changes what our parent's layout computes, and
+  // that is not covered by a posted request: re-run it explicitly.
+
   if ( QWidget *parent = parentWidget() )
   {
     if ( QLayout *parentLayout = parent->layout() )
@@ -192,9 +216,6 @@ void KadasSidePanelHost::reconcileReflow()
       parentLayout->activate();
     }
   }
-
-  armCanvasAnchor( mPendingAnchor );
-  mPendingAnchor = CanvasAnchor();
 }
 
 void KadasSidePanelHost::updateVisibility()
