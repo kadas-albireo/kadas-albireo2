@@ -169,6 +169,12 @@ void KadasMapToolHeightProfile::canvasReleaseEvent( QgsMapMouseEvent *e )
 {
   if ( !mPicking )
   {
+    if ( isCapturing() && mPosMarker )
+    {
+      // A new capture is started
+      onCleared();
+      mPosMarker->reset( Qgis::GeometryType::Point );
+    }
     KadasShapeCaptureMapTool::canvasReleaseEvent( e );
     return;
   }
