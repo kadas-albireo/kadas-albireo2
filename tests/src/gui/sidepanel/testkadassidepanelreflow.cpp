@@ -47,6 +47,7 @@ class TestKadasSidePanelReflow : public QObject
   private slots:
     void initTestCase();
     void showAndHideKeepsScale();
+    void togglingPanelWidthKeepsScale();
 
   private:
     //! Pumps the event loop long enough for all deferred reflows to settle.
@@ -137,6 +138,74 @@ void TestKadasSidePanelReflow::showAndHideKeepsScale()
   QGSCOMPARENEAR( restoredWidthPx, fullWidthPx, 1 );
   QGSCOMPARENEAR( muppHidden, mupp0, mupp0 * 1e-3 );
   QGSCOMPARENEAR( xMinHidden, xMin0, mupp0 );
+}
+
+/**
+ * Reproduces the compounding zoom-out seen when the catalog column inside the
+ * layer tree panel is shown and hidden repeatedly. That toggle does not add or
+ * remove a panel: it resizes the docked panel in place
+ * (KadasMainWindow::setLayersWidgetWidth), bracketed by
+ * beginPanelResize()/endPanelResize(). Every cycle that ends at the original
+ * panel width must also end at the original scale and anchored edge.
+ */
+void TestKadasSidePanelReflow::togglingPanelWidthKeepsScale()
+{
+  QWidget window;
+  QVBoxLayout *outerLayout = new QVBoxLayout( &window );
+  outerLayout->setContentsMargins( 0, 0, 0, 0 );
+
+  QHBoxLayout *canvasRow = new QHBoxLayout();
+  canvasRow->setContentsMargins( 0, 0, 0, 0 );
+  canvasRow->setSpacing( 0 );
+
+  // The layer tree panel sits on the left edge, so the canvas' right edge is
+  // the anchored one.
+  KadasSidePanelHost *host = new KadasSidePanelHost( KadasSidePanelHost::Edge::Left );
+  canvasRow->addWidget( host, 0 );
+
+  QgsMapCanvas *canvas = new QgsMapCanvas();
+  canvas->setDestinationCrs( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:3857" ) ) );
+  canvasRow->addWidget( canvas, 1 );
+  host->setMapCanvas( canvas );
+
+  outerLayout->addLayout( canvasRow );
+
+  window.resize( 900, 600 );
+  window.show();
+  QVERIFY( QTest::qWaitForWindowExposed( &window ) );
+
+  // Dock a fixed-width panel, like the layer tree widget.
+  QWidget *panel = new QWidget();
+  panel->setFixedWidth( 200 );
+  host->addPanel( panel );
+  panel->show();
+
+  canvas->setExtent( QgsRectangle( 0, 0, 1000, 1000 ) );
+  canvas->refresh();
+  settle();
+
+  const int narrowWidthPx = canvas->mapSettings().outputSize().width();
+  const double mupp0 = canvas->mapUnitsPerPixel();
+  const double xMax0 = canvas->extent().xMaximum();
+  QVERIFY2( narrowWidthPx > 0, "canvas has no output size" );
+  QVERIFY2( mupp0 > 0, "canvas has no scale" );
+
+  // Four toggles: wide, narrow, wide, narrow -- back to the starting width.
+  for ( int i = 0; i < 4; ++i )
+  {
+    host->beginPanelResize();
+    panel->setFixedWidth( i % 2 == 0 ? 500 : 200 );
+    host->endPanelResize();
+    settle();
+
+    // Every intermediate state must hold the scale too, not just the round trip.
+    const QByteArray msg = QStringLiteral( "scale drifted to %1 (from %2) after toggle %3" ).arg( canvas->mapUnitsPerPixel() ).arg( mupp0 ).arg( i ).toUtf8();
+    QVERIFY2( qAbs( canvas->mapUnitsPerPixel() - mupp0 ) < mupp0 * 1e-3, msg.constData() );
+  }
+
+  QGSCOMPARENEAR( canvas->mapSettings().outputSize().width(), narrowWidthPx, 1 );
+  QGSCOMPARENEAR( canvas->mapUnitsPerPixel(), mupp0, mupp0 * 1e-3 );
+  QGSCOMPARENEAR( canvas->extent().xMaximum(), xMax0, mupp0 );
 }
 
 int main( int argc, char *argv[] )

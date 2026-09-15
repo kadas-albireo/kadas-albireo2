@@ -96,6 +96,9 @@ class KADAS_GUI_EXPORT KadasSidePanelHost : public QWidget
         bool anchorLeft = true;
     };
 
+    //! Applies a pending geometry change now, so the canvas resize it triggers
+    //! happens while the canvas is frozen and the anchor is still armed.
+    void applyPendingLayout();
     void updateVisibility();
     //! Records the canvas edge/scale to preserve before a reflow.
     CanvasAnchor captureCanvasAnchor() const;
