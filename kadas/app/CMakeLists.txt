@@ -51,6 +51,7 @@ set(kadas_SRC
     external/qgis/app/qgslayertreeviewnonremovableindicator.cpp
     external/qgis/app/3d/qgsmaterialpreviewwidget.cpp
     guidegrid/kadasguidegridlayer.cpp
+    guidegrid/kadasguidegridutils.cpp
     guidegrid/kadasmaptoolguidegrid.cpp
     iamauth/kadasiamauth.cpp
     kml/kadaskmlexport.cpp
@@ -121,6 +122,7 @@ set(kadas_HDR
     external/qgis/app/3d/qgsmaterial3dhandler.h
     external/qgis/app/3d/qgsmaterialpreviewwidget.h
     guidegrid/kadasguidegridlayer.h
+    guidegrid/kadasguidegridutils.h
     guidegrid/kadasmaptoolguidegrid.h
     iamauth/kadasiamauth.h
     kml/kadaskmlexport.h
