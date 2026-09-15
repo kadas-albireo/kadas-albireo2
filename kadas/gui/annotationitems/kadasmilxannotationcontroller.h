@@ -18,6 +18,7 @@
 #define KADASMILXANNOTATIONCONTROLLER_H
 
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
+#include "kadas/gui/annotationitems/kadasannotationrotation.h"
 
 /**
  * \ingroup gui
@@ -58,6 +59,11 @@ class KADAS_GUI_EXPORT KadasMilxAnnotationController : public KadasAnnotationIte
     //! Re-render the layer live while dragging (the outline band is a poor stand-in for the symbol).
     bool liveRepaintOnEdit() const override { return true; }
 
+    //! Preview the real symbol while drawing: a rubber band through the control points shows nothing of an MSS graphic.
+    bool symbolPreviewWhileDrawing( const QgsAnnotationItem *item ) const override;
+
+    KadasAnnotationStyleEditor *createStyleEditor( QWidget *parent = nullptr ) const override;
+
     bool hitTest( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const override;
     void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx ) override;
     void onDoubleClick( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) override;
@@ -73,9 +79,33 @@ class KADAS_GUI_EXPORT KadasMilxAnnotationController : public KadasAnnotationIte
     // attribute control points (see getEditContext ring 1).
     enum AttribIds
     {
+      AttrAngle = -3,
       AttrX = -2,
       AttrY = -1,
     };
+
+    // vidx.part sentinel for the rotation handle; real vertices live in part 0,
+    // rings 0 (geometry) and 1 (attribute control points).
+    static constexpr int kPartRotate = 1;
+
+    //! Rest position of the rotation handle (map CRS), or an invalid point when \a item cannot be rotated.
+    QgsPointXY rotationHandle( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const;
+
+    //! Map position a single point symbol rotates about: its anchor, shifted by the user offset.
+    static QgsPointXY singlePointPivot( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx );
+
+    //! Map position a multi point symbol rotates about: the mean of its control points.
+    static QgsPointXY multiPointCenter( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx );
+
+    //! Rotates a multi point symbol's control and attribute points to \a rotated (map CRS); sizes must match.
+    static void applyRotatedPoints( QgsAnnotationItem *item, const QVector<QgsPointXY> &rotated, const KadasAnnotationItemContext &ctx );
+
+    //! Geometry and attribute points of a multi point symbol in map CRS, in the order applyRotatedPoints() expects.
+    static QVector<QgsPointXY> rotationSnapshot( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx );
+
+    // Per-drag rotation state of a multi point symbol, captured when the handle is
+    // grabbed. Single point symbols rotate their graphic instead and need none.
+    mutable KadasAnnotationRotation::VertexRotationState mRotation;
 };
 
 #endif // KADASMILXANNOTATIONCONTROLLER_H

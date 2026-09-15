@@ -18,12 +18,15 @@
 #include <QCursor>
 #include <QDialog>
 #include <QFileDialog>
+#include <QGuiApplication>
 #include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QPointer>
+#include <QScreen>
 #include <QSlider>
 #include <QTabWidget>
 #include <QToolButton>
+#include <algorithm>
 #include <quazip/quazipfile.h>
 
 #include <qgis/qgsannotationlayer.h>
@@ -198,19 +201,9 @@ void KadasMilxIntegration::createMilx( bool active )
     if ( !buttonPtr )
       return;
     if ( checked )
-    {
-      const int width = 320;
-      const int height = 320;
-      const QPoint anchor = buttonPtr->mapToGlobal( QPoint( buttonPtr->width() / 2, 0 ) );
-      mMilxLibrary->resize( width, height );
-      mMilxLibrary->move( anchor.x() - width / 2, anchor.y() - height );
-      mMilxLibrary->show();
-      mMilxLibrary->focusFilter();
-    }
+      showMilxLibrary( buttonPtr );
     else
-    {
       mMilxLibrary->hide();
-    }
   } );
 
   connect( mMilxLibrary, &KadasMilxLibrary::visibilityChanged, this, [buttonPtr]( bool visible ) {
@@ -249,6 +242,7 @@ void KadasMilxIntegration::createMilx( bool active )
           milx->setSymbolType( desc.symbolType );
           milx->setMinNumPoints( desc.minNumPoints );
           milx->setHasVariablePoints( desc.hasVariablePoints );
+          toolPtr->refreshStyleEditor();
         }
       }
     }
@@ -301,6 +295,31 @@ void KadasMilxIntegration::setMilxLeaderLineColor( QColor color )
   QgsProject::instance()->writeEntry( "milx", "leader_line_color", color.name() );
   KadasMilxClient::setLeaderLineColor( color );
   refreshMilxLayers();
+}
+
+void KadasMilxIntegration::showMilxLibrary( QWidget *anchorWidget )
+{
+  // The button lives in the editor panel docked to the side of the canvas, whose
+  // top is right under the top of the screen: opening the library above the
+  // button, as the bottom-bar editor used to, pushes most of the list off-screen.
+  // Open it beside the panel instead, and keep it within the screen so the whole
+  // list stays reachable.
+  const int margin = 8;
+  const QScreen *screen = anchorWidget->screen() ? anchorWidget->screen() : QGuiApplication::primaryScreen();
+  const QRect available = screen ? screen->availableGeometry() : QRect( 0, 0, 1024, 768 );
+  const int width = std::min( 360, available.width() - 2 * margin );
+  const int height = std::min( 600, available.height() - 2 * margin );
+
+  const QRect anchor( anchorWidget->mapToGlobal( QPoint( 0, 0 ) ), anchorWidget->size() );
+  int x = anchor.left() - margin - width;
+  if ( x < available.left() + margin )
+    x = anchor.right() + margin;
+  x = std::clamp( x, available.left() + margin, available.right() - width - margin + 1 );
+  const int y = std::clamp( anchor.top(), available.top() + margin, available.bottom() - height - margin + 1 );
+
+  mMilxLibrary->setGeometry( x, y, width, height );
+  mMilxLibrary->show();
+  mMilxLibrary->focusFilter();
 }
 
 void KadasMilxIntegration::refreshMilxLayers()

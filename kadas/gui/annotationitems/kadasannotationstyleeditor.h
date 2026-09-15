@@ -26,6 +26,7 @@ class QDoubleSpinBox;
 class QFontComboBox;
 class QFormLayout;
 class QGroupBox;
+class QLabel;
 class QLineEdit;
 class QPlainTextEdit;
 class QSpinBox;
@@ -60,6 +61,8 @@ class KADAS_GUI_EXPORT KadasAnnotationStyleEditor : public QWidget
     void previewChanged();
     //! Emitted when a discrete edit is finalized (push history + persist).
     void committed();
+    //! Requests the item's own external editor, i.e. the controller's double-click action.
+    void externalEditRequested();
 };
 
 
@@ -341,6 +344,28 @@ class KadasPictureStyleEditor : public KadasAnnotationStyleEditor
     QString mPath;
     // Aspect ratio captured when the lock was toggled on.
     double mAspectLockRatio = 0.0;
+};
+
+/**
+ * \brief Editor for KadasMilxAnnotationItem.
+ *
+ * An MSS symbol carries no Kadas-side style: its appearance lives in the MSS
+ * string, which only the libmss symbol editor can change. The panel therefore
+ * names the symbol and hands the editing over via externalEditRequested().
+ */
+class KadasMilxStyleEditor : public KadasAnnotationStyleEditor
+{
+    Q_OBJECT
+
+  public:
+    explicit KadasMilxStyleEditor( QWidget *parent = nullptr );
+
+    void loadFromItem( const QgsAnnotationItem *item ) override;
+    void applyToItem( QgsAnnotationItem *item ) const override;
+
+  private:
+    QLabel *mNameLabel = nullptr;
+    QPushButton *mSymbolEditorButton = nullptr;
 };
 
 #endif // SIP_RUN

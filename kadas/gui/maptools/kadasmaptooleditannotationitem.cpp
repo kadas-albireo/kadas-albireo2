@@ -27,6 +27,7 @@
 #include <qgis/qgsannotationitem.h>
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgsexpressioncontextutils.h>
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsmapcanvasitem.h>
@@ -345,6 +346,11 @@ void KadasMapToolEditAnnotationItem::renderItemPreview( QPainter *painter )
   QgsRenderContext ctx = QgsRenderContext::fromMapSettings( ms );
   ctx.setPainter( painter );
   ctx.setCoordinateTransform( QgsCoordinateTransform( mLayer->crs(), ms.destinationCrs(), ms.transformContext() ) );
+  // The layer scope is what a real render passes down (QgsMapRendererJob does the
+  // same), and an item that reads per-layer settings from it - an MSS symbol
+  // takes its size and line width that way - would otherwise preview with the
+  // global defaults and jump on the first real repaint.
+  ctx.expressionContext().appendScope( QgsExpressionContextUtils::layerScope( mLayer ) );
   QgsFeedback feedback;
   mItem->render( ctx, &feedback );
 }
@@ -921,6 +927,25 @@ void KadasMapToolEditAnnotationItem::setupStyleEditor()
     pushState();
     emit stylePersisted();
   } );
+
+  connect( mStyleEditor, &KadasAnnotationStyleEditor::externalEditRequested, this, [this] {
+    QgsAnnotationItem *item = mLayer ? mLayer->item( mItemId ) : nullptr;
+    if ( !item || !mController )
+      return;
+    mItem = item;
+    KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
+    mController->onDoubleClick( mItem, ctx );
+    mLayer->triggerRepaint();
+    mStyleEditor->loadFromItem( mItem );
+    refreshHandles();
+    pushState();
+  } );
+}
+
+void KadasMapToolEditAnnotationItem::refreshStyleEditor()
+{
+  if ( mStyleEditor && mItem )
+    mStyleEditor->loadFromItem( mItem );
 }
 
 void KadasMapToolEditAnnotationItem::createInitialItem()
@@ -1123,10 +1148,21 @@ void KadasMapToolEditAnnotationItem::showContextMenu( QgsAnnotationLayer *layer,
   if ( !chosen )
     return;
 
-  // A controller action (e.g. "Reset rotation") has already mutated the item;
-  // refresh the style editor so its fields reflect the new state.
-  if ( mStyleEditor && target == mItem )
-    mStyleEditor->loadFromItem( mItem );
+  if ( chosen != toFront && chosen != toBack && chosen != forward && chosen != backward )
+  {
+    // A controller action (e.g. "Reset rotation", "Symbol editor...") has already
+    // mutated the item: show the new state and record it.
+    if ( target == mItem )
+    {
+      if ( mStyleEditor )
+        mStyleEditor->loadFromItem( mItem );
+      refreshHandles();
+    }
+    layer->triggerRepaint();
+    if ( layer == mLayer.data() && itemId == mItemId )
+      pushState();
+    return;
+  }
 
   int newZ = curZ;
   if ( chosen == toFront )

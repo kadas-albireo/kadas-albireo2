@@ -29,6 +29,7 @@
 #include <qgis/qgsrendercontext.h>
 #include <qgis/qgsunittypes.h>
 
+#include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
 #include "kadas/gui/annotationitems/kadasmilxlayersettings.h"
@@ -53,6 +54,46 @@ QgsRectangle KadasMilxAnnotationItem::boundingBox() const
   for ( const QgsPointXY &p : mPoints )
     bbox.combineExtentWith( p.x(), p.y() );
   return bbox;
+}
+
+QgsRectangle KadasMilxAnnotationItem::boundingBox( QgsRenderContext &context ) const
+{
+  const QgsRectangle pointsBbox = boundingBox();
+  if ( mPoints.isEmpty() || mMssString.isEmpty() )
+    return pointsBbox;
+
+  // The rendered glyph reaches well beyond the control points - the hull of a
+  // single-point symbol is a zero-size rectangle - and the user offset moves it
+  // further still, so the plain bounding box makes clicks on the symbol miss the
+  // item entirely. Only libmss knows the exact extent, and asking it here would
+  // cost an IPC round trip per item and per render, so pad the hull generously
+  // instead: KadasMilxAnnotationController::hitTest() does ask libmss and
+  // rejects the false positives this padding lets through.
+  const double padPx = 2.0 * KadasMilxLayerSettings::resolve( context ).symbolSize * KadasAnnotationItemController::outputDpiScale( context );
+  const double mupp = context.mapToPixel().mapUnitsPerPixel();
+
+  // The padding is in map units while the item stores WGS84 coordinates, so the
+  // transform has to be explicit: the render context only carries a valid
+  // item -> map transform while rendering, not when a map tool builds one to hit
+  // test with.
+  QgsCoordinateTransform crst = context.coordinateTransform();
+  if ( !crst.isValid() )
+    crst = QgsCoordinateTransform( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), context.distanceArea().sourceCrs(), context.transformContext() );
+
+  try
+  {
+    QgsRectangle mapBbox = crst.transformBoundingBox( pointsBbox );
+    // Screen y grows downwards, map y upwards.
+    const double dx = mUserOffset.x() * mupp;
+    const double dy = -mUserOffset.y() * mupp;
+    mapBbox.combineExtentWith( QgsRectangle( mapBbox.xMinimum() + dx, mapBbox.yMinimum() + dy, mapBbox.xMaximum() + dx, mapBbox.yMaximum() + dy ) );
+    mapBbox.grow( padPx * mupp );
+    return crst.transformBoundingBox( mapBbox, Qgis::TransformDirection::Reverse );
+  }
+  catch ( const QgsCsException & )
+  {
+    return pointsBbox;
+  }
 }
 
 Qgis::AnnotationItemFlags KadasMilxAnnotationItem::flags() const
@@ -96,13 +137,58 @@ void KadasMilxAnnotationItem::render( QgsRenderContext &context, QgsFeedback *fe
   if ( symbol.points.isEmpty() || symbol.xml.isEmpty() )
     return;
 
-  if ( !KadasMilxClient::updateSymbol( computeScreenExtent( ms ), ms.outputDpi(), symbol, KadasMilxLayerSettings::resolve( context ), result, /* returnPoints */ false ) )
+  const KadasMilxSymbolSettings settings = KadasMilxLayerSettings::resolve( context );
+  if ( !KadasMilxClient::updateSymbol( computeScreenExtent( ms ), ms.outputDpi(), symbol, settings, result, /* returnPoints */ false ) )
   {
     return;
   }
 
+  // A single point symbol can be dragged off its anchor (mUserOffset); the
+  // leader line is what still ties the graphic to the position it describes. It
+  // is drawn before the rotation below: the line marks where the symbol belongs,
+  // so it must stay pinned to the anchor while the graphic turns.
+  if ( !isMultiPoint() && !mUserOffset.isNull() )
+  {
+    context.painter()->save();
+    context.painter()->setPen( QPen( settings.leaderLineColor, settings.leaderLineWidth ) );
+    context.painter()->drawLine( symbol.points.front(), symbol.points.front() + mUserOffset );
+    context.painter()->restore();
+  }
+
+  const QPoint anchor = symbol.points.front() + mUserOffset;
   const QPoint renderPos = symbol.points.front() + result.offset + mUserOffset;
+  context.painter()->save();
+  context.painter()->setTransform( rotationTransform( anchor ), /* combine */ true );
   context.painter()->drawImage( renderPos, result.graphic );
+  context.painter()->restore();
+}
+
+QPoint KadasMilxAnnotationItem::pivot( const QgsMapSettings &mapSettings ) const
+{
+  if ( mPoints.isEmpty() )
+    return QPoint();
+  const QgsCoordinateTransform crst( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), mapSettings.destinationCrs(), mapSettings.transformContext() );
+  try
+  {
+    return mapSettings.mapToPixel().transform( crst.transform( mPoints.front() ) ).toQPointF().toPoint() + mUserOffset;
+  }
+  catch ( const QgsCsException & )
+  {
+    return QPoint();
+  }
+}
+
+QTransform KadasMilxAnnotationItem::rotationTransform( const QPoint &pivot ) const
+{
+  QTransform transform;
+  if ( qgsDoubleNear( mRotation, 0.0 ) )
+    return transform;
+  // QPainter::rotate() turns clockwise on a y-down painter, which is exactly a
+  // clockwise-from-north bearing on a north-up map.
+  transform.translate( pivot.x(), pivot.y() );
+  transform.rotate( mRotation );
+  transform.translate( -pivot.x(), -pivot.y() );
+  return transform;
 }
 
 bool KadasMilxAnnotationItem::writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const
@@ -158,6 +244,7 @@ bool KadasMilxAnnotationItem::writeXml( QDomElement &element, QDomDocument &docu
 
   element.setAttribute( QStringLiteral( "kadasUserOffsetX" ), mUserOffset.x() );
   element.setAttribute( QStringLiteral( "kadasUserOffsetY" ), mUserOffset.y() );
+  element.setAttribute( QStringLiteral( "kadasRotation" ), QString::number( mRotation, 'f', 3 ) );
 
   writeCommonProperties( element, document, context );
   return true;
@@ -211,6 +298,7 @@ bool KadasMilxAnnotationItem::readXml( const QDomElement &element, const QgsRead
   }
 
   mUserOffset = QPoint( element.attribute( QStringLiteral( "kadasUserOffsetX" ), QStringLiteral( "0" ) ).toInt(), element.attribute( QStringLiteral( "kadasUserOffsetY" ), QStringLiteral( "0" ) ).toInt() );
+  mRotation = element.attribute( QStringLiteral( "kadasRotation" ), QStringLiteral( "0" ) ).toDouble();
 
   mDrawStatus = DrawStatus::Finished;
   mPressedPoints = mPoints.size();
@@ -232,6 +320,7 @@ KadasMilxAnnotationItem *KadasMilxAnnotationItem::clone() const
   item->mAttributes = mAttributes;
   item->mAttributePoints = mAttributePoints;
   item->mUserOffset = mUserOffset;
+  item->mRotation = mRotation;
   item->mPressedPoints = mPressedPoints;
   item->mDrawStatus = mDrawStatus;
   item->copyCommonProperties( this );

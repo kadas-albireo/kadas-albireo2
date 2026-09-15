@@ -45,6 +45,7 @@
 #include <qgis/qgspointxy.h>
 #include <qgis/qgspolygon.h>
 #include <qgis/qgsrectangle.h>
+#include <qgis/qgsrendercontext.h>
 
 #include <kadas/gui/kadasattachmentutils.h>
 #include <kadas/gui/kadasrichtextdialog.h>
@@ -57,6 +58,9 @@
 #include <kadas/gui/annotationitems/kadascoordcrossannotationitem.h>
 #include <kadas/gui/annotationitems/kadaslineannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadasmarkerannotationcontroller.h>
+#include <kadas/gui/annotationitems/kadasmilxannotationcontroller.h>
+#include <kadas/gui/annotationitems/kadasmilxannotationitem.h>
+#include <kadas/gui/annotationitems/kadasannotationrotation.h>
 #include <kadas/gui/annotationitems/kadaspinannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadaspinannotationitem.h>
 #include <kadas/gui/annotationitems/kadaspolygonannotationcontroller.h>
@@ -112,6 +116,11 @@ class TestKadasAnnotationControllers : public QObject
 
     // KadasPinAnnotationItem ---------------------------------------------
     void pin_defaultIconPath_resolvesInQrc();
+
+    // KadasMilxAnnotationItem --------------------------------------------
+    void milx_boundingBox_coversRenderedGlyph();
+    void milx_rotationTransform_turnsAboutThePivot();
+    void milx_rotationHandle_rotatesSinglePointSymbol();
 
     // KadasLineAnnotationController --------------------------------------
     void line_getEditContext_hitsOnSegmentNotInBoundingBox();
@@ -1216,6 +1225,117 @@ void TestKadasAnnotationControllers::richText_unformattedTextIsStoredAsPlainText
     dialog.accept();
     QVERIFY( dialog.html().isEmpty() );
   }
+}
+
+
+// ----- MilX ---------------------------------------------------------------
+
+void TestKadasAnnotationControllers::milx_boundingBox_coversRenderedGlyph()
+{
+  // The rendered MSS glyph is far bigger than the control point it hangs on, and
+  // the scale-dependent bounding box is all QgsAnnotationLayer::itemsInBounds()
+  // has to offer a click: too tight a box and clicking the symbol picks nothing,
+  // so neither the editor nor the context menu can ever open on it.
+  const QgsCoordinateReferenceSystem mapCrs( QStringLiteral( "EPSG:3857" ) );
+  const QgsCoordinateReferenceSystem itemCrs( QStringLiteral( "EPSG:4326" ) );
+  QgsMapSettings ms;
+  ms.setDestinationCrs( mapCrs );
+  ms.setExtent( QgsRectangle( 820000, 5930000, 840000, 5950000 ) );
+  ms.setOutputSize( QSize( 1000, 1000 ) );
+  ms.setOutputDpi( 96 );
+
+  const QgsCoordinateTransform toMap( itemCrs, mapCrs, QgsCoordinateTransformContext() );
+  const QgsPointXY anchor( 7.44, 46.95 );
+
+  KadasMilxAnnotationItem item;
+  item.setMssString( QStringLiteral( "<mss-symbol/>" ) );
+  item.setPoints( { anchor } );
+
+  const QPointF anchorScreen = ms.mapToPixel().transform( toMap.transform( anchor ) ).toQPointF();
+  auto itemPosAtScreenOffset = [&]( int dx, int dy ) {
+    const QgsPointXY mapPos = ms.mapToPixel().toMapCoordinates( QPoint( anchorScreen.x() + dx, anchorScreen.y() + dy ) );
+    return toMap.transform( mapPos, Qgis::TransformDirection::Reverse );
+  };
+
+  QgsRenderContext context = QgsRenderContext::fromMapSettings( ms );
+
+  // 40 px above the anchor is on the glyph of a single point symbol, yet way
+  // outside the (zero-size) hull of its control points.
+  const QgsPointXY onGlyph = itemPosAtScreenOffset( 0, -40 );
+  QVERIFY( !item.boundingBox().contains( onGlyph ) );
+  QVERIFY( item.boundingBox( context ).contains( onGlyph ) );
+
+  // Dragging the symbol away from its anchor leaves a leader line behind: the
+  // box has to follow the glyph, not stay on the anchor.
+  item.setUserOffset( QPoint( 0, -400 ) );
+  QVERIFY( item.boundingBox( context ).contains( itemPosAtScreenOffset( 0, -400 ) ) );
+}
+
+void TestKadasAnnotationControllers::milx_rotationTransform_turnsAboutThePivot()
+{
+  KadasMilxAnnotationItem item;
+  item.setMssString( QStringLiteral( "<mss-symbol/>" ) );
+  item.setPoints( { QgsPointXY( 7.44, 46.95 ) } );
+  item.setRotation( 90.0 );
+
+  // Screen space is y-down, so a clockwise-from-north bearing of 90 degrees
+  // takes a point above the pivot to a point right of it.
+  const QPoint pivot( 100, 100 );
+  const QPoint above( 100, 60 );
+  QCOMPARE( item.rotationTransform( pivot ).map( above ), QPoint( 140, 100 ) );
+
+  // An unrotated symbol must not pay for a transform at all.
+  item.setRotation( 0.0 );
+  QVERIFY( item.rotationTransform( pivot ).isIdentity() );
+}
+
+void TestKadasAnnotationControllers::milx_rotationHandle_rotatesSinglePointSymbol()
+{
+  // Same rotation UX as every other annotation: a knob north of the symbol,
+  // grabbed through getEditContext() and dragged through edit().
+  const QgsCoordinateReferenceSystem mapCrs( QStringLiteral( "EPSG:3857" ) );
+  QgsMapSettings ms;
+  ms.setDestinationCrs( mapCrs );
+  ms.setExtent( QgsRectangle( 820000, 5930000, 840000, 5950000 ) );
+  ms.setOutputSize( QSize( 1000, 1000 ) );
+  ms.setOutputDpi( 96 );
+  QgsAnnotationLayer layer( QStringLiteral( "mss" ), QgsAnnotationLayer::LayerOptions( QgsCoordinateTransformContext() ) );
+  layer.setCrs( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ) );
+  const KadasAnnotationItemContext ctx( &layer, ms );
+
+  KadasMilxAnnotationItem item;
+  item.setMssString( QStringLiteral( "<mss-symbol/>" ) );
+  const QgsPointXY anchor( 7.44, 46.95 );
+  item.setPoints( { anchor } );
+
+  // The symbol hangs off a screen pixel, so the pivot the controller rotates
+  // about is that pixel mapped back - not the unsnapped anchor.
+  const QgsPointXY pivot = ms.mapToPixel().toMapCoordinates( item.pivot( ms ) );
+
+  // The knob clears the glyph: half the symbol size plus the knob radius and a
+  // gap, never closer than the shared rest offset.
+  const double mupp = ms.mapUnitsPerPixel();
+  const double offPx = std::max( KadasAnnotationRotation::sHandleOffsetPixels, 0.5 * KadasMilxSymbolSettings::DefaultSymbolSize + KadasAnnotationRotation::sHandleRadiusPixels + 6.0 );
+  const QgsPointXY handle( pivot.x(), pivot.y() + offPx * mupp );
+
+  KadasMilxAnnotationController controller;
+  const KadasEditContext editContext = controller.getEditContext( &item, handle, ctx );
+  QVERIFY( editContext.vidx.isValid() );
+  QCOMPARE( editContext.attributes.size(), 1 );
+
+  // Drag the knob due east: a quarter turn clockwise from north.
+  controller.edit( &item, editContext, QgsPointXY( pivot.x() + offPx * mupp, pivot.y() ), ctx );
+  QCOMPARE( item.rotation(), 90.0 );
+  // The anchor itself must not move - only the graphic turns.
+  QCOMPARE( item.points().size(), 1 );
+  QCOMPARE( item.points().front().x(), anchor.x() );
+
+  // The numeric angle field reports and applies the same rotation.
+  const KadasAttribValues reported = controller.editAttribsFromPosition( &item, editContext, QgsPointXY( pivot.x(), pivot.y() - offPx * mupp ), ctx );
+  QCOMPARE( reported.size(), 1 );
+  QCOMPARE( reported.first(), 180.0 );
+  controller.edit( &item, editContext, reported, ctx );
+  QCOMPARE( item.rotation(), 180.0 );
 }
 
 QTEST_MAIN( TestKadasAnnotationControllers )

@@ -38,6 +38,7 @@
 #include <quazip/quazipfile.h>
 #include <quazip/quazipnewinfo.h>
 
+#include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationcontroller.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
 #include "kadas/gui/annotationitems/kadasmilxlayersettings.h"
@@ -77,6 +78,94 @@ QgsAnnotationItem *KadasMilxAnnotationController::createItem() const
   return new KadasMilxAnnotationItem();
 }
 
+QgsPointXY KadasMilxAnnotationController::singlePointPivot( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx )
+{
+  const auto *milx = static_cast<const KadasMilxAnnotationItem *>( item );
+  const QPoint pivot = milx->pivot( ctx.mapSettings() );
+  return ctx.mapSettings().mapToPixel().toMapCoordinates( pivot );
+}
+
+QVector<QgsPointXY> KadasMilxAnnotationController::rotationSnapshot( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx )
+{
+  const auto *milx = static_cast<const KadasMilxAnnotationItem *>( item );
+  QVector<QgsPointXY> snapshot;
+  const QList<QgsPointXY> pts = milx->points();
+  const QMap<KadasMilxAttrType, QgsPointXY> attrPts = milx->attributePoints();
+  snapshot.reserve( pts.size() + attrPts.size() );
+  for ( const QgsPointXY &p : pts )
+    snapshot.append( toMapPos( p, ctx ) );
+  // Attribute control points ride along so a width or radius handle keeps
+  // pointing at the same part of the symbol after the turn. QMap iterates in
+  // key order, which applyRotatedPoints() relies on to put them back.
+  for ( auto it = attrPts.cbegin(), itEnd = attrPts.cend(); it != itEnd; ++it )
+    snapshot.append( toMapPos( it.value(), ctx ) );
+  return snapshot;
+}
+
+void KadasMilxAnnotationController::applyRotatedPoints( QgsAnnotationItem *item, const QVector<QgsPointXY> &rotated, const KadasAnnotationItemContext &ctx )
+{
+  auto *milx = static_cast<KadasMilxAnnotationItem *>( item );
+  QList<QgsPointXY> pts = milx->points();
+  QMap<KadasMilxAttrType, QgsPointXY> attrPts = milx->attributePoints();
+  if ( rotated.size() != pts.size() + attrPts.size() )
+    return;
+  for ( int i = 0; i < pts.size(); ++i )
+    pts[i] = toItemPos( rotated[i], ctx );
+  int i = pts.size();
+  for ( auto it = attrPts.begin(), itEnd = attrPts.end(); it != itEnd; ++it, ++i )
+    it.value() = toItemPos( rotated[i], ctx );
+  milx->setPoints( pts );
+  milx->setAttributePoints( attrPts );
+}
+
+QgsPointXY KadasMilxAnnotationController::rotationHandle( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
+{
+  const auto *milx = static_cast<const KadasMilxAnnotationItem *>( item );
+  if ( milx->points().isEmpty() || milx->mssString().isEmpty() )
+    return QgsPointXY();
+
+  const double mupp = ctx.mapSettings().mapUnitsPerPixel();
+  if ( !milx->isMultiPoint() )
+  {
+    // Orbit the graphic, which is what turns - and the graphic sits at the
+    // offset position when the symbol has been dragged off its anchor. Clear
+    // the glyph by half its nominal size so the knob never lands on it.
+    constexpr double gapPixels = 6.0;
+    const double reach = 0.5 * KadasMilxLayerSettings::resolve( ctx.layer() ).symbolSize + KadasAnnotationRotation::sHandleRadiusPixels + gapPixels;
+    const double off = std::max( KadasAnnotationRotation::sHandleOffsetPixels, reach ) * mupp;
+    return KadasAnnotationRotation::handlePos( singlePointPivot( item, ctx ), milx->rotation(), off );
+  }
+
+  if ( mRotation.active() )
+    return mRotation.handle();
+
+  // Multi point: due north of the centre, lifted clear of the northmost point
+  // (attribute handles included) so the knob never sits on the symbol.
+  const QVector<QgsPointXY> pts = rotationSnapshot( item, ctx );
+  if ( pts.isEmpty() )
+    return QgsPointXY();
+  double topY = pts.front().y();
+  for ( const QgsPointXY &p : pts )
+    topY = std::max( topY, p.y() );
+  return QgsPointXY( multiPointCenter( item, ctx ).x(), topY + KadasAnnotationRotation::sHandleOffsetPixels * mupp );
+}
+
+QgsPointXY KadasMilxAnnotationController::multiPointCenter( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx )
+{
+  const QList<QgsPointXY> pts = static_cast<const KadasMilxAnnotationItem *>( item )->points();
+  if ( pts.isEmpty() )
+    return QgsPointXY();
+  double sumX = 0.0;
+  double sumY = 0.0;
+  for ( const QgsPointXY &p : pts )
+  {
+    const QgsPointXY mp = toMapPos( p, ctx );
+    sumX += mp.x();
+    sumY += mp.y();
+  }
+  return QgsPointXY( sumX / pts.size(), sumY / pts.size() );
+}
+
 QList<KadasNode> KadasMilxAnnotationController::nodes( const QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx ) const
 {
   const auto *milx = static_cast<const KadasMilxAnnotationItem *>( item );
@@ -107,6 +196,10 @@ QList<KadasNode> KadasMilxAnnotationController::nodes( const QgsAnnotationItem *
     const auto renderer = controlIndices.contains( i ) ? &ctrlPointNodeRenderer : &posPointNodeRenderer;
     result.append( { mapPt, renderer } );
   }
+
+  const QgsPointXY handle = rotationHandle( item, ctx );
+  if ( !handle.isEmpty() )
+    result.append( { handle, KadasAnnotationRotation::renderHandle } );
   return result;
 }
 
@@ -237,6 +330,10 @@ KadasEditContext KadasMilxAnnotationController::getEditContext( const QgsAnnotat
   const QgsCoordinateTransform xform( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() );
   const double tolSqr = pickTolSqr( ctx );
 
+  // Any hover hit-test means we are no longer mid-rotation; draw the handle at
+  // rest again (a drag never calls getEditContext, it goes straight to edit()).
+  mRotation.deactivate();
+
   // 1) Geometry node hit test (ring 0, vertex = point index).
   const QList<QgsPointXY> &pts = milx->points();
   for ( int i = 0; i < pts.size(); ++i )
@@ -285,7 +382,20 @@ KadasEditContext KadasMilxAnnotationController::getEditContext( const QgsAnnotat
     }
   }
 
-  // 3) Whole-symbol drag fallback. Anchor on the first point; for
+  // 3) Rotation handle (part kPartRotate). A single point symbol turns its
+  //    graphic about the anchor; a multi point symbol turns its control points,
+  //    so snapshot those for a drift-free drag.
+  const QgsPointXY handle = rotationHandle( item, ctx );
+  if ( !handle.isEmpty() && pos.sqrDist( handle ) < rotationPickTolSqr( ctx ) )
+  {
+    if ( milx->isMultiPoint() )
+      mRotation.begin( rotationSnapshot( item, ctx ), multiPointCenter( item, ctx ), handle );
+    KadasAttribDefs rot;
+    rot.insert( AttrAngle, KadasNumericAttribute { QObject::tr( "Angle" ), KadasNumericAttribute::Type::TypeAngle } );
+    return KadasEditContext( QgsVertexId( kPartRotate, 0, 0 ), handle, rot, Qt::CrossCursor );
+  }
+
+  // 4) Whole-symbol drag fallback. Anchor on the first point; for
   //    single-point symbols shift by the user offset so the drag starts on the glyph.
   if ( hitTest( item, pos, ctx ) && !pts.isEmpty() )
   {
@@ -311,6 +421,22 @@ KadasEditContext KadasMilxAnnotationController::getEditContext( const QgsAnnotat
 void KadasMilxAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
   auto *milx = static_cast<KadasMilxAnnotationItem *>( item );
+
+  if ( editContext.vidx.part == kPartRotate )
+  {
+    const bool snap = ctx.modifiers() & Qt::ShiftModifier;
+    if ( milx->isMultiPoint() )
+    {
+      if ( mRotation.hasSnapshot() )
+        applyRotatedPoints( item, mRotation.dragTo( newPoint, snap ), ctx );
+    }
+    else
+    {
+      const double angle = KadasAnnotationRotation::angleFromHandle( singlePointPivot( item, ctx ), newPoint );
+      milx->setRotation( KadasAnnotationRotation::snapAngle( angle, snap ) );
+    }
+    return;
+  }
 
   if ( editContext.vidx.isValid() )
   {
@@ -377,6 +503,19 @@ void KadasMilxAnnotationController::edit( QgsAnnotationItem *item, const KadasEd
 void KadasMilxAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx )
 {
   auto *milx = static_cast<KadasMilxAnnotationItem *>( item );
+  if ( editContext.vidx.part == kPartRotate )
+  {
+    if ( milx->isMultiPoint() )
+    {
+      if ( mRotation.hasSnapshot() )
+        applyRotatedPoints( item, mRotation.applyAngle( values[AttrAngle], KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel() ), ctx );
+    }
+    else
+    {
+      milx->setRotation( values[AttrAngle] );
+    }
+    return;
+  }
   if ( values.size() == 1 )
   {
     // Single shape attribute (length / width / radius / attitude): store it, then recompute via libmss.
@@ -405,6 +544,13 @@ void KadasMilxAnnotationController::edit( QgsAnnotationItem *item, const KadasEd
 
 KadasAttribValues KadasMilxAnnotationController::editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
 {
+  if ( editContext.vidx.part == kPartRotate )
+  {
+    const auto *milx = static_cast<const KadasMilxAnnotationItem *>( item );
+    KadasAttribValues v;
+    v.insert( AttrAngle, milx->isMultiPoint() ? mRotation.angleFromCursor( pos ) : KadasAnnotationRotation::angleFromHandle( singlePointPivot( item, ctx ), pos ) );
+    return v;
+  }
   if ( editContext.attributes.size() == 1 )
   {
     // Report the stored attribute value, not a position-derived one.
@@ -421,6 +567,14 @@ QgsPointXY KadasMilxAnnotationController::positionFromEditAttribs(
   const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx
 ) const
 {
+  if ( editContext.vidx.part == kPartRotate )
+  {
+    const auto *milx = static_cast<const KadasMilxAnnotationItem *>( item );
+    const double off = KadasAnnotationRotation::sHandleOffsetPixels * ctx.mapSettings().mapUnitsPerPixel();
+    if ( milx->isMultiPoint() )
+      return mRotation.handleForAngle( values[AttrAngle], off );
+    return KadasAnnotationRotation::handlePos( singlePointPivot( item, ctx ), values[AttrAngle], off );
+  }
   if ( values.size() == 1 )
   {
     const auto *milx = static_cast<const KadasMilxAnnotationItem *>( item );
@@ -628,7 +782,24 @@ void KadasMilxAnnotationController::populateContextMenu( QgsAnnotationItem *item
     // Single-point symbols carry a screen-space user offset; offer to reset.
     QAction *action = menu->addAction( QObject::tr( "Reset offset" ), [milx]() { milx->setUserOffset( QPoint() ); } );
     action->setEnabled( !milx->userOffset().isNull() );
+
+    QAction *resetRotation = menu->addAction( QObject::tr( "Reset rotation" ), [milx]() { milx->setRotation( 0.0 ); } );
+    resetRotation->setEnabled( !qgsDoubleNear( milx->rotation(), 0.0 ) );
   }
+}
+
+bool KadasMilxAnnotationController::symbolPreviewWhileDrawing( const QgsAnnotationItem *item ) const
+{
+  // libmss redraws the whole graphic from the control points on every click and
+  // every move, so the symbol under construction looks nothing like the polyline
+  // a rubber band would trace through those points. Nothing to preview until a
+  // symbol has been picked.
+  return !static_cast<const KadasMilxAnnotationItem *>( item )->mssString().isEmpty();
+}
+
+KadasAnnotationStyleEditor *KadasMilxAnnotationController::createStyleEditor( QWidget *parent ) const
+{
+  return new KadasMilxStyleEditor( parent );
 }
 
 void KadasMilxAnnotationController::onDoubleClick( QgsAnnotationItem *item, const KadasAnnotationItemContext &ctx )
@@ -667,7 +838,9 @@ bool KadasMilxAnnotationController::hitTest( const QgsAnnotationItem *item, cons
   for ( QPoint &p : symbol.points )
     p += milx->userOffset();
 
-  const QPoint screenPos = ctx.mapSettings().mapToPixel().transform( pos ).toQPointF().toPoint();
+  // libmss knows nothing of the rotation the painter applies, so test against the
+  // upright graphic by turning the click back by the same angle about the pivot.
+  const QPoint screenPos = milx->rotationTransform( symbol.points.front() ).inverted().map( ctx.mapSettings().mapToPixel().transform( pos ).toQPointF().toPoint() );
   QList<KadasMilxClient::NPointSymbol> symbols { symbol };
   int selectedSymbol = -1;
   QRect bbox;

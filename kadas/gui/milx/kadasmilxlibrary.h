@@ -21,6 +21,7 @@
 #include <QFutureWatcher>
 #include <QThread>
 
+class QDomElement;
 class QStandardItem;
 class QStandardItemModel;
 class QTreeView;
@@ -35,6 +36,17 @@ class KADAS_GUI_EXPORT KadasMilxLibrary : public QFrame
     KadasMilxLibrary( WId winId, QWidget *parent = 0 );
     ~KadasMilxLibrary();
     void focusFilter();
+
+    /**
+     * Localized display name of an MSS gallery \a element (the gallery itself, a
+     * section or a subsection), for the two-letter upper case \a lang.
+     *
+     * MSS gallery files name their groups with \c TranslDesc children
+     * (`<TranslDesc LangId="DE" Desc="..."/>`); galleries predating the 2026 MSS
+     * library used \c Name_<lang> elements instead. Both are read, English serving
+     * as the fallback for a language the file does not carry.
+     */
+    static QString localizedName( const QDomElement &element, const QString &lang );
 
   signals:
     void symbolSelected( const KadasMilxSymbolDesc &symbolDesc );

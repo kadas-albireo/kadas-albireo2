@@ -72,6 +72,8 @@ class KadasMilxIntegration : public QObject
     KadasMilxDropHandler mDropHandler;
 
     void refreshMilxLayers();
+    //! Pops the symbol library up next to \a anchorWidget, kept within the screen.
+    void showMilxLibrary( QWidget *anchorWidget );
     static void showMessageDialog( const QString &title, const QString &body, const QString &messages );
 
   private slots:
