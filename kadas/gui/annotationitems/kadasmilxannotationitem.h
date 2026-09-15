@@ -20,6 +20,7 @@
 #include <QMap>
 #include <QPoint>
 #include <QString>
+#include <QTransform>
 
 #include <qgis/qgsannotationitem.h>
 #include <qgis/qgspointxy.h>
@@ -119,6 +120,21 @@ class KADAS_GUI_EXPORT KadasMilxAnnotationItem : public QgsAnnotationItem
     QPoint userOffset() const { return mUserOffset; }
     void setUserOffset( const QPoint &offset ) { mUserOffset = offset; }
 
+    /**
+     * Clockwise rotation of the rendered graphic in degrees, 0 pointing to map north.
+     *
+     * Only single point symbols carry one: a multi point symbol is rotated by
+     * rotating its control points, which libmss then redraws from.
+     */
+    double rotation() const { return mRotation; }
+    void setRotation( double rotation ) { mRotation = rotation; }
+
+    //! Screen position the graphic hangs from and rotates about: the first point, shifted by the user offset.
+    QPoint pivot( const QgsMapSettings &mapSettings ) const;
+
+    //! Painter transform that applies rotation() about pivot(); identity when unrotated.
+    QTransform rotationTransform( const QPoint &pivot ) const;
+
     //! Number of physical clicks made during interactive draw.
     int pressedPoints() const { return mPressedPoints; }
     void setPressedPoints( int n ) { mPressedPoints = n; }
@@ -159,6 +175,7 @@ class KADAS_GUI_EXPORT KadasMilxAnnotationItem : public QgsAnnotationItem
     QMap<KadasMilxAttrType, double> mAttributes;
     QMap<KadasMilxAttrType, QgsPointXY> mAttributePoints;
     QPoint mUserOffset;
+    double mRotation = 0.0;
     int mPressedPoints = 0;
     DrawStatus mDrawStatus = DrawStatus::Finished;
 

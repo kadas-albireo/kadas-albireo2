@@ -58,7 +58,9 @@
 #include <kadas/gui/annotationitems/kadascoordcrossannotationitem.h>
 #include <kadas/gui/annotationitems/kadaslineannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadasmarkerannotationcontroller.h>
+#include <kadas/gui/annotationitems/kadasmilxannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadasmilxannotationitem.h>
+#include <kadas/gui/annotationitems/kadasannotationrotation.h>
 #include <kadas/gui/annotationitems/kadaspinannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadaspinannotationitem.h>
 #include <kadas/gui/annotationitems/kadaspolygonannotationcontroller.h>
@@ -117,6 +119,8 @@ class TestKadasAnnotationControllers : public QObject
 
     // KadasMilxAnnotationItem --------------------------------------------
     void milx_boundingBox_coversRenderedGlyph();
+    void milx_rotationTransform_turnsAboutThePivot();
+    void milx_rotationHandle_rotatesSinglePointSymbol();
 
     // KadasLineAnnotationController --------------------------------------
     void line_getEditContext_hitsOnSegmentNotInBoundingBox();
@@ -1265,6 +1269,73 @@ void TestKadasAnnotationControllers::milx_boundingBox_coversRenderedGlyph()
   // box has to follow the glyph, not stay on the anchor.
   item.setUserOffset( QPoint( 0, -400 ) );
   QVERIFY( item.boundingBox( context ).contains( itemPosAtScreenOffset( 0, -400 ) ) );
+}
+
+void TestKadasAnnotationControllers::milx_rotationTransform_turnsAboutThePivot()
+{
+  KadasMilxAnnotationItem item;
+  item.setMssString( QStringLiteral( "<mss-symbol/>" ) );
+  item.setPoints( { QgsPointXY( 7.44, 46.95 ) } );
+  item.setRotation( 90.0 );
+
+  // Screen space is y-down, so a clockwise-from-north bearing of 90 degrees
+  // takes a point above the pivot to a point right of it.
+  const QPoint pivot( 100, 100 );
+  const QPoint above( 100, 60 );
+  QCOMPARE( item.rotationTransform( pivot ).map( above ), QPoint( 140, 100 ) );
+
+  // An unrotated symbol must not pay for a transform at all.
+  item.setRotation( 0.0 );
+  QVERIFY( item.rotationTransform( pivot ).isIdentity() );
+}
+
+void TestKadasAnnotationControllers::milx_rotationHandle_rotatesSinglePointSymbol()
+{
+  // Same rotation UX as every other annotation: a knob north of the symbol,
+  // grabbed through getEditContext() and dragged through edit().
+  const QgsCoordinateReferenceSystem mapCrs( QStringLiteral( "EPSG:3857" ) );
+  QgsMapSettings ms;
+  ms.setDestinationCrs( mapCrs );
+  ms.setExtent( QgsRectangle( 820000, 5930000, 840000, 5950000 ) );
+  ms.setOutputSize( QSize( 1000, 1000 ) );
+  ms.setOutputDpi( 96 );
+  QgsAnnotationLayer layer( QStringLiteral( "mss" ), QgsAnnotationLayer::LayerOptions( QgsCoordinateTransformContext() ) );
+  layer.setCrs( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ) );
+  const KadasAnnotationItemContext ctx( &layer, ms );
+
+  KadasMilxAnnotationItem item;
+  item.setMssString( QStringLiteral( "<mss-symbol/>" ) );
+  const QgsPointXY anchor( 7.44, 46.95 );
+  item.setPoints( { anchor } );
+
+  // The symbol hangs off a screen pixel, so the pivot the controller rotates
+  // about is that pixel mapped back - not the unsnapped anchor.
+  const QgsPointXY pivot = ms.mapToPixel().toMapCoordinates( item.pivot( ms ) );
+
+  // The knob clears the glyph: half the symbol size plus the knob radius and a
+  // gap, never closer than the shared rest offset.
+  const double mupp = ms.mapUnitsPerPixel();
+  const double offPx = std::max( KadasAnnotationRotation::sHandleOffsetPixels, 0.5 * KadasMilxSymbolSettings::DefaultSymbolSize + KadasAnnotationRotation::sHandleRadiusPixels + 6.0 );
+  const QgsPointXY handle( pivot.x(), pivot.y() + offPx * mupp );
+
+  KadasMilxAnnotationController controller;
+  const KadasEditContext editContext = controller.getEditContext( &item, handle, ctx );
+  QVERIFY( editContext.vidx.isValid() );
+  QCOMPARE( editContext.attributes.size(), 1 );
+
+  // Drag the knob due east: a quarter turn clockwise from north.
+  controller.edit( &item, editContext, QgsPointXY( pivot.x() + offPx * mupp, pivot.y() ), ctx );
+  QCOMPARE( item.rotation(), 90.0 );
+  // The anchor itself must not move - only the graphic turns.
+  QCOMPARE( item.points().size(), 1 );
+  QCOMPARE( item.points().front().x(), anchor.x() );
+
+  // The numeric angle field reports and applies the same rotation.
+  const KadasAttribValues reported = controller.editAttribsFromPosition( &item, editContext, QgsPointXY( pivot.x(), pivot.y() - offPx * mupp ), ctx );
+  QCOMPARE( reported.size(), 1 );
+  QCOMPARE( reported.first(), 180.0 );
+  controller.edit( &item, editContext, reported, ctx );
+  QCOMPARE( item.rotation(), 180.0 );
 }
 
 QTEST_MAIN( TestKadasAnnotationControllers )

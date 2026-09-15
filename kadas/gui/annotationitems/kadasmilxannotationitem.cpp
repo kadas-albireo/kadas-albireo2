@@ -144,7 +144,9 @@ void KadasMilxAnnotationItem::render( QgsRenderContext &context, QgsFeedback *fe
   }
 
   // A single point symbol can be dragged off its anchor (mUserOffset); the
-  // leader line is what still ties the graphic to the position it describes.
+  // leader line is what still ties the graphic to the position it describes. It
+  // is drawn before the rotation below: the line marks where the symbol belongs,
+  // so it must stay pinned to the anchor while the graphic turns.
   if ( !isMultiPoint() && !mUserOffset.isNull() )
   {
     context.painter()->save();
@@ -153,8 +155,40 @@ void KadasMilxAnnotationItem::render( QgsRenderContext &context, QgsFeedback *fe
     context.painter()->restore();
   }
 
+  const QPoint anchor = symbol.points.front() + mUserOffset;
   const QPoint renderPos = symbol.points.front() + result.offset + mUserOffset;
+  context.painter()->save();
+  context.painter()->setTransform( rotationTransform( anchor ), /* combine */ true );
   context.painter()->drawImage( renderPos, result.graphic );
+  context.painter()->restore();
+}
+
+QPoint KadasMilxAnnotationItem::pivot( const QgsMapSettings &mapSettings ) const
+{
+  if ( mPoints.isEmpty() )
+    return QPoint();
+  const QgsCoordinateTransform crst( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ), mapSettings.destinationCrs(), mapSettings.transformContext() );
+  try
+  {
+    return mapSettings.mapToPixel().transform( crst.transform( mPoints.front() ) ).toQPointF().toPoint() + mUserOffset;
+  }
+  catch ( const QgsCsException & )
+  {
+    return QPoint();
+  }
+}
+
+QTransform KadasMilxAnnotationItem::rotationTransform( const QPoint &pivot ) const
+{
+  QTransform transform;
+  if ( qgsDoubleNear( mRotation, 0.0 ) )
+    return transform;
+  // QPainter::rotate() turns clockwise on a y-down painter, which is exactly a
+  // clockwise-from-north bearing on a north-up map.
+  transform.translate( pivot.x(), pivot.y() );
+  transform.rotate( mRotation );
+  transform.translate( -pivot.x(), -pivot.y() );
+  return transform;
 }
 
 bool KadasMilxAnnotationItem::writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const
@@ -210,6 +244,7 @@ bool KadasMilxAnnotationItem::writeXml( QDomElement &element, QDomDocument &docu
 
   element.setAttribute( QStringLiteral( "kadasUserOffsetX" ), mUserOffset.x() );
   element.setAttribute( QStringLiteral( "kadasUserOffsetY" ), mUserOffset.y() );
+  element.setAttribute( QStringLiteral( "kadasRotation" ), QString::number( mRotation, 'f', 3 ) );
 
   writeCommonProperties( element, document, context );
   return true;
@@ -263,6 +298,7 @@ bool KadasMilxAnnotationItem::readXml( const QDomElement &element, const QgsRead
   }
 
   mUserOffset = QPoint( element.attribute( QStringLiteral( "kadasUserOffsetX" ), QStringLiteral( "0" ) ).toInt(), element.attribute( QStringLiteral( "kadasUserOffsetY" ), QStringLiteral( "0" ) ).toInt() );
+  mRotation = element.attribute( QStringLiteral( "kadasRotation" ), QStringLiteral( "0" ) ).toDouble();
 
   mDrawStatus = DrawStatus::Finished;
   mPressedPoints = mPoints.size();
@@ -284,6 +320,7 @@ KadasMilxAnnotationItem *KadasMilxAnnotationItem::clone() const
   item->mAttributes = mAttributes;
   item->mAttributePoints = mAttributePoints;
   item->mUserOffset = mUserOffset;
+  item->mRotation = mRotation;
   item->mPressedPoints = mPressedPoints;
   item->mDrawStatus = mDrawStatus;
   item->copyCommonProperties( this );

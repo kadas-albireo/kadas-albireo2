@@ -109,6 +109,29 @@ User-applied screen-space offset (drag of the symbol graphic).
 %End
     void setUserOffset( const QPoint &offset );
 
+    double rotation() const;
+%Docstring
+Clockwise rotation of the rendered graphic in degrees, 0 pointing to map
+north.
+
+Only single point symbols carry one: a multi point symbol is rotated by
+rotating its control points, which libmss then redraws from.
+%End
+    void setRotation( double rotation );
+
+    QPoint pivot( const QgsMapSettings &mapSettings ) const;
+%Docstring
+Screen position the graphic hangs from and rotates about: the first
+point, shifted by the user offset.
+%End
+
+    QTransform rotationTransform( const QPoint &pivot ) const;
+%Docstring
+Painter transform that applies
+:py:func:`~KadasMilxAnnotationItem.rotation` about
+:py:func:`~KadasMilxAnnotationItem.pivot`; identity when unrotated.
+%End
+
     int pressedPoints() const;
 %Docstring
 Number of physical clicks made during interactive draw.
