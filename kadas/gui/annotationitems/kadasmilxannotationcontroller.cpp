@@ -24,6 +24,7 @@
 #include <QUuid>
 #include <limits>
 
+#include <qgis/qgsannotationlayer.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsmapsettings.h>
@@ -583,6 +584,16 @@ QgsPointXY KadasMilxAnnotationController::positionFromEditAttribs(
     return toMapPos( itemPos, ctx );
   }
   return positionFromDrawAttribs( item, values, ctx );
+}
+
+bool KadasMilxAnnotationController::supportsLayer( const QgsAnnotationLayer *layer ) const
+{
+  return KadasAnnotationItemController::supportsLayer( layer ) && layer->crs() == QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) );
+}
+
+QgsCoordinateReferenceSystem KadasMilxAnnotationController::preferredLayerCrs() const
+{
+  return QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) );
 }
 
 QgsPointXY KadasMilxAnnotationController::position( const QgsAnnotationItem *item ) const

@@ -18,6 +18,7 @@
 #define KADASMILXINTEGRATION_H
 
 #include <QObject>
+#include <QPointer>
 
 #include <qgis/qgscustomdrophandler.h>
 
@@ -27,6 +28,7 @@ class QComboBox;
 class QSlider;
 class QSpinBox;
 class QTabWidget;
+class QgsAnnotationLayer;
 class QgsColorButton;
 class QgsMapLayer;
 class KadasMilxLayerPropertiesPageFactory;
@@ -70,6 +72,11 @@ class KadasMilxIntegration : public QObject
     KadasMilxLibrary *mMilxLibrary = nullptr;
     KadasMilxLayerPropertiesPageFactory *mLayerPropertiesFactory = nullptr;
     KadasMilxDropHandler mDropHandler;
+    //! Layer the last MSS symbol went to, so the tool reopens on the layer the user works in.
+    QPointer<QgsAnnotationLayer> mLastMssLayer;
+
+    //! Returns the layer new MSS symbols go to, creating the standard MSS layer on first use.
+    QgsAnnotationLayer *getOrCreateMssLayer();
 
     void refreshMilxLayers();
     //! Pops the symbol library up next to \a anchorWidget, kept within the screen.

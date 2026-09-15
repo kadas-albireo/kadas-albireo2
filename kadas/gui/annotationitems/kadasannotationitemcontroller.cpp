@@ -23,8 +23,10 @@
 #include <QScreen>
 
 #include <qgis/qgsannotationitem.h>
+#include <qgis/qgsannotationlayer.h>
 #include <qgis/qgsannotationlineitem.h>
 #include <qgis/qgsannotationpolygonitem.h>
+#include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgscurve.h>
 #include <qgis/qgscurvepolygon.h>
@@ -39,7 +41,19 @@
 #include <qgis/qgsunittypes.h>
 
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
+#include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
 #include "kadas/gui/annotationitems/kadasannotationrotation.h"
+
+
+bool KadasAnnotationItemController::supportsLayer( const QgsAnnotationLayer *layer ) const
+{
+  return layer && !KadasAnnotationLayerHelpers::isParametricLayer( layer );
+}
+
+QgsCoordinateReferenceSystem KadasAnnotationItemController::preferredLayerCrs() const
+{
+  return QgsCoordinateReferenceSystem();
+}
 
 
 void KadasAnnotationItemController::populateContextMenu( QgsAnnotationItem *, QMenu *, const KadasEditContext &, const QgsPointXY &, const KadasAnnotationItemContext & )

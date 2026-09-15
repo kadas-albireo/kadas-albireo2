@@ -1751,11 +1751,17 @@ int KadasMainWindow::messageTimeout() const
 QgsMapTool *KadasMainWindow::addPinTool()
 {
   KadasAnnotationItemController *controller = KadasAnnotationControllerRegistry::instance()->controllerFor( KadasPinAnnotationItem::itemTypeId() );
-  QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::PinsLayer );
-  if ( !controller || !layer )
+  if ( !mLastPinLayer )
+  {
+    mLastPinLayer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::PinsLayer );
+  }
+  if ( !controller || !mLastPinLayer )
     return nullptr;
-  auto *tool = new KadasMapToolEditAnnotationItem( mapCanvas(), controller, layer );
+  auto *tool = new KadasMapToolEditAnnotationItem( mapCanvas(), controller, mLastPinLayer );
   tool->setMultipart( false );
+  // Picking another layer in the tool's chooser makes it the default the next
+  // time the pin tool is opened.
+  connect( tool, &KadasMapToolEditAnnotationItem::targetLayerChanged, this, [this]( QgsAnnotationLayer *target ) { mLastPinLayer = target; } );
   return tool;
 }
 

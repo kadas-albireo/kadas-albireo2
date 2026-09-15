@@ -140,10 +140,53 @@ class TestKadasAnnotationControllers : public QObject
     void selection_polygonBodyHitIsBody();
     void selection_rankerPrefersPrecisionOverZIndex();
 
+    // Target layer eligibility -------------------------------------------
+    void supportsLayer_acceptsPlainAnnotationLayersOnly();
+    void supportsLayer_milxRequiresWgs84Layer();
+
   private:
     static KadasAnnotationItemContext makeContext();
 };
 
+
+void TestKadasAnnotationControllers::supportsLayer_acceptsPlainAnnotationLayersOnly()
+{
+  // The layer chooser of the create tool offers exactly what the controller
+  // accepts, so an item type that is happy anywhere must still refuse the
+  // parametric overlays, whose content comes from layer settings.
+  KadasMarkerAnnotationController controller;
+
+  QgsAnnotationLayer::LayerOptions options( ( QgsCoordinateTransformContext() ) );
+  auto plain = std::make_unique<QgsAnnotationLayer>( QStringLiteral( "Annotation" ), options );
+  plain->setCrs( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:2056" ) ) );
+  QVERIFY( controller.supportsLayer( plain.get() ) );
+
+  auto parametric = std::make_unique<QgsAnnotationLayer>( QStringLiteral( "Bullseye" ), options );
+  parametric->setCustomProperty( QStringLiteral( "kadas/annotation-type" ), QStringLiteral( "bullseye" ) );
+  QVERIFY( !controller.supportsLayer( parametric.get() ) );
+
+  QVERIFY( !controller.supportsLayer( nullptr ) );
+  // No preference means the new layer follows the project CRS.
+  QVERIFY( !controller.preferredLayerCrs().isValid() );
+}
+
+void TestKadasAnnotationControllers::supportsLayer_milxRequiresWgs84Layer()
+{
+  // MSS geometry is stored in WGS84 and the item reads its layer CRS as being
+  // that, so offering a layer in any other CRS would place symbols nowhere.
+  KadasMilxAnnotationController controller;
+
+  QgsAnnotationLayer::LayerOptions options( ( QgsCoordinateTransformContext() ) );
+  auto wgs84 = std::make_unique<QgsAnnotationLayer>( QStringLiteral( "MSS" ), options );
+  wgs84->setCrs( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:4326" ) ) );
+  QVERIFY( controller.supportsLayer( wgs84.get() ) );
+
+  auto projected = std::make_unique<QgsAnnotationLayer>( QStringLiteral( "Annotation" ), options );
+  projected->setCrs( QgsCoordinateReferenceSystem( QStringLiteral( "EPSG:2056" ) ) );
+  QVERIFY( !controller.supportsLayer( projected.get() ) );
+
+  QCOMPARE( controller.preferredLayerCrs().authid(), QStringLiteral( "EPSG:4326" ) );
+}
 
 void TestKadasAnnotationControllers::initTestCase()
 {

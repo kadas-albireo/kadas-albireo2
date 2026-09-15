@@ -30,6 +30,7 @@
 
 class KadasAnnotationItemController;
 class KadasAnnotationStyleEditor;
+class KadasLayerSelectionWidget;
 class KadasMapItemTooltip;
 class KadasSidePanel;
 class KadasFloatingInputWidget;
@@ -78,7 +79,17 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     //! Reloads the editor panel from the current item, after something outside the tool changed it.
     void refreshStyleEditor();
 
+  public slots:
+    /**
+     * Create-mode: redirects subsequent items to \a layer. An item that is not a
+     * finished annotation yet is discarded rather than carried over, since it
+     * lives in the CRS of the layer it was started on.
+     */
+    void setTargetLayer( QgsAnnotationLayer *layer );
+
   signals:
+    //! Create-mode: emitted after setTargetLayer() switched to another layer.
+    void targetLayerChanged( QgsAnnotationLayer *layer );
     //! Create-mode: emitted whenever a part is finalized.
     void partFinished();
     //! Create-mode: emitted after a fresh item replaces the previous one.
@@ -133,6 +144,7 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     bool mIgnoreNextMoveEvent = false;
 
     KadasAnnotationStyleEditor *mStyleEditor = nullptr;
+    KadasLayerSelectionWidget *mLayerSelection = nullptr;
 
     // Preview band drawn above all layers; the layer is repainted only at commit points, never per mouse move.
     QgsRubberBand *mTempRubberBand = nullptr;
@@ -156,6 +168,8 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     KadasAttribValues collectAttributeValues() const;
 
     void setupStyleEditor();
+    //! Adds the layer row to the bottom bar: a chooser in create mode, a read-only display when editing.
+    void setupLayerSelection();
 
     void createInitialItem();
     void clearInProgressItem();

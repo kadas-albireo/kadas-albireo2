@@ -79,7 +79,21 @@ Reloads the editor panel from the current item, after something outside
 the tool changed it.
 %End
 
+  public slots:
+    void setTargetLayer( QgsAnnotationLayer *layer );
+%Docstring
+Create-mode: redirects subsequent items to ``layer``. An item that is
+not a finished annotation yet is discarded rather than carried over,
+since it lives in the CRS of the layer it was started on.
+%End
+
   signals:
+    void targetLayerChanged( QgsAnnotationLayer *layer );
+%Docstring
+Create-mode: emitted after
+:py:func:`~KadasMapToolEditAnnotationItem.setTargetLayer` switched to
+another layer.
+%End
     void partFinished();
 %Docstring
 Create-mode: emitted whenever a part is finalized.

@@ -32,6 +32,7 @@ class QMenu;
 class QWidget;
 class QgsAbstractGeometry;
 class QgsAnnotationItem;
+class QgsAnnotationLayer;
 class QgsCoordinateReferenceSystem;
 class QgsGeometry;
 class QgsRectangle;
@@ -172,6 +173,21 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
       Q_UNUSED( item );
       return false;
     }
+
+    // ----- Target layer ---------------------------------------------------
+
+    /**
+     * TRUE if items of this type can be drawn onto \a layer, which is what the
+     * layer chooser of the create tool offers.
+     *
+     * The default accepts every annotation layer except the parametric Kadas
+     * overlays (bullseye, map grid, ...), whose content is generated from layer
+     * settings rather than drawn. Override to constrain the choice further.
+     */
+    virtual bool supportsLayer( const QgsAnnotationLayer *layer ) const;
+
+    //! CRS a layer newly created for this item type carries; an invalid CRS (the default) means "follow the project".
+    virtual QgsCoordinateReferenceSystem preferredLayerCrs() const;
 
     // ----- Position helpers ----------------------------------------------
 

@@ -135,6 +135,15 @@ KadasMilxIntegration::~KadasMilxIntegration()
   delete mMilxLibrary;
 }
 
+QgsAnnotationLayer *KadasMilxIntegration::getOrCreateMssLayer()
+{
+  if ( !mLastMssLayer )
+  {
+    mLastMssLayer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::MssLayer );
+  }
+  return mLastMssLayer;
+}
+
 void KadasMilxIntegration::createMilx( bool active )
 {
   QgsMapCanvas *canvas = kApp->mainWindow()->mapCanvas();
@@ -150,7 +159,7 @@ void KadasMilxIntegration::createMilx( bool active )
   if ( !controller )
     return;
 
-  QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::MssLayer );
+  QgsAnnotationLayer *layer = getOrCreateMssLayer();
   if ( !layer )
     return;
 
@@ -163,6 +172,9 @@ void KadasMilxIntegration::createMilx( bool active )
   KadasMapToolEditAnnotationItem *tool = new KadasMapToolEditAnnotationItem( canvas, controller, layer );
   tool->setMultipart( false );
   tool->setAction( mUi.mActionMilx );
+  // Picking another layer in the tool's chooser makes it the default the next
+  // time the MSS tool is opened.
+  connect( tool, &KadasMapToolEditAnnotationItem::targetLayerChanged, this, [this]( QgsAnnotationLayer *target ) { mLastMssLayer = target; } );
   tool->setItemFactory( [pickedDesc]() -> QgsAnnotationItem * {
     auto *item = new KadasMilxAnnotationItem();
     if ( !pickedDesc->symbolXml.isEmpty() )

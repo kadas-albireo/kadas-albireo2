@@ -92,6 +92,9 @@ void KadasGpxIntegration::toggleAnnotation( bool active, Variant variant )
   KadasMapToolEditAnnotationItem *tool = new KadasMapToolEditAnnotationItem( canvas, controller, layer );
   tool->setMultipart( false );
   tool->setAction( action );
+  // Keep the layer the user picks in the tool's chooser as the default for the
+  // next GPX item.
+  connect( tool, &KadasMapToolEditAnnotationItem::targetLayerChanged, this, [this]( QgsAnnotationLayer *target ) { mLastAnnotationLayer = target; } );
 
   kApp->mainWindow()->layerTreeView()->setCurrentLayer( layer );
   kApp->mainWindow()->layerTreeView()->setLayerVisible( layer, true );

@@ -46,6 +46,7 @@
 #include "kadas/gui/kadassidepanel.h"
 #include "kadas/gui/kadasfeaturepicker.h"
 #include "kadas/gui/kadasfloatinginputwidget.h"
+#include "kadas/gui/kadaslayerselectionwidget.h"
 #include "kadas/gui/kadasmapitemtooltip.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 
@@ -280,6 +281,8 @@ void KadasMapToolEditAnnotationItem::activate()
   connect( mStateHistory, &KadasStateHistory::canUndoChanged, mBottomBar, &KadasSidePanel::setCanUndo );
   connect( mStateHistory, &KadasStateHistory::canRedoChanged, mBottomBar, &KadasSidePanel::setCanRedo );
 
+  setupLayerSelection();
+
   if ( mExtraTopWidget )
   {
     mBottomBar->addRow( mExtraTopWidget );
@@ -315,9 +318,9 @@ void KadasMapToolEditAnnotationItem::activate()
       mHandles->update();
     }
   } );
-  connect( mLayer.data(), &QgsMapLayer::repaintRequested, this, &KadasMapToolEditAnnotationItem::refreshHandles );
+  connect( mLayer.data(), &QgsMapLayer::repaintRequested, this, &KadasMapToolEditAnnotationItem::refreshHandles, Qt::UniqueConnection );
 
-  if ( mStyleEditor || mExtraTopWidget )
+  if ( mStyleEditor || mExtraTopWidget || mLayerSelection )
   {
     mBottomBar->adjustSize();
     mBottomBar->show();
@@ -450,6 +453,7 @@ void KadasMapToolEditAnnotationItem::deactivate()
   delete mBottomBar;
   mBottomBar = nullptr;
   mStyleEditor = nullptr;
+  mLayerSelection = nullptr;
   if ( mHandles )
   {
     canvas()->scene()->removeItem( mHandles );
@@ -888,6 +892,88 @@ void KadasMapToolEditAnnotationItem::previewTooltipForEditedItem()
   }
   const QgsPointXY devicePos = canvas()->mapSettings().mapToPixel().transform( mapPos );
   mTooltipWidget->showForItem( mLayer, mItemId, QPoint( static_cast<int>( devicePos.x() ), static_cast<int>( devicePos.y() ) ) );
+}
+
+void KadasMapToolEditAnnotationItem::setupLayerSelection()
+{
+  if ( !mBottomBar || !mController )
+    return;
+
+  KadasAnnotationItemController *controller = mController;
+  auto filter = [controller]( QgsMapLayer *layer ) { return controller->supportsLayer( qobject_cast<QgsAnnotationLayer *>( layer ) ); };
+  auto creator = [controller]( const QString &name ) -> QgsMapLayer * { return KadasAnnotationLayerHelpers::createLayer( name, controller->preferredLayerCrs() ); };
+
+  // No legend view to hand over: kadas/gui has no handle on the main window.
+  // The widget falls back to the project's layer tree for what it needs.
+  mLayerSelection = new KadasLayerSelectionWidget( canvas(), nullptr, filter, creator );
+  // The side panel labels the row itself.
+  mLayerSelection->setLabel( QString() );
+
+  if ( !mAllowCreate )
+  {
+    // Editing an existing item: the layer it sits on is worth showing, but it
+    // is not a choice - moving an item between layers is not what this tool
+    // does, and the CRS it is stored in belongs to its layer.
+    mLayerSelection->setReadOnly( true );
+    mLayerSelection->setSelectedLayer( mLayer );
+  }
+  else
+  {
+    mLayerSelection->setSelectedLayer( mLayer );
+    // The layer the tool was handed may not be on offer (removed from the
+    // project, wrong CRS for this item type): follow what the chooser settled on.
+    if ( QgsAnnotationLayer *selected = qobject_cast<QgsAnnotationLayer *>( mLayerSelection->getSelectedLayer() ) )
+    {
+      setTargetLayer( selected );
+    }
+    connect( mLayerSelection, &KadasLayerSelectionWidget::selectedLayerChanged, this, [this]( QgsMapLayer *layer ) { setTargetLayer( qobject_cast<QgsAnnotationLayer *>( layer ) ); } );
+  }
+
+  mBottomBar->addRow( tr( "Layer" ), mLayerSelection );
+}
+
+void KadasMapToolEditAnnotationItem::setTargetLayer( QgsAnnotationLayer *layer )
+{
+  if ( !mAllowCreate || !layer || layer == mLayer )
+    return;
+
+  // An item that is not a finished annotation yet is dropped rather than moved:
+  // its coordinates are in the CRS of the layer it was started on, and it is by
+  // definition not something the user has committed to. Finished items stay on
+  // the layer they were drawn into.
+  if ( mItem && ( mDrawState != DrawState::Finished || ( mController && mController->isEmpty( mItem ) ) ) )
+  {
+    clearInProgressItem();
+  }
+  if ( mLayer )
+  {
+    disconnect( mLayer.data(), &QgsMapLayer::repaintRequested, this, &KadasMapToolEditAnnotationItem::refreshHandles );
+    mLayer->triggerRepaint();
+  }
+
+  mItem = nullptr;
+  mItemId.clear();
+  mLayer = layer;
+  connect( mLayer.data(), &QgsMapLayer::repaintRequested, this, &KadasMapToolEditAnnotationItem::refreshHandles, Qt::UniqueConnection );
+
+  // The recorded states belong to items on the previous layer, so replaying
+  // them onto the fresh item would resurrect them in the wrong place.
+  if ( mStateHistory )
+  {
+    mStateHistory->clear();
+  }
+
+  createInitialItem();
+  if ( mItem )
+  {
+    if ( mStateHistory )
+      mStateHistory->push( new ToolState( mItem->clone(), mDrawState ) );
+    if ( mStyleEditor )
+      mStyleEditor->loadFromItem( mItem );
+    emit cleared();
+  }
+  refreshHandles();
+  emit targetLayerChanged( mLayer );
 }
 
 void KadasMapToolEditAnnotationItem::setupStyleEditor()
