@@ -477,6 +477,12 @@ void KadasMapToolEditAnnotationItem::canvasPressEvent( QgsMapMouseEvent *e )
   if ( !mItem || !mController || !mLayer )
     return;
 
+  if ( mLayer->customProperty( QStringLiteral( "readOnly" ) ).toBool() )
+  {
+    emit messageEmitted( tr( "Error: %1" ).arg( tr( "Layer is read-only" ) ), Qgis::MessageLevel::Info );
+    return;
+  }
+
   if ( mPressedButton != Qt::NoButton )
     return;
   mPressedButton = e->button();
