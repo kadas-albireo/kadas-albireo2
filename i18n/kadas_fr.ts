@@ -1735,17 +1735,17 @@ Veuillez annuler ces tâches et réessayer.</translation>
 <context>
     <name>KadasGpxDropHandler</name>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="347"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="350"/>
         <source>GPX import completed</source>
         <translation>Import GPX terminé</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="351"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="354"/>
         <source>GPX import failed</source>
         <translation>L&apos;import GPX a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="351"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="354"/>
         <source>The following files could not be imported:
 %1</source>
         <translation>Les fichiers suivants n&apos;ont pas pu être importés :
@@ -1756,28 +1756,28 @@ Veuillez annuler ces tâches et réessayer.</translation>
 <context>
     <name>KadasGpxIntegration</name>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="104"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="107"/>
         <source>Import GPX</source>
         <translation>importer GPX</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="104"/>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="237"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="107"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="240"/>
         <source>GPX Files (*.gpx)</source>
         <translation>Fichiers GPX (*.gpx)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="123"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="126"/>
         <source>GPX import completed</source>
         <translation>Import GPX terminé</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="127"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="130"/>
         <source>GPX import failed</source>
         <translation>L&apos;import GPX a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="127"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="130"/>
         <source>The following files could not be imported:
 %1</source>
         <translation>Les fichiers suivants n&apos;ont pas pu être importés :
@@ -1785,38 +1785,38 @@ Veuillez annuler ces tâches et réessayer.</translation>
 </translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="143"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="146"/>
         <source>Failed to open the input file.</source>
         <translation>Impossible d&apos;ouvrir le fichier d&apos;entrée.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="150"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="153"/>
         <source>Failed to read input file.</source>
         <translation>Impossible de lire fichier d&apos;entrée.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="207"/>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="237"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="210"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="240"/>
         <source>Export to GPX</source>
         <translation>Exporter vers GPX</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="223"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="226"/>
         <source>Select layer to export:</source>
         <translation>Sélectionner la couche à exporter:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="251"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="254"/>
         <source>GPX export failed</source>
         <translation>L&apos;export GPX a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="251"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="254"/>
         <source>Cannot write to file</source>
         <translation>Impossible d&apos;enregistrer le fichier</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="312"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="315"/>
         <source>GPX export completed</source>
         <translation>Export GPX terminé</translation>
     </message>
@@ -2483,17 +2483,31 @@ Veuillez annuler ces tâches et réessayer.</translation>
 <context>
     <name>KadasLayerSelectionWidget</name>
     <message>
-        <location filename="../kadas/gui/kadaslayerselectionwidget.cpp" line="42"/>
+        <location filename="../kadas/gui/kadaslayerselectionwidget.cpp" line="45"/>
         <source>Layer:</source>
         <translation>Couche:</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/kadaslayerselectionwidget.cpp" line="155"/>
-        <source>Layer Name</source>
-        <translation>Nom de la couche</translation>
+        <location filename="../kadas/gui/kadaslayerselectionwidget.cpp" line="62"/>
+        <source>Add a new layer</source>
+        <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/kadaslayerselectionwidget.cpp" line="155"/>
+        <location filename="../kadas/gui/kadaslayerselectionwidget.cpp" line="263"/>
+        <source>Layer</source>
+        <translation>Couche</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/kadaslayerselectionwidget.cpp" line="286"/>
+        <source>New Layer</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <source>Layer Name</source>
+        <translation type="vanished">Nom de la couche</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/kadaslayerselectionwidget.cpp" line="286"/>
         <source>Enter name of new layer:</source>
         <translation>Nom pour la nouvelle couche:</translation>
     </message>
@@ -4048,67 +4062,67 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasLineStyleEditor</name>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="556"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="558"/>
         <source>Line width</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="557"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="559"/>
         <source>Width</source>
         <translation>Largeur</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="562"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="564"/>
         <source>Line color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="563"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="565"/>
         <source>Color</source>
         <translation>Couleur</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="567"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="569"/>
         <source>Line style</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="568"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="570"/>
         <source>Style</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="572"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="574"/>
         <source>Arrow</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="581"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="583"/>
         <source>Head style</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="583"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="585"/>
         <source>Head size</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="588"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="590"/>
         <source>Head</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="592"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="594"/>
         <source>Tail style</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="594"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="596"/>
         <source>Tail size</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="599"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="601"/>
         <source>Tail</source>
         <translation type="unfinished"/>
     </message>
@@ -4116,12 +4130,12 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasLineTextStyleEditor</name>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1136"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1138"/>
         <source>Distance of the text from the line</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1137"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1139"/>
         <source>Offset</source>
         <translation>Décalage</translation>
     </message>
@@ -4317,7 +4331,7 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1829"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1835"/>
         <source>Unable to download image (%1).</source>
         <translation>Impossible de télécharger l&apos;image (%1).</translation>
     </message>
@@ -4365,12 +4379,12 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation>La projection de la couche %1 ne peut pas être reconnue, les objets peuvent être placés incorrectement.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1779"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1785"/>
         <source>Select Image</source>
         <translation>Sélectionnez une image</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1819"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1825"/>
         <source>Downloading...</source>
         <translation>Chargement...</translation>
     </message>
@@ -4379,22 +4393,22 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
         <translation type="vanished">Impossible de télécharger l&apos;image</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1838"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1844"/>
         <source>Unable to save downloaded image</source>
         <translation>Impossible d&apos;enregistrer l&apos;image téléchargée</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="1928"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="1934"/>
         <source>Authenticated as:</source>
         <translation>Authentifié comme:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="2018"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="2024"/>
         <source>Font scaling setting changed</source>
         <translation>Configuration modifiée de l&apos;échelle des caractères</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasmainwindow.cpp" line="2018"/>
+        <location filename="../kadas/app/kadasmainwindow.cpp" line="2024"/>
         <source>The font scaling change will be applied at the next program launch.</source>
         <translation>La modification de l&apos;échelle des polices sera appliquée lors du prochain lancement du programme.</translation>
     </message>
@@ -4621,32 +4635,37 @@ Veuillez essayer une résolution ou une taille de papier inférieure.</translati
 <context>
     <name>KadasMapToolEditAnnotationItem</name>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptooleditannotationitem.cpp" line="273"/>
+        <location filename="../kadas/gui/maptools/kadasmaptooleditannotationitem.cpp" line="277"/>
         <source>Draw %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptooleditannotationitem.cpp" line="273"/>
+        <location filename="../kadas/gui/maptools/kadasmaptooleditannotationitem.cpp" line="277"/>
         <source>Edit %1</source>
         <translation>Éditer %1</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptooleditannotationitem.cpp" line="1106"/>
+        <location filename="../kadas/gui/maptools/kadasmaptooleditannotationitem.cpp" line="968"/>
+        <source>Layer</source>
+        <translation>Couche</translation>
+    </message>
+    <message>
+        <location filename="../kadas/gui/maptools/kadasmaptooleditannotationitem.cpp" line="1262"/>
         <source>Bring to Front</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptooleditannotationitem.cpp" line="1107"/>
+        <location filename="../kadas/gui/maptools/kadasmaptooleditannotationitem.cpp" line="1263"/>
         <source>Bring Forward</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptooleditannotationitem.cpp" line="1108"/>
+        <location filename="../kadas/gui/maptools/kadasmaptooleditannotationitem.cpp" line="1264"/>
         <source>Send Backward</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/maptools/kadasmaptooleditannotationitem.cpp" line="1109"/>
+        <location filename="../kadas/gui/maptools/kadasmaptooleditannotationitem.cpp" line="1265"/>
         <source>Send to Back</source>
         <translation type="unfinished"/>
     </message>
@@ -5122,62 +5141,62 @@ Radius: %2</source>
 <context>
     <name>KadasMarkerStyleEditor</name>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="233"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="235"/>
         <source>Marker shape</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="234"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="236"/>
         <source>Shape</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="239"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="241"/>
         <source>Marker size</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="240"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="242"/>
         <source>Size</source>
         <translation>Taille</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="243"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="245"/>
         <source>Rotation, in degrees clockwise</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="244"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="246"/>
         <source>Rotation</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="250"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="252"/>
         <source>Outline width</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="255"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="257"/>
         <source>Fill color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="256"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="258"/>
         <source>Fill</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="261"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="263"/>
         <source>Outline color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="265"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="267"/>
         <source>Outline style</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="272"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="274"/>
         <source>Outline</source>
         <translation type="unfinished"/>
     </message>
@@ -5357,17 +5376,17 @@ Radius: %2</source>
 <context>
     <name>KadasMilxDropHandler</name>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="807"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="838"/>
         <source>MilX import completed</source>
         <translation>Import MilX terminé</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="811"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="842"/>
         <source>MilX import failed</source>
         <translation>L&apos;import MilX a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="811"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="842"/>
         <source>The following files could not be imported:
 %1</source>
         <translation>Les fichiers suivants n&apos;ont pas pu être importés :
@@ -5421,32 +5440,32 @@ Radius: %2</source>
 <context>
     <name>KadasMilxIntegration</name>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="74"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="77"/>
         <source>MSS license expired</source>
         <translation>La licence MSS a expiré</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="74"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="77"/>
         <source>The MSS license has expired. Please download a fresh copy of KADAS.</source>
         <translation>La licence MSS a expiré. Veuillez télécharger une nouvelle copie de KADAS.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="78"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="81"/>
         <source>MSS license about to expire</source>
         <translation>La licence MSS va expirer</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="78"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="81"/>
         <source>The MSS license will expire on %1. Please download a fresh copy of KADAS.</source>
         <translation>La licence MSS expirera le %1. Veuillez télécharger une nouvelle copie de KADAS.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="106"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="109"/>
         <source>International</source>
         <translation>International</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="107"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="110"/>
         <source>CH</source>
         <translation>CH</translation>
     </message>
@@ -5455,165 +5474,165 @@ Radius: %2</source>
         <translation type="vanished">Ne pas ajouter</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="181"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="196"/>
         <source>Select symbol...</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="182"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="197"/>
         <source>Select MSS symbol</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="347"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="378"/>
         <source>Compressed MilX Layer (*.milxlyz)</source>
         <translation>Couche MilX comprimé (*.milxlyz)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="348"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="379"/>
         <source>MilX Layer (*.milxly)</source>
         <translation>Couche MilX (*.milxly)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="353"/>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="500"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="384"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="531"/>
         <source>Select Output</source>
         <translation>Sélectionner le fichier de sortie</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="391"/>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="473"/>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="476"/>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="583"/>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="586"/>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="593"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="422"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="504"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="507"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="614"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="617"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="624"/>
         <source>Export Failed</source>
         <translation>L&apos;export a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="391"/>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="593"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="422"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="624"/>
         <source>Failed to open the output file for writing.</source>
         <translation>Impossible d&apos;ouvrir le fichier de sortie pour l&apos;écriture.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="459"/>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="577"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="490"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="608"/>
         <source>MilX export failed</source>
         <translation>L&apos;export MilX a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="459"/>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="577"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="490"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="608"/>
         <source>Failed to write output.</source>
         <translation>Impossible d&apos;écrire la sortie.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="465"/>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="599"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="496"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="630"/>
         <source>MilX export completed</source>
         <translation>Export MilX terminé</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="468"/>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="602"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="499"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="633"/>
         <source>Export Messages</source>
         <translation>Messages d&apos;exportation</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="468"/>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="602"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="499"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="633"/>
         <source>The following messages were emitted while exporting:</source>
         <translation>Les messages suivants ont été émis lors de l&apos;exportation:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="476"/>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="586"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="507"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="617"/>
         <source>The export failed:</source>
         <translation>L&apos;export a échoué:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="500"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="531"/>
         <source>Compressed KML Layer (*.kmz)</source>
         <translation>Couche KML compressée (*.kmz)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="609"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="640"/>
         <source>MilX Layer Files (*.milxly *.milxlyz)</source>
         <translation>Fichiers de couche MilX (*.milxly *.milxlyz)</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="610"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="641"/>
         <source>Select Milx Layer File</source>
         <translation>Sélectionner fichier de couche MilX</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="620"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="651"/>
         <source>MilX import failed</source>
         <translation>L&apos;import MilX a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="624"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="655"/>
         <source>MilX import completed</source>
         <translation>Import MilX terminé</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="642"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="673"/>
         <source>Failed to open the input file.</source>
         <translation>Impossible d&apos;ouvrir le fichier d&apos;entrée.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="652"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="683"/>
         <source>Failed to read input file.</source>
         <translation>Impossible de lire fichier d&apos;entrée.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="659"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="690"/>
         <source>Import Failed</source>
         <translation>L&apos;import a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="659"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="690"/>
         <source>The import failed:</source>
         <translation>L&apos;import a échoué:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="661"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="692"/>
         <source>MilX upgrade failed</source>
         <translation>Mise à jour MilX a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="670"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="701"/>
         <source>The file could not be parsed.</source>
         <translation>Le fichier n&apos;a pu être analysée.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="682"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="713"/>
         <source>Unexpected MSS library version tag.</source>
         <translation>Version tag de bibliothèque MSS inattendu.</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="721"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="752"/>
         <source>Import cartouche</source>
         <translation>Importer cartouche</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="724"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="755"/>
         <source>Import cartouche from MilX layer:</source>
         <translation>Importer le cartouche depuis la couche MilX:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="726"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="757"/>
         <source>Don&apos;t import</source>
         <translation>Ne pas importer</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="749"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="780"/>
         <source>Import Messages</source>
         <translation>Messages d&apos;importation</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="749"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="780"/>
         <source>The following messages were emitted while importing:</source>
         <translation>Les messages suivants ont été émis lors de l&apos;importation:</translation>
     </message>
@@ -5700,19 +5719,27 @@ Radius: %2</source>
 <context>
     <name>KadasMilxLibrary</name>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxlibrary.cpp" line="97"/>
+        <location filename="../kadas/gui/milx/kadasmilxlibrary.cpp" line="98"/>
         <source>Filter...</source>
         <translation>Filtre...</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxlibrary.cpp" line="111"/>
+        <location filename="../kadas/gui/milx/kadasmilxlibrary.cpp" line="112"/>
         <source>Loading...</source>
         <translation>Chargement...</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/milx/kadasmilxlibrary.cpp" line="281"/>
+        <location filename="../kadas/gui/milx/kadasmilxlibrary.cpp" line="312"/>
         <source>More Symbols...</source>
         <translation>Plusieurs symboles...</translation>
+    </message>
+</context>
+<context>
+    <name>KadasMilxStyleEditor</name>
+    <message>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1468"/>
+        <source>Symbol editor...</source>
+        <translation>Editeur de symbole...</translation>
     </message>
 </context>
 <context>
@@ -5812,150 +5839,150 @@ Radius: %2</source>
 <context>
     <name>KadasPictureStyleEditor</name>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1189"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1191"/>
         <source>Change image…</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1190"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1192"/>
         <source>Pick a new picture from a file or fetch one from a URL.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1195"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1197"/>
         <source>From file…</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1196"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1198"/>
         <source>From URL…</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1198"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1200"/>
         <source>Image</source>
         <translation>Image</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1202"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1204"/>
         <source>Picture width</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1205"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1207"/>
         <source>Picture height</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1208"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1210"/>
         <source>Lock ratio</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1209"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1211"/>
         <source>Preserve the picture&apos;s aspect ratio when resizing.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1218"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1220"/>
         <source>Size</source>
         <translation>Taille</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1221"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1223"/>
         <source>Rotation, in degrees clockwise</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1222"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1224"/>
         <source>Rotation</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1225"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1227"/>
         <source>Show callout</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1226"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1228"/>
         <source>Display the picture inside a balloon shape pointing at its anchor.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1231"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1233"/>
         <source>Balloon fill color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1236"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1238"/>
         <source>Balloon outline color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1243"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1245"/>
         <source>Balloon outline width</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1250"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1252"/>
         <source>Width of the balloon wedge base</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1252"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1254"/>
         <source>Callout</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1256"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1258"/>
         <source>Fill</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1261"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1263"/>
         <source>Outline</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1262"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1264"/>
         <source>Wedge</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1267"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1269"/>
         <source>Select picture</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1267"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1269"/>
         <source>Images (*.png *.jpg *.jpeg *.bmp *.gif *.tif *.tiff *.svg)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1275"/>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1281"/>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1288"/>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1299"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1277"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1283"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1290"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1301"/>
         <source>Picture URL</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1275"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1277"/>
         <source>Enter the URL of an image:</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1281"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1283"/>
         <source>Please enter a valid http:// or https:// URL.</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1288"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1290"/>
         <source>Failed to download image: %1</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1299"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1301"/>
         <source>Failed to write image to project archive.</source>
         <translation type="unfinished"/>
     </message>
@@ -5983,62 +6010,62 @@ Radius: %2</source>
 <context>
     <name>KadasPinStyleEditor</name>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="359"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="361"/>
         <source>Pin title</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="360"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="362"/>
         <source>Title</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="372"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="374"/>
         <source>No description — click to edit</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="373"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="375"/>
         <source>Click to edit the description</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="382"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="384"/>
         <source>Description</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="386"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="388"/>
         <source>Pin size</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="387"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="389"/>
         <source>Size</source>
         <translation>Taille</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="390"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="392"/>
         <source>Rotation, in degrees clockwise</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="391"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="393"/>
         <source>Rotation</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="395"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="397"/>
         <source>Pin color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="396"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="398"/>
         <source>Color</source>
         <translation>Couleur</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="407"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="409"/>
         <source>Pin description</source>
         <translation type="unfinished"/>
     </message>
@@ -6259,57 +6286,57 @@ Radius: %2</source>
 <context>
     <name>KadasPointTextStyleEditor</name>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1011"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1013"/>
         <source>Left</source>
         <translation>Gauche</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1012"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1014"/>
         <source>Align left</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1015"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1017"/>
         <source>Center</source>
         <translation>Centre</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1016"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1018"/>
         <source>Align center</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1019"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1021"/>
         <source>Right</source>
         <translation>Droite</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1020"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1022"/>
         <source>Align right</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1034"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1036"/>
         <source>Alignment</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1037"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1039"/>
         <source>Rotation, in degrees clockwise</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1038"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1040"/>
         <source>Rotation</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1046"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1048"/>
         <source>Background fill color (none to disable)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1047"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="1049"/>
         <source>Background</source>
         <translation type="unfinished"/>
     </message>
@@ -6332,37 +6359,37 @@ Radius: %2</source>
 <context>
     <name>KadasPolygonStyleEditor</name>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="711"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="713"/>
         <source>Outline width</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="716"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="718"/>
         <source>Fill color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="721"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="723"/>
         <source>Outline color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="725"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="727"/>
         <source>Outline style</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="729"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="731"/>
         <source>Fill style</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="735"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="737"/>
         <source>Fill</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="742"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="744"/>
         <source>Outline</source>
         <translation type="unfinished"/>
     </message>
@@ -6435,12 +6462,12 @@ Cette fenêtre se fermera automatiquement une fois l’authentification terminé
 <context>
     <name>KadasRectangleStyleEditor</name>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="798"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="800"/>
         <source>Rotation, in degrees clockwise</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="799"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="801"/>
         <source>Rotation</source>
         <translation type="unfinished"/>
     </message>
@@ -6812,32 +6839,32 @@ Cette fenêtre se fermera automatiquement une fois l’authentification terminé
 <context>
     <name>KadasSvgMarkerStyleEditor</name>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="491"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="493"/>
         <source>Marker size</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="492"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="494"/>
         <source>Size</source>
         <translation>Taille</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="495"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="497"/>
         <source>Rotation, in degrees clockwise</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="496"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="498"/>
         <source>Rotation</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="500"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="502"/>
         <source>Fill color (SVGs with a fill parameter)</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="501"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="503"/>
         <source>Color</source>
         <translation>Couleur</translation>
     </message>
@@ -6900,97 +6927,97 @@ Cette fenêtre se fermera automatiquement une fois l’authentification terminé
 <context>
     <name>KadasTextStyleEditorBase</name>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="830"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="832"/>
         <source>Enter text</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="833"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="835"/>
         <source>Text</source>
         <translation>Texte</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="839"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="841"/>
         <source>Font family</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="850"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="852"/>
         <source>Font size</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="856"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="858"/>
         <source>Font</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="872"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="874"/>
         <source>B</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="872"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="874"/>
         <source>Bold</source>
         <translation>En gras</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="873"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="875"/>
         <source>I</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="873"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="875"/>
         <source>Italic</source>
         <translation>Italique</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="874"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="876"/>
         <source>U</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="874"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="876"/>
         <source>Underline</source>
         <translation>Souligner</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="875"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="877"/>
         <source>S</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="875"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="877"/>
         <source>Strikethrough</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="885"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="887"/>
         <source>Style</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="892"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="894"/>
         <source>Text color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="893"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="895"/>
         <source>Color</source>
         <translation>Couleur</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="901"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="903"/>
         <source>Buffer (halo) color</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="908"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="910"/>
         <source>Buffer (halo) width</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="914"/>
+        <location filename="../kadas/gui/annotationitems/kadasannotationstyleeditor.cpp" line="916"/>
         <source>Buffer</source>
         <translation type="unfinished"/>
     </message>
@@ -8219,7 +8246,7 @@ avec géoloc.</translation>
         <translation>Impossible de lire les valeurs de pixel</translation>
     </message>
     <message>
-        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="233"/>
+        <location filename="../kadas/app/milx/kadasmilxintegration.cpp" line="238"/>
         <source>Select symbol...</source>
         <translation type="unfinished"/>
     </message>
@@ -8296,7 +8323,7 @@ avec géoloc.</translation>
     </message>
     <message>
         <location filename="../kadas/gui/annotationitems/kadasannotationitemcontrollers.cpp" line="87"/>
-        <location filename="../kadas/gui/annotationitems/kadasmilxannotationcontroller.cpp" line="72"/>
+        <location filename="../kadas/gui/annotationitems/kadasmilxannotationcontroller.cpp" line="74"/>
         <source>MilX Symbol</source>
         <translation type="unfinished"/>
     </message>
@@ -8352,38 +8379,44 @@ avec géoloc.</translation>
     </message>
     <message>
         <location filename="../kadas/gui/annotationitems/kadasmarkerannotationcontroller.cpp" line="311"/>
+        <location filename="../kadas/gui/annotationitems/kadasmilxannotationcontroller.cpp" line="797"/>
         <location filename="../kadas/gui/annotationitems/kadaspictureannotationcontroller.cpp" line="793"/>
         <location filename="../kadas/gui/annotationitems/kadaspointtextannotationcontroller.cpp" line="217"/>
         <source>Reset rotation</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasmilxannotationcontroller.cpp" line="591"/>
+        <location filename="../kadas/gui/annotationitems/kadasmilxannotationcontroller.cpp" line="395"/>
+        <source>Angle</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/gui/annotationitems/kadasmilxannotationcontroller.cpp" line="756"/>
         <source>Symbol editor...</source>
         <translation>Editeur de symbole...</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasmilxannotationcontroller.cpp" line="608"/>
+        <location filename="../kadas/gui/annotationitems/kadasmilxannotationcontroller.cpp" line="773"/>
         <source>Delete node</source>
         <translation>Effacer le noeud</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasmilxannotationcontroller.cpp" line="619"/>
+        <location filename="../kadas/gui/annotationitems/kadasmilxannotationcontroller.cpp" line="784"/>
         <source>Add node</source>
         <translation>Ajouter noeud</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasmilxannotationcontroller.cpp" line="629"/>
+        <location filename="../kadas/gui/annotationitems/kadasmilxannotationcontroller.cpp" line="794"/>
         <source>Reset offset</source>
         <translation>Supprimer offset</translation>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasmilxannotationitem.cpp" line="417"/>
+        <location filename="../kadas/gui/annotationitems/kadasmilxannotationitem.cpp" line="506"/>
         <source>No target annotation layer</source>
         <translation type="unfinished"/>
     </message>
     <message>
-        <location filename="../kadas/gui/annotationitems/kadasmilxannotationitem.cpp" line="429"/>
+        <location filename="../kadas/gui/annotationitems/kadasmilxannotationitem.cpp" line="518"/>
         <source>The file is corrupt</source>
         <translation>Le fichier est corrompu</translation>
     </message>
