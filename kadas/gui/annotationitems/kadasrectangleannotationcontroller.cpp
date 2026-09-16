@@ -154,12 +154,19 @@ QgsPointXY KadasRectangleAnnotationController::positionFromDrawAttribs( const Qg
 KadasEditContext KadasRectangleAnnotationController::getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const
 {
   const KadasRectangleAnnotationItem *rect = asRect( item );
+  // Any hover hit-test means no resize drag is in progress; the anchor is
+  // captured afresh when a corner is grabbed (a drag never calls getEditContext).
+  mResizeAnchorValid = false;
   const auto cs = rect->corners();
   for ( int i = 0; i < cs.size(); ++i )
   {
     const QgsPointXY mp = toMapPos( cs[i], ctx );
     if ( pos.sqrDist( mp ) < pickTolSqr( ctx ) )
+    {
+      mResizeAnchor = toMapPos( cs[( i + 2 ) % 4], ctx );
+      mResizeAnchorValid = true;
       return KadasEditContext( QgsVertexId( 0, 0, i ), mp, drawAttribs() );
+    }
   }
   const QgsPointXY rotMap = toMapPos( rect->rotationHandle(), ctx );
   if ( pos.sqrDist( rotMap ) < rotationPickTolSqr( ctx ) )
@@ -217,8 +224,11 @@ void KadasRectangleAnnotationController::edit( QgsAnnotationItem *item, const Ka
 
   if ( v >= 0 && v < 4 )
   {
-    const auto cs = rect->corners();
-    const QgsPointXY anchorMap = toMapPos( cs[( v + 2 ) % 4], ctx );
+    // The opposite corner stays put for the whole drag. Re-deriving it from the
+    // current corners on every step would follow the item's own corner ordering,
+    // which swaps as soon as the cursor crosses the anchor, so past that point
+    // the rectangle would chase the cursor instead of mirroring about the anchor.
+    const QgsPointXY anchorMap = mResizeAnchorValid ? mResizeAnchor : toMapPos( rect->corners()[( v + 2 ) % 4], ctx );
 
     const double a = rect->angle() * M_PI / 180.0;
     const double cosA = std::cos( a );

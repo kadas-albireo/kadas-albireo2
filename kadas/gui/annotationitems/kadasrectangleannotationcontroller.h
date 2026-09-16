@@ -87,6 +87,10 @@ class KADAS_GUI_EXPORT KadasRectangleAnnotationController : public KadasAnnotati
 
     QgsPointXY mDrawAnchor;
     bool mDrawAnchorValid = false;
+
+    //! Opposite corner (map CRS) captured when a corner handle is grabbed; a resize drag pivots around it.
+    mutable QgsPointXY mResizeAnchor;
+    mutable bool mResizeAnchorValid = false;
 };
 
 #endif // KADASRECTANGLEANNOTATIONCONTROLLER_H

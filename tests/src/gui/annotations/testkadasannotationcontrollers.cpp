@@ -105,6 +105,7 @@ class TestKadasAnnotationControllers : public QObject
     void rectangle_nodes_returnFourCornersPlusRotation();
     void rectangle_getEditContext_rotatedQuadHitTest();
     void rectangle_edit_movesCorrectCorner();
+    void rectangle_edit_cornerDraggedPastOppositeKeepsAnchor();
 
     // KadasCircleAnnotationController ------------------------------------
     void circle_nodes_returnsCenterAndRing();
@@ -441,6 +442,40 @@ void TestKadasAnnotationControllers::rectangle_edit_movesCorrectCorner()
   QCOMPARE( rect->size().height(), 100.0 );
   QCOMPARE( rect->center().x(), 75.0 );
   QCOMPARE( rect->center().y(), 0.0 );
+}
+
+
+void TestKadasAnnotationControllers::rectangle_edit_cornerDraggedPastOppositeKeepsAnchor()
+{
+  KadasRectangleAnnotationController controller;
+  const auto ctx = makeContext();
+  std::unique_ptr<QgsAnnotationItem> item( controller.createItem() );
+  auto *rect = static_cast<KadasRectangleAnnotationItem *>( item.get() );
+  rect->setBox( QgsPointXY( 0, 0 ), QSizeF( 100, 100 ), 0.0 );
+
+  // Grab the BR corner (50, -50) the way the map tool does; the anchor is the
+  // opposite TL corner (-50, 50) and must stay put for the whole drag.
+  const KadasEditContext ec = controller.getEditContext( item.get(), QgsPointXY( 50, -50 ), ctx );
+  QCOMPARE( ec.vidx.vertex, 1 );
+
+  // Still on the near side of the anchor.
+  controller.edit( item.get(), ec, QgsPointXY( -20, 20 ), ctx );
+  QCOMPARE( rect->center(), QgsPointXY( -35, 35 ) );
+  QCOMPARE( rect->size(), QSizeF( 30, 30 ) );
+
+  // Past the anchor in both axes: the box mirrors about the TL corner, which
+  // makes the dragged corner swap places with the anchor in the item's own
+  // corner ordering.
+  controller.edit( item.get(), ec, QgsPointXY( -100, 100 ), ctx );
+  QCOMPARE( rect->center(), QgsPointXY( -75, 75 ) );
+  QCOMPARE( rect->size(), QSizeF( 50, 50 ) );
+
+  // Regression: the next step must keep pivoting around (-50, 50) rather than
+  // around whatever corner now carries index 3, which would drag the whole
+  // rectangle along with the cursor.
+  controller.edit( item.get(), ec, QgsPointXY( -150, 150 ), ctx );
+  QCOMPARE( rect->center(), QgsPointXY( -100, 100 ) );
+  QCOMPARE( rect->size(), QSizeF( 100, 100 ) );
 }
 
 
