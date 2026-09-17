@@ -393,7 +393,7 @@ KadasPinStyleEditor::KadasPinStyleEditor( QWidget *parent )
   form->addRow( tr( "Rotation" ), mRotationSpin );
 
   mFillColorBtn = new QgsColorButton();
-  mFillColorBtn->setAllowOpacity( true );
+  mFillColorBtn->setAllowOpacity( false );
   mFillColorBtn->setToolTip( tr( "Pin color" ) );
   form->addRow( tr( "Color" ), mFillColorBtn );
 
@@ -451,7 +451,9 @@ void KadasPinStyleEditor::loadFromItem( const QgsAnnotationItem *item )
   const QSignalBlocker b1( mSizeSpin ), b2( mFillColorBtn ), b3( mRotationSpin );
   mSizeSpin->setValue( static_cast<int>( std::round( sl->size() ) ) );
   mRotationSpin->setValue( normalizedAngle( marker->symbol()->angle() ) );
-  mFillColorBtn->setColor( sl->fillColor() );
+  QColor fill = sl->fillColor();
+  fill.setAlpha( 255 );
+  mFillColorBtn->setColor( fill );
 }
 
 void KadasPinStyleEditor::applyToItem( QgsAnnotationItem *item ) const
