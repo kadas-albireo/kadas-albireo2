@@ -65,6 +65,8 @@ Controller for stock \c :py:class:`QgsAnnotationLineItem` (type id \c
 
     virtual QgsPointXY positionFromEditAttribs( const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const;
 
+    virtual void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx );
+
 
     virtual QgsPointXY position( const QgsAnnotationItem *item ) const;
 

@@ -14,6 +14,9 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QAction>
+#include <QIcon>
+#include <QMenu>
 #include <QObject>
 #include <QPainter>
 #include <QTextStream>
@@ -36,6 +39,7 @@
 #include <qgis/qgssettingsentryimpl.h>
 
 #include "kadas/gui/annotationitems/kadasannotationrotation.h"
+#include "kadas/gui/annotationitems/kadasannotationvertexedit.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadaslineannotationcontroller.h"
@@ -167,7 +171,44 @@ QList<KadasNode> KadasLineAnnotationController::nodes( const QgsAnnotationItem *
     }
     result.append( { handle, KadasAnnotationRotation::renderHandle } );
   }
+  // Midpoint handles: the only way to grow a line once it is finished, since
+  // digitizing cannot be resumed. Left out while digitizing, where the trailing
+  // rubber-band segment would sprout one that chases the cursor.
+  if ( !ctx.digitizing() )
+  {
+    const int segments = segmentCount( curve );
+    for ( int i = 0; i < segments; ++i )
+      result.append( { segmentMidpointMap( curve, i, ctx ), KadasAnnotationVertexEdit::renderHandle } );
+  }
   return result;
+}
+
+int KadasLineAnnotationController::segmentCount( const QgsCurve *curve )
+{
+  const int n = curve ? curve->numPoints() : 0;
+  return n >= 2 ? n - 1 : 0;
+}
+
+QgsPointXY KadasLineAnnotationController::segmentMidpointMap( const QgsCurve *curve, int segment, const KadasAnnotationItemContext &ctx )
+{
+  if ( segment < 0 || segment >= segmentCount( curve ) )
+    return QgsPointXY();
+  const QgsPoint a = curve->vertexAt( QgsVertexId( 0, 0, segment ) );
+  const QgsPoint b = curve->vertexAt( QgsVertexId( 0, 0, segment + 1 ) );
+  const QgsPointXY am = toMapPos( QgsPointXY( a.x(), a.y() ), ctx );
+  const QgsPointXY bm = toMapPos( QgsPointXY( b.x(), b.y() ), ctx );
+  return QgsPointXY( 0.5 * ( am.x() + bm.x() ), 0.5 * ( am.y() + bm.y() ) );
+}
+
+void KadasLineAnnotationController::deleteVertex( QgsAnnotationItem *item, int vertex )
+{
+  QgsLineString *ls = takeMutableLine( asLine( item ) );
+  if ( !ls || vertex < 0 || vertex >= ls->numPoints() )
+    return;
+  // Two vertices are the least a line can carry; below that it stops being one.
+  if ( ls->numPoints() <= 2 )
+    return;
+  ls->deleteVertex( QgsVertexId( 0, 0, vertex ) );
 }
 
 bool KadasLineAnnotationController::startPart( QgsAnnotationItem *item, const QgsPointXY &firstPoint, const KadasAnnotationItemContext &ctx )
@@ -249,9 +290,11 @@ KadasEditContext KadasLineAnnotationController::getEditContext( const QgsAnnotat
   const QgsCurve *curve = asLine( item )->geometry();
   if ( !curve )
     return KadasEditContext();
-  // Any hover hit-test means we are no longer mid-rotation; draw the handle at
-  // rest again (a drag never calls getEditContext, it goes straight to edit()).
+  // Any hover hit-test means we are no longer mid-rotation or mid-insert; draw
+  // the rotation handle at rest again and drop any armed insert (a drag never
+  // calls getEditContext, it goes straight to edit()).
   mRotation.deactivate();
+  mInsert.disarm();
   const int n = curve->numPoints();
   for ( int i = 0; i < n; ++i )
   {
@@ -260,6 +303,23 @@ KadasEditContext KadasLineAnnotationController::getEditContext( const QgsAnnotat
     if ( pos.sqrDist( mp ) < pickTolSqr( ctx ) )
     {
       return KadasEditContext( QgsVertexId( 0, 0, i ), mp, drawAttribs() );
+    }
+  }
+  // Midpoint handles, offered by nodes() under the same condition. Tested
+  // before the segment hit below, which covers the same stretch of line.
+  if ( !ctx.digitizing() )
+  {
+    const int segments = segmentCount( curve );
+    for ( int i = 0; i < segments; ++i )
+    {
+      const QgsPointXY mid = segmentMidpointMap( curve, i, ctx );
+      if ( pos.sqrDist( mid ) < pickTolSqr( ctx ) )
+      {
+        mInsert.arm( i );
+        KadasEditContext ec( QgsVertexId( KadasAnnotationVertexEdit::kPartInsert, 0, i ), mid, drawAttribs() );
+        ec.appliesOnClick = true;
+        return ec;
+      }
     }
   }
   // Rotation handle: snapshot the line (map coords) and pivot for a drift-free drag.
@@ -332,7 +392,25 @@ void KadasLineAnnotationController::edit( QgsAnnotationItem *item, const KadasEd
   }
   QgsLineString *ls = takeMutableLine( line );
   const int n = ls->numPoints();
-  if ( editContext.vidx.vertex >= 0 && editContext.vidx.vertex < n )
+  if ( editContext.vidx.part == KadasAnnotationVertexEdit::kPartInsert )
+  {
+    // A hover armed the segment; the first step of the drag turns the midpoint
+    // handle into a real vertex, every later step only moves that vertex.
+    if ( mInsert.segment() != editContext.vidx.vertex )
+      mInsert.arm( editContext.vidx.vertex );
+    const int segment = mInsert.segment();
+    const QgsPointXY ip = toItemPos( newPoint, ctx );
+    if ( mInsert.takePending() )
+    {
+      if ( segment >= 0 && segment + 1 <= n )
+        ls->insertVertex( QgsVertexId( 0, 0, segment + 1 ), QgsPoint( ip.x(), ip.y() ) );
+    }
+    else if ( segment >= 0 && segment + 1 < n )
+    {
+      ls->moveVertex( QgsVertexId( 0, 0, segment + 1 ), QgsPoint( ip.x(), ip.y() ) );
+    }
+  }
+  else if ( editContext.vidx.vertex >= 0 && editContext.vidx.vertex < n )
   {
     const QgsPointXY ip = toItemPos( newPoint, ctx );
     ls->moveVertex( QgsVertexId( 0, 0, editContext.vidx.vertex ), QgsPoint( ip.x(), ip.y() ) );
@@ -396,6 +474,21 @@ QgsPointXY KadasLineAnnotationController::positionFromEditAttribs(
     return mRotation.handleForAngle( values[AttrAngle], off );
   }
   return positionFromDrawAttribs( item, values, ctx );
+}
+
+void KadasLineAnnotationController::populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &, const KadasAnnotationItemContext & )
+{
+  // Only a right-click on a real vertex offers to remove one; a midpoint handle
+  // (part kPartInsert) is there to add, and adds nothing to remove.
+  if ( editContext.vidx.part != 0 || editContext.vidx.vertex < 0 )
+    return;
+  const QgsCurve *curve = asLine( item )->geometry();
+  if ( !curve )
+    return;
+  const int n = curve->numPoints();
+  const int vertex = editContext.vidx.vertex;
+  QAction *action = menu->addAction( QIcon( QStringLiteral( ":/kadas/icons/delete_node" ) ), QObject::tr( "Delete node" ), [item, vertex]() { deleteVertex( item, vertex ); } );
+  action->setEnabled( vertex < n && n > 2 );
 }
 
 QgsPointXY KadasLineAnnotationController::position( const QgsAnnotationItem *item ) const

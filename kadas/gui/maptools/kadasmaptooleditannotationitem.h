@@ -136,6 +136,8 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     KadasMapItemTooltip *mTooltipWidget = nullptr;
     QgsVector mMoveOffset;
     Qt::MouseButton mPressedButton = Qt::NoButton;
+    //! TRUE once the pointer has moved while the button is held, i.e. the press turned into a drag.
+    bool mDragMoved = false;
     bool mEditItemHidden = false;
 
     KadasSidePanel *mBottomBar = nullptr;

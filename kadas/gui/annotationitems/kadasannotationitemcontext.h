@@ -50,10 +50,15 @@ class KADAS_GUI_EXPORT KadasAnnotationItemContext
     Qt::KeyboardModifiers modifiers() const { return mModifiers; }
     void setModifiers( Qt::KeyboardModifiers modifiers ) { mModifiers = modifiers; }
 
+    //! TRUE while the item is still being digitized. Handles that only make sense on a finished shape (midpoint insert handles) are left out then, so the trailing rubber-band segment does not sprout one that chases the cursor.
+    bool digitizing() const { return mDigitizing; }
+    void setDigitizing( bool digitizing ) { mDigitizing = digitizing; }
+
   private:
     QgsAnnotationLayer *mLayer = nullptr;
     QgsMapSettings mMapSettings;
     Qt::KeyboardModifiers mModifiers = Qt::NoModifier;
+    bool mDigitizing = false;
 };
 
 #endif // KADASANNOTATIONITEMCONTEXT_H

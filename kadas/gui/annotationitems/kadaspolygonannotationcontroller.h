@@ -21,8 +21,11 @@
 
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationrotation.h"
+#include "kadas/gui/annotationitems/kadasannotationvertexedit.h"
 
+class QgsCurve;
 class QgsCurvePolygon;
+class QMenu;
 
 /**
  * \ingroup gui
@@ -55,6 +58,7 @@ class KADAS_GUI_EXPORT KadasPolygonAnnotationController : public KadasAnnotation
     void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) override;
     KadasAttribValues editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const override;
     QgsPointXY positionFromEditAttribs( const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const override;
+    void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx ) override;
 
     QgsPointXY position( const QgsAnnotationItem *item ) const override;
     void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos ) override;
@@ -93,6 +97,21 @@ class KADAS_GUI_EXPORT KadasPolygonAnnotationController : public KadasAnnotation
     // Rest position of the rotation handle: due north of the centroid but lifted
     // clear of the polygon's northmost extent so it never overlaps the shape.
     QgsPointXY restHandleMap( const QgsCurvePolygon *poly, const KadasAnnotationItemContext &ctx ) const;
+
+    // Per-drag midpoint-handle state, armed when such a handle is grabbed.
+    mutable KadasAnnotationVertexEdit::VertexInsertState mInsert;
+
+    //! Number of vertices the ring carries once its closing duplicate is discounted.
+    static int distinctVertexCount( const QgsCurve *ring );
+
+    //! Number of segments that carry a midpoint handle, the closing one included; 1 for a two-vertex ring, whose two segments coincide.
+    static int segmentCount( const QgsCurve *ring );
+
+    //! Midpoint (map CRS) of the segment starting at vertex \a segment, or an invalid point when the segment does not exist.
+    static QgsPointXY segmentMidpointMap( const QgsCurve *ring, int segment, const KadasAnnotationItemContext &ctx );
+
+    //! Removes vertex \a vertex, re-closing the ring; a no-op when it would leave fewer than three vertices behind.
+    static void deleteVertex( QgsAnnotationItem *item, int vertex );
 };
 
 #endif // KADASPOLYGONANNOTATIONCONTROLLER_H

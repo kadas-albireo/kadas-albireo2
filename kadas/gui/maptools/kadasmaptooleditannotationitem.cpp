@@ -298,6 +298,7 @@ void KadasMapToolEditAnnotationItem::activate()
       if ( !mItem || !mController || !mLayer )
         return {};
       KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
+      ctx.setDigitizing( mDrawState == DrawState::InProgress );
       return mController->nodes( mItem, ctx );
     },
     [this]() -> QList<KadasAnnotationMeasurementLabel> {
@@ -480,6 +481,7 @@ void KadasMapToolEditAnnotationItem::canvasPressEvent( QgsMapMouseEvent *e )
   if ( mPressedButton != Qt::NoButton )
     return;
   mPressedButton = e->button();
+  mDragMoved = false;
 
   if ( e->button() == Qt::RightButton )
   {
@@ -612,6 +614,7 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
   {
     if ( mEditContext.isValid() )
     {
+      mDragMoved = true;
       const QgsPointXY adjusted( pos.x() - mMoveOffset.x(), pos.y() - mMoveOffset.y() );
       mController->edit( mItem, mEditContext, adjusted, ctx );
       if ( mController->liveRepaintOnEdit() )
@@ -681,6 +684,14 @@ void KadasMapToolEditAnnotationItem::canvasReleaseEvent( QgsMapMouseEvent *e )
   mPressedButton = Qt::NoButton;
   if ( e->button() == Qt::LeftButton && mEditContext.isValid() )
   {
+    if ( !mDragMoved && mEditContext.appliesOnClick && mItem && mController && mLayer )
+    {
+      // A midpoint handle exists to add a vertex; clicking one without dragging
+      // has to add it at the handle itself rather than silently do nothing.
+      KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
+      ctx.setModifiers( e->modifiers() );
+      mController->edit( mItem, mEditContext, mEditContext.pos, ctx );
+    }
     if ( mEditItemHidden )
     {
       mEditItemHidden = false;

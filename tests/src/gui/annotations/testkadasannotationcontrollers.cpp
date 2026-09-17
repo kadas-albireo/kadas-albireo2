@@ -16,10 +16,12 @@
 
 #include <memory>
 
+#include <QAction>
 #include <QBuffer>
 #include <QDir>
 #include <QFile>
 #include <QImage>
+#include <QMenu>
 #include <QRegularExpression>
 #include <QStandardPaths>
 #include <QTextBlock>
@@ -64,6 +66,7 @@
 #include <kadas/gui/annotationitems/kadaspinannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadaspinannotationitem.h>
 #include <kadas/gui/annotationitems/kadaspolygonannotationcontroller.h>
+#include <kadas/gui/annotationitems/kadasannotationvertexedit.h>
 #include <kadas/gui/annotationitems/kadasrectangleannotationcontroller.h>
 #include <kadas/gui/annotationitems/kadasrectangleannotationitem.h>
 
@@ -126,12 +129,18 @@ class TestKadasAnnotationControllers : public QObject
     // KadasLineAnnotationController --------------------------------------
     void line_getEditContext_hitsOnSegmentNotInBoundingBox();
     void line_getEditContext_hitsVertex();
+    void line_midpointHandle_insertsOneVertexThenMovesIt();
+    void line_deleteNode_keepsAtLeastTwoVertices();
     void line_endDecoration_roundTripsPerEnd();
     void line_endDecoration_matchesLineAndFlipsTail();
     void line_symbolPreviewWhileDrawing_onlyWhenDecorated();
 
     // KadasPolygonAnnotationController -----------------------------------
     void polygon_getEditContext_hitsBodyNotBoundingBox();
+    void polygon_nodes_offerMidpointHandlesOnlyOnFinishedShape();
+    void polygon_midpointHandle_insertsOneVertexThenMovesIt();
+    void polygon_midpointHandle_growsTwoVertexRingIntoPolygon();
+    void polygon_deleteNode_reclosesRingAndKeepsAtLeastThree();
 
     // Multi-type hit isolation -------------------------------------------
     void hitTest_multipleTypesSelectsByGeometryNotBbox();
@@ -760,6 +769,88 @@ void TestKadasAnnotationControllers::line_getEditContext_hitsVertex()
 }
 
 
+namespace
+{
+  // The vertices of a line or polygon ring, in item CRS.
+  QVector<QgsPointXY> ringPoints( const QgsCurve *curve )
+  {
+    QVector<QgsPointXY> pts;
+    if ( !curve )
+      return pts;
+    for ( int i = 0; i < curve->numPoints(); ++i )
+    {
+      const QgsPoint p = curve->vertexAt( QgsVertexId( 0, 0, i ) );
+      pts.append( QgsPointXY( p.x(), p.y() ) );
+    }
+    return pts;
+  }
+
+  // The "Delete node" entry a controller put in \a menu, or nullptr.
+  QAction *deleteNodeAction( const QMenu &menu )
+  {
+    const auto actions = menu.actions();
+    for ( QAction *action : actions )
+    {
+      if ( action->text() == QLatin1String( "Delete node" ) )
+        return action;
+    }
+    return nullptr;
+  }
+} //namespace
+
+void TestKadasAnnotationControllers::line_midpointHandle_insertsOneVertexThenMovesIt()
+{
+  KadasLineAnnotationController controller;
+  const auto ctx = makeContext();
+  auto item = makeLine( { QgsPointXY( 0, 0 ), QgsPointXY( 100, 0 ) } );
+
+  // 2 vertices + 1 rotation handle + 1 midpoint handle.
+  QCOMPARE( controller.nodes( item.get(), ctx ).size(), 4 );
+
+  // Grab the midpoint of the only segment.
+  const KadasEditContext ec = controller.getEditContext( item.get(), QgsPointXY( 50, 0 ), ctx );
+  QVERIFY( ec.isValid() );
+  QCOMPARE( ec.vidx.part, KadasAnnotationVertexEdit::kPartInsert );
+  QCOMPARE( ec.vidx.vertex, 0 );
+  QVERIFY2( ec.appliesOnClick, "a midpoint handle must act on a plain click too" );
+
+  // First drag step materialises the vertex between the two existing ones.
+  controller.edit( item.get(), ec, QgsPointXY( 50, 50 ), ctx );
+  QCOMPARE( ringPoints( item->geometry() ), QVector<QgsPointXY>( { QgsPointXY( 0, 0 ), QgsPointXY( 50, 50 ), QgsPointXY( 100, 0 ) } ) );
+
+  // Every later step of the same drag moves that vertex rather than inserting
+  // another one behind the cursor.
+  controller.edit( item.get(), ec, QgsPointXY( 50, 80 ), ctx );
+  QCOMPARE( ringPoints( item->geometry() ), QVector<QgsPointXY>( { QgsPointXY( 0, 0 ), QgsPointXY( 50, 80 ), QgsPointXY( 100, 0 ) } ) );
+}
+
+void TestKadasAnnotationControllers::line_deleteNode_keepsAtLeastTwoVertices()
+{
+  KadasLineAnnotationController controller;
+  const auto ctx = makeContext();
+  auto item = makeLine( { QgsPointXY( 0, 0 ), QgsPointXY( 100, 0 ), QgsPointXY( 100, 100 ) } );
+
+  const KadasEditContext onVertex = controller.getEditContext( item.get(), QgsPointXY( 100, 0 ), ctx );
+  QCOMPARE( onVertex.vidx.vertex, 1 );
+
+  QMenu menu;
+  controller.populateContextMenu( item.get(), &menu, onVertex, QgsPointXY( 100, 0 ), ctx );
+  QAction *remove = deleteNodeAction( menu );
+  QVERIFY( remove );
+  QVERIFY( remove->isEnabled() );
+  remove->trigger();
+  QCOMPARE( ringPoints( item->geometry() ), QVector<QgsPointXY>( { QgsPointXY( 0, 0 ), QgsPointXY( 100, 100 ) } ) );
+
+  // Two vertices are the least a line can carry, so the entry now refuses.
+  const KadasEditContext onLastTwo = controller.getEditContext( item.get(), QgsPointXY( 0, 0 ), ctx );
+  QMenu tooFew;
+  controller.populateContextMenu( item.get(), &tooFew, onLastTwo, QgsPointXY( 0, 0 ), ctx );
+  QAction *blocked = deleteNodeAction( tooFew );
+  QVERIFY( blocked );
+  QVERIFY( !blocked->isEnabled() );
+}
+
+
 // ----- Polygon ----------------------------------------------------------
 
 void TestKadasAnnotationControllers::polygon_getEditContext_hitsBodyNotBoundingBox()
@@ -799,6 +890,94 @@ void TestKadasAnnotationControllers::polygon_getEditContext_hitsBodyNotBoundingB
   // Click in solid base of U: hit.
   ec = controller.getEditContext( item.get(), QgsPointXY( 50, 15 ), ctx );
   QVERIFY( ec.isValid() );
+}
+
+
+void TestKadasAnnotationControllers::polygon_nodes_offerMidpointHandlesOnlyOnFinishedShape()
+{
+  KadasPolygonAnnotationController controller;
+  auto ctx = makeContext();
+  auto item = makePolygon( { QgsPointXY( 0, 0 ), QgsPointXY( 100, 0 ), QgsPointXY( 100, 100 ), QgsPointXY( 0, 100 ), QgsPointXY( 0, 0 ) } );
+
+  // 4 vertices + 1 rotation handle + 4 midpoint handles (the closing segment
+  // gets one too).
+  QCOMPARE( controller.nodes( item.get(), ctx ).size(), 9 );
+
+  // While digitizing the rubber-band segments would sprout midpoint handles
+  // that chase the cursor, so they are left out.
+  ctx.setDigitizing( true );
+  QCOMPARE( controller.nodes( item.get(), ctx ).size(), 5 );
+  QVERIFY( !controller.getEditContext( item.get(), QgsPointXY( 50, 0 ), ctx ).vidx.isValid() );
+}
+
+void TestKadasAnnotationControllers::polygon_midpointHandle_insertsOneVertexThenMovesIt()
+{
+  KadasPolygonAnnotationController controller;
+  const auto ctx = makeContext();
+  auto item = makePolygon( { QgsPointXY( 0, 0 ), QgsPointXY( 100, 0 ), QgsPointXY( 100, 100 ), QgsPointXY( 0, 100 ), QgsPointXY( 0, 0 ) } );
+
+  // Grab the midpoint of the closing segment, the one that runs from the last
+  // vertex back to the first.
+  const KadasEditContext ec = controller.getEditContext( item.get(), QgsPointXY( 0, 50 ), ctx );
+  QVERIFY( ec.isValid() );
+  QCOMPARE( ec.vidx.part, KadasAnnotationVertexEdit::kPartInsert );
+  QCOMPARE( ec.vidx.vertex, 3 );
+
+  controller.edit( item.get(), ec, QgsPointXY( -40, 50 ), ctx );
+  QCOMPARE( ringPoints( item->geometry()->exteriorRing() ), QVector<QgsPointXY>( { QgsPointXY( 0, 0 ), QgsPointXY( 100, 0 ), QgsPointXY( 100, 100 ), QgsPointXY( 0, 100 ), QgsPointXY( -40, 50 ), QgsPointXY( 0, 0 ) } ) );
+
+  // Later steps move the new vertex; the closing duplicate stays last.
+  controller.edit( item.get(), ec, QgsPointXY( -80, 50 ), ctx );
+  QCOMPARE( ringPoints( item->geometry()->exteriorRing() ), QVector<QgsPointXY>( { QgsPointXY( 0, 0 ), QgsPointXY( 100, 0 ), QgsPointXY( 100, 100 ), QgsPointXY( 0, 100 ), QgsPointXY( -80, 50 ), QgsPointXY( 0, 0 ) } ) );
+}
+
+void TestKadasAnnotationControllers::polygon_midpointHandle_growsTwoVertexRingIntoPolygon()
+{
+  // A polygon abandoned after two points renders as a line and encloses
+  // nothing. Its one midpoint handle is what turns it back into a polygon,
+  // since digitizing cannot be resumed.
+  KadasPolygonAnnotationController controller;
+  const auto ctx = makeContext();
+  auto item = makePolygon( { QgsPointXY( 0, 0 ), QgsPointXY( 100, 0 ), QgsPointXY( 0, 0 ) } );
+
+  // 2 vertices, no rotation handle (there is no shape to rotate yet) and a
+  // single midpoint handle: the ring's two segments run along the same stretch.
+  QCOMPARE( controller.nodes( item.get(), ctx ).size(), 3 );
+
+  const KadasEditContext ec = controller.getEditContext( item.get(), QgsPointXY( 50, 0 ), ctx );
+  QCOMPARE( ec.vidx.part, KadasAnnotationVertexEdit::kPartInsert );
+  QCOMPARE( ec.vidx.vertex, 0 );
+
+  controller.edit( item.get(), ec, QgsPointXY( 50, 60 ), ctx );
+  QCOMPARE( ringPoints( item->geometry()->exteriorRing() ), QVector<QgsPointXY>( { QgsPointXY( 0, 0 ), QgsPointXY( 50, 60 ), QgsPointXY( 100, 0 ), QgsPointXY( 0, 0 ) } ) );
+  QVERIFY( item->geometry()->area() > 0.0 );
+}
+
+void TestKadasAnnotationControllers::polygon_deleteNode_reclosesRingAndKeepsAtLeastThree()
+{
+  KadasPolygonAnnotationController controller;
+  const auto ctx = makeContext();
+  auto item = makePolygon( { QgsPointXY( 0, 0 ), QgsPointXY( 100, 0 ), QgsPointXY( 100, 100 ), QgsPointXY( 0, 100 ), QgsPointXY( 0, 0 ) } );
+
+  // Deleting the first vertex leaves the closing duplicate standing on a vertex
+  // that is gone, so the ring has to be re-closed on the new first one.
+  const KadasEditContext onFirst = controller.getEditContext( item.get(), QgsPointXY( 0, 0 ), ctx );
+  QCOMPARE( onFirst.vidx.vertex, 0 );
+  QMenu menu;
+  controller.populateContextMenu( item.get(), &menu, onFirst, QgsPointXY( 0, 0 ), ctx );
+  QAction *remove = deleteNodeAction( menu );
+  QVERIFY( remove );
+  QVERIFY( remove->isEnabled() );
+  remove->trigger();
+  QCOMPARE( ringPoints( item->geometry()->exteriorRing() ), QVector<QgsPointXY>( { QgsPointXY( 100, 0 ), QgsPointXY( 100, 100 ), QgsPointXY( 0, 100 ), QgsPointXY( 100, 0 ) } ) );
+
+  // Three vertices are the least a polygon can carry, so the entry now refuses.
+  const KadasEditContext onTriangle = controller.getEditContext( item.get(), QgsPointXY( 100, 0 ), ctx );
+  QMenu tooFew;
+  controller.populateContextMenu( item.get(), &tooFew, onTriangle, QgsPointXY( 100, 0 ), ctx );
+  QAction *blocked = deleteNodeAction( tooFew );
+  QVERIFY( blocked );
+  QVERIFY( !blocked->isEnabled() );
 }
 
 
@@ -880,8 +1059,9 @@ void TestKadasAnnotationControllers::selection_lineEdgeHitIsPrecise()
   QCOMPARE( ecVertex.precision, KadasEditContext::HitPrecision::Precise );
 
   // On the segment between vertices: also precise (covers the explicit
-  // upgrade in the edge-hit branch).
-  KadasEditContext ecEdge = lineCtrl.getEditContext( line.get(), QgsPointXY( 50, 0 ), ctx );
+  // upgrade in the edge-hit branch). Away from the midpoint, which belongs to
+  // the insert handle.
+  KadasEditContext ecEdge = lineCtrl.getEditContext( line.get(), QgsPointXY( 25, 0 ), ctx );
   QVERIFY( ecEdge.isValid() );
   QVERIFY( !ecEdge.vidx.isValid() ); // whole-line drag, no vertex
   QCOMPARE( ecEdge.precision, KadasEditContext::HitPrecision::Precise );
