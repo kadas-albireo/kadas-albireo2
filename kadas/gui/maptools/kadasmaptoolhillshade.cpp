@@ -34,25 +34,16 @@
 
 
 KadasMapToolHillshade::KadasMapToolHillshade( QgsMapCanvas *mapCanvas )
-  : QgsMapToolExtent( mapCanvas )
+  : KadasShapeCaptureMapTool( mapCanvas, KadasShapeCaptureMapTool::Shape::Rectangle )
 {
   setCursor( Qt::ArrowCursor );
-  connect( this, &QgsMapToolExtent::extentChanged, this, &KadasMapToolHillshade::onExtentDrawn );
+  connect( this, &KadasShapeCaptureMapTool::shapeCaptured, this, &KadasMapToolHillshade::onShapeCaptured );
 }
 
-void KadasMapToolHillshade::onExtentDrawn( const QgsRectangle &extent )
+void KadasMapToolHillshade::onShapeCaptured( const QgsGeometry &geometry, const QgsCoordinateReferenceSystem &crs )
 {
-  QgsRectangle rect = extent;
-  rect.normalize();
-  if ( rect.isEmpty() )
-  {
-    clearRubberBand();
-    return;
-  }
-
-  compute( rect, canvas()->mapSettings().destinationCrs() );
-
-  clearRubberBand();
+  compute( geometry.boundingBox(), canvas()->mapSettings().destinationCrs() );
+  clear();
 }
 
 void KadasMapToolHillshade::compute( const QgsRectangle &extent, const QgsCoordinateReferenceSystem &crs )

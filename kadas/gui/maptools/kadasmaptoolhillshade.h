@@ -17,11 +17,12 @@
 #ifndef KADASMAPTOOLHILLSHADE_H
 #define KADASMAPTOOLHILLSHADE_H
 
-#include <qgis/qgsmaptoolextent.h>
+#include <qgis/qgsmaptool.h>
+#include "kadas/gui/maptools/kadasshapecapturemaptool.h"
 
 #include "kadas/gui/kadas_gui.h"
 
-class KADAS_GUI_EXPORT KadasMapToolHillshade : public QgsMapToolExtent
+class KADAS_GUI_EXPORT KadasMapToolHillshade : public KadasShapeCaptureMapTool
 {
     Q_OBJECT
   public:
@@ -29,7 +30,7 @@ class KADAS_GUI_EXPORT KadasMapToolHillshade : public QgsMapToolExtent
     void compute( const QgsRectangle &extent, const QgsCoordinateReferenceSystem &crs );
 
   private slots:
-    void onExtentDrawn( const QgsRectangle &extent );
+    void onShapeCaptured( const QgsGeometry &geometry, const QgsCoordinateReferenceSystem &crs );
 };
 
 #endif // KADASMAPTOOLHILLSHADE_H

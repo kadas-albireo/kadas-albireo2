@@ -10,7 +10,7 @@
 
 
 
-class KadasMapToolHillshade : QgsMapToolExtent
+class KadasMapToolHillshade : KadasShapeCaptureMapTool
 {
 %Docstring(signature="appended")
 *************************************************************************
