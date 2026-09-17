@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include <QAbstractTextDocumentLayout>
+#include <QApplication>
 #include <QContextMenuEvent>
 #include <algorithm>
 #include <QDesktopServices>
@@ -184,7 +185,7 @@ void KadasMapItemTooltip::mousePressEvent( QMouseEvent *ev )
     ev->ignore();
     return;
   }
-  mMouseMoved = false;
+  mPressPos = ev->pos();
   QTextEdit::mousePressEvent( ev );
 }
 
@@ -216,7 +217,6 @@ void KadasMapItemTooltip::mouseMoveEvent( QMouseEvent *ev )
     ev->ignore();
     return;
   }
-  mMouseMoved = true;
   QString anchor = document()->documentLayout()->anchorAt( ev->pos() );
   QString image = document()->documentLayout()->imageAt( ev->pos() );
   if ( ev->button() == Qt::NoButton && ( !anchor.isEmpty() || !image.isEmpty() ) )
@@ -237,7 +237,11 @@ void KadasMapItemTooltip::mouseReleaseEvent( QMouseEvent *ev )
     ev->ignore();
     return;
   }
-  if ( ev->button() == Qt::LeftButton && !mMouseMoved )
+  // A press that wandered was a text selection, not a click on the link under
+  // it. Judge that by how far it travelled rather than by whether any movement
+  // arrived at all: a trackpad or a touch screen puts a pixel or two into every
+  // click, which used to be enough to swallow the link entirely.
+  if ( ev->button() == Qt::LeftButton && ( ev->pos() - mPressPos ).manhattanLength() <= QApplication::startDragDistance() )
   {
     QString anchor = document()->documentLayout()->anchorAt( ev->pos() );
     QString image = document()->documentLayout()->imageAt( ev->pos() );
