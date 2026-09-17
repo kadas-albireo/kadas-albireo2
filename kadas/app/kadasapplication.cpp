@@ -25,7 +25,6 @@
 #include <QMessageBox>
 #include <QSplashScreen>
 #include <QStatusBar>
-#include <QStyleFactory>
 #include <QStyleHints>
 #include <QRegularExpression>
 #include <QUrlQuery>
@@ -294,7 +293,6 @@ void KadasApplication::init()
 
   // Setup application style
   setWindowIcon( QIcon( ":/kadas/logo" ) );
-  setStyle( QStyleFactory::create( "Fusion" ) );
   QFile styleSheet( ":/stylesheet" );
   if ( styleSheet.open( QIODevice::ReadOnly ) )
   {
