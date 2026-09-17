@@ -1,0 +1,517 @@
+From 37767a147813891d7ba8ae05c74b259e928edcf0 Mon Sep 17 00:00:00 2001
+From: Denis Rouzaud <denis.rouzaud@gmail.com>
+Date: Thu, 17 Sep 2026 10:22:04 +0200
+Subject: [PATCH] "Opaque Fill" option in color menu
+
+---
+ .../gui/auto_generated/qgscolorbutton.sip.in  | 51 +++++++++++++++++++
+ .../layout/qgslayoutattributetablewidget.cpp  |  1 +
+ src/gui/layout/qgslayoutmanualtablewidget.cpp |  1 +
+ src/gui/layout/qgslayoutmapgridwidget.cpp     |  3 ++
+ src/gui/layout/qgslayoutpolylinewidget.cpp    |  2 +
+ .../qgslayouttablebackgroundcolorsdialog.cpp  |  1 +
+ src/gui/qgscolorbutton.cpp                    | 29 +++++++++--
+ src/gui/qgscolorbutton.h                      | 35 +++++++++++++
+ src/gui/qgsgradientcolorrampdialog.cpp        |  2 +
+ src/gui/qgspropertyassistantwidget.cpp        |  1 +
+ .../symbology/qgsellipsesymbollayerwidget.cpp |  2 +
+ .../qgspointdisplacementrendererwidget.cpp    |  1 +
+ src/gui/symbology/qgssymbollayerwidget.cpp    | 10 ++++
+ src/gui/vector/qgsdiagramproperties.cpp       |  2 +
+ tests/src/python/test_qgscolorbutton.py       | 33 ++++++++++++
+ 15 files changed, 170 insertions(+), 4 deletions(-)
+
+diff --git a/python/PyQt6/gui/auto_generated/qgscolorbutton.sip.in b/python/PyQt6/gui/auto_generated/qgscolorbutton.sip.in
+index 6798d491542d..9d4e05b6bbd4 100644
+--- a/python/PyQt6/gui/auto_generated/qgscolorbutton.sip.in
++++ b/python/PyQt6/gui/auto_generated/qgscolorbutton.sip.in
+@@ -206,12 +206,35 @@ drop-down menu.
+ 
+ .. seealso:: :py:func:`setShowNoColor`
+ 
++.. seealso:: :py:func:`setOpaqueColorString`
++
+ .. note::
+ 
+    The "no color" option is only shown if the color button is set to show an alpha channel in the color
+    dialog
+ %End
+ 
++    void setOpaqueColorString( const QString &opaqueColorString );
++%Docstring
++Sets the string to use for the "opaque color" option in the button's
++drop-down menu.
++
++This option replaces the "no color" one whenever the button's current
++color is totally transparent, so that the color can be made opaque
++again.
++
++:param opaqueColorString: string to use for the "opaque color" menu
++                          option
++
++.. seealso:: :py:func:`opaqueColorString`
++
++.. seealso:: :py:func:`setNoColorString`
++
++.. seealso:: :py:func:`setShowNoColor`
++
++.. versionadded:: 4.4
++%End
++
+     void setShowNull( bool showNull, const QString &nullString = QString() );
+ %Docstring
+ Sets whether a set to null (clear) option is shown in the button's
+@@ -262,6 +285,20 @@ drop-down menu.
+    dialog
+ %End
+ 
++    QString opaqueColorString() const;
++%Docstring
++Returns the string used for the "opaque color" option in the button's
++drop-down menu.
++
++:return: string used for the "opaque color" menu option
++
++.. seealso:: :py:func:`setOpaqueColorString`
++
++.. seealso:: :py:func:`noColorString`
++
++.. versionadded:: 4.4
++%End
++
+     void setContext( const QString &context );
+ %Docstring
+ Sets the context string for the color button. The context string is
+@@ -400,7 +437,21 @@ Sets color to a totally transparent color.
+    If the color button is not set to show an opacity channel in the color
+    dialog  then the color will not be changed.
+ 
++.. seealso:: :py:func:`setToOpaqueColor`
++
+ .. seealso:: :py:func:`setToNull`
++%End
++
++    void setToOpaqueColor();
++%Docstring
++Sets the color to a totally opaque one, leaving the other color
++components untouched.
++
++.. seealso:: :py:func:`setToNoColor`
++
++.. seealso:: :py:func:`setToNull`
++
++.. versionadded:: 4.4
+ %End
+ 
+     void setToDefaultColor();
+diff --git a/src/gui/layout/qgslayoutattributetablewidget.cpp b/src/gui/layout/qgslayoutattributetablewidget.cpp
+index 90afb72130bd..d37976579124 100644
+--- a/src/gui/layout/qgslayoutattributetablewidget.cpp
++++ b/src/gui/layout/qgslayoutattributetablewidget.cpp
+@@ -129,6 +129,7 @@ QgsLayoutAttributeTableWidget::QgsLayoutAttributeTableWidget( QgsLayoutFrame *fr
+   mBackgroundColorButton->setContext( u"composer"_s );
+   mBackgroundColorButton->setShowNoColor( true );
+   mBackgroundColorButton->setNoColorString( tr( "No Background" ) );
++  mBackgroundColorButton->setOpaqueColorString( tr( "Opaque Background" ) );
+ 
+   updateGuiElements();
+ 
+diff --git a/src/gui/layout/qgslayoutmanualtablewidget.cpp b/src/gui/layout/qgslayoutmanualtablewidget.cpp
+index b99684128904..5deb65d7fae3 100644
+--- a/src/gui/layout/qgslayoutmanualtablewidget.cpp
++++ b/src/gui/layout/qgslayoutmanualtablewidget.cpp
+@@ -95,6 +95,7 @@ QgsLayoutManualTableWidget::QgsLayoutManualTableWidget( QgsLayoutFrame *frame )
+   mBackgroundColorButton->setContext( u"composer"_s );
+   mBackgroundColorButton->setShowNoColor( true );
+   mBackgroundColorButton->setNoColorString( tr( "No Background" ) );
++  mBackgroundColorButton->setOpaqueColorString( tr( "Opaque Background" ) );
+ 
+   updateGuiElements();
+ 
+diff --git a/src/gui/layout/qgslayoutmapgridwidget.cpp b/src/gui/layout/qgslayoutmapgridwidget.cpp
+index ce3d03732f57..9c608137d356 100644
+--- a/src/gui/layout/qgslayoutmapgridwidget.cpp
++++ b/src/gui/layout/qgslayoutmapgridwidget.cpp
+@@ -174,18 +174,21 @@ QgsLayoutMapGridWidget::QgsLayoutMapGridWidget( QgsLayoutItemMapGrid *mapGrid, Q
+   mGridFramePenColorButton->setAllowOpacity( true );
+   mGridFramePenColorButton->setContext( u"composer"_s );
+   mGridFramePenColorButton->setNoColorString( tr( "Transparent Frame" ) );
++  mGridFramePenColorButton->setOpaqueColorString( tr( "Opaque Frame" ) );
+   mGridFramePenColorButton->setShowNoColor( true );
+ 
+   mGridFrameFill1ColorButton->setColorDialogTitle( tr( "Select Grid Frame Fill Color" ) );
+   mGridFrameFill1ColorButton->setAllowOpacity( true );
+   mGridFrameFill1ColorButton->setContext( u"composer"_s );
+   mGridFrameFill1ColorButton->setNoColorString( tr( "Transparent Fill" ) );
++  mGridFrameFill1ColorButton->setOpaqueColorString( tr( "Opaque Fill" ) );
+   mGridFrameFill1ColorButton->setShowNoColor( true );
+ 
+   mGridFrameFill2ColorButton->setColorDialogTitle( tr( "Select Grid Frame Fill Color" ) );
+   mGridFrameFill2ColorButton->setAllowOpacity( true );
+   mGridFrameFill2ColorButton->setContext( u"composer"_s );
+   mGridFrameFill2ColorButton->setNoColorString( tr( "Transparent Fill" ) );
++  mGridFrameFill2ColorButton->setOpaqueColorString( tr( "Opaque Fill" ) );
+   mGridFrameFill2ColorButton->setShowNoColor( true );
+ 
+   mGridLineStyleButton->setSymbolType( Qgis::SymbolType::Line );
+diff --git a/src/gui/layout/qgslayoutpolylinewidget.cpp b/src/gui/layout/qgslayoutpolylinewidget.cpp
+index e247dd207b5a..c7e46f3afd18 100644
+--- a/src/gui/layout/qgslayoutpolylinewidget.cpp
++++ b/src/gui/layout/qgslayoutpolylinewidget.cpp
+@@ -72,11 +72,13 @@ QgsLayoutPolylineWidget::QgsLayoutPolylineWidget( QgsLayoutItemPolyline *polylin
+   mArrowHeadStrokeColorButton->setAllowOpacity( true );
+   mArrowHeadStrokeColorButton->setContext( u"composer"_s );
+   mArrowHeadStrokeColorButton->setNoColorString( tr( "Transparent Stroke" ) );
++  mArrowHeadStrokeColorButton->setOpaqueColorString( tr( "Opaque Stroke" ) );
+   mArrowHeadStrokeColorButton->setShowNoColor( true );
+   mArrowHeadFillColorButton->setColorDialogTitle( tr( "Select Arrow Head Fill Color" ) );
+   mArrowHeadFillColorButton->setAllowOpacity( true );
+   mArrowHeadFillColorButton->setContext( u"composer"_s );
+   mArrowHeadFillColorButton->setNoColorString( tr( "Transparent Fill" ) );
++  mArrowHeadFillColorButton->setOpaqueColorString( tr( "Opaque Fill" ) );
+   mArrowHeadFillColorButton->setShowNoColor( true );
+ 
+   //add widget for general composer item properties
+diff --git a/src/gui/layout/qgslayouttablebackgroundcolorsdialog.cpp b/src/gui/layout/qgslayouttablebackgroundcolorsdialog.cpp
+index 6ea31b317280..a6223fdbdfe8 100644
+--- a/src/gui/layout/qgslayouttablebackgroundcolorsdialog.cpp
++++ b/src/gui/layout/qgslayouttablebackgroundcolorsdialog.cpp
+@@ -126,4 +126,5 @@ void QgsLayoutTableBackgroundColorsDialog::setGuiElementValues()
+   mDefaultColorButton->setColorDialogTitle( tr( "Select Background Color" ) );
+   mDefaultColorButton->setShowNoColor( true );
+   mDefaultColorButton->setNoColorString( tr( "No Background" ) );
++  mDefaultColorButton->setOpaqueColorString( tr( "Opaque Background" ) );
+ }
+diff --git a/src/gui/qgscolorbutton.cpp b/src/gui/qgscolorbutton.cpp
+index d6f5821058d6..422b97d26557 100644
+--- a/src/gui/qgscolorbutton.cpp
++++ b/src/gui/qgscolorbutton.cpp
+@@ -52,6 +52,7 @@ QgsColorButton::QgsColorButton( QWidget *parent, const QString &cdt, QgsColorSch
+   : QToolButton( parent )
+   , mColorDialogTitle( cdt.isEmpty() ? tr( "Select Color" ) : cdt )
+   , mNoColorString( tr( "No color" ) )
++  , mOpaqueColorString( tr( "Opaque color" ) )
+ {
+   //if a color scheme registry was specified, use it, otherwise use the global instance
+   mColorSchemeRegistry = registry ? registry : QgsApplication::colorSchemeRegistry();
+@@ -196,6 +197,13 @@ void QgsColorButton::setToNoColor()
+   setColor( noColor );
+ }
+ 
++void QgsColorButton::setToOpaqueColor()
++{
++  QColor opaqueColor = QColor( mColor );
++  opaqueColor.setAlpha( 255 );
++  setColor( opaqueColor );
++}
++
+ void QgsColorButton::mousePressEvent( QMouseEvent *e )
+ {
+   if ( mPickingColor )
+@@ -507,10 +515,23 @@ void QgsColorButton::prepareMenu()
+ 
+     if ( mShowNoColorOption )
+     {
+-      QAction *noColorAction = new QAction( mNoColorString, this );
+-      noColorAction->setIcon( createMenuIcon( Qt::transparent, false ) );
+-      mMenu->addAction( noColorAction );
+-      connect( noColorAction, &QAction::triggered, this, &QgsColorButton::setToNoColor );
++      // if the color is already totally transparent, offer the reverse operation instead
++      if ( mColor.isValid() && mColor.alpha() == 0 )
++      {
++        QColor opaqueColor = QColor( mColor );
++        opaqueColor.setAlpha( 255 );
++        QAction *opaqueColorAction = new QAction( mOpaqueColorString, this );
++        opaqueColorAction->setIcon( createMenuIcon( opaqueColor ) );
++        mMenu->addAction( opaqueColorAction );
++        connect( opaqueColorAction, &QAction::triggered, this, &QgsColorButton::setToOpaqueColor );
++      }
++      else
++      {
++        QAction *noColorAction = new QAction( mNoColorString, this );
++        noColorAction->setIcon( createMenuIcon( Qt::transparent, false ) );
++        mMenu->addAction( noColorAction );
++        connect( noColorAction, &QAction::triggered, this, &QgsColorButton::setToNoColor );
++      }
+     }
+ 
+     mMenu->addSeparator();
+diff --git a/src/gui/qgscolorbutton.h b/src/gui/qgscolorbutton.h
+index f9556d72853d..2152ab4c498e 100644
+--- a/src/gui/qgscolorbutton.h
++++ b/src/gui/qgscolorbutton.h
+@@ -56,6 +56,7 @@ class GUI_EXPORT QgsColorButton : public QToolButton
+     Q_PROPERTY( QColor defaultColor READ defaultColor WRITE setDefaultColor )
+     Q_PROPERTY( bool showNoColor READ showNoColor WRITE setShowNoColor )
+     Q_PROPERTY( QString noColorString READ noColorString WRITE setNoColorString )
++    Q_PROPERTY( QString opaqueColorString READ opaqueColorString WRITE setOpaqueColorString )
+     Q_PROPERTY( QString context READ context WRITE setContext )
+ 
+   public:
+@@ -193,11 +194,26 @@ class GUI_EXPORT QgsColorButton : public QToolButton
+      * \param noColorString string to use for the "no color" menu option
+      * \see noColorString
+      * \see setShowNoColor
++     * \see setOpaqueColorString
+      * \note The "no color" option is only shown if the color button is set to show an alpha channel in the color
+      * dialog
+      */
+     void setNoColorString( const QString &noColorString ) { mNoColorString = noColorString; }
+ 
++    /**
++     * Sets the string to use for the "opaque color" option in the button's drop-down menu.
++     *
++     * This option replaces the "no color" one whenever the button's current color is totally transparent,
++     * so that the color can be made opaque again.
++     *
++     * \param opaqueColorString string to use for the "opaque color" menu option
++     * \see opaqueColorString
++     * \see setNoColorString
++     * \see setShowNoColor
++     * \since QGIS 4.4
++     */
++    void setOpaqueColorString( const QString &opaqueColorString ) { mOpaqueColorString = opaqueColorString; }
++
+     /**
+      * Sets whether a set to null (clear) option is shown in the button's drop-down menu.
+      * \param showNull set to TRUE to show a null option
+@@ -231,6 +247,15 @@ class GUI_EXPORT QgsColorButton : public QToolButton
+      */
+     QString noColorString() const { return mNoColorString; }
+ 
++    /**
++     * Returns the string used for the "opaque color" option in the button's drop-down menu.
++     * \returns string used for the "opaque color" menu option
++     * \see setOpaqueColorString
++     * \see noColorString
++     * \since QGIS 4.4
++     */
++    QString opaqueColorString() const { return mOpaqueColorString; }
++
+     /**
+      * Sets the context string for the color button. The context string is passed to all color swatch
+      * grids shown in the button's drop-down menu, to allow them to customize their display colors
+@@ -343,10 +368,19 @@ class GUI_EXPORT QgsColorButton : public QToolButton
+      * Sets color to a totally transparent color.
+      * \note If the color button is not set to show an opacity channel in the color
+      * dialog  then the color will not be changed.
++     * \see setToOpaqueColor()
+      * \see setToNull()
+      */
+     void setToNoColor();
+ 
++    /**
++     * Sets the color to a totally opaque one, leaving the other color components untouched.
++     * \see setToNoColor()
++     * \see setToNull()
++     * \since QGIS 4.4
++     */
++    void setToOpaqueColor();
++
+     /**
+      * Sets color to the button's default color, if set.
+      * \see setDefaultColor
+@@ -476,6 +510,7 @@ class GUI_EXPORT QgsColorButton : public QToolButton
+ 
+     bool mShowNoColorOption = false;
+     QString mNoColorString;
++    QString mOpaqueColorString;
+     bool mShowNull = false;
+     QString mNullColorString;
+ 
+diff --git a/src/gui/qgsgradientcolorrampdialog.cpp b/src/gui/qgsgradientcolorrampdialog.cpp
+index 8d98afba38e2..7dd122df6e03 100644
+--- a/src/gui/qgsgradientcolorrampdialog.cpp
++++ b/src/gui/qgsgradientcolorrampdialog.cpp
+@@ -113,11 +113,13 @@ QgsGradientColorRampDialog::QgsGradientColorRampDialog( const QgsGradientColorRa
+   btnColor1->setContext( u"symbology"_s );
+   btnColor1->setShowNoColor( true );
+   btnColor1->setNoColorString( tr( "Transparent" ) );
++  btnColor1->setOpaqueColorString( tr( "Opaque" ) );
+   btnColor2->setAllowOpacity( true );
+   btnColor2->setColorDialogTitle( tr( "Select Ramp Color" ) );
+   btnColor2->setContext( u"symbology"_s );
+   btnColor2->setShowNoColor( true );
+   btnColor2->setNoColorString( tr( "Transparent" ) );
++  btnColor2->setOpaqueColorString( tr( "Opaque" ) );
+   updateColorButtons();
+   connect( btnColor1, &QgsColorButton::colorChanged, this, &QgsGradientColorRampDialog::setColor1 );
+   connect( btnColor2, &QgsColorButton::colorChanged, this, &QgsGradientColorRampDialog::setColor2 );
+diff --git a/src/gui/qgspropertyassistantwidget.cpp b/src/gui/qgspropertyassistantwidget.cpp
+index faa47a3f40fc..2331dfbd7a28 100644
+--- a/src/gui/qgspropertyassistantwidget.cpp
++++ b/src/gui/qgspropertyassistantwidget.cpp
+@@ -468,6 +468,7 @@ QgsPropertyColorAssistantWidget::QgsPropertyColorAssistantWidget( QWidget *paren
+   mNullColorButton->setColorDialogTitle( tr( "Color For Null Values" ) );
+   mNullColorButton->setContext( u"symbology"_s );
+   mNullColorButton->setNoColorString( tr( "Transparent" ) );
++  mNullColorButton->setOpaqueColorString( tr( "Opaque" ) );
+ 
+   if ( const QgsColorRampTransformer *colorTransform = dynamic_cast<const QgsColorRampTransformer *>( initialState.transformer() ) )
+   {
+diff --git a/src/gui/symbology/qgsellipsesymbollayerwidget.cpp b/src/gui/symbology/qgsellipsesymbollayerwidget.cpp
+index 8128e20ca677..63ded400e661 100644
+--- a/src/gui/symbology/qgsellipsesymbollayerwidget.cpp
++++ b/src/gui/symbology/qgsellipsesymbollayerwidget.cpp
+@@ -72,11 +72,13 @@ QgsEllipseSymbolLayerWidget::QgsEllipseSymbolLayerWidget( QgsVectorLayer *vl, QW
+   btnChangeColorFill->setContext( u"symbology"_s );
+   btnChangeColorFill->setShowNoColor( true );
+   btnChangeColorFill->setNoColorString( tr( "Transparent Fill" ) );
++  btnChangeColorFill->setOpaqueColorString( tr( "Opaque Fill" ) );
+   btnChangeColorStroke->setAllowOpacity( true );
+   btnChangeColorStroke->setColorDialogTitle( tr( "Select Stroke Color" ) );
+   btnChangeColorStroke->setContext( u"symbology"_s );
+   btnChangeColorStroke->setShowNoColor( true );
+   btnChangeColorStroke->setNoColorString( tr( "Transparent Stroke" ) );
++  btnChangeColorStroke->setOpaqueColorString( tr( "Opaque Stroke" ) );
+ 
+   mFillColorDDBtn->registerLinkedWidget( btnChangeColorFill );
+   mStrokeColorDDBtn->registerLinkedWidget( btnChangeColorStroke );
+diff --git a/src/gui/symbology/qgspointdisplacementrendererwidget.cpp b/src/gui/symbology/qgspointdisplacementrendererwidget.cpp
+index 880a22b36ecc..5dcc2e92b358 100644
+--- a/src/gui/symbology/qgspointdisplacementrendererwidget.cpp
++++ b/src/gui/symbology/qgspointdisplacementrendererwidget.cpp
+@@ -130,6 +130,7 @@ QgsPointDisplacementRendererWidget::QgsPointDisplacementRendererWidget( QgsVecto
+   mCircleColorButton->setAllowOpacity( true );
+   mCircleColorButton->setShowNoColor( true );
+   mCircleColorButton->setNoColorString( tr( "Transparent Stroke" ) );
++  mCircleColorButton->setOpaqueColorString( tr( "Opaque Stroke" ) );
+   mLabelColorButton->setContext( u"symbology"_s );
+   mLabelColorButton->setColorDialogTitle( tr( "Select Color" ) );
+   mLabelColorButton->setAllowOpacity( true );
+diff --git a/src/gui/symbology/qgssymbollayerwidget.cpp b/src/gui/symbology/qgssymbollayerwidget.cpp
+index 72d140bf6040..49f522d7aec4 100644
+--- a/src/gui/symbology/qgssymbollayerwidget.cpp
++++ b/src/gui/symbology/qgssymbollayerwidget.cpp
+@@ -702,11 +702,13 @@ QgsSimpleMarkerSymbolLayerWidget::QgsSimpleMarkerSymbolLayerWidget( QgsVectorLay
+   btnChangeColorFill->setContext( u"symbology"_s );
+   btnChangeColorFill->setShowNoColor( true );
+   btnChangeColorFill->setNoColorString( tr( "Transparent Fill" ) );
++  btnChangeColorFill->setOpaqueColorString( tr( "Opaque Fill" ) );
+   btnChangeColorStroke->setAllowOpacity( true );
+   btnChangeColorStroke->setColorDialogTitle( tr( "Select Stroke Color" ) );
+   btnChangeColorStroke->setContext( u"symbology"_s );
+   btnChangeColorStroke->setShowNoColor( true );
+   btnChangeColorStroke->setNoColorString( tr( "Transparent Stroke" ) );
++  btnChangeColorStroke->setOpaqueColorString( tr( "Opaque Stroke" ) );
+ 
+   mFillColorDDBtn->registerLinkedWidget( btnChangeColorFill );
+   mStrokeColorDDBtn->registerLinkedWidget( btnChangeColorStroke );
+@@ -1006,11 +1008,13 @@ QgsSimpleFillSymbolLayerWidget::QgsSimpleFillSymbolLayerWidget( QgsVectorLayer *
+   btnChangeColor->setContext( u"symbology"_s );
+   btnChangeColor->setShowNoColor( true );
+   btnChangeColor->setNoColorString( tr( "Transparent Fill" ) );
++  btnChangeColor->setOpaqueColorString( tr( "Opaque Fill" ) );
+   btnChangeStrokeColor->setAllowOpacity( true );
+   btnChangeStrokeColor->setColorDialogTitle( tr( "Select Stroke Color" ) );
+   btnChangeStrokeColor->setContext( u"symbology"_s );
+   btnChangeStrokeColor->setShowNoColor( true );
+   btnChangeStrokeColor->setNoColorString( tr( "Transparent Stroke" ) );
++  btnChangeStrokeColor->setOpaqueColorString( tr( "Opaque Stroke" ) );
+ 
+   spinOffsetX->setClearValue( 0.0 );
+   spinOffsetY->setClearValue( 0.0 );
+@@ -1360,11 +1364,13 @@ QgsGradientFillSymbolLayerWidget::QgsGradientFillSymbolLayerWidget( QgsVectorLay
+   btnChangeColor->setContext( u"symbology"_s );
+   btnChangeColor->setShowNoColor( true );
+   btnChangeColor->setNoColorString( tr( "Transparent" ) );
++  btnChangeColor->setOpaqueColorString( tr( "Opaque" ) );
+   btnChangeColor2->setAllowOpacity( true );
+   btnChangeColor2->setColorDialogTitle( tr( "Select Gradient Color" ) );
+   btnChangeColor2->setContext( u"symbology"_s );
+   btnChangeColor2->setShowNoColor( true );
+   btnChangeColor2->setNoColorString( tr( "Transparent" ) );
++  btnChangeColor2->setOpaqueColorString( tr( "Opaque" ) );
+ 
+   mStartColorDDBtn->registerLinkedWidget( btnChangeColor );
+   mEndColorDDBtn->registerLinkedWidget( btnChangeColor2 );
+@@ -1706,11 +1712,13 @@ QgsShapeburstFillSymbolLayerWidget::QgsShapeburstFillSymbolLayerWidget( QgsVecto
+   btnChangeColor->setContext( u"symbology"_s );
+   btnChangeColor->setShowNoColor( true );
+   btnChangeColor->setNoColorString( tr( "Transparent" ) );
++  btnChangeColor->setOpaqueColorString( tr( "Opaque" ) );
+   btnChangeColor2->setAllowOpacity( true );
+   btnChangeColor2->setColorDialogTitle( tr( "Select Gradient Color" ) );
+   btnChangeColor2->setContext( u"symbology"_s );
+   btnChangeColor2->setShowNoColor( true );
+   btnChangeColor2->setNoColorString( tr( "Transparent" ) );
++  btnChangeColor2->setOpaqueColorString( tr( "Opaque" ) );
+ 
+   mStartColorDDBtn->registerLinkedWidget( btnChangeColor );
+   mEndColorDDBtn->registerLinkedWidget( btnChangeColor2 );
+@@ -5383,11 +5391,13 @@ QgsLineburstSymbolLayerWidget::QgsLineburstSymbolLayerWidget( QgsVectorLayer *vl
+   btnChangeColor->setContext( u"symbology"_s );
+   btnChangeColor->setShowNoColor( true );
+   btnChangeColor->setNoColorString( tr( "Transparent" ) );
++  btnChangeColor->setOpaqueColorString( tr( "Opaque" ) );
+   btnChangeColor2->setAllowOpacity( true );
+   btnChangeColor2->setColorDialogTitle( tr( "Select Gradient Color" ) );
+   btnChangeColor2->setContext( u"symbology"_s );
+   btnChangeColor2->setShowNoColor( true );
+   btnChangeColor2->setNoColorString( tr( "Transparent" ) );
++  btnChangeColor2->setOpaqueColorString( tr( "Opaque" ) );
+ 
+   mStartColorDDBtn->registerLinkedWidget( btnChangeColor );
+   mEndColorDDBtn->registerLinkedWidget( btnChangeColor2 );
+diff --git a/src/gui/vector/qgsdiagramproperties.cpp b/src/gui/vector/qgsdiagramproperties.cpp
+index ca24ad0b5e28..3bcb75fb9c79 100644
+--- a/src/gui/vector/qgsdiagramproperties.cpp
++++ b/src/gui/vector/qgsdiagramproperties.cpp
+@@ -126,11 +126,13 @@ QgsDiagramProperties::QgsDiagramProperties( QgsVectorLayer *layer, QWidget *pare
+   mBackgroundColorButton->setContext( u"symbology"_s );
+   mBackgroundColorButton->setShowNoColor( true );
+   mBackgroundColorButton->setNoColorString( tr( "Transparent Background" ) );
++  mBackgroundColorButton->setOpaqueColorString( tr( "Opaque Background" ) );
+   mDiagramPenColorButton->setColorDialogTitle( tr( "Select Pen Color" ) );
+   mDiagramPenColorButton->setAllowOpacity( true );
+   mDiagramPenColorButton->setContext( u"symbology"_s );
+   mDiagramPenColorButton->setShowNoColor( true );
+   mDiagramPenColorButton->setNoColorString( tr( "Transparent Stroke" ) );
++  mDiagramPenColorButton->setOpaqueColorString( tr( "Opaque Stroke" ) );
+ 
+   mMaxValueSpinBox->setShowClearButton( false );
+   mSizeSpinBox->setClearValue( 5 );
+diff --git a/tests/src/python/test_qgscolorbutton.py b/tests/src/python/test_qgscolorbutton.py
+index 3a594935fe77..8b0cbd6c784e 100644
+--- a/tests/src/python/test_qgscolorbutton.py
++++ b/tests/src/python/test_qgscolorbutton.py
+@@ -38,6 +38,39 @@ def testClearingColors(self):
+         # ensure that only the alpha channel has changed - not the other color components
+         self.assertEqual(button.color(), QColor(255, 100, 200, 0))
+ 
++        # and back to opaque
++        button.setToOpaqueColor()
++        self.assertEqual(button.color(), QColor(255, 100, 200, 255))
++
++    def testNoColorMenuAction(self):
++        """
++        Test that the "no color" menu action flips to "opaque color" when the color
++        is totally transparent
++        """
++        button = QgsColorButton()
++        button.setAllowOpacity(True)
++        button.setShowNoColor(True)
++        button.setNoColorString("Transparent Fill")
++        button.setOpaqueColorString("Opaque Fill")
++        self.assertEqual(button.noColorString(), "Transparent Fill")
++        self.assertEqual(button.opaqueColorString(), "Opaque Fill")
++
++        def menu_texts():
++            button.menu().aboutToShow.emit()
++            return [a.text() for a in button.menu().actions()]
++
++        button.setColor(QColor(255, 100, 200, 255))
++        self.assertIn("Transparent Fill", menu_texts())
++        self.assertNotIn("Opaque Fill", menu_texts())
++
++        button.setColor(QColor(255, 100, 200, 0))
++        self.assertIn("Opaque Fill", menu_texts())
++        self.assertNotIn("Transparent Fill", menu_texts())
++
++        # a null color is not "totally transparent" - it has no color at all
++        button.setToNull()
++        self.assertIn("Transparent Fill", menu_texts())
++
+     def testNulling(self):
+         """
+         Test clearing colors to null
