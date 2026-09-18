@@ -854,7 +854,7 @@ void TestKadasAnnotationControllers::line_midpointHandle_insertsOneVertexThenMov
   // Grab the midpoint of the only segment.
   const KadasEditContext ec = controller.getEditContext( item.get(), QgsPointXY( 50, 0 ), ctx );
   QVERIFY( ec.isValid() );
-  QCOMPARE( ec.vidx.part, KadasAnnotationVertexEdit::kPartInsert );
+  QVERIFY( KadasAnnotationVertexEdit::isInsertHandle( ec.vidx ) );
   QCOMPARE( ec.vidx.vertex, 0 );
   QVERIFY2( ec.appliesOnClick, "a midpoint handle must act on a plain click too" );
   controller.beginEdit( item.get(), ec, ctx );
@@ -882,7 +882,7 @@ void TestKadasAnnotationControllers::line_midpointHandle_survivesHitTestsOnOther
   auto other = makeLine( { QgsPointXY( 0, 20 ), QgsPointXY( 100, 20 ) } );
 
   const KadasEditContext ec = controller.getEditContext( item.get(), QgsPointXY( 50, 0 ), ctx );
-  QCOMPARE( ec.vidx.part, KadasAnnotationVertexEdit::kPartInsert );
+  QVERIFY( KadasAnnotationVertexEdit::isInsertHandle( ec.vidx ) );
   controller.beginEdit( item.get(), ec, ctx );
 
   // The first step of the drag materialises the vertex.
@@ -890,7 +890,7 @@ void TestKadasAnnotationControllers::line_midpointHandle_survivesHitTestsOnOther
   QCOMPARE( ringPoints( item->geometry() ).size(), 3 );
 
   // Picking sweeps the neighbour; its midpoint is elsewhere, so no insert there.
-  QVERIFY( controller.getEditContext( other.get(), QgsPointXY( 50, 50 ), ctx ).vidx.part != KadasAnnotationVertexEdit::kPartInsert );
+  QVERIFY( !KadasAnnotationVertexEdit::isInsertHandle( controller.getEditContext( other.get(), QgsPointXY( 50, 50 ), ctx ).vidx ) );
 
   // The rest of the drag still moves that one vertex rather than leaving a
   // second one behind because the insert looked unarmed again.
@@ -999,7 +999,7 @@ void TestKadasAnnotationControllers::polygon_midpointHandle_insertsOneVertexThen
   // vertex back to the first.
   const KadasEditContext ec = controller.getEditContext( item.get(), QgsPointXY( 0, 50 ), ctx );
   QVERIFY( ec.isValid() );
-  QCOMPARE( ec.vidx.part, KadasAnnotationVertexEdit::kPartInsert );
+  QVERIFY( KadasAnnotationVertexEdit::isInsertHandle( ec.vidx ) );
   QCOMPARE( ec.vidx.vertex, 3 );
   controller.beginEdit( item.get(), ec, ctx );
 
@@ -1026,7 +1026,7 @@ void TestKadasAnnotationControllers::polygon_midpointHandle_growsTwoVertexRingIn
   QCOMPARE( controller.nodes( item.get(), ctx ).size(), 3 );
 
   const KadasEditContext ec = controller.getEditContext( item.get(), QgsPointXY( 50, 0 ), ctx );
-  QCOMPARE( ec.vidx.part, KadasAnnotationVertexEdit::kPartInsert );
+  QVERIFY( KadasAnnotationVertexEdit::isInsertHandle( ec.vidx ) );
   QCOMPARE( ec.vidx.vertex, 0 );
   controller.beginEdit( item.get(), ec, ctx );
 

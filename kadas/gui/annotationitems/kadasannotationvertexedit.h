@@ -21,6 +21,8 @@
 
 #include <QPointF>
 
+#include <qgis/qgsvertexid.h>
+
 #include "kadas/gui/kadas_gui.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontext.h"
 
@@ -35,61 +37,68 @@ class QPainter;
  * only way to grow a shape once it is finished: digitizing itself cannot be
  * resumed. The line and polygon controllers share this so the two behave alike.
  */
-namespace KadasAnnotationVertexEdit
+class KADAS_GUI_EXPORT KadasAnnotationVertexEdit
 {
-  //! vidx.part sentinel for a midpoint handle. Real vertices use part 0, the rotation handle part 1.
-  constexpr int kPartInsert = 2;
+  public:
+    //! vidx.part sentinel for a midpoint handle. Real vertices use part 0, the rotation handle part 1.
+    static constexpr int kPartInsert = 2;
 
-  //! Paints the midpoint handle (a haloed circle with a plus in it) at screen \a pt. Round where the vertices are square, so the two never get confused.
-  void renderHandle( QPainter *painter, const QPointF &pt, int size );
+    //! TRUE when \a vidx addresses a midpoint handle rather than a real vertex or another kind of handle.
+    static bool isInsertHandle( const QgsVertexId &vidx ) { return vidx.part == kPartInsert; }
 
-  //! Distance in pixels from a segment midpoint within which its handle shows itself. Far enough that the handle is there by the time the pointer arrives, near enough that a shape with many short segments is not studded with them.
-  constexpr double kRevealRadiusPixels = 30;
+    //! Distance in pixels from a segment midpoint within which its handle shows itself. Far enough that the handle is there by the time the pointer arrives, near enough that a shape with many short segments is not studded with them.
+    static constexpr double kRevealRadiusPixels = 30;
 
-  //! TRUE when the handle at \a midpointMap is close enough to the pointer to be shown. Without a known pointer position no midpoint handle shows at all.
-  bool KADAS_GUI_EXPORT isRevealed( const QgsPointXY &midpointMap, const KadasAnnotationItemContext &ctx );
+    //! Paints the midpoint handle (a haloed circle with a plus in it) at screen \a pt. Round where the vertices are square, so the two never get confused.
+    static void renderHandle( QPainter *painter, const QPointF &pt, int size );
 
-  /**
-   * \ingroup gui
-   * \brief Per-drag state for a midpoint handle.
-   *
-   * getEditContext() arms the segment when the handle is grabbed; the first
-   * edit() of that drag consumes the arming and inserts the vertex, and every
-   * later step only moves it. Without the arming the insert would repeat on
-   * every mouse move and leave a trail of vertices behind the cursor.
-   */
-  class KADAS_GUI_EXPORT VertexInsertState
-  {
-    public:
-      //! Segment the armed insert belongs to (the vertex lands at index segment + 1), or -1 when nothing is armed.
-      int segment() const { return mSegment; }
+    //! TRUE when the handle at \a midpointMap is close enough to the pointer to be shown. Without a known pointer position no midpoint handle shows at all.
+    static bool isRevealed( const QgsPointXY &midpointMap, const KadasAnnotationItemContext &ctx );
 
-      //! Arms an insert on \a segment.
-      void arm( int segment )
-      {
-        mSegment = segment;
-        mPending = true;
-      }
+    /**
+     * \ingroup gui
+     * \brief Per-drag state for a midpoint handle.
+     *
+     * getEditContext() arms the segment when the handle is grabbed; the first
+     * edit() of that drag consumes the arming and inserts the vertex, and every
+     * later step only moves it. Without the arming the insert would repeat on
+     * every mouse move and leave a trail of vertices behind the cursor.
+     */
+    class VertexInsertState
+    {
+      public:
+        //! Segment the armed insert belongs to (the vertex lands at index segment + 1), or -1 when nothing is armed.
+        int segment() const { return mSegment; }
 
-      //! Clears the armed segment; call on any hover hit-test so a finished drag does not leak into the next one.
-      void disarm()
-      {
-        mSegment = -1;
-        mPending = false;
-      }
+        //! Arms an insert on \a segment.
+        void arm( int segment )
+        {
+          mSegment = segment;
+          mPending = true;
+        }
 
-      //! TRUE exactly once per armed segment: the drag step that has to materialise the vertex.
-      bool takePending()
-      {
-        const bool pending = mPending;
-        mPending = false;
-        return pending;
-      }
+        //! Clears the armed segment; call on any hover hit-test so a finished drag does not leak into the next one.
+        void disarm()
+        {
+          mSegment = -1;
+          mPending = false;
+        }
 
-    private:
-      int mSegment = -1;
-      bool mPending = false;
-  };
-} // namespace KadasAnnotationVertexEdit
+        //! TRUE exactly once per armed segment: the drag step that has to materialise the vertex.
+        bool takePending()
+        {
+          const bool pending = mPending;
+          mPending = false;
+          return pending;
+        }
+
+      private:
+        int mSegment = -1;
+        bool mPending = false;
+    };
+
+  private:
+    KadasAnnotationVertexEdit() = delete;
+};
 
 #endif // KADASANNOTATIONVERTEXEDIT_H

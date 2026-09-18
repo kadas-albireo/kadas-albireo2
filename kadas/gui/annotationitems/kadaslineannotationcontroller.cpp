@@ -388,7 +388,7 @@ void KadasLineAnnotationController::beginEdit( const QgsAnnotationItem *, const 
 {
   // Armed here rather than in getEditContext(), which also runs as the hit test
   // for every other item under the cursor and would keep disarming this one.
-  if ( editContext.vidx.part == KadasAnnotationVertexEdit::kPartInsert )
+  if ( KadasAnnotationVertexEdit::isInsertHandle( editContext.vidx ) )
     mInsert.arm( editContext.vidx.vertex );
   else
     mInsert.disarm();
@@ -414,7 +414,7 @@ void KadasLineAnnotationController::edit( QgsAnnotationItem *item, const KadasEd
   }
   QgsLineString *ls = takeMutableLine( line );
   const int n = ls->numPoints();
-  if ( editContext.vidx.part == KadasAnnotationVertexEdit::kPartInsert )
+  if ( KadasAnnotationVertexEdit::isInsertHandle( editContext.vidx ) )
   {
     // A hover armed the segment; the first step of the drag turns the midpoint
     // handle into a real vertex, every later step only moves that vertex.
@@ -500,8 +500,8 @@ QgsPointXY KadasLineAnnotationController::positionFromEditAttribs(
 
 void KadasLineAnnotationController::populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &, const KadasAnnotationItemContext & )
 {
-  // Only a right-click on a real vertex offers to remove one; a midpoint handle
-  // (part kPartInsert) is there to add, and adds nothing to remove.
+  // Only a right-click on a real vertex offers to remove one; the other parts
+  // hold handles, and a midpoint handle is there to add, not to remove.
   if ( editContext.vidx.part != 0 || editContext.vidx.vertex < 0 )
     return;
   const QgsCurve *curve = asLine( item )->geometry();
