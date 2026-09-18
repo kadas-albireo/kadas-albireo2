@@ -219,7 +219,9 @@ void KadasMapItemTooltip::mouseMoveEvent( QMouseEvent *ev )
   }
   QString anchor = document()->documentLayout()->anchorAt( ev->pos() );
   QString image = document()->documentLayout()->imageAt( ev->pos() );
-  if ( ev->button() == Qt::NoButton && ( !anchor.isEmpty() || !image.isEmpty() ) )
+  // buttons(), not button(): a move event carries no single button, so button()
+  // is always NoButton here and would promise a link even mid text selection.
+  if ( ev->buttons() == Qt::NoButton && ( !anchor.isEmpty() || !image.isEmpty() ) )
   {
     viewport()->setCursor( Qt::PointingHandCursor );
   }
@@ -237,33 +239,34 @@ void KadasMapItemTooltip::mouseReleaseEvent( QMouseEvent *ev )
     ev->ignore();
     return;
   }
+  // Always: QTextEdit tracks the press it was given and stays convinced the
+  // button is down until it sees the release, drag-selecting under a pointer
+  // with nothing held. Opening a link is on top of that, not instead of it.
+  QTextEdit::mouseReleaseEvent( ev );
+
   // A press that wandered was a text selection, not a click on the link under
   // it. Judge that by how far it travelled rather than by whether any movement
   // arrived at all: a trackpad or a touch screen puts a pixel or two into every
   // click, which used to be enough to swallow the link entirely.
-  if ( ev->button() == Qt::LeftButton && ( ev->pos() - mPressPos ).manhattanLength() <= QApplication::startDragDistance() )
+  if ( ev->button() != Qt::LeftButton || ( ev->pos() - mPressPos ).manhattanLength() > QApplication::startDragDistance() )
+    return;
+
+  const QString anchor = document()->documentLayout()->anchorAt( ev->pos() );
+  const QString image = document()->documentLayout()->imageAt( ev->pos() );
+  if ( !anchor.isEmpty() )
   {
-    QString anchor = document()->documentLayout()->anchorAt( ev->pos() );
-    QString image = document()->documentLayout()->imageAt( ev->pos() );
-    if ( !anchor.isEmpty() )
-    {
-      QDesktopServices::openUrl( QUrl( anchor ) );
-    }
-    else if ( !image.isEmpty() )
-    {
-      // The image is drawn small to fit the tooltip; opening it shows the file
-      // behind it at the resolution it was stored with.
-      const QUrl url( image );
-      const QString file = KadasAttachmentUtils::isIdentifier( image ) ? KadasAttachmentUtils::resolve( image ) : ( url.isLocalFile() ? url.toLocalFile() : image );
-      if ( !file.isEmpty() && QFile::exists( file ) )
-      {
-        QDesktopServices::openUrl( QUrl::fromLocalFile( file ) );
-      }
-    }
+    QDesktopServices::openUrl( QUrl( anchor ) );
   }
-  else
+  else if ( !image.isEmpty() )
   {
-    QTextEdit::mouseReleaseEvent( ev );
+    // The image is drawn small to fit the tooltip; opening it shows the file
+    // behind it at the resolution it was stored with.
+    const QUrl url( image );
+    const QString file = KadasAttachmentUtils::isIdentifier( image ) ? KadasAttachmentUtils::resolve( image ) : ( url.isLocalFile() ? url.toLocalFile() : image );
+    if ( !file.isEmpty() && QFile::exists( file ) )
+    {
+      QDesktopServices::openUrl( QUrl::fromLocalFile( file ) );
+    }
   }
 }
 

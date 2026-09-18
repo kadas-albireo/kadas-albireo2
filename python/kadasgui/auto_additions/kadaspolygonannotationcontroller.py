@@ -1,5 +1,5 @@
 # The following has been generated automatically from kadas/gui/annotationitems/kadaspolygonannotationcontroller.h
 try:
-    KadasPolygonAnnotationController.__overridden_methods__ = ['itemType', 'itemName', 'createItem', 'nodes', 'startPart', 'setCurrentPoint', 'setCurrentAttributes', 'continuePart', 'endPart', 'drawAttribs', 'drawAttribsFromPosition', 'positionFromDrawAttribs', 'getEditContext', 'edit', 'editAttribsFromPosition', 'positionFromEditAttribs', 'populateContextMenu', 'position', 'setPosition', 'translate', 'applyPersistedStyle', 'persistStyle', 'createStyleEditor']
+    KadasPolygonAnnotationController.__overridden_methods__ = ['itemType', 'itemName', 'createItem', 'nodes', 'startPart', 'setCurrentPoint', 'setCurrentAttributes', 'continuePart', 'endPart', 'drawAttribs', 'drawAttribsFromPosition', 'positionFromDrawAttribs', 'getEditContext', 'beginEdit', 'edit', 'editAttribsFromPosition', 'positionFromEditAttribs', 'populateContextMenu', 'position', 'setPosition', 'translate', 'applyPersistedStyle', 'persistStyle', 'createStyleEditor']
 except (NameError, AttributeError):
     pass

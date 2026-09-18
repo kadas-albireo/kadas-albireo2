@@ -190,18 +190,27 @@ QgsPointXY KadasPolygonAnnotationController::segmentMidpointMap( const QgsCurve 
   return QgsPointXY( 0.5 * ( am.x() + bm.x() ), 0.5 * ( am.y() + bm.y() ) );
 }
 
+bool KadasPolygonAnnotationController::canDeleteVertex( const QgsCurve *ring, int vertex )
+{
+  // Three vertices are the least a polygon can carry; below that it stops
+  // enclosing anything.
+  const int distinct = distinctVertexCount( ring );
+  return distinct > 3 && vertex >= 0 && vertex < distinct;
+}
+
 void KadasPolygonAnnotationController::deleteVertex( QgsAnnotationItem *item, int vertex )
 {
+  // Checked against the geometry as it stands: taking the mutable copy first
+  // would swap the item's geometry for a clone even when the delete is refused,
+  // dangling whatever the caller still holds a raw pointer to.
+  const QgsCurvePolygon *poly = asPolygon( item )->geometry();
+  if ( !poly || !canDeleteVertex( poly->exteriorRing(), vertex ) )
+    return;
   QgsLineString *ring = takeMutableExterior( asPolygon( item ) );
   if ( !ring )
     return;
   const int n = ring->numPoints();
   const bool closed = n > 1 && ring->pointN( 0 ) == ring->pointN( n - 1 );
-  const int distinct = distinctVertexCount( ring );
-  // Three vertices are the least a polygon can carry; below that it stops
-  // enclosing anything.
-  if ( distinct <= 3 || vertex < 0 || vertex >= distinct )
-    return;
   ring->deleteVertex( QgsVertexId( 0, 0, vertex ) );
   // Removing the first vertex leaves the closing duplicate standing on a vertex
   // that is gone; re-close the ring on whichever vertex is first now.
@@ -317,11 +326,9 @@ KadasEditContext KadasPolygonAnnotationController::getEditContext( const QgsAnno
   const QgsCurve *ring = poly->exteriorRing();
   if ( !ring )
     return KadasEditContext();
-  // Any hover hit-test means we are no longer mid-rotation or mid-insert; draw
-  // the rotation handle at rest again and drop any armed insert (a drag never
-  // calls getEditContext, it goes straight to edit()).
+  // Any hover hit-test means we are no longer mid-rotation; draw the handle at
+  // rest again (a drag never calls getEditContext, it goes straight to edit()).
   mRotation.deactivate();
-  mInsert.disarm();
   const int n = ring->numPoints();
   const int last = distinctVertexCount( ring );
   for ( int i = 0; i < last; ++i )
@@ -344,7 +351,6 @@ KadasEditContext KadasPolygonAnnotationController::getEditContext( const QgsAnno
       const QgsPointXY mid = segmentMidpointMap( ring, i, ctx );
       if ( pos.sqrDist( mid ) < pickTolSqr( ctx ) )
       {
-        mInsert.arm( i );
         KadasEditContext ec( QgsVertexId( KadasAnnotationVertexEdit::kPartInsert, 0, i ), mid, drawAttribs() );
         ec.appliesOnClick = true;
         return ec;
@@ -387,6 +393,16 @@ KadasEditContext KadasPolygonAnnotationController::getEditContext( const QgsAnno
     }
   }
   return KadasEditContext();
+}
+
+void KadasPolygonAnnotationController::beginEdit( const QgsAnnotationItem *, const KadasEditContext &editContext, const KadasAnnotationItemContext & )
+{
+  // Armed here rather than in getEditContext(), which also runs as the hit test
+  // for every other item under the cursor and would keep disarming this one.
+  if ( editContext.vidx.part == KadasAnnotationVertexEdit::kPartInsert )
+    mInsert.arm( editContext.vidx.vertex );
+  else
+    mInsert.disarm();
 }
 
 void KadasPolygonAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
@@ -515,10 +531,9 @@ void KadasPolygonAnnotationController::populateContextMenu( QgsAnnotationItem *i
   const QgsCurve *ring = poly->exteriorRing();
   if ( !ring )
     return;
-  const int distinct = distinctVertexCount( ring );
   const int vertex = editContext.vidx.vertex;
   QAction *action = menu->addAction( QIcon( QStringLiteral( ":/kadas/icons/delete_node" ) ), QObject::tr( "Delete node" ), [item, vertex]() { deleteVertex( item, vertex ); } );
-  action->setEnabled( vertex < distinct && distinct > 3 );
+  action->setEnabled( canDeleteVertex( ring, vertex ) );
 }
 
 QgsPointXY KadasPolygonAnnotationController::position( const QgsAnnotationItem *item ) const

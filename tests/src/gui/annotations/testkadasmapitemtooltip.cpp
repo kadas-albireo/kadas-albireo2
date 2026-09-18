@@ -47,6 +47,7 @@ class TestKadasMapItemTooltip : public QObject
     void linkOpensOnClickThatBarelyMoved();
     void linkStaysShutWhenTheClickWasADrag();
     void linkStaysShutWhileAMapToolOwnsThePointer();
+    void plainClickLeavesNoTextSelectionBehind();
 
   private:
     //! A point inside the anchor of the tooltip's one link, in viewport coordinates.
@@ -157,6 +158,37 @@ void TestKadasMapItemTooltip::linkStaysShutWhileAMapToolOwnsThePointer()
 
   QVERIFY( catcher.urls.isEmpty() );
   QDesktopServices::unsetUrlHandler( QStringLiteral( "https" ) );
+}
+
+void TestKadasMapItemTooltip::plainClickLeavesNoTextSelectionBehind()
+{
+  // Regression: the release was handed on to QTextEdit only when the click was
+  // ruled out as a link click, so an ordinary click on plain text never reached
+  // it. A press inside an existing selection deliberately leaves that selection
+  // alone, because it might be the start of a drag; it is the release that
+  // decides it was a click after all and clears it. Without that release the
+  // selection could not be dismissed at all.
+  QgsMapCanvas canvas;
+  canvas.resize( 800, 600 );
+  canvas.show();
+  KadasMapItemTooltip tooltip( &canvas );
+  tooltip.setHtml( QStringLiteral( "<p>a stretch of ordinary text, long enough to select across</p>" ) );
+  tooltip.move( 10, 10 );
+  tooltip.show();
+  QVERIFY( QTest::qWaitForWindowExposed( &canvas ) );
+
+  const QPoint start( 2, 4 );
+  const QPoint end( 70, 4 );
+  QTest::mousePress( tooltip.viewport(), Qt::LeftButton, Qt::NoModifier, start );
+  QTest::mouseMove( tooltip.viewport(), end );
+  QTest::mouseRelease( tooltip.viewport(), Qt::LeftButton, Qt::NoModifier, end );
+  QVERIFY2( tooltip.textCursor().hasSelection(), "dragging across the text did not select it" );
+
+  // A plain click inside that selection dismisses it.
+  const QPoint inside( 35, 4 );
+  QTest::mousePress( tooltip.viewport(), Qt::LeftButton, Qt::NoModifier, inside );
+  QTest::mouseRelease( tooltip.viewport(), Qt::LeftButton, Qt::NoModifier, inside );
+  QVERIFY2( !tooltip.textCursor().hasSelection(), "clicking inside the selection left it standing, so the release never reached QTextEdit" );
 }
 
 QTEST_MAIN( TestKadasMapItemTooltip )

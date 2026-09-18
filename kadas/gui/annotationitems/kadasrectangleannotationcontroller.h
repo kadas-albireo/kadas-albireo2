@@ -46,6 +46,7 @@ class KADAS_GUI_EXPORT KadasRectangleAnnotationController : public KadasAnnotati
     QgsPointXY positionFromDrawAttribs( const QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const override;
 
     KadasEditContext getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const override;
+    void beginEdit( const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAnnotationItemContext &ctx ) override;
     void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx ) override;
     void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) override;
     KadasAttribValues editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const override;
@@ -88,9 +89,9 @@ class KADAS_GUI_EXPORT KadasRectangleAnnotationController : public KadasAnnotati
     QgsPointXY mDrawAnchor;
     bool mDrawAnchorValid = false;
 
-    //! Opposite corner (map CRS) captured when a corner handle is grabbed; a resize drag pivots around it.
-    mutable QgsPointXY mResizeAnchor;
-    mutable bool mResizeAnchorValid = false;
+    //! Opposite corner (map CRS) captured when a corner drag begins; the whole drag pivots around it.
+    QgsPointXY mResizeAnchor;
+    bool mResizeAnchorValid = false;
 };
 
 #endif // KADASRECTANGLEANNOTATIONCONTROLLER_H

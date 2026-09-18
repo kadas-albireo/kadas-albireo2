@@ -17,6 +17,7 @@
 #ifndef KADASMAPTOOLEDITANNOTATIONITEM_H
 #define KADASMAPTOOLEDITANNOTATIONITEM_H
 
+#include <QPoint>
 #include <QPointer>
 #include <QString>
 #include <functional>
@@ -127,6 +128,10 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     QPointer<QWidget> mExtraTopWidget;
 
     KadasEditContext mEditContext;
+    //! TRUE once beginEdit() has run for mEditContext, so a controller captures what it freezes for an edit exactly once per edit.
+    bool mEditBegun = false;
+    //! Hands mEditContext to the controller as the edit that is about to run, at most once per edit.
+    void beginEditOnce();
     //! TRUE while the pointer is over the editor panel, where the map tooltip previews the edit.
     bool mPointerInEditor = false;
     //! Shows the edited item's tooltip beside it, for as long as the pointer is in the editor.
@@ -135,8 +140,14 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     //! Non-interactive preview of the hovered item's tooltip; alive only while the tool is.
     KadasMapItemTooltip *mTooltipWidget = nullptr;
     QgsVector mMoveOffset;
-    //! Last pointer position on the canvas, in map coordinates; handed to the controller so handles that only show near the pointer know where it is.
-    QgsPointXY mCursorPos;
+    // Last pointer position on the canvas, in device pixels rather than map
+    // coordinates: a pan or a zoom under a motionless pointer leaves it on the
+    // same pixel but over a different place on the map, and a map coordinate
+    // recorded before such a move points nowhere near the pointer afterwards.
+    QPoint mCursorDevicePos;
+    bool mCursorPosValid = false;
+    //! Pointer position in map coordinates, empty while the pointer is off the canvas. Handed to the controller so handles that only show near the pointer know where it is.
+    QgsPointXY cursorMapPos() const;
     Qt::MouseButton mPressedButton = Qt::NoButton;
     //! TRUE once the pointer has moved while the button is held, i.e. the press turned into a drag.
     bool mDragMoved = false;
@@ -156,7 +167,10 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     class HandlesOverlay;
     HandlesOverlay *mHandles = nullptr;
 
+    //! Repaints the handles and remeasures the labels; for when the item itself changed.
     void refreshHandles();
+    //! Repaints the handles reusing the measured labels; for when only the pointer moved.
+    void repaintHandles();
     void updateTempRubberBand();
     void clearTempRubberBand();
     void updateDrawPreview();

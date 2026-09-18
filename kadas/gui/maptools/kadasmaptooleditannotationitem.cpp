@@ -24,6 +24,7 @@
 #include <functional>
 #include <limits>
 #include <memory>
+#include <optional>
 
 #include <qgis/qgsannotationitem.h>
 #include <qgis/qgsannotationlayer.h>
@@ -71,6 +72,9 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
     }
 
     void updateRect() { setRect( mMapCanvas->mapSettings().visibleExtent() ); }
+
+    //! Drops the cached measurement labels so the next paint recomputes them; call whenever the item itself changed.
+    void invalidateLabels() { mLabels.reset(); }
 
     //! Optional callback that renders a live preview of the edited item straight
     //! into the overlay painter (in scene coordinates), so an in-progress edit
@@ -154,7 +158,12 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
     {
       if ( !mLabelsProvider )
         return;
-      const QList<KadasAnnotationMeasurementLabel> labels = mLabelsProvider();
+      // Computing these means an ellipsoidal length per edge; they depend on the
+      // item alone, never on where the pointer is, so a repaint that merely
+      // follows the pointer reuses them.
+      if ( !mLabels )
+        mLabels = mLabelsProvider();
+      const QList<KadasAnnotationMeasurementLabel> &labels = *mLabels;
       if ( labels.isEmpty() )
         return;
 
@@ -211,18 +220,12 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
         return false;
 
       QPointF dir = delta / length;
+      // Taken from the segment as it runs, before the flip below reverses it.
+      const QPointF normal = KadasAnnotationMeasurementLabel::Segment::labelOffsetDirection( dir, segment.interior );
       // Read the segment in whichever of its two directions keeps the text upright:
       // left to right, and bottom to top when it is vertical.
       if ( dir.x() < 0 || ( qgsDoubleNear( dir.x(), 0.0 ) && dir.y() > 0 ) )
         dir = -dir;
-      // Perpendicular to the (flipped) direction, hence always pointing up-screen.
-      QPointF normal( dir.y(), -dir.x() );
-      if ( segment.away )
-      {
-        const QPointF away = toCanvasCoordinates( *segment.away );
-        if ( QPointF::dotProduct( normal, anchor - away ) < 0 )
-          normal = -normal;
-      }
 
       painter->translate( anchor + normal * offset );
       painter->rotate( std::atan2( dir.y(), dir.x() ) * 180.0 / M_PI );
@@ -232,6 +235,7 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
     NodesProvider mNodesProvider;
     LabelsProvider mLabelsProvider;
     GuideProvider mGuideProvider;
+    std::optional<QList<KadasAnnotationMeasurementLabel>> mLabels;
     std::function<void( QPainter * )> mPreviewRenderer;
 };
 
@@ -338,7 +342,7 @@ void KadasMapToolEditAnnotationItem::activate()
         return {};
       KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
       ctx.setDigitizing( mDrawState == DrawState::InProgress );
-      ctx.setCursorPos( mCursorPos );
+      ctx.setCursorPos( cursorMapPos() );
       return mController->nodes( mItem, ctx );
     },
     [this]() -> QList<KadasAnnotationMeasurementLabel> {
@@ -362,6 +366,9 @@ void KadasMapToolEditAnnotationItem::activate()
     }
   } );
   connect( mLayer.data(), &QgsMapLayer::repaintRequested, this, &KadasMapToolEditAnnotationItem::refreshHandles, Qt::UniqueConnection );
+  // Watched for the leave event: once the pointer is off the canvas nothing
+  // reports where it is any more, and the handles that follow it say so.
+  canvas()->viewport()->installEventFilter( this );
   // Queued: this arrives from the middle of QgsMapCanvas::setLayers(), and
   // tearing the tool down from there would be re-entrant.
   connect( canvas(), &QgsMapCanvas::layersChanged, this, &KadasMapToolEditAnnotationItem::closeIfTargetLayerHidden, static_cast<Qt::ConnectionType>( Qt::QueuedConnection | Qt::UniqueConnection ) );
@@ -380,8 +387,32 @@ void KadasMapToolEditAnnotationItem::activate()
 
 void KadasMapToolEditAnnotationItem::refreshHandles()
 {
+  if ( !mHandles )
+    return;
+  mHandles->invalidateLabels();
+  mHandles->update();
+}
+
+void KadasMapToolEditAnnotationItem::repaintHandles()
+{
   if ( mHandles )
     mHandles->update();
+}
+
+void KadasMapToolEditAnnotationItem::beginEditOnce()
+{
+  if ( mEditBegun || !mEditContext.isValid() || !mItem || !mController || !mLayer )
+    return;
+  mEditBegun = true;
+  const KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
+  mController->beginEdit( mItem, mEditContext, ctx );
+}
+
+QgsPointXY KadasMapToolEditAnnotationItem::cursorMapPos() const
+{
+  if ( !mCursorPosValid || !canvas() )
+    return QgsPointXY();
+  return canvas()->getCoordinateTransform()->toMapCoordinates( mCursorDevicePos );
 }
 
 void KadasMapToolEditAnnotationItem::renderItemPreview( QPainter *painter )
@@ -479,6 +510,9 @@ void KadasMapToolEditAnnotationItem::clearTempRubberBand()
 void KadasMapToolEditAnnotationItem::deactivate()
 {
   QgsMapTool::deactivate();
+  if ( canvas() )
+    canvas()->viewport()->removeEventFilter( this );
+  mCursorPosValid = false;
   delete mTooltipWidget;
   mTooltipWidget = nullptr;
   mPointerInEditor = false;
@@ -542,7 +576,10 @@ void KadasMapToolEditAnnotationItem::canvasPressEvent( QgsMapMouseEvent *e )
     return;
 
   if ( mEditContext.isValid() )
+  {
+    beginEditOnce();
     return;
+  }
 
   if ( !mAllowCreate && mDrawState != DrawState::InProgress )
   {
@@ -630,7 +667,8 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
   KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
   ctx.setModifiers( e->modifiers() );
   const QgsPointXY pos = e->mapPoint();
-  mCursorPos = pos;
+  mCursorDevicePos = e->pos();
+  mCursorPosValid = true;
 
   if ( mAllowCreate && mDrawState == DrawState::InProgress )
   {
@@ -685,10 +723,13 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
   else
   {
     // The handles follow the pointer: a midpoint handle only shows once the
-    // pointer comes near the segment it belongs to.
-    refreshHandles();
+    // pointer comes near the segment it belongs to. Only which handles show
+    // changes here, so the measurement labels are reused rather than remeasured
+    // on every pixel of pointer travel.
+    repaintHandles();
     KadasEditContext oldContext = mEditContext;
     mEditContext = mController->getEditContext( mItem, pos, ctx );
+    mEditBegun = false;
     if ( !mEditContext.isValid() )
     {
       setCursor( Qt::ArrowCursor );
@@ -734,6 +775,7 @@ void KadasMapToolEditAnnotationItem::canvasReleaseEvent( QgsMapMouseEvent *e )
       // has to add it at the handle itself rather than silently do nothing.
       KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
       ctx.setModifiers( e->modifiers() );
+      beginEditOnce();
       mController->edit( mItem, mEditContext, mEditContext.pos, ctx );
     }
     if ( mEditItemHidden )
@@ -749,6 +791,8 @@ void KadasMapToolEditAnnotationItem::canvasReleaseEvent( QgsMapMouseEvent *e )
     if ( mStyleEditor )
       mStyleEditor->loadFromItem( mItem );
   }
+  // The edit is over either way: the next one captures its own state.
+  mEditBegun = false;
 }
 
 void KadasMapToolEditAnnotationItem::canvasDoubleClickEvent( QgsMapMouseEvent * )
@@ -898,6 +942,7 @@ void KadasMapToolEditAnnotationItem::inputChanged()
   const QgsPointXY newPos = mController->positionFromEditAttribs( mItem, mEditContext, values, ctx );
   mInputWidget->adjustCursorAndExtent( newPos );
 
+  beginEditOnce();
   mController->edit( mItem, mEditContext, values, ctx );
   mLayer->triggerRepaint();
   pushState();
@@ -909,6 +954,13 @@ void KadasMapToolEditAnnotationItem::inputChanged()
 
 bool KadasMapToolEditAnnotationItem::eventFilter( QObject *watched, QEvent *event )
 {
+  if ( canvas() && watched == canvas()->viewport() && event->type() == QEvent::Leave )
+  {
+    // Nothing will report where the pointer is any more, so the handles that
+    // only show near it stop showing rather than staying where it last was.
+    mCursorPosValid = false;
+    repaintHandles();
+  }
   if ( watched == mBottomBar )
   {
     if ( event->type() == QEvent::Enter )

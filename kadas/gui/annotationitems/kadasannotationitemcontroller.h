@@ -18,6 +18,7 @@
 #define KADASANNOTATIONITEMCONTROLLER_H
 
 #include <QColor>
+#include <QPointF>
 #include <QString>
 #include <QStringList>
 #include <optional>
@@ -61,11 +62,29 @@ struct KadasAnnotationMeasurementLabel
      */
     struct Segment
     {
+        //! Side of the directed segment the shape's interior lies on, which is the side its label has to avoid.
+        enum class InteriorSide
+        {
+          None, //!< The segment belongs to no closed shape (an open line): the label takes whichever side is up on screen.
+          Left,
+          Right,
+        };
+
         //! Segment ends, in map coordinates. The label runs parallel to them, in whichever of the two directions reads left to right.
         QgsPointXY start;
         QgsPointXY end;
-        //! Map point the label is pushed away from - a point just inside the shape, so edge labels land outside it. Unset: the label goes on whichever side is up on screen.
-        std::optional<QgsPointXY> away;
+        //! Which side the shape's interior is on, so the label lands outside it.
+        InteriorSide interior = InteriorSide::None;
+
+        /**
+         * Unit normal, in screen coordinates, a label for a segment running in
+         * screen direction \a dir is pushed along to clear the shape: away from
+         * the side \a interior names, or up the screen when it names none.
+         *
+         * Screen y grows downwards, which is the whole difficulty: it inverts
+         * the sign of a cross product without turning the picture upside down.
+         */
+        static QPointF labelOffsetDirection( const QPointF &dir, InteriorSide interior );
     };
 
     QgsPointXY mapPos;
@@ -155,6 +174,25 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     // ----- Edit interface -------------------------------------------------
 
     virtual KadasEditContext getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const = 0;
+
+    /**
+     * Called once on the item being edited, before the first edit() of a drag or
+     * click on \a editContext, so a controller can freeze whatever has to hold
+     * still for that whole edit: the corner a resize pivots around, the segment
+     * a midpoint handle will insert into.
+     *
+     * getEditContext() is the wrong place for it. It doubles as the hit test
+     * that item picking runs over every candidate under the cursor, so a
+     * neighbouring item would arm and disarm state belonging to the item the
+     * user is actually editing.
+     */
+    virtual void beginEdit( const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAnnotationItemContext &ctx )
+    {
+      Q_UNUSED( item );
+      Q_UNUSED( editContext );
+      Q_UNUSED( ctx );
+    }
+
     virtual void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx ) = 0;
     virtual void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) = 0;
     virtual KadasAttribValues editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const = 0;
@@ -330,13 +368,7 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
 #ifndef SIP_RUN
     // ----- Segment measurement labels --------------------------------------
 
-    //! Side of a directed edge the shape's interior lies on, which is the side an edge label must avoid.
-    enum class InteriorSide
-    {
-      None, //!< The edge belongs to no closed shape (an open line): the label picks the side that is up on screen.
-      Left,
-      Right,
-    };
+    using InteriorSide = KadasAnnotationMeasurementLabel::Segment::InteriorSide;
 
     //! Interior side of the closed ring through \a ring (item coordinates), from its winding; InteriorSide::None when it is degenerate.
     static InteriorSide ringInteriorSide( const QVector<QgsPointXY> &ring );

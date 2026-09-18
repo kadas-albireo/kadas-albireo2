@@ -54,6 +54,7 @@ class KADAS_GUI_EXPORT KadasPolygonAnnotationController : public KadasAnnotation
     QgsPointXY positionFromDrawAttribs( const QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const override;
 
     KadasEditContext getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const override;
+    void beginEdit( const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAnnotationItemContext &ctx ) override;
     void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx ) override;
     void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) override;
     KadasAttribValues editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const override;
@@ -98,8 +99,8 @@ class KADAS_GUI_EXPORT KadasPolygonAnnotationController : public KadasAnnotation
     // clear of the polygon's northmost extent so it never overlaps the shape.
     QgsPointXY restHandleMap( const QgsCurvePolygon *poly, const KadasAnnotationItemContext &ctx ) const;
 
-    // Per-drag midpoint-handle state, armed when such a handle is grabbed.
-    mutable KadasAnnotationVertexEdit::VertexInsertState mInsert;
+    // Per-edit midpoint-handle state, armed by beginEdit() when such a handle is grabbed.
+    KadasAnnotationVertexEdit::VertexInsertState mInsert;
 
     //! Number of vertices the ring carries once its closing duplicate is discounted.
     static int distinctVertexCount( const QgsCurve *ring );
@@ -110,7 +111,10 @@ class KADAS_GUI_EXPORT KadasPolygonAnnotationController : public KadasAnnotation
     //! Midpoint (map CRS) of the segment starting at vertex \a segment, or an invalid point when the segment does not exist.
     static QgsPointXY segmentMidpointMap( const QgsCurve *ring, int segment, const KadasAnnotationItemContext &ctx );
 
-    //! Removes vertex \a vertex, re-closing the ring; a no-op when it would leave fewer than three vertices behind.
+    //! TRUE when \a vertex exists on \a ring and removing it would still leave a polygon behind. The single source of the rule, shared by the menu entry and by deleteVertex().
+    static bool canDeleteVertex( const QgsCurve *ring, int vertex );
+
+    //! Removes vertex \a vertex, re-closing the ring; a no-op unless canDeleteVertex() allows it.
     static void deleteVertex( QgsAnnotationItem *item, int vertex );
 };
 

@@ -17,8 +17,11 @@
 #ifndef KADASANNOTATIONITEMCONTEXT_H
 #define KADASANNOTATIONITEMCONTEXT_H
 
+#include <optional>
+
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgscoordinatereferencesystem.h>
+#include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsmapsettings.h>
 #include <qgis/qgspointxy.h>
 
@@ -59,12 +62,32 @@ class KADAS_GUI_EXPORT KadasAnnotationItemContext
     QgsPointXY cursorPos() const { return mCursorPos; }
     void setCursorPos( const QgsPointXY &cursorPos ) { mCursorPos = cursorPos; }
 
+#ifndef SIP_RUN
+
+    /**
+     * Item CRS to map CRS transform, built on first use and kept for the rest of
+     * the context's life. Use its ReverseTransform direction for the way back.
+     *
+     * One hit test or handle repaint converts hundreds of points, and building a
+     * transform costs far more than using one, so everything goes through this
+     * one rather than constructing its own per point. The CRSs it is built from
+     * are fixed when the context is constructed.
+     */
+    const QgsCoordinateTransform &itemToMapTransform() const
+    {
+      if ( !mItemToMap )
+        mItemToMap = QgsCoordinateTransform( itemCrs(), mMapSettings.destinationCrs(), mMapSettings.transformContext() );
+      return *mItemToMap;
+    }
+#endif
+
   private:
     QgsAnnotationLayer *mLayer = nullptr;
     QgsMapSettings mMapSettings;
     Qt::KeyboardModifiers mModifiers = Qt::NoModifier;
     bool mDigitizing = false;
     QgsPointXY mCursorPos;
+    mutable std::optional<QgsCoordinateTransform> mItemToMap;
 };
 
 #endif // KADASANNOTATIONITEMCONTEXT_H

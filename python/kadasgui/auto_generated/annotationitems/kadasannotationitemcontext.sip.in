@@ -10,6 +10,7 @@
 
 
 
+
 class KadasAnnotationItemContext
 {
 %Docstring(signature="appended")
@@ -55,6 +56,16 @@ so the trailing rubber-band segment does not sprout one that chases the
 cursor.
 %End
     void setDigitizing( bool digitizing );
+
+    QgsPointXY cursorPos() const;
+%Docstring
+Pointer position in map coordinates, empty when it is unknown (pointer
+off the canvas, or a caller that has none). Handles that would clutter
+the shape if they were all shown at once - the midpoint insert handles -
+only appear near it.
+%End
+    void setCursorPos( const QgsPointXY &cursorPos );
+
 
 };
 
