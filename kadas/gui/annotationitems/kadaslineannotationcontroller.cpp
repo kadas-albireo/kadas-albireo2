@@ -173,12 +173,17 @@ QList<KadasNode> KadasLineAnnotationController::nodes( const QgsAnnotationItem *
   }
   // Midpoint handles: the only way to grow a line once it is finished, since
   // digitizing cannot be resumed. Left out while digitizing, where the trailing
-  // rubber-band segment would sprout one that chases the cursor.
+  // rubber-band segment would sprout one that chases the cursor, and shown only
+  // under the pointer, so they do not bury the vertices the rest of the time.
   if ( !ctx.digitizing() )
   {
     const int segments = segmentCount( curve );
     for ( int i = 0; i < segments; ++i )
-      result.append( { segmentMidpointMap( curve, i, ctx ), KadasAnnotationVertexEdit::renderHandle } );
+    {
+      const QgsPointXY mid = segmentMidpointMap( curve, i, ctx );
+      if ( KadasAnnotationVertexEdit::isRevealed( mid, ctx ) )
+        result.append( { mid, KadasAnnotationVertexEdit::renderHandle } );
+    }
   }
   return result;
 }
@@ -305,8 +310,9 @@ KadasEditContext KadasLineAnnotationController::getEditContext( const QgsAnnotat
       return KadasEditContext( QgsVertexId( 0, 0, i ), mp, drawAttribs() );
     }
   }
-  // Midpoint handles, offered by nodes() under the same condition. Tested
-  // before the segment hit below, which covers the same stretch of line.
+  // Midpoint handles. The pick tolerance is well inside the radius that reveals
+  // them in nodes(), so nothing invisible can be grabbed. Tested before the
+  // segment hit below, which covers the same stretch of line.
   if ( !ctx.digitizing() )
   {
     const int segments = segmentCount( curve );
@@ -586,8 +592,8 @@ QList<KadasAnnotationMeasurementLabel> KadasLineAnnotationController::measuremen
     const double seg = da.measureLine( ai, bi );
     total += seg;
 
-    const QgsPointXY midItem( 0.5 * ( a.x() + b.x() ), 0.5 * ( a.y() + b.y() ) );
-    labels.append( { toMapPos( midItem, ctx ), formatLengthMeters( seg ), true } );
+    // A line has no inside, so the label simply takes the upper side of its segment.
+    labels.append( segmentLabel( ai, bi, formatLengthMeters( seg ), ctx ) );
   }
 
   const QgsPoint last = curve->vertexAt( QgsVertexId( 0, 0, n - 1 ) );

@@ -20,6 +20,7 @@
 #include <QPainter>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <cmath>
 #include <functional>
 #include <limits>
 #include <memory>
@@ -165,6 +166,7 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
       const QColor backgroundColor( 255, 255, 255, 192 );
       constexpr int offsetBelow = 20; // px
       constexpr int padding = 3;
+      constexpr double segmentGap = 4; // px between a segment and the label lying alongside it
 
       QFont font = painter->font();
       font.setPointSizeF( 9.0 );
@@ -172,6 +174,7 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
 
       painter->save();
       painter->setFont( font );
+      painter->setRenderHint( QPainter::Antialiasing, true );
       const QFontMetrics metrics( font );
 
       for ( const KadasAnnotationMeasurementLabel &label : labels )
@@ -181,13 +184,49 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
         for ( const QString &l : lines )
           width = std::max( width, metrics.horizontalAdvance( l ) );
         const int height = metrics.height() * lines.size();
+        // Drawn around the origin, so the placement below is a plain translate
+        // (plus a rotation for a label that follows its segment).
+        const QRectF box( -0.5 * ( width + 2 * padding ), -0.5 * ( height + 2 * padding ), width + 2 * padding, height + 2 * padding );
         const QPointF screen = toCanvasCoordinates( label.mapPos );
-        QRectF rect( screen.x() - 0.5 * ( width + 2 * padding ), screen.y() + ( label.centered ? 0 : offsetBelow ) - 0.5 * ( height + 2 * padding ), width + 2 * padding, height + 2 * padding );
-        painter->fillRect( rect, backgroundColor );
+
+        painter->save();
+        if ( !label.segment || !placeAlongSegment( painter, *label.segment, screen, 0.5 * box.height() + segmentGap ) )
+          painter->translate( screen.x(), screen.y() + ( label.centered ? 0 : offsetBelow ) );
+        painter->fillRect( box, backgroundColor );
         painter->setPen( textColor );
-        painter->drawText( rect, Qt::AlignCenter, label.text );
+        painter->drawText( box, Qt::AlignCenter, label.text );
+        painter->restore();
       }
       painter->restore();
+    }
+
+    //! Moves \a painter onto \a anchor, rotated to run along \a segment and pushed \a offset pixels off it, away from the shape's interior. Returns FALSE for a segment too short to give a direction, leaving the painter untouched.
+    bool placeAlongSegment( QPainter *painter, const KadasAnnotationMeasurementLabel::Segment &segment, const QPointF &anchor, double offset )
+    {
+      const QPointF start = toCanvasCoordinates( segment.start );
+      const QPointF end = toCanvasCoordinates( segment.end );
+      const QPointF delta = end - start;
+      const double length = std::hypot( delta.x(), delta.y() );
+      if ( length < 1.0 )
+        return false;
+
+      QPointF dir = delta / length;
+      // Read the segment in whichever of its two directions keeps the text upright:
+      // left to right, and bottom to top when it is vertical.
+      if ( dir.x() < 0 || ( qgsDoubleNear( dir.x(), 0.0 ) && dir.y() > 0 ) )
+        dir = -dir;
+      // Perpendicular to the (flipped) direction, hence always pointing up-screen.
+      QPointF normal( dir.y(), -dir.x() );
+      if ( segment.away )
+      {
+        const QPointF away = toCanvasCoordinates( *segment.away );
+        if ( QPointF::dotProduct( normal, anchor - away ) < 0 )
+          normal = -normal;
+      }
+
+      painter->translate( anchor + normal * offset );
+      painter->rotate( std::atan2( dir.y(), dir.x() ) * 180.0 / M_PI );
+      return true;
     }
 
     NodesProvider mNodesProvider;
@@ -299,6 +338,7 @@ void KadasMapToolEditAnnotationItem::activate()
         return {};
       KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
       ctx.setDigitizing( mDrawState == DrawState::InProgress );
+      ctx.setCursorPos( mCursorPos );
       return mController->nodes( mItem, ctx );
     },
     [this]() -> QList<KadasAnnotationMeasurementLabel> {
@@ -590,6 +630,7 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
   KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
   ctx.setModifiers( e->modifiers() );
   const QgsPointXY pos = e->mapPoint();
+  mCursorPos = pos;
 
   if ( mAllowCreate && mDrawState == DrawState::InProgress )
   {
@@ -643,6 +684,9 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
   }
   else
   {
+    // The handles follow the pointer: a midpoint handle only shows once the
+    // pointer comes near the segment it belongs to.
+    refreshHandles();
     KadasEditContext oldContext = mEditContext;
     mEditContext = mController->getEditContext( mItem, pos, ctx );
     if ( !mEditContext.isValid() )

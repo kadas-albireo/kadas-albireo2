@@ -20,6 +20,7 @@
 #include <QColor>
 #include <QString>
 #include <QStringList>
+#include <optional>
 
 #include <qgis/qgis.h>
 
@@ -50,9 +51,28 @@ class KadasAnnotationStyleEditor;
  */
 struct KadasAnnotationMeasurementLabel
 {
+    /**
+     * \ingroup gui
+     * \brief Placement of a label that measures a segment.
+     *
+     * Such a label is laid along its segment rather than upright on top of it, and
+     * pushed clear of it, so the number never hides the line it belongs to nor the
+     * midpoint handle sitting there.
+     */
+    struct Segment
+    {
+        //! Segment ends, in map coordinates. The label runs parallel to them, in whichever of the two directions reads left to right.
+        QgsPointXY start;
+        QgsPointXY end;
+        //! Map point the label is pushed away from - a point just inside the shape, so edge labels land outside it. Unset: the label goes on whichever side is up on screen.
+        std::optional<QgsPointXY> away;
+    };
+
     QgsPointXY mapPos;
     QString text;
     bool centered = true;
+    //! Set when the label measures a segment; unset for a label that just marks a spot (a total, an area).
+    std::optional<Segment> segment;
 };
 
 /**
@@ -305,6 +325,24 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     // Honor the shared "/kadas/measure_decimals" setting.
     static QString formatLengthMeters( double meters );
     static QString formatAreaSquareMeters( double sqMeters );
+#endif
+
+#ifndef SIP_RUN
+    // ----- Segment measurement labels --------------------------------------
+
+    //! Side of a directed edge the shape's interior lies on, which is the side an edge label must avoid.
+    enum class InteriorSide
+    {
+      None, //!< The edge belongs to no closed shape (an open line): the label picks the side that is up on screen.
+      Left,
+      Right,
+    };
+
+    //! Interior side of the closed ring through \a ring (item coordinates), from its winding; InteriorSide::None when it is degenerate.
+    static InteriorSide ringInteriorSide( const QVector<QgsPointXY> &ring );
+
+    //! Label \a text for the edge \a a to \a b (item coordinates), anchored on its midpoint, laid along it and pushed to the side opposite \a side.
+    static KadasAnnotationMeasurementLabel segmentLabel( const QgsPointXY &a, const QgsPointXY &b, const QString &text, const KadasAnnotationItemContext &ctx, InteriorSide side = InteriorSide::None );
 #endif
 };
 

@@ -147,12 +147,17 @@ QList<KadasNode> KadasPolygonAnnotationController::nodes( const QgsAnnotationIte
   // digitizing cannot be resumed. This is also what rescues a ring left with two
   // vertices, which renders as a line and has no area to speak of. Left out while
   // digitizing, where the rubber-band segments would sprout handles that chase
-  // the cursor.
+  // the cursor, and shown only under the pointer, so they do not bury the
+  // vertices the rest of the time.
   if ( !ctx.digitizing() )
   {
     const int segments = segmentCount( ring );
     for ( int i = 0; i < segments; ++i )
-      result.append( { segmentMidpointMap( ring, i, ctx ), KadasAnnotationVertexEdit::renderHandle } );
+    {
+      const QgsPointXY mid = segmentMidpointMap( ring, i, ctx );
+      if ( KadasAnnotationVertexEdit::isRevealed( mid, ctx ) )
+        result.append( { mid, KadasAnnotationVertexEdit::renderHandle } );
+    }
   }
   return result;
 }
@@ -328,8 +333,9 @@ KadasEditContext KadasPolygonAnnotationController::getEditContext( const QgsAnno
       return KadasEditContext( QgsVertexId( 0, 0, i ), mp, drawAttribs() );
     }
   }
-  // Midpoint handles, offered by nodes() under the same condition. Tested
-  // before the body hit below, which covers the boundary they sit on.
+  // Midpoint handles. The pick tolerance is well inside the radius that reveals
+  // them in nodes(), so nothing invisible can be grabbed. Tested before the body
+  // hit below, which covers the boundary they sit on.
   if ( !ctx.digitizing() )
   {
     const int segments = segmentCount( ring );
@@ -595,20 +601,25 @@ QList<KadasAnnotationMeasurementLabel> KadasPolygonAnnotationController::measure
   da.setSourceCrs( ctx.itemCrs(), ctx.mapSettings().transformContext() );
   da.setEllipsoid( QgsProject::instance()->ellipsoid() );
 
-  // One length label per exterior-ring edge.
+  // One length label per exterior-ring edge, laid outside the ring - which side
+  // that is depends on how the ring happens to be wound.
   const QgsCurve *ring = poly->exteriorRing();
   const int n = ring->numPoints();
+  QVector<QgsPointXY> pts;
+  pts.reserve( n );
+  for ( int i = 0; i < n; ++i )
+  {
+    const QgsPoint p = ring->vertexAt( QgsVertexId( 0, 0, i ) );
+    pts.append( QgsPointXY( p.x(), p.y() ) );
+  }
+  const InteriorSide interior = ringInteriorSide( pts );
   for ( int i = 1; i < n; ++i )
   {
-    const QgsPoint a = ring->vertexAt( QgsVertexId( 0, 0, i - 1 ) );
-    const QgsPoint b = ring->vertexAt( QgsVertexId( 0, 0, i ) );
-    const QgsPointXY ai( a.x(), a.y() );
-    const QgsPointXY bi( b.x(), b.y() );
+    const QgsPointXY &ai = pts.at( i - 1 );
+    const QgsPointXY &bi = pts.at( i );
     if ( ai == bi )
       continue; // skip rubber-band trailing duplicate / closing edge of degenerate ring
-    const double seg = da.measureLine( ai, bi );
-    const QgsPointXY midItem( 0.5 * ( a.x() + b.x() ), 0.5 * ( a.y() + b.y() ) );
-    labels.append( { toMapPos( midItem, ctx ), formatLengthMeters( seg ), true } );
+    labels.append( segmentLabel( ai, bi, formatLengthMeters( da.measureLine( ai, bi ) ), ctx, interior ) );
   }
 
   std::unique_ptr<QgsCurvePolygon> clone( poly->clone() );

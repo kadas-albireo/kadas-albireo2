@@ -380,13 +380,12 @@ QList<KadasAnnotationMeasurementLabel> KadasRectangleAnnotationController::measu
   da.setSourceCrs( ctx.itemCrs(), ctx.mapSettings().transformContext() );
   da.setEllipsoid( QgsProject::instance()->ellipsoid() );
 
+  const InteriorSide interior = ringInteriorSide( corners );
   for ( int i = 0; i < 4; ++i )
   {
     const QgsPointXY &a = corners[i];
     const QgsPointXY &b = corners[( i + 1 ) % 4];
-    const double seg = da.measureLine( a, b );
-    const QgsPointXY midItem( 0.5 * ( a.x() + b.x() ), 0.5 * ( a.y() + b.y() ) );
-    labels.append( { toMapPos( midItem, ctx ), formatLengthMeters( seg ), true } );
+    labels.append( segmentLabel( a, b, formatLengthMeters( da.measureLine( a, b ) ), ctx, interior ) );
   }
 
   double areaM2 = 0.0;

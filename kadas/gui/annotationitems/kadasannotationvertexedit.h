@@ -22,6 +22,7 @@
 #include <QPointF>
 
 #include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/annotationitems/kadasannotationitemcontext.h"
 
 class QPainter;
 
@@ -39,8 +40,14 @@ namespace KadasAnnotationVertexEdit
   //! vidx.part sentinel for a midpoint handle. Real vertices use part 0, the rotation handle part 1.
   constexpr int kPartInsert = 2;
 
-  //! Paints the midpoint handle (a small hollow diamond) at screen \a pt. Deliberately smaller than a vertex handle so the real vertices stay the prominent ones.
+  //! Paints the midpoint handle (a haloed circle with a plus in it) at screen \a pt. Round where the vertices are square, so the two never get confused.
   void renderHandle( QPainter *painter, const QPointF &pt, int size );
+
+  //! Distance in pixels from a segment midpoint within which its handle shows itself. Far enough that the handle is there by the time the pointer arrives, near enough that a shape with many short segments is not studded with them.
+  constexpr double kRevealRadiusPixels = 30;
+
+  //! TRUE when the handle at \a midpointMap is close enough to the pointer to be shown. Without a known pointer position no midpoint handle shows at all.
+  bool KADAS_GUI_EXPORT isRevealed( const QgsPointXY &midpointMap, const KadasAnnotationItemContext &ctx );
 
   /**
    * \ingroup gui

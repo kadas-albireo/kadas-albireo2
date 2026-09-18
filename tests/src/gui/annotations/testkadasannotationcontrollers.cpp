@@ -37,6 +37,7 @@
 #include <qgis/qgsapplication.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgscoordinatetransform.h>
+#include <qgis/qgsgeometry.h>
 #include <qgis/qgslinestring.h>
 #include <qgis/qgslinesymbol.h>
 #include <qgis/qgslinesymbollayer.h>
@@ -137,10 +138,11 @@ class TestKadasAnnotationControllers : public QObject
 
     // KadasPolygonAnnotationController -----------------------------------
     void polygon_getEditContext_hitsBodyNotBoundingBox();
-    void polygon_nodes_offerMidpointHandlesOnlyOnFinishedShape();
+    void polygon_nodes_offerMidpointHandlesNearThePointer();
     void polygon_midpointHandle_insertsOneVertexThenMovesIt();
     void polygon_midpointHandle_growsTwoVertexRingIntoPolygon();
     void polygon_deleteNode_reclosesRingAndKeepsAtLeastThree();
+    void polygon_measurementLabels_pushEdgeLabelsOutsideAConcaveRing();
 
     // Multi-type hit isolation -------------------------------------------
     void hitTest_multipleTypesSelectsByGeometryNotBbox();
@@ -801,10 +803,11 @@ namespace
 void TestKadasAnnotationControllers::line_midpointHandle_insertsOneVertexThenMovesIt()
 {
   KadasLineAnnotationController controller;
-  const auto ctx = makeContext();
+  auto ctx = makeContext();
+  ctx.setCursorPos( QgsPointXY( 50, 0 ) );
   auto item = makeLine( { QgsPointXY( 0, 0 ), QgsPointXY( 100, 0 ) } );
 
-  // 2 vertices + 1 rotation handle + 1 midpoint handle.
+  // 2 vertices + 1 rotation handle + 1 midpoint handle, the pointer being on it.
   QCOMPARE( controller.nodes( item.get(), ctx ).size(), 4 );
 
   // Grab the midpoint of the only segment.
@@ -893,15 +896,20 @@ void TestKadasAnnotationControllers::polygon_getEditContext_hitsBodyNotBoundingB
 }
 
 
-void TestKadasAnnotationControllers::polygon_nodes_offerMidpointHandlesOnlyOnFinishedShape()
+void TestKadasAnnotationControllers::polygon_nodes_offerMidpointHandlesNearThePointer()
 {
   KadasPolygonAnnotationController controller;
   auto ctx = makeContext();
   auto item = makePolygon( { QgsPointXY( 0, 0 ), QgsPointXY( 100, 0 ), QgsPointXY( 100, 100 ), QgsPointXY( 0, 100 ), QgsPointXY( 0, 0 ) } );
 
-  // 4 vertices + 1 rotation handle + 4 midpoint handles (the closing segment
-  // gets one too).
-  QCOMPARE( controller.nodes( item.get(), ctx ).size(), 9 );
+  // 4 vertices + 1 rotation handle. With the pointer nowhere, no midpoint
+  // handle shows: four of them at once would bury the vertices.
+  QCOMPARE( controller.nodes( item.get(), ctx ).size(), 5 );
+
+  // On the middle of the bottom edge only that edge's handle appears; the other
+  // three midpoints are further off than the reveal radius.
+  ctx.setCursorPos( QgsPointXY( 50, 0 ) );
+  QCOMPARE( controller.nodes( item.get(), ctx ).size(), 6 );
 
   // While digitizing the rubber-band segments would sprout midpoint handles
   // that chase the cursor, so they are left out.
@@ -937,7 +945,8 @@ void TestKadasAnnotationControllers::polygon_midpointHandle_growsTwoVertexRingIn
   // nothing. Its one midpoint handle is what turns it back into a polygon,
   // since digitizing cannot be resumed.
   KadasPolygonAnnotationController controller;
-  const auto ctx = makeContext();
+  auto ctx = makeContext();
+  ctx.setCursorPos( QgsPointXY( 50, 0 ) );
   auto item = makePolygon( { QgsPointXY( 0, 0 ), QgsPointXY( 100, 0 ), QgsPointXY( 0, 0 ) } );
 
   // 2 vertices, no rotation handle (there is no shape to rotate yet) and a
@@ -978,6 +987,49 @@ void TestKadasAnnotationControllers::polygon_deleteNode_reclosesRingAndKeepsAtLe
   QAction *blocked = deleteNodeAction( tooFew );
   QVERIFY( blocked );
   QVERIFY( !blocked->isEnabled() );
+}
+
+
+void TestKadasAnnotationControllers::polygon_measurementLabels_pushEdgeLabelsOutsideAConcaveRing()
+{
+  // The same U as the hit test above. Its centroid sits above the notch's
+  // bottom edge, inside the gap between the arms, so a label pushed away from
+  // the centroid would land on that edge's inner side: the side has to come
+  // from the edge itself, not from the shape as a whole.
+  KadasPolygonAnnotationController controller;
+  const auto ctx = makeContext();
+  const QVector<QgsPointXY> ring {
+    QgsPointXY( 0, 0 ),
+    QgsPointXY( 100, 0 ),
+    QgsPointXY( 100, 80 ),
+    QgsPointXY( 70, 80 ),
+    QgsPointXY( 70, 30 ),
+    QgsPointXY( 30, 30 ),
+    QgsPointXY( 30, 80 ),
+    QgsPointXY( 0, 80 ),
+    QgsPointXY( 0, 0 ),
+  };
+  auto item = makePolygon( ring );
+  const QgsGeometry geom( item->geometry()->clone() );
+
+  // One length label per edge, then the area label.
+  const QList<KadasAnnotationMeasurementLabel> labels = controller.measurementLabels( item.get(), ctx );
+  QCOMPARE( labels.size(), ring.size() );
+
+  for ( int i = 1; i < ring.size(); ++i )
+  {
+    const KadasAnnotationMeasurementLabel &label = labels.at( i - 1 );
+    QVERIFY( label.segment.has_value() );
+    // Laid along its own edge, anchored on the middle of it.
+    QCOMPARE( label.segment->start, ring.at( i - 1 ) );
+    QCOMPARE( label.segment->end, ring.at( i ) );
+    QCOMPARE( label.mapPos, QgsPointXY( 0.5 * ( ring.at( i - 1 ).x() + ring.at( i ).x() ), 0.5 * ( ring.at( i - 1 ).y() + ring.at( i ).y() ) ) );
+    QVERIFY( label.segment->away.has_value() );
+    QVERIFY2( geom.contains( QgsGeometry::fromPointXY( *label.segment->away ) ), qPrintable( QStringLiteral( "edge %1 pushes its label the wrong way" ).arg( i ) ) );
+  }
+
+  // The area label belongs to no edge, so it stays upright on the centroid.
+  QVERIFY( !labels.last().segment.has_value() );
 }
 
 

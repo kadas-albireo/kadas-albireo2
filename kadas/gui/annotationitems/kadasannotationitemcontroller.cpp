@@ -217,3 +217,38 @@ double KadasAnnotationItemController::outputDpiScale( const QgsRenderContext &co
     return 1.0;
   return static_cast<double>( context.painter()->device()->logicalDpiX() ) / screenDpi;
 }
+
+// ----- Segment measurement labels ------------------------------------------
+
+KadasAnnotationItemController::InteriorSide KadasAnnotationItemController::ringInteriorSide( const QVector<QgsPointXY> &ring )
+{
+  // Shoelace: a positive area means the ring is wound counter-clockwise, which
+  // puts its interior on the left of every edge taken in that order.
+  double twiceArea = 0.0;
+  const int n = ring.size();
+  for ( int i = 0; i < n; ++i )
+  {
+    const QgsPointXY &a = ring.at( i );
+    const QgsPointXY &b = ring.at( ( i + 1 ) % n );
+    twiceArea += a.x() * b.y() - b.x() * a.y();
+  }
+  if ( qgsDoubleNear( twiceArea, 0.0 ) )
+    return InteriorSide::None;
+  return twiceArea > 0 ? InteriorSide::Left : InteriorSide::Right;
+}
+
+KadasAnnotationMeasurementLabel KadasAnnotationItemController::segmentLabel( const QgsPointXY &a, const QgsPointXY &b, const QString &text, const KadasAnnotationItemContext &ctx, InteriorSide side )
+{
+  const QgsPointXY mid( 0.5 * ( a.x() + b.x() ), 0.5 * ( a.y() + b.y() ) );
+  KadasAnnotationMeasurementLabel label { toMapPos( mid, ctx ), text, true, KadasAnnotationMeasurementLabel::Segment { toMapPos( a, ctx ), toMapPos( b, ctx ), std::nullopt } };
+  if ( side != InteriorSide::None )
+  {
+    // A point a quarter of the edge's length into the shape. Taking it right next
+    // to the edge rather than at the centroid keeps the label outside a concave
+    // ring too, where the centroid can sit on the wrong side of an edge.
+    const double sign = side == InteriorSide::Left ? 1.0 : -1.0;
+    const QgsPointXY inside( mid.x() - sign * 0.25 * ( b.y() - a.y() ), mid.y() + sign * 0.25 * ( b.x() - a.x() ) );
+    label.segment->away = toMapPos( inside, ctx );
+  }
+  return label;
+}

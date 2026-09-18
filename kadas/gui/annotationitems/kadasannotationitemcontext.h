@@ -20,6 +20,7 @@
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgscoordinatereferencesystem.h>
 #include <qgis/qgsmapsettings.h>
+#include <qgis/qgspointxy.h>
 
 #include "kadas/gui/kadas_gui.h"
 
@@ -54,11 +55,16 @@ class KADAS_GUI_EXPORT KadasAnnotationItemContext
     bool digitizing() const { return mDigitizing; }
     void setDigitizing( bool digitizing ) { mDigitizing = digitizing; }
 
+    //! Pointer position in map coordinates, empty when it is unknown (pointer off the canvas, or a caller that has none). Handles that would clutter the shape if they were all shown at once - the midpoint insert handles - only appear near it.
+    QgsPointXY cursorPos() const { return mCursorPos; }
+    void setCursorPos( const QgsPointXY &cursorPos ) { mCursorPos = cursorPos; }
+
   private:
     QgsAnnotationLayer *mLayer = nullptr;
     QgsMapSettings mMapSettings;
     Qt::KeyboardModifiers mModifiers = Qt::NoModifier;
     bool mDigitizing = false;
+    QgsPointXY mCursorPos;
 };
 
 #endif // KADASANNOTATIONITEMCONTEXT_H

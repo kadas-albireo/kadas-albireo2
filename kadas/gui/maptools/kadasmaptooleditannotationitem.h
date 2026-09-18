@@ -135,6 +135,8 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     //! Non-interactive preview of the hovered item's tooltip; alive only while the tool is.
     KadasMapItemTooltip *mTooltipWidget = nullptr;
     QgsVector mMoveOffset;
+    //! Last pointer position on the canvas, in map coordinates; handed to the controller so handles that only show near the pointer know where it is.
+    QgsPointXY mCursorPos;
     Qt::MouseButton mPressedButton = Qt::NoButton;
     //! TRUE once the pointer has moved while the button is held, i.e. the press turned into a drag.
     bool mDragMoved = false;
