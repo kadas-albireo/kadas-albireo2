@@ -60,7 +60,7 @@ struct KadasAnnotationMeasurementLabel
      * pushed clear of it, so the number never hides the line it belongs to nor the
      * midpoint handle sitting there.
      */
-    struct Segment
+    struct KADAS_GUI_EXPORT Segment
     {
         //! Side of the directed segment the shape's interior lies on, which is the side its label has to avoid.
         enum class InteriorSide
