@@ -20,9 +20,11 @@
 #include <QPainter>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <cmath>
 #include <functional>
 #include <limits>
 #include <memory>
+#include <optional>
 
 #include <qgis/qgsannotationitem.h>
 #include <qgis/qgsannotationlayer.h>
@@ -70,6 +72,9 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
     }
 
     void updateRect() { setRect( mMapCanvas->mapSettings().visibleExtent() ); }
+
+    //! Drops the cached measurement labels so the next paint recomputes them; call whenever the item itself changed.
+    void invalidateLabels() { mLabels.reset(); }
 
     //! Optional callback that renders a live preview of the edited item straight
     //! into the overlay painter (in scene coordinates), so an in-progress edit
@@ -153,7 +158,12 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
     {
       if ( !mLabelsProvider )
         return;
-      const QList<KadasAnnotationMeasurementLabel> labels = mLabelsProvider();
+      // Computing these means an ellipsoidal length per edge; they depend on the
+      // item alone, never on where the pointer is, so a repaint that merely
+      // follows the pointer reuses them.
+      if ( !mLabels )
+        mLabels = mLabelsProvider();
+      const QList<KadasAnnotationMeasurementLabel> &labels = *mLabels;
       if ( labels.isEmpty() )
         return;
 
@@ -165,6 +175,7 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
       const QColor backgroundColor( 255, 255, 255, 192 );
       constexpr int offsetBelow = 20; // px
       constexpr int padding = 3;
+      constexpr double segmentGap = 4; // px between a segment and the label lying alongside it
 
       QFont font = painter->font();
       font.setPointSizeF( 9.0 );
@@ -172,6 +183,7 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
 
       painter->save();
       painter->setFont( font );
+      painter->setRenderHint( QPainter::Antialiasing, true );
       const QFontMetrics metrics( font );
 
       for ( const KadasAnnotationMeasurementLabel &label : labels )
@@ -181,18 +193,49 @@ class KadasMapToolEditAnnotationItem::HandlesOverlay : public QgsMapCanvasItem
         for ( const QString &l : lines )
           width = std::max( width, metrics.horizontalAdvance( l ) );
         const int height = metrics.height() * lines.size();
+        // Drawn around the origin, so the placement below is a plain translate
+        // (plus a rotation for a label that follows its segment).
+        const QRectF box( -0.5 * ( width + 2 * padding ), -0.5 * ( height + 2 * padding ), width + 2 * padding, height + 2 * padding );
         const QPointF screen = toCanvasCoordinates( label.mapPos );
-        QRectF rect( screen.x() - 0.5 * ( width + 2 * padding ), screen.y() + ( label.centered ? 0 : offsetBelow ) - 0.5 * ( height + 2 * padding ), width + 2 * padding, height + 2 * padding );
-        painter->fillRect( rect, backgroundColor );
+
+        painter->save();
+        if ( !label.segment || !placeAlongSegment( painter, *label.segment, screen, 0.5 * box.height() + segmentGap ) )
+          painter->translate( screen.x(), screen.y() + ( label.centered ? 0 : offsetBelow ) );
+        painter->fillRect( box, backgroundColor );
         painter->setPen( textColor );
-        painter->drawText( rect, Qt::AlignCenter, label.text );
+        painter->drawText( box, Qt::AlignCenter, label.text );
+        painter->restore();
       }
       painter->restore();
+    }
+
+    //! Moves \a painter onto \a anchor, rotated to run along \a segment and pushed \a offset pixels off it, away from the shape's interior. Returns FALSE for a segment too short to give a direction, leaving the painter untouched.
+    bool placeAlongSegment( QPainter *painter, const KadasAnnotationMeasurementLabel::Segment &segment, const QPointF &anchor, double offset )
+    {
+      const QPointF start = toCanvasCoordinates( segment.start );
+      const QPointF end = toCanvasCoordinates( segment.end );
+      const QPointF delta = end - start;
+      const double length = std::hypot( delta.x(), delta.y() );
+      if ( length < 1.0 )
+        return false;
+
+      QPointF dir = delta / length;
+      // Taken from the segment as it runs, before the flip below reverses it.
+      const QPointF normal = KadasAnnotationMeasurementLabel::Segment::labelOffsetDirection( dir, segment.interior );
+      // Read the segment in whichever of its two directions keeps the text upright:
+      // left to right, and bottom to top when it is vertical.
+      if ( dir.x() < 0 || ( qgsDoubleNear( dir.x(), 0.0 ) && dir.y() > 0 ) )
+        dir = -dir;
+
+      painter->translate( anchor + normal * offset );
+      painter->rotate( std::atan2( dir.y(), dir.x() ) * 180.0 / M_PI );
+      return true;
     }
 
     NodesProvider mNodesProvider;
     LabelsProvider mLabelsProvider;
     GuideProvider mGuideProvider;
+    std::optional<QList<KadasAnnotationMeasurementLabel>> mLabels;
     std::function<void( QPainter * )> mPreviewRenderer;
 };
 
@@ -298,6 +341,8 @@ void KadasMapToolEditAnnotationItem::activate()
       if ( !mItem || !mController || !mLayer )
         return {};
       KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
+      ctx.setDigitizing( mDrawState == DrawState::InProgress );
+      ctx.setCursorPos( cursorMapPos() );
       return mController->nodes( mItem, ctx );
     },
     [this]() -> QList<KadasAnnotationMeasurementLabel> {
@@ -321,6 +366,9 @@ void KadasMapToolEditAnnotationItem::activate()
     }
   } );
   connect( mLayer.data(), &QgsMapLayer::repaintRequested, this, &KadasMapToolEditAnnotationItem::refreshHandles, Qt::UniqueConnection );
+  // Watched for the leave event: once the pointer is off the canvas nothing
+  // reports where it is any more, and the handles that follow it say so.
+  canvas()->viewport()->installEventFilter( this );
   // Queued: this arrives from the middle of QgsMapCanvas::setLayers(), and
   // tearing the tool down from there would be re-entrant.
   connect( canvas(), &QgsMapCanvas::layersChanged, this, &KadasMapToolEditAnnotationItem::closeIfTargetLayerHidden, static_cast<Qt::ConnectionType>( Qt::QueuedConnection | Qt::UniqueConnection ) );
@@ -339,8 +387,32 @@ void KadasMapToolEditAnnotationItem::activate()
 
 void KadasMapToolEditAnnotationItem::refreshHandles()
 {
+  if ( !mHandles )
+    return;
+  mHandles->invalidateLabels();
+  mHandles->update();
+}
+
+void KadasMapToolEditAnnotationItem::repaintHandles()
+{
   if ( mHandles )
     mHandles->update();
+}
+
+void KadasMapToolEditAnnotationItem::beginEditOnce()
+{
+  if ( mEditBegun || !mEditContext.isValid() || !mItem || !mController || !mLayer )
+    return;
+  mEditBegun = true;
+  const KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
+  mController->beginEdit( mItem, mEditContext, ctx );
+}
+
+QgsPointXY KadasMapToolEditAnnotationItem::cursorMapPos() const
+{
+  if ( !mCursorPosValid || !canvas() )
+    return QgsPointXY();
+  return canvas()->getCoordinateTransform()->toMapCoordinates( mCursorDevicePos );
 }
 
 void KadasMapToolEditAnnotationItem::renderItemPreview( QPainter *painter )
@@ -438,6 +510,9 @@ void KadasMapToolEditAnnotationItem::clearTempRubberBand()
 void KadasMapToolEditAnnotationItem::deactivate()
 {
   QgsMapTool::deactivate();
+  if ( canvas() )
+    canvas()->viewport()->removeEventFilter( this );
+  mCursorPosValid = false;
   delete mTooltipWidget;
   mTooltipWidget = nullptr;
   mPointerInEditor = false;
@@ -480,6 +555,7 @@ void KadasMapToolEditAnnotationItem::canvasPressEvent( QgsMapMouseEvent *e )
   if ( mPressedButton != Qt::NoButton )
     return;
   mPressedButton = e->button();
+  mDragMoved = false;
 
   if ( e->button() == Qt::RightButton )
   {
@@ -500,7 +576,10 @@ void KadasMapToolEditAnnotationItem::canvasPressEvent( QgsMapMouseEvent *e )
     return;
 
   if ( mEditContext.isValid() )
+  {
+    beginEditOnce();
     return;
+  }
 
   if ( !mAllowCreate && mDrawState != DrawState::InProgress )
   {
@@ -588,6 +667,8 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
   KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
   ctx.setModifiers( e->modifiers() );
   const QgsPointXY pos = e->mapPoint();
+  mCursorDevicePos = e->pos();
+  mCursorPosValid = true;
 
   if ( mAllowCreate && mDrawState == DrawState::InProgress )
   {
@@ -612,6 +693,7 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
   {
     if ( mEditContext.isValid() )
     {
+      mDragMoved = true;
       const QgsPointXY adjusted( pos.x() - mMoveOffset.x(), pos.y() - mMoveOffset.y() );
       mController->edit( mItem, mEditContext, adjusted, ctx );
       if ( mController->liveRepaintOnEdit() )
@@ -640,8 +722,14 @@ void KadasMapToolEditAnnotationItem::canvasMoveEvent( QgsMapMouseEvent *e )
   }
   else
   {
+    // The handles follow the pointer: a midpoint handle only shows once the
+    // pointer comes near the segment it belongs to. Only which handles show
+    // changes here, so the measurement labels are reused rather than remeasured
+    // on every pixel of pointer travel.
+    repaintHandles();
     KadasEditContext oldContext = mEditContext;
     mEditContext = mController->getEditContext( mItem, pos, ctx );
+    mEditBegun = false;
     if ( !mEditContext.isValid() )
     {
       setCursor( Qt::ArrowCursor );
@@ -681,6 +769,15 @@ void KadasMapToolEditAnnotationItem::canvasReleaseEvent( QgsMapMouseEvent *e )
   mPressedButton = Qt::NoButton;
   if ( e->button() == Qt::LeftButton && mEditContext.isValid() )
   {
+    if ( !mDragMoved && mEditContext.appliesOnClick && mItem && mController && mLayer )
+    {
+      // A midpoint handle exists to add a vertex; clicking one without dragging
+      // has to add it at the handle itself rather than silently do nothing.
+      KadasAnnotationItemContext ctx( mLayer, canvas()->mapSettings() );
+      ctx.setModifiers( e->modifiers() );
+      beginEditOnce();
+      mController->edit( mItem, mEditContext, mEditContext.pos, ctx );
+    }
     if ( mEditItemHidden )
     {
       mEditItemHidden = false;
@@ -694,6 +791,8 @@ void KadasMapToolEditAnnotationItem::canvasReleaseEvent( QgsMapMouseEvent *e )
     if ( mStyleEditor )
       mStyleEditor->loadFromItem( mItem );
   }
+  // The edit is over either way: the next one captures its own state.
+  mEditBegun = false;
 }
 
 void KadasMapToolEditAnnotationItem::canvasDoubleClickEvent( QgsMapMouseEvent * )
@@ -843,6 +942,7 @@ void KadasMapToolEditAnnotationItem::inputChanged()
   const QgsPointXY newPos = mController->positionFromEditAttribs( mItem, mEditContext, values, ctx );
   mInputWidget->adjustCursorAndExtent( newPos );
 
+  beginEditOnce();
   mController->edit( mItem, mEditContext, values, ctx );
   mLayer->triggerRepaint();
   pushState();
@@ -854,6 +954,13 @@ void KadasMapToolEditAnnotationItem::inputChanged()
 
 bool KadasMapToolEditAnnotationItem::eventFilter( QObject *watched, QEvent *event )
 {
+  if ( canvas() && watched == canvas()->viewport() && event->type() == QEvent::Leave )
+  {
+    // Nothing will report where the pointer is any more, so the handles that
+    // only show near it stop showing rather than staying where it last was.
+    mCursorPosValid = false;
+    repaintHandles();
+  }
   if ( watched == mBottomBar )
   {
     if ( event->type() == QEvent::Enter )

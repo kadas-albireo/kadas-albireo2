@@ -24,8 +24,11 @@
 
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationrotation.h"
+#include "kadas/gui/annotationitems/kadasannotationvertexedit.h"
 
+class QgsCurve;
 class QgsLineSymbol;
+class QMenu;
 
 /**
  * \ingroup gui
@@ -54,10 +57,12 @@ class KADAS_GUI_EXPORT KadasLineAnnotationController : public KadasAnnotationIte
     QgsPointXY positionFromDrawAttribs( const QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const override;
 
     KadasEditContext getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const override;
+    void beginEdit( const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAnnotationItemContext &ctx ) override;
     void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx ) override;
     void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) override;
     KadasAttribValues editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const override;
     QgsPointXY positionFromEditAttribs( const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const override;
+    void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx ) override;
 
     QgsPointXY position( const QgsAnnotationItem *item ) const override;
     void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos ) override;
@@ -135,6 +140,21 @@ class KADAS_GUI_EXPORT KadasLineAnnotationController : public KadasAnnotationIte
     // Per-drag rotation state, captured when the rotation handle is grabbed.
     // Shared with the polygon controller so rotation behaves identically.
     mutable KadasAnnotationRotation::VertexRotationState mRotation;
+
+    // Per-edit midpoint-handle state, armed by beginEdit() when such a handle is grabbed.
+    KadasAnnotationVertexEdit::VertexInsertState mInsert;
+
+    //! Midpoint (map CRS) of the segment starting at vertex \a segment, or an invalid point when the segment does not exist.
+    static QgsPointXY segmentMidpointMap( const QgsCurve *curve, int segment, const KadasAnnotationItemContext &ctx );
+
+    //! Number of segments that carry a midpoint handle; 0 unless the line has at least two vertices.
+    static int segmentCount( const QgsCurve *curve );
+
+    //! TRUE when \a vertex exists on \a curve and removing it would still leave a line behind. The single source of the rule, shared by the menu entry and by deleteVertex().
+    static bool canDeleteVertex( const QgsCurve *curve, int vertex );
+
+    //! Removes vertex \a vertex; a no-op unless canDeleteVertex() allows it.
+    static void deleteVertex( QgsAnnotationItem *item, int vertex );
 };
 
 #endif // KADASLINEANNOTATIONCONTROLLER_H

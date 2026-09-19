@@ -14,6 +14,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <memory>
+
 #include <QDomDocument>
 #include <QDomElement>
 #include <QTextDocument>
@@ -54,6 +56,28 @@ void KadasPinAnnotationItem::installDefaultSymbol()
   setSymbol( new QgsMarkerSymbol( QgsSymbolLayerList() << layer ) );
 }
 
+void KadasPinAnnotationItem::makeFillOpaque()
+{
+  const QgsMarkerSymbol *sym = symbol();
+  if ( !sym )
+    return;
+  std::unique_ptr<QgsMarkerSymbol> opaque;
+  for ( int i = 0; i < sym->symbolLayerCount(); ++i )
+  {
+    const auto *svg = dynamic_cast<const QgsSvgMarkerSymbolLayer *>( sym->symbolLayer( i ) );
+    if ( !svg || svg->fillColor().alpha() == 255 )
+      continue;
+    if ( !opaque )
+      opaque.reset( sym->clone() );
+    auto *layer = static_cast<QgsSvgMarkerSymbolLayer *>( opaque->symbolLayer( i ) );
+    QColor fill = layer->fillColor();
+    fill.setAlpha( 255 );
+    layer->setFillColor( fill );
+  }
+  if ( opaque )
+    setSymbol( opaque.release() );
+}
+
 bool KadasPinAnnotationItem::writeXml( QDomElement &element, QDomDocument &document, const QgsReadWriteContext &context ) const
 {
   QgsAnnotationMarkerItem::writeXml( element, document, context );
@@ -66,6 +90,7 @@ bool KadasPinAnnotationItem::writeXml( QDomElement &element, QDomDocument &docum
 bool KadasPinAnnotationItem::readXml( const QDomElement &element, const QgsReadWriteContext &context )
 {
   QgsAnnotationMarkerItem::readXml( element, context );
+  makeFillOpaque();
   mName = element.attribute( QStringLiteral( "kadasName" ) );
   mRemarks = element.attribute( QStringLiteral( "kadasRemarks" ) );
   mShadow.readXml( element );

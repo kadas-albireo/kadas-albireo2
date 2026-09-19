@@ -14,6 +14,9 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QAction>
+#include <QIcon>
+#include <QMenu>
 #include <QObject>
 #include <QPainter>
 #include <QTextStream>
@@ -37,6 +40,7 @@
 #include <qgis/qgssettingsentryimpl.h>
 
 #include "kadas/gui/annotationitems/kadasannotationrotation.h"
+#include "kadas/gui/annotationitems/kadasannotationvertexedit.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
 #include "kadas/gui/annotationitems/kadasannotationstyleeditor.h"
 #include "kadas/gui/annotationitems/kadaspolygonannotationcontroller.h"
@@ -117,9 +121,8 @@ QList<KadasNode> KadasPolygonAnnotationController::nodes( const QgsAnnotationIte
   const QgsCurve *ring = poly->exteriorRing();
   if ( !ring )
     return result;
-  const int n = ring->numPoints();
   // Skip the closing duplicate vertex when the ring is closed.
-  const int last = ( n > 1 && ring->vertexAt( QgsVertexId( 0, 0, 0 ) ) == ring->vertexAt( QgsVertexId( 0, 0, n - 1 ) ) ) ? n - 1 : n;
+  const int last = distinctVertexCount( ring );
   for ( int i = 0; i < last; ++i )
   {
     const QgsPoint p = ring->vertexAt( QgsVertexId( 0, 0, i ) );
@@ -140,7 +143,79 @@ QList<KadasNode> KadasPolygonAnnotationController::nodes( const QgsAnnotationIte
     }
     result.append( { handle, KadasAnnotationRotation::renderHandle } );
   }
+  // Midpoint handles: the only way to grow a polygon once it is finished, since
+  // digitizing cannot be resumed. This is also what rescues a ring left with two
+  // vertices, which renders as a line and has no area to speak of. Left out while
+  // digitizing, where the rubber-band segments would sprout handles that chase
+  // the cursor, and shown only under the pointer, so they do not bury the
+  // vertices the rest of the time.
+  if ( !ctx.digitizing() )
+  {
+    const int segments = segmentCount( ring );
+    for ( int i = 0; i < segments; ++i )
+    {
+      const QgsPointXY mid = segmentMidpointMap( ring, i, ctx );
+      if ( KadasAnnotationVertexEdit::isRevealed( mid, ctx ) )
+        result.append( { mid, KadasAnnotationVertexEdit::renderHandle } );
+    }
+  }
   return result;
+}
+
+int KadasPolygonAnnotationController::distinctVertexCount( const QgsCurve *ring )
+{
+  const int n = ring ? ring->numPoints() : 0;
+  return ( n > 1 && ring->vertexAt( QgsVertexId( 0, 0, 0 ) ) == ring->vertexAt( QgsVertexId( 0, 0, n - 1 ) ) ) ? n - 1 : n;
+}
+
+int KadasPolygonAnnotationController::segmentCount( const QgsCurve *ring )
+{
+  const int distinct = distinctVertexCount( ring );
+  if ( distinct < 2 )
+    return 0;
+  // A two-vertex ring runs out and back along the same stretch: one handle, not
+  // two coincident ones.
+  return distinct == 2 ? 1 : distinct;
+}
+
+QgsPointXY KadasPolygonAnnotationController::segmentMidpointMap( const QgsCurve *ring, int segment, const KadasAnnotationItemContext &ctx )
+{
+  if ( segment < 0 || segment >= segmentCount( ring ) )
+    return QgsPointXY();
+  const int distinct = distinctVertexCount( ring );
+  const QgsPoint a = ring->vertexAt( QgsVertexId( 0, 0, segment ) );
+  const QgsPoint b = ring->vertexAt( QgsVertexId( 0, 0, ( segment + 1 ) % distinct ) );
+  const QgsPointXY am = toMapPos( QgsPointXY( a.x(), a.y() ), ctx );
+  const QgsPointXY bm = toMapPos( QgsPointXY( b.x(), b.y() ), ctx );
+  return QgsPointXY( 0.5 * ( am.x() + bm.x() ), 0.5 * ( am.y() + bm.y() ) );
+}
+
+bool KadasPolygonAnnotationController::canDeleteVertex( const QgsCurve *ring, int vertex )
+{
+  // Three vertices are the least a polygon can carry; below that it stops
+  // enclosing anything.
+  const int distinct = distinctVertexCount( ring );
+  return distinct > 3 && vertex >= 0 && vertex < distinct;
+}
+
+void KadasPolygonAnnotationController::deleteVertex( QgsAnnotationItem *item, int vertex )
+{
+  // Checked against the geometry as it stands: taking the mutable copy first
+  // would swap the item's geometry for a clone even when the delete is refused,
+  // dangling whatever the caller still holds a raw pointer to.
+  const QgsCurvePolygon *poly = asPolygon( item )->geometry();
+  if ( !poly || !canDeleteVertex( poly->exteriorRing(), vertex ) )
+    return;
+  QgsLineString *ring = takeMutableExterior( asPolygon( item ) );
+  if ( !ring )
+    return;
+  const int n = ring->numPoints();
+  const bool closed = n > 1 && ring->pointN( 0 ) == ring->pointN( n - 1 );
+  ring->deleteVertex( QgsVertexId( 0, 0, vertex ) );
+  // Removing the first vertex leaves the closing duplicate standing on a vertex
+  // that is gone; re-close the ring on whichever vertex is first now.
+  if ( vertex == 0 && closed && ring->numPoints() > 1 )
+    ring->moveVertex( QgsVertexId( 0, 0, ring->numPoints() - 1 ), ring->pointN( 0 ) );
 }
 
 QgsPointXY KadasPolygonAnnotationController::restHandleMap( const QgsCurvePolygon *poly, const KadasAnnotationItemContext &ctx ) const
@@ -255,7 +330,7 @@ KadasEditContext KadasPolygonAnnotationController::getEditContext( const QgsAnno
   // rest again (a drag never calls getEditContext, it goes straight to edit()).
   mRotation.deactivate();
   const int n = ring->numPoints();
-  const int last = ( n > 1 && ring->vertexAt( QgsVertexId( 0, 0, 0 ) ) == ring->vertexAt( QgsVertexId( 0, 0, n - 1 ) ) ) ? n - 1 : n;
+  const int last = distinctVertexCount( ring );
   for ( int i = 0; i < last; ++i )
   {
     const QgsPoint p = ring->vertexAt( QgsVertexId( 0, 0, i ) );
@@ -263,6 +338,23 @@ KadasEditContext KadasPolygonAnnotationController::getEditContext( const QgsAnno
     if ( pos.sqrDist( mp ) < pickTolSqr( ctx ) )
     {
       return KadasEditContext( QgsVertexId( 0, 0, i ), mp, drawAttribs() );
+    }
+  }
+  // Midpoint handles. The pick tolerance is well inside the radius that reveals
+  // them in nodes(), so nothing invisible can be grabbed. Tested before the body
+  // hit below, which covers the boundary they sit on.
+  if ( !ctx.digitizing() )
+  {
+    const int segments = segmentCount( ring );
+    for ( int i = 0; i < segments; ++i )
+    {
+      const QgsPointXY mid = segmentMidpointMap( ring, i, ctx );
+      if ( pos.sqrDist( mid ) < pickTolSqr( ctx ) )
+      {
+        KadasEditContext ec( QgsVertexId( KadasAnnotationVertexEdit::kPartInsert, 0, i ), mid, drawAttribs() );
+        ec.appliesOnClick = true;
+        return ec;
+      }
     }
   }
   // Rotation handle: snapshot the ring (map coords) and pivot for a drift-free drag.
@@ -303,6 +395,16 @@ KadasEditContext KadasPolygonAnnotationController::getEditContext( const QgsAnno
   return KadasEditContext();
 }
 
+void KadasPolygonAnnotationController::beginEdit( const QgsAnnotationItem *, const KadasEditContext &editContext, const KadasAnnotationItemContext & )
+{
+  // Armed here rather than in getEditContext(), which also runs as the hit test
+  // for every other item under the cursor and would keep disarming this one.
+  if ( KadasAnnotationVertexEdit::isInsertHandle( editContext.vidx ) )
+    mInsert.arm( editContext.vidx.vertex );
+  else
+    mInsert.disarm();
+}
+
 void KadasPolygonAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
   if ( editContext.vidx.part == kPartRotate )
@@ -325,7 +427,27 @@ void KadasPolygonAnnotationController::edit( QgsAnnotationItem *item, const Kada
   if ( !ring )
     return;
   const int n = ring->numPoints();
-  if ( editContext.vidx.vertex >= 0 && editContext.vidx.vertex < n )
+  if ( KadasAnnotationVertexEdit::isInsertHandle( editContext.vidx ) )
+  {
+    // A hover armed the segment; the first step of the drag turns the midpoint
+    // handle into a real vertex, every later step only moves that vertex. The
+    // new vertex always lands after the first one, so the closing duplicate
+    // stays last and needs no fixing up.
+    if ( mInsert.segment() != editContext.vidx.vertex )
+      mInsert.arm( editContext.vidx.vertex );
+    const int segment = mInsert.segment();
+    const QgsPointXY ip = toItemPos( newPoint, ctx );
+    if ( mInsert.takePending() )
+    {
+      if ( segment >= 0 && segment + 1 <= n )
+        ring->insertVertex( QgsVertexId( 0, 0, segment + 1 ), QgsPoint( ip.x(), ip.y() ) );
+    }
+    else if ( segment >= 0 && segment + 1 < n )
+    {
+      ring->moveVertex( QgsVertexId( 0, 0, segment + 1 ), QgsPoint( ip.x(), ip.y() ) );
+    }
+  }
+  else if ( editContext.vidx.vertex >= 0 && editContext.vidx.vertex < n )
   {
     const QgsPointXY ip = toItemPos( newPoint, ctx );
     ring->moveVertex( QgsVertexId( 0, 0, editContext.vidx.vertex ), QgsPoint( ip.x(), ip.y() ) );
@@ -395,6 +517,23 @@ QgsPointXY KadasPolygonAnnotationController::positionFromEditAttribs(
     return mRotation.handleForAngle( values[AttrAngle], off );
   }
   return positionFromDrawAttribs( item, values, ctx );
+}
+
+void KadasPolygonAnnotationController::populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &, const KadasAnnotationItemContext & )
+{
+  // Only a right-click on a real vertex offers to remove one; the other parts
+  // hold handles, and a midpoint handle is there to add, not to remove.
+  if ( editContext.vidx.part != 0 || editContext.vidx.vertex < 0 )
+    return;
+  const QgsCurvePolygon *poly = asPolygon( item )->geometry();
+  if ( !poly )
+    return;
+  const QgsCurve *ring = poly->exteriorRing();
+  if ( !ring )
+    return;
+  const int vertex = editContext.vidx.vertex;
+  QAction *action = menu->addAction( QIcon( QStringLiteral( ":/kadas/icons/delete_node" ) ), QObject::tr( "Delete node" ), [item, vertex]() { deleteVertex( item, vertex ); } );
+  action->setEnabled( canDeleteVertex( ring, vertex ) );
 }
 
 QgsPointXY KadasPolygonAnnotationController::position( const QgsAnnotationItem *item ) const
@@ -477,20 +616,25 @@ QList<KadasAnnotationMeasurementLabel> KadasPolygonAnnotationController::measure
   da.setSourceCrs( ctx.itemCrs(), ctx.mapSettings().transformContext() );
   da.setEllipsoid( QgsProject::instance()->ellipsoid() );
 
-  // One length label per exterior-ring edge.
+  // One length label per exterior-ring edge, laid outside the ring - which side
+  // that is depends on how the ring happens to be wound.
   const QgsCurve *ring = poly->exteriorRing();
   const int n = ring->numPoints();
+  QVector<QgsPointXY> pts;
+  pts.reserve( n );
+  for ( int i = 0; i < n; ++i )
+  {
+    const QgsPoint p = ring->vertexAt( QgsVertexId( 0, 0, i ) );
+    pts.append( QgsPointXY( p.x(), p.y() ) );
+  }
+  const InteriorSide interior = ringInteriorSide( pts );
   for ( int i = 1; i < n; ++i )
   {
-    const QgsPoint a = ring->vertexAt( QgsVertexId( 0, 0, i - 1 ) );
-    const QgsPoint b = ring->vertexAt( QgsVertexId( 0, 0, i ) );
-    const QgsPointXY ai( a.x(), a.y() );
-    const QgsPointXY bi( b.x(), b.y() );
+    const QgsPointXY &ai = pts.at( i - 1 );
+    const QgsPointXY &bi = pts.at( i );
     if ( ai == bi )
       continue; // skip rubber-band trailing duplicate / closing edge of degenerate ring
-    const double seg = da.measureLine( ai, bi );
-    const QgsPointXY midItem( 0.5 * ( a.x() + b.x() ), 0.5 * ( a.y() + b.y() ) );
-    labels.append( { toMapPos( midItem, ctx ), formatLengthMeters( seg ), true } );
+    labels.append( segmentLabel( ai, bi, formatLengthMeters( da.measureLine( ai, bi ) ), ctx, interior ) );
   }
 
   std::unique_ptr<QgsCurvePolygon> clone( poly->clone() );
