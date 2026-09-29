@@ -477,6 +477,9 @@ void KadasMapToolMeasure::recomputeReadout()
     }
   }
 
+  updateRubberBand( parts );
+  updateCanvasLabels( parts );
+
   if ( parts.isEmpty() )
   {
     mReadoutLabel->setText( QStringLiteral( "<b>—</b>" ) );
@@ -484,8 +487,6 @@ void KadasMapToolMeasure::recomputeReadout()
     // to its natural size for the next measurement.
     if ( mBottomBar )
       mBottomBar->setMinimumWidth( 0 );
-    if ( mLabelsOverlay )
-      mLabelsOverlay->setLabels( {} );
     return;
   }
 
@@ -542,9 +543,6 @@ void KadasMapToolMeasure::recomputeReadout()
     if ( hintWidth > mBottomBar->minimumWidth() )
       mBottomBar->setMinimumWidth( hintWidth );
   }
-
-  updateRubberBand( parts );
-  updateCanvasLabels( parts );
 }
 
 
