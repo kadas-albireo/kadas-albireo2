@@ -36,8 +36,19 @@ int main( int argc, char *argv[] )
 {
   try
   {
+    QString appDir = QFileInfo( QString::fromLocal8Bit( argv[0] ) ).dir().absolutePath();
+    std::string envPath = "kadas.env";
+    if ( !QFile::exists( QString::fromStdString( envPath ) ) )
+    {
+      QString bundleEnv = appDir + QStringLiteral( "/kadas.env" );
+      if ( QFile::exists( bundleEnv ) )
+      {
+        envPath = bundleEnv.toStdString();
+      }
+    }
+
     std::ifstream file;
-    file.open( "kadas.env" );
+    file.open( envPath );
 
     std::string var;
     std::string name;
@@ -49,6 +60,12 @@ int main( int argc, char *argv[] )
       {
         name = var.substr( 0, pos );
         value = var.substr( pos + 1 );
+        QString qValue = QString::fromStdString( value );
+        if ( qValue.contains( QStringLiteral( "@executable_path" ) ) )
+        {
+          qValue.replace( QStringLiteral( "@executable_path" ), appDir );
+          value = qValue.toStdString();
+        }
         if ( !qputenv( name.c_str(), QByteArray::fromStdString( value ) ) )
         {
           std::string message = "Could not set environment variable:" + var;
