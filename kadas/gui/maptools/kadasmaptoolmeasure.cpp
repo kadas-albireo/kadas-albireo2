@@ -556,7 +556,7 @@ void KadasMapToolMeasure::updateRubberBand( const QList<Part> &parts )
     mRubberBand->setWidth( 2 );
   }
 
-  const Qgis::GeometryType bandType = ( shape() == Shape::Polygon ) ? Qgis::GeometryType::Polygon : Qgis::GeometryType::Line;
+  const Qgis::GeometryType bandType = ( shape() == Shape::Polyline ) ? Qgis::GeometryType::Line : Qgis::GeometryType::Polygon;
   mRubberBand->reset( bandType );
 
 
