@@ -165,16 +165,26 @@ void KadasMapToolHeightProfile::canvasMoveEvent( QgsMapMouseEvent *e )
   }
 }
 
+void KadasMapToolHeightProfile::canvasPressEvent( QgsMapMouseEvent *e )
+{
+  // The dialog processes events while sampling: don't let a click alter the line under it
+  if ( mPicking || mDialog->isBusy() )
+    return;
+
+  // A new line is started: drop the profile of the previous one
+  if ( e->button() == Qt::LeftButton && !isCapturing() )
+    onCleared();
+
+  KadasShapeCaptureMapTool::canvasPressEvent( e );
+}
+
 void KadasMapToolHeightProfile::canvasReleaseEvent( QgsMapMouseEvent *e )
 {
+  if ( mDialog->isBusy() )
+    return;
+
   if ( !mPicking )
   {
-    if ( isCapturing() && mPosMarker )
-    {
-      // A new capture is started
-      onCleared();
-      mPosMarker->reset( Qgis::GeometryType::Point );
-    }
     KadasShapeCaptureMapTool::canvasReleaseEvent( e );
     return;
   }
