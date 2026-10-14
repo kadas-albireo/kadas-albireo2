@@ -9,8 +9,7 @@
 
 
 
-
-class KadasMapToolSlope : QgsMapToolExtent
+class KadasMapToolSlope : KadasShapeCaptureMapTool
 {
 %Docstring(signature="appended")
 *************************************************************************
