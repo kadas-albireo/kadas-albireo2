@@ -530,9 +530,6 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="timeSpec">
-          <enum>Qt::TimeSpec::LocalTime</enum>
-         </property>
         </widget>
        </item>
        <item row="5" column="0">
