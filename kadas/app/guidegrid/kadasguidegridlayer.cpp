@@ -33,6 +33,7 @@
 #include <qgis/qgsrendercontext.h>
 #include <qgis/qgssymbollayerutils.h>
 #include <qgis/qgstextformat.h>
+#include <qgis/qgstextrenderer.h>
 
 #include "kadas/core/kadasguidegridutils.h"
 
@@ -55,6 +56,7 @@ class KadasGuideGridRenderer : public QgsMapLayerRenderer
       : QgsMapLayerRenderer( layer->id(), &rendererContext )
       , mGridConfig( layer->mGridConfig )
       , mOpacity( layer->opacity() )
+      , mTitle( layer->name() )
     {}
 
     bool render() override
@@ -106,21 +108,6 @@ class KadasGuideGridRenderer : public QgsMapLayerRenderer
         path.addPolygon( vLine1 );
         p->drawPath( path );
       }
-
-      if ( mGridConfig.showLayerTitle && !previewJob )
-      {
-        QgsMapLayer *layer = QgsProject::instance()->mapLayer( layerId() );
-        if ( layer )
-        {
-          QPointF ptsLeft = titlePoints( true );
-          QPointF ptsTop = titlePoints( false );
-
-          QString name = layer->name();
-          drawTitleLabel( ptsLeft, name, true, font, fontMetrics, bufferColor );
-          drawTitleLabel( ptsTop, name, false, font, fontMetrics, bufferColor );
-        }
-      }
-
       double sy1 = adaptLabelsToScreen ? std::max( vLine1.first().y(), screenRect.top() ) : vLine1.first().y();
       double sy2 = adaptLabelsToScreen ? std::min( vLine1.last().y(), screenRect.bottom() ) : vLine1.last().y();
       QuadrantLabeling quadrantLabeling = mGridConfig.quadrantLabeling;
@@ -236,6 +223,30 @@ class KadasGuideGridRenderer : public QgsMapLayerRenderer
         hLine1 = hLine2;
       }
 
+      if ( mGridConfig.showLayerTitle && !previewJob )
+      {
+        QgsTextFormat titleFormat;
+        titleFormat.setFont( font );
+        titleFormat.setSize( mGridConfig.fontSize * dpiScale );
+        titleFormat.setSizeUnit( Qgis::RenderUnit::Pixels );
+        titleFormat.setColor( mGridConfig.color );
+        QgsTextBufferSettings titleBuffer;
+        titleBuffer.setEnabled( true );
+        titleBuffer.setColor( bufferColor );
+        titleBuffer.setSize( std::max( 1.0, mGridConfig.fontSize / 8. ) );
+        titleBuffer.setSizeUnit( Qgis::RenderUnit::Pixels );
+        titleFormat.setBuffer( titleBuffer );
+
+        // Center the title in the label band next to the grid edge, beyond the labels if these are outside
+        const double titleOffset = ( mGridConfig.labelingPos == KadasGuideGridLayer::LabelsOutside ? 1.5 : 0.5 ) * labelBoxSize;
+        const QPointF leftAnchor = mapToPixel.transform( crst.transform( QgsPointXY( gridRect.xMinimum(), gridRect.center().y() ) ) ).toQPointF() - QPointF( titleOffset, 0 );
+        const QPointF topAnchor = mapToPixel.transform( crst.transform( QgsPointXY( gridRect.center().x(), gridRect.yMaximum() ) ) ).toQPointF() - QPointF( 0, titleOffset );
+
+        // Zero-sized rects: the text is centered on the anchor and rotated around it
+        QgsTextRenderer::drawText( QRectF( leftAnchor, QSizeF( 0, 0 ) ), M_PI / 2, Qgis::TextHorizontalAlignment::Center, { mTitle }, *renderContext(), titleFormat, true, Qgis::TextVerticalAlignment::VerticalCenter );
+        QgsTextRenderer::drawText( QRectF( topAnchor, QSizeF( 0, 0 ) ), 0, Qgis::TextHorizontalAlignment::Center, { mTitle }, *renderContext(), titleFormat, true, Qgis::TextVerticalAlignment::VerticalCenter );
+      }
+
       p->restore();
       return true;
     }
@@ -243,6 +254,7 @@ class KadasGuideGridRenderer : public QgsMapLayerRenderer
   private:
     GridConfig mGridConfig;
     double mOpacity = 1.0;
+    QString mTitle;
 
     void drawGridLabel( double x, double y, const QString &text, const QFont &font, const QFontMetrics &metrics, const QColor &bufferColor )
     {
@@ -285,67 +297,6 @@ class KadasGuideGridRenderer : public QgsMapLayerRenderer
         screenPoints.append( mapToPixel.transform( crst.transform( pt ) ).toQPointF() );
       }
       return screenPoints;
-    }
-
-    void drawTitleLabel( const QPointF &point, const QString &name, const bool &vertical, const QFont &font, const QFontMetrics &metrics, const QColor &bufferColor )
-    {
-      const int labelBoxSize = mGridConfig.labelingPos == KadasGuideGridLayer::LabelsOutside ? metrics.height() : 0;
-      QPainterPath path;
-      double x = point.x() + labelBoxSize;
-      double y = point.y() - labelBoxSize;
-      x -= 0.5 * metrics.horizontalAdvance( name );
-      y = y - metrics.descent() + 0.5 * metrics.height();
-      path.addText( x, y, font, name );
-      QPainter *p = renderContext()->painter();
-      p->save();
-      if ( vertical )
-      {
-        p->translate( point.x(), point.y() );
-        p->rotate( -90 );
-        p->translate( -point.x(), -point.y() );
-      }
-      p->setPen( QPen( bufferColor, qRound( mGridConfig.fontSize / 8. ) ) );
-      p->drawPath( path );
-      p->setPen( Qt::NoPen );
-      p->drawPath( path );
-      p->restore();
-    }
-
-    QPointF titlePoints( const bool &vertical ) const
-    {
-      const QgsCoordinateTransform crst = renderContext()->coordinateTransform();
-      const QgsMapToPixel &mapToPixel = renderContext()->mapToPixel();
-      const QgsRectangle &gridRect = mGridConfig.gridRect;
-
-      QgsPointXY center = gridRect.center();
-
-
-      double left = gridRect.xMinimum();
-      double top = gridRect.yMaximum();
-
-      QgsPoint pt;
-      if ( vertical )
-      {
-        pt = QgsPoint( left, center.y() );
-      }
-      else
-      {
-        pt = QgsPoint( center.x(), top );
-      }
-
-      QPointF screenPoint = mapToPixel.transform( crst.transform( pt ) ).toQPointF();
-
-      constexpr double OFFSET_FROM_GRID = 25;
-      if ( vertical )
-      {
-        screenPoint.setX( screenPoint.x() - OFFSET_FROM_GRID );
-      }
-      else
-      {
-        screenPoint.setY( screenPoint.y() - OFFSET_FROM_GRID );
-      }
-
-      return screenPoint;
     }
 };
 
