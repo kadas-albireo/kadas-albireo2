@@ -313,7 +313,17 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QComboBox" name="comboBoxRowLabels"/>
+           <widget class="QComboBox" name="comboBoxRowLabels">
+            <property name="toolTip">
+             <string>First label: a number (e.g. 1, 20) or letters (e.g. A, AA, BA)</string>
+            </property>
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+            <property name="insertPolicy">
+             <enum>QComboBox::NoInsert</enum>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QToolButton" name="toolButtonSwitchLabels">
@@ -324,9 +334,29 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="comboBoxColLabels"/>
+           <widget class="QComboBox" name="comboBoxColLabels">
+            <property name="toolTip">
+             <string>First label: a number (e.g. 1, 20) or letters (e.g. A, AA, BA)</string>
+            </property>
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+            <property name="insertPolicy">
+             <enum>QComboBox::NoInsert</enum>
+            </property>
+           </widget>
           </item>
          </layout>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBoxAvoidRepeatingLetters">
+          <property name="toolTip">
+           <string>Skip letter labels made of a single repeated letter, e.g. AA, BB, CCC</string>
+          </property>
+          <property name="text">
+           <string>Avoid repeating letters</string>
+          </property>
+         </widget>
         </item>
         <item>
          <layout class="QVBoxLayout" name="verticalLayoutLabelPos">

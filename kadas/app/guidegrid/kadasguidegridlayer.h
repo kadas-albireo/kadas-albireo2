@@ -75,9 +75,10 @@ class KadasGuideGridLayer : public KadasAnnotationLayer
     const QColor &color() const { return mGridConfig.color; }
     int lineWidth() const { return mGridConfig.lineWidth; }
     int fontSize() const { return mGridConfig.fontSize; }
-    QPair<QChar, QChar> labelingMode() const { return qMakePair( mGridConfig.rowChar, mGridConfig.colChar ); }
+    QPair<QString, QString> labelingMode() const { return qMakePair( mGridConfig.rowStart, mGridConfig.colStart ); }
     LabelingPos labelingPos() const { return mGridConfig.labelingPos; }
     QuadrantLabeling labelQuadrants() const { return mGridConfig.quadrantLabeling; }
+    bool avoidRepeatingLetters() const { return mGridConfig.avoidRepeatingLetters; }
 
   public slots:
     void setColor( const QColor &color )
@@ -95,10 +96,10 @@ class KadasGuideGridLayer : public KadasAnnotationLayer
       mGridConfig.fontSize = fontSize;
       regenerate();
     }
-    void setLabelingMode( QChar rowChar, QChar colChar )
+    void setLabelingMode( const QString &rowStart, const QString &colStart )
     {
-      mGridConfig.rowChar = rowChar;
-      mGridConfig.colChar = colChar;
+      mGridConfig.rowStart = rowStart;
+      mGridConfig.colStart = colStart;
       regenerate();
     }
     void setLabelingPos( LabelingPos pos )
@@ -109,6 +110,11 @@ class KadasGuideGridLayer : public KadasAnnotationLayer
     void setLabelQuadrants( QuadrantLabeling labelQuadrants )
     {
       mGridConfig.quadrantLabeling = labelQuadrants;
+      regenerate();
+    }
+    void setAvoidRepeatingLetters( bool avoidRepeatingLetters )
+    {
+      mGridConfig.avoidRepeatingLetters = avoidRepeatingLetters;
       regenerate();
     }
 
@@ -133,8 +139,9 @@ class KadasGuideGridLayer : public KadasAnnotationLayer
         int fontSize = 30;
         QColor color = Qt::red;
         int lineWidth = 1;
-        QChar rowChar = 'A';
-        QChar colChar = '1';
+        QString rowStart = QStringLiteral( "A" );
+        QString colStart = QStringLiteral( "1" );
+        bool avoidRepeatingLetters = true;
         LabelingPos labelingPos = LabelsInside;
         QuadrantLabeling quadrantLabeling = DontLabelQuadrants;
     } mGridConfig;
