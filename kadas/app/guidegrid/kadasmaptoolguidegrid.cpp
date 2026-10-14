@@ -19,6 +19,7 @@
 #include <QComboBox>
 #include <QPushButton>
 #include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <QToolButton>
 
 #include <qgis/qgsapplication.h>
@@ -114,12 +115,10 @@ KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeVi
   ui.setupUi( base );
   addRow( base );
 
-  // Match either a number xor a letters, but not both (e.g not abc1234) .
-  QRegularExpression rx( "^(?:\\d+|[A-Za-z]+)$" );
-
-  QValidator *validatorNumberXorLetter = new QRegularExpressionValidator( rx, this );
-  ui.comboBoxRowLabels->setValidator( validatorNumberXorLetter );
-  ui.comboBoxColLabels->setValidator( validatorNumberXorLetter );
+  // The first label is either a number or letters, e.g. 1, 20, A, AA, BA
+  QValidator *labelStartValidator = new QRegularExpressionValidator( QRegularExpression( "^(?:\\d{1,6}|[A-Za-z]{1,3})$" ), this );
+  ui.comboBoxRowLabels->setValidator( labelStartValidator );
+  ui.comboBoxColLabels->setValidator( labelStartValidator );
 
   for ( int c = 'A'; c <= 'Z'; ++c )
   {
@@ -129,12 +128,12 @@ KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeVi
   {
     ui.comboBoxColLabels->addItem( QChar( c ) );
   }
-  ui.comboBoxLabelPos->addItem( tr( "Inside" ), static_cast<int>( LabelingPos::LabelsInside ) );
-  ui.comboBoxLabelPos->addItem( tr( "Outside" ), static_cast<int>( LabelingPos::LabelsOutside ) );
+  ui.comboBoxLabelPos->addItem( tr( "Inside" ), KadasGuideGridLayer::LabelsInside );
+  ui.comboBoxLabelPos->addItem( tr( "Outside" ), KadasGuideGridLayer::LabelsOutside );
 
-  ui.comboBoxQuadrants->addItem( tr( "Don't label quadrants" ), static_cast<int>( QuadrantLabeling::DontLabelQuadrants ) );
-  ui.comboBoxQuadrants->addItem( tr( "Label one quadrant" ), static_cast<int>( QuadrantLabeling::LabelOneQuadrant ) );
-  ui.comboBoxQuadrants->addItem( tr( "Label all quadrants" ), static_cast<int>( QuadrantLabeling::LabelAllQuadrants ) );
+  ui.comboBoxQuadrants->addItem( tr( "Don't label quadrants" ), KadasGuideGridLayer::DontLabelQuadrants );
+  ui.comboBoxQuadrants->addItem( tr( "Label one quadrant" ), KadasGuideGridLayer::LabelOneQuadrant );
+  ui.comboBoxQuadrants->addItem( tr( "Label all quadrants" ), KadasGuideGridLayer::LabelAllQuadrants );
 
   // The label-position combos carry long captions; let them shrink and elide
   // the current text instead of forcing the whole panel to the widest item
@@ -195,8 +194,8 @@ KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeVi
   connect( ui.toolButtonColor, &QgsColorButton::colorChanged, this, &KadasGuideGridWidget::updateColor );
   connect( ui.spinBoxLineWidth, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasGuideGridWidget::updateLineWidth );
   connect( ui.spinBoxFontSize, qOverload<int>( &QSpinBox::valueChanged ), this, &KadasGuideGridWidget::updateFontSize );
-  connect( ui.comboBoxRowLabels, qOverload<const QString &>( &QComboBox::currentTextChanged ), this, &KadasGuideGridWidget::updateLabeling );
-  connect( ui.comboBoxColLabels, qOverload<const QString &>( &QComboBox::currentTextChanged ), this, &KadasGuideGridWidget::updateLabeling );
+  connect( ui.comboBoxRowLabels, &QComboBox::currentTextChanged, this, &KadasGuideGridWidget::updateLabeling );
+  connect( ui.comboBoxColLabels, &QComboBox::currentTextChanged, this, &KadasGuideGridWidget::updateLabeling );
   connect( ui.toolButtonSwitchLabels, &QToolButton::clicked, this, &KadasGuideGridWidget::switchLabels );
   connect( ui.comboBoxLabelPos, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
   connect( ui.comboBoxQuadrants, qOverload<int>( &QComboBox::currentIndexChanged ), this, &KadasGuideGridWidget::updateLabeling );
@@ -269,16 +268,16 @@ void KadasGuideGridWidget::setCurrentLayer( QgsMapLayer *layer )
   ui.spinBoxFontSize->setValue( mCurrentLayer->fontSize() );
   QPair<QString, QString> labelingMode = mCurrentLayer->labelingMode();
   ui.comboBoxRowLabels->blockSignals( true );
-  ui.comboBoxRowLabels->setCurrentText( QString( labelingMode.first ) );
+  ui.comboBoxRowLabels->setCurrentText( labelingMode.first );
   ui.comboBoxRowLabels->blockSignals( false );
   ui.comboBoxColLabels->blockSignals( true );
-  ui.comboBoxColLabels->setCurrentText( QString( labelingMode.second ) );
+  ui.comboBoxColLabels->setCurrentText( labelingMode.second );
   ui.comboBoxColLabels->blockSignals( false );
   ui.comboBoxLabelPos->blockSignals( true );
-  ui.comboBoxLabelPos->setCurrentIndex( ui.comboBoxLabelPos->findData( static_cast<int>( mCurrentLayer->labelingPos() ) ) );
+  ui.comboBoxLabelPos->setCurrentIndex( ui.comboBoxLabelPos->findData( mCurrentLayer->labelingPos() ) );
   ui.comboBoxLabelPos->blockSignals( false );
   ui.comboBoxQuadrants->blockSignals( true );
-  ui.comboBoxQuadrants->setCurrentIndex( ui.comboBoxQuadrants->findData( static_cast<int>( mCurrentLayer->labelQuadrants() ) ) );
+  ui.comboBoxQuadrants->setCurrentIndex( ui.comboBoxQuadrants->findData( mCurrentLayer->labelQuadrants() ) );
   ui.comboBoxQuadrants->blockSignals( false );
   ui.checkBoxAvoidRepeatingLetters->blockSignals( true );
   ui.checkBoxAvoidRepeatingLetters->setChecked( mCurrentLayer->avoidRepeatingLetters() );
@@ -467,8 +466,8 @@ void KadasGuideGridWidget::updateFontSize( int fontSize )
 
 void KadasGuideGridWidget::switchLabels()
 {
-  int rowIndex = ui.comboBoxRowLabels->currentIndex();
-  int colIndex = ui.comboBoxColLabels->currentIndex();
+  const QString rowStart = ui.comboBoxRowLabels->currentText();
+  const QString colStart = ui.comboBoxColLabels->currentText();
   ui.comboBoxColLabels->blockSignals( true );
   ui.comboBoxRowLabels->blockSignals( true );
   QAbstractItemModel *rowModel = ui.comboBoxRowLabels->model();
@@ -477,8 +476,8 @@ void KadasGuideGridWidget::switchLabels()
   colModel->setParent( ui.comboBoxRowLabels );
   ui.comboBoxColLabels->setModel( rowModel );
   ui.comboBoxRowLabels->setModel( colModel );
-  ui.comboBoxColLabels->setCurrentIndex( rowIndex );
-  ui.comboBoxRowLabels->setCurrentIndex( colIndex );
+  ui.comboBoxColLabels->setCurrentText( rowStart );
+  ui.comboBoxRowLabels->setCurrentText( colStart );
   ui.comboBoxColLabels->blockSignals( false );
   ui.comboBoxRowLabels->blockSignals( false );
   updateLabeling();
@@ -490,9 +489,15 @@ void KadasGuideGridWidget::updateLabeling()
   {
     return;
   }
-  mCurrentLayer->setLabelingMode( ui.comboBoxRowLabels->currentText().toUpper(), ui.comboBoxColLabels->currentText().toUpper() );
-  mCurrentLayer->setLabelingPos( static_cast<LabelingPos>( ui.comboBoxLabelPos->currentData().toInt() ) );
-  mCurrentLayer->setLabelQuadrants( static_cast<QuadrantLabeling>( ui.comboBoxQuadrants->currentData().toInt() ) );
+  const QString rowStart = ui.comboBoxRowLabels->currentText().toUpper();
+  const QString colStart = ui.comboBoxColLabels->currentText().toUpper();
+  // Keep the previous start labels while one of them is being retyped
+  if ( !rowStart.isEmpty() && !colStart.isEmpty() )
+  {
+    mCurrentLayer->setLabelingMode( rowStart, colStart );
+  }
+  mCurrentLayer->setLabelingPos( static_cast<KadasGuideGridLayer::LabelingPos>( ui.comboBoxLabelPos->currentData().toInt() ) );
+  mCurrentLayer->setLabelQuadrants( static_cast<KadasGuideGridLayer::QuadrantLabeling>( ui.comboBoxQuadrants->currentData().toInt() ) );
   mCurrentLayer->setAvoidRepeatingLetters( ui.checkBoxAvoidRepeatingLetters->isChecked() );
   mCurrentLayer->triggerRepaint();
 }

@@ -22,35 +22,6 @@
 #include "kadas/app/kadasannotationlayer.h"
 #include "kadas/core/kadaspluginlayer.h"
 
-enum class LabelingPos
-{
-  LabelsInside,
-  LabelsOutside
-};
-enum class QuadrantLabeling
-{
-  DontLabelQuadrants,
-  LabelOneQuadrant,
-  LabelAllQuadrants
-};
-
-struct GridConfig
-{
-    QgsRectangle gridRect;
-    int cols = 0;
-    int rows = 0;
-    bool colSizeLocked = false;
-    bool rowSizeLocked = false;
-    int fontSize = 30;
-    QColor color = Qt::red;
-    int lineWidth = 1;
-    QString rowStart = QString( "A" );
-    QString colStart = QString( "1" );
-    bool avoidRepeatingLetters = true;
-    LabelingPos labelingPos = LabelingPos::LabelsInside;
-    QuadrantLabeling quadrantLabeling = QuadrantLabeling::DontLabelQuadrants;
-};
-
 /**
  * Guide grid layer: draws a numbered/lettered rectangular grid over the map.
  *
@@ -72,6 +43,18 @@ class KadasGuideGridLayer : public KadasAnnotationLayer
 {
     Q_OBJECT
   public:
+    enum LabelingPos
+    {
+      LabelsInside,
+      LabelsOutside
+    };
+    enum QuadrantLabeling
+    {
+      DontLabelQuadrants,
+      LabelOneQuadrant,
+      LabelAllQuadrants
+    };
+
     static QString layerType() { return "guide_grid"; }
 
     explicit KadasGuideGridLayer( const QString &name );
@@ -113,7 +96,7 @@ class KadasGuideGridLayer : public KadasAnnotationLayer
       mGridConfig.fontSize = fontSize;
       regenerate();
     }
-    void setLabelingMode( QString rowStart, QString colStart )
+    void setLabelingMode( const QString &rowStart, const QString &colStart )
     {
       mGridConfig.rowStart = rowStart;
       mGridConfig.colStart = colStart;
@@ -146,7 +129,22 @@ class KadasGuideGridLayer : public KadasAnnotationLayer
     /// of this subclass and would strip any custom child element).
     void writeConfigToCustomProperties();
 
-    GridConfig mGridConfig;
+    struct GridConfig
+    {
+        QgsRectangle gridRect;
+        int cols = 0;
+        int rows = 0;
+        bool colSizeLocked = false;
+        bool rowSizeLocked = false;
+        int fontSize = 30;
+        QColor color = Qt::red;
+        int lineWidth = 1;
+        QString rowStart = QStringLiteral( "A" );
+        QString colStart = QStringLiteral( "1" );
+        bool avoidRepeatingLetters = true;
+        LabelingPos labelingPos = LabelsInside;
+        QuadrantLabeling quadrantLabeling = DontLabelQuadrants;
+    } mGridConfig;
 
     /// Rebuild the layer's annotation items (lines + labels) from the current GridConfig.
     void regenerate() override;
@@ -178,6 +176,17 @@ class KadasGuideGridLayer : public KadasPluginLayer
 {
     Q_OBJECT
   public:
+    enum LabelingPos
+    {
+      LabelsInside,
+      LabelsOutside
+    };
+    enum QuadrantLabeling
+    {
+      DontLabelQuadrants,
+      LabelOneQuadrant,
+      LabelAllQuadrants
+    };
     static QString layerType() { return "guide_grid"; }
 
     KadasGuideGridLayer( const QString &name );
@@ -197,23 +206,21 @@ class KadasGuideGridLayer : public KadasPluginLayer
     const QColor &color() const { return mGridConfig.color; }
     int lineWidth() const { return mGridConfig.lineWidth; }
     int fontSize() const { return mGridConfig.fontSize; }
-    QPair<QString, QString> labelingMode() const { return qMakePair( mGridConfig.rowStart, mGridConfig.colStart ); }
+    QPair<QChar, QChar> labelingMode() const { return qMakePair( mGridConfig.rowChar, mGridConfig.colChar ); }
     LabelingPos labelingPos() const { return mGridConfig.labelingPos; }
     QuadrantLabeling labelQuadrants() const { return mGridConfig.quadrantLabeling; }
-    bool avoidRepeatingLetters() const { return mGridConfig.avoidRepeatingLetters; }
 
   public slots:
     void setColor( const QColor &color ) { mGridConfig.color = color; }
     void setLineWidth( int lineWidth ) { mGridConfig.lineWidth = lineWidth; }
     void setFontSize( int fontSize ) { mGridConfig.fontSize = fontSize; }
-    void setLabelingMode( QString rowStart, QString colStart )
+    void setLabelingMode( QChar rowChar, QChar colChar )
     {
-      mGridConfig.rowStart = rowStart;
-      mGridConfig.colStart = colStart;
+      mGridConfig.rowChar = rowChar;
+      mGridConfig.colChar = colChar;
     }
     void setLabelingPos( LabelingPos pos ) { mGridConfig.labelingPos = pos; }
     void setLabelQuadrants( QuadrantLabeling labelQuadrants ) { mGridConfig.quadrantLabeling = labelQuadrants; }
-    void setAvoidRepeatingLetters( bool avoidRepeatingLetters ) { mGridConfig.avoidRepeatingLetters = avoidRepeatingLetters; }
 
   protected:
     bool readXml( const QDomNode &layer_node, QgsReadWriteContext &context ) override;
@@ -222,7 +229,21 @@ class KadasGuideGridLayer : public KadasPluginLayer
   private:
     class Renderer;
 
-    GridConfig mGridConfig;
+    struct GridConfig
+    {
+        QgsRectangle gridRect;
+        int cols = 0;
+        int rows = 0;
+        bool colSizeLocked = false;
+        bool rowSizeLocked = false;
+        int fontSize = 30;
+        QColor color = Qt::red;
+        int lineWidth = 1;
+        QChar rowChar = 'A';
+        QChar colChar = '1';
+        LabelingPos labelingPos = LabelsInside;
+        QuadrantLabeling quadrantLabeling = DontLabelQuadrants;
+    } mGridConfig;
 };
 
 

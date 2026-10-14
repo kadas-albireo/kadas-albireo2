@@ -1,6 +1,6 @@
 /***************************************************************************
     kadasguidegridutils.h
-    ----------------------
+    ---------------------
     copyright            : (C) 2026 by OPENGIS.ch
     email                : info@opengis.ch
  ***************************************************************************/
@@ -19,13 +19,22 @@
 
 #include <QString>
 
-/**
- * Helpers for guide grid labeling, used by both KadasGuideGridLayer and KadasGuideGridRenderer.
- */
-class KadasGuideGridUtils
+#include "kadas/core/kadas_core.h"
+
+class KADAS_CORE_EXPORT KadasGuideGridUtils
 {
   public:
-    static QString gridLabel( const QString &firstStart, int offset, bool avoidRepeatingLetters = false );
+    /**
+     * Returns the label of the guide grid row or column at \a offset from the first one, labeled \a start.
+     * \a start is either a number (1, 20, ...) or letters (A, AA, BA, ...), letters run as A..Z, AA..AZ, BA..ZZ, AAA, ...
+     * If \a avoidRepeatingLetters is set, letter labels made of a single repeated letter (AA, BB, AAA, ...) are skipped.
+     */
+    static QString gridLabel( const QString &start, int offset, bool avoidRepeatingLetters = false );
+
+  private:
+    static int lettersToNumber( const QString &letters );
+    static QString numberToLetters( int number );
+    static int repeatingLettersCount( int number );
 };
 
 #endif // KADASGUIDEGRIDUTILS_H

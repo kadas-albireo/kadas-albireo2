@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>381</width>
-    <height>392</height>
+    <height>400</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayoutMain">
@@ -83,7 +83,7 @@
         <item>
          <widget class="QToolButton" name="toolButtonPickTopLeft">
           <property name="icon">
-           <iconset resource="../../resources/resources.qrc">
+           <iconset>
             <normaloff>:/kadas/icons/pick</normaloff>:/kadas/icons/pick</iconset>
           </property>
          </widget>
@@ -112,7 +112,7 @@
         <item>
          <widget class="QToolButton" name="toolButtonPickBottomRight">
           <property name="icon">
-           <iconset resource="../../resources/resources.qrc">
+           <iconset>
             <normaloff>:/kadas/icons/pick</normaloff>:/kadas/icons/pick</iconset>
           </property>
          </widget>
@@ -197,7 +197,7 @@
         <item>
          <widget class="QToolButton" name="toolButtonLockWidth">
           <property name="icon">
-           <iconset resource="../../resources/resources.qrc">
+           <iconset>
             <normaloff>:/kadas/icons/unlocked</normaloff>:/kadas/icons/unlocked</iconset>
           </property>
           <property name="checkable">
@@ -231,7 +231,7 @@
         <item>
          <widget class="QToolButton" name="toolButtonLockHeight">
           <property name="icon">
-           <iconset resource="../../resources/resources.qrc">
+           <iconset>
             <normaloff>:/kadas/icons/unlocked</normaloff>:/kadas/icons/unlocked</iconset>
           </property>
           <property name="checkable">
@@ -315,17 +315,20 @@
           <item>
            <widget class="QComboBox" name="comboBoxRowLabels">
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Starting label for coordinates&lt;/p&gt;&lt;p&gt;Example 'A', 'AA' or 'BA' &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>First label: a number (e.g. 1, 20) or letters (e.g. A, AA, BA)</string>
             </property>
             <property name="editable">
              <bool>true</bool>
+            </property>
+            <property name="insertPolicy">
+             <enum>QComboBox::NoInsert</enum>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QToolButton" name="toolButtonSwitchLabels">
             <property name="icon">
-             <iconset resource="../../resources/resources.qrc">
+             <iconset>
               <normaloff>:/kadas/icons/switch</normaloff>:/kadas/icons/switch</iconset>
             </property>
            </widget>
@@ -333,14 +336,27 @@
           <item>
            <widget class="QComboBox" name="comboBoxColLabels">
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Starting label for coordinates&lt;/p&gt;&lt;p&gt;Example '1' , '20' or '100' &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>First label: a number (e.g. 1, 20) or letters (e.g. A, AA, BA)</string>
             </property>
             <property name="editable">
              <bool>true</bool>
             </property>
+            <property name="insertPolicy">
+             <enum>QComboBox::NoInsert</enum>
+            </property>
            </widget>
           </item>
          </layout>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBoxAvoidRepeatingLetters">
+          <property name="toolTip">
+           <string>Skip letter labels made of a single repeated letter, e.g. AA, BB, CCC</string>
+          </property>
+          <property name="text">
+           <string>Avoid repeating letters</string>
+          </property>
+         </widget>
         </item>
         <item>
          <layout class="QVBoxLayout" name="verticalLayoutLabelPos">
@@ -356,23 +372,6 @@
          </layout>
         </item>
        </layout>
-      </item>
-      <item row="8" column="1">
-       <widget class="QCheckBox" name="checkBoxAvoidRepeatingLetters">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="0">
-       <widget class="QLabel" name="label">
-        <property name="toolTip">
-         <string>Example: &quot;AA&quot;, &quot;BB&quot; &quot;CCC&quot;</string>
-        </property>
-        <property name="text">
-         <string>Avoid repeating letters</string>
-        </property>
-       </widget>
       </item>
      </layout>
     </widget>

@@ -1,0 +1,47 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/core/kadasguidegridutils.h                                     *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+class KadasGuideGridUtils
+{
+%Docstring(signature="appended")
+*************************************************************************
+
+This program is free software; you can redistribute it and/or modify *
+it under the terms of the GNU General Public License as published by *
+the Free Software Foundation; either version 2 of the License, or * (at
+your option) any later version. *
+
+**************************************************************************
+%End
+
+%TypeHeaderCode
+#include "kadas/core/kadasguidegridutils.h"
+%End
+  public:
+    static QString gridLabel( const QString &start, int offset, bool avoidRepeatingLetters = false );
+%Docstring
+Returns the label of the guide grid row or column at ``offset`` from the
+first one, labeled ``start``. ``start`` is either a number (1, 20, ...)
+or letters (A, AA, BA, ...), letters run as A..Z, AA..AZ, BA..ZZ, AAA,
+... If ``avoidRepeatingLetters`` is set, letter labels made of a single
+repeated letter (AA, BB, AAA, ...) are skipped.
+%End
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/core/kadasguidegridutils.h                                     *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
