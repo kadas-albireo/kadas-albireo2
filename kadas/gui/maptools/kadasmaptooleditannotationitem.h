@@ -84,12 +84,13 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     /**
      * Create-mode: redirects subsequent items to \a layer. An item that is not a
      * finished annotation yet is discarded rather than carried over, since it
-     * lives in the CRS of the layer it was started on.
+     * lives in the CRS of the layer it was started on. A null \a layer leaves
+     * the tool with nothing to draw into until another layer is set.
      */
     void setTargetLayer( QgsAnnotationLayer *layer );
 
   signals:
-    //! Create-mode: emitted after setTargetLayer() switched to another layer.
+    //! Create-mode: emitted after setTargetLayer() switched to another layer, possibly none.
     void targetLayerChanged( QgsAnnotationLayer *layer );
     //! Create-mode: emitted whenever a part is finalized.
     void partFinished();
@@ -212,6 +213,8 @@ class KADAS_GUI_EXPORT KadasMapToolEditAnnotationItem : public QgsMapTool
     void inputChanged();
     //! Ends the session once the edited item's layer is no longer drawn on the canvas.
     void closeIfTargetLayerHidden();
+    //! Stops editing or drawing into the target layer once it gets locked.
+    void targetLayerPropertyChanged( const QString &key );
 };
 
 #endif // KADASMAPTOOLEDITANNOTATIONITEM_H

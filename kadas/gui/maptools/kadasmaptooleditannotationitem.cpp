@@ -42,6 +42,7 @@
 #include <qgis/qgsfeedback.h>
 #include <qgis/qgssettings.h>
 
+#include "kadas/core/kadaslayerutils.h"
 #include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontext.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
@@ -287,19 +288,34 @@ void KadasMapToolEditAnnotationItem::activate()
     mTooltipWidget->setInteractive( false );
     connect( canvas(), &QgsMapCanvas::extentsChanged, mTooltipWidget, &KadasMapItemTooltip::clear );
   }
-  if ( !mController || !mLayer )
+  if ( !mController || ( !mLayer && !mAllowCreate ) )
   {
     canvas()->unsetMapTool( this );
     return;
   }
 
-  if ( mAllowCreate && !mItem )
+  if ( KadasLayerUtils::isLocked( mLayer ) )
   {
-    createInitialItem();
-    if ( !mItem )
+    // Nothing on a locked layer is edited, and nothing new goes into it. Drawing
+    // carries on with whatever layer the chooser falls back to, if any.
+    if ( !mAllowCreate )
     {
       canvas()->unsetMapTool( this );
       return;
+    }
+    mLayer = nullptr;
+  }
+
+  if ( mAllowCreate && !mItem )
+  {
+    if ( mLayer )
+    {
+      createInitialItem();
+      if ( !mItem )
+      {
+        canvas()->unsetMapTool( this );
+        return;
+      }
     }
   }
   else if ( !mItem )
@@ -309,7 +325,8 @@ void KadasMapToolEditAnnotationItem::activate()
   }
 
   mStateHistory = new KadasStateHistory( this );
-  mStateHistory->push( new ToolState( mItem->clone(), mDrawState ) );
+  if ( mItem )
+    mStateHistory->push( new ToolState( mItem->clone(), mDrawState ) );
   connect( mStateHistory, &KadasStateHistory::stateChanged, this, &KadasMapToolEditAnnotationItem::stateChanged );
 
   mBottomBar = new KadasSidePanel( canvas() );
@@ -365,7 +382,11 @@ void KadasMapToolEditAnnotationItem::activate()
       mHandles->update();
     }
   } );
-  connect( mLayer.data(), &QgsMapLayer::repaintRequested, this, &KadasMapToolEditAnnotationItem::refreshHandles, Qt::UniqueConnection );
+  if ( mLayer )
+  {
+    connect( mLayer.data(), &QgsMapLayer::repaintRequested, this, &KadasMapToolEditAnnotationItem::refreshHandles, Qt::UniqueConnection );
+    connect( mLayer.data(), &QgsMapLayer::customPropertyChanged, this, &KadasMapToolEditAnnotationItem::targetLayerPropertyChanged, Qt::UniqueConnection );
+  }
   // Watched for the leave event: once the pointer is off the canvas nothing
   // reports where it is any more, and the handles that follow it say so.
   canvas()->viewport()->installEventFilter( this );
@@ -549,14 +570,18 @@ void KadasMapToolEditAnnotationItem::canvasPressEvent( QgsMapMouseEvent *e )
 {
   if ( mTooltipWidget )
     mTooltipWidget->clear();
-  if ( !mItem || !mController || !mLayer )
-    return;
-
-  if ( mLayer->customProperty( QStringLiteral( "readOnly" ) ).toBool() )
+  if ( mAllowCreate && !mLayer )
   {
-    emit messageEmitted( tr( "Error: %1" ).arg( tr( "Layer is read-only" ) ), Qgis::MessageLevel::Info );
+    // The chooser has nothing to offer, every suitable layer being locked:
+    // nothing can be drawn until a new layer is created there.
+    if ( e->button() == Qt::LeftButton )
+      emit messageEmitted( tr( "No unlocked layer to draw into, create a new one." ) );
+    else if ( e->button() == Qt::RightButton )
+      canvas()->unsetMapTool( this );
     return;
   }
+  if ( !mItem || !mController || !mLayer )
+    return;
 
   if ( mPressedButton != Qt::NoButton )
     return;
@@ -1035,11 +1060,35 @@ void KadasMapToolEditAnnotationItem::closeIfTargetLayerHidden()
     if ( node && node->isVisible() )
       return;
   }
+  else if ( mAllowCreate )
+  {
+    // Not drawing into anything yet: waiting for a layer to be created in the chooser.
+    return;
+  }
   // Once the layer is no longer shown there is nothing left to edit on screen:
   // the item is invisible, the edit handles float over nothing, and picking
   // already skips hidden layers, so the item could not even be reselected.
   // Hiding the layer (or removing it) therefore ends the session.
   canvas()->unsetMapTool( this );
+}
+
+void KadasMapToolEditAnnotationItem::targetLayerPropertyChanged( const QString &key )
+{
+  if ( key != KadasLayerUtils::lockedPropertyKey() || !canvas() || canvas()->mapTool() != this )
+    return;
+  if ( !KadasLayerUtils::isLocked( mLayer ) )
+    return;
+  if ( mAllowCreate )
+  {
+    // The chooser drops the layer from its list and moves on to another, but
+    // the shape under way must not wait for that to stop drawing into it.
+    setTargetLayer( nullptr );
+  }
+  else
+  {
+    emit messageEmitted( KadasLayerUtils::lockedMessage( mLayer ) );
+    canvas()->unsetMapTool( this );
+  }
 }
 
 void KadasMapToolEditAnnotationItem::setupLayerSelection()
@@ -1048,7 +1097,7 @@ void KadasMapToolEditAnnotationItem::setupLayerSelection()
     return;
 
   KadasAnnotationItemController *controller = mController;
-  auto filter = [controller]( QgsMapLayer *layer ) { return controller->supportsLayer( qobject_cast<QgsAnnotationLayer *>( layer ) ); };
+  auto filter = [controller]( QgsMapLayer *layer ) { return controller->supportsLayer( qobject_cast<QgsAnnotationLayer *>( layer ) ) && !KadasLayerUtils::isLocked( layer ); };
   auto creator = [controller]( const QString &name ) -> QgsMapLayer * { return KadasAnnotationLayerHelpers::createLayer( name, controller->preferredLayerCrs() ); };
 
   // No legend view to hand over: kadas/gui has no handle on the main window.
@@ -1067,7 +1116,9 @@ void KadasMapToolEditAnnotationItem::setupLayerSelection()
   }
   else
   {
-    mLayerSelection->setSelectedLayer( mLayer );
+    // Without a layer of its own - the one it was handed is locked - the tool
+    // takes the chooser's default, made current and visible like any choice.
+    mLayerSelection->setSelectedLayer( mLayer ? mLayer.data() : mLayerSelection->getSelectedLayer() );
     // The layer the tool was handed may not be on offer (removed from the
     // project, wrong CRS for this item type): follow what the chooser settled on.
     if ( QgsAnnotationLayer *selected = qobject_cast<QgsAnnotationLayer *>( mLayerSelection->getSelectedLayer() ) )
@@ -1083,28 +1134,37 @@ void KadasMapToolEditAnnotationItem::setupLayerSelection()
 
 void KadasMapToolEditAnnotationItem::setTargetLayer( QgsAnnotationLayer *layer )
 {
-  if ( !mAllowCreate || !layer || layer == mLayer )
+  if ( !mAllowCreate || layer == mLayer )
     return;
 
   // The chooser is locked while a shape is being drawn, so the item at this
-  // point is either the untouched placeholder for the next one - which just
-  // moves along with the choice - or one the user already finished, which stays
-  // on the layer it was drawn into. Nothing has to be transformed either way.
-  // An item left empty (a text item with no text, say) is litter rather than
-  // content, and is dropped here as it is everywhere else.
-  if ( mItem && ( mDrawState == DrawState::Empty || ( mController && mController->isEmpty( mItem ) ) ) )
+  // point is mostly either the untouched placeholder for the next one - which
+  // just moves along with the choice - or one the user already finished, which
+  // stays on the layer it was drawn into. Nothing has to be transformed either
+  // way. A shape still being drawn only gets here when its layer is locked or
+  // removed under it, and is dropped like an item left empty (a text item with
+  // no text, say), which is litter rather than content. A removed layer took
+  // its items along, so mItem is not to be looked at then.
+  if ( mItem && ( mDrawState != DrawState::Finished || ( mLayer && mController && mController->isEmpty( mItem ) ) ) )
   {
     clearInProgressItem();
   }
   if ( mLayer )
   {
     disconnect( mLayer.data(), &QgsMapLayer::repaintRequested, this, &KadasMapToolEditAnnotationItem::refreshHandles );
+    disconnect( mLayer.data(), &QgsMapLayer::customPropertyChanged, this, &KadasMapToolEditAnnotationItem::targetLayerPropertyChanged );
   }
 
   mItem = nullptr;
   mItemId.clear();
+  mDrawState = DrawState::Empty;
+  updateLayerSelectionLock();
   mLayer = layer;
-  connect( mLayer.data(), &QgsMapLayer::repaintRequested, this, &KadasMapToolEditAnnotationItem::refreshHandles, Qt::UniqueConnection );
+  if ( mLayer )
+  {
+    connect( mLayer.data(), &QgsMapLayer::repaintRequested, this, &KadasMapToolEditAnnotationItem::refreshHandles, Qt::UniqueConnection );
+    connect( mLayer.data(), &QgsMapLayer::customPropertyChanged, this, &KadasMapToolEditAnnotationItem::targetLayerPropertyChanged, Qt::UniqueConnection );
+  }
 
   // The recorded states belong to items on the previous layer, so replaying
   // them onto the fresh item would resurrect them in the wrong place.
@@ -1275,6 +1335,9 @@ KadasMapToolEditAnnotationItem::PickedItem KadasMapToolEditAnnotationItem::pickI
     if ( !al )
       continue;
     if ( KadasAnnotationLayerHelpers::isParametricLayer( al ) )
+      continue;
+    // Whatever is picked here gets edited or restacked, neither of which a locked layer allows.
+    if ( KadasLayerUtils::isLocked( al ) )
       continue;
     const QgsRectangle layerBounds = canvas()->mapSettings().mapToLayerCoordinates( al, mapBounds );
     QgsFeedback feedback;

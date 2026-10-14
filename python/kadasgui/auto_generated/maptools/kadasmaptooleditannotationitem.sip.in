@@ -84,7 +84,9 @@ the tool changed it.
 %Docstring
 Create-mode: redirects subsequent items to ``layer``. An item that is
 not a finished annotation yet is discarded rather than carried over,
-since it lives in the CRS of the layer it was started on.
+since it lives in the CRS of the layer it was started on. A null
+``layer`` leaves the tool with nothing to draw into until another layer
+is set.
 %End
 
   signals:
@@ -92,7 +94,7 @@ since it lives in the CRS of the layer it was started on.
 %Docstring
 Create-mode: emitted after
 :py:func:`~KadasMapToolEditAnnotationItem.setTargetLayer` switched to
-another layer.
+another layer, possibly none.
 %End
     void partFinished();
 %Docstring

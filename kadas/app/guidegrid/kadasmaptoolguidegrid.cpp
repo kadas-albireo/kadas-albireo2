@@ -28,6 +28,7 @@
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgsproject.h>
 
+#include "kadas/core/kadaslayerutils.h"
 #include "kadas/gui/kadaslayerselectionwidget.h"
 #include <guidegrid/kadasguidegridlayer.h>
 #include <guidegrid/kadasmaptoolguidegrid.h>
@@ -146,7 +147,7 @@ KadasGuideGridWidget::KadasGuideGridWidget( QgsMapCanvas *canvas, QgsLayerTreeVi
     connect( combo, qOverload<int>( &QComboBox::currentIndexChanged ), combo, [combo] { combo->setToolTip( combo->currentText() ); } );
   }
 
-  auto layerFilter = []( QgsMapLayer *layer ) { return dynamic_cast<KadasGuideGridLayer *>( layer ) != nullptr; };
+  auto layerFilter = []( QgsMapLayer *layer ) { return dynamic_cast<KadasGuideGridLayer *>( layer ) && !KadasLayerUtils::isLocked( layer ); };
   auto layerCreator = [this]( const QString &name ) { return createLayer( name ); };
   mLayerSelectionWidget = new KadasLayerSelectionWidget( canvas, layerTreeView, layerFilter, layerCreator );
   ui.layerSelectionWidgetHolder->addWidget( mLayerSelectionWidget );

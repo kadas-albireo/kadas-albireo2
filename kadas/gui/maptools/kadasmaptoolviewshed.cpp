@@ -36,6 +36,7 @@
 
 #include "kadas/core/kadas.h"
 #include "kadas/core/kadascoordinateformat.h"
+#include "kadas/core/kadaslayerutils.h"
 #include "kadas/analysis/kadasviewshedfilter.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
@@ -285,7 +286,12 @@ void KadasMapToolViewshed::onShapeCaptured( const QgsGeometry &geometry, const Q
     QgsProject::instance()->addMapLayer( outLayer );
 
     QgsAnnotationLayer *pinsLayer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::PinsLayer );
-    if ( pinsLayer )
+    if ( KadasLayerUtils::isLocked( pinsLayer ) )
+    {
+      // The viewshed stands on its own, only the pin marking the observer is left out.
+      emit messageEmitted( KadasLayerUtils::lockedMessage( pinsLayer ) );
+    }
+    else if ( pinsLayer )
     {
       const QgsPointXY layerPos = QgsCoordinateTransform( crs, pinsLayer->crs(), QgsProject::instance()->transformContext() ).transform( center );
       auto *pin = new KadasPinAnnotationItem( QgsPoint( layerPos.x(), layerPos.y() ) );
