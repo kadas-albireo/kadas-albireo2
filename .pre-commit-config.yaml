@@ -7,7 +7,7 @@ exclude: |
   )
 repos:
 - repo: https://github.com/pre-commit/mirrors-clang-format
-  rev: v23.1.0
+  rev: v23.1.2
   hooks:
   - id: clang-format
     types_or: [c++, c, c#]
@@ -28,21 +28,21 @@ repos:
     args: [--in-place, --remove-all-unused-imports, --remove-unused-variables]
 
 - repo: https://github.com/PyCQA/isort
-  rev: 9.0.1
+  rev: 9.0.2
   hooks:
   - id: isort
     files: ^share/python/plugins/
     args: [--profile, black, --line-length, "99"]
 
 - repo: https://github.com/psf/black-pre-commit-mirror
-  rev: 26.5.1
+  rev: 26.10.0
   hooks:
   - id: black
     files: ^share/python/plugins/
     args: [--line-length, "99"]
 
 - repo: https://github.com/PyCQA/flake8
-  rev: 7.3.0
+  rev: 7.4.1
   hooks:
   - id: flake8
     files: ^share/python/plugins/
