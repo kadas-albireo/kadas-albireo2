@@ -18,8 +18,10 @@
 #define KADASANNOTATIONITEMCONTROLLER_H
 
 #include <QColor>
+#include <QPointF>
 #include <QString>
 #include <QStringList>
+#include <optional>
 
 #include <qgis/qgis.h>
 
@@ -50,9 +52,46 @@ class KadasAnnotationStyleEditor;
  */
 struct KadasAnnotationMeasurementLabel
 {
+    /**
+     * \ingroup gui
+     * \brief Placement of a label that measures a segment.
+     *
+     * Such a label is laid along its segment rather than upright on top of it, and
+     * pushed clear of it, so the number never hides the line it belongs to nor the
+     * midpoint handle sitting there.
+     */
+    struct KADAS_GUI_EXPORT Segment
+    {
+        //! Side of the directed segment the shape's interior lies on, which is the side its label has to avoid.
+        enum class InteriorSide
+        {
+          None, //!< The segment belongs to no closed shape (an open line): the label takes whichever side is up on screen.
+          Left,
+          Right,
+        };
+
+        //! Segment ends, in map coordinates. The label runs parallel to them, in whichever of the two directions reads left to right.
+        QgsPointXY start;
+        QgsPointXY end;
+        //! Which side the shape's interior is on, so the label lands outside it.
+        InteriorSide interior = InteriorSide::None;
+
+        /**
+         * Unit normal, in screen coordinates, a label for a segment running in
+         * screen direction \a dir is pushed along to clear the shape: away from
+         * the side \a interior names, or up the screen when it names none.
+         *
+         * Screen y grows downwards, which is the whole difficulty: it inverts
+         * the sign of a cross product without turning the picture upside down.
+         */
+        static QPointF labelOffsetDirection( const QPointF &dir, InteriorSide interior );
+    };
+
     QgsPointXY mapPos;
     QString text;
     bool centered = true;
+    //! Set when the label measures a segment; unset for a label that just marks a spot (a total, an area).
+    std::optional<Segment> segment;
 };
 
 /**
@@ -135,6 +174,25 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     // ----- Edit interface -------------------------------------------------
 
     virtual KadasEditContext getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const = 0;
+
+    /**
+     * Called once on the item being edited, before the first edit() of a drag or
+     * click on \a editContext, so a controller can freeze whatever has to hold
+     * still for that whole edit: the corner a resize pivots around, the segment
+     * a midpoint handle will insert into.
+     *
+     * getEditContext() is the wrong place for it. It doubles as the hit test
+     * that item picking runs over every candidate under the cursor, so a
+     * neighbouring item would arm and disarm state belonging to the item the
+     * user is actually editing.
+     */
+    virtual void beginEdit( const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAnnotationItemContext &ctx )
+    {
+      Q_UNUSED( item );
+      Q_UNUSED( editContext );
+      Q_UNUSED( ctx );
+    }
+
     virtual void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx ) = 0;
     virtual void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) = 0;
     virtual KadasAttribValues editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const = 0;
@@ -305,6 +363,18 @@ class KADAS_GUI_EXPORT KadasAnnotationItemController
     // Honor the shared "/kadas/measure_decimals" setting.
     static QString formatLengthMeters( double meters );
     static QString formatAreaSquareMeters( double sqMeters );
+#endif
+
+#ifndef SIP_RUN
+    // ----- Segment measurement labels --------------------------------------
+
+    using InteriorSide = KadasAnnotationMeasurementLabel::Segment::InteriorSide;
+
+    //! Interior side of the closed ring through \a ring (item coordinates), from its winding; InteriorSide::None when it is degenerate.
+    static InteriorSide ringInteriorSide( const QVector<QgsPointXY> &ring );
+
+    //! Label \a text for the edge \a a to \a b (item coordinates), anchored on its midpoint, laid along it and pushed to the side opposite \a side.
+    static KadasAnnotationMeasurementLabel segmentLabel( const QgsPointXY &a, const QgsPointXY &b, const QString &text, const KadasAnnotationItemContext &ctx, InteriorSide side = InteriorSide::None );
 #endif
 };
 

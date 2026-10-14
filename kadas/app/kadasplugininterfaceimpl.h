@@ -250,6 +250,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual QAction *actionNewBookmark() override { return nullptr; }
     virtual QAction *actionShowBookmarks() override { return nullptr; }
     virtual QAction *actionDraw() override { return nullptr; }
+    virtual QAction *actionNew3DMapCanvas() override { return nullptr; }
     virtual QAction *actionNewVectorLayer() override { return nullptr; }
     virtual QAction *actionAddOgrLayer() override { return nullptr; }
     virtual QAction *actionAddRasterLayer() override { return nullptr; }

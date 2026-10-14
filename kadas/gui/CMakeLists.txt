@@ -34,6 +34,7 @@ set(kadas_gui_SRC
     annotationitems/kadasannotationprojectintegration.cpp
     annotationitems/kadasannotationrotation.cpp
     annotationitems/kadasannotationstyleeditor.cpp
+    annotationitems/kadasannotationvertexedit.cpp
     annotationitems/kadascircleannotationcontroller.cpp
     annotationitems/kadascircleannotationitem.cpp
     annotationitems/kadascoordcrossannotationcontroller.cpp
@@ -122,6 +123,7 @@ set(kadas_gui_HDR
     annotationitems/kadasannotationrotation.h
     annotationitems/kadasannotationshadow.h
     annotationitems/kadasannotationstyleeditor.h
+    annotationitems/kadasannotationvertexedit.h
     annotationitems/kadasannotationzindex.h
     annotationitems/kadascircleannotationcontroller.h
     annotationitems/kadascircleannotationitem.h

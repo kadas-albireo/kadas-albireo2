@@ -17,9 +17,13 @@
 #ifndef KADASANNOTATIONITEMCONTEXT_H
 #define KADASANNOTATIONITEMCONTEXT_H
 
+#include <optional>
+
 #include <qgis/qgsannotationlayer.h>
 #include <qgis/qgscoordinatereferencesystem.h>
+#include <qgis/qgscoordinatetransform.h>
 #include <qgis/qgsmapsettings.h>
+#include <qgis/qgspointxy.h>
 
 #include "kadas/gui/kadas_gui.h"
 
@@ -50,10 +54,40 @@ class KADAS_GUI_EXPORT KadasAnnotationItemContext
     Qt::KeyboardModifiers modifiers() const { return mModifiers; }
     void setModifiers( Qt::KeyboardModifiers modifiers ) { mModifiers = modifiers; }
 
+    //! TRUE while the item is still being digitized. Handles that only make sense on a finished shape (midpoint insert handles) are left out then, so the trailing rubber-band segment does not sprout one that chases the cursor.
+    bool digitizing() const { return mDigitizing; }
+    void setDigitizing( bool digitizing ) { mDigitizing = digitizing; }
+
+    //! Pointer position in map coordinates, empty when it is unknown (pointer off the canvas, or a caller that has none). Handles that would clutter the shape if they were all shown at once - the midpoint insert handles - only appear near it.
+    QgsPointXY cursorPos() const { return mCursorPos; }
+    void setCursorPos( const QgsPointXY &cursorPos ) { mCursorPos = cursorPos; }
+
+#ifndef SIP_RUN
+
+    /**
+     * Item CRS to map CRS transform, built on first use and kept for the rest of
+     * the context's life. Use its ReverseTransform direction for the way back.
+     *
+     * One hit test or handle repaint converts hundreds of points, and building a
+     * transform costs far more than using one, so everything goes through this
+     * one rather than constructing its own per point. The CRSs it is built from
+     * are fixed when the context is constructed.
+     */
+    const QgsCoordinateTransform &itemToMapTransform() const
+    {
+      if ( !mItemToMap )
+        mItemToMap = QgsCoordinateTransform( itemCrs(), mMapSettings.destinationCrs(), mMapSettings.transformContext() );
+      return *mItemToMap;
+    }
+#endif
+
   private:
     QgsAnnotationLayer *mLayer = nullptr;
     QgsMapSettings mMapSettings;
     Qt::KeyboardModifiers mModifiers = Qt::NoModifier;
+    bool mDigitizing = false;
+    QgsPointXY mCursorPos;
+    mutable std::optional<QgsCoordinateTransform> mItemToMap;
 };
 
 #endif // KADASANNOTATIONITEMCONTEXT_H

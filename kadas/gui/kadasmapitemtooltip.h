@@ -81,7 +81,8 @@ class KADAS_GUI_EXPORT KadasMapItemTooltip : public QTextEdit
     QTimer mHideTimer;
     QPoint mPos;
     QgsMapCanvas *mCanvas = nullptr;
-    bool mMouseMoved = false;
+    //! Where the last press landed, so a release that barely moved still counts as a click on the link under it.
+    QPoint mPressPos;
     //! FALSE while a map tool owns the pointer: buttons pass through, the wheel does not.
     bool mInteractive = true;
     // Item under the pointer, and the one positionAndShow() last acted on. Every

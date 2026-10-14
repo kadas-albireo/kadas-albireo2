@@ -195,6 +195,18 @@ KadasEditContext KadasRectangleAnnotationController::getEditContext( const QgsAn
   return KadasEditContext();
 }
 
+void KadasRectangleAnnotationController::beginEdit( const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAnnotationItemContext &ctx )
+{
+  // The corner opposite the grabbed one stays put for the whole drag. Taken here
+  // rather than in getEditContext(), which also runs as the hit test for every
+  // other item under the cursor and would keep overwriting this.
+  const int v = editContext.vidx.vertex;
+  const auto cs = asRect( item )->corners();
+  mResizeAnchorValid = v >= 0 && v < 4 && cs.size() == 4;
+  if ( mResizeAnchorValid )
+    mResizeAnchor = toMapPos( cs[( v + 2 ) % 4], ctx );
+}
+
 void KadasRectangleAnnotationController::edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx )
 {
   KadasRectangleAnnotationItem *rect = asRect( item );
@@ -217,8 +229,11 @@ void KadasRectangleAnnotationController::edit( QgsAnnotationItem *item, const Ka
 
   if ( v >= 0 && v < 4 )
   {
-    const auto cs = rect->corners();
-    const QgsPointXY anchorMap = toMapPos( cs[( v + 2 ) % 4], ctx );
+    // The anchor beginEdit() froze. Re-deriving it from the current corners on
+    // every step would follow the item's own corner ordering, which swaps as soon
+    // as the cursor crosses the anchor, so past that point the rectangle would
+    // chase the cursor instead of mirroring about the anchor.
+    const QgsPointXY anchorMap = mResizeAnchorValid ? mResizeAnchor : toMapPos( rect->corners()[( v + 2 ) % 4], ctx );
 
     const double a = rect->angle() * M_PI / 180.0;
     const double cosA = std::cos( a );
@@ -370,13 +385,12 @@ QList<KadasAnnotationMeasurementLabel> KadasRectangleAnnotationController::measu
   da.setSourceCrs( ctx.itemCrs(), ctx.mapSettings().transformContext() );
   da.setEllipsoid( QgsProject::instance()->ellipsoid() );
 
+  const InteriorSide interior = ringInteriorSide( corners );
   for ( int i = 0; i < 4; ++i )
   {
     const QgsPointXY &a = corners[i];
     const QgsPointXY &b = corners[( i + 1 ) % 4];
-    const double seg = da.measureLine( a, b );
-    const QgsPointXY midItem( 0.5 * ( a.x() + b.x() ), 0.5 * ( a.y() + b.y() ) );
-    labels.append( { toMapPos( midItem, ctx ), formatLengthMeters( seg ), true } );
+    labels.append( segmentLabel( a, b, formatLengthMeters( da.measureLine( a, b ) ), ctx, interior ) );
   }
 
   double areaM2 = 0.0;

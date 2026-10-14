@@ -48,18 +48,19 @@ references within it.
 
     static QString remarksAsHtml( const QString &remarks );
 %Docstring
-``remarks`` as markup ready to be appended to a document: rich text as it
-stands, plain text escaped and wrapped in a block.
+``remarks`` as markup ready to be appended to a document: rich text as
+it stands, plain text escaped and wrapped in a block.
 
-Which of the two a description is, is a guess -- Kadas 2.x stored both in
-this one field, with nothing to tell them apart -- so it is made here once
-and everything that renders or searches a description guesses alike.
+Which of the two a description is, is a guess — Kadas 2.x stored both in
+this one field, with nothing to tell them apart — so it is made here
+once and everything that renders or searches a description guesses
+alike.
 %End
 
     static QString remarksAsPlainText( const QString &remarks );
 %Docstring
-``remarks`` as searchable text, with any markup resolved rather than matched
-against.
+``remarks`` as searchable text, with any markup resolved rather than
+matched against.
 %End
 
     static QString defaultIconPath();

@@ -61,6 +61,8 @@ rather than something to be operated. Interactive by default.
 
     virtual void leaveEvent( QEvent * );
 
+    virtual bool eventFilter( QObject *watched, QEvent *event );
+
     virtual void mousePressEvent( QMouseEvent *ev );
 
     virtual void mouseMoveEvent( QMouseEvent *ev );
