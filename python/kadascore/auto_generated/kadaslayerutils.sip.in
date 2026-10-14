@@ -1,0 +1,56 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/core/kadaslayerutils.h                                         *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+
+class KadasLayerUtils
+{
+%Docstring(signature="appended")
+Static helpers for locking layers: a locked layer can neither be removed
+nor edited.
+%End
+
+%TypeHeaderCode
+#include "kadas/core/kadaslayerutils.h"
+%End
+  public:
+    static QString lockedPropertyKey();
+%Docstring
+Custom property holding the lock state;
+:py:func:`QgsMapLayer.customPropertyChanged()` reports it with this key
+when the lock changes.
+%End
+
+    static bool isLocked( const QgsMapLayer *layer );
+%Docstring
+``True`` if ``layer`` is locked.
+%End
+
+    static void setLocked( QgsMapLayer *layer, bool locked );
+%Docstring
+Locks or unlocks ``layer``: makes it (non-)removable and, for vector
+layers, (not) read-only.
+%End
+
+    static QString lockedMessage( const QgsMapLayer *layer );
+%Docstring
+Message telling the user that ``layer`` cannot be edited because it is
+locked.
+%End
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * kadas/core/kadaslayerutils.h                                         *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/

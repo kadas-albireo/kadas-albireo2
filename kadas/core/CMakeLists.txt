@@ -6,6 +6,7 @@ set(kadas_core_SRC
     kadasfileserver.cpp
     kadasguidegridutils.cpp
     kadaslatlontoutm.cpp
+    kadaslayerutils.cpp
     kadassettingstree.cpp
     kadasstatehistory.cpp
 )
@@ -19,6 +20,7 @@ set(kadas_core_HDR
     kadasfileserver.h
     kadasguidegridutils.h
     kadaslatlontoutm.h
+    kadaslayerutils.h
     kadaspluginlayer.h
     kadassettingstree.h
     kadasstatehistory.h
