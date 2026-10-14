@@ -72,6 +72,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual QMenu *databaseMenu() override { return getClassicMenu( ActionClassicMenuLocation::DATABASE_MENU ); }
     virtual QMenu *vectorMenu() override { return getClassicMenu( ActionClassicMenuLocation::VECTOR_MENU ); }
     virtual QMenu *webMenu() override { return getClassicMenu( ActionClassicMenuLocation::WEB_MENU ); }
+    virtual QMenu *processingMenu() override { return getClassicMenu( ActionClassicMenuLocation::CUSTOM_MENU, tr( "Processing" ) ); }
 #if _QGIS_VERSION_INT >= 33440
     virtual QMenu *meshMenu() override;
 #endif
@@ -92,6 +93,8 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual void removePluginVectorMenu( const QString &name, QAction *action ) override;
     virtual void addPluginToWebMenu( const QString &name, QAction *action ) override;
     virtual void removePluginWebMenu( const QString &name, QAction *action ) override;
+    virtual void addPluginToProcessingMenu( const QString &name, QAction *action ) override;
+    virtual void removePluginProcessingMenu( const QString &name, QAction *action ) override;
 
 #if _QGIS_VERSION_INT >= 33000
     virtual QMenu *projectImportExportMenu() override;
@@ -183,6 +186,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual QToolBar *databaseToolBar() override { return dummyToolbar(); }
     virtual QToolBar *webToolBar() override { return dummyToolbar(); }
     virtual QToolBar *selectionToolBar() override { return dummyToolbar(); }
+    virtual QToolBar *processingToolboxToolBar() override { return dummyToolbar(); }
     QToolBar *dummyToolbar();
 
     virtual int addToolBarIcon( QAction *qAction ) override { return -1; }
@@ -265,6 +269,7 @@ class KadasPluginInterfaceImpl : public KadasPluginInterface
     virtual QAction *actionOpenStatisticalSummary() override { return nullptr; }
     virtual QAction *actionToggleEditing() override { return nullptr; }
     virtual QAction *actionSaveActiveLayerEdits() override { return nullptr; }
+    virtual QAction *actionEditFeaturesInPlace() override { return nullptr; }
     virtual QAction *actionAllEdits() override { return nullptr; }
     virtual QAction *actionSaveEdits() override { return nullptr; }
     virtual QAction *actionSaveAllEdits() override { return nullptr; }

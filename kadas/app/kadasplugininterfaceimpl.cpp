@@ -242,6 +242,16 @@ void KadasPluginInterfaceImpl::removePluginWebMenu( const QString &name, QAction
   getSubMenu( getClassicMenu( ActionClassicMenuLocation::WEB_MENU ), name )->removeAction( action );
 }
 
+void KadasPluginInterfaceImpl::addPluginToProcessingMenu( const QString &name, QAction *action )
+{
+  getSubMenu( processingMenu(), name )->addAction( action );
+}
+
+void KadasPluginInterfaceImpl::removePluginProcessingMenu( const QString &name, QAction *action )
+{
+  getSubMenu( processingMenu(), name )->removeAction( action );
+}
+
 #if _QGIS_VERSION_INT >= 33000
 QMenu *KadasPluginInterfaceImpl::projectImportExportMenu()
 {
