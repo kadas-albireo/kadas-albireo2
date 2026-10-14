@@ -17,10 +17,8 @@
 #ifndef KADASMAPTOOLHILLSHADE_H
 #define KADASMAPTOOLHILLSHADE_H
 
-#include <qgis/qgsmaptool.h>
-#include "kadas/gui/maptools/kadasshapecapturemaptool.h"
-
 #include "kadas/gui/kadas_gui.h"
+#include "kadas/gui/maptools/kadasshapecapturemaptool.h"
 
 class KADAS_GUI_EXPORT KadasMapToolHillshade : public KadasShapeCaptureMapTool
 {

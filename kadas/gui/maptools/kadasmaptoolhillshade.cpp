@@ -42,7 +42,7 @@ KadasMapToolHillshade::KadasMapToolHillshade( QgsMapCanvas *mapCanvas )
 
 void KadasMapToolHillshade::onShapeCaptured( const QgsGeometry &geometry, const QgsCoordinateReferenceSystem &crs )
 {
-  compute( geometry.boundingBox(), canvas()->mapSettings().destinationCrs() );
+  compute( geometry.boundingBox(), crs );
   clear();
 }
 

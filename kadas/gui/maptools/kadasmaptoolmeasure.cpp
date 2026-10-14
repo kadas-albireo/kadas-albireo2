@@ -34,6 +34,7 @@
 #include <qgis/qgsmultilinestring.h>
 #include <qgis/qgsmultipolygon.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsrubberband.h>
 #include <qgis/qgssettings.h>
 
 #include "kadas/gui/kadassidepanel.h"

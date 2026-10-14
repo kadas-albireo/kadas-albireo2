@@ -23,7 +23,6 @@
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgssettingsentryenumflag.h>
 #include <qgis/qgsunittypes.h>
-#include <qgis/qgsrubberband.h>
 
 #include "kadas/core/kadassettingstree.h"
 #include "kadas/gui/kadas_gui.h"
@@ -32,6 +31,7 @@
 class QCheckBox;
 class QComboBox;
 class QLabel;
+class QgsRubberBand;
 class KadasSidePanel;
 class KadasMeasureLabelsOverlay;
 
