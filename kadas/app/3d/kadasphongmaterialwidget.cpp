@@ -61,9 +61,9 @@ QgsMaterialSettingsWidget *KadasPhongMaterialWidget::create()
   return new KadasPhongMaterialWidget();
 }
 
-void KadasPhongMaterialWidget::setTechnique( Qgis::MaterialRenderingTechnique technique )
+void KadasPhongMaterialWidget::updateWidgetVisibility()
 {
-  switch ( technique )
+  switch ( mTechnique )
   {
     case Qgis::MaterialRenderingTechnique::Triangles:
     case Qgis::MaterialRenderingTechnique::TrianglesFromModel:

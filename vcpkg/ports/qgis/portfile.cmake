@@ -1,9 +1,9 @@
 string(REPLACE "." "_" TAG ${VERSION})
 
 # set(QGIS_REF final-${TAG})
-set(QGIS_REF 3e257d182ce0e216977573904e4b963b44be52e8)
+set(QGIS_REF d835ed0a563f5c286127c6f5efbdb5b1473e9adb)
 set(QGIS_SHA512
-    7bc736e8dd5a8e8b2f8929976e1ce7a677f1a99dd4dbfe46d03239080f594cef827ff192e609ada324a5c4ab7a5ab279a12e080b0bd15c34e68050f7d8f772e7
+    fbd37f34f4138ca1ffe65ad50a678ebbe7d445c35d8c59fa964a1f4475f66d59067bd2fa7c140a7672f5e74a88bcdc768eecf2f9c04550f5f2d6165d0a14cdff
 )
 
 vcpkg_from_github(
@@ -30,8 +30,6 @@ vcpkg_from_github(
   mac_install_images.patch
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
-  oauth2NoEmptyClientSecret.patch # https://github.com/qgis/QGIS/pull/66777
-  colorButtonOpaqueFill.patch # https://github.com/qgis/QGIS/pull/67477
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)

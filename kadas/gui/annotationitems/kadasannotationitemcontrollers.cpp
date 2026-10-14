@@ -77,12 +77,18 @@ void KadasAnnotationItemControllers::registerBuiltins()
       r->addItemType( new QgsAnnotationItemMetadata( type, visible, visiblePlural, create ) );
     }
   };
-  registerType( itemRegistry, KadasCircleAnnotationItem::itemTypeId(), QObject::tr( "Kadas Circle" ), QObject::tr( "Kadas Circles" ), [] { return new KadasCircleAnnotationItem(); } );
-  registerType( itemRegistry, KadasRectangleAnnotationItem::itemTypeId(), QObject::tr( "Kadas Rectangle" ), QObject::tr( "Kadas Rectangles" ), [] { return new KadasRectangleAnnotationItem(); } );
-  registerType( itemRegistry, KadasPinAnnotationItem::itemTypeId(), QObject::tr( "Kadas Pin" ), QObject::tr( "Kadas Pins" ), [] { return new KadasPinAnnotationItem(); } );
-  registerType( itemRegistry, KadasSvgMarkerAnnotationItem::itemTypeId(), QObject::tr( "SVG Marker" ), QObject::tr( "SVG Markers" ), [] { return new KadasSvgMarkerAnnotationItem(); } );
-  registerType( itemRegistry, KadasCoordCrossAnnotationItem::itemTypeId(), QObject::tr( "Coordinate Cross" ), QObject::tr( "Coordinate Crosses" ), [] { return new KadasCoordCrossAnnotationItem(); } );
-  registerType( itemRegistry, KadasGpxWaypointAnnotationItem::itemTypeId(), QObject::tr( "GPX Waypoint" ), QObject::tr( "GPX Waypoints" ), [] { return new KadasGpxWaypointAnnotationItem(); } );
-  registerType( itemRegistry, KadasGpxRouteAnnotationItem::itemTypeId(), QObject::tr( "GPX Route" ), QObject::tr( "GPX Routes" ), [] { return new KadasGpxRouteAnnotationItem(); } );
-  registerType( itemRegistry, KadasMilxAnnotationItem::itemTypeId(), QObject::tr( "MilX Symbol" ), QObject::tr( "MilX Symbols" ), [] { return new KadasMilxAnnotationItem(); } );
+  registerType( itemRegistry, KadasCircleAnnotationItem::itemTypeId(), QObject::tr( "Kadas Circle" ), QObject::tr( "Kadas Circles" ), [] { return std::make_unique<KadasCircleAnnotationItem>(); } );
+  registerType( itemRegistry, KadasRectangleAnnotationItem::itemTypeId(), QObject::tr( "Kadas Rectangle" ), QObject::tr( "Kadas Rectangles" ), [] {
+    return std::make_unique<KadasRectangleAnnotationItem>();
+  } );
+  registerType( itemRegistry, KadasPinAnnotationItem::itemTypeId(), QObject::tr( "Kadas Pin" ), QObject::tr( "Kadas Pins" ), [] { return std::make_unique<KadasPinAnnotationItem>(); } );
+  registerType( itemRegistry, KadasSvgMarkerAnnotationItem::itemTypeId(), QObject::tr( "SVG Marker" ), QObject::tr( "SVG Markers" ), [] { return std::make_unique<KadasSvgMarkerAnnotationItem>(); } );
+  registerType( itemRegistry, KadasCoordCrossAnnotationItem::itemTypeId(), QObject::tr( "Coordinate Cross" ), QObject::tr( "Coordinate Crosses" ), [] {
+    return std::make_unique<KadasCoordCrossAnnotationItem>();
+  } );
+  registerType( itemRegistry, KadasGpxWaypointAnnotationItem::itemTypeId(), QObject::tr( "GPX Waypoint" ), QObject::tr( "GPX Waypoints" ), [] {
+    return std::make_unique<KadasGpxWaypointAnnotationItem>();
+  } );
+  registerType( itemRegistry, KadasGpxRouteAnnotationItem::itemTypeId(), QObject::tr( "GPX Route" ), QObject::tr( "GPX Routes" ), [] { return std::make_unique<KadasGpxRouteAnnotationItem>(); } );
+  registerType( itemRegistry, KadasMilxAnnotationItem::itemTypeId(), QObject::tr( "MilX Symbol" ), QObject::tr( "MilX Symbols" ), [] { return std::make_unique<KadasMilxAnnotationItem>(); } );
 }
