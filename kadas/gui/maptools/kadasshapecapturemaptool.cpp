@@ -190,7 +190,11 @@ void KadasShapeCaptureMapTool::canvasPressEvent( QgsMapMouseEvent *e )
 
   if ( e->button() == Qt::RightButton && ( mShape == Shape::Polyline || mShape == Shape::Polygon ) && mCapturing )
   {
-    addPoint( toMapCoordinates( e->pos() ) );
+    // Right-clicking on the last vertex finishes without duplicating it
+    const QgsPointXY pos = toMapCoordinates( e->pos() );
+    const double tol = searchRadiusMU( canvas() );
+    if ( mVertices.isEmpty() || pos.sqrDist( mVertices.last() ) >= tol * tol )
+      addPoint( pos );
     mCapturing = false;
     const QgsGeometry geom = ( mShape == Shape::Polygon ) ? buildPolygonGeometry() : buildPolylineGeometry();
     if ( !geom.isEmpty() )
