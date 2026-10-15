@@ -281,18 +281,38 @@ target_include_directories(
 
 if(WITH_VCPKG)
   if(WIN32)
+    set(PYTHONHOME_DIR "${VCPKG_BASE_DIR}")
     set(PYTHON_STDLIB_DIR "${VCPKG_BASE_DIR}/tools/python3/Lib")
     set(PYTHON_SITE_PACKAGES_DIR
         "${VCPKG_BASE_DIR}/tools/python3/Lib/site-packages"
     )
+    set(QGIS_PREFIX_DIR "${VCPKG_BASE_DIR}")
+    set(PROJ_DATA_DIR "${VCPKG_BASE_DIR}/share/proj")
+    set(QT_PLUGIN_DIR "${VCPKG_BASE_DIR}/Qt6/plugins")
     set(ENV_PATH_SEP ";")
+  elseif(APPLE)
+    set(PYTHONHOME_DIR "@executable_path/..")
+    set(PYTHON_STDLIB_DIR
+        "@executable_path/../lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}"
+    )
+    set(PYTHON_SITE_PACKAGES_DIR
+        "@executable_path/../lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages:@executable_path/../share/kadas/python"
+    )
+    set(QGIS_PREFIX_DIR "@executable_path")
+    set(PROJ_DATA_DIR "@executable_path/../share/proj")
+    set(QT_PLUGIN_DIR "@executable_path/../PlugIns")
+    set(ENV_PATH_SEP ":")
   else()
+    set(PYTHONHOME_DIR "${VCPKG_BASE_DIR}")
     set(PYTHON_STDLIB_DIR
         "${VCPKG_BASE_DIR}/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}"
     )
     set(PYTHON_SITE_PACKAGES_DIR
         "${VCPKG_BASE_DIR}/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages"
     )
+    set(QGIS_PREFIX_DIR "${VCPKG_BASE_DIR}")
+    set(PROJ_DATA_DIR "${VCPKG_BASE_DIR}/share/proj")
+    set(QT_PLUGIN_DIR "${VCPKG_BASE_DIR}/Qt6/plugins")
     set(ENV_PATH_SEP ":")
   endif()
   configure_file(
