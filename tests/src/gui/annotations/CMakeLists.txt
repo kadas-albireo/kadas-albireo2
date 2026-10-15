@@ -1,5 +1,7 @@
-set(TESTS testkadasannotationcontrollers.cpp testkadasannotationshadows.cpp
-          testkadasmapitemtooltip.cpp testkadasprojectmigration.cpp
+set(TESTS
+    testkadasannotationcontrollers.cpp testkadasannotationlayerlock.cpp
+    testkadasannotationshadows.cpp testkadasmapitemtooltip.cpp
+    testkadasprojectmigration.cpp
 )
 
 foreach(TESTSRC ${TESTS})

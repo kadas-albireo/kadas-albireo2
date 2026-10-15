@@ -28,6 +28,7 @@
 #include <qgis/qgsmapcanvas.h>
 #include <qgis/qgsproject.h>
 
+#include "kadas/core/kadaslayerutils.h"
 #include "kadas/gui/kadaslayerselectionwidget.h"
 
 
@@ -140,6 +141,9 @@ void KadasLayerSelectionWidget::repopulateLayers()
   const QList<QgsMapLayer *> layers = QgsProject::instance()->mapLayers().values();
   for ( QgsMapLayer *layer : layers )
   {
+    // Watched on every layer, filtered out or not: locking a layer may take it
+    // off the list, and unlocking it may put it back.
+    connect( layer, &QgsMapLayer::customPropertyChanged, this, &KadasLayerSelectionWidget::layerCustomPropertyChanged, Qt::UniqueConnection );
     if ( !mFilter || mFilter( layer ) )
     {
       connect( layer, &QgsMapLayer::nameChanged, this, &KadasLayerSelectionWidget::repopulateLayers, Qt::UniqueConnection );
@@ -211,6 +215,12 @@ void KadasLayerSelectionWidget::activateLayer( QgsMapLayer *layer )
     mLayerTreeView->setCurrentLayer( layer );
   if ( mCanvas && mCanvas->currentLayer() != layer )
     mCanvas->setCurrentLayer( layer );
+}
+
+void KadasLayerSelectionWidget::layerCustomPropertyChanged( const QString &key )
+{
+  if ( key == KadasLayerUtils::lockedPropertyKey() )
+    repopulateLayers();
 }
 
 void KadasLayerSelectionWidget::canvasCurrentLayerChanged( QgsMapLayer *layer )

@@ -22,6 +22,7 @@
 #include <qgis/qgsmapmouseevent.h>
 #include <qgis/qgsproject.h>
 
+#include "kadas/core/kadaslayerutils.h"
 #include "kadas/gui/kadaslayerselectionwidget.h"
 #include <mapgrid/kadasmapgridlayer.h>
 #include <mapgrid/kadasmaptoolmapgrid.h>
@@ -86,7 +87,7 @@ KadasMapGridWidget::KadasMapGridWidget( QgsMapCanvas *canvas, QgsLayerTreeView *
   ui.setupUi( base );
   addRow( base );
 
-  auto layerFilter = []( QgsMapLayer *layer ) { return dynamic_cast<KadasMapGridLayer *>( layer ) != nullptr; };
+  auto layerFilter = []( QgsMapLayer *layer ) { return dynamic_cast<KadasMapGridLayer *>( layer ) && !KadasLayerUtils::isLocked( layer ); };
   auto layerCreator = [this]( const QString &name ) { return createLayer( name ); };
   mLayerSelectionWidget = new KadasLayerSelectionWidget( canvas, layerTreeView, layerFilter, layerCreator );
   ui.layerSelectionWidgetHolder->addWidget( mLayerSelectionWidget );

@@ -82,6 +82,7 @@
 #include "kadas/app/devtools/kadasdevelopertoolsdockwidget.h"
 #include "kadas/app/auth/kadasportalauth.h"
 #include "kadas/core/kadas.h"
+#include "kadas/core/kadaslayerutils.h"
 #include "kadas/core/kadassettingstree.h"
 #include "kadas/gui/kadasattributetabledialog.h"
 #include "kadas/gui/kadasclipboard.h"
@@ -628,15 +629,20 @@ QgsPointCloudLayer *KadasApplication::addPointCloudLayer( const QString &uri, co
 
 QPair<QString, QgsAnnotationLayer *> KadasApplication::addImageItem( const QString &filename ) const
 {
-  const QString attachedPath = QgsProject::instance()->createAttachedFile( QFileInfo( filename ).fileName() );
-  QFile( attachedPath ).remove();
-  QFile( filename ).copy( attachedPath );
-  QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
-
   const bool isSvg = filename.endsWith( QLatin1String( ".svg" ), Qt::CaseInsensitive );
   const Qgis::PictureFormat format = isSvg ? Qgis::PictureFormat::SVG : Qgis::PictureFormat::Raster;
   const KadasAnnotationLayerRegistry::StandardLayer standardLayer = isSvg ? KadasAnnotationLayerRegistry::StandardLayer::SymbolsLayer : KadasAnnotationLayerRegistry::StandardLayer::PicturesLayer;
   QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( standardLayer );
+  if ( KadasLayerUtils::isLocked( layer ) )
+  {
+    mMainWindow->messageBar()->pushMessage( KadasLayerUtils::lockedMessage( layer ), Qgis::Info, mMainWindow->messageTimeout() );
+    return {};
+  }
+
+  const QString attachedPath = QgsProject::instance()->createAttachedFile( QFileInfo( filename ).fileName() );
+  QFile( attachedPath ).remove();
+  QFile( filename ).copy( attachedPath );
+  QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
 
   const QgsCoordinateTransform canvasToLayer( mMainWindow->mapCanvas()->mapSettings().destinationCrs(), layer->crs(), QgsProject::instance()->transformContext() );
   const QgsPointXY center = canvasToLayer.transform( mMainWindow->mapCanvas()->extent().center() );
@@ -1388,6 +1394,12 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
   QgsCoordinateReferenceSystem mapCrs = canvas->mapSettings().destinationCrs();
   if ( KadasClipboard::instance()->hasFormat( "image/svg+xml" ) )
   {
+    QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::SymbolsLayer );
+    if ( KadasLayerUtils::isLocked( layer ) )
+    {
+      displayMessage( KadasLayerUtils::lockedMessage( layer ) );
+      return nullptr;
+    }
     const QMimeData *mimeData = QApplication::clipboard()->mimeData();
     QString filename = QgsProject::instance()->createAttachedFile( "pasted_image.svg" );
     QFile file( filename );
@@ -1395,7 +1407,6 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
     {
       file.write( mimeData->data( "image/svg+xml" ) );
       file.close();
-      QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::SymbolsLayer );
       const QgsCoordinateTransform mapToLayer( mapCrs, layer->crs(), QgsProject::instance()->transformContext() );
       const QgsPointXY layerPos = mapToLayer.transform( pastePos );
       auto *item = new QgsAnnotationPictureItem( Qgis::PictureFormat::SVG, filename, QgsRectangle( layerPos.x(), layerPos.y(), layerPos.x(), layerPos.y() ) );
@@ -1424,9 +1435,14 @@ QgsMapTool *KadasApplication::paste( QgsPointXY *mapPos )
         image = qvariant_cast<QImage>( mimeData->imageData() );
       if ( image.isNull() )
         return nullptr;
+      QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::PicturesLayer );
+      if ( KadasLayerUtils::isLocked( layer ) )
+      {
+        displayMessage( KadasLayerUtils::lockedMessage( layer ) );
+        return nullptr;
+      }
       QString filename = QgsProject::instance()->createAttachedFile( "pasted_image.png" );
       image.save( filename );
-      QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::PicturesLayer );
       const QgsCoordinateTransform mapToLayer( mapCrs, layer->crs(), QgsProject::instance()->transformContext() );
       const QgsPointXY layerPos = mapToLayer.transform( pastePos );
       auto *item = new QgsAnnotationPictureItem( Qgis::PictureFormat::Raster, filename, QgsRectangle( layerPos.x(), layerPos.y(), layerPos.x(), layerPos.y() ) );
@@ -1486,6 +1502,11 @@ void KadasApplication::handleItemPicked( const KadasFeaturePicker::PickResult &r
 {
   if ( !result.annotationLayer )
   {
+    return;
+  }
+  if ( KadasLayerUtils::isLocked( result.annotationLayer ) )
+  {
+    displayMessage( KadasLayerUtils::lockedMessage( result.annotationLayer ) );
     return;
   }
   if ( result.annotationItemId.isEmpty() )
