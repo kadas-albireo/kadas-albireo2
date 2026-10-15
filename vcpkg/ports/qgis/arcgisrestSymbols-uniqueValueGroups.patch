@@ -1,0 +1,197 @@
+diff --git a/src/core/providers/arcgis/qgsarcgisrestutils.cpp b/src/core/providers/arcgis/qgsarcgisrestutils.cpp
+index bfc4a0fb104..0d2e180eb80 100644
+--- a/src/core/providers/arcgis/qgsarcgisrestutils.cpp
++++ b/src/core/providers/arcgis/qgsarcgisrestutils.cpp
+@@ -863,12 +863,8 @@ std::unique_ptr< QgsFeatureRenderer > QgsArcGisRestUtils::convertRenderer( const
+       attribute = field1;
+     }
+ 
+-    const QVariantList categories = rendererData.value( u"uniqueValueInfos"_s ).toList();
+     QgsCategoryList categoryList;
+-    for ( const QVariant &category : categories )
+-    {
+-      const QVariantMap categoryData = category.toMap();
+-      const QString value = categoryData.value( u"value"_s ).toString();
++    auto addCategory = [&]( const QVariantMap &categoryData, const QVariant &value ) {
+       const QString label = categoryData.value( u"label"_s ).toString();
+       std::unique_ptr< QgsSymbol > symbol( QgsArcGisRestUtils::convertSymbol( categoryData.value( u"symbol"_s ).toMap(), context ) );
+       if ( symbol )
+@@ -878,6 +874,48 @@ std::unique_ptr< QgsFeatureRenderer > QgsArcGisRestUtils::convertRenderer( const
+ 
+         categoryList.append( QgsRendererCategory( value, symbol.release(), label ) );
+       }
++    };
++
++    const QVariantList categories = rendererData.value( u"uniqueValueInfos"_s ).toList();
++    for ( const QVariant &category : categories )
++    {
++      const QVariantMap categoryData = category.toMap();
++      addCategory( categoryData, categoryData.value( u"value"_s ).toString() );
++    }
++
++    if ( categoryList.empty() )
++    {
++      // Newer, authored renderers (e.g. those produced by ArcGIS Pro) may store their classes
++      // grouped under "uniqueValueGroups" instead of a flat "uniqueValueInfos" list, with each
++      // class carrying a "values" list of value tuples (one entry per active field) rather than
++      // a single flat "value" string.
++      const QString delimiter = rendererData.value( u"fieldDelimiter"_s ).toString();
++      const QVariantList groups = rendererData.value( u"uniqueValueGroups"_s ).toList();
++      for ( const QVariant &group : groups )
++      {
++        const QVariantList classes = group.toMap().value( u"classes"_s ).toList();
++        for ( const QVariant &classVariant : classes )
++        {
++          const QVariantMap classData = classVariant.toMap();
++          const QVariantList valueTuples = classData.value( u"values"_s ).toList();
++          if ( valueTuples.empty() )
++          {
++            addCategory( classData, classData.value( u"value"_s ).toString() );
++            continue;
++          }
++
++          for ( const QVariant &valueTuple : valueTuples )
++          {
++            QStringList valueParts;
++            const QVariantList tupleParts = valueTuple.toList();
++            valueParts.reserve( tupleParts.size() );
++            for ( const QVariant &part : tupleParts )
++              valueParts.append( part.toString() );
++
++            addCategory( classData, valueParts.join( delimiter ) );
++          }
++        }
++      }
+     }
+ 
+     std::unique_ptr< QgsSymbol > defaultSymbol( convertSymbol( rendererData.value( u"defaultSymbol"_s ).toMap(), context ) );
+diff --git a/tests/src/python/test_provider_afs.py b/tests/src/python/test_provider_afs.py
+index fedc530c0c3..9bbcbe5abc5 100644
+--- a/tests/src/python/test_provider_afs.py
++++ b/tests/src/python/test_provider_afs.py
+@@ -2101,6 +2101,125 @@ class TestPyQgsAFSProvider(QgisTestCase, ProviderTestCase):
+         self.assertEqual(vl.renderer().categories()[0].value(), "US")
+         self.assertEqual(vl.renderer().categories()[1].value(), "Canada")
+ 
++    def testCategorizedRendererUniqueValueGroups(self):
++        """Test that a uniqueValue renderer using the "uniqueValueGroups" structure
++        (as authored by newer versions of ArcGIS Pro) is correctly acquired from provider"""
++
++        endpoint = self.basetestpath + "/renderer_groups_fake_qgis_http_endpoint"
++        with open(self.sanitize_local_url(endpoint, "?f=json"), "wb") as f:
++            f.write(
++                b"""
++        {"currentVersion":11.3,"id":1,"name":"QGIS Test","type":"Feature Layer","description":
++        "QGIS Provider Test Layer","geometryType":"esriGeometryPoint","copyrightText":"not copyright","parentLayer":{"id":2,"name":"QGIS Tests"},"subLayers":[],
++        "minScale":72225,"maxScale":0,
++        "defaultVisibility":true,
++        "extent":{"xmin":-71.123,"ymin":66.33,"xmax":-65.32,"ymax":78.3,
++        "spatialReference":{"wkid":4326,"latestWkid":4326}},
++        "hasAttachments":false,"htmlPopupType":"esriServerHTMLPopupTypeAsHTMLText",
++        "displayField":"LABEL","typeIdField":null,
++        "fields":[{"name":"OBJECTID","type":"esriFieldTypeOID","alias":"OBJECTID","domain":null}],
++        "relationships":[],"canModifyLayer":false,"canScaleSymbols":false,"hasLabels":false,
++        "capabilities":"Map,Query,Data","maxRecordCount":1000,"supportsStatistics":true,
++        "supportsAdvancedQueries":true,"supportedQueryFormats":"JSON, AMF",
++        "drawingInfo":{"renderer": {
++    "type": "uniqueValue",
++    "field1": "COUNTRY",
++    "fieldDelimiter": ",",
++    "uniqueValueGroups": [
++      {
++        "heading": "",
++        "classes": [
++          {
++            "label": "US",
++            "symbol": {
++              "color": [253, 127, 111, 255],
++              "size": 12.75,
++              "angle": 0,
++              "xoffset": 0,
++              "yoffset": 0,
++              "type": "esriSMS",
++              "style": "esriSMSCircle",
++              "outline": {
++                "color": [26, 26, 26, 255],
++                "width": 0.75,
++                "type": "esriSLS",
++                "style": "esriSLSSolid"
++              }
++            },
++            "values": [["US"]]
++          },
++          {
++            "label": "Canada",
++            "symbol": {
++              "color": [126, 176, 213, 255],
++              "size": 12.75,
++              "angle": 0,
++              "xoffset": 0,
++              "yoffset": 0,
++              "type": "esriSMS",
++              "style": "esriSMSCircle",
++              "outline": {
++                "color": [26, 26, 26, 255],
++                "width": 0.75,
++                "type": "esriSLS",
++                "style": "esriSLSSolid"
++              }
++            },
++            "values": [["Canada"]]
++          }
++        ]
++      }
++    ],
++    "authoringInfo": {
++      "colorRamp": {
++        "type": "algorithmic",
++        "algorithm": "esriCIELabAlgorithm",
++        "fromColor": [245, 208, 24, 255],
++        "toColor": [90, 10, 250, 255]
++      }
++    }
++    }},
++        "ownershipBasedAccessControlForFeatures":{"allowOthersToQuery":true},"useStandardizedQueries":true}"""
++            )
++
++        with open(
++            self.sanitize_local_url(
++                endpoint, "/query?f=json_where=1=1&returnIdsOnly=true"
++            ),
++            "wb",
++        ) as f:
++            f.write(
++                b"""
++        {
++         "objectIdFieldName": "OBJECTID",
++         "objectIds": [
++          1
++         ]
++        }
++        """
++            )
++
++        # Create test layer
++        vl = QgsVectorLayer(
++            "url='http://" + endpoint + "' crs='epsg:4326'",
++            "test",
++            "arcgisfeatureserver",
++        )
++        self.assertTrue(vl.isValid())
++        self.assertIsNotNone(vl.dataProvider().createRenderer())
++        self.assertIsInstance(vl.renderer(), QgsCategorizedSymbolRenderer)
++        self.assertEqual(len(vl.renderer().categories()), 2)
++        self.assertEqual(vl.renderer().categories()[0].value(), "US")
++        self.assertEqual(vl.renderer().categories()[0].label(), "US")
++        self.assertEqual(
++            vl.renderer().categories()[0].symbol().color().name(), "#fd7f6f"
++        )
++        self.assertEqual(vl.renderer().categories()[1].value(), "Canada")
++        self.assertEqual(vl.renderer().categories()[1].label(), "Canada")
++        self.assertEqual(
++            vl.renderer().categories()[1].symbol().color().name(), "#7eb0d5"
++        )
++
+     def testGraduatedRendererContinuous(self):
+         """
+         Test that the graduated renderer with continuous coloring
