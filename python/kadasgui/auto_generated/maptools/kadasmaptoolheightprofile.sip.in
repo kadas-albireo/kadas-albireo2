@@ -31,6 +31,8 @@ your option) any later version. *
   public:
     KadasMapToolHeightProfile( QgsMapCanvas *canvas );
 
+    virtual void canvasPressEvent( QgsMapMouseEvent *e );
+
     virtual void canvasMoveEvent( QgsMapMouseEvent *e );
 
     virtual void canvasReleaseEvent( QgsMapMouseEvent *e );

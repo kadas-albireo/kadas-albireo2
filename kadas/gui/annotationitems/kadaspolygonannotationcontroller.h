@@ -21,8 +21,11 @@
 
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationrotation.h"
+#include "kadas/gui/annotationitems/kadasannotationvertexedit.h"
 
+class QgsCurve;
 class QgsCurvePolygon;
+class QMenu;
 
 /**
  * \ingroup gui
@@ -51,10 +54,12 @@ class KADAS_GUI_EXPORT KadasPolygonAnnotationController : public KadasAnnotation
     QgsPointXY positionFromDrawAttribs( const QgsAnnotationItem *item, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const override;
 
     KadasEditContext getEditContext( const QgsAnnotationItem *item, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const override;
+    void beginEdit( const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAnnotationItemContext &ctx ) override;
     void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &newPoint, const KadasAnnotationItemContext &ctx ) override;
     void edit( QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) override;
     KadasAttribValues editAttribsFromPosition( const QgsAnnotationItem *item, const KadasEditContext &editContext, const QgsPointXY &pos, const KadasAnnotationItemContext &ctx ) const override;
     QgsPointXY positionFromEditAttribs( const QgsAnnotationItem *item, const KadasEditContext &editContext, const KadasAttribValues &values, const KadasAnnotationItemContext &ctx ) const override;
+    void populateContextMenu( QgsAnnotationItem *item, QMenu *menu, const KadasEditContext &editContext, const QgsPointXY &clickPos, const KadasAnnotationItemContext &ctx ) override;
 
     QgsPointXY position( const QgsAnnotationItem *item ) const override;
     void setPosition( QgsAnnotationItem *item, const QgsPointXY &pos ) override;
@@ -93,6 +98,24 @@ class KADAS_GUI_EXPORT KadasPolygonAnnotationController : public KadasAnnotation
     // Rest position of the rotation handle: due north of the centroid but lifted
     // clear of the polygon's northmost extent so it never overlaps the shape.
     QgsPointXY restHandleMap( const QgsCurvePolygon *poly, const KadasAnnotationItemContext &ctx ) const;
+
+    // Per-edit midpoint-handle state, armed by beginEdit() when such a handle is grabbed.
+    KadasAnnotationVertexEdit::VertexInsertState mInsert;
+
+    //! Number of vertices the ring carries once its closing duplicate is discounted.
+    static int distinctVertexCount( const QgsCurve *ring );
+
+    //! Number of segments that carry a midpoint handle, the closing one included; 1 for a two-vertex ring, whose two segments coincide.
+    static int segmentCount( const QgsCurve *ring );
+
+    //! Midpoint (map CRS) of the segment starting at vertex \a segment, or an invalid point when the segment does not exist.
+    static QgsPointXY segmentMidpointMap( const QgsCurve *ring, int segment, const KadasAnnotationItemContext &ctx );
+
+    //! TRUE when \a vertex exists on \a ring and removing it would still leave a polygon behind. The single source of the rule, shared by the menu entry and by deleteVertex().
+    static bool canDeleteVertex( const QgsCurve *ring, int vertex );
+
+    //! Removes vertex \a vertex, re-closing the ring; a no-op unless canDeleteVertex() allows it.
+    static void deleteVertex( QgsAnnotationItem *item, int vertex );
 };
 
 #endif // KADASPOLYGONANNOTATIONCONTROLLER_H

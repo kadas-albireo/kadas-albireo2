@@ -34,10 +34,12 @@ KadasMapToolHeightProfile::KadasMapToolHeightProfile( QgsMapCanvas *canvas )
 {
   mPosMarker = new QgsRubberBand( canvas, Qgis::GeometryType::Point );
   mPosMarker->setColor( Qt::blue );
-  mPosMarker->setStrokeColor( Qt::blue );
+  mPosMarker->setStrokeColor( Qt::white );
+  mPosMarker->setWidth( 2 );
   mPosMarker->setFillColor( Qt::blue );
   mPosMarker->setIcon( Qgis::RubberBandIconType::Circle );
   mPosMarker->setIconSize( 8 );
+  mPosMarker->setZValue( 1000 );
 
   mDialog = new KadasHeightProfileDialog( this, nullptr, Qt::WindowStaysOnTopHint );
 
@@ -163,8 +165,24 @@ void KadasMapToolHeightProfile::canvasMoveEvent( QgsMapMouseEvent *e )
   }
 }
 
+void KadasMapToolHeightProfile::canvasPressEvent( QgsMapMouseEvent *e )
+{
+  // The dialog processes events while sampling: don't let a click alter the line under it
+  if ( mPicking || mDialog->isBusy() )
+    return;
+
+  // A new line is started: drop the profile of the previous one
+  if ( e->button() == Qt::LeftButton && !isCapturing() )
+    onCleared();
+
+  KadasShapeCaptureMapTool::canvasPressEvent( e );
+}
+
 void KadasMapToolHeightProfile::canvasReleaseEvent( QgsMapMouseEvent *e )
 {
+  if ( mDialog->isBusy() )
+    return;
+
   if ( !mPicking )
   {
     KadasShapeCaptureMapTool::canvasReleaseEvent( e );

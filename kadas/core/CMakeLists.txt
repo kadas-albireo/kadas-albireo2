@@ -4,6 +4,7 @@ set(kadas_core_SRC
     kadascoordinateformat.cpp
     kadascoordinateutils.cpp
     kadasfileserver.cpp
+    kadasguidegridutils.cpp
     kadaslatlontoutm.cpp
     kadassettingstree.cpp
     kadasstatehistory.cpp
@@ -16,6 +17,7 @@ set(kadas_core_HDR
     kadascoordinateutils.h
     kadasjsonutils.h
     kadasfileserver.h
+    kadasguidegridutils.h
     kadaslatlontoutm.h
     kadaspluginlayer.h
     kadassettingstree.h

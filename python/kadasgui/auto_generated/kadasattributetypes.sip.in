@@ -84,6 +84,7 @@ Valid ``_vidx`` implies Precise; a default ``_vidx`` implies Body
     KadasAttribDefs attributes;
     Qt::CursorShape cursor;
     HitPrecision precision;
+    bool appliesOnClick;
     bool isValid() const;
 
     bool isSameTarget( const KadasEditContext &other ) const;

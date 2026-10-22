@@ -10,6 +10,7 @@
 
 
 
+
 class KadasAnnotationItemContext
 {
 %Docstring(signature="appended")
@@ -39,6 +40,32 @@ Map canvas settings; \c
 %Docstring
 CRS of the item, i.e. the parent annotation layer's CRS.
 %End
+
+    Qt::KeyboardModifiers modifiers() const;
+%Docstring
+Keyboard modifiers active during the current edit (e.g. Shift for angle
+snapping).
+%End
+    void setModifiers( Qt::KeyboardModifiers modifiers );
+
+    bool digitizing() const;
+%Docstring
+``True`` while the item is still being digitized. Handles that only make
+sense on a finished shape (midpoint insert handles) are left out then,
+so the trailing rubber-band segment does not sprout one that chases the
+cursor.
+%End
+    void setDigitizing( bool digitizing );
+
+    QgsPointXY cursorPos() const;
+%Docstring
+Pointer position in map coordinates, empty when it is unknown (pointer
+off the canvas, or a caller that has none). Handles that would clutter
+the shape if they were all shown at once - the midpoint insert handles -
+only appear near it.
+%End
+    void setCursorPos( const QgsPointXY &cursorPos );
+
 
 };
 

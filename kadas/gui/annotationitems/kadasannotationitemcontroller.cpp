@@ -148,25 +148,28 @@ bool KadasAnnotationItemController::intersects( const QgsAnnotationItem *item, c
 
 // ----- Transform helpers ---------------------------------------------------
 
+// All four go through the transform the context caches: a single hit test or
+// handle repaint runs hundreds of conversions, and building a transform costs
+// far more than using one.
+
 QgsPointXY KadasAnnotationItemController::toMapPos( const QgsPointXY &itemPos, const KadasAnnotationItemContext &ctx )
 {
-  return QgsCoordinateTransform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() ).transform( itemPos );
+  return ctx.itemToMapTransform().transform( itemPos );
 }
 
 QgsPointXY KadasAnnotationItemController::toItemPos( const QgsPointXY &mapPos, const KadasAnnotationItemContext &ctx )
 {
-  const QgsPointXY p = QgsCoordinateTransform( ctx.mapSettings().destinationCrs(), ctx.itemCrs(), ctx.mapSettings().transformContext() ).transform( mapPos );
-  return QgsPointXY( p.x(), p.y() );
+  return ctx.itemToMapTransform().transform( mapPos, Qgis::TransformDirection::Reverse );
 }
 
 QgsRectangle KadasAnnotationItemController::toItemRect( const QgsRectangle &mapRect, const KadasAnnotationItemContext &ctx )
 {
-  return QgsCoordinateTransform( ctx.mapSettings().destinationCrs(), ctx.itemCrs(), ctx.mapSettings().transformContext() ).transform( mapRect );
+  return ctx.itemToMapTransform().transform( mapRect, Qgis::TransformDirection::Reverse );
 }
 
 QgsRectangle KadasAnnotationItemController::toMapRect( const QgsRectangle &itemRect, const KadasAnnotationItemContext &ctx )
 {
-  return QgsCoordinateTransform( ctx.itemCrs(), ctx.mapSettings().destinationCrs(), ctx.mapSettings().transformContext() ).transform( itemRect );
+  return ctx.itemToMapTransform().transform( itemRect );
 }
 
 double KadasAnnotationItemController::pickTolSqr( const KadasAnnotationItemContext &ctx )
@@ -216,4 +219,57 @@ double KadasAnnotationItemController::outputDpiScale( const QgsRenderContext &co
   if ( !context.painter() || !context.painter()->device() || screenDpi <= 0.0 )
     return 1.0;
   return static_cast<double>( context.painter()->device()->logicalDpiX() ) / screenDpi;
+}
+
+// ----- Segment measurement labels ------------------------------------------
+
+QPointF KadasAnnotationMeasurementLabel::Segment::labelOffsetDirection( const QPointF &dir, InteriorSide interior )
+{
+  // ( dy, -dx ) is the normal that appears to the left of the segment as it is
+  // drawn: for a segment running rightwards, up the screen.
+  const QPointF screenLeft( dir.y(), -dir.x() );
+  switch ( interior )
+  {
+    case InteriorSide::Left:
+      // Worked through on the bottom edge of a counter-clockwise square, (0,0)
+      // to (100,0): its interior is north, which is where screenLeft points, so
+      // the label goes the other way.
+      return -screenLeft;
+    case InteriorSide::Right:
+      return screenLeft;
+    case InteriorSide::None:
+      break;
+  }
+  // No shape to keep clear of: the label takes the upper side of its segment,
+  // and the left one where the segment is vertical and has no upper side.
+  if ( screenLeft.y() < 0 || ( qgsDoubleNear( screenLeft.y(), 0.0 ) && screenLeft.x() < 0 ) )
+    return screenLeft;
+  return -screenLeft;
+}
+
+KadasAnnotationItemController::InteriorSide KadasAnnotationItemController::ringInteriorSide( const QVector<QgsPointXY> &ring )
+{
+  // Shoelace: a positive area means the ring is wound counter-clockwise, which
+  // puts its interior on the left of every edge taken in that order.
+  double twiceArea = 0.0;
+  const int n = ring.size();
+  for ( int i = 0; i < n; ++i )
+  {
+    const QgsPointXY &a = ring.at( i );
+    const QgsPointXY &b = ring.at( ( i + 1 ) % n );
+    twiceArea += a.x() * b.y() - b.x() * a.y();
+  }
+  if ( qgsDoubleNear( twiceArea, 0.0 ) )
+    return InteriorSide::None;
+  return twiceArea > 0 ? InteriorSide::Left : InteriorSide::Right;
+}
+
+KadasAnnotationMeasurementLabel KadasAnnotationItemController::segmentLabel( const QgsPointXY &a, const QgsPointXY &b, const QString &text, const KadasAnnotationItemContext &ctx, InteriorSide side )
+{
+  // The side travels as the side of this one edge rather than as a point just
+  // inside the shape: such a point would have to be reprojected like the ends,
+  // which can land outside the CRS's valid domain and throw from inside the
+  // overlay's paint, and which flips the side outright on a long edge.
+  const QgsPointXY mid( 0.5 * ( a.x() + b.x() ), 0.5 * ( a.y() + b.y() ) );
+  return { toMapPos( mid, ctx ), text, true, KadasAnnotationMeasurementLabel::Segment { toMapPos( a, ctx ), toMapPos( b, ctx ), side } };
 }

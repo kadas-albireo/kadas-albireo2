@@ -32,10 +32,12 @@ KadasEditContext.HitPrecision.__doc__ = """Geometric precision of a hit; a preci
 """
 # --
 try:
-    KadasNode.__doc__ = """Editing node descriptor."""
+    KadasEditContext.__attribute_docs__ = {'appliesOnClick': '``True`` when a plain click (press and release without a drag) must run the edit as well, not only a drag: a handle that exists to add something, such as a midpoint handle inserting a vertex, would otherwise do nothing at all on a click.'}
+    KadasEditContext.__annotations__ = {'appliesOnClick': bool}
+    KadasEditContext.__doc__ = """Editing context for an annotation hit."""
 except (NameError, AttributeError):
     pass
 try:
-    KadasEditContext.__doc__ = """Editing context for an annotation hit."""
+    KadasNode.__doc__ = """Editing node descriptor."""
 except (NameError, AttributeError):
     pass

@@ -1,0 +1,181 @@
+diff --git a/src/core/providers/arcgis/qgsarcgisrestutils.cpp b/src/core/providers/arcgis/qgsarcgisrestutils.cpp
+index a66af3d5b1a..9ab50f8ed3c 100644
+--- a/src/core/providers/arcgis/qgsarcgisrestutils.cpp
++++ b/src/core/providers/arcgis/qgsarcgisrestutils.cpp
+@@ -720,6 +720,17 @@ std::unique_ptr<QgsAbstractVectorLayerLabeling > QgsArcGisRestUtils::convertLabe
+       settings->placement = Qgis::LabelPlacement::Horizontal;
+     }
+ 
++    const bool repeatLabel = labeling.value( u"repeatLabel"_s ).toBool();
++    if ( repeatLabel && settings->placement == Qgis::LabelPlacement::Line )
++    {
++      const double repeatLabelDistance = labeling.value( u"repeatLabelDistance"_s ).toDouble();
++      if ( repeatLabelDistance > 0.0 )
++      {
++        settings->repeatDistance = repeatLabelDistance;
++        settings->repeatDistanceUnit = Qgis::RenderUnit::Points;
++      }
++    }
++
+     const double minScale = labeling.value( u"minScale"_s ).toDouble();
+     const double maxScale = labeling.value( u"maxScale"_s ).toDouble();
+ 
+diff --git a/tests/src/core/testqgsarcgisrestutils.cpp b/tests/src/core/testqgsarcgisrestutils.cpp
+index f0d60607e5d..1bf2a98d911 100644
+--- a/tests/src/core/testqgsarcgisrestutils.cpp
++++ b/tests/src/core/testqgsarcgisrestutils.cpp
+@@ -78,6 +78,7 @@ class TestQgsArcGisRestUtils : public QObject
+     void testVisualVariableRotationCategorizedRenderer();
+     void testVisualVariableRotationGraduatedRenderer();
+     void testParseLabeling();
++    void testParseLabelingRepeat();
+     void testParseCompoundCurve();
+     void testParsePolyline();
+     void testParsePolylineZ();
+@@ -1231,6 +1232,146 @@ void TestQgsArcGisRestUtils::testParseLabeling()
+   QCOMPARE( textFormat.buffer().sizeUnit(), Qgis::RenderUnit::Points );
+ }
+ 
++void TestQgsArcGisRestUtils::testParseLabelingRepeat()
++{
++  const QVariantMap map = jsonStringToMap(
++    "{"
++    "\"labelingInfo\": ["
++    "{"
++    "\"labelExpression\": \"[Hierarchie]\","
++    "\"labelPlacement\": \"esriServerLinePlacementCenterAlong\","
++    "\"textLayout\": \"straight\","
++    "\"deconflictionStrategy\": \"dynamic\","
++    "\"allowOverrun\": true,"
++    "\"repeatLabel\": true,"
++    "\"repeatLabelDistance\": 150,"
++    "\"lineConnection\": \"minimizeLabels\","
++    "\"useClippedGeometry\": true,"
++    "\"stackLabel\": true,"
++    "\"stackAlignment\": \"dynamic\","
++    "\"removeDuplicates\": \"none\","
++    "\"stackRowLength\": 24,"
++    "\"where\": \"(\\\"Hierarchie\\\"  = 'XX' )\","
++    "\"useCodedValues\": true,"
++    "\"maxScale\": 0,"
++    "\"minScale\": 0,"
++    "\"name\": \"XX\","
++    "\"priority\": 1,"
++    "\"symbol\": {"
++    "\"type\": \"esriTS\","
++    "\"color\": ["
++    "0,"
++    "92,"
++    "230,"
++    "255"
++    "],"
++    "\"backgroundColor\": null,"
++    "\"borderLineColor\": null,"
++    "\"borderLineSize\": null,"
++    "\"verticalAlignment\": \"baseline\","
++    "\"horizontalAlignment\": \"left\","
++    "\"rightToLeft\": false,"
++    "\"angle\": 0,"
++    "\"xoffset\": 0,"
++    "\"yoffset\": 0,"
++    "\"kerning\": true,"
++    "\"haloColor\": ["
++    "251,"
++    "251,"
++    "251,"
++    "255"
++    "],"
++    "\"haloSize\": 2,"
++    "\"font\": {"
++    "\"family\": \"Arial\","
++    "\"size\": 14,"
++    "\"style\": \"normal\","
++    "\"weight\": \"bold\","
++    "\"decoration\": \"none\""
++    "}"
++    "}"
++    "},"
++    "{"
++    "\"labelExpression\": \"[Hierarchie]\","
++    "\"labelPlacement\": \"esriServerLinePlacementCenterAlong\","
++    "\"textLayout\": \"straight\","
++    "\"deconflictionStrategy\": \"dynamic\","
++    "\"allowOverrun\": true,"
++    "\"repeatLabel\": true,"
++    "\"repeatLabelDistance\": 290,"
++    "\"lineConnection\": \"minimizeLabels\","
++    "\"useClippedGeometry\": true,"
++    "\"stackLabel\": true,"
++    "\"stackAlignment\": \"dynamic\","
++    "\"removeDuplicates\": \"none\","
++    "\"stackRowLength\": 24,"
++    "\"where\": \"(\\\"Hierarchie\\\"  = 'XXXX' )\","
++    "\"useCodedValues\": true,"
++    "\"maxScale\": 0,"
++    "\"minScale\": 0,"
++    "\"name\": \"XXXX\","
++    "\"priority\": 2,"
++    "\"symbol\": {"
++    "\"type\": \"esriTS\","
++    "\"color\": ["
++    "0,"
++    "92,"
++    "230,"
++    "255"
++    "],"
++    "\"backgroundColor\": null,"
++    "\"borderLineColor\": null,"
++    "\"borderLineSize\": null,"
++    "\"verticalAlignment\": \"baseline\","
++    "\"horizontalAlignment\": \"left\","
++    "\"rightToLeft\": false,"
++    "\"angle\": 0,"
++    "\"xoffset\": 0,"
++    "\"yoffset\": 0,"
++    "\"kerning\": true,"
++    "\"haloColor\": ["
++    "251,"
++    "251,"
++    "251,"
++    "255"
++    "],"
++    "\"haloSize\": 2,"
++    "\"font\": {"
++    "\"family\": \"Arial\","
++    "\"size\": 14,"
++    "\"style\": \"normal\","
++    "\"weight\": \"bold\","
++    "\"decoration\": \"none\""
++    "}"
++    "}"
++    "}"
++    "]"
++    "}"
++  );
++
++  const std::unique_ptr<QgsAbstractVectorLayerLabeling> labeling( QgsArcGisRestUtils::convertLabeling( map.value( u"labelingInfo"_s ).toList() ) );
++  QVERIFY( labeling );
++  QgsRuleBasedLabeling *rules = dynamic_cast<QgsRuleBasedLabeling *>( labeling.get() );
++  QVERIFY( rules );
++  QgsRuleBasedLabeling::Rule *root = rules->rootRule();
++  QVERIFY( root );
++
++  const QgsRuleBasedLabeling::RuleList children = root->children();
++  QCOMPARE( children.count(), 2 );
++
++  QgsPalLayerSettings *settings = children.at( 0 )->settings();
++  QVERIFY( settings );
++  QCOMPARE( settings->placement, Qgis::LabelPlacement::Line );
++  QCOMPARE( settings->repeatDistance, 150 );
++  QCOMPARE( settings->repeatDistanceUnit, Qgis::RenderUnit::Points );
++
++  settings = children.at( 1 )->settings();
++  QVERIFY( settings );
++  QCOMPARE( settings->placement, Qgis::LabelPlacement::Line );
++  QCOMPARE( settings->repeatDistance, 290 );
++  QCOMPARE( settings->repeatDistanceUnit, Qgis::RenderUnit::Points );
++}
++
+ QVariantMap TestQgsArcGisRestUtils::jsonStringToMap( const QString &string ) const
+ {
+   const QJsonDocument doc = QJsonDocument::fromJson( string.toUtf8() );

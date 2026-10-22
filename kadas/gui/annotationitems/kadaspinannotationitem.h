@@ -71,6 +71,17 @@ class KADAS_GUI_EXPORT KadasPinAnnotationItem : public QgsAnnotationMarkerItem
     KadasAnnotationShadow mShadow;
 
     void installDefaultSymbol();
+
+    /**
+     * Forces the pin symbol's fill opaque.
+     *
+     * A pin cannot render a translucent fill: the SVG behind it draws its own
+     * shading over that colour, and an alpha on top washes the whole pin out
+     * instead of tinting it. Kadas versions that let the colour carry one saved
+     * pins that still do, so they are normalised on the way in rather than only
+     * in the style editor, which a pin need never be opened in.
+     */
+    void makeFillOpaque();
 };
 
 #endif // KADASPINANNOTATIONITEM_H

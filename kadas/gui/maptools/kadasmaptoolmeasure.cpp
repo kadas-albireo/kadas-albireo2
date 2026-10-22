@@ -34,6 +34,7 @@
 #include <qgis/qgsmultilinestring.h>
 #include <qgis/qgsmultipolygon.h>
 #include <qgis/qgsproject.h>
+#include <qgis/qgsrubberband.h>
 #include <qgis/qgssettings.h>
 
 #include "kadas/gui/kadassidepanel.h"
@@ -161,6 +162,7 @@ KadasMapToolMeasure::KadasMapToolMeasure( QgsMapCanvas *canvas, MeasureMode meas
 KadasMapToolMeasure::~KadasMapToolMeasure()
 {
   delete mBottomBar;
+  delete mRubberBand;
   delete mLabelsOverlay;
 }
 
@@ -278,6 +280,8 @@ void KadasMapToolMeasure::deactivate()
 {
   delete mBottomBar;
   mBottomBar = nullptr;
+  delete mRubberBand;
+  mRubberBand = nullptr;
   delete mLabelsOverlay;
   mLabelsOverlay = nullptr;
   mReadoutLabel = nullptr;
@@ -474,6 +478,9 @@ void KadasMapToolMeasure::recomputeReadout()
     }
   }
 
+  updateRubberBand( parts );
+  updateCanvasLabels( parts );
+
   if ( parts.isEmpty() )
   {
     mReadoutLabel->setText( QStringLiteral( "<b>—</b>" ) );
@@ -481,8 +488,6 @@ void KadasMapToolMeasure::recomputeReadout()
     // to its natural size for the next measurement.
     if ( mBottomBar )
       mBottomBar->setMinimumWidth( 0 );
-    if ( mLabelsOverlay )
-      mLabelsOverlay->setLabels( {} );
     return;
   }
 
@@ -539,10 +544,29 @@ void KadasMapToolMeasure::recomputeReadout()
     if ( hintWidth > mBottomBar->minimumWidth() )
       mBottomBar->setMinimumWidth( hintWidth );
   }
-
-  updateCanvasLabels( parts );
 }
 
+
+void KadasMapToolMeasure::updateRubberBand( const QList<Part> &parts )
+{
+  if ( !mRubberBand )
+  {
+    mRubberBand = new QgsRubberBand( canvas(), Qgis::GeometryType::Polygon );
+    mRubberBand->setStrokeColor( QColor( 227, 22, 28, 255 ) );
+    mRubberBand->setFillColor( QColor( 227, 22, 28, 63 ) );
+    mRubberBand->setWidth( 2 );
+  }
+
+  const Qgis::GeometryType bandType = ( shape() == Shape::Polyline ) ? Qgis::GeometryType::Line : Qgis::GeometryType::Polygon;
+  mRubberBand->reset( bandType );
+
+
+  for ( int i = 0, n = parts.size(); i < n; ++i )
+  {
+    const Part &p = parts[i];
+    mRubberBand->addGeometry( p.geometry );
+  }
+}
 void KadasMapToolMeasure::updateCanvasLabels( const QList<Part> &parts )
 {
   if ( !mLabelsOverlay )

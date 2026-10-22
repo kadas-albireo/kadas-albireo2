@@ -97,6 +97,8 @@ struct KADAS_GUI_EXPORT KadasEditContext
     KadasAttribDefs attributes;
     Qt::CursorShape cursor = Qt::CrossCursor;
     HitPrecision precision = HitPrecision::Body;
+    //! TRUE when a plain click (press and release without a drag) must run the edit as well, not only a drag: a handle that exists to add something, such as a midpoint handle inserting a vertex, would otherwise do nothing at all on a click.
+    bool appliesOnClick = false;
     bool isValid() const { return mValid; }
 
     //! TRUE when both contexts reference the same edit target, i.e. the same vertex identity and validity. \a pos, \a attributes, \a cursor and \a precision are deliberately ignored: they change on every mouse move while the hovered handle stays the same.
