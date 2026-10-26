@@ -290,6 +290,7 @@ void KadasApplication::init()
   QgsNetworkAccessManager::instance()->setupDefaultProxyAndCache();
 
   Kadas::importSslCertificates();
+  Kadas::distrustCompromisedCaCertificates();
 
   // Add token injector
   QgsNetworkAccessManager::setRequestPreprocessor( injectAuthToken );
