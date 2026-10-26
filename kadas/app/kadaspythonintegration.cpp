@@ -64,6 +64,21 @@ bool KadasPythonIntegration::checkSystemImports()
   runString( "oldhome=None" );
   runString( "if 'HOME' in os.environ: oldhome=os.environ['HOME']\n" );
   runString( "os.environ['HOME']=os.environ['USERPROFILE']\n" );
+
+  // Python loads the Windows root store into OpenSSL, which does not honor the Windows Disallowed store:
+  // skip the roots of the eMudhra intermediate CAs whose private keys were compromised (October 2026)
+  runString( "import hashlib, ssl\n"
+             "def _kadas_enum_certificates(store_name, enum_certificates=ssl.enum_certificates):\n"
+             "    compromised = {\n"
+             "        '7DD78D5F4F13459A83DFF9ABBBA62EDBAF6F2D102BF257FD712F4D9F2746ED8D',  # emSign Root TLS CA - G3\n"
+             "        'F2EDAAFF3D9B701FB4D14C9F285F8C0BAD90FC3BCC1FA07D47F4718EDABA34A5',  # emSign Root CS CA - G3\n"
+             "        '86A1ECBA089C4A8D3BBE2734C612BA341D813E043CF9E8A862CD5C57A36BBE6B',  # emSign ECC Root CA - G3\n"
+             "        'D7A7A0FB5D7E2731D771E9484EBCDEF71D5F0C3E0A2948782BC83EE0EA699EF4',  # AAA Certificate Services\n"
+             "    }\n"
+             "    return [c for c in enum_certificates(store_name) if hashlib.sha256(c[0]).hexdigest().upper() not in compromised]\n"
+             "ssl.enum_certificates = _kadas_enum_certificates\n"
+             "del _kadas_enum_certificates\n",
+             QString(), false );
 #endif
 
   QByteArray prefixPath = qgetenv( "QGIS_PREFIX_PATH" );
