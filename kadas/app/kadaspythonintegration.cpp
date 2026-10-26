@@ -64,6 +64,32 @@ bool KadasPythonIntegration::checkSystemImports()
   runString( "oldhome=None" );
   runString( "if 'HOME' in os.environ: oldhome=os.environ['HOME']\n" );
   runString( "os.environ['HOME']=os.environ['USERPROFILE']\n" );
+
+  // Python loads the Windows root store into OpenSSL, which does not honor the Windows Disallowed store:
+  // skip the roots of the eMudhra intermediate CAs whose private keys were compromised (October 2026).
+  // The certificates are loaded as PEM: Python 3.11.10 fails to load DER data when another library
+  // left an error in the OpenSSL error queue of the thread.
+  runString( "import hashlib, ssl, warnings\n"
+             "def _kadas_load_windows_store_certs(self, storename, purpose):\n"
+             "    compromised = {\n"
+             "        '7DD78D5F4F13459A83DFF9ABBBA62EDBAF6F2D102BF257FD712F4D9F2746ED8D',  # emSign Root TLS CA - G3\n"
+             "        'F2EDAAFF3D9B701FB4D14C9F285F8C0BAD90FC3BCC1FA07D47F4718EDABA34A5',  # emSign Root CS CA - G3\n"
+             "        '86A1ECBA089C4A8D3BBE2734C612BA341D813E043CF9E8A862CD5C57A36BBE6B',  # emSign ECC Root CA - G3\n"
+             "        'D7A7A0FB5D7E2731D771E9484EBCDEF71D5F0C3E0A2948782BC83EE0EA699EF4',  # AAA Certificate Services\n"
+             "    }\n"
+             "    certs = []\n"
+             "    try:\n"
+             "        for cert, encoding, trust in ssl.enum_certificates(storename):\n"
+             "            if encoding == 'x509_asn' and (trust is True or purpose.oid in trust) and hashlib.sha256(cert).hexdigest().upper() not in compromised:\n"
+             "                certs.append(ssl.DER_cert_to_PEM_cert(cert))\n"
+             "    except PermissionError:\n"
+             "        warnings.warn('unable to enumerate Windows certificate store')\n"
+             "    if certs:\n"
+             "        self.load_verify_locations(cadata=''.join(certs))\n"
+             "    return certs\n"
+             "ssl.SSLContext._load_windows_store_certs = _kadas_load_windows_store_certs\n"
+             "del _kadas_load_windows_store_certs\n",
+             QString(), false );
 #endif
 
   QByteArray prefixPath = qgetenv( "QGIS_PREFIX_PATH" );

@@ -20,12 +20,16 @@
 #include <openssl/ssl.h>
 
 #include <QApplication>
+#include <QCryptographicHash>
 #include <QDir>
 #include <QFile>
 #include <QNetworkProxyFactory>
 #include <QSettings>
+#include <QSslKey>
 #include <QStandardPaths>
 
+#include <qgis/qgsapplication.h>
+#include <qgis/qgsauthmanager.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgssettings.h>
@@ -411,4 +415,67 @@ void Kadas::importSslCertificates()
     CertCloseStore( hStore, 0 );
   }
 #endif // Q_OS_WINDOWS
+}
+
+void Kadas::distrustCompromisedCaCertificates()
+{
+  // Roots of the eMudhra intermediate CAs whose private keys were compromised (October 2026),
+  // identified by the SHA-256 of their public key, see https://emudhra.we-have-a-problem.com/
+  // QGIS verifies TLS against its own copy of the system root store, which does not
+  // honor the distrust shipped by the OS (e.g. the Windows Disallowed store).
+  static const QStringList compromisedSpkiSha256 = {
+    QStringLiteral( "C619E4780ED8E0ABEDA24AD732567DE4383A7EA941338F6D1A7D1B49AC792FE9" ), // emSign Root TLS CA - G3
+    QStringLiteral( "0A6C2B2CA5B364207954171987AC9D2178561569D8205457E77CA90C32EDE282" ), // emSign Root CS CA - G3
+    QStringLiteral( "8D417DB2DD8BF5E3084D1E3F196D583849D81BDD4C00C70B9D39369E96B8C782" ), // emSign ECC Root CA - G3
+    QStringLiteral( "BD153ED7B0434F6886B17BCE8BBE84ED340C7132D702A8F4FA318F756ECBD6F3" ), // AAA Certificate Services
+  };
+
+  QList<QSslCertificate> caCertificates = QSslConfiguration::defaultConfiguration().caCertificates();
+  QgsAuthManager *authManager = QgsApplication::authManager();
+  // isDisabled() also initializes the authentication manager and its trusted CA cache
+  if ( !authManager->isDisabled() )
+  {
+    caCertificates += authManager->trustedCaCertsCache();
+  }
+
+  QList<QSslCertificate> compromised;
+  for ( const QSslCertificate &cert : std::as_const( caCertificates ) )
+  {
+    const QString spkiSha256 = QCryptographicHash::hash( cert.publicKey().toDer(), QCryptographicHash::Sha256 ).toHex().toUpper();
+    if ( compromisedSpkiSha256.contains( spkiSha256 ) && !compromised.contains( cert ) )
+    {
+      QgsDebugMsgLevel( QString( "Distrusting compromised CA certificate %1" ).arg( cert.subjectDisplayName() ), 1 );
+      compromised.append( cert );
+    }
+  }
+  if ( compromised.isEmpty() )
+  {
+    return;
+  }
+
+  // Used by connections which do not go through QgsNetworkAccessManager
+  QSslConfiguration defaultConfig = QSslConfiguration::defaultConfiguration();
+  QList<QSslCertificate> defaultCaCertificates = defaultConfig.caCertificates();
+  for ( const QSslCertificate &cert : std::as_const( compromised ) )
+  {
+    defaultCaCertificates.removeAll( cert );
+  }
+  defaultConfig.setCaCertificates( defaultCaCertificates );
+  QSslConfiguration::setDefaultConfiguration( defaultConfig );
+
+  // QgsNetworkAccessManager adds the QGIS trusted CA certificates to each request before running the preprocessors
+  QgsNetworkAccessManager::setRequestPreprocessor( [compromised]( QNetworkRequest *request ) {
+    QSslConfiguration sslConfig = request->sslConfiguration();
+    QList<QSslCertificate> requestCaCertificates = sslConfig.caCertificates();
+    bool changed = false;
+    for ( const QSslCertificate &cert : compromised )
+    {
+      changed |= requestCaCertificates.removeAll( cert ) > 0;
+    }
+    if ( changed )
+    {
+      sslConfig.setCaCertificates( requestCaCertificates );
+      request->setSslConfiguration( sslConfig );
+    }
+  } );
 }
