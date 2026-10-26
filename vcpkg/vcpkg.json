@@ -133,5 +133,20 @@
         }
       ]
     }
-  }
+  },
+  "overrides": [
+    {
+      "name": "py-certifi",
+      "version-date": "2026-10-19"
+    },
+    {
+      "name": "py-pip",
+      "version": "26.2.2"
+    },
+    {
+      "name": "py-pip-system-certs",
+      "version": "5.3",
+      "port-version": 1
+    }
+  ]
 }
