@@ -1,9 +1,9 @@
 string(REPLACE "." "_" TAG ${VERSION})
 
 # set(QGIS_REF final-${TAG})
-set(QGIS_REF d835ed0a563f5c286127c6f5efbdb5b1473e9adb)
+set(QGIS_REF 4595d764ccf8149604def9a249232f9c2a9f608a)
 set(QGIS_SHA512
-    fbd37f34f4138ca1ffe65ad50a678ebbe7d445c35d8c59fa964a1f4475f66d59067bd2fa7c140a7672f5e74a88bcdc768eecf2f9c04550f5f2d6165d0a14cdff
+    db60de0a839c0a18372599979d67b9d0dc04a5a0817bc4803ec9672d732e9bc8226488c42259f229203d63bbc397dd706d8d5ad8e33116f1f197170472d280b9
 )
 
 vcpkg_from_github(
@@ -30,7 +30,6 @@ vcpkg_from_github(
   mac_install_images.patch
   flagDegreesUseUntranslatedStringSuffix.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1272
   wcsSpatialExtentSettings.patch # https://jira.swisstopo.ch/browse/MGDIGRE_SB-1201
-  arcgisrestSymbols-repeatLabelDistance.patch # https://github.com/qgis/QGIS/pull/67799
 )
 
 file(REMOVE ${SOURCE_PATH}/cmake/FindGDAL.cmake)
