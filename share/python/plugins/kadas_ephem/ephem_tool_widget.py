@@ -172,7 +172,7 @@ class EphemToolWidget(KadasBottomBar):
 
             self.ui.labelMoonAzimuthElevationValue.setText(result.azimuthElevationValueText)
             self.ui.labelMoonRiseValue.setText(result.riseValueText)
-            self.ui.labelMoonSetValue
+            self.ui.labelMoonSetValue.setText(result.setValueText)
 
             # Moon phase
             moon_image_suffix = math.floor(round(result.moonPhase / 12.5) * 12.5)
