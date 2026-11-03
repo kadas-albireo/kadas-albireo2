@@ -237,7 +237,7 @@ Kadas3DMapCanvasWidget *Kadas3DIntegration::createNewMapCanvas3D( const QString 
     auto demTerrainSettings = std::make_unique<QgsDemTerrainSettings>();
     demTerrainSettings->setLayer( qobject_cast<QgsRasterLayer *>( heightLayer ) );
     demTerrainSettings->setResolution( 32 );
-    demTerrainSettings->setSkirtHeight( 300 );
+    demTerrainSettings->setSkirtHeight( 1000 );
     map->setTerrainSettings( demTerrainSettings.release() );
   }
 
