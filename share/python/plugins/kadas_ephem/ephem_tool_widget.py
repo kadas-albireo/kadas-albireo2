@@ -2,7 +2,7 @@ import math
 import os
 
 from kadas.kadascore import KadasCoordinateUtils
-from kadas.kadasgui import KadasBottomBar
+from kadas.kadasgui import KadasSidePanel
 from qgis.core import (
     Qgis,
     QgsCoordinateFormatter,
@@ -14,9 +14,9 @@ from qgis.core import (
     QgsSvgMarkerSymbolLayer,
 )
 from qgis.gui import QgsRubberBand
-from qgis.PyQt.QtCore import QDateTime, QEventLoop, Qt, pyqtSignal
-from qgis.PyQt.QtGui import QIcon, QPixmap
-from qgis.PyQt.QtWidgets import QApplication, QLabel, QSizePolicy
+from qgis.PyQt.QtCore import QCoreApplication, QDateTime, QEventLoop, Qt
+from qgis.PyQt.QtGui import QPixmap
+from qgis.PyQt.QtWidgets import QApplication, QLabel, QWidget
 from qgis.PyQt.uic import loadUiType
 
 from .ephem_recompute_task import EphemComputeTask
@@ -24,24 +24,21 @@ from .ephem_recompute_task import EphemComputeTask
 Ui_EphemToolWidget, _ = loadUiType(os.path.join(os.path.dirname(__file__), "EphemToolWidget.ui"))
 
 
-class EphemToolWidget(KadasBottomBar):
-
-    close = pyqtSignal()
+class EphemToolWidget(KadasSidePanel):
 
     def __init__(self, iface):
-        KadasBottomBar.__init__(self, iface.mapCanvas())
+        KadasSidePanel.__init__(self, iface.mapCanvas())
 
         self.iface = iface
 
-        self.ui = Ui_EphemToolWidget()
-        self.ui.setupUi(self)
+        # Title row with close button (emits closeRequested); reuses the plugin's
+        # existing "Ephemeris" translation.
+        self.setTitle(QCoreApplication.translate("EphemPlugin", "Ephemeris"))
 
-        self.ui.closeButton.setSizePolicy(
-            QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred
-        )
-        self.ui.closeButton.setIcon(QIcon(":/kadas/icons/close"))
-        self.ui.closeButton.setToolTip(self.tr("Close"))
-        self.ui.closeButton.clicked.connect(self.close)
+        base = QWidget()
+        self.ui = Ui_EphemToolWidget()
+        self.ui.setupUi(base)
+        self.addRow(base)
 
         self.ui.dateTimeEdit.setDateTime(QDateTime.currentDateTime())
         self.ui.dateTimeEdit.editingFinished.connect(self.recompute)
@@ -58,13 +55,9 @@ class EphemToolWidget(KadasBottomBar):
         self.ui.tabWidgetOutput.currentChanged.connect(self.recompute)
 
         self.busyOverlay = QLabel(self.tr("Calculating..."))
-        self.busyOverlay.setStyleSheet("QLabel { background-color: white;}")
-        self.busyOverlay.setAlignment(
-            Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter
-        )
+        self.busyOverlay.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.busyOverlay.setVisible(False)
-        self.busyOverlay.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        self.ui.verticalLayout.addWidget(self.busyOverlay)
+        self.addRow(self.busyOverlay)
 
         self.wgsPos = None
         self.mrcPos = None
