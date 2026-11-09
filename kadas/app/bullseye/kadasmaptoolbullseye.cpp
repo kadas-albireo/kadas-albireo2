@@ -23,6 +23,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgsunittypes.h>
 
+#include "kadas/core/kadaslayerutils.h"
 #include "kadas/gui/kadaslayerselectionwidget.h"
 #include <bullseye/kadasbullseyelayer.h>
 #include <bullseye/kadasmaptoolbullseye.h>
@@ -106,7 +107,7 @@ KadasBullseyeWidget::KadasBullseyeWidget( QgsMapCanvas *canvas, QgsLayerTreeView
   ui.setupUi( base );
   addRow( base );
 
-  auto layerFilter = []( QgsMapLayer *layer ) { return dynamic_cast<KadasBullseyeLayer *>( layer ) != nullptr; };
+  auto layerFilter = []( QgsMapLayer *layer ) { return dynamic_cast<KadasBullseyeLayer *>( layer ) && !KadasLayerUtils::isLocked( layer ); };
   auto layerCreator = [this]( const QString &name ) { return createLayer( name ); };
   mLayerSelectionWidget = new KadasLayerSelectionWidget( mCanvas, layerTreeView, layerFilter, layerCreator );
   ui.layerSelectionWidgetHolder->addWidget( mLayerSelectionWidget );

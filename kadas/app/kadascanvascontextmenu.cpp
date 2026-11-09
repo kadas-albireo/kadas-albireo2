@@ -28,6 +28,7 @@
 #include <qgis/qgsvectorlayer.h>
 
 #include "kadas/core/kadascoordinateformat.h"
+#include "kadas/core/kadaslayerutils.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
 #include "kadas/gui/annotationitems/kadasgpxwaypointannotationitem.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
@@ -76,30 +77,45 @@ KadasCanvasContextMenu::KadasCanvasContextMenu( QgsMapCanvas *canvas, const QgsP
     addSeparator();
   }
 
+  // Converting, editing and deleting all change the picked layer, which a lock
+  // forbids: say so in their place rather than leaving the user guessing.
+  const bool pickedLayerLocked = KadasLayerUtils::isLocked( mPickResult.annotationLayer );
+  auto addLockedLayerInfo = [this] { addAction( QgsApplication::getThemeIcon( "/locked.svg" ), KadasLayerUtils::lockedMessage( mPickResult.annotationLayer ) )->setEnabled( false ); };
   if ( pickedAnnotation )
   {
     if ( dynamic_cast<const KadasPinAnnotationItem *>( pickedAnnotation ) )
     {
       addAction( QIcon( ":/kadas/icons/copy_coordinates" ), tr( "Copy position" ), this, &KadasCanvasContextMenu::copyAnnotationItemPosition );
-      addAction( QgsApplication::getThemeIcon( "/mIconPointLayer.svg" ), tr( "Convert to waypoint" ), this, &KadasCanvasContextMenu::createWaypointFromPin );
+      if ( !pickedLayerLocked )
+        addAction( QgsApplication::getThemeIcon( "/mIconPointLayer.svg" ), tr( "Convert to waypoint" ), this, &KadasCanvasContextMenu::createWaypointFromPin );
     }
-    else if ( dynamic_cast<const QgsAnnotationMarkerItem *>( pickedAnnotation ) && !dynamic_cast<const KadasGpxWaypointAnnotationItem *>( pickedAnnotation ) )
+    else if ( !pickedLayerLocked && dynamic_cast<const QgsAnnotationMarkerItem *>( pickedAnnotation ) && !dynamic_cast<const KadasGpxWaypointAnnotationItem *>( pickedAnnotation ) )
     {
       addAction( QIcon( ":/kadas/icons/pin_red" ), tr( "Convert to pin" ), this, &KadasCanvasContextMenu::createPinFromMarker );
     }
-    else if ( dynamic_cast<const KadasGpxWaypointAnnotationItem *>( pickedAnnotation ) )
+    else if ( !pickedLayerLocked && dynamic_cast<const KadasGpxWaypointAnnotationItem *>( pickedAnnotation ) )
     {
       addAction( QIcon( ":/kadas/icons/pin_red" ), tr( "Convert to pin" ), this, &KadasCanvasContextMenu::createPinFromMarker );
     }
-    addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, &KadasCanvasContextMenu::editItem );
-    addSeparator();
-    addAction( QgsApplication::getThemeIcon( "/mActionDeleteSelected.svg" ), tr( "Delete" ), this, &KadasCanvasContextMenu::deleteAnnotationItem );
+    if ( pickedLayerLocked )
+    {
+      addLockedLayerInfo();
+    }
+    else
+    {
+      addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, &KadasCanvasContextMenu::editItem );
+      addSeparator();
+      addAction( QgsApplication::getThemeIcon( "/mActionDeleteSelected.svg" ), tr( "Delete" ), this, &KadasCanvasContextMenu::deleteAnnotationItem );
+    }
   }
   else if ( mPickResult.annotationLayer )
   {
     // Layer-level pick on a parametric annotation layer (bullseye / guide
     // grid): edited atomically via its dedicated config tool.
-    addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, &KadasCanvasContextMenu::editItem );
+    if ( pickedLayerLocked )
+      addLockedLayerInfo();
+    else
+      addAction( QgsApplication::getThemeIcon( "/mActionToggleEditing.svg" ), tr( "Edit" ), this, &KadasCanvasContextMenu::editItem );
     addSeparator();
   }
   else if ( mPickResult.feature.isValid() && mPickResult.layer )
@@ -302,6 +318,11 @@ void KadasCanvasContextMenu::createWaypointFromPin()
   QgsAnnotationLayer *target = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::RoutesLayer );
   if ( !target )
     return;
+  if ( KadasLayerUtils::isLocked( target ) )
+  {
+    kApp->displayMessage( KadasLayerUtils::lockedMessage( target ) );
+    return;
+  }
 
   const QgsPointXY targetPos = QgsCoordinateTransform( mPickResult.annotationLayer->crs(), target->crs(), QgsProject::instance()->transformContext() ).transform( pin->geometry() );
   auto *waypoint = new KadasGpxWaypointAnnotationItem( QgsPoint( targetPos ) );
@@ -321,6 +342,11 @@ void KadasCanvasContextMenu::createPinFromMarker()
   QgsAnnotationLayer *target = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::PinsLayer );
   if ( !target )
     return;
+  if ( KadasLayerUtils::isLocked( target ) )
+  {
+    kApp->displayMessage( KadasLayerUtils::lockedMessage( target ) );
+    return;
+  }
 
   const QgsPointXY targetPos = QgsCoordinateTransform( mPickResult.annotationLayer->crs(), target->crs(), QgsProject::instance()->transformContext() ).transform( marker->geometry() );
   auto *pin = new KadasPinAnnotationItem( QgsPoint( targetPos ) );

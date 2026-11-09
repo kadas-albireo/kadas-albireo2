@@ -38,6 +38,7 @@
 
 #include "kadas/core/kadas.h"
 #include "kadas/core/kadascoordinateformat.h"
+#include "kadas/core/kadaslayerutils.h"
 #include "kadas/analysis/kadasninecellfilter.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
@@ -347,7 +348,7 @@ void KadasMapToolMinMax::canvasReleaseEvent( QgsMapMouseEvent *e )
   setCursor( Qt::ArrowCursor );
 }
 
-void KadasMapToolMinMax::showContextMenu( const QgsPointXY &mapPos, bool isMaxPin ) const
+void KadasMapToolMinMax::showContextMenu( const QgsPointXY &mapPos, bool isMaxPin )
 {
   // Highlight the pin's SVG footprint (55x43 px; tri_down floats above the
   // position, tri_up hangs below) while the context menu is open.
@@ -383,6 +384,11 @@ void KadasMapToolMinMax::showContextMenu( const QgsPointXY &mapPos, bool isMaxPi
     QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::PinsLayer );
     if ( !layer )
       return;
+    if ( KadasLayerUtils::isLocked( layer ) )
+    {
+      emit messageEmitted( KadasLayerUtils::lockedMessage( layer ) );
+      return;
+    }
     const QgsPointXY layerPos = QgsCoordinateTransform( canvas()->mapSettings().destinationCrs(), layer->crs(), QgsProject::instance()->transformContext() ).transform( mapPos );
     auto *pin = new KadasPinAnnotationItem( QgsPoint( layerPos.x(), layerPos.y() ) );
     layer->addItem( pin );

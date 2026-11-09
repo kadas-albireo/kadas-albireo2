@@ -1790,7 +1790,8 @@ void KadasMainWindow::addLocalPicture()
   QgsSettings().setValue( "/UI/lastImportExportDir", QFileInfo( filename ).absolutePath() );
 
   QPair<QString, QgsAnnotationLayer *> pair = kApp->addImageItem( filename );
-  mMapCanvas->setMapTool( new KadasMapToolEditAnnotationItem( mapCanvas(), pair.second, pair.first ) );
+  if ( pair.second )
+    mMapCanvas->setMapTool( new KadasMapToolEditAnnotationItem( mapCanvas(), pair.second, pair.first ) );
 }
 
 void KadasMainWindow::addRemotePicture()
@@ -1850,7 +1851,8 @@ void KadasMainWindow::addRemotePicture()
     tempfile.flush();
 
     QPair<QString, QgsAnnotationLayer *> pair = kApp->addImageItem( tempfile.fileName() );
-    mMapCanvas->setMapTool( new KadasMapToolEditAnnotationItem( mapCanvas(), pair.second, pair.first ) );
+    if ( pair.second )
+      mMapCanvas->setMapTool( new KadasMapToolEditAnnotationItem( mapCanvas(), pair.second, pair.first ) );
     break;
   }
 }

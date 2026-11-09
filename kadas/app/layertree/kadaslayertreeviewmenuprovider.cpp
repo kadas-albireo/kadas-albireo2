@@ -27,6 +27,7 @@
 #include <qgis/qgsrasterrenderer.h>
 #include <qgis/qgsvectorlayer.h>
 
+#include "kadas/core/kadaslayerutils.h"
 #include "kadas/core/kadaspluginlayer.h"
 #include "kadasapplication.h"
 #include "kadasbullseyelayer.h"
@@ -237,13 +238,7 @@ QAction *KadasLayerTreeViewMenuProvider::actionLockLayer( QMenu *parent )
   {
     return nullptr;
   }
-  bool isLocked = true;
-  isLocked = isLocked && !( layer->flags() & QgsMapLayer::Removable );
-  QgsVectorLayer *vl = qobject_cast<QgsVectorLayer *>( layer );
-  if ( vl )
-  {
-    isLocked = isLocked && vl->readOnly();
-  }
+  const bool isLocked = KadasLayerUtils::isLocked( layer );
 
   QAction *lockAction = new QAction( tr( "Lock Layer" ), parent );
   lockAction->setCheckable( true );
@@ -329,24 +324,7 @@ void KadasLayerTreeViewMenuProvider::setLayerUseAsHeightmap( bool enabled )
 
 void KadasLayerTreeViewMenuProvider::setLayerLock( bool enabled )
 {
-  QgsMapLayer *layer = mView->currentLayer();
-  if ( layer )
-  {
-    if ( enabled )
-    {
-      layer->setFlags( layer->flags() & ~QgsMapLayer::Removable );
-    }
-    else
-    {
-      layer->setFlags( layer->flags() | QgsMapLayer::Removable );
-    }
-  }
-
-  QgsVectorLayer *vl = qobject_cast<QgsVectorLayer *>( layer );
-  if ( vl )
-  {
-    vl->setReadOnly( enabled );
-  }
+  KadasLayerUtils::setLocked( mView->currentLayer(), enabled );
 }
 
 void KadasLayerTreeViewMenuProvider::showLayerAttributeTable()

@@ -56,6 +56,7 @@
 
 #include "kadas/core/kadas.h"
 #include "kadas/core/kadascoordinateformat.h"
+#include "kadas/core/kadaslayerutils.h"
 #include "kadas/gui/kadasheightprofiledialog.h"
 #ifdef Q_OS_MAC
 #include "kadas/gui/kadasclipboardutils.h"
@@ -855,12 +856,18 @@ void KadasHeightProfileDialog::copyToClipboard()
 
 void KadasHeightProfileDialog::addToCanvas()
 {
+  QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::SymbolsLayer );
+  if ( KadasLayerUtils::isLocked( layer ) )
+  {
+    emit mTool->messageEmitted( KadasLayerUtils::lockedMessage( layer ) );
+    return;
+  }
+
   const QImage image = renderPlotImage();
 
   const QString filename = QgsProject::instance()->createAttachedFile( "heightProfile.png" );
   image.save( filename );
 
-  QgsAnnotationLayer *layer = KadasAnnotationLayerRegistry::getOrCreateAnnotationLayer( KadasAnnotationLayerRegistry::StandardLayer::SymbolsLayer );
   const QgsCoordinateTransform canvasToLayer( mTool->canvas()->mapSettings().destinationCrs(), layer->crs(), QgsProject::instance()->transformContext() );
   const QgsPointXY center = canvasToLayer.transform( mTool->canvas()->extent().center() );
   const QgsRectangle bounds( center.x(), center.y(), center.x(), center.y() );

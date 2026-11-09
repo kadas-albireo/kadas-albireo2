@@ -28,6 +28,7 @@
 #include <qgis/qgsrendercontext.h>
 #include <qgis/qgsrubberband.h>
 
+#include "kadas/core/kadaslayerutils.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
 #include "kadas/gui/maptools/kadasmaptooldeleteitems.h"
 
@@ -59,6 +60,7 @@ void KadasMapToolDeleteItems::deleteItems( const QgsRectangle &filterRect )
 {
   QgsRenderContext rc = QgsRenderContext::fromMapSettings( canvas()->mapSettings() );
   QMap<QgsAnnotationLayer *, QStringList> delItems;
+  QStringList lockedLayerNames;
 
   for ( QgsMapLayer *layer : canvas()->layers() )
   {
@@ -76,14 +78,24 @@ void KadasMapToolDeleteItems::deleteItems( const QgsRectangle &filterRect )
     const QgsRectangle layerBounds = canvas()->mapSettings().mapToLayerCoordinates( annoLayer, filterRect );
     QgsFeedback feedback;
     const QStringList hits = annoLayer->itemsInBounds( layerBounds, rc, &feedback );
-    if ( !hits.isEmpty() )
+    if ( hits.isEmpty() )
     {
-      delItems.insert( annoLayer, hits );
+      continue;
     }
+    if ( KadasLayerUtils::isLocked( annoLayer ) )
+    {
+      lockedLayerNames.append( annoLayer->name() );
+      continue;
+    }
+    delItems.insert( annoLayer, hits );
   }
 
   if ( delItems.isEmpty() )
   {
+    if ( !lockedLayerNames.isEmpty() )
+    {
+      emit messageEmitted( tr( "Items on locked layers cannot be deleted: %1" ).arg( lockedLayerNames.join( QLatin1String( ", " ) ) ) );
+    }
     return;
   }
 
@@ -121,6 +133,10 @@ void KadasMapToolDeleteItems::deleteItems( const QgsRectangle &filterRect )
     checkbox->setChecked( true );
     confirmDialog.layout()->addWidget( checkbox );
     checkboxes.insert( it.key(), checkbox );
+  }
+  if ( !lockedLayerNames.isEmpty() )
+  {
+    confirmDialog.layout()->addWidget( new QLabel( tr( "Items on locked layers are kept: %1" ).arg( lockedLayerNames.join( QLatin1String( ", " ) ) ) ) );
   }
   confirmDialog.layout()->addItem( new QSpacerItem( 1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding ) );
   QDialogButtonBox *bbox = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal );

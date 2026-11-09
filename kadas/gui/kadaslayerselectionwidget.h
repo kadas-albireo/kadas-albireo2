@@ -154,6 +154,8 @@ class KADAS_GUI_EXPORT KadasLayerSelectionWidget : public QWidget
     void createLayer();
     void layerSelectionChanged( int idx );
     void repopulateLayers();
+    //! Repopulates when a layer gets locked or unlocked, since the filter may well depend on it.
+    void layerCustomPropertyChanged( const QString &key );
     //! Follows the legend's active layer, but only when it is one this widget offers.
     void canvasCurrentLayerChanged( QgsMapLayer *layer );
 };
