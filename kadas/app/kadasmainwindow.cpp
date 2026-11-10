@@ -25,6 +25,7 @@
 #include <QRegularExpression>
 #include <QShortcut>
 #include <QSplitter>
+#include <QToolButton>
 #include <QUrlQuery>
 
 #include <gdal.h>
@@ -72,7 +73,7 @@
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
-#include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
+//#include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 #include "kadas/gui/kadasprojecttemplateselectiondialog.h"
 #include "kadas/gui/kadasmapwidget.h"
 
@@ -293,6 +294,7 @@ void KadasMainWindow::init()
   mAddServiceButton->setMenu( addServiceMenu );
 
   mMapCanvas->installEventFilter( this );
+  kApp->installEventFilter( this );
   mLayersWidgetResizeHandle->installEventFilter( this );
   // Watched for Enter only, to clear the host's resize cursor (see eventFilter).
   mLayersWidget->installEventFilter( this );
@@ -544,6 +546,66 @@ bool KadasMainWindow::eventFilter( QObject *obj, QEvent *ev )
   {
     return handleLayersWidgetResize( obj, ev );
   }
+  else if ( KadasRibbonButton *button = dynamic_cast<KadasRibbonButton *>( obj ) )
+  {
+    const QMouseEvent *mouseEvent = static_cast<QMouseEvent *>( ev );
+
+    switch ( mouseEvent->type() )
+    {
+      case QEvent::MouseButtonPress:
+      {
+        if ( mouseEvent->button() == Qt::LeftButton )
+        {
+          mIsDraggingButton = false;
+          mDragStartPos = mouseEvent->position().toPoint();
+          ev->accept();
+          return true; // Swallow event at this point we don't know if it's going to be a simple click or a click + drag
+        }
+        break;
+      }
+
+      case QEvent::MouseMove:
+      {
+        if ( mouseEvent->buttons() == Qt::LeftButton && !mDragStartPos.isNull() && ( mDragStartPos - mouseEvent->position().toPoint() ).manhattanLength() >= QApplication::startDragDistance() )
+        {
+          if ( !button->objectName().startsWith( "mFavoriteButton" ) && button->defaultAction() )
+          {
+            QMimeData *mimeData = new QMimeData();
+            mimeData->setData( "application/qgis-kadas-button", button->defaultAction()->objectName().toLocal8Bit() );
+            QDrag *drag = new QDrag( this );
+            drag->setMimeData( mimeData );
+            drag->setPixmap( button->icon().pixmap( 32, 32 ) );
+            drag->setHotSpot( QPoint( 16, 16 ) );
+            drag->exec( Qt::CopyAction );
+            mDragStartPos = QPoint();
+            mIsDraggingButton = true;
+          }
+        }
+        break;
+      }
+
+      case QEvent::MouseButtonRelease:
+      {
+        if ( mIsDraggingButton )
+        {
+          mIsDraggingButton = false;
+          return true;
+        }
+        else
+        {
+          if ( button->menu() )
+            button->showMenu();
+
+          return false;
+        }
+        break;
+      }
+
+      default:
+        break;
+    }
+    return false;
+  }
   return false;
 }
 
@@ -735,37 +797,6 @@ void KadasMainWindow::updateWidgetPositions()
 
   // Move loading label
   mLoadingLabel->move( mMapCanvas->width() - 5 - mLoadingLabel->width(), mMapCanvas->height() - 5 - mLoadingLabel->height() );
-}
-
-void KadasMainWindow::mousePressEvent( QMouseEvent *event )
-{
-  if ( event->buttons() == Qt::LeftButton )
-  {
-    KadasRibbonButton *button = dynamic_cast<KadasRibbonButton *>( childAt( event->position().toPoint() ) );
-    if ( button && !button->objectName().startsWith( "mFavoriteButton" ) )
-    {
-      mDragStartPos = event->position().toPoint();
-    }
-  }
-}
-
-void KadasMainWindow::mouseMoveEvent( QMouseEvent *event )
-{
-  if ( event->buttons() == Qt::LeftButton && !mDragStartPos.isNull() && ( mDragStartPos - event->position().toPoint() ).manhattanLength() >= QApplication::startDragDistance() )
-  {
-    KadasRibbonButton *button = dynamic_cast<KadasRibbonButton *>( childAt( event->position().toPoint() ) );
-    if ( button && !button->objectName().startsWith( "mFavoriteButton" ) && button->defaultAction() )
-    {
-      QMimeData *mimeData = new QMimeData();
-      mimeData->setData( "application/qgis-kadas-button", button->defaultAction()->objectName().toLocal8Bit() );
-      QDrag *drag = new QDrag( this );
-      drag->setMimeData( mimeData );
-      drag->setPixmap( button->icon().pixmap( 32, 32 ) );
-      drag->setHotSpot( QPoint( 16, 16 ) );
-      drag->exec( Qt::CopyAction );
-      mDragStartPos = QPoint();
-    }
-  }
 }
 
 void KadasMainWindow::dragEnterEvent( QDragEnterEvent *event )

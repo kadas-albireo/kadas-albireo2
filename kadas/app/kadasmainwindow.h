@@ -165,8 +165,6 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
 
   private:
     bool eventFilter( QObject *obj, QEvent *ev ) override;
-    void mousePressEvent( QMouseEvent *event ) override;
-    void mouseMoveEvent( QMouseEvent *event ) override;
     void dropEvent( QDropEvent *event ) override;
     void dragEnterEvent( QDragEnterEvent *event ) override;
     void showEvent( QShowEvent * /*event*/ ) override;
@@ -236,6 +234,8 @@ class KadasMainWindow : public QMainWindow, private Ui::KadasWindowBase, private
     QMap<QString, QAction *> mAddedActions;
     QList<QgsCustomDropHandler *> mCustomDropHandlers;
     bool mFullscreen = false;
+
+    bool mIsDraggingButton = false;
 
     KadasHelpViewer *mHelpViewer = nullptr;
 };
