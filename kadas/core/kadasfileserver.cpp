@@ -44,30 +44,30 @@ QByteArray KadasFileServer::genHeaders( int code, const QString &filePath )
   QByteArray h;
   if ( code == 200 )
   {
-    h = "HTTP/1.1 200 OK\n";
+    h = "HTTP/1.1 200 OK\r\n";
   }
   else if ( code == 404 )
   {
-    h = "HTTP/1.1 404 Not Found\n";
+    h = "HTTP/1.1 404 Not Found\r\n";
   }
   else if ( code == 405 )
   {
-    h = "HTTP/1.1 405 Method Not Allowed\n";
+    h = "HTTP/1.1 405 Method Not Allowed\r\n";
   }
 
   QByteArray current_date = QDateTime::currentDateTime().toString( Qt::RFC2822Date ).toLocal8Bit();
 
-  h += "Date: " + current_date + "\n";
-  h += "Connection: close\n";
+  h += "Date: " + current_date + "\r\n";
+  h += "Connection: close\r\n";
 
   if ( code == 200 && !filePath.isEmpty() )
   {
     QMimeDatabase mimeDb;
     QMimeType mimeType = mimeDb.mimeTypeForFile( filePath, QMimeDatabase::MatchExtension );
-    h += "Content-Type: " + mimeType.name().toUtf8() + "\n";
+    h += "Content-Type: " + mimeType.name().toUtf8() + "\r\n";
   }
 
-  h += "\n";
+  h += "\r\n";
   return h;
 }
 
