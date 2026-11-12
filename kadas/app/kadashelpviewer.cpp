@@ -42,6 +42,6 @@ void KadasHelpViewer::showHelp() const
   if ( !qDir.exists( lang ) )
     lang = "en";
 
-  QUrl url( QString( "http:///%1:%2/%3/" ).arg( mHelpFileServer.getHost() ).arg( mHelpFileServer.getPort() ).arg( lang ) );
+  QUrl url( QString( "http://%1:%2/%3/" ).arg( mHelpFileServer.getHost() ).arg( mHelpFileServer.getPort() ).arg( lang ) );
   QDesktopServices::openUrl( url );
 }
