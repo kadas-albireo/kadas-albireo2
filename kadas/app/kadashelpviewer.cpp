@@ -20,6 +20,7 @@
 #include <QUrl>
 
 #include <qgis/qgis.h>
+#include <qgis/qgslogger.h>
 #include <qgis/qgsuserprofilemanager.h>
 
 #include "kadas/core/kadas.h"
@@ -27,20 +28,21 @@
 
 KadasHelpViewer::KadasHelpViewer( QObject *parent )
   : QObject( parent )
-  , mHelpFileServer( QString(), "127.0.0.1" )
-{
-  const QString docdir = QDir( Kadas::pkgDataPath() ).absoluteFilePath( "docs/html" );
-  mHelpFileServer.setFilesTopDir( docdir );
-}
+  , mDocDir( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "docs/html" ) )
+  , mHelpFileServer( mDocDir, "127.0.0.1" )
+{}
 
 void KadasHelpViewer::showHelp() const
 {
   const QString locale = QSettings().value( "locale/userLocale", "en" ).toString();
   QString lang = locale.left( 2 );
 
-  QDir qDir( mHelpFileServer.getFilesTopDir() );
+  QDir qDir( mDocDir );
   if ( !qDir.exists( lang ) )
+  {
+    QgsDebugMsgLevel( QString( "Documentation is not available for '%1'. Will be served in english." ).arg( lang ), 1 );
     lang = "en";
+  }
 
   QUrl url( QString( "http://%1:%2/%3/" ).arg( mHelpFileServer.getHost() ).arg( mHelpFileServer.getPort() ).arg( lang ) );
   QDesktopServices::openUrl( url );

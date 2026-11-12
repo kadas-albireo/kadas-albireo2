@@ -14,32 +14,46 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QTcpServer>
+#include <QMutex>
+#include <QSemaphore>
+#include <QThread>
 
 #include "kadas/core/kadas_core.h"
 
-class KADAS_CORE_EXPORT KadasFileServer : public QTcpServer
+class QTcpServer;
+class QTcpSocket;
+
+/**
+ * Minimal HTTP file server, running in its own thread so that serving requests
+ * is independent of the load of the GUI thread.
+ */
+class KADAS_CORE_EXPORT KadasFileServer : public QThread
 {
     Q_OBJECT
   public:
     KadasFileServer( const QString &topdir, const QString &host = "", int port = 0 );
+    ~KadasFileServer() override;
     const QString &getHost() const { return mHost; }
     int getPort() const { return mPort; }
 
-    QString getFilesTopDir() const { return mTopdir; }
-    void setFilesTopDir( const QString &topDir );
+  protected:
+    void run() override;
 
   private:
     static constexpr int IDLE_TIMEOUT_MS = 15000;
     static constexpr int MAX_REQUEST_SIZE = 65536; // 64 KB
 
     QByteArray genHeaders( int code, qint64 contentLength, const QString &filePath = QString() );
+    void handleConnections( QTcpServer *server );
     void sendReply( QTcpSocket *socket, const QByteArray &request );
 
+    // Written once by the worker thread before mStarted is released
     QString mHost;
-    int mPort;
-    QString mTopdir;
+    int mPort = 0;
+    QSemaphore mStarted;
 
-  private slots:
-    void handleConnection();
+    QString mBindHost;
+    int mBindPort = 0;
+
+    const QString mTopdir;
 };
