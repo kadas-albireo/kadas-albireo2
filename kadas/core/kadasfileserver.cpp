@@ -37,7 +37,7 @@ void KadasFileServer::setFilesTopDir( const QString &topDir )
   mTopdir = topDir;
 }
 
-QByteArray KadasFileServer::genHeaders( int code )
+QByteArray KadasFileServer::genHeaders( int code, qint64 contentLength, const QString &filePath )
 {
   QByteArray h;
   if ( code == 200 )
@@ -57,6 +57,7 @@ QByteArray KadasFileServer::genHeaders( int code )
 
   h += "Date: " + current_date + "\r\n";
   h += "Connection: close\r\n";
+  h += "Content-Length: " + QByteArray::number( contentLength ) + "\r\n";
 
   if ( code == 200 && !filePath.isEmpty() )
   {
@@ -129,24 +130,23 @@ void KadasFileServer::sendReply( QTcpSocket *socket )
     QFile file( path );
     if ( file.open( QIODevice::ReadOnly ) )
     {
-      headers = genHeaders( 200 );
-      if ( requestMethod == "GET" )
-      {
-        body = file.readAll();
-      }
+      body = file.readAll();
+      headers = genHeaders( 200, body.size(), path );
     }
     else
     {
-      headers = genHeaders( 404 );
-      if ( requestMethod == "GET" )
-      {
-        body = QString( "<html><body><p>Error 404: File not found: '%1'</p></body></html>" ).arg( QString::fromUtf8( fileRequested ) ).toUtf8();
-      }
+      body = QString( "<html><body><p>Error 404: File not found: '%1'</p></body></html>" ).arg( QString::fromUtf8( fileRequested ) ).toUtf8();
+      headers = genHeaders( 404, body.size() );
+    }
+    // HEAD responses carry the headers of the GET response, but no body
+    if ( requestMethod == "HEAD" )
+    {
+      body.clear();
     }
   }
   else
   {
-    headers = genHeaders( 405 );
+    headers = genHeaders( 405, 0 );
   }
 
   socket->write( headers + body );
