@@ -14,31 +14,53 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <memory>
+
 #include <QDateTime>
 #include <QFile>
 #include <QFileInfo>
 #include <QMimeDatabase>
+#include <QTcpServer>
 #include <QTcpSocket>
 #include <QTimer>
 
-#include <memory>
-
 #include <qgis/qgslogger.h>
+
 #include "kadas/core/kadasfileserver.h"
 
 KadasFileServer::KadasFileServer( const QString &topdir, const QString &host, int port )
+  : mBindHost( host )
+  , mBindPort( port )
+  , mTopdir( topdir )
 {
-  mTopdir = topdir;
-  listen( QHostAddress( host ), port );
-  mHost = serverAddress().toString();
-  mPort = serverPort();
-  connect( this, &QTcpServer::newConnection, this, &KadasFileServer::handleConnection );
-  QgsDebugMsgLevel( QString( "KadasFileServer running on %1:%2" ).arg( mHost ).arg( mPort ), 2 );
+  setObjectName( "KadasFileServer" );
+  start();
+  // Wait until the worker thread is listening, so that host and port are valid
+  mStarted.acquire();
 }
 
-void KadasFileServer::setFilesTopDir( const QString &topDir )
+KadasFileServer::~KadasFileServer()
 {
-  mTopdir = topDir;
+  quit();
+  wait();
+}
+
+void KadasFileServer::run()
+{
+  // Created here, so that the server and all its sockets live in the worker thread
+  QTcpServer server;
+  if ( !server.listen( QHostAddress( mBindHost ), mBindPort ) )
+  {
+    QgsDebugMsgLevel( QString( "KadasFileServer failed to listen: %1" ).arg( server.errorString() ), 1 );
+  }
+  mHost = server.serverAddress().toString();
+  mPort = server.serverPort();
+  QgsDebugMsgLevel( QString( "KadasFileServer running on %1:%2" ).arg( mHost ).arg( mPort ), 2 );
+  mStarted.release();
+
+  // The server is the context object, so the slot runs in the worker thread
+  connect( &server, &QTcpServer::newConnection, &server, [this, &server] { handleConnections( &server ); } );
+  exec();
 }
 
 QByteArray KadasFileServer::genHeaders( int code, qint64 contentLength, const QString &filePath )
@@ -78,11 +100,11 @@ QByteArray KadasFileServer::genHeaders( int code, qint64 contentLength, const QS
   return h;
 }
 
-void KadasFileServer::handleConnection()
+void KadasFileServer::handleConnections( QTcpServer *server )
 {
-  while ( hasPendingConnections() )
+  while ( server->hasPendingConnections() )
   {
-    QTcpSocket *socket = nextPendingConnection();
+    QTcpSocket *socket = server->nextPendingConnection();
     connect( socket, &QTcpSocket::disconnected, socket, &QObject::deleteLater );
 
     // Drop connections which never deliver a complete request
