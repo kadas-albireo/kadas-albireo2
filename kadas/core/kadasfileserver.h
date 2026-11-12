@@ -30,7 +30,7 @@ class KADAS_CORE_EXPORT KadasFileServer : public QTcpServer
     void setFilesTopDir( const QString &topDir );
 
   private:
-    QByteArray genHeaders( int code );
+    QByteArray genHeaders( int code, const QString &filePath = QString() );
 
     QString mHost;
     int mPort;
