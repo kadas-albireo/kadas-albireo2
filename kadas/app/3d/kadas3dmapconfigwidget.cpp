@@ -88,7 +88,7 @@ Kadas3DMapConfigWidget::Kadas3DMapConfigWidget( Qgs3DMapSettings *map, QgsMapCan
   spinCameraFieldOfView->setClearValue( 45.0 );
   spinTerrainScale->setClearValue( 1.0 );
   spinTerrainResolution->setClearValue( 32 );
-  spinTerrainSkirtHeight->setClearValue( 300 );
+  spinTerrainSkirtHeight->setClearValue( 1000 );
   spinMapResolution->setClearValue( 512 );
   spinScreenError->setClearValue( 2 );
   spinGroundError->setClearValue( 1 );
@@ -157,7 +157,7 @@ Kadas3DMapConfigWidget::Kadas3DMapConfigWidget( Qgs3DMapSettings *map, QgsMapCan
     cboTerrainType->setCurrentIndex( cboTerrainType->findData( QgsTerrainGenerator::Flat ) );
     cboTerrainLayer->setLayer( nullptr );
     spinTerrainResolution->setValue( 32 );
-    spinTerrainSkirtHeight->setValue( 300 );
+    spinTerrainSkirtHeight->setValue( 1000 );
   }
 
   spinCameraFieldOfView->setValue( mMap->fieldOfView() );
