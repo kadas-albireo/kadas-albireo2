@@ -21,6 +21,8 @@
 #include <QTcpSocket>
 #include <QTimer>
 
+#include <memory>
+
 #include <qgis/qgslogger.h>
 #include "kadas/core/kadasfileserver.h"
 
@@ -54,6 +56,10 @@ QByteArray KadasFileServer::genHeaders( int code, qint64 contentLength, const QS
   {
     h = "HTTP/1.1 405 Method Not Allowed\r\n";
   }
+  else if ( code == 431 )
+  {
+    h = "HTTP/1.1 431 Request Header Fields Too Large\r\n";
+  }
 
   QByteArray current_date = QDateTime::currentDateTime().toString( Qt::RFC2822Date ).toLocal8Bit();
 
@@ -77,38 +83,43 @@ void KadasFileServer::handleConnection()
   while ( hasPendingConnections() )
   {
     QTcpSocket *socket = nextPendingConnection();
-    if ( socket->isOpen() )
-    {
-      if ( socket->bytesAvailable() )
+    connect( socket, &QTcpSocket::disconnected, socket, &QObject::deleteLater );
+
+    // Drop connections which never deliver a complete request
+    QTimer *idleTimer = new QTimer( socket );
+    idleTimer->setSingleShot( true );
+    connect( idleTimer, &QTimer::timeout, socket, &QTcpSocket::close );
+    idleTimer->start( IDLE_TIMEOUT_MS );
+
+    // TCP is a byte stream: a request may arrive in several chunks, so accumulate
+    // data until the end of the header section ("\r\n\r\n") has been received
+    auto buffer = std::make_shared<QByteArray>();
+    auto onReadyRead = [this, socket, idleTimer, buffer] {
+      buffer->append( socket->readAll() );
+      if ( buffer->contains( "\r\n\r\n" ) )
       {
-        sendReply( socket );
+        idleTimer->stop();
+        sendReply( socket, *buffer );
       }
-      else
+      else if ( buffer->size() > MAX_REQUEST_SIZE )
       {
-        QTimer *timeoutTimer = new QTimer( socket );
-        connect( timeoutTimer, &QTimer::timeout, socket, [socket] {
-          socket->close();
-          socket->deleteLater();
-        } );
-        timeoutTimer->start( 500 );
-        connect( socket, &QTcpSocket::readyRead, socket, [this, socket, timeoutTimer] {
-          timeoutTimer->stop();
-          timeoutTimer->deleteLater();
-          sendReply( socket );
-        } );
+        idleTimer->stop();
+        socket->write( genHeaders( 431, 0 ) );
+        socket->close();
       }
-    }
-    else
+    };
+    connect( socket, &QTcpSocket::readyRead, socket, onReadyRead );
+
+    // Data may already have arrived before the signal was connected
+    if ( socket->bytesAvailable() )
     {
-      socket->deleteLater();
+      onReadyRead();
     }
   }
 }
 
-void KadasFileServer::sendReply( QTcpSocket *socket )
+void KadasFileServer::sendReply( QTcpSocket *socket, const QByteArray &data )
 {
-  QByteArray data = socket->readAll();
-
   QByteArrayList parts = data.split( ' ' );
 
   QByteArray headers;

@@ -30,7 +30,11 @@ class KADAS_CORE_EXPORT KadasFileServer : public QTcpServer
     void setFilesTopDir( const QString &topDir );
 
   private:
+    static constexpr int IDLE_TIMEOUT_MS = 15000;
+    static constexpr int MAX_REQUEST_SIZE = 65536; // 64 KB
+
     QByteArray genHeaders( int code, qint64 contentLength, const QString &filePath = QString() );
+    void sendReply( QTcpSocket *socket, const QByteArray &request );
 
     QString mHost;
     int mPort;
@@ -38,5 +42,4 @@ class KADAS_CORE_EXPORT KadasFileServer : public QTcpServer
 
   private slots:
     void handleConnection();
-    void sendReply( QTcpSocket *socket );
 };
