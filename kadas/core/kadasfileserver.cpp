@@ -63,7 +63,7 @@ void KadasFileServer::run()
   exec();
 }
 
-QByteArray KadasFileServer::genHeaders( int code, qint64 contentLength, const QString &filePath )
+QByteArray KadasFileServer::genHeaders( int code, qint64 contentLength, bool keepAlive, const QString &filePath )
 {
   QByteArray h;
   if ( code == 200 )
@@ -86,7 +86,15 @@ QByteArray KadasFileServer::genHeaders( int code, qint64 contentLength, const QS
   QByteArray current_date = QDateTime::currentDateTime().toString( Qt::RFC2822Date ).toLocal8Bit();
 
   h += "Date: " + current_date + "\r\n";
-  h += "Connection: close\r\n";
+  if ( keepAlive )
+  {
+    h += "Connection: keep-alive\r\n";
+    h += "Keep-Alive: timeout=" + QByteArray::number( IDLE_TIMEOUT_MS / 1000 ) + "\r\n";
+  }
+  else
+  {
+    h += "Connection: close\r\n";
+  }
   h += "Content-Length: " + QByteArray::number( contentLength ) + "\r\n";
 
   if ( code == 200 && !filePath.isEmpty() )
@@ -107,26 +115,32 @@ void KadasFileServer::handleConnections( QTcpServer *server )
     QTcpSocket *socket = server->nextPendingConnection();
     connect( socket, &QTcpSocket::disconnected, socket, &QObject::deleteLater );
 
-    // Drop connections which never deliver a complete request
+    // Drop connections which stay idle, the timer is restarted whenever data arrives
     QTimer *idleTimer = new QTimer( socket );
     idleTimer->setSingleShot( true );
     connect( idleTimer, &QTimer::timeout, socket, &QTcpSocket::close );
     idleTimer->start( IDLE_TIMEOUT_MS );
 
-    // TCP is a byte stream: a request may arrive in several chunks, so accumulate
-    // data until the end of the header section ("\r\n\r\n") has been received
+    // TCP is a byte stream: a request may arrive in several chunks, and several
+    // requests may arrive in one chunk (keep-alive). Accumulate data and process
+    // every request whose header section ("\r\n\r\n") is complete.
     auto buffer = std::make_shared<QByteArray>();
     auto onReadyRead = [this, socket, idleTimer, buffer] {
+      idleTimer->start( IDLE_TIMEOUT_MS );
       buffer->append( socket->readAll() );
-      if ( buffer->contains( "\r\n\r\n" ) )
+      int end;
+      while ( socket->state() == QAbstractSocket::ConnectedState && ( end = buffer->indexOf( "\r\n\r\n" ) ) >= 0 )
       {
-        idleTimer->stop();
-        sendReply( socket, *buffer );
+        const QByteArray request = buffer->left( end + 4 );
+        buffer->remove( 0, end + 4 );
+        if ( !sendReply( socket, request ) )
+        {
+          return;
+        }
       }
-      else if ( buffer->size() > MAX_REQUEST_SIZE )
+      if ( buffer->size() > MAX_REQUEST_SIZE )
       {
-        idleTimer->stop();
-        socket->write( genHeaders( 431, 0 ) );
+        socket->write( genHeaders( 431, 0, false ) );
         socket->close();
       }
     };
@@ -140,9 +154,16 @@ void KadasFileServer::handleConnections( QTcpServer *server )
   }
 }
 
-void KadasFileServer::sendReply( QTcpSocket *socket, const QByteArray &data )
+bool KadasFileServer::sendReply( QTcpSocket *socket, const QByteArray &data )
 {
-  QByteArrayList parts = data.split( ' ' );
+  const QByteArray requestLine = data.left( data.indexOf( "\r\n" ) );
+  const QByteArrayList parts = requestLine.split( ' ' );
+
+  // HTTP/1.1 connections are persistent unless the client asks to close,
+  // HTTP/1.0 connections are closed unless the client asks to keep them open
+  const QByteArray lowerData = data.toLower();
+  const bool http10 = parts.length() >= 3 && parts[2].trimmed() == "HTTP/1.0";
+  bool keepAlive = http10 ? lowerData.contains( "\r\nconnection: keep-alive" ) : !lowerData.contains( "\r\nconnection: close" );
 
   QByteArray headers;
   QByteArray body;
@@ -172,12 +193,12 @@ void KadasFileServer::sendReply( QTcpSocket *socket, const QByteArray &data )
     if ( !path.isEmpty() && file.open( QIODevice::ReadOnly ) )
     {
       body = file.readAll();
-      headers = genHeaders( 200, body.size(), path );
+      headers = genHeaders( 200, body.size(), keepAlive, path );
     }
     else
     {
       body = QString( "<html><body><p>Error 404: File not found: '%1'</p></body></html>" ).arg( QString::fromUtf8( fileRequested ) ).toUtf8();
-      headers = genHeaders( 404, body.size() );
+      headers = genHeaders( 404, body.size(), keepAlive );
     }
     // HEAD responses carry the headers of the GET response, but no body
     if ( requestMethod == "HEAD" )
@@ -187,11 +208,16 @@ void KadasFileServer::sendReply( QTcpSocket *socket, const QByteArray &data )
   }
   else
   {
-    headers = genHeaders( 405, 0 );
+    // Unsupported request, a body may follow which we can not delimit: close
+    keepAlive = false;
+    headers = genHeaders( 405, 0, false );
   }
 
   socket->write( headers + body );
   socket->flush();
-  socket->close();
-  socket->deleteLater();
+  if ( !keepAlive )
+  {
+    socket->close();
+  }
+  return keepAlive;
 }

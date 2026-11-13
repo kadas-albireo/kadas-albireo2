@@ -43,9 +43,9 @@ class KADAS_CORE_EXPORT KadasFileServer : public QThread
     static constexpr int IDLE_TIMEOUT_MS = 15000;
     static constexpr int MAX_REQUEST_SIZE = 65536; // 64 KB
 
-    QByteArray genHeaders( int code, qint64 contentLength, const QString &filePath = QString() );
+    QByteArray genHeaders( int code, qint64 contentLength, bool keepAlive, const QString &filePath = QString() );
     void handleConnections( QTcpServer *server );
-    void sendReply( QTcpSocket *socket, const QByteArray &request );
+    bool sendReply( QTcpSocket *socket, const QByteArray &request );
 
     // Written once by the worker thread before mStarted is released
     QString mHost;
