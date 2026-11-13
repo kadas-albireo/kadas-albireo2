@@ -31,7 +31,7 @@
 KadasFileServer::KadasFileServer( const QString &topdir, const QString &host, int port )
   : mBindHost( host )
   , mBindPort( port )
-  , mTopdir( topdir )
+  , mTopdir( QFileInfo( topdir ).canonicalFilePath() )
 {
   setObjectName( "KadasFileServer" );
   start();
@@ -184,8 +184,10 @@ bool KadasFileServer::sendReply( QTcpSocket *socket, const QByteArray &data )
     }
     // Normalize path to resolve any ".." segments (e.g. /en/../search/worker.js)
     QString path = QFileInfo( mTopdir + fileRequested ).canonicalFilePath();
-    // Prevent directory traversal outside the top dir
-    if ( !path.startsWith( mTopdir ) )
+    // Prevent directory traversal outside the top dir (the trailing slash
+    // prevents sibling directories like <topdir>2 from matching)
+    const QString root = mTopdir.endsWith( '/' ) ? mTopdir : mTopdir + '/';
+    if ( mTopdir.isEmpty() || !path.startsWith( root ) )
     {
       path = QString();
     }
