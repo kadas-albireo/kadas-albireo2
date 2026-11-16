@@ -21,6 +21,7 @@
 #include <qgis/qgsdatasourceuri.h>
 #include <qgis/qgslogger.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/gui/kadascataloglayersource.h"
 
 QString KadasCatalogLayerSource::adjustUri( const QgsMimeDataUtils::Uri &uri, const QgsCoordinateReferenceSystem &canvasCrs )
@@ -35,7 +36,7 @@ QString KadasCatalogLayerSource::adjustUri( const QgsMimeDataUtils::Uri &uri, co
     if ( testCrs == canvasCrs )
     {
       adjustedUri.replace( QRegularExpression( "crs=[^&]+" ), "crs=" + c );
-      QgsDebugMsgLevel( QString( "Changing layer crs to %1, new uri: %2" ).arg( c, adjustedUri ), 2 );
+      KadasDebugMsgLevel( QString( "Changing layer crs to %1, new uri: %2" ).arg( c, adjustedUri ), 2 );
       break;
     }
   }
@@ -47,7 +48,7 @@ QString KadasCatalogLayerSource::adjustUri( const QgsMimeDataUtils::Uri &uri, co
     if ( fmt == lastImageEncoding )
     {
       adjustedUri.replace( QRegularExpression( "format=[^&]+" ), "format=" + fmt );
-      QgsDebugMsgLevel( QString( "Changing layer format to %1, new uri: %2" ).arg( fmt, adjustedUri ), 2 );
+      KadasDebugMsgLevel( QString( "Changing layer format to %1, new uri: %2" ).arg( fmt, adjustedUri ), 2 );
       break;
     }
   }

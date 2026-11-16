@@ -35,6 +35,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/gui/annotationitems/kadasannotationcontrollerregistry.h"
 #include "kadas/gui/annotationitems/kadasannotationitemcontroller.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
@@ -57,7 +58,7 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
   QString licenseKey = QStringLiteral( MILX_LICENSE_KEY );
   if ( licenseKey.isEmpty() )
   {
-    QgsDebugMsgLevel( "MilX license key is empty, disabling MilX integration.", 2 );
+    KadasDebugMsgLevel( "MilX license key is empty, disabling MilX integration.", 2 );
     return;
   }
 
@@ -84,7 +85,7 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
 
   if ( !KadasMilxClient::init() )
   {
-    QgsDebugMsgLevel( "Failed to initialize the MilX library.", 2 );
+    KadasDebugMsgLevel( "Failed to initialize the MilX library.", 2 );
     return;
   }
 

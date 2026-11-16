@@ -26,6 +26,7 @@
 #include <qgis/qgsprintlayout.h>
 #include <qgis/qgsshortcutsmanager.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/gui/kadasmapwidget.h"
 
 #include "kadasapplication.h"
@@ -61,7 +62,7 @@ QgsLayerTreeView *KadasPluginInterfaceImpl::layerTreeView()
 
 QgsGpsToolsInterface *KadasPluginInterfaceImpl::gpsTools()
 {
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return nullptr;
 }
 
@@ -106,7 +107,7 @@ void KadasPluginInterfaceImpl::closeMapCanvas( const QString &name )
 
 QList<Qgs3DMapCanvas *> KadasPluginInterfaceImpl::mapCanvases3D()
 {
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return QList<Qgs3DMapCanvas *>();
 }
 
@@ -116,14 +117,14 @@ Qgs3DMapCanvas *KadasPluginInterfaceImpl::createNewMapCanvas3D( const QString &n
 Qgs3DMapCanvas *KadasPluginInterfaceImpl::createNewMapCanvas3D( const QString &name ) override
 #endif
 {
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return nullptr;
 }
 
 void KadasPluginInterfaceImpl::closeMapCanvas3D( const QString &name )
 {
   Q_UNUSED( name )
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
 }
 
 #endif
@@ -165,20 +166,20 @@ QgsMessageBar *KadasPluginInterfaceImpl::messageBar()
 
 QList<QgsLayoutDesignerInterface *> KadasPluginInterfaceImpl::openLayoutDesigners()
 {
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return QList<QgsLayoutDesignerInterface *>();
 }
 
 QgsVectorLayerTools *KadasPluginInterfaceImpl::vectorLayerTools()
 {
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return nullptr;
 }
 
 #if _QGIS_VERSION_INT >= 33440
 QMenu *KadasPluginInterfaceImpl::meshMenu()
 {
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return nullptr;
 }
 #endif
@@ -256,55 +257,55 @@ void KadasPluginInterfaceImpl::removePluginProcessingMenu( const QString &name, 
 #if _QGIS_VERSION_INT >= 33000
 QMenu *KadasPluginInterfaceImpl::projectImportExportMenu()
 {
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return nullptr;
 }
 
 void KadasPluginInterfaceImpl::addProjectImportAction( QAction *action )
 {
   Q_UNUSED( action )
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
 }
 
 void KadasPluginInterfaceImpl::removeProjectImportAction( QAction *action )
 {
   Q_UNUSED( action )
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
 }
 
 void KadasPluginInterfaceImpl::addProjectExportAction( QAction *action )
 {
   Q_UNUSED( action )
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
 }
 
 void KadasPluginInterfaceImpl::removeProjectExportAction( QAction *action )
 {
   Q_UNUSED( action )
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
 }
 
 QMenu *KadasPluginInterfaceImpl::projectModelsMenu()
 {
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return nullptr;
 }
 
 QMenu *KadasPluginInterfaceImpl::createProjectModelSubMenu( const QString &title )
 {
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return nullptr;
 }
 
 void KadasPluginInterfaceImpl::openDataSourceManagerPage( const QString &pageName )
 {
   Q_UNUSED( pageName )
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
 }
 
 QgsUserProfileManager *KadasPluginInterfaceImpl::userProfileManager()
 {
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return nullptr;
 }
 #endif
@@ -391,7 +392,7 @@ QgsTiledSceneLayer *KadasPluginInterfaceImpl::addTiledSceneLayer( const QString 
   Q_UNUSED( url )
   Q_UNUSED( baseName )
   Q_UNUSED( providerKey )
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return nullptr;
 }
 #endif
@@ -807,11 +808,11 @@ void KadasPluginInterfaceImpl::showLayoutDesigner( QgsPrintLayout *layout )
 
 QgsLayerTreeRegistryBridge::InsertionPoint KadasPluginInterfaceImpl::layerTreeInsertionPoint()
 {
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
   return kApp->layerTreeInsertionPoint();
 }
 
 void KadasPluginInterfaceImpl::showApiDocumentation( Qgis::DocumentationApi api, Qgis::DocumentationBrowser browser, const QString &object, const QString &module )
 {
-  QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+  KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
 }

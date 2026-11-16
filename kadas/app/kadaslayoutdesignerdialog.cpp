@@ -63,6 +63,7 @@
 #include <qgis/qgsprojectviewsettings.h>
 #include <qgis/qgssettings.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadasapplication.h"
 #include "kadaslayoutappmenuprovider.h"
 #include "kadaslayoutdesignerdialog.h"
@@ -1407,12 +1408,12 @@ void KadasLayoutDesignerDialog::restoreWindowState()
 
   if ( !restoreState( settings.value( QStringLiteral( "LayoutDesigner/state" ), QByteArray() ).toByteArray() ) )
   {
-    QgsDebugMsgLevel( QStringLiteral( "restore of layout UI state failed" ), 2 );
+    KadasDebugMsgLevel( QStringLiteral( "restore of layout UI state failed" ), 2 );
   }
   // restore window geometry
   if ( !restoreGeometry( settings.value( QStringLiteral( "LayoutDesigner/geometry" ), QgsSettings::App ).toByteArray() ) )
   {
-    QgsDebugMsgLevel( QStringLiteral( "restore of layout UI geometry failed" ), 2 );
+    KadasDebugMsgLevel( QStringLiteral( "restore of layout UI geometry failed" ), 2 );
     // default to 80% of screen size, at 10% from top left corner
     resize( screen()->availableGeometry().size() * 0.8 );
     QSize pos = screen()->availableGeometry().size() * 0.1;

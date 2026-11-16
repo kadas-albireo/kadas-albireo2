@@ -30,6 +30,7 @@
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgssettings.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/core/kadas.h"
 #include "kadas/core/kadas_config.h"
 
@@ -167,32 +168,32 @@ GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errM
 
     if ( !gdalHttpProxy.isEmpty() )
     {
-      QgsDebugMsgLevel( QString( "GDAL_HTTP_PROXY: %1" ).arg( gdalHttpProxy ), 2 );
+      KadasDebugMsgLevel( QString( "GDAL_HTTP_PROXY: %1" ).arg( gdalHttpProxy ), 2 );
       qputenv( "GDAL_HTTP_PROXY", gdalHttpProxy.toLocal8Bit() );
       qputenv( "GDAL_HTTPS_PROXY", gdalHttpProxy.toLocal8Bit() );
     }
     else
     {
-      QgsDebugMsgLevel( QString( "Unset GDAL_HTTP(S)_PROXY" ), 2 );
+      KadasDebugMsgLevel( QString( "Unset GDAL_HTTP(S)_PROXY" ), 2 );
       qunsetenv( "GDAL_HTTP_PROXY" );
       qunsetenv( "GDAL_HTTPS_PROXY" );
     }
 
     if ( !gdalProxyUserPwd.isEmpty() )
     {
-      QgsDebugMsgLevel( QString( "GDAL_HTTP_PROXYUSERPWD: %1" ).arg( gdalProxyUserPwd ), 2 );
+      KadasDebugMsgLevel( QString( "GDAL_HTTP_PROXYUSERPWD: %1" ).arg( gdalProxyUserPwd ), 2 );
       qputenv( "GDAL_HTTP_PROXYUSERPWD", gdalProxyUserPwd.toLocal8Bit() );
     }
 
     if ( !gdalProxyAuth.isEmpty() && !settingsGdalUnsetEnvVar->value() )
     {
-      QgsDebugMsgLevel( QString( "GDAL_PROXY_AUTH: %1" ).arg( gdalProxyAuth ), 2 );
+      KadasDebugMsgLevel( QString( "GDAL_PROXY_AUTH: %1" ).arg( gdalProxyAuth ), 2 );
       qputenv( "GDAL_PROXY_AUTH", gdalProxyAuth.toLocal8Bit() );
     }
 
     if ( settingsGdalUnsetEnvVar->value() )
     {
-      QgsDebugMsgLevel( QString( "Unset GDAL_PROXY_AUTH" ), 2 );
+      KadasDebugMsgLevel( QString( "Unset GDAL_PROXY_AUTH" ), 2 );
       qunsetenv( "GDAL_PROXY_AUTH" );
     }
 
@@ -266,16 +267,16 @@ void Kadas::importSslCertificates()
 {
   // Look for certificates in <appDataDir>/certificates to add to the SSL socket CA certificate database
   QDir certDir( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "certificates" ) );
-  QgsDebugMsgLevel( QString( "Looking for certificates in %1" ).arg( certDir.absolutePath() ), 2 );
+  KadasDebugMsgLevel( QString( "Looking for certificates in %1" ).arg( certDir.absolutePath() ), 2 );
   for ( const QString &certFilename : certDir.entryList( QStringList() << "*.pem", QDir::Files ) )
   {
     QFile certFile( certDir.absoluteFilePath( certFilename ) );
     if ( certFile.open( QIODevice::ReadOnly ) )
     {
-      QgsDebugMsgLevel( QString( "Reading certificate file %1" ).arg( certFile.fileName() ), 2 );
+      KadasDebugMsgLevel( QString( "Reading certificate file %1" ).arg( certFile.fileName() ), 2 );
       QByteArray pem = certFile.readAll();
       QList<QSslCertificate> certs = QSslCertificate::fromData( pem, QSsl::Pem );
-      QgsDebugMsgLevel( QString( "Adding %1 certificates" ).arg( certs.size() ), 2 );
+      KadasDebugMsgLevel( QString( "Adding %1 certificates" ).arg( certs.size() ), 2 );
 #if QT_VERSION >= QT_VERSION_CHECK( 5, 15, 0 )
       QSslConfiguration::defaultConfiguration().addCaCertificates( certs );
 #else
@@ -319,7 +320,7 @@ void Kadas::importSslCertificates()
       {
         strcpy( cert_name, "Unknown" );
       }
-      QgsDebugMsgLevel( QString( "Checking system certificate %1" ).arg( cert_name ), 2 );
+      KadasDebugMsgLevel( QString( "Checking system certificate %1" ).arg( cert_name ), 2 );
 
       encoded_cert = ( const unsigned char * ) pContext->pbCertEncoded;
       if ( !encoded_cert )
@@ -401,7 +402,7 @@ void Kadas::importSslCertificates()
 
       QByteArray pem = X509_to_PEM( x509 );
       QList<QSslCertificate> certs = QSslCertificate::fromData( pem, QSsl::Pem );
-      QgsDebugMsgLevel( QString( "Importing %1 certificates from system certificate %2" ).arg( certs.size() ).arg( cert_name ), 2 );
+      KadasDebugMsgLevel( QString( "Importing %1 certificates from system certificate %2" ).arg( certs.size() ).arg( cert_name ), 2 );
       QSslConfiguration::defaultConfiguration().addCaCertificates( certs );
       X509_free( x509 );
     }

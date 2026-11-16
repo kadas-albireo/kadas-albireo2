@@ -37,6 +37,7 @@
 #include <qgis/qgsmarkersymbollayer.h>
 #include <qgis/qgsmarkersymbol.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/gui/search/kadasremotedatasearchprovider.h"
 
 
@@ -153,7 +154,7 @@ void KadasRemoteDataSearchProvider::fetchResults( const QString &string, const Q
         QJsonDocument doc = QJsonDocument::fromJson( replyText, &err );
         if ( doc.isNull() )
         {
-          QgsDebugMsgLevel( QString( "Parsing error:" ).arg( err.errorString() ), 2 );
+          KadasDebugMsgLevel( QString( "Parsing error:" ).arg( err.errorString() ), 2 );
         }
         QVariantMap resultMap = doc.object().toVariantMap();
         for ( const QVariant &item : resultMap["results"].toList() )
@@ -165,7 +166,7 @@ void KadasRemoteDataSearchProvider::fetchResults( const QString &string, const Q
           const QRegularExpressionMatch match = patBox.match( itemAttrsMap["geom_st_box2d"].toString() );
           if ( !match.hasMatch() )
           {
-            QgsDebugMsgLevel( "Box RegEx did not match " + itemAttrsMap["geom_st_box2d"].toString(), 2 );
+            KadasDebugMsgLevel( "Box RegEx did not match " + itemAttrsMap["geom_st_box2d"].toString(), 2 );
             continue;
           }
 

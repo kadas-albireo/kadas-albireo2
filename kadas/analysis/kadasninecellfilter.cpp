@@ -25,6 +25,7 @@
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgsunittypes.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/core/kadas.h"
 #include "kadas/analysis/kadasninecellfilter.h"
 
@@ -148,7 +149,7 @@ int KadasNineCellFilter::processRaster( QProgressDialog *p, QString &errorMsg )
     }
     else
     {
-      QgsDebugMsgLevel( "Warning: Failed to automatically compute zFactor, defaulting to 1", 2 );
+      KadasDebugMsgLevel( "Warning: Failed to automatically compute zFactor, defaulting to 1", 2 );
       mZFactor = 1;
     }
   }
