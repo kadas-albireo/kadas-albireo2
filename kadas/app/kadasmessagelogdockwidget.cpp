@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadasmessagelogviewer.h
-    -----------------------
+    kadasmessagelogdockwidget.cpp
+    -----------------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -14,21 +14,27 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef KADASMESSAGELOGVIEWER_H
-#define KADASMESSAGELOGVIEWER_H
+#include <QAction>
 
+#include <qgis/qgsapplication.h>
+#include <qgis/qgsauthmanager.h>
 #include <qgis/qgsmessagelogviewer.h>
 
-class KadasMessageLogViewer : public QgsMessageLogViewer
+#include "kadasmessagelogdockwidget.h"
+
+KadasMessageLogDockWidget::KadasMessageLogDockWidget( QWidget *parent )
+  : QDockWidget( tr( "Log Messages" ), parent )
 {
-    Q_OBJECT
+  setObjectName( QStringLiteral( "MessageLog" ) );
 
-  public:
-    KadasMessageLogViewer( QWidget *parent, Qt::WindowFlags fl = Qt::WindowFlags() );
+  mMessageLogViewer = new QgsMessageLogViewer( this );
+  mMessageLogViewer->setWindowFlags( Qt::Widget );
+  setWidget( mMessageLogViewer );
 
-  protected:
-    void closeEvent( QCloseEvent *e ) override;
-    void reject() override;
-};
+  connect( QgsApplication::authManager(), &QgsAuthManager::messageLog, mMessageLogViewer, [this]( const QString &message, const QString &tag, Qgis::MessageLevel level ) {
+    mMessageLogViewer->logMessage( message, tag, level );
+  } );
 
-#endif // KADASMESSAGELOGVIEWER_H
+  toggleViewAction()->setShortcut( QKeySequence( Qt::CTRL | Qt::SHIFT | Qt::Key_L ) );
+  parent->addAction( toggleViewAction() );
+}

@@ -107,7 +107,7 @@
 #include "kadaslayerrefreshmanager.h"
 #include "kadasmainwindow.h"
 #include "kadasmapwidgetmanager.h"
-#include "kadasmessagelogviewer.h"
+#include "kadasmessagelogdockwidget.h"
 #include "kadasnewspopup.h"
 #include "kadasplugininterfaceimpl.h"
 #include "kadaspluginmanager.h"
@@ -393,15 +393,9 @@ void KadasApplication::init()
   mMainWindow->mapCanvas()->setMapTool( mMapToolPan );
 
   QgsMessageOutput::setMessageOutputCreator( messageOutputViewer );
-  mMessageLogViewer = new KadasMessageLogViewer( mMainWindow );
-  if ( showMessageLog )
-  {
-    mMessageLogViewer->show();
-  }
-
-  connect( QgsApplication::authManager(), &QgsAuthManager::messageLog, mMessageLogViewer, [this]( const QString &message, const QString &tag, Qgis::MessageLevel level ) {
-    mMessageLogViewer->logMessage( message, tag, level );
-  } );
+  mMessageLogDockWidget = new KadasMessageLogDockWidget( mMainWindow );
+  mMainWindow->addDockWidget( Qt::BottomDockWidgetArea, mMessageLogDockWidget );
+  mMessageLogDockWidget->setVisible( showMessageLog );
 
   QgsProject::instance()->setBadLayerHandler( new KadasHandleBadLayersHandler );
   QgsPathResolver::setPathPreprocessor( [this]( const QString &path ) { return migrateDatasource( path ); } );
@@ -1215,8 +1209,8 @@ void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
 
 void KadasApplication::showMessageLog()
 {
-  mMessageLogViewer->exec();
-  mMessageLogViewer->hide();
+  mMessageLogDockWidget->show();
+  mMessageLogDockWidget->raise();
 }
 
 QgsMapLayer *KadasApplication::currentLayer() const

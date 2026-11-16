@@ -51,7 +51,7 @@ class KadasGpxIntegration;
 class KadasLayerRefreshManager;
 class KadasMainWindow;
 class KadasMapToolPan;
-class KadasMessageLogViewer;
+class KadasMessageLogDockWidget;
 class KadasDeveloperToolsDockWidget;
 class KadasPluginInterface;
 class KadasPortalAuth;
@@ -158,7 +158,7 @@ class KadasApplication : public QgsApplication
     KadasPythonIntegration *mPythonIntegration = nullptr;
     KadasMainWindow *mMainWindow = nullptr;
     KadasLayerRefreshManager *mLayerRefreshManager = nullptr;
-    KadasMessageLogViewer *mMessageLogViewer = nullptr;
+    KadasMessageLogDockWidget *mMessageLogDockWidget = nullptr;
     bool mBlockActiveLayerChanged = false;
     KadasMapToolPan *mMapToolPan = nullptr;
     QList<QgsMapLayerConfigWidgetFactory *> mMapLayerPanelFactories;
