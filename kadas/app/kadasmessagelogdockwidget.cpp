@@ -36,5 +36,4 @@ KadasMessageLogDockWidget::KadasMessageLogDockWidget( QWidget *parent )
   } );
 
   toggleViewAction()->setShortcut( QKeySequence( Qt::CTRL | Qt::SHIFT | Qt::Key_L ) );
-  parent->addAction( toggleViewAction() );
 }

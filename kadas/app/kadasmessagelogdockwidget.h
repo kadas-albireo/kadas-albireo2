@@ -26,7 +26,7 @@ class KadasMessageLogDockWidget : public QDockWidget
     Q_OBJECT
 
   public:
-    explicit KadasMessageLogDockWidget( QWidget *parent );
+    explicit KadasMessageLogDockWidget( QWidget *parent = nullptr );
 
   private:
     QgsMessageLogViewer *mMessageLogViewer = nullptr;

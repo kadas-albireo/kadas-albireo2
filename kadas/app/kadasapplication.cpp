@@ -224,6 +224,10 @@ void KadasApplication::init()
 {
   QgsApplication::init();
 
+  // Create the message log early (without parent, it is docked once the main window exists)
+  // so that messages logged during startup are captured
+  mMessageLogDockWidget = new KadasMessageLogDockWidget();
+
   const QStringList args = QCoreApplication::arguments();
 
   const bool showMessageLog = args.contains( QStringLiteral( "--message-log" ) );
@@ -394,8 +398,8 @@ void KadasApplication::init()
   mMainWindow->mapCanvas()->setMapTool( mMapToolPan );
 
   QgsMessageOutput::setMessageOutputCreator( messageOutputViewer );
-  mMessageLogDockWidget = new KadasMessageLogDockWidget( mMainWindow );
   mMainWindow->addDockWidget( Qt::BottomDockWidgetArea, mMessageLogDockWidget );
+  mMainWindow->addAction( mMessageLogDockWidget->toggleViewAction() );
   mMessageLogDockWidget->setVisible( showMessageLog );
 
   QgsProject::instance()->setBadLayerHandler( new KadasHandleBadLayersHandler );
