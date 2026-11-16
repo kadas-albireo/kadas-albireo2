@@ -73,7 +73,6 @@
 #include "kadas/gui/annotationitems/kadasannotationlayerregistry.h"
 #include "kadas/gui/annotationitems/kadaspinannotationitem.h"
 #include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
-//#include "kadas/gui/maptools/kadasmaptooleditannotationitem.h"
 #include "kadas/gui/kadasprojecttemplateselectiondialog.h"
 #include "kadas/gui/kadasmapwidget.h"
 
@@ -559,7 +558,7 @@ bool KadasMainWindow::eventFilter( QObject *obj, QEvent *ev )
           mIsDraggingButton = false;
           mDragStartPos = mouseEvent->position().toPoint();
           ev->accept();
-          return true; // Swallow event at this point we don't know if it's going to be a simple click or a click + drag
+          return false; // Swallow event at this point we don't know if it's going to be a simple click or a click + drag
         }
         break;
       }
