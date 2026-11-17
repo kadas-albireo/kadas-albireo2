@@ -224,10 +224,6 @@ void KadasApplication::init()
 {
   QgsApplication::init();
 
-  // Create the message log early (without parent, it is docked once the main window exists)
-  // so that messages logged during startup are captured
-  mMessageLogDockWidget = new KadasMessageLogDockWidget();
-
   const QStringList args = QCoreApplication::arguments();
 
   const bool showMessageLog = args.contains( QStringLiteral( "--message-log" ) );
@@ -269,6 +265,10 @@ void KadasApplication::init()
   // Install crash reporter
   KadasCrashRpt::install();
 #endif
+
+  // Create the message log early (without parent, it is docked once the main window exists)
+  // so that messages logged during startup are captured
+  mMessageLogDockWidget = new KadasMessageLogDockWidget();
 
   QgsApplication::initQgis();
 
