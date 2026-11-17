@@ -9,17 +9,12 @@
 
 
 
-class KadasFileServer : QTcpServer
+
+class KadasFileServer : QThread
 {
 %Docstring(signature="appended")
-*************************************************************************
-
-This program is free software; you can redistribute it and/or modify *
-it under the terms of the GNU General Public License as published by *
-the Free Software Foundation; either version 2 of the License, or * (at
-your option) any later version. *
-
-**************************************************************************
+Minimal HTTP file server, running in its own thread so that serving
+requests is independent of the load of the GUI thread.
 %End
 
 %TypeHeaderCode
@@ -27,11 +22,13 @@ your option) any later version. *
 %End
   public:
     KadasFileServer( const QString &topdir, const QString &host = "", int port = 0 );
+    ~KadasFileServer();
     const QString &getHost() const;
     int getPort() const;
 
-    QString getFilesTopDir() const;
-    void setFilesTopDir( const QString &topDir );
+  protected:
+    virtual void run();
+
 
 };
 /************************************************************************

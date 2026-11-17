@@ -32,6 +32,7 @@ class KadasHelpViewer : public QObject
     void showHelp() const;
 
   private:
+    QString mDocDir;
     KadasFileServer mHelpFileServer;
 };
 
