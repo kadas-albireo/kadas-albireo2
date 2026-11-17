@@ -19,6 +19,7 @@
 #include <QDateTime>
 #include <QFile>
 #include <QFileInfo>
+#include <QLocale>
 #include <QMimeDatabase>
 #include <QTcpServer>
 #include <QTcpSocket>
@@ -83,7 +84,8 @@ QByteArray KadasFileServer::genHeaders( int code, qint64 contentLength, bool kee
     h = "HTTP/1.1 431 Request Header Fields Too Large\r\n";
   }
 
-  QByteArray current_date = QDateTime::currentDateTime().toString( Qt::RFC2822Date ).toLocal8Bit();
+  // HTTP dates are always GMT, in English
+  QByteArray current_date = QLocale::c().toString( QDateTime::currentDateTimeUtc(), "ddd, dd MMM yyyy HH:mm:ss 'GMT'" ).toLatin1();
 
   h += "Date: " + current_date + "\r\n";
   if ( keepAlive )
@@ -101,7 +103,11 @@ QByteArray KadasFileServer::genHeaders( int code, qint64 contentLength, bool kee
   {
     QMimeDatabase mimeDb;
     QMimeType mimeType = mimeDb.mimeTypeForFile( filePath, QMimeDatabase::MatchExtension );
-    h += "Content-Type: " + mimeType.name().toUtf8() + "\r\n";
+    // Unknown types: omit the header so that browsers can sniff the content
+    if ( !mimeType.isDefault() )
+    {
+      h += "Content-Type: " + mimeType.name().toUtf8() + "\r\n";
+    }
   }
 
   h += "\r\n";
