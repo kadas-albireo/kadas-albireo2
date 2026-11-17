@@ -39,7 +39,7 @@ KadasFileServer::KadasFileServer( const QString &topdir, const QString &host, in
   // Wait until the worker thread is listening, so that host and port are valid.
   if ( !mStarted.tryAcquire( 1, START_TIMEOUT_MS ) )
   {
-    KadasDebugMsgLevel::logMessage( QStringLiteral( "Worker thread did not start in time" ), QStringLiteral( "KadasFileServer" ), Qgis::MessageLevel::Warning );
+    KadasDebugMsgLevel( QStringLiteral( "Worker thread did not start in time" ), Qgis::MessageLevel::Warning );
   }
 }
 
@@ -55,7 +55,7 @@ void KadasFileServer::run()
   QTcpServer server;
   if ( !server.listen( QHostAddress( mBindHost ), mBindPort ) )
   {
-    KadasDebugMsgLevel::logMessage( QStringLiteral( "Failed to listen: %1" ).arg( server.errorString() ), QStringLiteral( "KadasFileServer" ), Qgis::MessageLevel::Warning );
+    KadasDebugMsgLevel( QStringLiteral( "Failed to listen: %1" ).arg( server.errorString() ), Qgis::MessageLevel::Warning );
   }
   mHost = server.serverAddress().toString();
   mPort = server.serverPort();
