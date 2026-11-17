@@ -183,6 +183,9 @@ bool KadasFileServer::sendReply( QTcpSocket *socket, const QByteArray &data )
     // Omit any querystring
     fileRequested = fileRequested.split( '?' )[0];
 
+    // Decode percent-encoded characters (e.g. %20, UTF-8 file names)
+    fileRequested = QByteArray::fromPercentEncoding( fileRequested );
+
     // load index.html if not file specified
     if ( fileRequested.endsWith( '/' ) )
     {
@@ -205,7 +208,7 @@ bool KadasFileServer::sendReply( QTcpSocket *socket, const QByteArray &data )
     }
     else
     {
-      body = QString( "<html><body><p>Error 404: File not found: '%1'</p></body></html>" ).arg( QString::fromUtf8( fileRequested ) ).toUtf8();
+      body = QString( "<html><body><p>Error 404: File not found: '%1'</p></body></html>" ).arg( QString::fromUtf8( fileRequested ).toHtmlEscaped() ).toUtf8();
       headers = genHeaders( 404, body.size(), keepAlive );
     }
     // HEAD responses carry the headers of the GET response, but no body
