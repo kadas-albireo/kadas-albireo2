@@ -16,7 +16,7 @@ jobs:
 #          - os: macos-13
 #            triplet: x64-osx
 #            deployment-target: "10.15"
-          - os: macos-15
+          - os: macos-26
             triplet: arm64-osx-dynamic
             deployment-target: "11.0"
     name: build (macos)
