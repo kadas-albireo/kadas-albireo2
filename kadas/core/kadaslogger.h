@@ -26,7 +26,7 @@
 
 /**
  * Debug logging which, unlike QgsDebugMsgLevel, also shows up in the "KADAS" tab of the message log panel.
- * Messages up to the level set with the QGIS_DEBUG environment variable (default 1, 0 = errors only)
+ * Messages up to the level set with the --debug-level command line argument or the QGIS_DEBUG environment variable (default 1, 0 = errors only)
  * are logged, and also forwarded to QgsLogger (debug output, or QGIS_LOG_FILE if set).
  */
 class KadasLogger
