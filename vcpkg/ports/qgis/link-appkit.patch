@@ -1,9 +1,9 @@
 diff --git a/src/native/CMakeLists.txt b/src/native/CMakeLists.txt
-index 8631b5ae49d..467abd10aff 100644
+index a09a568..3d763fa 100644
 --- a/src/native/CMakeLists.txt
 +++ b/src/native/CMakeLists.txt
-@@ -106,6 +106,10 @@ if (UNIX AND NOT APPLE AND NOT ANDROID)
-   target_link_libraries(qgis_native ${QT_VERSION_BASE}::DBus)
+@@ -126,6 +126,10 @@ if (UNIX AND NOT APPLE AND NOT ANDROID)
+   endif()
  endif()
  
 +if(APPLE)
