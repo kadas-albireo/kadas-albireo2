@@ -22,6 +22,7 @@
 #include <qgis/qgsgui.h>
 #include <qgis/qgslayertreeview.h>
 #include <qgis/qgsmaptool.h>
+#include <qgis/qgsprocessingmodelalgorithm.h>
 #include <qgis/qgsprintlayout.h>
 #include <qgis/qgsshortcutsmanager.h>
 
@@ -461,6 +462,13 @@ bool KadasPluginInterfaceImpl::saveProject()
 QgsLayoutDesignerInterface *KadasPluginInterfaceImpl::openLayoutDesigner( QgsMasterLayoutInterface *layout )
 {
   // TODO
+  return nullptr;
+}
+
+QgsModelDesignerDialog *KadasPluginInterfaceImpl::openModelDesigner( QgsProcessingModelAlgorithm *model )
+{
+  // Model designer is not available in KADAS
+  delete model;
   return nullptr;
 }
 
