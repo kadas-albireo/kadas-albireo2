@@ -16,6 +16,8 @@
 
 #include <QDateTime>
 #include <QFile>
+#include <QFileInfo>
+#include <QMimeDatabase>
 #include <QTcpSocket>
 #include <QTimer>
 
@@ -37,7 +39,7 @@ void KadasFileServer::setFilesTopDir( const QString &topDir )
   mTopdir = topDir;
 }
 
-QByteArray KadasFileServer::genHeaders( int code )
+QByteArray KadasFileServer::genHeaders( int code, const QString &filePath )
 {
   QByteArray h;
   if ( code == 200 )
@@ -56,8 +58,16 @@ QByteArray KadasFileServer::genHeaders( int code )
   QByteArray current_date = QDateTime::currentDateTime().toString( Qt::RFC2822Date ).toLocal8Bit();
 
   h += "Date: " + current_date + "\n";
-  h += "Connection: close\n\n";
+  h += "Connection: close\n";
 
+  if ( code == 200 && !filePath.isEmpty() )
+  {
+    QMimeDatabase mimeDb;
+    QMimeType mimeType = mimeDb.mimeTypeForFile( filePath, QMimeDatabase::MatchExtension );
+    h += "Content-Type: " + mimeType.name().toUtf8() + "\n";
+  }
+
+  h += "\n";
   return h;
 }
 
@@ -117,11 +127,17 @@ void KadasFileServer::sendReply( QTcpSocket *socket )
     {
       fileRequested += "index.html";
     }
-    QString path = mTopdir + fileRequested;
-    QFile file( path );
-    if ( file.open( QIODevice::ReadOnly ) )
+    // Normalize path to resolve any ".." segments (e.g. /en/../search/worker.js)
+    QString path = QFileInfo( mTopdir + fileRequested ).canonicalFilePath();
+    // Prevent directory traversal outside the top dir
+    if ( !path.startsWith( mTopdir ) )
     {
-      headers = genHeaders( 200 );
+      path = QString();
+    }
+    QFile file( path );
+    if ( !path.isEmpty() && file.open( QIODevice::ReadOnly ) )
+    {
+      headers = genHeaders( 200, path );
       if ( requestMethod == "GET" )
       {
         body = file.readAll();
