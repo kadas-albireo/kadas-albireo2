@@ -238,7 +238,14 @@ void KadasGpxIntegration::saveGpx()
   {
     return;
   }
-  KadasItemLayer *layer = static_cast<KadasItemLayer *>( layerSelectionWidget->getSelectedLayer() );
+
+  QgsMapLayer *selectedLayer = layerSelectionWidget->getSelectedLayer();
+  if ( !selectedLayer )
+  {
+    kApp->mainWindow()->messageBar()->pushMessage( tr( "GPX export failed" ), tr( "No layer selected" ), Qgis::Critical, 5 );
+    return;
+  }
+  KadasItemLayer *layer = static_cast<KadasItemLayer *>( selectedLayer );
 
   QString lastDir = QgsSettings().value( "/UI/lastImportExportDir", "." ).toString();
   QString filename = QFileDialog::getSaveFileName( kApp->mainWindow(), tr( "Export to GPX" ), QDir( lastDir ).absoluteFilePath( layer->name() + ".gpx" ), tr( "GPX Files (*.gpx)" ) );
