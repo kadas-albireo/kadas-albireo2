@@ -161,6 +161,7 @@ class TestKadasFileServer : public QObject
     void directoryTraversalIsBlocked();
     void siblingDirectoryIsBlocked();
     void queryStringIsIgnored();
+    void percentEncodedPathIsDecoded();
     void unsupportedMethodIsRejected();
     void oversizedHeadersAreRejected();
     void idleConnectionIsClosed();
@@ -186,6 +187,17 @@ void TestKadasFileServer::initTestCase()
   QVERIFY( index.open( QIODevice::WriteOnly ) );
   index.write( mIndexContent );
   index.close();
+
+  QFile special(
+    root
+    + QString::fromUtf8(
+      "/\xC3\x9C"
+      "bersicht a.html"
+    )
+  );
+  QVERIFY( special.open( QIODevice::WriteOnly ) );
+  special.write( "special" );
+  special.close();
 
   // Files outside the served directory, which must never be served
   for ( const QString &path : { base + "/secret.txt", base + "/www2/secret.txt" } )
@@ -356,6 +368,22 @@ void TestKadasFileServer::queryStringIsIgnored()
   QVERIFY( r.valid );
   QCOMPARE( r.status, 200 );
   QCOMPARE( r.body, mIndexContent );
+}
+
+void TestKadasFileServer::percentEncodedPathIsDecoded()
+{
+  auto c = connect();
+  c->send( get( "/%C3%9Cbersicht%20a.html" ) );
+  const Response r = c->read();
+  QVERIFY( r.valid );
+  QCOMPARE( r.status, 200 );
+  QCOMPARE( r.body, QByteArray( "special" ) );
+
+  // An encoded traversal must still be blocked
+  c->send( get( "/%2e%2e/secret.txt" ) );
+  const Response r2 = c->read();
+  QVERIFY( r2.valid );
+  QCOMPARE( r2.status, 404 );
 }
 
 void TestKadasFileServer::unsupportedMethodIsRejected()
