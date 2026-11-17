@@ -207,7 +207,7 @@ bool KadasFileServer::sendReply( QTcpSocket *socket, const QByteArray &data )
       path = QString();
     }
     QFile file( path );
-    if ( file.open( QIODevice::ReadOnly ) )
+    if ( !path.isEmpty() && file.open( QIODevice::ReadOnly ) )
     {
       body = file.readAll();
       headers = genHeaders( 200, body.size(), keepAlive, path );
