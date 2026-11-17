@@ -26,6 +26,7 @@
 #include <QTimer>
 
 #include <qgis/qgslogger.h>
+#include <qgis/qgsmessagelog.h>
 
 #include "kadas/core/kadasfileserver.h"
 
@@ -36,8 +37,11 @@ KadasFileServer::KadasFileServer( const QString &topdir, const QString &host, in
 {
   setObjectName( "KadasFileServer" );
   start();
-  // Wait until the worker thread is listening, so that host and port are valid
-  mStarted.acquire();
+  // Wait until the worker thread is listening, so that host and port are valid.
+  if ( !mStarted.tryAcquire( 1, START_TIMEOUT_MS ) )
+  {
+    QgsMessageLog::logMessage( QStringLiteral( "Worker thread did not start in time" ), QStringLiteral( "KadasFileServer" ), Qgis::MessageLevel::Warning );
+  }
 }
 
 KadasFileServer::~KadasFileServer()
@@ -52,15 +56,17 @@ void KadasFileServer::run()
   QTcpServer server;
   if ( !server.listen( QHostAddress( mBindHost ), mBindPort ) )
   {
-    QgsDebugMsgLevel( QString( "KadasFileServer failed to listen: %1" ).arg( server.errorString() ), 1 );
+    QgsMessageLog::logMessage( QStringLiteral( "Failed to listen: %1" ).arg( server.errorString() ), QStringLiteral( "KadasFileServer" ), Qgis::MessageLevel::Warning );
   }
   mHost = server.serverAddress().toString();
   mPort = server.serverPort();
   QgsDebugMsgLevel( QString( "KadasFileServer running on %1:%2" ).arg( mHost ).arg( mPort ), 2 );
-  mStarted.release();
 
   // The server is the context object, so the slot runs in the worker thread
   connect( &server, &QTcpServer::newConnection, &server, [this, &server] { handleConnections( &server ); } );
+  // Signal readiness from within the event loop, so that a quit() issued right
+  // after the constructor returns can not be lost before exec() is running
+  QTimer::singleShot( 0, &server, [this] { mStarted.release(); } );
   exec();
 }
 

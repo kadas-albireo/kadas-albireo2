@@ -14,7 +14,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <QMutex>
 #include <QSemaphore>
 #include <QThread>
 
@@ -40,6 +39,7 @@ class KADAS_CORE_EXPORT KadasFileServer : public QThread
     void run() override;
 
   private:
+    static constexpr int START_TIMEOUT_MS = 5000;
     static constexpr int IDLE_TIMEOUT_MS = 15000;
     static constexpr int MAX_REQUEST_SIZE = 65536; // 64 KB
 
