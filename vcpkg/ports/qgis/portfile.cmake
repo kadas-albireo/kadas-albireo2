@@ -92,6 +92,9 @@ list(APPEND QGIS_OPTIONS "-DQGIS_INCLUDE_SUBDIR=include/qgis")
 list(APPEND QGIS_OPTIONS "-DProtobuf_LITE_LIBRARY=protobuf::libprotobuf-lite")
 list(APPEND QGIS_OPTIONS "-DWITH_INTERNAL_NLOHMANN_JSON:BOOL=OFF")
 list(APPEND QGIS_OPTIONS "-DWITH_QTWEBENGINE:BOOL=OFF")
+# Qt's WaylandClient is not built in our vcpkg Qt, and newer QGIS enables
+# Wayland by default
+list(APPEND QGIS_OPTIONS "-DWITH_WAYLAND:BOOL=OFF")
 list(APPEND QGIS_OPTIONS "-DQGIS_MAC_BUNDLE:BOOL=OFF")
 
 if("opencl" IN_LIST FEATURES)
