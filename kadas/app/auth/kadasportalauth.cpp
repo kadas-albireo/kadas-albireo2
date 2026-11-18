@@ -134,6 +134,21 @@ void KadasPortalAuth::setupAuthenticationOAuth2()
 
   // Authentication via OAuth2
   mOAuth2ConfigCreated = createOAuth2Auth( settingsOAuth2RequestUrl->value(), settingsOAuth2TokenUrl->value(), clientId, settingsOAuth2ClientSecret->value() );
+  mAuthConfigAvailable = mOAuth2ConfigCreated;
+}
+
+bool KadasPortalAuth::authenticateRequest( QNetworkRequest &request ) const
+{
+  if ( !mAuthConfigAvailable )
+  {
+    return false;
+  }
+  if ( !QgsApplication::authManager()->updateNetworkRequest( request, ESRI_AUTH_CFG_ID ) )
+  {
+    QgsDebugError( QString( "Failed to authenticate request with auth config %1: %2" ).arg( ESRI_AUTH_CFG_ID, request.url().toString( QUrl::RemoveQuery ) ) );
+    return false;
+  }
+  return true;
 }
 
 void KadasPortalAuth::login()
@@ -182,6 +197,7 @@ bool KadasPortalAuth::loginOAuth2()
   // Remove the auth config, otherwise every request using it (catalog, layers) would
   // start the interactive login again. It is created again at the next start.
   QgsApplication::authManager()->removeAuthenticationConfig( ESRI_AUTH_CFG_ID );
+  mAuthConfigAvailable = false;
   QgsDebugError( QString( "Continuing without authentication, auth config %1 removed" ).arg( ESRI_AUTH_CFG_ID ) );
   return false;
 }
@@ -320,6 +336,7 @@ void KadasPortalAuth::createEsriAuth( const QString &token )
   if ( QgsApplication::authManager()->storeAuthenticationConfig( config, true /* overwrite */ ) )
   {
     KadasDebugMsgLevel( QString( "Created EsriToken auth config with id %1" ).arg( ESRI_AUTH_CFG_ID ), 1 );
+    mAuthConfigAvailable = true;
   }
   else
   {
