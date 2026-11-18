@@ -20,10 +20,10 @@
 #include <QUrl>
 
 #include <qgis/qgis.h>
-#include <qgis/qgslogger.h>
 #include <qgis/qgsuserprofilemanager.h>
 
 #include "kadas/core/kadas.h"
+#include "kadas/core/kadaslogger.h"
 #include "kadashelpviewer.h"
 
 KadasHelpViewer::KadasHelpViewer( QObject *parent )
@@ -40,7 +40,7 @@ void KadasHelpViewer::showHelp() const
   QDir qDir( mDocDir );
   if ( !qDir.exists( lang ) )
   {
-    QgsDebugMsgLevel( QString( "Documentation is not available for '%1'. Will be served in english." ).arg( lang ), 1 );
+    KadasDebugMsgLevel( QString( "Documentation is not available for '%1'. Will be served in english." ).arg( lang ), 1 );
     lang = "en";
   }
 
