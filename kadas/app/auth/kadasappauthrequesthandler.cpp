@@ -45,14 +45,20 @@ void KadasAppAuthRequestHandler::handleAuthRequestCloseBrowser()
 
   emit browserClosed();
 
-  // Bring focus back to KADAS app
-  if ( KadasApplication::instance() )
-  {
-    KadasMainWindow *mainWindow = KadasApplication::instance()->mainWindow();
-    mainWindow->raise();
-    mainWindow->activateWindow();
-    mainWindow->show();
-  }
+  // QGIS calls this method directly from the OAuth2 thread: widgets must only be accessed from the GUI thread
+  QMetaObject::invokeMethod(
+    this,
+    [] {
+      KadasApplication *app = KadasApplication::instance();
+      KadasMainWindow *mainWindow = app ? app->mainWindow() : nullptr;
+      if ( mainWindow && mainWindow->isVisible() )
+      {
+        mainWindow->raise();
+        mainWindow->activateWindow();
+      }
+    },
+    Qt::QueuedConnection
+  );
 }
 
 void KadasAppAuthRequestHandler::abortAuth()
