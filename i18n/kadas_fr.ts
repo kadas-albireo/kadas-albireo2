@@ -1735,17 +1735,17 @@ Veuillez annuler ces tâches et réessayer.</translation>
 <context>
     <name>KadasGpxDropHandler</name>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="350"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="356"/>
         <source>GPX import completed</source>
         <translation>Import GPX terminé</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="354"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="360"/>
         <source>GPX import failed</source>
         <translation>L&apos;import GPX a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="354"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="360"/>
         <source>The following files could not be imported:
 %1</source>
         <translation>Les fichiers suivants n&apos;ont pas pu être importés :
@@ -1762,7 +1762,7 @@ Veuillez annuler ces tâches et réessayer.</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadasgpxintegration.cpp" line="107"/>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="240"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="246"/>
         <source>GPX Files (*.gpx)</source>
         <translation>Fichiers GPX (*.gpx)</translation>
     </message>
@@ -1796,7 +1796,7 @@ Veuillez annuler ces tâches et réessayer.</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadasgpxintegration.cpp" line="210"/>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="240"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="246"/>
         <source>Export to GPX</source>
         <translation>Exporter vers GPX</translation>
     </message>
@@ -1806,17 +1806,23 @@ Veuillez annuler ces tâches et réessayer.</translation>
         <translation>Sélectionner la couche à exporter:</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="254"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="241"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="260"/>
         <source>GPX export failed</source>
         <translation>L&apos;export GPX a échoué</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="254"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="241"/>
+        <source>No layer selected</source>
+        <translation type="unfinished"/>
+    </message>
+    <message>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="260"/>
         <source>Cannot write to file</source>
         <translation>Impossible d&apos;enregistrer le fichier</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasgpxintegration.cpp" line="315"/>
+        <location filename="../kadas/app/kadasgpxintegration.cpp" line="321"/>
         <source>GPX export completed</source>
         <translation>Export GPX terminé</translation>
     </message>
@@ -6094,67 +6100,67 @@ Radius: %2</source>
 <context>
     <name>KadasPluginInterfaceImpl</name>
     <message>
-        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="540"/>
+        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="548"/>
         <source>Project</source>
         <translation>Projet</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="543"/>
+        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="551"/>
         <source>Edit</source>
         <translation>Éditer</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="546"/>
+        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="554"/>
         <source>View</source>
         <translation>Vue</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="549"/>
+        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="557"/>
         <source>Layer</source>
         <translation>Couche</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="552"/>
+        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="560"/>
         <source>New layer</source>
         <translation>Nouvelle couche</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="555"/>
+        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="563"/>
         <source>Add layer</source>
         <translation>Ajouter une couche</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="558"/>
+        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="566"/>
         <source>Settings</source>
         <translation>Paramètres</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="563"/>
+        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="571"/>
         <source>Raster</source>
         <translation>Raster</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="566"/>
+        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="574"/>
         <source>Database</source>
         <translation>Base de données</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="569"/>
+        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="577"/>
         <source>Vector</source>
         <translation>Vecteur</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="572"/>
+        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="580"/>
         <source>Web</source>
         <translation>Site internet</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="575"/>
+        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="583"/>
         <source>Window</source>
         <translation>Fenêtre</translation>
     </message>
     <message>
-        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="579"/>
+        <location filename="../kadas/app/kadasplugininterfaceimpl.cpp" line="587"/>
         <source>Help</source>
         <translation>Aide</translation>
     </message>
