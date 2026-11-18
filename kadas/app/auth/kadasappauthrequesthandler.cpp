@@ -20,7 +20,6 @@
 
 #include <QDesktopServices>
 
-#include <qgis/qgslogger.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 
 #include "kadasapplication.h"

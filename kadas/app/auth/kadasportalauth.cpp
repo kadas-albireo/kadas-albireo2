@@ -28,7 +28,6 @@
 #include <qgis/qgsauthmanager.h>
 #include <qgis/qgsauthmethod.h>
 #include <qgis/qgsfeedback.h>
-#include <qgis/qgslogger.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgssettingsentryimpl.h>
 #include <qgis/qgssettingstreenode.h>
@@ -145,7 +144,7 @@ bool KadasPortalAuth::authenticateRequest( QNetworkRequest &request ) const
   }
   if ( !QgsApplication::authManager()->updateNetworkRequest( request, ESRI_AUTH_CFG_ID ) )
   {
-    QgsDebugError( QString( "Failed to authenticate request with auth config %1: %2" ).arg( ESRI_AUTH_CFG_ID, request.url().toString( QUrl::RemoveQuery ) ) );
+    KadasDebugError( QString( "Failed to authenticate request with auth config %1: %2" ).arg( ESRI_AUTH_CFG_ID, request.url().toString( QUrl::RemoveQuery ) ) );
     return false;
   }
   return true;
@@ -175,11 +174,11 @@ bool KadasPortalAuth::loginOAuth2()
     QNetworkRequest request( ( QUrl( settingsOAuth2TokenUrl->value() ) ) );
     if ( QgsApplication::authManager()->updateNetworkRequest( request, ESRI_AUTH_CFG_ID ) )
     {
-      QgsDebugMsgLevel( QString( "OAuth2 login succeeded for auth config %1" ).arg( ESRI_AUTH_CFG_ID ), 1 );
+      KadasDebugMsgLevel( QString( "OAuth2 login succeeded for auth config %1" ).arg( ESRI_AUTH_CFG_ID ), 1 );
       return true;
     }
 
-    QgsDebugError( QString( "OAuth2 login failed or was canceled for auth config %1" ).arg( ESRI_AUTH_CFG_ID ) );
+    KadasDebugError( QString( "OAuth2 login failed or was canceled for auth config %1" ).arg( ESRI_AUTH_CFG_ID ) );
 
     // On timeout the browser close request is never sent
     mRequestRunningMessageBox.hide();
@@ -198,7 +197,7 @@ bool KadasPortalAuth::loginOAuth2()
   // start the interactive login again. It is created again at the next start.
   QgsApplication::authManager()->removeAuthenticationConfig( ESRI_AUTH_CFG_ID );
   mAuthConfigAvailable = false;
-  QgsDebugError( QString( "Continuing without authentication, auth config %1 removed" ).arg( ESRI_AUTH_CFG_ID ) );
+  KadasDebugError( QString( "Continuing without authentication, auth config %1 removed" ).arg( ESRI_AUTH_CFG_ID ) );
   return false;
 }
 
@@ -219,7 +218,7 @@ void KadasPortalAuth::verifyOAuth2Token()
   }
   if ( restUrl.isEmpty() )
   {
-    QgsDebugMsgLevel( QString( "OAuth2 token verification skipped: no portal REST URL found in the OAuth2 URLs" ), 1 );
+    KadasDebugMsgLevel( QString( "OAuth2 token verification skipped: no portal REST URL found in the OAuth2 URLs" ), 1 );
     return;
   }
 
@@ -233,7 +232,7 @@ void KadasPortalAuth::verifyOAuth2Token()
 
     if ( content.error() == QNetworkReply::NoError && response.contains( QStringLiteral( "username" ) ) )
     {
-      QgsDebugMsgLevel( QString( "OAuth2 token accepted by the portal, user %1" ).arg( response.value( QStringLiteral( "username" ) ).toString() ), 1 );
+      KadasDebugMsgLevel( QString( "OAuth2 token accepted by the portal, user %1" ).arg( response.value( QStringLiteral( "username" ) ).toString() ), 1 );
       return;
     }
 
@@ -246,11 +245,11 @@ void KadasPortalAuth::verifyOAuth2Token()
     const bool tokenRejected = errorCode == 401 || errorCode == 403 || errorCode == 498 || errorCode == 499;
     if ( !tokenRejected || attempt >= retryDelaysMs.size() )
     {
-      QgsDebugError( QString( "OAuth2 token verification failed (HTTP status %1, error %2: %3)" ).arg( httpStatus ).arg( errorCode ).arg( errorMessage ) );
+      KadasDebugError( QString( "OAuth2 token verification failed (HTTP status %1, error %2: %3)" ).arg( httpStatus ).arg( errorCode ).arg( errorMessage ) );
       return;
     }
 
-    QgsDebugError( QString( "OAuth2 token not accepted by the portal yet (error %1: %2), retrying in %3 ms" ).arg( errorCode ).arg( errorMessage ).arg( retryDelaysMs[attempt] ) );
+    KadasDebugError( QString( "OAuth2 token not accepted by the portal yet (error %1: %2), retrying in %3 ms" ).arg( errorCode ).arg( errorMessage ).arg( retryDelaysMs[attempt] ) );
     QEventLoop loop;
     QTimer::singleShot( retryDelaysMs[attempt], &loop, &QEventLoop::quit );
     loop.exec();
