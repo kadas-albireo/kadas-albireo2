@@ -39,6 +39,7 @@
 #include "kadasmainwindow.h"
 #include "kadaspluginmanager.h"
 #include "kadaspythonintegration.h"
+#include "auth/kadasportalauth.h"
 
 
 KadasPluginManagerInstallButton::KadasPluginManagerInstallButton( Status status, QWidget *parent )
@@ -264,7 +265,13 @@ QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugi
   // FOR DEBUG
   // repoUrl = QStringLiteral( "https://gist.githubusercontent.com/3nids/defd253c47c3ae9d821c97ac05f44941/raw/ef14420f744bdeaffc4d8ff23a287942befbd62f/kadas-plugins.xml" ); // DEBUGONLY
 
-  QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( QNetworkRequest( QUrl( repoUrl ) ) );
+  QNetworkRequest request( ( QUrl( repoUrl ) ) );
+  // The plugin repository is usually on the portal and requires the same authentication as the catalog
+  if ( KadasApplication::instance() && KadasApplication::instance()->portalAuth() )
+  {
+    KadasApplication::instance()->portalAuth()->authenticateRequest( request );
+  }
+  QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( request );
   QEventLoop evLoop;
   connect( reply, &QNetworkReply::finished, &evLoop, &QEventLoop::quit );
   evLoop.exec( QEventLoop::ExcludeUserInputEvents );
@@ -485,9 +492,16 @@ bool KadasPluginManager::installPlugin( const QString &pluginName, const QString
   //download and unzip in kadasPluginsPath
   QgsNetworkContentFetcher nf;
   QTextStream( stdout ) << downloadUrl << Qt::endl;
-  QUrl repositoryUrl( downloadUrl );
+  QNetworkRequest request( ( QUrl( downloadUrl ) ) );
+  // Only send the portal token to the plugin repository host, download links can point to third party hosts.
+  // The request is authenticated here and not via the fetcher's authcfg, so that redirects (e.g. to a storage) do not get the token.
+  const QUrl repoUrl( QgsSettings().value( "/PythonPluginRepository/repositoryUrl" ).toString() );
+  if ( request.url().host().compare( repoUrl.host(), Qt::CaseInsensitive ) == 0 && KadasApplication::instance() && KadasApplication::instance()->portalAuth() )
+  {
+    KadasApplication::instance()->portalAuth()->authenticateRequest( request );
+  }
   QEventLoop e;
-  nf.fetchContent( repositoryUrl );
+  nf.fetchContent( request );
   connect( &nf, &QgsNetworkContentFetcher::downloadProgress, [b]( qint64 rec, qint64 tot ) { b->setStatus( KadasPluginManagerInstallButton::Installing, double( rec ) / tot * 100 ); } );
   QObject::connect( &nf, &QgsNetworkContentFetcher::finished, &e, &QEventLoop::quit );
   e.exec();

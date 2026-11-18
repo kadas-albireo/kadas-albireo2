@@ -28,6 +28,7 @@ class QgsSettingsEntryString;
 class QgsSettingsEntryStringList;
 class QgsSettingsTreeNode;
 class KadasAppAuthRequestHandler;
+class QNetworkRequest;
 
 class KadasPortalAuth : public QObject
 {
@@ -59,6 +60,13 @@ class KadasPortalAuth : public QObject
      */
     void login();
 
+    /**
+     * Adds the portal authentication to \a request, if an auth config has been set up in this session
+     * (OAuth2 or ESRI token) and has not been removed because the user continued without authentication.
+     * Returns TRUE if the request has been authenticated.
+     */
+    bool authenticateRequest( QNetworkRequest &request ) const;
+
   private slots:
     void authRequestHandlerBrowserOpened();
     void authRequestHandlerBrowserClosed();
@@ -84,6 +92,7 @@ class KadasPortalAuth : public QObject
     QMessageBox mRequestRunningMessageBox;
     KadasAppAuthRequestHandler *mAppAuthRequestHandler;
     bool mOAuth2ConfigCreated = false;
+    bool mAuthConfigAvailable = false;
 };
 
 #endif // KADASPORTALAUTH_H
