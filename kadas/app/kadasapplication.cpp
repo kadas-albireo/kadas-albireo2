@@ -359,13 +359,15 @@ void KadasApplication::init()
   // Start the network logger early, we want all requests logged!
   mNetworkLogger = new QgsNetworkLogger( QgsNetworkAccessManager::instance(), this );
 
+  QSplashScreen splash( QPixmap( ":/kadas/splash" ) );
+  splash.show();
+  processEvents();
+
   // Setup authentication before loading catalog
   mPortalAuth = new KadasPortalAuth();
   mPortalAuth->setupAuthentication();
 
   // Create main window
-  QSplashScreen splash( QPixmap( ":/kadas/splash" ) );
-  splash.show();
   mMainWindow = new KadasMainWindow();
   mMainWindow->init();
 
@@ -436,10 +438,13 @@ void KadasApplication::init()
   // Setup layout item widgets
   QgsLayoutGuiUtils::registerGuiForKnownItemTypes( mMainWindow->mapCanvas() );
 
-
   // Init annotation-item controllers and the parallel annotation-layer registry
   KadasAnnotationItemControllers::registerBuiltins();
   KadasAnnotationLayerRegistry::init();
+
+  // OAuth2 login (interactive if there is no valid cached token) before the catalog and the
+  // startup project send the first authenticated requests
+  mPortalAuth->login();
 
   loadStartupProject();
 

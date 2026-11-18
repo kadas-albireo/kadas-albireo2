@@ -51,7 +51,13 @@ class KadasPortalAuth : public QObject
 
     explicit KadasPortalAuth( QObject *parent = nullptr );
 
+    //! Creates the authentication configuration. Does not run the interactive OAuth2 login, see login()
     void setupAuthentication();
+
+    /**
+     * Runs the OAuth2 login if OAuth2 is configured, and blocks until it is finished.
+     */
+    void login();
 
   private slots:
     void authRequestHandlerBrowserOpened();
@@ -62,11 +68,22 @@ class KadasPortalAuth : public QObject
     void setupAuthenticationEsriToken();
     void createCookies( const QString &token );
     void createEsriAuth( const QString &token );
-    void createOAuth2Auth( const QString &requestUrl, const QString &tokenUrl, const QString &clientId, const QString &clientSecret );
+    bool createOAuth2Auth( const QString &requestUrl, const QString &tokenUrl, const QString &clientId, const QString &clientSecret );
+
+    /**
+     * Runs the OAuth2 login (interactive if there is no valid cached token) and blocks until it is finished.
+     * On failure the user can retry or continue without authentication, in which case the auth config is removed.
+     * Returns TRUE if the login succeeded.
+     */
+    bool loginOAuth2();
+
+    //! Checks that the portal accepts the OAuth2 token and waits a bit if it is not accepted yet
+    void verifyOAuth2Token();
     QString retrieveOAuthClientId( const QString &clientIdUrl, const QString &clientIdJsonPath );
 
     QMessageBox mRequestRunningMessageBox;
     KadasAppAuthRequestHandler *mAppAuthRequestHandler;
+    bool mOAuth2ConfigCreated = false;
 };
 
 #endif // KADASPORTALAUTH_H
