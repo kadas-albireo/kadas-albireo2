@@ -31,9 +31,10 @@
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsnetworkcontentfetcher.h>
-#include <qgis/qgssettings.h>
+#include <qgis/qgssettingsentryimpl.h>
 
 #include "kadas/core/kadas.h"
+#include "kadas/core/kadassettingstree.h"
 
 #include "kadasapplication.h"
 #include "kadasmainwindow.h"
@@ -41,6 +42,9 @@
 #include "kadaspythonintegration.h"
 #include "auth/kadasportalauth.h"
 
+
+const QgsSettingsEntryString *KadasPluginManager::settingsRepositoryUrl
+  = new QgsSettingsEntryString( QStringLiteral( "plugin-repository-url" ), KadasSettingsTree::sTreeKadas, QString(), QStringLiteral( "URL of the plugin repository." ) );
 
 KadasPluginManagerInstallButton::KadasPluginManagerInstallButton( Status status, QWidget *parent )
   : QWidget( parent )
@@ -259,8 +263,7 @@ KadasPluginManager::KadasPluginManager()
 
 QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugins()
 {
-  QgsSettings s;
-  QString repoUrl = s.value( "/PythonPluginRepository/repositoryUrl" ).toString();
+  QString repoUrl = settingsRepositoryUrl->value();
 
   // FOR DEBUG
   // repoUrl = QStringLiteral( "https://gist.githubusercontent.com/3nids/defd253c47c3ae9d821c97ac05f44941/raw/ef14420f744bdeaffc4d8ff23a287942befbd62f/kadas-plugins.xml" ); // DEBUGONLY
@@ -495,7 +498,7 @@ bool KadasPluginManager::installPlugin( const QString &pluginName, const QString
   QNetworkRequest request( ( QUrl( downloadUrl ) ) );
   // Only send the portal token to the plugin repository host, download links can point to third party hosts.
   // The request is authenticated here and not via the fetcher's authcfg, so that redirects (e.g. to a storage) do not get the token.
-  const QUrl repoUrl( QgsSettings().value( "/PythonPluginRepository/repositoryUrl" ).toString() );
+  const QUrl repoUrl( settingsRepositoryUrl->value() );
   if ( request.url().host().compare( repoUrl.host(), Qt::CaseInsensitive ) == 0 && KadasApplication::instance() && KadasApplication::instance()->portalAuth() )
   {
     KadasApplication::instance()->portalAuth()->authenticateRequest( request );
