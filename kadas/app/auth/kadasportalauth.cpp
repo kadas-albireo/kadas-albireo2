@@ -93,18 +93,31 @@ KadasPortalAuth::KadasPortalAuth( QObject *parent )
 
 void KadasPortalAuth::setupAuthentication()
 {
+  mAuthConfigAvailable = false;
+  mPortalUrl.clear();
+
+  if ( !settingsOAuth2Enabled->value() && settingsPortalTokenUrl->value().isEmpty() )
+  {
+    KadasDebugMsgLevel( QString( "No TOKEN url or OAuth2 configured for portal" ), 1 );
+    removeAuthConfig();
+    return;
+  }
+
+  // Replace the auth config of the previous session by one without token. It is overwritten
+  // below on success, so every failure path ends with a config that leaves the requests of the
+  // catalog and the layers unauthenticated instead of starting the interactive login.
+  if ( !storeEsriTokenAuth( QString() ) )
+  {
+    removeAuthConfig();
+  }
+
   if ( settingsOAuth2Enabled->value() )
   {
     setupAuthenticationOAuth2();
-    return;
-  }
-  else if ( !settingsPortalTokenUrl->value().isEmpty() )
-  {
-    setupAuthenticationEsriToken();
   }
   else
   {
-    KadasDebugMsgLevel( QString( "No TOKEN url or OAuth2 configured for portal" ), 1 );
+    setupAuthenticationEsriToken();
   }
 }
 
@@ -132,10 +145,9 @@ void KadasPortalAuth::setupAuthenticationOAuth2()
   }
 
   // Authentication via OAuth2
-  mOAuth2ConfigCreated = createOAuth2Auth( settingsOAuth2RequestUrl->value(), settingsOAuth2TokenUrl->value(), clientId, settingsOAuth2ClientSecret->value() );
-  mAuthConfigAvailable = mOAuth2ConfigCreated;
-  if ( mAuthConfigAvailable )
+  if ( createOAuth2Auth( settingsOAuth2RequestUrl->value(), settingsOAuth2TokenUrl->value(), clientId, settingsOAuth2ClientSecret->value() ) )
   {
+    mAuthConfigAvailable = true;
     mPortalUrl = QUrl( settingsOAuth2TokenUrl->value() );
   }
 }
@@ -164,7 +176,7 @@ bool KadasPortalAuth::authenticateRequest( QNetworkRequest &request ) const
 
 void KadasPortalAuth::login()
 {
-  if ( !mOAuth2ConfigCreated )
+  if ( !settingsOAuth2Enabled->value() || !mAuthConfigAvailable )
   {
     return;
   }
@@ -205,11 +217,14 @@ bool KadasPortalAuth::loginOAuth2()
     }
   }
 
-  // Remove the auth config, otherwise every request using it (catalog, layers) would
-  // start the interactive login again. It is created again at the next start.
-  QgsApplication::authManager()->removeAuthenticationConfig( ESRI_AUTH_CFG_ID );
+  // Replace the OAuth2 config by one without token, otherwise every request using it (catalog, layers)
+  // would start the interactive login again. The OAuth2 config is created again at the next start.
+  if ( !storeEsriTokenAuth( QString() ) )
+  {
+    removeAuthConfig();
+  }
   mAuthConfigAvailable = false;
-  KadasDebugError( QString( "Continuing without authentication, auth config %1 removed" ).arg( ESRI_AUTH_CFG_ID ) );
+  KadasDebugError( QString( "Continuing without authentication, auth config %1 reset" ).arg( ESRI_AUTH_CFG_ID ) );
   return false;
 }
 
@@ -313,8 +328,11 @@ void KadasPortalAuth::setupAuthenticationEsriToken()
     // the agstoken cookie.
     createCookies( token );
   }
-  if ( settingsTokenUseEsriAuth->value() )
-    createEsriAuth( token );
+  if ( settingsTokenUseEsriAuth->value() && storeEsriTokenAuth( token ) )
+  {
+    mAuthConfigAvailable = true;
+    mPortalUrl = QUrl( settingsPortalTokenUrl->value() );
+  }
 }
 
 void KadasPortalAuth::createCookies( const QString &token )
@@ -329,41 +347,47 @@ void KadasPortalAuth::createCookies( const QString &token )
   }
 }
 
-void KadasPortalAuth::createEsriAuth( const QString &token )
+bool KadasPortalAuth::storeAuthConfig( QgsAuthMethodConfig &config )
 {
-  if ( !QgsApplication::authManager()->masterPasswordHashInDatabase() && QgsApplication::authManager()->passwordHelperEnabled() )
+  QgsAuthManager *authManager = QgsApplication::authManager();
+  if ( !authManager->masterPasswordHashInDatabase() && authManager->passwordHelperEnabled() )
   {
     // if no master password set by user yet, just generate a new one and store it in the system keychain
-    QgsApplication::authManager()->createAndStoreRandomMasterPasswordInKeyChain();
+    authManager->createAndStoreRandomMasterPasswordInKeyChain();
   }
 
-  // Create or update an EsriToken authentication configuration in QgsAuthManager
-  QgsAuthMethodConfig config;
+  // Create or update the authentication configuration in QgsAuthManager
   config.setId( ESRI_AUTH_CFG_ID );
+  if ( authManager->storeAuthenticationConfig( config, true /* overwrite */ ) )
+  {
+    KadasDebugMsgLevel( QString( "Created %1 auth config with id %2" ).arg( config.method(), ESRI_AUTH_CFG_ID ), 1 );
+    return true;
+  }
+
+  KadasDebugError( QString( "Failed to create %1 auth config with id %2" ).arg( config.method(), ESRI_AUTH_CFG_ID ) );
+  return false;
+}
+
+void KadasPortalAuth::removeAuthConfig()
+{
+  QgsAuthManager *authManager = QgsApplication::authManager();
+  if ( authManager->configIds().contains( ESRI_AUTH_CFG_ID ) )
+  {
+    authManager->removeAuthenticationConfig( ESRI_AUTH_CFG_ID );
+  }
+}
+
+bool KadasPortalAuth::storeEsriTokenAuth( const QString &token )
+{
+  QgsAuthMethodConfig config;
   config.setName( QStringLiteral( "kadas_esri_token" ) );
   config.setMethod( QStringLiteral( "EsriToken" ) );
   config.setConfig( QStringLiteral( "token" ), token );
-
-  if ( QgsApplication::authManager()->storeAuthenticationConfig( config, true /* overwrite */ ) )
-  {
-    KadasDebugMsgLevel( QString( "Created EsriToken auth config with id %1" ).arg( ESRI_AUTH_CFG_ID ), 1 );
-    mAuthConfigAvailable = true;
-    mPortalUrl = QUrl( settingsPortalTokenUrl->value() );
-  }
-  else
-  {
-    KadasDebugMsgLevel( QString( "Failed to create EsriToken auth config with id %1" ).arg( ESRI_AUTH_CFG_ID ), 1 );
-  }
+  return storeAuthConfig( config );
 }
 
 bool KadasPortalAuth::createOAuth2Auth( const QString &requestUrl, const QString &tokenUrl, const QString &clientId, const QString &clientSecret )
 {
-  if ( !QgsApplication::authManager()->masterPasswordHashInDatabase() && QgsApplication::authManager()->passwordHelperEnabled() )
-  {
-    // if no master password set by user yet, just generate a new one and store it in the system keychain
-    QgsApplication::authManager()->createAndStoreRandomMasterPasswordInKeyChain();
-  }
-
   // Create OAuth2 configuration JSON
   // Note: Using manual JSON approach because qgsauthoauth2config.h is not exported in QGIS public API
   QVariantMap oauth2Config;
@@ -376,23 +400,11 @@ bool KadasPortalAuth::createOAuth2Auth( const QString &requestUrl, const QString
   QJsonDocument doc = QJsonDocument::fromVariant( oauth2Config );
   QString oauth2ConfigJson = QString::fromUtf8( doc.toJson( QJsonDocument::Compact ) );
 
-  // Create or update an OAuth2 authentication configuration in QgsAuthManager
   QgsAuthMethodConfig config;
-  config.setId( ESRI_AUTH_CFG_ID );
   config.setName( QStringLiteral( "kadas_oauth2" ) );
   config.setMethod( QStringLiteral( "OAuth2" ) );
   config.setConfig( QStringLiteral( "oauth2config" ), oauth2ConfigJson );
-
-  if ( QgsApplication::authManager()->storeAuthenticationConfig( config, true /* overwrite */ ) )
-  {
-    KadasDebugMsgLevel( QString( "Created OAuth2 auth config with id %1" ).arg( ESRI_AUTH_CFG_ID ), 1 );
-    return true;
-  }
-  else
-  {
-    KadasDebugMsgLevel( QString( "Failed to create OAuth2 auth config with id %1" ).arg( ESRI_AUTH_CFG_ID ), 1 );
-    return false;
-  }
+  return storeAuthConfig( config );
 }
 
 QString KadasPortalAuth::retrieveOAuthClientId( const QString &clientIdUrl, const QString &clientIdJsonPath )
