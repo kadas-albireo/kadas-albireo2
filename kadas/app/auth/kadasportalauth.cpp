@@ -99,7 +99,13 @@ void KadasPortalAuth::setupAuthentication()
   if ( !settingsOAuth2Enabled->value() && settingsPortalTokenUrl->value().isEmpty() )
   {
     KadasDebugMsgLevel( QString( "No TOKEN url or OAuth2 configured for portal" ), 1 );
-    removeAuthConfig();
+    // Layers of saved projects may still reference the auth config of a previous session. Replace it by one without
+    // token so that they are loaded unauthenticated: if it was removed, their requests would fail.
+    // Only if it exists, since storing a config requires the master password.
+    if ( QgsApplication::authManager()->configIds().contains( ESRI_AUTH_CFG_ID ) && !storeEsriTokenAuth( QString() ) )
+    {
+      removeAuthConfig();
+    }
     return;
   }
 
@@ -218,7 +224,9 @@ bool KadasPortalAuth::loginOAuth2()
   }
 
   // Replace the OAuth2 config by one without token, otherwise every request using it (catalog, layers)
-  // would start the interactive login again. The OAuth2 config is created again at the next start.
+  // would start the interactive login again. Removing it instead would make the requests of the layers
+  // referencing it fail, so that is only the fallback. The OAuth2 config is created again at the next start.
+  // Overwriting removes the old config first, which also clears the cached OAuth2 object.
   if ( !storeEsriTokenAuth( QString() ) )
   {
     removeAuthConfig();
