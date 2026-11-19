@@ -1621,11 +1621,14 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
     std::sort( sortedEntries.begin(), sortedEntries.end(), []( const Entry *a, const Entry *b ) { return a->order < b->order; } );
 
     QgsLayerTreeGroup *rootGroup = mLayerTreeView->layerTreeModel()->rootGroup();
+    // Top level items go above the topmost raster/vector layer or group of the
+    // project, like single layers do.
+    int baseOffset = kApp->computeLayerGroupInsertionOffset( rootGroup );
     // If there are more than one toplevel items, add an extra enclosing group
     if ( nToplevel > 1 )
     {
-      int offset = kApp->computeLayerGroupInsertionOffset( rootGroup );
-      rootGroup = rootGroup->insertGroup( offset, uri.name );
+      rootGroup = rootGroup->insertGroup( baseOffset, uri.name );
+      baseOffset = 0;
     }
     int rootInsCount = 0;
     // Second pass: add groups/layers
@@ -1644,7 +1647,9 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
         // default offset. The drop position (atInsertionPoint) is likewise not
         // threaded here: a multi-sublayer service is placed as its own group,
         // not at a single drop row.
-        QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint( QgsLayerTreeRegistryBridge::InsertionPoint( parent, parent == rootGroup ? rootInsCount++ : parent->children().count() ) );
+        QgsProject::instance()->layerTreeRegistryBridge()->setLayerInsertionPoint(
+          QgsLayerTreeRegistryBridge::InsertionPoint( parent, parent == rootGroup ? baseOffset + rootInsCount++ : parent->children().count() )
+        );
 
         QgsMapLayer *layer = addCatalogLayerSource( KadasCatalogLayerSource::resolve( uri.providerKey, adjustedUri, entry->id, entry->name ), false );
         if ( layer )
@@ -1654,7 +1659,7 @@ void KadasMainWindow::addCatalogLayer( const QgsMimeDataUtils::Uri &uri, const Q
       }
       else
       {
-        entry->group = parent == rootGroup ? parent->addGroup( entry->name ) : parent->addGroup( entry->name );
+        entry->group = parent == rootGroup ? parent->insertGroup( baseOffset + rootInsCount++, entry->name ) : parent->addGroup( entry->name );
       }
     }
 
