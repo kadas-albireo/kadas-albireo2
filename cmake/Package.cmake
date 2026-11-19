@@ -42,6 +42,22 @@ add_custom_target(
   DEPENDS kadas
 )
 
-list(APPEND CPACK_GENERATOR "ZIP")
+if(KADAS_MAC_BUNDLE)
+  # Stage the install tree into the app bundle, then make it self-contained and
+  # create the dmg from platform/macos/CPackMacDeployQt.cmake.in
+  set(PYMACDEPLOYQT_EXECUTABLE
+      "${CMAKE_SOURCE_DIR}/platform/macos/pymacdeployqt.py"
+  )
+  configure_file(
+    "${CMAKE_SOURCE_DIR}/platform/macos/CPackMacDeployQt.cmake.in"
+    "${CMAKE_BINARY_DIR}/CPackExternal.cmake" @ONLY
+  )
+  set(CPACK_EXTERNAL_PACKAGE_SCRIPT "${CMAKE_BINARY_DIR}/CPackExternal.cmake")
+  set(CPACK_EXTERNAL_ENABLE_STAGING ON)
+  set(CPACK_PACKAGING_INSTALL_PREFIX "/${KADAS_MAC_APP_NAME}.app")
+  list(APPEND CPACK_GENERATOR "External")
+else()
+  list(APPEND CPACK_GENERATOR "ZIP")
+endif()
 
 include(CPack)

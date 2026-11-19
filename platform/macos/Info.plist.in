@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleName</key>
+	<string>@KADAS_MAC_APP_NAME@</string>
+	<key>CFBundleDisplayName</key>
+	<string>@KADAS_MAC_APP_NAME@</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.sourcepole.kadas</string>
+	<key>CFBundleExecutable</key>
+	<string>kadas</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © KADAS Albireo contributors</string>
+	<key>CFBundleShortVersionString</key>
+	<string>@KADAS_VERSION@</string>
+	<key>CFBundleVersion</key>
+	<string>@KADAS_VERSION@</string>
+	<key>CFBundleIconFile</key>
+	<string>kadas.icns</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	@KADAS_MACOS_MINIMUM_VERSION_PLIST@
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSSupportsAutomaticGraphicsSwitching</key>
+	<true/>
+</dict>
+</plist>

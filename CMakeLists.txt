@@ -68,6 +68,44 @@ set(VCPKG_BASE_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
 include(GNUInstallDirs)
 include(GenerateExportHeader)
 
+# Install layout. On macOS, KADAS is installed into an app bundle (see
+# cmake/Package.cmake and platform/macos), the build tree is not affected.
+if(APPLE)
+  set(KADAS_MAC_BUNDLE
+      TRUE
+      CACHE BOOL "Install into a macOS app bundle"
+  )
+  set(KADAS_MAC_APP_NAME
+      "KADAS Albireo"
+      CACHE STRING "Name of the macOS app bundle"
+  )
+endif()
+if(APPLE AND KADAS_MAC_BUNDLE)
+  # Keep @rpath install names, but do not embed build-tree RPATHs in installed
+  # binaries: platform/macos/pymacdeployqt.py sets the bundle RPATHs.
+  set(CMAKE_MACOSX_RPATH ON)
+  set(CMAKE_SKIP_INSTALL_RPATH TRUE)
+
+  set(APP_CONTENTS_DIR "Contents")
+  set(APP_MACOS_DIR "${APP_CONTENTS_DIR}/MacOS")
+  set(APP_FRAMEWORKS_DIR "${APP_CONTENTS_DIR}/Frameworks")
+  set(APP_RESOURCES_DIR "${APP_CONTENTS_DIR}/Resources")
+  set(APP_PLUGINS_DIR "${APP_CONTENTS_DIR}/PlugIns")
+
+  set(KADAS_BIN_SUBDIR "${APP_MACOS_DIR}")
+  set(KADAS_LIB_SUBDIR "${APP_FRAMEWORKS_DIR}")
+  set(KADAS_DATA_SUBDIR "${APP_RESOURCES_DIR}/kadas")
+else()
+  set(KADAS_MAC_BUNDLE FALSE)
+  set(KADAS_BIN_SUBDIR "bin")
+  set(KADAS_LIB_SUBDIR "lib${LIB_SUFFIX}")
+  set(KADAS_DATA_SUBDIR "share/kadas")
+endif()
+# Where the installed application looks up its data, relative to the executable
+file(RELATIVE_PATH KADAS_DATA_RELATIVE_PATH "/${KADAS_BIN_SUBDIR}"
+     "/${KADAS_DATA_SUBDIR}"
+)
+
 set(CMAKE_CXX_STANDARD 20)
 
 set(BUILD_SHARED_LIBS
@@ -104,6 +142,10 @@ if(WITH_BINDINGS)
 
   if(WIN32)
     set(SITEARCH_INSTALL_DIR "bin/Lib/site-packages")
+  elseif(KADAS_MAC_BUNDLE)
+    set(SITEARCH_INSTALL_DIR
+        "${APP_FRAMEWORKS_DIR}/lib/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}/site-packages"
+    )
   else()
     set(SITEARCH_INSTALL_DIR "${Python_SITEARCH}")
   endif()
@@ -153,7 +195,7 @@ set(INSTALL_DTM
 )
 if(INSTALL_DTM)
   install(FILES "share/geodata/dtm_analysis.tif"
-          DESTINATION "share/kadas/geodata/"
+          DESTINATION "${KADAS_DATA_SUBDIR}/geodata/"
   )
 endif()
 set(INSTALL_ALBIREO_SETTINGS
@@ -161,13 +203,15 @@ set(INSTALL_ALBIREO_SETTINGS
     CACHE BOOL "Install Albireo Settings."
 )
 if(INSTALL_ALBIREO_SETTINGS)
-  install(FILES "share/settings_patch.ini" DESTINATION "share/kadas/")
-  install(DIRECTORY "share/project_templates" DESTINATION "share/kadas/")
+  install(FILES "share/settings_patch.ini" DESTINATION "${KADAS_DATA_SUBDIR}/")
+  install(DIRECTORY "share/project_templates"
+          DESTINATION "${KADAS_DATA_SUBDIR}/"
+  )
 endif()
 
 install(
   DIRECTORY "share/"
-  DESTINATION "share/kadas/"
+  DESTINATION "${KADAS_DATA_SUBDIR}/"
   PATTERN "settings_patch.ini" EXCLUDE
   PATTERN "project_templates" EXCLUDE
   PATTERN "geodata" EXCLUDE
@@ -180,7 +224,7 @@ endif()
 
 include(Package)
 
-if(UNIX)
+if(UNIX AND NOT APPLE)
   install(FILES com.sourcepole.kadas.desktop
           DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications/
   )

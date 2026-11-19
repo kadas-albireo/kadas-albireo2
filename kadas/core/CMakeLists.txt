@@ -63,9 +63,12 @@ set(kadas_core_HDR ${kadas_core_HDR} ${CMAKE_CURRENT_BINARY_DIR}/kadas_core.h)
 
 install(
   TARGETS kadas_core
-  RUNTIME DESTINATION bin
-  ARCHIVE DESTINATION lib${LIB_SUFFIX}
-  LIBRARY DESTINATION lib${LIB_SUFFIX}
+  RUNTIME DESTINATION ${KADAS_BIN_SUBDIR}
+  ARCHIVE DESTINATION ${KADAS_LIB_SUBDIR}
+  LIBRARY DESTINATION ${KADAS_LIB_SUBDIR}
 )
 
-install(FILES ${kadas_core_HDR} DESTINATION include/kadas/core)
+# Headers are not part of the macOS app bundle
+if(NOT KADAS_MAC_BUNDLE)
+  install(FILES ${kadas_core_HDR} DESTINATION include/kadas/core)
+endif()

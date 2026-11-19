@@ -18,7 +18,8 @@ jobs:
 #            deployment-target: "10.15"
           - os: macos-26
             triplet: arm64-osx-dynamic
-            deployment-target: "11.0"
+            # Needs to be aligned with vcpkg/triplets/arm64-osx-dynamic.cmake
+            deployment-target: "13.0"
     name: build (macos)
     runs-on: ${{ matrix.os }}
 
@@ -55,6 +56,13 @@ jobs:
         with:
           xcode-version: latest-stable
 
+      - name: Setup oras
+        uses: oras-project/setup-oras@v2
+
+      - name: Fetch tif
+        run: |
+          oras pull ghcr.io/kadas-albireo/kadas-albireo2/dtm_analysis:1.0 -o .
+
       - name: 🔢 Determine version
         id: version
         uses: ./.github/actions/determine-version
@@ -72,7 +80,10 @@ jobs:
           cmake -S . \
                 -G Ninja \
                 -B build \
+                -D CMAKE_BUILD_TYPE=Release \
+                -D CMAKE_OSX_DEPLOYMENT_TARGET=${{ matrix.deployment-target }} \
                 -D KADAS_VERSION=${{ steps.version.outputs.version }} \
+                -D CPACK_PACKAGE_FILE_NAME="kadas-macos-arm64-$(date +'%Y-%m-%d_%H%M')" \
                 -D VCPKG_TARGET_TRIPLET="${{ matrix.triplet }}" \
                 -D VCPKG_HOST_TRIPLET="${{ matrix.triplet }}" \
                 -D VCPKG_INSTALL_OPTIONS="--only-binarycaching" \
@@ -132,3 +143,36 @@ jobs:
         run: |
           ./build/vcpkg_installed/${{ matrix.triplet }}/tools/python3/python3 \
             -m pytest share/python/plugins/kadas_gpkg/tests/ -v
+
+      - name: 📦 Package
+        run: |
+          cmake --build build --target bundle
+
+      - name: 📤 Upload dmg
+        id: upload-dmg
+        uses: actions/upload-artifact@v7
+        with:
+          archive: false
+          path: |
+            build/kadas-macos-*.dmg
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v3
+        if: ${{ github.event_name == 'release' }}
+        with:
+          files: |
+            build/kadas-macos-*.dmg
+
+      - name: 💬 Sticky comment on PR
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          header: macos-artifacts
+          message: |
+            ## 🍎 macOS Build Artifacts
+
+            📦 [Download dmg](${{ steps.upload-dmg.outputs.artifact-url }})
+
+            _The app is not notarized, run `xattr -d com.apple.quarantine "/Applications/KADAS Albireo.app"` after installing it to avoid the warning._
+
+            <sub>Built from ${{ github.event.pull_request.head.sha }} • [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})</sub>

@@ -3,4 +3,6 @@ add_subdirectory(analysis)
 add_subdirectory(gui)
 add_subdirectory(app)
 
-install(FILES resources/timezone21.bin DESTINATION share/kadas/resources)
+install(FILES resources/timezone21.bin
+        DESTINATION ${KADAS_DATA_SUBDIR}/resources
+)
