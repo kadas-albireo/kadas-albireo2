@@ -366,6 +366,7 @@ void KadasApplication::init()
   // Setup authentication before loading catalog
   mPortalAuth = new KadasPortalAuth();
   mPortalAuth->setupAuthentication();
+  mPortalAuth->login();
 
   // Create main window
   mMainWindow = new KadasMainWindow();
@@ -441,10 +442,6 @@ void KadasApplication::init()
   // Init annotation-item controllers and the parallel annotation-layer registry
   KadasAnnotationItemControllers::registerBuiltins();
   KadasAnnotationLayerRegistry::init();
-
-  // OAuth2 login (interactive if there is no valid cached token) before the catalog and the
-  // startup project send the first authenticated requests
-  mPortalAuth->login();
 
   loadStartupProject();
 
