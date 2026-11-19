@@ -1,0 +1,41 @@
+# Run by the CPack External generator (see cmake/Package.cmake) once the
+# install tree has been staged into the app bundle in CPACK_TEMPORARY_DIRECTORY:
+# make the bundle self-contained and wrap it into a dmg.
+
+set(_APP "@KADAS_MAC_APP_NAME@.app")
+set(_DMG "${CPACK_PACKAGE_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}.dmg")
+
+# Copy the remaining libraries into the bundle and fix their install names and
+# RPATHs
+execute_process(
+  COMMAND "@PYMACDEPLOYQT_EXECUTABLE@" "${_APP}"
+  WORKING_DIRECTORY "${CPACK_TEMPORARY_DIRECTORY}"
+  COMMAND_ERROR_IS_FATAL ANY
+)
+
+file(REMOVE "${_DMG}")
+find_program(CREATE_DMG_EXECUTABLE create-dmg)
+if(CREATE_DMG_EXECUTABLE)
+  execute_process(
+    COMMAND
+      "${CREATE_DMG_EXECUTABLE}" --volname "@KADAS_MAC_APP_NAME@" --volicon
+      "@CMAKE_SOURCE_DIR@/kadas/resources/kadas.icns" --window-pos 200 120
+      --window-size 512 320 --icon-size 100 --icon "${_APP}" 130 160
+      --hide-extension "${_APP}" --app-drop-link 380 160 "${_DMG}"
+      "${CPACK_TEMPORARY_DIRECTORY}/${_APP}"
+    COMMAND_ERROR_IS_FATAL ANY
+  )
+else()
+  message(STATUS "create-dmg not found, creating a plain dmg with hdiutil")
+  file(CREATE_LINK "/Applications" "${CPACK_TEMPORARY_DIRECTORY}/Applications"
+       SYMBOLIC
+  )
+  execute_process(
+    COMMAND hdiutil create -volname "@KADAS_MAC_APP_NAME@" -srcfolder
+            "${CPACK_TEMPORARY_DIRECTORY}" -format UDZO -ov "${_DMG}"
+    COMMAND_ERROR_IS_FATAL ANY
+  )
+  file(REMOVE "${CPACK_TEMPORARY_DIRECTORY}/Applications")
+endif()
+
+message(STATUS "Created ${_DMG}")

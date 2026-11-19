@@ -225,9 +225,12 @@ set(kadas_gui_HDR ${kadas_gui_HDR} ${CMAKE_CURRENT_BINARY_DIR}/kadas_gui.h)
 
 install(
   TARGETS kadas_gui
-  RUNTIME DESTINATION bin
-  ARCHIVE DESTINATION lib${LIB_SUFFIX}
-  LIBRARY DESTINATION lib${LIB_SUFFIX}
+  RUNTIME DESTINATION ${KADAS_BIN_SUBDIR}
+  ARCHIVE DESTINATION ${KADAS_LIB_SUBDIR}
+  LIBRARY DESTINATION ${KADAS_LIB_SUBDIR}
 )
 
-install(FILES ${kadas_gui_HDR} DESTINATION include/kadas/gui)
+# Headers are not part of the macOS app bundle
+if(NOT KADAS_MAC_BUNDLE)
+  install(FILES ${kadas_gui_HDR} DESTINATION include/kadas/gui)
+endif()

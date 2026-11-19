@@ -60,6 +60,62 @@ if(MSVC)
   install(FILES "${VCPKG_BASE_DIR}/tools/ffmpeg/ffprobe.exe"
           DESTINATION "opt/ffmpeg"
   )
+elseif(KADAS_MAC_BUNDLE)
+  # Same layout as the QGIS app bundle (QGIS_MAC_BUNDLE).
+  # KadasApplication::init() and main.cpp point QGIS, Python, PROJ and GDAL to
+  # it at runtime.
+  set(QGIS_PLUGIN_DIR "${VCPKG_BASE_DIR}/lib/qgis/plugins")
+  file(GLOB PROVIDER_LIBS "${QGIS_PLUGIN_DIR}/*provider*.so")
+  file(GLOB AUTHMETHODS_LIBS "${QGIS_PLUGIN_DIR}/*authmethod*.so")
+  set(QGIS_PLUGIN_INSTALL_PREFIX "${APP_PLUGINS_DIR}/qgis")
+
+  file(GLOB ALL_LIBS "${VCPKG_BASE_DIR}/lib/*.dylib"
+       "${VCPKG_BASE_DIR}/lib/*.so"
+  )
+  install(FILES ${ALL_LIBS} DESTINATION "${APP_FRAMEWORKS_DIR}")
+  # Qt plugins, including the Qt3D ones (renderers, geometryloaders, ...),
+  # without the static plugin build artifacts
+  install(
+    DIRECTORY "${VCPKG_BASE_DIR}/Qt6/plugins/"
+    DESTINATION "${APP_PLUGINS_DIR}"
+    PATTERN "objects-*" EXCLUDE
+    PATTERN "*.a" EXCLUDE
+    PATTERN "*.prl" EXCLUDE
+  )
+  # Relocatable Qt resolves its prefix to Contents/
+  install(
+    DIRECTORY "${VCPKG_BASE_DIR}/Qt6/qml/"
+    DESTINATION "${APP_CONTENTS_DIR}/Qt6/qml"
+    PATTERN "objects-*" EXCLUDE
+    PATTERN "*.a" EXCLUDE
+    PATTERN "*.prl" EXCLUDE
+  )
+  install(DIRECTORY "${VCPKG_BASE_DIR}/share/qgis/python/"
+          DESTINATION "${APP_RESOURCES_DIR}/qgis/python"
+  )
+
+  if(WITH_BINDINGS)
+    # Python runtime, PYTHONHOME is Contents/Frameworks
+    set(_PYTHON_NAME "python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}")
+    install(
+      DIRECTORY "${VCPKG_BASE_DIR}/lib/${_PYTHON_NAME}"
+      DESTINATION "${APP_FRAMEWORKS_DIR}/lib"
+      PATTERN "*.sip" EXCLUDE
+      PATTERN "__pycache__" EXCLUDE
+    )
+    # Python interpreter, with a wrapper setting PYTHONHOME
+    install(PROGRAMS "${VCPKG_BASE_DIR}/tools/python3/${_PYTHON_NAME}"
+            DESTINATION "${APP_MACOS_DIR}"
+    )
+    set(PYTHON_EXECUTABLE "${_PYTHON_NAME}")
+    configure_file(
+      "${CMAKE_SOURCE_DIR}/platform/macos/python.in"
+      "${CMAKE_BINARY_DIR}/platform/macos/python" @ONLY
+    )
+    install(PROGRAMS "${CMAKE_BINARY_DIR}/platform/macos/python"
+            DESTINATION "${APP_MACOS_DIR}"
+    )
+  endif()
 else()
   set(QGIS_PLUGIN_DIR "${VCPKG_BASE_DIR}/lib/qgis/plugins")
   file(GLOB PROVIDER_LIBS "${QGIS_PLUGIN_DIR}/*provider*.so")
@@ -138,29 +194,42 @@ endif()
 
 copy_resource("${PROJ_DATA_PATH}" "proj")
 copy_resource("${VCPKG_BASE_DIR}/share/gdal" "gdal")
+
+if(KADAS_MAC_BUNDLE)
+  set(QGIS_DATA_INSTALL_DIR "${APP_RESOURCES_DIR}/qgis")
+  set(PROJ_DATA_INSTALL_DIR "${QGIS_DATA_INSTALL_DIR}/proj")
+  set(GDAL_DATA_INSTALL_DIR "${QGIS_DATA_INSTALL_DIR}/gdal")
+  set(QCA_PLUGIN_INSTALL_DIR "${APP_PLUGINS_DIR}/crypto")
+else()
+  set(QGIS_DATA_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/qgis")
+  set(PROJ_DATA_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/proj")
+  set(GDAL_DATA_INSTALL_DIR "${CMAKE_INSTALL_DATADIR}/gdal")
+  set(QCA_PLUGIN_INSTALL_DIR "bin/Qt6/plugins/crypto")
+endif()
+
 install(DIRECTORY "${SHARE_DIR}/qgis/resources/"
-        DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/resources"
+        DESTINATION "${QGIS_DATA_INSTALL_DIR}/resources"
 )
 install(DIRECTORY "${QGIS_SHARE_DIR}/svg/"
-        DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/svg"
+        DESTINATION "${QGIS_DATA_INSTALL_DIR}/svg"
 )
 install(DIRECTORY "${QGIS_SHARE_DIR}/i18n/"
-        DESTINATION "${CMAKE_INSTALL_DATADIR}/qgis/i18n"
+        DESTINATION "${QGIS_DATA_INSTALL_DIR}/i18n"
 )
-install(DIRECTORY "${PROJ_DATA_PATH}/"
-        DESTINATION "${CMAKE_INSTALL_DATADIR}/proj"
-)
+install(DIRECTORY "${PROJ_DATA_PATH}/" DESTINATION "${PROJ_DATA_INSTALL_DIR}")
 install(DIRECTORY "${VCPKG_BASE_DIR}/share/gdal/"
-        DESTINATION "${CMAKE_INSTALL_DATADIR}/gdal"
+        DESTINATION "${GDAL_DATA_INSTALL_DIR}"
 )
 install(DIRECTORY "${VCPKG_BASE_DIR}/bin/Qca/crypto/"
-        DESTINATION "bin/Qt6/plugins/crypto"
+        DESTINATION "${QCA_PLUGIN_INSTALL_DIR}"
 ) # QCA plugins
-install(
-  DIRECTORY "${VCPKG_BASE_DIR}/tools/python3/"
-  DESTINATION "bin"
-  PATTERN "*.sip" EXCLUDE
-  PATTERN "__pycache__" EXCLUDE
-)
+if(NOT KADAS_MAC_BUNDLE)
+  install(
+    DIRECTORY "${VCPKG_BASE_DIR}/tools/python3/"
+    DESTINATION "bin"
+    PATTERN "*.sip" EXCLUDE
+    PATTERN "__pycache__" EXCLUDE
+  )
+endif()
 
 add_dependencies(kadas deploy)

@@ -21,9 +21,12 @@ set(kadas_analysis_HDR ${kadas_analysis_HDR}
 
 install(
   TARGETS kadas_analysis
-  RUNTIME DESTINATION bin
-  ARCHIVE DESTINATION lib${LIB_SUFFIX}
-  LIBRARY DESTINATION lib${LIB_SUFFIX}
+  RUNTIME DESTINATION ${KADAS_BIN_SUBDIR}
+  ARCHIVE DESTINATION ${KADAS_LIB_SUBDIR}
+  LIBRARY DESTINATION ${KADAS_LIB_SUBDIR}
 )
 
-install(FILES ${kadas_analysis_HDR} DESTINATION include/kadas/analysis)
+# Headers are not part of the macOS app bundle
+if(NOT KADAS_MAC_BUNDLE)
+  install(FILES ${kadas_analysis_HDR} DESTINATION include/kadas/analysis)
+endif()

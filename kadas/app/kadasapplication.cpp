@@ -224,6 +224,17 @@ void KadasApplication::init()
 {
   QgsApplication::init();
 
+#ifdef Q_OS_MACOS
+  // In the macOS app bundle (see platform/macos), the QGIS plugins and data are not
+  // where the QGIS libraries expect them relative to the executable.
+  const QDir bundleContentsDir( QDir::cleanPath( applicationDirPath() + QStringLiteral( "/.." ) ) );
+  if ( bundleContentsDir.exists( QStringLiteral( "Resources/qgis" ) ) )
+  {
+    QgsApplication::setPluginPath( bundleContentsDir.absoluteFilePath( QStringLiteral( "PlugIns/qgis" ) ) );
+    QgsApplication::setPkgDataPath( bundleContentsDir.absoluteFilePath( QStringLiteral( "Resources/qgis" ) ) );
+  }
+#endif
+
   const QStringList args = QCoreApplication::arguments();
 
   const bool showMessageLog = args.contains( QStringLiteral( "--message-log" ) );

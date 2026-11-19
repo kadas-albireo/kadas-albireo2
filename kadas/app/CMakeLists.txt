@@ -323,5 +323,24 @@ file(WRITE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/kadassourcedir.txt
      ${PROJECT_SOURCE_DIR}
 )
 
-install(TARGETS kadas DESTINATION bin)
-install(FILES ${KADAS_QM} DESTINATION share/kadas/i18n)
+install(TARGETS kadas DESTINATION ${KADAS_BIN_SUBDIR})
+install(FILES ${KADAS_QM} DESTINATION ${KADAS_DATA_SUBDIR}/i18n)
+
+if(KADAS_MAC_BUNDLE)
+  set(KADAS_MACOS_MINIMUM_VERSION_PLIST "")
+  if(CMAKE_OSX_DEPLOYMENT_TARGET)
+    set(KADAS_MACOS_MINIMUM_VERSION_PLIST
+        "<key>LSMinimumSystemVersion</key>\n\t<string>${CMAKE_OSX_DEPLOYMENT_TARGET}</string>"
+    )
+  endif()
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/platform/macos/Info.plist.in
+    ${CMAKE_BINARY_DIR}/platform/macos/Info.plist @ONLY
+  )
+  install(FILES ${CMAKE_BINARY_DIR}/platform/macos/Info.plist
+          DESTINATION ${APP_CONTENTS_DIR}
+  )
+  install(FILES ${CMAKE_SOURCE_DIR}/kadas/resources/kadas.icns
+          DESTINATION ${APP_RESOURCES_DIR}
+  )
+endif()

@@ -88,6 +88,28 @@ int main( int argc, char *argv[] )
     return EXIT_FAILURE;
   }
 
+#ifdef Q_OS_MACOS
+  // When running from the macOS app bundle (see platform/macos), use the Python runtime,
+  // PROJ and GDAL data shipped in it. Variables which are already set (e.g. from kadas.env) win.
+  // KadasApplication::init() points QGIS to its plugins and data in the bundle.
+  const QDir bundleContentsDir( QDir::cleanPath( QFileInfo( QString::fromLocal8Bit( argv[0] ) ).absolutePath() + QStringLiteral( "/.." ) ) );
+  if ( bundleContentsDir.exists( QStringLiteral( "Resources/qgis" ) ) )
+  {
+    const QList<QPair<const char *, QString>> bundleEnv {
+      { "PYTHONHOME", bundleContentsDir.absoluteFilePath( QStringLiteral( "Frameworks" ) ) },
+      { "PROJ_DATA", bundleContentsDir.absoluteFilePath( QStringLiteral( "Resources/qgis/proj" ) ) },
+      { "GDAL_DATA", bundleContentsDir.absoluteFilePath( QStringLiteral( "Resources/qgis/gdal" ) ) },
+    };
+    for ( const auto &[name, value] : bundleEnv )
+    {
+      if ( !qEnvironmentVariableIsSet( name ) )
+      {
+        qputenv( name, value.toUtf8() );
+      }
+    }
+  }
+#endif // Q_OS_MACOS
+
 #ifdef Q_OS_WINDOWS
   // Clean environment
   QList<QByteArray> path = qgetenv( "PATH" ).split( ';' );
