@@ -23,6 +23,7 @@
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgsunittypes.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/analysis/kadaslineofsight.h"
 #include "kadas/core/kadas.h"
 
@@ -48,7 +49,7 @@ bool KadasLineOfSight::computeTargetVisibility( const QgsPoint &observerPos, con
   double gtrans[6] = {};
   if ( GDALGetGeoTransform( raster, &gtrans[0] ) != CE_None )
   {
-    QgsDebugMsgLevel( "Failed to get raster geotransform", 2 );
+    KadasDebugMsgLevel( "Failed to get raster geotransform", 2 );
     GDALClose( raster );
     return true;
   }
@@ -57,7 +58,7 @@ bool KadasLineOfSight::computeTargetVisibility( const QgsPoint &observerPos, con
   QgsCoordinateReferenceSystem rasterCrs( proj );
   if ( !rasterCrs.isValid() )
   {
-    QgsDebugMsgLevel( "Failed to get raster CRS", 2 );
+    KadasDebugMsgLevel( "Failed to get raster CRS", 2 );
     GDALClose( raster );
     return true;
   }
@@ -65,7 +66,7 @@ bool KadasLineOfSight::computeTargetVisibility( const QgsPoint &observerPos, con
   GDALRasterBandH band = GDALGetRasterBand( raster, 1 );
   if ( !band )
   {
-    QgsDebugMsgLevel( "Failed to open raster band 0", 2 );
+    KadasDebugMsgLevel( "Failed to open raster band 0", 2 );
     GDALClose( raster );
     return true;
   }
@@ -96,7 +97,7 @@ bool KadasLineOfSight::computeTargetVisibility( const QgsPoint &observerPos, con
     double pixValues[4] = {};
     if ( CE_None != GDALRasterIO( band, GF_Read, std::floor( col ), std::floor( row ), 2, 2, &pixValues[0], 2, 2, GDT_Float64, 0, 0 ) )
     {
-      QgsDebugMsgLevel( "Failed to read pixel values", 2 );
+      KadasDebugMsgLevel( "Failed to read pixel values", 2 );
       samples.append( QPointF( samples.size(), 0 ) );
     }
     else

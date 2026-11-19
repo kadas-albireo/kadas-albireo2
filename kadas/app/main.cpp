@@ -31,6 +31,29 @@
 
 int main( int argc, char *argv[] )
 {
+  // --debug-level <n> / --debug-level=<n>: QgsLogger reads QGIS_DEBUG once, early during
+  // application construction, so this has to be applied before KadasApplication is created.
+  for ( int i = 1; i < argc; ++i )
+  {
+    const QString arg = QString::fromLocal8Bit( argv[i] );
+    QString value;
+    if ( arg == QLatin1String( "--debug-level" ) && i + 1 < argc )
+    {
+      value = QString::fromLocal8Bit( argv[i + 1] );
+    }
+    else if ( arg.startsWith( QLatin1String( "--debug-level=" ) ) )
+    {
+      value = arg.mid( QStringLiteral( "--debug-level=" ).length() );
+    }
+    bool ok = false;
+    const int debugLevel = value.toInt( &ok );
+    if ( ok )
+    {
+      qputenv( "QGIS_DEBUG", QByteArray::number( debugLevel ) );
+      break;
+    }
+  }
+
   try
   {
     std::ifstream file;

@@ -25,9 +25,7 @@
 #include <QTcpSocket>
 #include <QTimer>
 
-#include <qgis/qgslogger.h>
-#include <qgis/qgsmessagelog.h>
-
+#include "kadas/core/kadaslogger.h"
 #include "kadas/core/kadasfileserver.h"
 
 KadasFileServer::KadasFileServer( const QString &topdir, const QString &host, int port )
@@ -40,7 +38,7 @@ KadasFileServer::KadasFileServer( const QString &topdir, const QString &host, in
   // Wait until the worker thread is listening, so that host and port are valid.
   if ( !mStarted.tryAcquire( 1, START_TIMEOUT_MS ) )
   {
-    QgsMessageLog::logMessage( QStringLiteral( "Worker thread did not start in time" ), QStringLiteral( "KadasFileServer" ), Qgis::MessageLevel::Warning );
+    KadasDebugError( QStringLiteral( "Worker thread did not start in time" ) );
   }
 }
 
@@ -56,11 +54,11 @@ void KadasFileServer::run()
   QTcpServer server;
   if ( !server.listen( QHostAddress( mBindHost ), mBindPort ) )
   {
-    QgsMessageLog::logMessage( QStringLiteral( "Failed to listen: %1" ).arg( server.errorString() ), QStringLiteral( "KadasFileServer" ), Qgis::MessageLevel::Warning );
+    KadasDebugError( QStringLiteral( "Failed to listen: %1" ).arg( server.errorString() ) );
   }
   mHost = server.serverAddress().toString();
   mPort = server.serverPort();
-  QgsDebugMsgLevel( QString( "KadasFileServer running on %1:%2" ).arg( mHost ).arg( mPort ), 2 );
+  KadasDebugMsgLevel( QString( "KadasFileServer running on %1:%2" ).arg( mHost ).arg( mPort ), 2 );
 
   // The server is the context object, so the slot runs in the worker thread
   connect( &server, &QTcpServer::newConnection, &server, [this, &server] { handleConnections( &server ); } );

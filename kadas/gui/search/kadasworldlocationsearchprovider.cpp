@@ -44,6 +44,7 @@
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgssettings.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/gui/search/kadasworldlocationsearchprovider.h"
 #include "kadas/gui/search/kadaslocationsearchprovider.h"
 
@@ -132,7 +133,8 @@ void KadasWorldLocationSearchProvider::handleNetworkReply()
   QJsonDocument doc = QJsonDocument::fromJson( replyText, &err );
   if ( doc.isNull() )
   {
-    QgsDebugMsgLevel( QString( "Parsing error: %1" ).arg( err.errorString() ), 2 );
+    KadasDebugMsgLevel( QString( "Parsing error: %1" ).arg( err.errorString() ), 2 );
+    return;
   }
   QJsonObject resultMap = doc.object();
   const QJsonArray constResults = resultMap["results"].toArray();
