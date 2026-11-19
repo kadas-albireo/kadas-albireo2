@@ -105,6 +105,8 @@ class KadasPortalAuth : public QObject
     KadasAppAuthRequestHandler *mAppAuthRequestHandler;
     //! TRUE if the auth config has been set up with a token (ESRI token) or for OAuth2 in this session
     bool mAuthConfigAvailable = false;
+    //! TRUE if the browser has been opened for the interactive login during login()
+    bool mBrowserOpenedDuringLogin = false;
     //! URL of the portal the auth config belongs to, requests to other hosts are not authenticated
     QUrl mPortalUrl;
 };
