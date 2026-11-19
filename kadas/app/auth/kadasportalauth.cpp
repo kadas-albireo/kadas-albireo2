@@ -129,6 +129,7 @@ void KadasPortalAuth::setupAuthentication()
 
 void KadasPortalAuth::authRequestHandlerBrowserOpened()
 {
+  mBrowserOpenedDuringLogin = true;
   mRequestRunningMessageBox.show();
 }
 
@@ -189,7 +190,9 @@ void KadasPortalAuth::login()
 
   // Login now, so that the catalog and the layers find a valid token instead of
   // each triggering the interactive login while loading
-  if ( loginOAuth2() )
+  mBrowserOpenedDuringLogin = false;
+  // Only verify freshly issued tokens: a cached token was already accepted in a previous session
+  if ( loginOAuth2() && mBrowserOpenedDuringLogin )
   {
     verifyOAuth2Token();
   }
@@ -261,6 +264,8 @@ void KadasPortalAuth::verifyOAuth2Token()
   for ( int attempt = 0;; ++attempt )
   {
     QNetworkRequest request( QUrl( restUrl + QStringLiteral( "/community/self?f=json" ) ) );
+    // Blocking on the main thread at startup: don't wait for the default network timeout
+    request.setTransferTimeout( 10000 );
     const QgsNetworkReplyContent content = QgsNetworkAccessManager::blockingGet( request, ESRI_AUTH_CFG_ID );
     const int httpStatus = content.attribute( QNetworkRequest::HttpStatusCodeAttribute ).toInt();
     const QJsonObject response = QJsonDocument::fromJson( content.content() ).object();
@@ -276,8 +281,8 @@ void KadasPortalAuth::verifyOAuth2Token()
     const int errorCode = error.isEmpty() ? httpStatus : error.value( QStringLiteral( "code" ) ).toInt();
     const QString errorMessage = error.isEmpty() ? content.errorString() : error.value( QStringLiteral( "message" ) ).toString();
 
-    // Only retry for errors meaning that the token was not accepted (yet)
-    const bool tokenRejected = errorCode == 401 || errorCode == 403 || errorCode == 498 || errorCode == 499;
+    // Only retry for errors meaning that the token was not accepted (yet).
+    const bool tokenRejected = errorCode == 401 || errorCode == 498 || errorCode == 499;
     if ( !tokenRejected || attempt >= retryDelaysMs.size() )
     {
       KadasDebugError( QString( "OAuth2 token verification failed (HTTP status %1, error %2: %3)" ).arg( httpStatus ).arg( errorCode ).arg( errorMessage ) );
