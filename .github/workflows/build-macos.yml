@@ -61,6 +61,15 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: 💾 Mount a separate volume for vcpkg packages
+        run: |
+          # vcpkg hard-links files from packages/ into vcpkg_installed/. macOS may then resolve
+          # @loader_path of a hard-linked binary through its packages/ path, where dependencies
+          # from other ports are missing (e.g. qmake not finding ICU when building qwt).
+          # Hard links cannot cross volumes, so vcpkg falls back to copying.
+          hdiutil create -size 100g -type SPARSE -fs APFS -volname vcpkg-packages "${RUNNER_TEMP}/vcpkg-packages"
+          hdiutil attach -nobrowse "${RUNNER_TEMP}/vcpkg-packages.sparseimage"
+
       - name: 🌱 Install dependencies and generate project files
         env:
           GDAL_PYTHON_BINDINGS_WITHOUT_NUMPY: "Yes"
@@ -69,19 +78,21 @@ jobs:
           # Install first only with binarycaching, then deduplicate binaries and replace copies with symlinks.
           # Nuget doesn't understand the symlink concept
 
+          VCPKG_PACKAGES_OPTIONS="--x-packages-root=/Volumes/vcpkg-packages;--clean-packages-after-build"
+
           cmake -S . \
                 -G Ninja \
                 -B build \
                 -D KADAS_VERSION=${{ steps.version.outputs.version }} \
                 -D VCPKG_TARGET_TRIPLET="${{ matrix.triplet }}" \
                 -D VCPKG_HOST_TRIPLET="${{ matrix.triplet }}" \
-                -D VCPKG_INSTALL_OPTIONS="--only-binarycaching" \
+                -D VCPKG_INSTALL_OPTIONS="--only-binarycaching;${VCPKG_PACKAGES_OPTIONS}" \
                 -D NUGET_USERNAME=kadas-albireo \
                 -D NUGET_TOKEN=${{ secrets.GITHUB_TOKEN }} || true
                 
           fdupes -r -1 build/vcpkg_installed/arm64-osx-dynamic/lib | grep libQt | while read line; do master=""; for file in ${line[*]}; do if  [[ "x${master}" == "x" ]]; then master=$file; else rm "${file}"; ln -s $(basename "${master}") "${file}"; fi; done; done
 
-          cmake -D VCPKG_INSTALL_OPTIONS="" build
+          cmake -D VCPKG_INSTALL_OPTIONS="${VCPKG_PACKAGES_OPTIONS}" build
 
       - name: 📑 Upload vcpkg build logs
         uses: actions/upload-artifact@v7
