@@ -20,6 +20,7 @@
 #include <QStringList>
 
 #include <qgis/qgspythonrunner.h>
+#include "kadas/core/kadaslogger.h"
 
 // forward declaration for PyObject
 #ifndef PyObject_HEAD
@@ -129,13 +130,13 @@ class KadasPythonRunner : public QgsPythonRunner
 
     bool runFileCommand( const QString &filename, const QString &messageOnError = QString() ) override
     {
-      QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+      KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
       return false;
     }
 
     bool setArgvCommand( const QStringList &arguments, const QString &messageOnError = QString() ) override
     {
-      QgsDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
+      KadasDebugMsgLevel( QString( "%1 Not implemented" ).arg( __func__ ), 2 );
       return false;
     }
 

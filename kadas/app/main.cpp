@@ -34,6 +34,29 @@
 
 int main( int argc, char *argv[] )
 {
+  // --debug-level <n> / --debug-level=<n>: QgsLogger reads QGIS_DEBUG once, early during
+  // application construction, so this has to be applied before KadasApplication is created.
+  for ( int i = 1; i < argc; ++i )
+  {
+    const QString arg = QString::fromLocal8Bit( argv[i] );
+    QString value;
+    if ( arg == QLatin1String( "--debug-level" ) && i + 1 < argc )
+    {
+      value = QString::fromLocal8Bit( argv[i + 1] );
+    }
+    else if ( arg.startsWith( QLatin1String( "--debug-level=" ) ) )
+    {
+      value = arg.mid( QStringLiteral( "--debug-level=" ).length() );
+    }
+    bool ok = false;
+    const int debugLevel = value.toInt( &ok );
+    if ( ok )
+    {
+      qputenv( "QGIS_DEBUG", QByteArray::number( debugLevel ) );
+      break;
+    }
+  }
+
   try
   {
     std::ifstream file;
@@ -135,6 +158,10 @@ int main( int argc, char *argv[] )
   parser.addOption( networkLoggerOption );
   QCommandLineOption gpsSimulatorOption( QStringList() << QStringLiteral( "gps-simulator" ), QStringLiteral( "Feed the GPS from a built-in simulator following a route over Switzerland." ) );
   parser.addOption( gpsSimulatorOption );
+  // Handled in main() before the application is constructed, declared here for --help only
+  QCommandLineOption
+    debugLevelOption( QStringList() << QStringLiteral( "debug-level" ), QStringLiteral( "Set the debug level (0 = errors only, higher = more verbose). Overrides the QGIS_DEBUG environment variable." ), QStringLiteral( "level" ) );
+  parser.addOption( debugLevelOption );
   // Tolerate unknown options instead of aborting (Qt may still inject some).
   parser.parse( QApplication::arguments() );
   const bool openNetworkLogger = parser.isSet( networkLoggerOption );

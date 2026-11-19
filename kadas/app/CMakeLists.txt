@@ -20,7 +20,7 @@ set(kadas_SRC
     kadasmainwindow.cpp
     kadasmapidentifydialog.cpp
     kadasmapwidgetmanager.cpp
-    kadasmessagelogviewer.cpp
+    kadasmessagelogdockwidget.cpp
     kadasnewspopup.cpp
     kadasplugininterfaceimpl.cpp
     kadaspluginlayerproperties.cpp
@@ -89,7 +89,7 @@ set(kadas_HDR
     kadasmainwindow.h
     kadasmapidentifydialog.h
     kadasmapwidgetmanager.h
-    kadasmessagelogviewer.h
+    kadasmessagelogdockwidget.h
     kadasnewspopup.h
     kadasplugininterfaceimpl.h
     kadaspluginlayerproperties.h

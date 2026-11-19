@@ -15,6 +15,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "kadas/core/kadaslogger.h"
 #include "kadasappauthrequesthandler.h"
 
 #include <QDesktopServices>
@@ -33,14 +34,14 @@ KadasAppAuthRequestHandler::KadasAppAuthRequestHandler( QObject *parent )
 void KadasAppAuthRequestHandler::handleAuthRequestOpenBrowser( const QUrl &url )
 {
   QDesktopServices::openUrl( url );
-  QgsDebugMsgLevel( QString( "Opening OAuth2 URL in system browser: %1" ).arg( url.toString() ), 1 );
+  KadasDebugMsgLevel( QString( "Opening OAuth2 URL in system browser: %1" ).arg( url.toString() ), 1 );
 
   emit browserOpened();
 }
 
 void KadasAppAuthRequestHandler::handleAuthRequestCloseBrowser()
 {
-  QgsDebugMsgLevel( QString( "OAuth2 handle close browser" ), 1 );
+  KadasDebugMsgLevel( QString( "OAuth2 handle close browser" ), 1 );
 
   emit browserClosed();
 
@@ -56,6 +57,6 @@ void KadasAppAuthRequestHandler::handleAuthRequestCloseBrowser()
 
 void KadasAppAuthRequestHandler::abortAuth()
 {
-  QgsDebugMsgLevel( QString( "OAuth2 authentication canceled by user" ), 1 );
+  KadasDebugMsgLevel( QString( "OAuth2 authentication canceled by user" ), 1 );
   QgsNetworkAccessManager::instance()->abortAuthBrowser();
 }

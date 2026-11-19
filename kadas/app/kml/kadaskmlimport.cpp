@@ -46,6 +46,7 @@
 #include <qgis/qgssymbollayerutils.h>
 #include <qgis/qgstextformat.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/core/kadasalgorithms.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
 #include "kadas/gui/annotationitems/kadasannotationzindex.h"
@@ -183,7 +184,7 @@ bool KadasKMLImport::importDocument( const QString &filename, const QDomDocument
       if ( geoms.isEmpty() )
       {
         // Placemark without geometry
-        QgsDebugMsgLevel( "Could not parse placemark geometry", 2 );
+        KadasDebugMsgLevel( "Could not parse placemark geometry", 2 );
         continue;
       }
 

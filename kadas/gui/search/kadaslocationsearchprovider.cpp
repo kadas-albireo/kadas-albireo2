@@ -45,6 +45,7 @@
 #include <qgis/qgssettings.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/gui/search/kadaslocationsearchprovider.h"
 
 
@@ -107,7 +108,7 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
     serviceUrl = QgsSettings().value( "search/locationsearchurl", "https://api3.geo.admin.ch/rest/services/api/SearchServer" ).toString();
   }
 
-  QgsDebugMsgLevel( serviceUrl, 2 );
+  KadasDebugMsgLevel( serviceUrl, 2 );
 
   QUrl url( serviceUrl );
   QUrlQuery query( url );
@@ -134,7 +135,7 @@ void KadasLocationSearchFilter::fetchResults( const QString &string, const QgsLo
     return;
   if ( errorCode != QgsBlockingNetworkRequest::NoError )
   {
-    QgsDebugMsgLevel( QString( "Location search request failed: %1" ).arg( blockingRequest.errorMessage() ), 2 );
+    KadasDebugMsgLevel( QString( "Location search request failed: %1" ).arg( blockingRequest.errorMessage() ), 2 );
     return;
   }
 
@@ -147,7 +148,7 @@ void KadasLocationSearchFilter::parseReply( const QByteArray &replyContent, QgsF
   QJsonDocument doc = QJsonDocument::fromJson( replyContent, &err );
   if ( doc.isNull() )
   {
-    QgsDebugMsgLevel( QString( "Parsing error: %1" ).arg( err.errorString() ), 2 );
+    KadasDebugMsgLevel( QString( "Parsing error: %1" ).arg( err.errorString() ), 2 );
     return;
   }
 

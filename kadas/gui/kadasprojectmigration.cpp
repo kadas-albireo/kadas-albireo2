@@ -39,6 +39,7 @@
 #include <qgis/qgssymbollayerutils.h>
 #include <qgis/qgsunittypes.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/core/kadas.h"
 #include "kadas/gui/annotationitems/kadasannotationlayerhelpers.h"
 #include "kadas/gui/annotationitems/kadasmilxannotationitem.h"
@@ -67,7 +68,7 @@ QString KadasProjectMigration::migrateProject( const QString &fileName, QStringL
     auto archive = std::make_unique<QgsArchive>();
     if ( !archive->unzip( fileName ) )
     {
-      QgsDebugMsgLevel( "Failed to unzip project archive", 2 );
+      KadasDebugMsgLevel( "Failed to unzip project archive", 2 );
       return fileName;
     }
     // Find the `.qgs` document inside the archive. Bundles always have
@@ -137,7 +138,7 @@ QString KadasProjectMigration::migrateProject( const QString &fileName, QStringL
   QDomDocument doc;
   if ( !doc.setContent( &file ) )
   {
-    QgsDebugMsgLevel( "Failed to parse project", 2 );
+    KadasDebugMsgLevel( "Failed to parse project", 2 );
     return fileName;
   }
   QString basedir = QFileInfo( fileName ).path();
@@ -162,7 +163,7 @@ bool KadasProjectMigration::migrateProjectXml( const QString &basedir, QDomDocum
   QDomElement root = doc.documentElement();
   if ( root.tagName() != "qgis" )
   {
-    QgsDebugMsgLevel( "Invalid project (incorrect root tag name)", 2 );
+    KadasDebugMsgLevel( "Invalid project (incorrect root tag name)", 2 );
     return false;
   }
 
@@ -218,7 +219,7 @@ bool KadasProjectMigration::migrateLegacyMilxLayers( QDomDocument &doc, QDomElem
   if ( milxMapLayers.isEmpty() )
     return false;
 
-  QgsDebugMsgLevel( QStringLiteral( "Migrating %1 legacy KadasMilxLayer plugin layer(s) to QgsAnnotationLayer" ).arg( milxMapLayers.size() ), 1 );
+  KadasDebugMsgLevel( QStringLiteral( "Migrating %1 legacy KadasMilxLayer plugin layer(s) to QgsAnnotationLayer" ).arg( milxMapLayers.size() ), 1 );
 
   for ( QDomElement &mapLayerEl : milxMapLayers )
   {
@@ -317,7 +318,7 @@ bool KadasProjectMigration::migrateLegacyMilxLayers( QDomDocument &doc, QDomElem
       Q_UNUSED( itemId );
       ++migratedCount;
     }
-    QgsDebugMsgLevel( QStringLiteral( "Migrated %1 MilX item(s) from layer '%2'" ).arg( migratedCount ).arg( layerName ), 2 );
+    KadasDebugMsgLevel( QStringLiteral( "Migrated %1 MilX item(s) from layer '%2'" ).arg( migratedCount ).arg( layerName ), 2 );
 
     QDomElement newMapLayerEl = doc.createElement( "maplayer" );
     QgsReadWriteContext context;
@@ -383,7 +384,7 @@ bool KadasProjectMigration::migrateLegacyPluginGridLayers( QDomDocument &doc, QD
   if ( gridMapLayers.isEmpty() )
     return false;
 
-  QgsDebugMsgLevel( QStringLiteral( "Migrating %1 legacy bullseye/guide_grid plugin layer(s) to QgsAnnotationLayer" ).arg( gridMapLayers.size() ), 1 );
+  KadasDebugMsgLevel( QStringLiteral( "Migrating %1 legacy bullseye/guide_grid plugin layer(s) to QgsAnnotationLayer" ).arg( gridMapLayers.size() ), 1 );
 
   for ( QDomElement &mapLayerEl : gridMapLayers )
   {
@@ -1945,7 +1946,7 @@ bool KadasProjectMigration::migrateLegacyKadasItemLayers( QDomDocument &doc, QDo
       QList<QgsAnnotationItem *> annos = translateMapItem( itemEl, layerCrs );
       if ( annos.isEmpty() )
       {
-        QgsDebugMsgLevel( QStringLiteral( "KadasItemLayer XML rewrite skipped for layer '%1': item type '%2' not translatable yet" ).arg( originalName, itemEl.attribute( QStringLiteral( "name" ) ) ), 1 );
+        KadasDebugMsgLevel( QStringLiteral( "KadasItemLayer XML rewrite skipped for layer '%1': item type '%2' not translatable yet" ).arg( originalName, itemEl.attribute( QStringLiteral( "name" ) ) ), 1 );
         allOk = false;
         break;
       }

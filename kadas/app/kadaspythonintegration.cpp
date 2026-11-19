@@ -27,6 +27,7 @@
 #include <qgis/qgsmessageoutput.h>
 #include <qgis/qgssettings.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/core/kadas.h"
 #include "kadasapplication.h"
 #include "kadaspythonintegration.h"
@@ -88,7 +89,7 @@ bool KadasPythonIntegration::checkSystemImports()
   pluginpaths << '"' + homePluginsPath() + '"';
   pluginpaths << '"' + kadasPluginsPath() + '"';
   pluginpaths << '"' + qgisPluginsPath() + '"';
-  QgsDebugMsgLevel( "Plugin paths: " + pluginpaths.join( "; " ), 2 );
+  KadasDebugMsgLevel( "Plugin paths: " + pluginpaths.join( "; " ), 2 );
 
   // expect that bindings are installed locally, so add the path to modules
   // also add path to plugins
@@ -96,7 +97,7 @@ bool KadasPythonIntegration::checkSystemImports()
   newpaths << '"' + qgisPythonPath() + '"';
   newpaths << '"' + kadasPythonPath() + '"';
   newpaths << '"' + homePythonPath() + '"';
-  QgsDebugMsgLevel( "Python paths: " + pluginpaths.join( "; " ), 2 );
+  KadasDebugMsgLevel( "Python paths: " + pluginpaths.join( "; " ), 2 );
   newpaths << pluginpaths;
   runString( "sys.path = [" + newpaths.join( QStringLiteral( "," ) ) + "] + sys.path" );
 
@@ -400,12 +401,12 @@ QString KadasPythonIntegration::getTypeAsString( PyObject *obj )
 
   if ( PyType_Check( obj ) )
   {
-    QgsDebugMsgLevel( QStringLiteral( "got type" ), 2 );
+    KadasDebugMsgLevel( QStringLiteral( "got type" ), 2 );
     return QString( ( ( PyTypeObject * ) obj )->tp_name );
   }
   else
   {
-    QgsDebugMsgLevel( QStringLiteral( "got object" ), 2 );
+    KadasDebugMsgLevel( QStringLiteral( "got object" ), 2 );
     return PyObjectToQString( obj );
   }
 }
@@ -481,7 +482,7 @@ QString KadasPythonIntegration::PyObjectToQString( PyObject *obj ) const
   }
 
   // some problem with conversion to Unicode string
-  QgsDebugMsgLevel( QStringLiteral( "unable to convert PyObject to a QString!" ), 2 );
+  KadasDebugMsgLevel( QStringLiteral( "unable to convert PyObject to a QString!" ), 2 );
   return QStringLiteral( "(qgis error)" );
 }
 
@@ -580,10 +581,10 @@ void KadasPythonIntegration::restorePlugins()
 
 bool KadasPythonIntegration::loadPlugin( const QString &packageName )
 {
-  QgsDebugMsgLevel( QStringLiteral( "Loading plugin %1" ).arg( packageName ), 2 );
+  KadasDebugMsgLevel( QStringLiteral( "Loading plugin %1" ).arg( packageName ), 2 );
   if ( !mPythonEnabled )
   {
-    QgsDebugMsgLevel( QStringLiteral( "Not loading plugin. Python is not enabled" ), 2 );
+    KadasDebugMsgLevel( QStringLiteral( "Not loading plugin. Python is not enabled" ), 2 );
     return false;
   }
 
@@ -592,7 +593,7 @@ bool KadasPythonIntegration::loadPlugin( const QString &packageName )
 
   if ( isPluginLoaded( packageName ) )
   {
-    QgsDebugMsgLevel( QStringLiteral( "Not loading plugin. It is already loaded." ), 2 );
+    KadasDebugMsgLevel( QStringLiteral( "Not loading plugin. It is already loaded." ), 2 );
     return true;
   }
 
@@ -612,7 +613,7 @@ bool KadasPythonIntegration::loadPlugin( const QString &packageName )
   if ( success )
   {
     if ( !isPythonPluginCompatible( packageName ) )
-      QgsDebugMsgLevel( QStringLiteral( "Warning: Plugin version is not compatible." ), 1 );
+      KadasDebugMsgLevel( QStringLiteral( "Warning: Plugin version is not compatible." ), 1 );
 
     evalString( QStringLiteral( "qgis.utils.loadPlugin('%1')" ).arg( packageName ), output );
     success = ( output == QLatin1String( "True" ) );
@@ -638,7 +639,7 @@ QString KadasPythonIntegration::getPluginMetadata( const QString &pluginName, co
   QString res;
   QString str = QStringLiteral( "qgis.utils.pluginMetadata('%1', '%2')" ).arg( pluginName, function );
   evalString( str, res );
-  //QgsDebugMsgLevel("metadata "+pluginName+" - '"+function+"' = "+res, 2 );
+  //KadasDebugMsgLevel("metadata "+pluginName+" - '"+function+"' = "+res, 2 );
   return res;
 }
 
@@ -800,7 +801,7 @@ bool KadasPythonIntegration::checkQgisVersion( const QString &minVersion, const 
   // our qgis version - cut release name after version number
   QString qgisVersion = QString( _QGIS_VERSION ).section( '-', 0, 0 );
 
-  QgsDebugMsgLevel( QStringLiteral( "Min Version %1, max version %2, QGIS Version %3" ).arg( minVersion ).arg( maxVersion ).arg( qgisVersion ), 2 );
+  KadasDebugMsgLevel( QStringLiteral( "Min Version %1, max version %2, QGIS Version %3" ).arg( minVersion ).arg( maxVersion ).arg( qgisVersion ), 2 );
 
   QStringList qgisVersionParts = qgisVersion.split( '.' );
 
