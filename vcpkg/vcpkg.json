@@ -2,13 +2,13 @@
   "vcpkg-configuration": {
     "default-registry": {
       "kind": "git",
-      "baseline": "44ccfd88b3eca6929d6d16398c7b19945c29a5f6",
+      "baseline": "d13c536672dced4b8c671955ea7d057a1b7a1ff8",
       "repository": "https://github.com/microsoft/vcpkg"
     },
     "registries": [
       {
         "kind": "git",
-        "baseline": "5746a3c67d28c7f6517663091e3c688733fa2c5c",
+        "baseline": "6368dbcdc9b297c602543ceccabd7310bc6f6536",
         "repository": "https://github.com/open-vcpkg/python-registry",
         "packages": [
           "python3",
