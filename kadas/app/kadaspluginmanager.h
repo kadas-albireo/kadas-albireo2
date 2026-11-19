@@ -19,6 +19,7 @@
 
 class QProgressBar;
 class QPushButton;
+class QgsSettingsEntryString;
 class KadasRibbonButton;
 
 
@@ -52,6 +53,8 @@ class KadasPluginManager : public KadasBottomBar, private Ui::KadasPluginManager
 {
     Q_OBJECT
   public:
+    static const QgsSettingsEntryString *settingsRepositoryUrl;
+
     KadasPluginManager( QgsMapCanvas *canvas, QAction *action );
 
     void loadPlugins();
