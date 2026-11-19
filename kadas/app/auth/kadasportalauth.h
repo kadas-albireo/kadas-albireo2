@@ -24,6 +24,7 @@
 
 #include "kadas/core/kadassettingstree.h"
 
+class QgsAuthMethodConfig;
 class QgsSettingsEntryBool;
 class QgsSettingsEntryString;
 class QgsSettingsEntryStringList;
@@ -78,7 +79,15 @@ class KadasPortalAuth : public QObject
     void setupAuthenticationOAuth2();
     void setupAuthenticationEsriToken();
     void createCookies( const QString &token );
-    void createEsriAuth( const QString &token );
+
+    //! Stores \a config with id ESRI_AUTH_CFG_ID, overwriting the existing one. Creates the master password if needed.
+    bool storeAuthConfig( QgsAuthMethodConfig &config );
+
+    //! Removes the auth config with id ESRI_AUTH_CFG_ID, if it exists
+    void removeAuthConfig();
+
+    //! Stores an EsriToken auth config. With an empty \a token requests using it are sent unauthenticated.
+    bool storeEsriTokenAuth( const QString &token );
     bool createOAuth2Auth( const QString &requestUrl, const QString &tokenUrl, const QString &clientId, const QString &clientSecret );
 
     /**
@@ -94,7 +103,7 @@ class KadasPortalAuth : public QObject
 
     QMessageBox mRequestRunningMessageBox;
     KadasAppAuthRequestHandler *mAppAuthRequestHandler;
-    bool mOAuth2ConfigCreated = false;
+    //! TRUE if the auth config has been set up with a token (ESRI token) or for OAuth2 in this session
     bool mAuthConfigAvailable = false;
     //! URL of the portal the auth config belongs to, requests to other hosts are not authenticated
     QUrl mPortalUrl;
