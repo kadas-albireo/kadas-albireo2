@@ -134,6 +134,10 @@ void KadasPortalAuth::setupAuthenticationOAuth2()
   // Authentication via OAuth2
   mOAuth2ConfigCreated = createOAuth2Auth( settingsOAuth2RequestUrl->value(), settingsOAuth2TokenUrl->value(), clientId, settingsOAuth2ClientSecret->value() );
   mAuthConfigAvailable = mOAuth2ConfigCreated;
+  if ( mAuthConfigAvailable )
+  {
+    mPortalUrl = QUrl( settingsOAuth2TokenUrl->value() );
+  }
 }
 
 bool KadasPortalAuth::authenticateRequest( QNetworkRequest &request ) const
@@ -142,6 +146,14 @@ bool KadasPortalAuth::authenticateRequest( QNetworkRequest &request ) const
   {
     return false;
   }
+
+  // Only send the portal token to the portal itself, and never unencrypted
+  const QUrl url = request.url();
+  if ( mPortalUrl.host().isEmpty() || url.scheme() != QLatin1String( "https" ) || url.host().compare( mPortalUrl.host(), Qt::CaseInsensitive ) != 0 || url.port( 443 ) != mPortalUrl.port( 443 ) )
+  {
+    return false;
+  }
+
   if ( !QgsApplication::authManager()->updateNetworkRequest( request, ESRI_AUTH_CFG_ID ) )
   {
     KadasDebugError( QString( "Failed to authenticate request with auth config %1: %2" ).arg( ESRI_AUTH_CFG_ID, request.url().toString( QUrl::RemoveQuery ) ) );
@@ -336,6 +348,7 @@ void KadasPortalAuth::createEsriAuth( const QString &token )
   {
     KadasDebugMsgLevel( QString( "Created EsriToken auth config with id %1" ).arg( ESRI_AUTH_CFG_ID ), 1 );
     mAuthConfigAvailable = true;
+    mPortalUrl = QUrl( settingsPortalTokenUrl->value() );
   }
   else
   {

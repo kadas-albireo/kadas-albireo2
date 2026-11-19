@@ -20,6 +20,7 @@
 
 #include <QObject>
 #include <QMessageBox>
+#include <QUrl>
 
 #include "kadas/core/kadassettingstree.h"
 
@@ -63,6 +64,8 @@ class KadasPortalAuth : public QObject
     /**
      * Adds the portal authentication to \a request, if an auth config has been set up in this session
      * (OAuth2 or ESRI token) and has not been removed because the user continued without authentication.
+     * The token is only added to https requests targeting the host and port of the portal, i.e. of the
+     * OAuth2 token URL or of the ESRI token URL. Other requests are left untouched.
      * Returns TRUE if the request has been authenticated.
      */
     bool authenticateRequest( QNetworkRequest &request ) const;
@@ -93,6 +96,8 @@ class KadasPortalAuth : public QObject
     KadasAppAuthRequestHandler *mAppAuthRequestHandler;
     bool mOAuth2ConfigCreated = false;
     bool mAuthConfigAvailable = false;
+    //! URL of the portal the auth config belongs to, requests to other hosts are not authenticated
+    QUrl mPortalUrl;
 };
 
 #endif // KADASPORTALAUTH_H
