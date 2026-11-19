@@ -42,6 +42,7 @@
 #include <qgis/qgsjsonutils.h>
 
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/gui/search/kadasmapserverfindsearchprovider.h"
 
 
@@ -157,7 +158,7 @@ void KadasMapServerFindSearchProvider::fetchResults( const QString &string, cons
         QJsonDocument doc = QJsonDocument::fromJson( replyText, &err );
         if ( doc.isNull() )
         {
-          QgsDebugMsgLevel( QString( "Parsing error:" ).arg( err.errorString() ), 2 );
+          KadasDebugMsgLevel( QString( "Parsing error:" ).arg( err.errorString() ), 2 );
         }
         QVariantMap resultMap = doc.object().toVariantMap();
         for ( const QVariant &item : resultMap["results"].toList() )

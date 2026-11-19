@@ -23,7 +23,6 @@
 #include <QTabWidget>
 #include <quazip/quazipfile.h>
 
-#include <qgis/qgslogger.h>
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsproject.h>
 #include <qgis/qgssettings.h>
@@ -35,6 +34,7 @@
 #include "kadas/gui/milx/kadasmilxlayer.h"
 #include "kadas/gui/milx/kadasmilxlayerpropertiespage.h"
 #include "kadas/gui/milx/kadasmilxlibrary.h"
+#include "kadas/core/kadaslogger.h"
 #include "kadasapplication.h"
 #include "kadasmainwindow.h"
 #include "milx/kadasmilxintegration.h"
@@ -55,7 +55,7 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
   QString licenseKey = QStringLiteral( MILX_LICENSE_KEY );
   if ( licenseKey.isEmpty() )
   {
-    QgsDebugMsgLevel( "MilX license key is empty, disabling MilX integration.", 2 );
+    KadasDebugMsgLevel( "MilX license key is empty, disabling MilX integration.", 2 );
     return;
   }
 
@@ -82,7 +82,7 @@ KadasMilxIntegration::KadasMilxIntegration( const MilxUi &ui, QObject *parent )
 
   if ( !KadasMilxClient::init() )
   {
-    QgsDebugMsgLevel( "Failed to initialize the MilX library.", 2 );
+    KadasDebugMsgLevel( "Failed to initialize the MilX library.", 2 );
     return;
   }
 

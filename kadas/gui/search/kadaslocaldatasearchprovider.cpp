@@ -29,6 +29,7 @@
 #include <qgis/qgsgeometry.h>
 #include <qgis/qgsexpressioncontextutils.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/gui/search/kadaslocaldatasearchprovider.h"
 
 
@@ -97,7 +98,7 @@ void KadasLocalDataSearchFilter::fetchResults( const QString &string, const QgsL
     }
     if ( resultCount >= sResultCountLimit )
     {
-      QgsDebugMsgLevel( "Stopping search due to result count limit hit", 2 );
+      KadasDebugMsgLevel( "Stopping search due to result count limit hit", 2 );
       break;
     }
   }

@@ -1,6 +1,6 @@
 /***************************************************************************
-    kadasmessagelogviewer.cpp
-    -------------------------
+    kadasmessagelogdockwidget.h
+    ---------------------------
     copyright            : (C) 2019 by Sandro Mani
     email                : smani at sourcepole dot ch
  ***************************************************************************/
@@ -14,20 +14,22 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "kadasmessagelogviewer.h"
+#ifndef KADASMESSAGELOGDOCKWIDGET_H
+#define KADASMESSAGELOGDOCKWIDGET_H
 
-KadasMessageLogViewer::KadasMessageLogViewer( QWidget *parent, Qt::WindowFlags fl )
-  : QgsMessageLogViewer( parent, fl )
-{
-  setWindowTitle( tr( "KADAS Message Log" ) );
-}
+#include <QDockWidget>
 
-void KadasMessageLogViewer::closeEvent( QCloseEvent *e )
-{
-  QDialog::closeEvent( e );
-}
+class QgsMessageLogViewer;
 
-void KadasMessageLogViewer::reject()
+class KadasMessageLogDockWidget : public QDockWidget
 {
-  QDialog::reject();
-}
+    Q_OBJECT
+
+  public:
+    explicit KadasMessageLogDockWidget( QWidget *parent = nullptr );
+
+  private:
+    QgsMessageLogViewer *mMessageLogViewer = nullptr;
+};
+
+#endif // KADASMESSAGELOGDOCKWIDGET_H

@@ -64,6 +64,7 @@
 #include <qgis/qgsziputils.h>
 #include <qgis/qgsdockablewidgethelper.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/app/auth/kadasportalauth.h"
 #include "kadas/core/kadas.h"
 #include "kadas/gui/kadasattributetabledialog.h"
@@ -93,7 +94,7 @@
 #include "kadaslayerrefreshmanager.h"
 #include "kadasmainwindow.h"
 #include "kadasmapwidgetmanager.h"
-#include "kadasmessagelogviewer.h"
+#include "kadasmessagelogdockwidget.h"
 #include "kadasnewspopup.h"
 #include "kadasplugininterfaceimpl.h"
 #include "kadaspluginmanager.h"
@@ -221,6 +222,10 @@ void KadasApplication::init()
   KadasCrashRpt::install();
 #endif
 
+  // Create the message log early (without parent, it is docked once the main window exists)
+  // so that messages logged during startup are captured
+  mMessageLogDockWidget = new KadasMessageLogDockWidget();
+
   QgsApplication::initQgis();
 
   QgsCoordinateTransform::setCustomMissingRequiredGridHandler( [=]( const QgsCoordinateReferenceSystem &sourceCrs, const QgsCoordinateReferenceSystem &destinationCrs, const QgsDatumTransform::GridDetails &grid ) {
@@ -252,18 +257,18 @@ void KadasApplication::init()
   bool settingsEmpty = false;
   if ( settings.value( "timestamp", 0 ).toInt() > 0 )
   {
-    QgsDebugMsgLevel( "Patching settings", 1 );
+    KadasDebugMsgLevel( "Patching settings", 1 );
     srcSettings.setFileName( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "settings_patch.ini" ) );
   }
   else
   {
-    QgsDebugMsgLevel( "Copying full settings", 1 );
+    KadasDebugMsgLevel( "Copying full settings", 1 );
     settingsEmpty = true;
     srcSettings.setFileName( QDir( Kadas::pkgDataPath() ).absoluteFilePath( "settings_full.ini" ) );
   }
   if ( srcSettings.exists() )
   {
-    QgsDebugMsgLevel( QString( "Reading settings from %1" ).arg( srcSettings.fileName() ), 1 );
+    KadasDebugMsgLevel( QString( "Reading settings from %1" ).arg( srcSettings.fileName() ), 1 );
     QgsSettings newSettings( srcSettings.fileName(), QSettings::IniFormat );
     QString timestamp = settings.value( "timestamp", "0" ).toString();
     QString newtimestamp = newSettings.value( "timestamp" ).toString();
@@ -277,7 +282,7 @@ void KadasApplication::init()
   }
   else
   {
-    QgsDebugMsgLevel( QString( "Could not find settings settings file %1" ).arg( srcSettings.fileName() ), 1 );
+    KadasDebugMsgLevel( QString( "Could not find settings settings file %1" ).arg( srcSettings.fileName() ), 1 );
   }
 
   // Set help path
@@ -332,13 +337,9 @@ void KadasApplication::init()
   mMainWindow->mapCanvas()->setMapTool( mMapToolPan );
 
   QgsMessageOutput::setMessageOutputCreator( messageOutputViewer );
-  mMessageLogViewer = new KadasMessageLogViewer( mMainWindow );
-  if ( showMessageLog )
-  {
-    mMessageLogViewer->show();
-  }
-
-  connect( QgsApplication::authManager(), &QgsAuthManager::messageLog, mMessageLogViewer, &KadasMessageLogViewer::logMessage );
+  mMainWindow->addDockWidget( Qt::BottomDockWidgetArea, mMessageLogDockWidget );
+  mMainWindow->addAction( mMessageLogDockWidget->toggleViewAction() );
+  mMessageLogDockWidget->setVisible( showMessageLog );
 
   QgsProject::instance()->setBadLayerHandler( new KadasHandleBadLayersHandler );
   QgsPathResolver::setPathPreprocessor( [this]( const QString &path ) { return migrateDatasource( path ); } );
@@ -635,7 +636,7 @@ bool KadasApplication::projectCreateFromTemplate( const QString &templateFile, c
     loop.exec( QEventLoop::ExcludeUserInputEvents );
     if ( reply->error() != QNetworkReply::NoError )
     {
-      QgsDebugMsgLevel( QString( "Could not read %1" ).arg( templateUrl.toString() ), 2 );
+      KadasDebugMsgLevel( QString( "Could not read %1" ).arg( templateUrl.toString() ), 2 );
       QMessageBox::critical( mMainWindow, tr( "Error" ), tr( "Failed to read the project template." ) );
       return false;
     }
@@ -647,7 +648,7 @@ bool KadasApplication::projectCreateFromTemplate( const QString &templateFile, c
     zip.open( QuaZip::mdUnzip );
     if ( !zip.setCurrentFile( projectFileName, QuaZip::csInsensitive ) )
     {
-      QgsDebugMsgLevel( QString( "Could not find file %1 in archive %2" ).arg( projectFileName, templateUrl.toString() ), 2 );
+      KadasDebugMsgLevel( QString( "Could not find file %1 in archive %2" ).arg( projectFileName, templateUrl.toString() ), 2 );
       QMessageBox::critical( mMainWindow, tr( "Error" ), tr( "Failed to read the project template." ) );
       return false;
     }
@@ -660,7 +661,7 @@ bool KadasApplication::projectCreateFromTemplate( const QString &templateFile, c
     }
     else
     {
-      QgsDebugMsgLevel( QString( "Could not extract file %1 from archive %2 to dir %3" ).arg( projectFileName, templateUrl.toString(), mProjectTempDir->path() ), 2 );
+      KadasDebugMsgLevel( QString( "Could not extract file %1 from archive %2 to dir %3" ).arg( projectFileName, templateUrl.toString(), mProjectTempDir->path() ), 2 );
       QMessageBox::critical( mMainWindow, tr( "Error" ), tr( "Failed to read the project template." ) );
       return false;
     }
@@ -943,7 +944,7 @@ void KadasApplication::saveAttributeTableDocks( QDomDocument &doc )
     if ( storedDialogs.contains( attributeTableDialog ) )
       return;
 
-    QgsDebugMsgLevel( attributeTableDialog->windowTitle(), 2 );
+    KadasDebugMsgLevel( attributeTableDialog->windowTitle(), 2 );
     const QDomElement tableElement = attributeTableDialog->writeXml( doc );
     attributeTablesElement.appendChild( tableElement );
     storedDialogs.insert( attributeTableDialog );
@@ -1105,7 +1106,7 @@ void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
   {
     layerUrl = QUrlQuery( layer->source() ).queryItemValue( "url" );
   }
-  QgsDebugMsgLevel( QString( "GDI layer url is %1" ).arg( layerUrl ), 2 );
+  KadasDebugMsgLevel( QString( "GDI layer url is %1" ).arg( layerUrl ), 2 );
   if ( layerUrl.isEmpty() )
   {
     return;
@@ -1116,7 +1117,7 @@ void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
     gdiBaseUrl += "/";
   }
   QUrl searchUrl( gdiBaseUrl + "sharing/rest/search?f=pjson&q=" + QUrl::toPercentEncoding( "url:" + layerUrl ) );
-  QgsDebugMsgLevel( QString( "The GDI item search url is %1" ).arg( searchUrl.toString() ), 2 );
+  KadasDebugMsgLevel( QString( "The GDI item search url is %1" ).arg( searchUrl.toString() ), 2 );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( QNetworkRequest( searchUrl ) );
   connect( reply, &QNetworkReply::finished, [this, gdiBaseUrl, reply] {
     QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
@@ -1126,7 +1127,7 @@ void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
       QVariantMap result = results.at( 0 ).toMap();
       QString id = result["id"].toString();
       QString metadataUrl = gdiBaseUrl + "home/item.html?id=" + id;
-      QgsDebugMsgLevel( QString( "The GDI item metadata URL is %1" ).arg( metadataUrl ), 2 );
+      KadasDebugMsgLevel( QString( "The GDI item metadata URL is %1" ).arg( metadataUrl ), 2 );
       QDesktopServices::openUrl( metadataUrl );
     }
     else
@@ -1139,8 +1140,8 @@ void KadasApplication::showLayerInfo( const QgsMapLayer *layer )
 
 void KadasApplication::showMessageLog()
 {
-  mMessageLogViewer->exec();
-  mMessageLogViewer->hide();
+  mMessageLogDockWidget->show();
+  mMessageLogDockWidget->raise();
 }
 
 QgsMapLayer *KadasApplication::currentLayer() const
@@ -1611,7 +1612,7 @@ KadasApplication::DataSourceMigrations KadasApplication::dataSourceMigrationMap(
 
 void KadasApplication::loadPythonSupport()
 {
-  //QgsDebugMsgLevel("Python support library's instance() symbol resolved.", 2 );
+  //KadasDebugMsgLevel("Python support library's instance() symbol resolved.", 2 );
   mPythonIntegration = new KadasPythonIntegration( this );
   mPythonIntegration->initPython( mPythonInterface, true );
   if ( !mPythonIntegration->isEnabled() )
@@ -1657,12 +1658,12 @@ void KadasApplication::injectAuthToken( QNetworkRequest *request )
   {
     return;
   }
-  QgsDebugMsgLevel( QString( "injectAuthToken: got url %1" ).arg( url.url() ), 2 );
+  KadasDebugMsgLevel( QString( "injectAuthToken: got url %1" ).arg( url.url() ), 2 );
   // Extract the token from the esri_auth cookie, if such cookie exists in the pool
   QList<QNetworkCookie> cookies = nam->cookieJar()->cookiesForUrl( request->url() );
   for ( const QNetworkCookie &cookie : cookies )
   {
-    QgsDebugMsgLevel( QString( "injectAuthToken: got cookie %1 for url %2" ).arg( QString::fromUtf8( cookie.toRawForm() ) ).arg( url.url() ), 2 );
+    KadasDebugMsgLevel( QString( "injectAuthToken: got cookie %1 for url %2" ).arg( QString::fromUtf8( cookie.toRawForm() ) ).arg( url.url() ), 2 );
     QByteArray data = QUrl::fromPercentEncoding( cookie.toRawForm() ).toLocal8Bit();
     if ( data.startsWith( "agstoken=" ) )
     {
@@ -1672,7 +1673,7 @@ void KadasApplication::injectAuthToken( QNetworkRequest *request )
         query.addQueryItem( "token", tokenRe.cap( 1 ) );
         url.setQuery( query );
         request->setUrl( url );
-        QgsDebugMsgLevel( QString( "injectAuthToken: url altered to %1" ).arg( url.toString() ), 2 );
+        KadasDebugMsgLevel( QString( "injectAuthToken: url altered to %1" ).arg( url.toString() ), 2 );
         break;
       }
     }

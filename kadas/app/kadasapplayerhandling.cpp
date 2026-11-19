@@ -57,6 +57,7 @@
 #include <qgis/qgsprovidersublayersdialog.h>
 #include <qgis/qgsvectortileutils.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadasapplayerhandling.h"
 #include "kadasapplication.h"
 #include "kadasmainwindow.h"
@@ -251,7 +252,7 @@ QList<QgsMapLayer *> KadasAppLayerHandling::addOgrVectorLayers( const QStringLis
       baseName = QgsMapLayer::formatLayerName( baseName );
     }
 
-    QgsDebugMsgLevel( "completeBaseName: " + baseName, 2 );
+    KadasDebugMsgLevel( "completeBaseName: " + baseName, 2 );
     const bool isVsiCurl { uri.startsWith( QLatin1String( "/vsicurl" ), Qt::CaseInsensitive ) };
     const auto scheme { QUrl( uri ).scheme() };
     const bool isRemoteUrl { scheme.startsWith( QLatin1String( "http" ) ) || scheme == QLatin1String( "ftp" ) };
@@ -396,7 +397,7 @@ QgsPointCloudLayer *KadasAppLayerHandling::addPointCloudLayer( const QString &ur
     base = QgsMapLayer::formatLayerName( base );
   }
 
-  QgsDebugMsgLevel( "completeBaseName: " + base, 2 );
+  KadasDebugMsgLevel( "completeBaseName: " + base, 2 );
 
   // create the layer
   std::unique_ptr<QgsPointCloudLayer> layer( new QgsPointCloudLayer( uri, base, provider ) );
@@ -447,7 +448,7 @@ QgsVectorTileLayer *KadasAppLayerHandling::addVectorTileLayer( const QString &ur
     base = QgsMapLayer::formatLayerName( base );
   }
 
-  QgsDebugMsgLevel( "completeBaseName: " + base, 2 );
+  KadasDebugMsgLevel( "completeBaseName: " + base, 2 );
 
   QString updatedUri = uri;
   QgsVectorTileUtils::updateUriSources( updatedUri, forceUpdateUriSources );

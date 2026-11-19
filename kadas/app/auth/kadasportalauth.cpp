@@ -30,6 +30,7 @@
 #include <qgis/qgssettingsentryimpl.h>
 #include <qgis/qgssettingstreenode.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadasportalauth.h"
 
 #include "kadas/app/kadasapplication.h"
@@ -101,7 +102,7 @@ void KadasPortalAuth::setupAuthentication()
   }
   else
   {
-    QgsDebugMsgLevel( QString( "No TOKEN url or OAuth2 configured for portal" ), 1 );
+    KadasDebugMsgLevel( QString( "No TOKEN url or OAuth2 configured for portal" ), 1 );
   }
 }
 
@@ -141,14 +142,14 @@ void KadasPortalAuth::setupAuthenticationEsriToken()
   // globally disabled via KadasApplication::settingsDisableHttp2 to work
   // around QTBUG-146829), so the logged-in Windows user's credentials are
   // used silently without prompting.
-  QgsDebugMsgLevel( QStringLiteral( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
+  KadasDebugMsgLevel( QStringLiteral( "Extracting portal TOKEN from %1" ).arg( tokenUrl ), 1 );
 
   QNetworkRequest req = QNetworkRequest( QUrl( tokenUrl ) );
   QgsNetworkReplyContent content = QgsNetworkAccessManager::instance()->blockingGet( req );
 
   if ( content.error() != QNetworkReply::NoError )
   {
-    QgsDebugMsgLevel( QString( "error fetching token: %1" ).arg( content.errorString() ), 1 );
+    KadasDebugMsgLevel( QString( "error fetching token: %1" ).arg( content.errorString() ), 1 );
     return;
   }
 
@@ -156,19 +157,19 @@ void KadasPortalAuth::setupAuthenticationEsriToken()
   QJsonDocument doc = QJsonDocument::fromJson( content.content(), &err );
   if ( doc.isNull() )
   {
-    QgsDebugMsgLevel( QString( "Could not parse JSON from response: %1" ).arg( err.errorString() ), 1 );
+    KadasDebugMsgLevel( QString( "Could not parse JSON from response: %1" ).arg( err.errorString() ), 1 );
     return;
   }
 
   QJsonObject obj = doc.object();
   if ( !obj.contains( QStringLiteral( "token" ) ) )
   {
-    QgsDebugMsgLevel( QString( "Could not read TOKEN from response: %1" ).arg( err.errorString() ), 1 );
+    KadasDebugMsgLevel( QString( "Could not read TOKEN from response: %1" ).arg( err.errorString() ), 1 );
     return;
   }
 
   QString token = obj[QStringLiteral( "token" )].toString();
-  QgsDebugMsgLevel( QString( "ESRI Token found" ), 1 );
+  KadasDebugMsgLevel( QString( "ESRI Token found" ), 1 );
   if ( settingsTokenCreateCookies->value() )
   {
     // Populate the cookie jar synchronously: the catalog browser starts
@@ -187,7 +188,7 @@ void KadasPortalAuth::createCookies( const QString &token )
   const QStringList cookieUrls = settingsPortalCookieUrls->value();
   for ( const QString &url : cookieUrls )
   {
-    QgsDebugMsgLevel( QString( "Setting cookie for url %1" ).arg( url ), 1 );
+    KadasDebugMsgLevel( QString( "Setting cookie for url %1" ).arg( url ), 1 );
     QNetworkCookie cookie = QNetworkCookie( QByteArray( "agstoken" ), token.toLocal8Bit() );
     jar->setCookiesFromUrl( QList<QNetworkCookie>() << cookie, url.trimmed() );
   }
@@ -210,11 +211,11 @@ void KadasPortalAuth::createEsriAuth( const QString &token )
 
   if ( QgsApplication::authManager()->storeAuthenticationConfig( config, true /* overwrite */ ) )
   {
-    QgsDebugMsgLevel( QString( "Created EsriToken auth config with id %1" ).arg( ESRI_AUTH_CFG_ID ), 1 );
+    KadasDebugMsgLevel( QString( "Created EsriToken auth config with id %1" ).arg( ESRI_AUTH_CFG_ID ), 1 );
   }
   else
   {
-    QgsDebugMsgLevel( QString( "Failed to create EsriToken auth config with id %1" ).arg( ESRI_AUTH_CFG_ID ), 1 );
+    KadasDebugMsgLevel( QString( "Failed to create EsriToken auth config with id %1" ).arg( ESRI_AUTH_CFG_ID ), 1 );
   }
 }
 
@@ -247,24 +248,24 @@ void KadasPortalAuth::createOAuth2Auth( const QString &requestUrl, const QString
 
   if ( QgsApplication::authManager()->storeAuthenticationConfig( config, true /* overwrite */ ) )
   {
-    QgsDebugMsgLevel( QString( "Created OAuth2 auth config with id %1" ).arg( ESRI_AUTH_CFG_ID ), 1 );
+    KadasDebugMsgLevel( QString( "Created OAuth2 auth config with id %1" ).arg( ESRI_AUTH_CFG_ID ), 1 );
   }
   else
   {
-    QgsDebugMsgLevel( QString( "Failed to create OAuth2 auth config with id %1" ).arg( ESRI_AUTH_CFG_ID ), 1 );
+    KadasDebugMsgLevel( QString( "Failed to create OAuth2 auth config with id %1" ).arg( ESRI_AUTH_CFG_ID ), 1 );
   }
 }
 
 QString KadasPortalAuth::retrieveOAuthClientId( const QString &clientIdUrl, const QString &clientIdJsonPath )
 {
-  QgsDebugMsgLevel( QStringLiteral( "Extracting OAuth2 ClientId from %1" ).arg( clientIdUrl ), 1 );
+  KadasDebugMsgLevel( QStringLiteral( "Extracting OAuth2 ClientId from %1" ).arg( clientIdUrl ), 1 );
 
   QNetworkRequest req = QNetworkRequest( QUrl( clientIdUrl ) );
   QgsNetworkReplyContent content = QgsNetworkAccessManager::instance()->blockingGet( req );
 
   if ( content.error() != QNetworkReply::NoError )
   {
-    QgsDebugMsgLevel( QString( "Error fetching token: %1" ).arg( content.errorString() ), 1 );
+    KadasDebugMsgLevel( QString( "Error fetching token: %1" ).arg( content.errorString() ), 1 );
     return QString();
   }
 
@@ -272,7 +273,7 @@ QString KadasPortalAuth::retrieveOAuthClientId( const QString &clientIdUrl, cons
   QJsonDocument doc = QJsonDocument::fromJson( content.content(), &err );
   if ( doc.isNull() )
   {
-    QgsDebugMsgLevel( QString( "Could not parse JSON from response: %1" ).arg( err.errorString() ), 1 );
+    KadasDebugMsgLevel( QString( "Could not parse JSON from response: %1" ).arg( err.errorString() ), 1 );
     return QString();
   }
 
@@ -280,7 +281,7 @@ QString KadasPortalAuth::retrieveOAuthClientId( const QString &clientIdUrl, cons
   const QString clientId = KadasJsonUtils::jsonPathToString( doc, clientIdJsonPath );
   if ( clientId.isEmpty() )
   {
-    QgsDebugMsgLevel( QStringLiteral( "Could not extract ClientId using JSON path %1" ).arg( clientIdJsonPath ), 1 );
+    KadasDebugMsgLevel( QStringLiteral( "Could not extract ClientId using JSON path %1" ).arg( clientIdJsonPath ), 1 );
     return QString();
   }
 

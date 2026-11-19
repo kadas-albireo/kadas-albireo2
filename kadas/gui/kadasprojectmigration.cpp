@@ -32,6 +32,7 @@
 #include <qgis/qgsproject.h>
 #include <qgis/qgssymbollayerutils.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/core/kadas.h"
 #include "kadas/gui/kadasitemlayer.h"
 #include "kadas/gui/kadasprojectmigration.h"
@@ -59,7 +60,7 @@ QString KadasProjectMigration::migrateProject( const QString &fileName, QStringL
   QDomDocument doc;
   if ( !doc.setContent( &file ) )
   {
-    QgsDebugMsgLevel( "Failed to parse project", 2 );
+    KadasDebugMsgLevel( "Failed to parse project", 2 );
     return fileName;
   }
   QString basedir = QFileInfo( fileName ).path();
@@ -84,7 +85,7 @@ bool KadasProjectMigration::migrateProjectXml( const QString &basedir, QDomDocum
   QDomElement root = doc.documentElement();
   if ( root.tagName() != "qgis" )
   {
-    QgsDebugMsgLevel( "Invalid project (incorrect root tag name)", 2 );
+    KadasDebugMsgLevel( "Invalid project (incorrect root tag name)", 2 );
     return false;
   }
 

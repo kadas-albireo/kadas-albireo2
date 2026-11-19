@@ -17,6 +17,7 @@ set(kadas_core_HDR
     kadasjsonutils.h
     kadasfileserver.h
     kadaslatlontoutm.h
+    kadaslogger.h
     kadaspluginlayer.h
     kadassettingstree.h
     kadasstatehistory.h
