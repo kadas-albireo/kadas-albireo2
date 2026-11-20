@@ -34,7 +34,6 @@
 #include <qgis/qgssettingsentryimpl.h>
 
 #include "kadas/core/kadas.h"
-#include "kadas/core/kadassettingstree.h"
 
 #include "kadasapplication.h"
 #include "kadasmainwindow.h"
@@ -44,7 +43,7 @@
 
 
 const QgsSettingsEntryString *KadasPluginManager::settingsRepositoryUrl
-  = new QgsSettingsEntryString( QStringLiteral( "plugin-repository-url" ), KadasSettingsTree::sTreeKadas, QString(), QStringLiteral( "URL of the plugin repository." ) );
+  = new QgsSettingsEntryString( QStringLiteral( "repositoryUrl" ), QStringLiteral( "PythonPluginRepository" ), QString(), QStringLiteral( "URL of the plugin repository." ) );
 
 KadasPluginManagerInstallButton::KadasPluginManagerInstallButton( Status status, QWidget *parent )
   : QWidget( parent )
