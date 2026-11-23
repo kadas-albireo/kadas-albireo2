@@ -76,6 +76,9 @@ class KADAS_CORE_EXPORT Kadas
 
     // Import SSL certificates from the certificate directory and from the system store (on Windows)
     static void importSslCertificates();
+
+    // Remove the root CAs affected by known CA key compromises from the CA certificates used for TLS connections
+    static void distrustCompromisedCaCertificates() SIP_SKIP;
 };
 
 #endif // KADAS_H
