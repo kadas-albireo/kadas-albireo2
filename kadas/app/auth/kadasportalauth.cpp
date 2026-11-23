@@ -178,6 +178,9 @@ bool KadasPortalAuth::authenticateRequest( QNetworkRequest &request ) const
     KadasDebugError( QString( "Failed to authenticate request with auth config %1: %2" ).arg( ESRI_AUTH_CFG_ID, request.url().toString( QUrl::RemoveQuery ) ) );
     return false;
   }
+
+  // Qt copies all headers into the redirected request: don't let a redirect carry the token to another host
+  request.setAttribute( QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::SameOriginRedirectPolicy );
   return true;
 }
 
@@ -266,6 +269,8 @@ void KadasPortalAuth::verifyOAuth2Token()
     QNetworkRequest request( QUrl( restUrl + QStringLiteral( "/community/self?f=json" ) ) );
     // Blocking on the main thread at startup: don't wait for the default network timeout
     request.setTransferTimeout( 10000 );
+    // Don't let a redirect carry the token to another host
+    request.setAttribute( QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::SameOriginRedirectPolicy );
     const QgsNetworkReplyContent content = QgsNetworkAccessManager::blockingGet( request, ESRI_AUTH_CFG_ID );
     const int httpStatus = content.attribute( QNetworkRequest::HttpStatusCodeAttribute ).toInt();
     const QJsonObject response = QJsonDocument::fromJson( content.content() ).object();

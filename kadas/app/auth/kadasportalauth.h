@@ -67,6 +67,8 @@ class KadasPortalAuth : public QObject
      * (OAuth2 or ESRI token) and has not been removed because the user continued without authentication.
      * The token is only added to https requests targeting the host and port of the portal, i.e. of the
      * OAuth2 token URL or of the ESRI token URL. Other requests are left untouched.
+     * Authenticated requests are restricted to same origin redirects, since Qt copies the headers
+     * (and thus the token) of the original request into the redirected one.
      * Returns TRUE if the request has been authenticated.
      */
     bool authenticateRequest( QNetworkRequest &request ) const;
