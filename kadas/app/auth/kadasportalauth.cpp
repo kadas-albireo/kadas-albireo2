@@ -102,28 +102,13 @@ void KadasPortalAuth::setupAuthentication()
 
   const QString storedMethod = QgsApplication::authManager()->availableAuthMethodConfigs().value( ESRI_AUTH_CFG_ID ).method();
 
-  if ( !settingsOAuth2Enabled->value() && settingsPortalTokenUrl->value().isEmpty() )
-  {
-    KadasDebugMsgLevel( QString( "No TOKEN url or OAuth2 configured for portal" ), 1 );
-    // Layers of saved projects may still reference the auth config of a previous session. Replace it by one without
-    // token so that they are loaded unauthenticated: if it was removed, their requests would fail.
-    // Only if it exists, since storing a config requires the master password.
-    if ( !storedMethod.isEmpty() )
-    {
-      resetAuthConfig();
-    }
-    return;
-  }
-
   if ( settingsOAuth2Enabled->value() )
   {
-    // Replace the auth config by one without token. It is overwritten
-    // on success, so every failure path ends with a config that leaves the requests of the
-    // catalog and the layers unauthenticated instead of starting the interactive login.
+    // Every failure below leaves this config without token, so nothing starts the interactive login
     resetAuthConfig();
     setupAuthenticationOAuth2();
   }
-  else
+  else if ( !settingsPortalTokenUrl->value().isEmpty() )
   {
     // EsriToken config: keep the token of the previous session
     if ( !storedMethod.isEmpty() && storedMethod != ESRI_TOKEN_METHOD )
@@ -131,6 +116,15 @@ void KadasPortalAuth::setupAuthentication()
       resetAuthConfig();
     }
     setupAuthenticationEsriToken();
+  }
+  else
+  {
+    KadasDebugMsgLevel( QString( "No TOKEN url or OAuth2 configured for portal" ), 1 );
+    // Saved layers may still reference it: keep it, without token
+    if ( !storedMethod.isEmpty() )
+    {
+      resetAuthConfig();
+    }
   }
 }
 
@@ -236,10 +230,8 @@ bool KadasPortalAuth::loginOAuth2()
     }
   }
 
-  // Replace the OAuth2 config by one without token, otherwise every request using it (catalog, layers)
-  // would start the interactive login again. Removing it instead would make the requests of the layers
-  // referencing it fail, so that is only the fallback. The OAuth2 config is created again at the next start.
-  // Overwriting removes the old config first, which also clears the cached OAuth2 object.
+  // Otherwise every request using the OAuth2 config would start the interactive login again.
+  // Overwriting also clears the cached OAuth2 object.
   resetAuthConfig();
   mAuthConfigAvailable = false;
   KadasDebugError( QString( "Continuing without authentication, auth config %1 reset" ).arg( ESRI_AUTH_CFG_ID ) );
@@ -390,27 +382,20 @@ bool KadasPortalAuth::storeAuthConfig( QgsAuthMethodConfig &config )
   return false;
 }
 
-void KadasPortalAuth::removeAuthConfig()
-{
-  QgsAuthManager *authManager = QgsApplication::authManager();
-  if ( authManager->configIds().contains( ESRI_AUTH_CFG_ID ) )
-  {
-    authManager->removeAuthenticationConfig( ESRI_AUTH_CFG_ID );
-  }
-}
-
 void KadasPortalAuth::resetAuthConfig()
 {
   // The name and the method are stored unencrypted: checking them doesn't require the master password
-  const QgsAuthMethodConfig storedConfig = QgsApplication::authManager()->availableAuthMethodConfigs().value( ESRI_AUTH_CFG_ID );
+  QgsAuthManager *authManager = QgsApplication::authManager();
+  const QgsAuthMethodConfig storedConfig = authManager->availableAuthMethodConfigs().value( ESRI_AUTH_CFG_ID );
   if ( storedConfig.method() == ESRI_TOKEN_METHOD && storedConfig.name() == NO_TOKEN_CONFIG_NAME )
   {
     return;
   }
 
-  if ( !storeEsriTokenAuth( QString() ) )
+  // Removing is only the fallback: requests of layers referencing a missing config fail
+  if ( !storeEsriTokenAuth( QString() ) && authManager->configIds().contains( ESRI_AUTH_CFG_ID ) )
   {
-    removeAuthConfig();
+    authManager->removeAuthenticationConfig( ESRI_AUTH_CFG_ID );
   }
 }
 
