@@ -88,6 +88,12 @@ class KadasPortalAuth : public QObject
     //! Removes the auth config with id ESRI_AUTH_CFG_ID, if it exists
     void removeAuthConfig();
 
+    /**
+     * Replaces the auth config with id ESRI_AUTH_CFG_ID by an EsriToken config without token (or removes it if that fails),
+     * so that requests using it are sent unauthenticated.
+     */
+    void resetAuthConfig();
+
     //! Stores an EsriToken auth config. With an empty \a token requests using it are sent unauthenticated.
     bool storeEsriTokenAuth( const QString &token );
     bool createOAuth2Auth( const QString &requestUrl, const QString &tokenUrl, const QString &clientId, const QString &clientSecret );

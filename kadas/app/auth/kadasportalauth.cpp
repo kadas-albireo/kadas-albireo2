@@ -66,6 +66,10 @@ const QgsSettingsEntryString *KadasPortalAuth::settingsOAuth2ClientSecret
 
 const QString KadasPortalAuth::ESRI_AUTH_CFG_ID = QStringLiteral( "kadas_esri_token" );
 
+const QString ESRI_TOKEN_METHOD = QStringLiteral( "EsriToken" );
+//! Name of the auth config without token
+const QString NO_TOKEN_CONFIG_NAME = QStringLiteral( "kadas_esri_token_none" );
+
 KadasPortalAuth::KadasPortalAuth( QObject *parent )
   : QObject { parent }
   , mRequestRunningMessageBox(
@@ -96,33 +100,36 @@ void KadasPortalAuth::setupAuthentication()
   mAuthConfigAvailable = false;
   mPortalUrl.clear();
 
+  const QString storedMethod = QgsApplication::authManager()->availableAuthMethodConfigs().value( ESRI_AUTH_CFG_ID ).method();
+
   if ( !settingsOAuth2Enabled->value() && settingsPortalTokenUrl->value().isEmpty() )
   {
     KadasDebugMsgLevel( QString( "No TOKEN url or OAuth2 configured for portal" ), 1 );
     // Layers of saved projects may still reference the auth config of a previous session. Replace it by one without
     // token so that they are loaded unauthenticated: if it was removed, their requests would fail.
     // Only if it exists, since storing a config requires the master password.
-    if ( QgsApplication::authManager()->configIds().contains( ESRI_AUTH_CFG_ID ) && !storeEsriTokenAuth( QString() ) )
+    if ( !storedMethod.isEmpty() )
     {
-      removeAuthConfig();
+      resetAuthConfig();
     }
     return;
   }
 
-  // Replace the auth config of the previous session by one without token. It is overwritten
-  // below on success, so every failure path ends with a config that leaves the requests of the
-  // catalog and the layers unauthenticated instead of starting the interactive login.
-  if ( !storeEsriTokenAuth( QString() ) )
-  {
-    removeAuthConfig();
-  }
-
   if ( settingsOAuth2Enabled->value() )
   {
+    // Replace the auth config by one without token. It is overwritten
+    // on success, so every failure path ends with a config that leaves the requests of the
+    // catalog and the layers unauthenticated instead of starting the interactive login.
+    resetAuthConfig();
     setupAuthenticationOAuth2();
   }
   else
   {
+    // EsriToken config: keep the token of the previous session
+    if ( !storedMethod.isEmpty() && storedMethod != ESRI_TOKEN_METHOD )
+    {
+      resetAuthConfig();
+    }
     setupAuthenticationEsriToken();
   }
 }
@@ -233,10 +240,7 @@ bool KadasPortalAuth::loginOAuth2()
   // would start the interactive login again. Removing it instead would make the requests of the layers
   // referencing it fail, so that is only the fallback. The OAuth2 config is created again at the next start.
   // Overwriting removes the old config first, which also clears the cached OAuth2 object.
-  if ( !storeEsriTokenAuth( QString() ) )
-  {
-    removeAuthConfig();
-  }
+  resetAuthConfig();
   mAuthConfigAvailable = false;
   KadasDebugError( QString( "Continuing without authentication, auth config %1 reset" ).arg( ESRI_AUTH_CFG_ID ) );
   return false;
@@ -395,11 +399,27 @@ void KadasPortalAuth::removeAuthConfig()
   }
 }
 
+void KadasPortalAuth::resetAuthConfig()
+{
+  // The name and the method are stored unencrypted: checking them doesn't require the master password
+  const QgsAuthMethodConfig storedConfig = QgsApplication::authManager()->availableAuthMethodConfigs().value( ESRI_AUTH_CFG_ID );
+  if ( storedConfig.method() == ESRI_TOKEN_METHOD && storedConfig.name() == NO_TOKEN_CONFIG_NAME )
+  {
+    return;
+  }
+
+  if ( !storeEsriTokenAuth( QString() ) )
+  {
+    removeAuthConfig();
+  }
+}
+
 bool KadasPortalAuth::storeEsriTokenAuth( const QString &token )
 {
   QgsAuthMethodConfig config;
-  config.setName( QStringLiteral( "kadas_esri_token" ) );
-  config.setMethod( QStringLiteral( "EsriToken" ) );
+  // The name tells a config without token apart without decrypting it, see resetAuthConfig()
+  config.setName( token.isEmpty() ? NO_TOKEN_CONFIG_NAME : QStringLiteral( "kadas_esri_token" ) );
+  config.setMethod( ESRI_TOKEN_METHOD );
   config.setConfig( QStringLiteral( "token" ), token );
   return storeAuthConfig( config );
 }
