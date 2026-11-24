@@ -31,7 +31,7 @@
 #include <qgis/qgsmessagebar.h>
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsnetworkcontentfetcher.h>
-#include <qgis/qgssettings.h>
+#include <qgis/qgssettingsentryimpl.h>
 
 #include "kadas/core/kadas.h"
 
@@ -39,7 +39,11 @@
 #include "kadasmainwindow.h"
 #include "kadaspluginmanager.h"
 #include "kadaspythonintegration.h"
+#include "auth/kadasportalauth.h"
 
+
+const QgsSettingsEntryString *KadasPluginManager::settingsRepositoryUrl
+  = new QgsSettingsEntryString( QStringLiteral( "repositoryUrl" ), QStringLiteral( "PythonPluginRepository" ), QString(), QStringLiteral( "URL of the plugin repository." ) );
 
 KadasPluginManagerInstallButton::KadasPluginManagerInstallButton( Status status, QWidget *parent )
   : QWidget( parent )
@@ -254,13 +258,15 @@ KadasPluginManager::KadasPluginManager()
 
 QMap<QString, KadasPluginManager::PluginInfo> KadasPluginManager::availablePlugins()
 {
-  QgsSettings s;
-  QString repoUrl = s.value( "/PythonPluginRepository/repositoryUrl" ).toString();
+  QString repoUrl = settingsRepositoryUrl->value();
 
   // FOR DEBUG
   // repoUrl = QStringLiteral( "https://gist.githubusercontent.com/3nids/defd253c47c3ae9d821c97ac05f44941/raw/ef14420f744bdeaffc4d8ff23a287942befbd62f/kadas-plugins.xml" ); // DEBUGONLY
 
-  QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( QNetworkRequest( QUrl( repoUrl ) ) );
+  QNetworkRequest request( ( QUrl( repoUrl ) ) );
+  // The plugin repository is usually on the portal and requires the same authentication as the catalog
+  kApp->portalAuth()->authenticateRequest( request );
+  QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( request );
   QEventLoop evLoop;
   connect( reply, &QNetworkReply::finished, &evLoop, &QEventLoop::quit );
   evLoop.exec( QEventLoop::ExcludeUserInputEvents );
@@ -481,7 +487,9 @@ bool KadasPluginManager::installPlugin( const QString &pluginName, const QString
   //download and unzip in kadasPluginsPath
   QgsNetworkContentFetcher nf;
   QTextStream( stdout ) << downloadUrl << Qt::endl;
-  QUrl repositoryUrl( downloadUrl );
+  QNetworkRequest request( ( QUrl( downloadUrl ) ) );
+  // Not via the fetcher's authcfg: the fetcher would also add the token to redirects (e.g. to a storage)
+  kApp->portalAuth()->authenticateRequest( request );
   QEventLoop e;
   nf.fetchContent( repositoryUrl );
   connect( &nf, &QgsNetworkContentFetcher::downloadProgress, [b]( qint64 rec, qint64 tot ) {

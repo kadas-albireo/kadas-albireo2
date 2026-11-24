@@ -69,6 +69,7 @@ class KadasApplication : public QgsApplication
 
     KadasMainWindow *mainWindow() const { return mMainWindow; }
     KadasPythonIntegration *pythonIntegration() const { return mPythonIntegration; }
+    KadasPortalAuth *portalAuth() const { return mPortalAuth; }
     KadasLayerRefreshManager *layerRefreshManager() const { return mLayerRefreshManager; }
 
     QgsRasterLayer *addRasterLayer( const QString &uri, const QString &baseName, const QString &providerKey, bool quiet = false, int insOffset = 0, bool adjustInsertionPoint = true ) const;

@@ -305,13 +305,16 @@ void KadasApplication::init()
     QgsDebugMsgLevel( QString( "Network request: %1" ).arg( req->url().toString() ), 2 );
   } );
 
+  QSplashScreen splash( QPixmap( ":/kadas/splash" ) );
+  splash.show();
+  processEvents();
+
   // Setup authentication before loading catalog
   mPortalAuth = new KadasPortalAuth();
   mPortalAuth->setupAuthentication();
+  mPortalAuth->login();
 
   // Create main window
-  QSplashScreen splash( QPixmap( ":/kadas/splash" ) );
-  splash.show();
   mMainWindow = new KadasMainWindow();
   mMainWindow->init();
 
