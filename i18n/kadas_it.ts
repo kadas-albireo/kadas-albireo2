@@ -382,13 +382,13 @@
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="472"/>
         <source>at scale 1:%1</source>
-        <translation type="unfinished"/>
+        <translation>in scala 1:%1</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="621"/>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="656"/>
         <source>Go to %1, %2 (%3 %4%5)</source>
-        <translation type="unfinished"/>
+        <translation>Vai a %1, %2 (%3 %4%5)</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="624"/>
@@ -399,7 +399,7 @@
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.cpp" line="695"/>
         <source>Go to %1%2%3 %4 %5</source>
-        <translation type="unfinished"/>
+        <translation>Vai a %1%2%3 %4 %5</translation>
     </message>
     <message>
         <location filename="../kadas/gui/search/kadasalternategotolocatorfilter.h" line="38"/>
@@ -1636,7 +1636,7 @@ Annullare queste attività e riprovare.</translation>
     <message>
         <location filename="../kadas/app/kadasgpxintegration.cpp" line="258"/>
         <source>GPX export failed</source>
-        <translation>Importazione GPX fallita</translation>
+        <translation>Esportazione GPX fallita</translation>
     </message>
     <message>
         <location filename="../kadas/app/kadasgpxintegration.cpp" line="258"/>
@@ -1647,6 +1647,10 @@ Annullare queste attività e riprovare.</translation>
         <location filename="../kadas/app/kadasgpxintegration.cpp" line="310"/>
         <source>GPX export completed</source>
         <translation>Esportazione GPX completata</translation>
+    </message>
+    <message>
+        <source>No layer selected</source>
+        <translation>Nessun layer selezionato</translation>
     </message>
 </context>
 <context>
@@ -5543,6 +5547,14 @@ This dialog will close automatically when authentication is complete.</source>
 
 Si prega di completare l&apos;autenticazione nel browser.
 Questo dialogo si chiuderà automaticamente quando l&apos;autenticazione è completa.</translation>
+    </message>
+    <message>
+        <source>The authentication failed or was canceled.</source>
+        <translation>L&apos;autenticazione non è riuscita o è stata annullata.</translation>
+    </message>
+    <message>
+        <source>Continue without authentication</source>
+        <translation>Continua senza autenticazione</translation>
     </message>
 </context>
 <context>

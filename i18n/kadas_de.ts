@@ -1649,6 +1649,10 @@ Bitte brechen Sie diese Aufgaben ab und versuchen Sie es erneut.</translation>
         <source>GPX export completed</source>
         <translation>GPX Export erfolgreich</translation>
     </message>
+    <message>
+        <source>No layer selected</source>
+        <translation>Keine Ebene ausgewählt</translation>
+    </message>
 </context>
 <context>
     <name>KadasGpxRouteEditorBase</name>
@@ -5545,6 +5549,14 @@ This dialog will close automatically when authentication is complete.</source>
 
 Bitte schließen Sie die Authentifizierung in Ihrem Browser ab.
 Dieses Dialogfeld schließt sich automatisch, sobald die Authentifizierung abgeschlossen ist.</translation>
+    </message>
+    <message>
+        <source>The authentication failed or was canceled.</source>
+        <translation>Die Authentifizierung ist fehlgeschlagen oder wurde abgebrochen.</translation>
+    </message>
+    <message>
+        <source>Continue without authentication</source>
+        <translation>Ohne Authentifizierung fortfahren</translation>
     </message>
 </context>
 <context>
