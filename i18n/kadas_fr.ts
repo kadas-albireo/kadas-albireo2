@@ -1650,6 +1650,10 @@ Veuillez annuler ces tâches et réessayer.</translation>
         <source>GPX export completed</source>
         <translation>Export GPX terminé</translation>
     </message>
+    <message>
+        <source>No layer selected</source>
+        <translation>Aucune couche sélectionnée</translation>
+    </message>
 </context>
 <context>
     <name>KadasGpxRouteEditorBase</name>

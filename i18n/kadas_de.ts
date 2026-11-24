@@ -1649,6 +1649,10 @@ Bitte brechen Sie diese Aufgaben ab und versuchen Sie es erneut.</translation>
         <source>GPX export completed</source>
         <translation>GPX Export erfolgreich</translation>
     </message>
+    <message>
+        <source>No layer selected</source>
+        <translation>Keine Ebene ausgewählt</translation>
+    </message>
 </context>
 <context>
     <name>KadasGpxRouteEditorBase</name>
