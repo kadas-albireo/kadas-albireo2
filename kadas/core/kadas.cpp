@@ -248,7 +248,7 @@ GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errM
       {
         gdalSource.append( QString( "&coverage=%1" ).arg( identifier ) );
       }
-    }     
+    }
     if ( uri.hasParam( "crs" ) )
     {
       gdalSource.append( QString( "&crs=%1" ).arg( uri.param( "crs" ) ) );
