@@ -25,6 +25,7 @@
 #include <QNetworkProxyFactory>
 #include <QSettings>
 #include <QStandardPaths>
+#include <QRegularExpression>
 
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsrasterlayer.h>
@@ -237,15 +238,17 @@ GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errM
     }
     if ( uri.hasParam( "identifier" ) )
     {
-      if ( wcsUrl.contains( "MapServer", Qt::CaseInsensitive ) )
+      const QString identifier = uri.param( "identifier" );
+      static const QRegularExpression numericId( "^\\d+$" );
+      if ( wcsUrl.contains( "MapServer", Qt::CaseInsensitive ) && numericId.match( identifier ).hasMatch() )
       {
-        gdalSource.append( QString( "&coverage=Coverage%1" ).arg( uri.param( "identifier" ) ) );
+        gdalSource.append( QString( "&coverage=Coverage%1" ).arg( identifier ) );
       }
       else
       {
-        gdalSource.append( QString( "&coverage=%1" ).arg( uri.param( "identifier" ) ) );
+        gdalSource.append( QString( "&coverage=%1" ).arg( identifier ) );
       }
-    }
+    }     
     if ( uri.hasParam( "crs" ) )
     {
       gdalSource.append( QString( "&crs=%1" ).arg( uri.param( "crs" ) ) );
