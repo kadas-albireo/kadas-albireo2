@@ -491,7 +491,7 @@ bool KadasPluginManager::installPlugin( const QString &pluginName, const QString
   // Not via the fetcher's authcfg: the fetcher would also add the token to redirects (e.g. to a storage)
   kApp->portalAuth()->authenticateRequest( request );
   QEventLoop e;
-  nf.fetchContent( repositoryUrl );
+  nf.fetchContent( request );
   connect( &nf, &QgsNetworkContentFetcher::downloadProgress, [b]( qint64 rec, qint64 tot ) {
     b->setStatus( KadasPluginManagerInstallButton::Installing, double( rec ) / tot * 100 );
   } );
