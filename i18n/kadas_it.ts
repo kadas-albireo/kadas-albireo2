@@ -5544,6 +5544,14 @@ This dialog will close automatically when authentication is complete.</source>
 Si prega di completare l&apos;autenticazione nel browser.
 Questo dialogo si chiuderà automaticamente quando l&apos;autenticazione è completa.</translation>
     </message>
+    <message>
+        <source>The authentication failed or was canceled.</source>
+        <translation>L&apos;autenticazione non è riuscita o è stata annullata.</translation>
+    </message>
+    <message>
+        <source>Continue without authentication</source>
+        <translation>Continua senza autenticazione</translation>
+    </message>
 </context>
 <context>
     <name>KadasProjectTemplateSelectionDialog</name>
