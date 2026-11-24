@@ -20,14 +20,17 @@
 
 #include <QObject>
 #include <QMessageBox>
+#include <QUrl>
 
 #include "kadas/core/kadassettingstree.h"
 
+class QgsAuthMethodConfig;
 class QgsSettingsEntryBool;
 class QgsSettingsEntryString;
 class QgsSettingsEntryStringList;
 class QgsSettingsTreeNode;
 class KadasAppAuthRequestHandler;
+class QNetworkRequest;
 
 class KadasPortalAuth : public QObject
 {
@@ -51,7 +54,23 @@ class KadasPortalAuth : public QObject
 
     explicit KadasPortalAuth( QObject *parent = nullptr );
 
+    //! Creates the authentication configuration. Does not run the interactive OAuth2 login, see login()
     void setupAuthentication();
+
+    /**
+     * Runs the OAuth2 login if OAuth2 is configured, and blocks until it is finished.
+     */
+    void login();
+
+    /**
+     * Adds the portal authentication to \a request, if an auth config has been set up in this session
+     * and has not been reset because the user continued without authentication.
+     * The token is only added to https requests targeting the host and port of the portal.
+     * Authenticated requests are restricted to same origin redirects, since Qt copies the headers
+     * (and thus the token) of the original request into the redirected one.
+     * Returns TRUE if the request has been authenticated.
+     */
+    bool authenticateRequest( QNetworkRequest &request ) const;
 
   private slots:
     void authRequestHandlerBrowserOpened();
@@ -61,12 +80,39 @@ class KadasPortalAuth : public QObject
     void setupAuthenticationOAuth2();
     void setupAuthenticationEsriToken();
     void createCookies( const QString &token );
-    void createEsriAuth( const QString &token );
-    void createOAuth2Auth( const QString &requestUrl, const QString &tokenUrl, const QString &clientId, const QString &clientSecret );
+
+    //! Stores \a config with id ESRI_AUTH_CFG_ID, overwriting the existing one. Creates the master password if needed.
+    bool storeAuthConfig( QgsAuthMethodConfig &config );
+
+    /**
+     * Replaces the auth config with id ESRI_AUTH_CFG_ID by an EsriToken config without token (or removes it if that fails),
+     * so that requests using it are sent unauthenticated.
+     */
+    void resetAuthConfig();
+
+    //! Stores an EsriToken auth config. With an empty \a token requests using it are sent unauthenticated.
+    bool storeEsriTokenAuth( const QString &token );
+    bool createOAuth2Auth( const QString &requestUrl, const QString &tokenUrl, const QString &clientId, const QString &clientSecret );
+
+    /**
+     * Runs the OAuth2 login (interactive if there is no valid cached token) and blocks until it is finished.
+     * On failure the user can retry or continue without authentication, in which case the auth config is reset.
+     * Returns TRUE if the login succeeded.
+     */
+    bool loginOAuth2();
+
+    //! Checks that the portal accepts the OAuth2 token and waits a bit if it is not accepted yet
+    void verifyOAuth2Token();
     QString retrieveOAuthClientId( const QString &clientIdUrl, const QString &clientIdJsonPath );
 
     QMessageBox mRequestRunningMessageBox;
     KadasAppAuthRequestHandler *mAppAuthRequestHandler;
+    //! TRUE if the auth config has been set up with a token (ESRI token) or for OAuth2 in this session
+    bool mAuthConfigAvailable = false;
+    //! TRUE if the browser has been opened for the interactive login during login()
+    bool mBrowserOpenedDuringLogin = false;
+    //! URL of the portal the auth config belongs to, requests to other hosts are not authenticated
+    QUrl mPortalUrl;
 };
 
 #endif // KADASPORTALAUTH_H
