@@ -26,6 +26,7 @@
 #include <QSettings>
 #include <QStandardPaths>
 #include <QRegularExpression>
+#include <QUrlQuery>
 
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgsrasterlayer.h>
@@ -240,7 +241,21 @@ GDALDatasetH Kadas::gdalOpenForLayer( const QgsRasterLayer *layer, QString *errM
     {
       const QString identifier = uri.param( "identifier" );
       static const QRegularExpression numericId( "^\\d+$" );
-      if ( wcsUrl.contains( "MapServer", Qt::CaseInsensitive ) && numericId.match( identifier ).hasMatch() )
+      QString version = uri.param( "version" );
+      if ( version.isEmpty() )
+      {
+        const QList<QPair<QString, QString>> queryItems = QUrlQuery( QUrl( wcsUrl ) ).queryItems( QUrl::FullyDecoded );
+        for ( const QPair<QString, QString> &item : queryItems )
+        {
+          if ( item.first.compare( "version", Qt::CaseInsensitive ) == 0 )
+          {
+            version = item.second;
+            break;
+          }
+        }
+      }
+      const bool isWcs2 = version.isEmpty() || version.startsWith( "2" );
+      if ( isWcs2 && wcsUrl.contains( "MapServer", Qt::CaseInsensitive ) && numericId.match( identifier ).hasMatch() )
       {
         gdalSource.append( QString( "&coverage=Coverage%1" ).arg( identifier ) );
       }
