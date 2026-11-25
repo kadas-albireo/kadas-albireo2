@@ -70,6 +70,7 @@ void KadasArcGisRestCatalogProvider::parseFolderDo()
   if ( reply->error() != QNetworkReply::NoError )
   {
     KadasDebugError( QString( "Error retrieving catalog folder from %1: %2" ).arg( reply->request().url().toString(), reply->errorString() ) );
+    mBrowser->reportLoadError( QString( "%1 (%2)" ).arg( reply->errorString(), reply->request().url().host() ) );
   }
   else
   {
@@ -112,6 +113,7 @@ void KadasArcGisRestCatalogProvider::parseServiceDo()
   if ( reply->error() != QNetworkReply::NoError )
   {
     KadasDebugError( QString( "Error retrieving catalog service from %1: %2" ).arg( reply->request().url().toString(), reply->errorString() ) );
+    mBrowser->reportLoadError( QString( "%1 (%2)" ).arg( reply->errorString(), reply->request().url().host() ) );
   }
   else
   {
@@ -163,6 +165,7 @@ void KadasArcGisRestCatalogProvider::parseWMTSDo()
   if ( reply->error() != QNetworkReply::NoError )
   {
     KadasDebugError( QString( "Error retrieving catalog capabilities from %1: %2" ).arg( reply->request().url().toString(), reply->errorString() ) );
+    mBrowser->reportLoadError( QString( "%1 (%2)" ).arg( reply->errorString(), reply->request().url().host() ) );
   }
   else
   {
@@ -208,6 +211,7 @@ void KadasArcGisRestCatalogProvider::parseWMSDo()
   if ( reply->error() != QNetworkReply::NoError )
   {
     KadasDebugError( QString( "Error retrieving catalog capabilities from %1: %2" ).arg( reply->request().url().toString(), reply->errorString() ) );
+    mBrowser->reportLoadError( QString( "%1 (%2)" ).arg( reply->errorString(), reply->request().url().host() ) );
   }
   else
   {

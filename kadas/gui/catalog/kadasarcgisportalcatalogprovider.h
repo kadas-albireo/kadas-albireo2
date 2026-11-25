@@ -54,10 +54,10 @@ class KADAS_GUI_EXPORT KadasArcGisPortalCatalogProvider : public KadasCatalogPro
 
     //! Adds the authentication to the request, logs an error if this fails
     void updateNetworkRequest( QNetworkRequest &req ) const;
-    //! Returns TRUE if the reply has no network error, logs the error otherwise
-    static bool replySucceeded( QNetworkReply *reply, const QString &what );
-    //! Returns TRUE if the ArcGIS json reply contains no error object, logs the error otherwise
-    static bool jsonReplySucceeded( const QVariantMap &json, QNetworkReply *reply, const QString &what );
+    //! Returns TRUE if the reply has no network error, logs and reports the error otherwise
+    bool replySucceeded( QNetworkReply *reply, const QString &what );
+    //! Returns TRUE if the ArcGIS json reply contains no error object, logs and reports the error otherwise
+    bool jsonReplySucceeded( const QVariantMap &json, QNetworkReply *reply, const QString &what );
 
     void readWMTSDetail( const ResultEntry &entry );
     void readWMSDetail( const ResultEntry &entry );

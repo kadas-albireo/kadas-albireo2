@@ -491,6 +491,20 @@ void KadasMainWindow::init()
   connect( mCatalogBrowser, &KadasCatalogBrowser::layerSelected, this, [this]( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers ) {
     addCatalogLayer( uri, metadataUrl, sublayers );
   } );
+  connect( mCatalogBrowser, &KadasCatalogBrowser::loadFinished, this, [this]( bool empty, int errorCount, const QString &firstError ) {
+    if ( errorCount == 0 )
+    {
+      return;
+    }
+    if ( empty )
+    {
+      mInfoBar->pushWarning( tr( "Catalog" ), tr( "The catalog could not be loaded: %1. See the message log for details." ).arg( firstError ) );
+    }
+    else
+    {
+      mInfoBar->pushWarning( tr( "Catalog" ), tr( "The catalog is incomplete, %n request(s) failed: %1. See the message log for details.", nullptr, errorCount ).arg( firstError ) );
+    }
+  } );
 
   // Parented to the canvas so its overlay item is torn down while the canvas
   // it lives in is still around.

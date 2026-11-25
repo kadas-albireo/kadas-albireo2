@@ -56,6 +56,7 @@ void KadasGeoAdminRestCatalogProvider::replyGeoCatalogFinished()
   if ( reply->error() != QNetworkReply::NoError )
   {
     KadasDebugError( QString( "Error retrieving catalog from %1: %2" ).arg( reply->request().url().toString(), reply->errorString() ) );
+    mBrowser->reportLoadError( QString( "%1 (%2)" ).arg( reply->errorString(), reply->request().url().host() ) );
     emit finished();
     return;
   }
@@ -118,6 +119,7 @@ void KadasGeoAdminRestCatalogProvider::replyWMSGeoAdminFinished()
   if ( reply->error() != QNetworkReply::NoError )
   {
     KadasDebugError( QString( "Error retrieving catalog from %1: %2" ).arg( reply->request().url().toString(), reply->errorString() ) );
+    mBrowser->reportLoadError( QString( "%1 (%2)" ).arg( reply->errorString(), reply->request().url().host() ) );
     emit finished();
     return;
   }
@@ -128,6 +130,7 @@ void KadasGeoAdminRestCatalogProvider::replyWMSGeoAdminFinished()
   if ( doc.isNull() )
   {
     KadasDebugError( QString( "Error parsing catalog capabilities from %1" ).arg( url ) );
+    mBrowser->reportLoadError( QString( "Invalid catalog capabilities (%1)" ).arg( QUrl( url ).host() ) );
     emit finished();
     return;
   }
