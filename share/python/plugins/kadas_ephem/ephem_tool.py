@@ -25,7 +25,7 @@ class EphemTool(QgsMapTool):
 
     def activate(self):
         self.widget = EphemToolWidget(self.iface)
-        self.widget.close.connect(self.close)
+        self.widget.closeRequested.connect(self.close)
         self.widget.setVisible(True)
         self.pin = QgsRubberBand(self.iface.mapCanvas(), Qgis.GeometryType.Point)
         self.pin.setIcon(QgsRubberBand.IconType.ICON_SVG)
@@ -37,6 +37,10 @@ class EphemTool(QgsMapTool):
     def deactivate(self):
         if self.widget:
             self.widget.cleanup()
+            # The side panel is owned by its host layout, so dropping the Python
+            # reference alone would leave it docked. deleteLater, not delete:
+            # deactivate can run inside the panel's own closeRequested emission.
+            self.widget.deleteLater()
             self.widget = None
 
         self.pin.reset()
