@@ -25,6 +25,7 @@
 #include <qgis/qgsnetworkaccessmanager.h>
 #include <qgis/qgssettings.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/gui/kadascatalogbrowser.h"
 #include "kadas/gui/catalog/kadasgeoadminrestcatalogprovider.h"
 
@@ -42,6 +43,7 @@ void KadasGeoAdminRestCatalogProvider::load()
   url.setQuery( query );
   QNetworkRequest req( url );
   req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
+  KadasDebugMsgLevel( QString( "Requesting catalog from %1" ).arg( url.toString() ), 1 );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
   connect( reply, &QNetworkReply::finished, this, &KadasGeoAdminRestCatalogProvider::replyGeoCatalogFinished );
 }
@@ -53,6 +55,7 @@ void KadasGeoAdminRestCatalogProvider::replyGeoCatalogFinished()
   reply->deleteLater();
   if ( reply->error() != QNetworkReply::NoError )
   {
+    KadasDebugError( QString( "Error retrieving catalog from %1: %2" ).arg( reply->request().url().toString(), reply->errorString() ) );
     emit finished();
     return;
   }
@@ -100,6 +103,7 @@ void KadasGeoAdminRestCatalogProvider::replyGeoCatalogFinished()
   url.setQuery( query );
   QNetworkRequest req( url );
   req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
+  KadasDebugMsgLevel( QString( "Requesting catalog capabilities from %1" ).arg( url.toString() ), 2 );
   QNetworkReply *replyWMS = QgsNetworkAccessManager::instance()->get( req );
   replyWMS->setProperty( "url", url );
   connect( replyWMS, &QNetworkReply::finished, this, &KadasGeoAdminRestCatalogProvider::replyWMSGeoAdminFinished );
@@ -113,6 +117,7 @@ void KadasGeoAdminRestCatalogProvider::replyWMSGeoAdminFinished()
   QString url = reply->property( "url" ).toString();
   if ( reply->error() != QNetworkReply::NoError )
   {
+    KadasDebugError( QString( "Error retrieving catalog from %1: %2" ).arg( reply->request().url().toString(), reply->errorString() ) );
     emit finished();
     return;
   }
@@ -122,6 +127,7 @@ void KadasGeoAdminRestCatalogProvider::replyWMSGeoAdminFinished()
 
   if ( doc.isNull() )
   {
+    KadasDebugError( QString( "Error parsing catalog capabilities from %1" ).arg( url ) );
     emit finished();
     return;
   }

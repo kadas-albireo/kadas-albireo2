@@ -24,6 +24,7 @@
 
 #include <qgis/qgsnetworkaccessmanager.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/gui/kadascatalogbrowser.h"
 #include "kadas/gui/catalog/kadasarcgisrestcatalogprovider.h"
 
@@ -36,6 +37,7 @@ KadasArcGisRestCatalogProvider::KadasArcGisRestCatalogProvider( const QString &b
 void KadasArcGisRestCatalogProvider::load()
 {
   mPendingTasks = 0;
+  KadasDebugMsgLevel( QString( "Requesting catalog from %1" ).arg( mBaseUrl ), 1 );
   parseFolder( "/" );
 }
 
@@ -65,7 +67,11 @@ void KadasArcGisRestCatalogProvider::parseFolderDo()
   QString path = reply->property( "path" ).toString();
   QStringList catTitles = reply->property( "catTitles" ).toStringList();
 
-  if ( reply->error() == QNetworkReply::NoError )
+  if ( reply->error() != QNetworkReply::NoError )
+  {
+    KadasDebugError( QString( "Error retrieving catalog folder from %1: %2" ).arg( reply->request().url().toString(), reply->errorString() ) );
+  }
+  else
   {
     QVariantMap folderData = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
     QString catName = QFileInfo( path ).baseName();
@@ -103,7 +109,11 @@ void KadasArcGisRestCatalogProvider::parseServiceDo()
   QString path = reply->property( "path" ).toString();
   QStringList catTitles = reply->property( "catTitles" ).toStringList();
 
-  if ( reply->error() == QNetworkReply::NoError )
+  if ( reply->error() != QNetworkReply::NoError )
+  {
+    KadasDebugError( QString( "Error retrieving catalog service from %1: %2" ).arg( reply->request().url().toString(), reply->errorString() ) );
+  }
+  else
   {
     QVariantMap serviceData = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
     if ( serviceData.contains( "singleFusedMapCache" ) )
@@ -150,7 +160,11 @@ void KadasArcGisRestCatalogProvider::parseWMTSDo()
   QStringList catTitles = reply->property( "catTitles" ).toStringList();
   QString url = reply->property( "url" ).toString();
 
-  if ( reply->error() == QNetworkReply::NoError )
+  if ( reply->error() != QNetworkReply::NoError )
+  {
+    KadasDebugError( QString( "Error retrieving catalog capabilities from %1: %2" ).arg( reply->request().url().toString(), reply->errorString() ) );
+  }
+  else
   {
     QDomDocument doc;
     doc.setContent( reply->readAll() );
@@ -191,7 +205,11 @@ void KadasArcGisRestCatalogProvider::parseWMSDo()
   QStringList catTitles = reply->property( "catTitles" ).toStringList();
   QString url = reply->property( "url" ).toString();
 
-  if ( reply->error() == QNetworkReply::NoError )
+  if ( reply->error() != QNetworkReply::NoError )
+  {
+    KadasDebugError( QString( "Error retrieving catalog capabilities from %1: %2" ).arg( reply->request().url().toString(), reply->errorString() ) );
+  }
+  else
   {
     QDomDocument doc;
     doc.setContent( reply->readAll() );

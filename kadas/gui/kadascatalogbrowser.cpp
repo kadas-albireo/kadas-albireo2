@@ -30,6 +30,7 @@
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgssettingsentryimpl.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/gui/kadascatalogbrowser.h"
 #include "kadas/gui/kadascatalogprovider.h"
 
@@ -283,27 +284,39 @@ KadasCatalogBrowser::KadasCatalogBrowser( QWidget *parent )
 
 void KadasCatalogBrowser::reload()
 {
-  if ( mTreeView->model() != mLoadingModel && mProviders.size() > 0 )
+  if ( mProviders.isEmpty() )
   {
-    mCatalogModel->setRowCount( 0 );
-    setTreeModel( mLoadingModel );
+    KadasDebugError( QStringLiteral( "No catalog configured, check the kadas/geodatacatalogs setting" ) );
+    return;
+  }
+  if ( mTreeView->model() == mLoadingModel )
+  {
+    KadasDebugMsgLevel( QStringLiteral( "Catalog is already loading, ignoring reload request" ), 1 );
+    return;
+  }
 
-    mFinishedProviders = 0;
-    for ( KadasCatalogProvider *provider : mProviders )
-    {
-      connect( provider, &KadasCatalogProvider::finished, this, &KadasCatalogBrowser::providerFinished );
-      provider->load();
-    }
+  KadasDebugMsgLevel( QStringLiteral( "Loading catalog from %1 provider(s)" ).arg( mProviders.size() ), 1 );
+  mCatalogModel->setRowCount( 0 );
+  setTreeModel( mLoadingModel );
+
+  mFinishedProviders = 0;
+  for ( KadasCatalogProvider *provider : std::as_const( mProviders ) )
+  {
+    // Unique, as reload can be called several times and each finished signal must be counted once
+    connect( provider, &KadasCatalogProvider::finished, this, &KadasCatalogBrowser::providerFinished, Qt::UniqueConnection );
+    provider->load();
   }
 }
 
 void KadasCatalogBrowser::providerFinished()
 {
   mFinishedProviders += 1;
+  KadasDebugMsgLevel( QStringLiteral( "Catalog provider %1 finished (%2 of %3)" ).arg( sender() ? sender()->metaObject()->className() : QString() ).arg( mFinishedProviders ).arg( mProviders.size() ), 1 );
   if ( mFinishedProviders == mProviders.size() )
   {
     if ( mCatalogModel->rowCount() > 0 )
     {
+      KadasDebugMsgLevel( QStringLiteral( "Catalog loaded with %1 top level categories" ).arg( mCatalogModel->rowCount() ), 1 );
       mFilterProxyModel->setSourceModel( mCatalogModel );
       mFilterProxyModel->setSortRole( CatalogItem::s_sortIndexRole );
       mFilterProxyModel->sort( 0 );
@@ -311,6 +324,7 @@ void KadasCatalogBrowser::providerFinished()
     }
     else
     {
+      KadasDebugError( QStringLiteral( "Catalog is empty, no provider returned any entry. Showing the catalog as offline" ) );
       setTreeModel( mOfflineModel );
     }
   }
