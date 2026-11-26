@@ -153,6 +153,7 @@ void KadasRibbonSplitButton::setCurrentAction( QAction *action, bool persist )
   // not the category, so the user always sees what a click will do.
   mButton->setText( action->text() );
   mButton->setToolTip( action->text() );
+  mButton->setDefaultAction( action );
   if ( persist && mLastToolSetting && !action->objectName().isEmpty() )
   {
     mLastToolSetting->setValue( action->objectName() );
