@@ -143,7 +143,7 @@ void KadasGeoAdminRestCatalogProvider::replyWMSGeoAdminFinished()
   for ( int i = 0, n = layerItems.size(); i < n; ++i )
   {
     QDomNode layerItem = layerItems.at( i );
-    QMimeData *mimeData;
+    QMimeData *mimeData = nullptr;
     QString title = layerItem.firstChildElement( "Title" ).text();
     QString layerBodId = layerItem.firstChildElement( "Name" ).text();
 

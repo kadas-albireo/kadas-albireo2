@@ -320,7 +320,8 @@ void KadasCatalogBrowser::providerFinished()
   if ( mFinishedProviders == mProviders.size() )
   {
     mRefreshButton->setEnabled( true );
-    const bool empty = mCatalogModel->rowCount() == 0;
+    // Count the leaves, providers may have added category items before their entries failed to load
+    const bool empty = mLoadedEntryCount == 0;
     if ( !empty )
     {
       if ( mLoadErrorCount > 0 )

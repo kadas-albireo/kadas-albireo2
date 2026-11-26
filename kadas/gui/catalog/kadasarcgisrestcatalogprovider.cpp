@@ -221,10 +221,12 @@ void KadasArcGisRestCatalogProvider::parseWMSDo()
     QStringList parentCrs;
     for ( const QDomNode &layerItem : childrenByTagName( doc.firstChildElement( "WMS_Capabilities" ).firstChildElement( "Capability" ), "Layer" ) )
     {
-      QMimeData *mimeData;
+      QMimeData *mimeData = nullptr;
       QString title = layerItem.firstChildElement( "Title" ).text();
-      parseWMSLayerCapabilities( layerItem, title, imgFormats, parentCrs, url, "", QString(), mimeData );
-      mBrowser->addItem( getCategoryItem( catTitles, QStringList() ), title, -1, mimeData );
+      if ( parseWMSLayerCapabilities( layerItem, title, imgFormats, parentCrs, url, "", QString(), mimeData ) )
+      {
+        mBrowser->addItem( getCategoryItem( catTitles, QStringList() ), title, -1, true, mimeData );
+      }
     }
   }
 
