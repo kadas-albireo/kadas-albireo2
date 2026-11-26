@@ -30,6 +30,7 @@
 #include <qgis/qgsrasterlayer.h>
 #include <qgis/qgssettingsentryimpl.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/gui/kadascatalogbrowser.h"
 #include "kadas/gui/kadascatalogprovider.h"
 
@@ -283,27 +284,54 @@ KadasCatalogBrowser::KadasCatalogBrowser( QWidget *parent )
 
 void KadasCatalogBrowser::reload()
 {
-  if ( mTreeView->model() != mLoadingModel && mProviders.size() > 0 )
+  if ( mProviders.isEmpty() )
   {
-    mCatalogModel->setRowCount( 0 );
-    setTreeModel( mLoadingModel );
+    KadasDebugError( QStringLiteral( "No catalog configured, check the kadas/geodatacatalogs setting" ) );
+    return;
+  }
+  if ( mTreeView->model() == mLoadingModel )
+  {
+    KadasDebugMsgLevel( QStringLiteral( "Catalog is already loading, ignoring reload request" ), 1 );
+    return;
+  }
 
-    mFinishedProviders = 0;
-    for ( KadasCatalogProvider *provider : mProviders )
-    {
-      connect( provider, &KadasCatalogProvider::finished, this, &KadasCatalogBrowser::providerFinished );
-      provider->load();
-    }
+  KadasDebugMsgLevel( QStringLiteral( "Loading catalog from %1 provider(s)" ).arg( mProviders.size() ), 1 );
+  mCatalogModel->setRowCount( 0 );
+  setTreeModel( mLoadingModel );
+  // Show that the reload is in progress, reload requests are ignored meanwhile anyway
+  mRefreshButton->setEnabled( false );
+
+  mFinishedProviders = 0;
+  mLoadedEntryCount = 0;
+  mLoadErrorCount = 0;
+  mFirstLoadError.clear();
+  for ( KadasCatalogProvider *provider : std::as_const( mProviders ) )
+  {
+    // Unique, as reload can be called several times and each finished signal must be counted once
+    connect( provider, &KadasCatalogProvider::finished, this, &KadasCatalogBrowser::providerFinished, Qt::UniqueConnection );
+    provider->load();
   }
 }
 
 void KadasCatalogBrowser::providerFinished()
 {
   mFinishedProviders += 1;
+  KadasDebugMsgLevel( QStringLiteral( "Catalog provider %1 finished (%2 of %3)" ).arg( sender() ? sender()->metaObject()->className() : QString() ).arg( mFinishedProviders ).arg( mProviders.size() ), 1 );
   if ( mFinishedProviders == mProviders.size() )
   {
-    if ( mCatalogModel->rowCount() > 0 )
+    mRefreshButton->setEnabled( true );
+    // Count the leaves, providers may have added category items before their entries failed to load
+    const bool empty = mLoadedEntryCount == 0;
+    if ( !empty )
     {
+      if ( mLoadErrorCount > 0 )
+      {
+        KadasDebugError( QStringLiteral( "Catalog loaded incompletely with %1 entries, %2 request(s) failed" ).arg( mLoadedEntryCount ).arg( mLoadErrorCount ) );
+      }
+      else
+      {
+        KadasDebugMsgLevel( QStringLiteral( "Catalog loaded with %1 entries" ).arg( mLoadedEntryCount ), 1 );
+      }
       mFilterProxyModel->setSourceModel( mCatalogModel );
       mFilterProxyModel->setSortRole( CatalogItem::s_sortIndexRole );
       mFilterProxyModel->sort( 0 );
@@ -311,9 +339,23 @@ void KadasCatalogBrowser::providerFinished()
     }
     else
     {
+      KadasDebugError( QStringLiteral( "Catalog is empty, no provider returned any entry (%1 request(s) failed). Showing the catalog as offline" ).arg( mLoadErrorCount ) );
+      QStandardItem *offlineItem = mOfflineModel->item( 0 );
+      offlineItem->setText( mLoadErrorCount > 0 ? tr( "Catalog could not be loaded" ) : tr( "Offline" ) );
+      offlineItem->setToolTip( mFirstLoadError );
       setTreeModel( mOfflineModel );
     }
+    emit loadFinished( empty, mLoadErrorCount, mFirstLoadError );
   }
+}
+
+void KadasCatalogBrowser::reportLoadError( const QString &message )
+{
+  if ( mLoadErrorCount == 0 )
+  {
+    mFirstLoadError = message;
+  }
+  mLoadErrorCount += 1;
 }
 
 void KadasCatalogBrowser::filterChanged( const QString &text )
@@ -399,5 +441,9 @@ void KadasCatalogBrowser::updatePreview()
 
 QStandardItem *KadasCatalogBrowser::addItem( QStandardItem *parent, QString text, int sortIndex, bool isLeaf, QMimeData *mimeData )
 {
+  if ( isLeaf )
+  {
+    mLoadedEntryCount += 1;
+  }
   return mCatalogModel->addItem( parent, text, sortIndex, isLeaf, mimeData );
 }

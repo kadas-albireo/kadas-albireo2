@@ -30,6 +30,7 @@
 #include <qgis/qgsmimedatautils.h>
 #include <qgis/qgssettings.h>
 
+#include "kadas/core/kadaslogger.h"
 #include "kadas/core/kadas.h"
 #include "kadas/gui/kadascatalogbrowser.h"
 #include "kadas/gui/catalog/kadasvbscatalogprovider.h"
@@ -56,6 +57,7 @@ void KadasVBSCatalogProvider::load()
   url.setQuery( query );
   QNetworkRequest req( url );
   req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
+  KadasDebugMsgLevel( QString( "Requesting catalog from %1" ).arg( url.toString() ), 1 );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
   connect( reply, &QNetworkReply::finished, this, &KadasVBSCatalogProvider::replyFinished );
 }
@@ -63,9 +65,15 @@ void KadasVBSCatalogProvider::load()
 void KadasVBSCatalogProvider::replyFinished()
 {
   QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
-  if ( reply->error() == QNetworkReply::NoError )
+  if ( reply->error() != QNetworkReply::NoError )
+  {
+    KadasDebugError( QString( "Error retrieving catalog from %1: %2" ).arg( reply->request().url().toString(), reply->errorString() ) );
+    mBrowser->reportLoadError( QString( "%1 (%2)" ).arg( reply->errorString(), reply->request().url().host() ) );
+  }
+  else
   {
     QVariantMap listData = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
+    KadasDebugMsgLevel( QString( "Received %1 catalog entries from %2" ).arg( QString::number( listData["results"].toList().size() ), reply->request().url().toString() ), 1 );
     QMap<QString, EntryMap> wmtsLayers;
     QMap<QString, EntryMap> wmsLayers;
     QMap<QString, EntryMap> amsLayers;
@@ -133,7 +141,12 @@ void KadasVBSCatalogProvider::readWMTSCapabilitiesDo()
   EntryMap *entries = reinterpret_cast<EntryMap *>( reply->property( "entries" ).value<void *>() );
   QString referer = QgsSettings().value( "search/referer", "http://localhost" ).toString();
 
-  if ( reply->error() == QNetworkReply::NoError )
+  if ( reply->error() != QNetworkReply::NoError )
+  {
+    KadasDebugError( QString( "Error retrieving catalog capabilities from %1: %2" ).arg( reply->request().url().toString(), reply->errorString() ) );
+    mBrowser->reportLoadError( QString( "%1 (%2)" ).arg( reply->errorString(), reply->request().url().host() ) );
+  }
+  else
   {
     QDomDocument doc;
     doc.setContent( reply->readAll() );
@@ -177,7 +190,12 @@ void KadasVBSCatalogProvider::readWMSCapabilitiesDo()
   EntryMap *entries = reinterpret_cast<EntryMap *>( reply->property( "entries" ).value<void *>() );
   QString url = reply->property( "url" ).toString();
 
-  if ( reply->error() == QNetworkReply::NoError )
+  if ( reply->error() != QNetworkReply::NoError )
+  {
+    KadasDebugError( QString( "Error retrieving catalog capabilities from %1: %2" ).arg( reply->request().url().toString(), reply->errorString() ) );
+    mBrowser->reportLoadError( QString( "%1 (%2)" ).arg( reply->errorString(), reply->request().url().host() ) );
+  }
+  else
   {
     QDomDocument doc;
     doc.setContent( reply->readAll() );
@@ -213,13 +231,19 @@ void KadasVBSCatalogProvider::readAMSCapabilitiesDo()
   EntryMap *entries = reinterpret_cast<EntryMap *>( reply->property( "entries" ).value<void *>() );
   QString url = reply->property( "url" ).toString();
 
-  if ( reply->error() == QNetworkReply::NoError )
+  if ( reply->error() != QNetworkReply::NoError )
+  {
+    KadasDebugError( QString( "Error retrieving catalog map service capabilities from %1: %2" ).arg( reply->request().url().toString(), reply->errorString() ) );
+    mBrowser->reportLoadError( QString( "%1 (%2)" ).arg( reply->errorString(), reply->request().url().host() ) );
+  }
+  else
   {
     QVariantMap serviceInfoMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
 
     if ( !serviceInfoMap["error"].isNull() )
     {
-      // Something went wrong
+      KadasDebugError( QString( "Error retrieving catalog map service capabilities from %1: %2" ).arg( reply->request().url().toString(), serviceInfoMap["error"].toMap()["message"].toString() ) );
+      mBrowser->reportLoadError( QString( "%1 (%2)" ).arg( serviceInfoMap["error"].toMap()["message"].toString(), reply->request().url().host() ) );
       delete entries;
       endTask();
       return;
@@ -288,14 +312,14 @@ void KadasVBSCatalogProvider::readAMSCapabilitiesDo()
       {
         mimeDataUri.layerType = "vector";
         mimeDataUri.providerKey = "arcgisfeatureserver";
-        mimeDataUri.uri = QString( "crs='%1' url='%2/0' layer='%3'" ).arg( crs.authid() ).arg( url ).arg( layerName );
+        mimeDataUri.uri = QString( "crs='%1' url='%2/0' layer='%3'" ).arg( crs.authid(), url, layerName );
       }
       else
       {
         mimeDataUri.layerType = "raster";
         mimeDataUri.providerKey = "arcgismapserver";
         QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png" ) ? "png" : filteredEncodings.values().front();
-        mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='%4'" ).arg( crs.authid() ).arg( format ).arg( url ).arg( layerName );
+        mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='%4'" ).arg( crs.authid(), format, url, layerName );
       }
 
       const ResultEntry &entry = ( *entries )[layerName];

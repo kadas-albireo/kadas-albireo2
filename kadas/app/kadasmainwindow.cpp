@@ -61,6 +61,7 @@
 
 #include "kadas/core/kadas.h"
 #include "kadas/core/kadassettingstree.h"
+#include "kadas/core/kadaslogger.h"
 #include "kadas/gui/kadascataloglayersource.h"
 #include "kadas/gui/kadascatalogpreview.h"
 #include "kadas/gui/kadasclipboard.h"
@@ -476,10 +477,33 @@ void KadasMainWindow::init()
       KadasArcGisPortalCatalogProvider *portalprovider = new KadasArcGisPortalCatalogProvider( url, mCatalogBrowser, params, KadasPortalAuth::ESRI_AUTH_CFG_ID );
       mCatalogBrowser->addProvider( portalprovider );
     }
+    else
+    {
+      if ( !catalogUri.isEmpty() )
+      {
+        KadasDebugError( QString( "Ignoring catalog with unknown type '%1': %2" ).arg( type, catalogUri ) );
+      }
+      continue;
+    }
+    KadasDebugMsgLevel( QString( "Added catalog provider of type %1 for %2" ).arg( type, url ), 2 );
   }
 
   connect( mCatalogBrowser, &KadasCatalogBrowser::layerSelected, this, [this]( const QgsMimeDataUtils::Uri &uri, const QString &metadataUrl, const QVariantList &sublayers ) {
     addCatalogLayer( uri, metadataUrl, sublayers );
+  } );
+  connect( mCatalogBrowser, &KadasCatalogBrowser::loadFinished, this, [this]( bool empty, int errorCount, const QString &firstError ) {
+    if ( errorCount == 0 )
+    {
+      return;
+    }
+    if ( empty )
+    {
+      mInfoBar->pushWarning( tr( "Catalog" ), tr( "The catalog could not be loaded: %1. See the message log for details." ).arg( firstError ) );
+    }
+    else
+    {
+      mInfoBar->pushWarning( tr( "Catalog" ), tr( "The catalog is incomplete, %n request(s) failed: %1. See the message log for details.", nullptr, errorCount ).arg( firstError ) );
+    }
   } );
 
   // Parented to the canvas so its overlay item is torn down while the canvas

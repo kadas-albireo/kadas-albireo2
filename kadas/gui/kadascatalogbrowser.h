@@ -52,6 +52,12 @@ class KADAS_GUI_EXPORT KadasCatalogBrowser : public QWidget
     //! TRUE while selecting an entry previews it on the map.
     bool autoPreviewEnabled() const;
 
+    /**
+     * Called by the providers when a request needed to load the catalog failed.
+     * The failures are summarized to the user once all providers finished loading.
+     */
+    void reportLoadError( const QString &message );
+
   public slots:
     void reload();
 
@@ -66,6 +72,14 @@ class KADAS_GUI_EXPORT KadasCatalogBrowser : public QWidget
 
     //! Emitted when nothing should be previewed any longer.
     void previewCleared();
+
+    /**
+     * Emitted when all providers finished loading the catalog.
+     * \param empty TRUE if no catalog entry could be loaded
+     * \param errorCount number of failed requests, the catalog is incomplete if not zero
+     * \param firstError description of the first failure
+     */
+    void loadFinished( bool empty, int errorCount, const QString &firstError );
 
   protected:
     /**
@@ -98,6 +112,9 @@ class KADAS_GUI_EXPORT KadasCatalogBrowser : public QWidget
     TreeFilterProxyModel *mFilterProxyModel;
     QList<KadasCatalogProvider *> mProviders;
     int mFinishedProviders;
+    int mLoadedEntryCount = 0;
+    int mLoadErrorCount = 0;
+    QString mFirstLoadError;
 
     /**
      * Debounce for the preview: browsing with the arrow keys would otherwise

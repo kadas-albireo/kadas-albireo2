@@ -73,9 +73,68 @@ void KadasArcGisPortalCatalogProvider::load()
   url.setQuery( query );
   QNetworkRequest req( url );
   req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
-  QgsApplication::authManager()->updateNetworkRequest( req, mAuthId );
+  updateNetworkRequest( req );
+  KadasDebugMsgLevel( QString( "Requesting catalog from %1" ).arg( redactedUrl( req.url() ) ), 1 );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
   connect( reply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::replyFinished );
+}
+
+//! Returns the url as string for logging, without the token parameter and password
+static QString redactedUrl( const QUrl &url )
+{
+  QUrl redacted( url );
+  QUrlQuery query( redacted );
+  if ( query.hasQueryItem( "token" ) )
+  {
+    query.removeAllQueryItems( "token" );
+    query.addQueryItem( "token", "xxx" );
+    redacted.setQuery( query );
+  }
+  return redacted.toString( QUrl::RemovePassword );
+}
+
+void KadasArcGisPortalCatalogProvider::updateNetworkRequest( QNetworkRequest &req ) const
+{
+  if ( !mAuthId.isEmpty() && !QgsApplication::authManager()->updateNetworkRequest( req, mAuthId ) )
+  {
+    KadasDebugError( QString( "Could not add the authentication of auth config %1 to the request to %2, the request is sent unauthenticated" ).arg( mAuthId, redactedUrl( req.url() ) ) );
+  }
+}
+
+bool KadasArcGisPortalCatalogProvider::replySucceeded( QNetworkReply *reply, const QString &what )
+{
+  if ( reply->error() == QNetworkReply::NoError )
+  {
+    return true;
+  }
+
+  // Details needed to tell apart why a server refuses a request, never the credentials themselves
+  const QByteArray authHeader = reply->request().rawHeader( "Authorization" );
+  const QString sentAuth = authHeader.isEmpty() ? QStringLiteral( "none" ) : QString::fromLatin1( authHeader.split( ' ' ).first() );
+  const QString sentToken = QUrlQuery( reply->request().url() ).hasQueryItem( "token" ) ? QStringLiteral( "yes" ) : QStringLiteral( "no" );
+  const QString challenge = QString::fromLatin1( reply->rawHeader( "WWW-Authenticate" ) );
+  const QString protocol = reply->attribute( QNetworkRequest::Http2WasUsedAttribute ).toBool() ? QStringLiteral( "HTTP/2" ) : QStringLiteral( "HTTP/1.1" );
+  const QString body = QString::fromUtf8( reply->readAll().left( 300 ) ).simplified();
+  KadasDebugError(
+    QString( "Error retrieving %1 from %2: %3 (HTTP status %4, %5, sent Authorization: %6, sent token parameter: %7, WWW-Authenticate: '%8', reply: '%9')" )
+      .arg( what, redactedUrl( reply->request().url() ), reply->errorString(), reply->attribute( QNetworkRequest::HttpStatusCodeAttribute ).toString(), protocol, sentAuth, sentToken, challenge, body )
+  );
+  mBrowser->reportLoadError( QString( "%1 (%2)" ).arg( reply->errorString(), reply->request().url().host() ) );
+  return false;
+}
+
+bool KadasArcGisPortalCatalogProvider::jsonReplySucceeded( const QVariantMap &json, QNetworkReply *reply, const QString &what )
+{
+  // ArcGIS reports errors (i.e. invalid token) with HTTP status 200 and an error object in the body
+  if ( !json.value( "error" ).isNull() )
+  {
+    const QVariantMap error = json["error"].toMap();
+    KadasDebugError( QString( "Error retrieving %1 from %2: server replied with error %3: %4 %5" )
+                       .arg( what, redactedUrl( reply->request().url() ), error["code"].toString(), error["message"].toString(), error["details"].toStringList().join( ", " ) ) );
+    mBrowser->reportLoadError( QString( "%1 %2 (%3)" ).arg( error["code"].toString(), error["message"].toString(), reply->request().url().host() ) );
+    return false;
+  }
+  return true;
 }
 
 void KadasArcGisPortalCatalogProvider::replyFinished()
@@ -87,9 +146,22 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
   QString nextStart;
   QString num;
 
-  if ( reply->error() == QNetworkReply::NoError )
+  if ( replySucceeded( reply, QStringLiteral( "catalog" ) ) )
   {
-    QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
+    const QByteArray data = reply->readAll();
+    QJsonParseError parseError;
+    QVariantMap rootMap = QJsonDocument::fromJson( data, &parseError ).object().toVariantMap();
+    if ( parseError.error != QJsonParseError::NoError )
+    {
+      KadasDebugError( QString( "Error parsing catalog from %1: %2. Reply starts with: %3" ).arg( redactedUrl( reqUrl ), parseError.errorString(), QString::fromUtf8( data.left( 500 ) ) ) );
+      mBrowser->reportLoadError( QString( "%1 (%2)" ).arg( parseError.errorString(), reqUrl.host() ) );
+    }
+    else if ( jsonReplySucceeded( rootMap, reply, QStringLiteral( "catalog" ) ) )
+    {
+      KadasDebugMsgLevel(
+        QString( "Received %1 catalog entries from %2 (total %3)" ).arg( QString::number( rootMap["results"].toList().size() ), redactedUrl( reqUrl ), QString::number( rootMap["total"].toInt() ) ), 1
+      );
+    }
 
     for ( const QVariant &resultData : rootMap["results"].toList() )
     {
@@ -121,7 +193,8 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
       mLayers[id][resultMap["type"].toString().toLower()] = entry;
     }
 
-    if ( rootMap["nextStart"].toInt() >= 0 && rootMap["num"].toInt() >= 0 )
+    // nextStart is -1 on the last page. It is missing on error replies, which must not be paged further.
+    if ( rootMap.contains( "nextStart" ) && rootMap.contains( "num" ) && rootMap["nextStart"].toInt() >= 0 && rootMap["num"].toInt() >= 0 )
     {
       lastRequest = false;
       nextStart = rootMap["nextStart"].toString();
@@ -131,6 +204,7 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
   reply->deleteLater();
   if ( lastRequest )
   {
+    KadasDebugMsgLevel( QString( "Catalog listing complete, loading details of %1 layers" ).arg( mLayers.size() ), 1 );
     QStringList typeOrder = { "vector tile service", "wmts", "map service", "wms" };
     int pos = 0;
     for ( const QString &entry : mServicePreference.split( "," ) )
@@ -176,7 +250,8 @@ void KadasArcGisPortalCatalogProvider::replyFinished()
     reqUrl.setQuery( query );
     QNetworkRequest req( reqUrl );
     req.setRawHeader( "Referer", QgsSettings().value( "search/referer", "http://localhost" ).toByteArray() );
-    QgsApplication::authManager()->updateNetworkRequest( req, mAuthId );
+    updateNetworkRequest( req );
+    KadasDebugMsgLevel( QString( "Requesting next catalog page from %1" ).arg( redactedUrl( reqUrl ) ), 2 );
     QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
     connect( reply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::replyFinished );
   }
@@ -195,7 +270,7 @@ void KadasArcGisPortalCatalogProvider::readWMTSDetail( const ResultEntry &entry 
 {
   mPendingTasks += 1;
   QNetworkRequest req( entry.detailUrl );
-  QgsApplication::authManager()->updateNetworkRequest( req, mAuthId );
+  updateNetworkRequest( req );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
   reply->setProperty( "entry", QVariant::fromValue<void *>( reinterpret_cast<void *>( new ResultEntry( entry ) ) ) );
   connect( reply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readWMTSCapabilities );
@@ -204,17 +279,31 @@ void KadasArcGisPortalCatalogProvider::readWMTSDetail( const ResultEntry &entry 
 void KadasArcGisPortalCatalogProvider::readWMTSCapabilities()
 {
   QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
+  reply->deleteLater();
   ResultEntry *entry = reinterpret_cast<ResultEntry *>( reply->property( "entry" ).value<void *>() );
-  QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
+  const QString what = QString( "WMTS details of catalog entry '%1'" ).arg( entry->title );
+  if ( !replySucceeded( reply, what ) )
+  {
+    delete entry;
+    endTask();
+    return;
+  }
+  const QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
+  if ( !jsonReplySucceeded( rootMap, reply, what ) )
+  {
+    delete entry;
+    endTask();
+    return;
+  }
   QString layerIdentifier = rootMap["wmtsInfo"].toMap()["layerIdentifier"].toString();
 
   QString WMTSCapUrl = QString( entry->url ).replace( QRegularExpression( "/WMTS/.*$" ), "/WMTS/WMTSCapabilities.xml" );
   QNetworkRequest req( ( QUrl( WMTSCapUrl ) ) );
-  QgsApplication::authManager()->updateNetworkRequest( req, mAuthId );
+  updateNetworkRequest( req );
   QNetworkReply *capReply = QgsNetworkAccessManager::instance()->get( req );
   capReply->setProperty( "entry", QVariant::fromValue<void *>( reinterpret_cast<void *>( entry ) ) );
   capReply->setProperty( "layeridentifier", layerIdentifier );
-  KadasDebugMsgLevel( QString( "Reading WMTS capabilities %1 for layer %2" ).arg( WMTSCapUrl ).arg( layerIdentifier ), 2 );
+  KadasDebugMsgLevel( QString( "Reading WMTS capabilities %1 for layer %2" ).arg( redactedUrl( QUrl( WMTSCapUrl ) ), layerIdentifier ), 2 );
   connect( capReply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readWMTSCapabilitiesDo );
 }
 
@@ -226,10 +315,14 @@ void KadasArcGisPortalCatalogProvider::readWMTSCapabilitiesDo()
   QString layerIdentifier = reply->property( "layeridentifier" ).toString();
   QString referer = QgsSettings().value( "search/referer", "http://localhost" ).toString();
 
-  if ( reply->error() == QNetworkReply::NoError )
+  if ( replySucceeded( reply, QString( "WMTS capabilities of catalog entry '%1'" ).arg( entry->title ) ) )
   {
     QDomDocument doc;
-    doc.setContent( reply->readAll() );
+    if ( !doc.setContent( reply->readAll() ) )
+    {
+      KadasDebugError( QString( "Error parsing WMTS capabilities from %1 for catalog entry '%2'" ).arg( redactedUrl( reply->request().url() ), entry->title ) );
+      mBrowser->reportLoadError( QString( "Invalid WMTS capabilities (%1)" ).arg( reply->request().url().host() ) );
+    }
     if ( !doc.isNull() )
     {
       QDomNodeList layerItems = doc.firstChildElement( "Capabilities" ).firstChildElement( "Contents" ).elementsByTagName( "Layer" );
@@ -249,6 +342,10 @@ void KadasArcGisPortalCatalogProvider::readWMTSCapabilitiesDo()
         QStringList sortIndices = entry->sortIndices.split( "/" );
         mBrowser->addItem( getCategoryItem( entry->category.split( "/" ), sortIndices ), entry->title, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );
       }
+      else
+      {
+        KadasDebugMsgLevel( QString( "Layer '%1' of catalog entry '%2' not found in WMTS capabilities %3" ).arg( layerIdentifier, entry->title, redactedUrl( reply->request().url() ) ), 1 );
+      }
     }
   }
 
@@ -260,7 +357,7 @@ void KadasArcGisPortalCatalogProvider::readWMSDetail( const ResultEntry &entry )
 {
   mPendingTasks += 1;
   QNetworkRequest req( entry.detailUrl );
-  QgsApplication::authManager()->updateNetworkRequest( req, mAuthId );
+  updateNetworkRequest( req );
   QNetworkReply *reply = QgsNetworkAccessManager::instance()->get( req );
   reply->setProperty( "entry", QVariant::fromValue<void *>( reinterpret_cast<void *>( new ResultEntry( entry ) ) ) );
   connect( reply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readWMSCapabilities );
@@ -269,8 +366,22 @@ void KadasArcGisPortalCatalogProvider::readWMSDetail( const ResultEntry &entry )
 void KadasArcGisPortalCatalogProvider::readWMSCapabilities()
 {
   QNetworkReply *reply = qobject_cast<QNetworkReply *>( QObject::sender() );
+  reply->deleteLater();
   ResultEntry *entry = reinterpret_cast<ResultEntry *>( reply->property( "entry" ).value<void *>() );
-  QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
+  const QString what = QString( "WMS details of catalog entry '%1'" ).arg( entry->title );
+  if ( !replySucceeded( reply, what ) )
+  {
+    delete entry;
+    endTask();
+    return;
+  }
+  const QVariantMap rootMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
+  if ( !jsonReplySucceeded( rootMap, reply, what ) )
+  {
+    delete entry;
+    endTask();
+    return;
+  }
   QVariantList layers = rootMap["layers"].toList();
   QString layerName;
   if ( !layers.isEmpty() )
@@ -279,11 +390,11 @@ void KadasArcGisPortalCatalogProvider::readWMSCapabilities()
   }
 
   QNetworkRequest req( QUrl( entry->url + "?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0" ) );
-  QgsApplication::authManager()->updateNetworkRequest( req, mAuthId );
+  updateNetworkRequest( req );
   QNetworkReply *capReply = QgsNetworkAccessManager::instance()->get( req );
   capReply->setProperty( "entry", QVariant::fromValue<void *>( reinterpret_cast<void *>( entry ) ) );
   capReply->setProperty( "layername", layerName );
-  KadasDebugMsgLevel( QString( "Reading WMS capabilities %1 for layer %2" ).arg( req.url().toString() ).arg( layerName ), 2 );
+  KadasDebugMsgLevel( QString( "Reading WMS capabilities %1 for layer %2" ).arg( redactedUrl( req.url() ), layerName ), 2 );
   connect( capReply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readWMSCapabilitiesDo );
 }
 
@@ -295,10 +406,14 @@ void KadasArcGisPortalCatalogProvider::readWMSCapabilitiesDo()
   QString layerName = reply->property( "layername" ).toString();
   QString url = entry->url;
 
-  if ( reply->error() == QNetworkReply::NoError )
+  if ( replySucceeded( reply, QString( "WMS capabilities of catalog entry '%1'" ).arg( entry->title ) ) )
   {
     QDomDocument doc;
-    doc.setContent( reply->readAll() );
+    if ( !doc.setContent( reply->readAll() ) )
+    {
+      KadasDebugError( QString( "Error parsing WMS capabilities from %1 for catalog entry '%2'" ).arg( redactedUrl( reply->request().url() ), entry->title ) );
+      mBrowser->reportLoadError( QString( "Invalid WMS capabilities (%1)" ).arg( reply->request().url().host() ) );
+    }
     QStringList imgFormats = parseWMSFormats( doc );
     QStringList parentCrs;
 
@@ -330,6 +445,10 @@ void KadasArcGisPortalCatalogProvider::readWMSCapabilitiesDo()
       QStringList sortIndices = entry->sortIndices.split( "/" );
       mBrowser->addItem( getCategoryItem( entry->category.split( "/" ), sortIndices ), entry->title, sortIndices.isEmpty() ? -1 : sortIndices.last().toInt(), true, mimeData );
     }
+    else
+    {
+      KadasDebugMsgLevel( QString( "Layer '%1' of catalog entry '%2' not found or invalid in WMS capabilities %3" ).arg( layerName, entry->title, redactedUrl( reply->request().url() ) ), 1 );
+    }
   }
 
   delete entry;
@@ -357,7 +476,8 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilities( const ResultEntry &e
   QUrl url( entry.url + "?f=json" );
 
   QNetworkRequest req( url );
-  QgsApplication::authManager()->updateNetworkRequest( req, mAuthId );
+  updateNetworkRequest( req );
+  KadasDebugMsgLevel( QString( "Reading map service capabilities %1 for catalog entry '%2'" ).arg( redactedUrl( req.url() ), entry.title ), 2 );
   QNetworkReply *reply = nam->get( req );
   reply->setProperty( "entry", QVariant::fromValue<void *>( reinterpret_cast<void *>( new ResultEntry( entry ) ) ) );
   connect( reply, &QNetworkReply::finished, this, &KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo );
@@ -370,13 +490,12 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
   ResultEntry *entry = reinterpret_cast<ResultEntry *>( reply->property( "entry" ).value<void *>() );
   QString url = entry->url;
 
-  if ( reply->error() == QNetworkReply::NoError )
+  if ( replySucceeded( reply, QString( "map service capabilities of catalog entry '%1'" ).arg( entry->title ) ) )
   {
     QVariantMap serviceInfoMap = QJsonDocument::fromJson( reply->readAll() ).object().toVariantMap();
 
-    if ( !serviceInfoMap["error"].isNull() )
+    if ( !jsonReplySucceeded( serviceInfoMap, reply, QString( "map service capabilities of catalog entry '%1'" ).arg( entry->title ) ) )
     {
-      // Something went wrong
       delete entry;
       endTask();
       return;
@@ -444,14 +563,14 @@ void KadasArcGisPortalCatalogProvider::readAMSCapabilitiesDo()
     {
       mimeDataUri.layerType = "vector";
       mimeDataUri.providerKey = "arcgisfeatureserver";
-      mimeDataUri.uri = QString( "crs='%1' url='%2' authcfg=%3" ).arg( crs.authid() ).arg( url ).arg( mAuthId );
+      mimeDataUri.uri = QString( "crs='%1' url='%2' authcfg=%3" ).arg( crs.authid(), url, mAuthId );
     }
     else
     {
       mimeDataUri.layerType = "raster";
       mimeDataUri.providerKey = "arcgismapserver";
       QString format = filteredEncodings.isEmpty() || filteredEncodings.contains( "png32" ) ? "png32" : filteredEncodings.values().front();
-      mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='0' authcfg=%4" ).arg( crs.authid() ).arg( format ).arg( url ).arg( mAuthId );
+      mimeDataUri.uri = QString( "crs='%1' format='%2' url='%3' layer='0' authcfg=%4" ).arg( crs.authid(), format, url, mAuthId );
     }
 
     QMimeData *mimeData = QgsMimeDataUtils::encodeUriList( QgsMimeDataUtils::UriList() << mimeDataUri );
@@ -471,7 +590,7 @@ void KadasArcGisPortalCatalogProvider::addVTSlayer( const ResultEntry &entry )
 {
   QString gdiBaseUrl = QgsSettings().value( "kadas/gdiBaseUrl" ).toString();
   QString styleUrl = QString( "%1/sharing/rest/content/items/%2/resources/styles/root.json" ).arg( gdiBaseUrl, entry.id );
-  QString metadataUrl = QStringLiteral( "%1/home/item.html?id=%2" ).arg( gdiBaseUrl ).arg( entry.id );
+  QString metadataUrl = QStringLiteral( "%1/home/item.html?id=%2" ).arg( gdiBaseUrl, entry.id );
   QgsMimeDataUtils::Uri mimeDataUri;
   mimeDataUri.layerType = "vector";
   mimeDataUri.providerKey = "arcgisvectortileservice";
